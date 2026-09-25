@@ -23,7 +23,8 @@
     "urlError": "請填寫以 https:// 或 http:// 開頭的完整連結。",
     "summary": "{amount} 將進入第 {cycle} 個週期的週期儲備。",
     "summaryNoCycle": "{amount} 將進入週期儲備。",
-    "submitAmount": "貢獻 {amount}"
+    "submitAmount": "貢獻 {amount}",
+    "riskLink": "貢獻前請閱讀風險揭露"
   },
   "detail": {
     "invalidId": "貢獻 ID 無效",

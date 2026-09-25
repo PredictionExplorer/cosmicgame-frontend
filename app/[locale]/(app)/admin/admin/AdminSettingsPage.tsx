@@ -3,22 +3,16 @@
 import type { ReactNode } from 'react';
 import { useLocale, useTranslations } from 'next-intl';
 
-import {
-  buildContracts,
-  CONTRACT_ENTRY_IDS,
-  type ContractEntryCopy,
-} from '@/app/[locale]/(app)/contracts/contractAddressData';
+import { buildContracts, contractEntryCopy } from '@/content/legal/contractRegistry';
 
 import {
   ALLOCATION_TRACK_COPY_KEYS,
-  withNextCycleShare,
-  type AllocationTrackShare,
+  allocationSharesFromDashboard,
 } from '@/config/allocationTracks';
 import {
   ContractEvidence,
   formatSourcifyChecked,
   SourcifyCheckedNote,
-  type ContractEvidenceLabels,
 } from '@/components/legal/ContractEvidence';
 import { AddressChip } from '@/components/ui/address-chip';
 import { Badge } from '@/components/ui/badge';
@@ -40,7 +34,10 @@ import {
   secondsOrNull,
 } from '@/utils/protocolParams';
 
-/** The parameter groups, in reading order; titles live in `admin.settings.groups.<id>`. */
+/**
+ * The parameter groups, in reading order. A group /contracts also shows takes
+ * its title from the contracts catalog, so the two pages name it alike.
+ */
 const PARAMETER_GROUPS = ['shares', 'selection', 'timing', 'cost'] as const;
 type ParameterGroup = (typeof PARAMETER_GROUPS)[number];
 
@@ -53,32 +50,10 @@ interface ParameterRow {
 }
 
 /**
- * The Cycle Reserve's split as the dashboard reports it, every track in the
- * order and with the names /contracts uses, completed with the remainder
- * carried to the next cycle, so the shares add up to 100% (`null`: a share
- * that could not be read).
- */
-export function allocationShares(data: {
-  PrizePercentage?: unknown;
-  ChronoWarriorPercentage?: unknown;
-  RafflePercentage?: unknown;
-  StakingPercentage?: unknown;
-  CharityPercentage?: unknown;
-}): AllocationTrackShare[] {
-  return withNextCycleShare([
-    { id: 'signature', percent: toFiniteNumber(data.PrizePercentage) },
-    { id: 'chrono', percent: toFiniteNumber(data.ChronoWarriorPercentage) },
-    { id: 'stellar', percent: toFiniteNumber(data.RafflePercentage) },
-    { id: 'anchor', percent: toFiniteNumber(data.StakingPercentage) },
-    { id: 'publicGoods', percent: toFiniteNumber(data.CharityPercentage) },
-  ]);
-}
-
-/**
  * A label and its value on one hairline-divided line. The label takes the
  * room the value leaves, and the value wraps inside at most 60% of the row,
- * so a long value ("Not reported by the dashboard API", a date and its
- * badge) never squeezes the label to a syllable per line or runs off the edge.
+ * so a long value (a date and its badge, a divisor and its share) never
+ * squeezes the label to a syllable per line or runs off the edge.
  * A wide row (an address) sets its value and its evidence on one line from
  * `xl`, stacked below.
  */
@@ -155,7 +130,6 @@ export default function AdminSettingsPage() {
   }
 
   const unknown = <UnknownValue label={tCommon('status.unavailable')} />;
-  const notReported = <span className="type-body-sm text-subtle">{t('settings.notReported')}</span>;
 
   const count = (value: unknown) => {
     const numeric = toFiniteNumber(value);
@@ -200,7 +174,7 @@ export default function AdminSettingsPage() {
   const groups: Record<ParameterGroup, ParameterRow[]> = {
     // Every track /contracts draws, Chrono-Warrior and the remainder carried
     // to the next cycle included, so the shares read as the whole split.
-    shares: allocationShares(data).map((share) => ({
+    shares: allocationSharesFromDashboard(data).map((share) => ({
       key: `share-${share.id}`,
       label: tContracts(`funds.segments.${ALLOCATION_TRACK_COPY_KEYS[share.id]}.label`),
       value: percent(share.percent),
@@ -253,35 +227,19 @@ export default function AdminSettingsPage() {
         label: tContracts('configuration.cards.ethStep.label'),
         value: divisor(data.PriceIncrease),
       },
-      // The dashboard API does not report these two; say so instead of an empty field.
-      {
-        key: 'initialGestureCostFraction',
-        label: field('initialGestureCostFraction'),
-        value: notReported,
-      },
-      { key: 'gestureRatio', label: field('gestureRatio'), value: notReported },
     ],
   };
-
-  const contractCopy = Object.fromEntries(
-    CONTRACT_ENTRY_IDS.map((id) => [
-      id,
-      {
-        name: tContracts(`entries.${id}.name`),
-        description: tContracts(`entries.${id}.description`),
-      },
-    ]),
-  ) as ContractEntryCopy;
-  const evidence: ContractEvidenceLabels = {
-    explorer: tContracts('addresses.explorer'),
-    sourcify: tContracts('addresses.sourcify'),
+  const groupTitles: Record<ParameterGroup, string> = {
+    shares: tContracts('funds.title'),
+    selection: tContracts('configuration.groups.selection'),
+    timing: tContracts('configuration.groups.timing'),
+    cost: t('settings.groups.cost'),
   };
 
   return (
     <div className="space-y-14 sm:space-y-16">
       <section aria-labelledby="settings-contracts-heading">
         <SectionHeader
-          size="panel"
           headingId="settings-contracts-heading"
           title={t('settings.groups.contracts')}
           description={t('settings.contractsDescription')}
@@ -291,7 +249,7 @@ export default function AdminSettingsPage() {
           className="-mt-2 mb-5 max-w-2xl"
         />
         <dl className="border-t border-rule-faint">
-          {buildContracts(data.ContractAddrs, contractCopy).map((contract) => (
+          {buildContracts(data.ContractAddrs, contractEntryCopy(tContracts)).map((contract) => (
             <SheetRow key={contract.id} id={contract.id} label={contract.name} wide>
               <AddressChip
                 address={contract.address}
@@ -301,7 +259,7 @@ export default function AdminSettingsPage() {
                 href={false}
                 className="type-hash whitespace-normal text-foreground"
               />
-              <ContractEvidence address={contract.address} labels={evidence} />
+              <ContractEvidence address={contract.address} />
             </SheetRow>
           ))}
         </dl>
@@ -310,11 +268,7 @@ export default function AdminSettingsPage() {
       <div className="grid gap-x-16 gap-y-14 sm:gap-y-16 lg:grid-cols-2">
         {PARAMETER_GROUPS.map((group) => (
           <section key={group} aria-labelledby={`settings-${group}-heading`}>
-            <SectionHeader
-              size="panel"
-              headingId={`settings-${group}-heading`}
-              title={t(`settings.groups.${group}`)}
-            />
+            <SectionHeader headingId={`settings-${group}-heading`} title={groupTitles[group]} />
             <dl className="border-t border-rule-faint">
               {groups[group].map((row) => (
                 <SheetRow key={row.key} id={row.key} label={row.label}>

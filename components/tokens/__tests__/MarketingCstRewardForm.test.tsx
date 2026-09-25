@@ -11,7 +11,7 @@ import type { RecipientCheck } from '@/components/tokens/transfer/useRecipientFa
 
 import { checkA11y, renderWithQuery, screen, waitFor } from '@/test-utils';
 
-import { MarketingCstRewardForm, parseCstAmount } from '../MarketingCstRewardForm';
+import { MarketingCstRewardForm } from '../MarketingCstRewardForm';
 
 const OWNER = '0x1111111111111111111111111111111111111111';
 const TREASURER = '0x2222222222222222222222222222222222222222';
@@ -19,7 +19,6 @@ const RECIPIENT = '0x4444444444444444444444444444444444444444';
 const TEN_CST = 10n * 10n ** 18n;
 
 const mockReadContract = jest.fn();
-const mockReportError = jest.fn();
 let mockTx = createFakeTxFlow(TREASURER);
 const mockNotify = jest.fn();
 let mockCheck: RecipientCheck = { status: 'idle' };
@@ -61,22 +60,10 @@ jest.mock('../../../hooks/web3', () => ({
   useActiveWeb3React: () => ({ account: TREASURER, active: true }),
 }));
 
-jest.mock('../../../utils/errors', () => {
-  const actual = jest.requireActual('../../../utils/errors');
-  return {
-    ...actual,
-    reportError: (...args: unknown[]) => mockReportError(...args),
-  };
-});
-
-function setupReads({ balance = TEN_CST, decimals = 18 as number | Error } = {}) {
-  mockReadContract.mockImplementation(({ functionName }: { functionName: string }) => {
-    if (functionName === 'decimals') {
-      return decimals instanceof Error ? Promise.reject(decimals) : Promise.resolve(decimals);
-    }
-    if (functionName === 'balanceOf') return Promise.resolve(balance);
-    return Promise.resolve(null);
-  });
+function setupReads({ balance = TEN_CST } = {}) {
+  mockReadContract.mockImplementation(({ functionName }: { functionName: string }) =>
+    Promise.resolve(functionName === 'balanceOf' ? balance : null),
+  );
 }
 
 function renderForm() {
@@ -93,12 +80,12 @@ function renderForm() {
 async function fill(recipient: string, amount: string) {
   const user = userEvent.setup();
   const recipientField = screen.getByLabelText('forms.transfer.recipient.label');
-  const amountField = screen.getByLabelText('Amount');
+  const amountField = screen.getByLabelText(/forms\.transfer\.amount\.label/);
   await user.clear(recipientField);
   if (recipient) await user.type(recipientField, recipient);
   await user.clear(amountField);
   if (amount) await user.type(amountField, amount);
-  await user.click(screen.getByRole('button', { name: 'Send CST' }));
+  await user.click(screen.getByRole('button', { name: /^Send / }));
 }
 
 beforeEach(() => {
@@ -111,39 +98,6 @@ beforeEach(() => {
     known: null,
     warning: null,
   };
-});
-
-describe('parseCstAmount', () => {
-  it('reads a dot or a comma as the decimal separator', () => {
-    expect(parseCstAmount('1.5', 18)).toBe(15n * 10n ** 17n);
-    expect(parseCstAmount('1,5', 18)).toBe(15n * 10n ** 17n);
-    expect(parseCstAmount(' 20 ', 18)).toBe(20n * 10n ** 18n);
-  });
-
-  it('rejects text and flags more decimals than the token has', () => {
-    expect(parseCstAmount('abc', 18)).toBeNull();
-    expect(parseCstAmount('1.2.3', 18)).toBeNull();
-    expect(parseCstAmount('0.123', 2)).toBe('precision');
-  });
-
-  // The transfer cannot be undone: an English operator typing "1,000" once sent 1 CST.
-  it('refuses a thousands separator instead of reading it as a decimal mark', () => {
-    expect(parseCstAmount('1,000', 18, 'en')).toBe('grouping');
-    expect(parseCstAmount('12,500', 18, 'zh')).toBe('grouping');
-    expect(parseCstAmount('1,000.5', 18, 'en')).toBe('grouping');
-    expect(parseCstAmount('1.000.000', 18, 'en')).toBe('grouping');
-    expect(parseCstAmount('1 000', 18, 'uk')).toBe('grouping');
-    expect(parseCstAmount('1\u00a0000', 18, 'uk')).toBe('grouping');
-    // Vietnamese groups thousands with a dot.
-    expect(parseCstAmount('1.000', 18, 'vi')).toBe('grouping');
-  });
-
-  it("keeps reading the locale's own decimal mark, three decimals included", () => {
-    expect(parseCstAmount('0.125', 18, 'en')).toBe(125n * 10n ** 15n);
-    expect(parseCstAmount('1,000', 18, 'vi')).toBe(10n ** 18n);
-    expect(parseCstAmount('0,125', 18, 'uk')).toBe(125n * 10n ** 15n);
-    expect(parseCstAmount('2,5', 18, 'en')).toBe(25n * 10n ** 17n);
-  });
 });
 
 describe('MarketingCstRewardForm', () => {
@@ -166,7 +120,7 @@ describe('MarketingCstRewardForm', () => {
 
     await fill('not an address', '0');
     expect(screen.getByText('forms.transfer.recipient.errors.invalid')).toBeVisible();
-    expect(screen.getByText('Enter an amount greater than zero.')).toBeVisible();
+    expect(screen.getByText('forms.transfer.amount.errors.zero')).toBeVisible();
     expect(screen.getByLabelText('forms.transfer.recipient.label')).toHaveAttribute(
       'aria-invalid',
       'true',
@@ -177,31 +131,31 @@ describe('MarketingCstRewardForm', () => {
     expect(screen.getByText('forms.transfer.recipient.errors.self')).toBeVisible();
 
     await fill(RECIPIENT, '11');
-    expect(screen.getByText('The reserve holds less CST than this.')).toBeVisible();
+    expect(
+      screen.getByText(/^forms\.transfer\.amount\.errors\.exceedsBalance\(amount=10/),
+    ).toBeVisible();
     expect(mockTx.flow.run).not.toHaveBeenCalled();
   });
 
-  it('shows what the typed amount will send before anything is sent', async () => {
+  it('names the typed amount on the send button before anything is sent', async () => {
     const user = userEvent.setup();
     renderForm();
     await screen.findByText('10', { exact: false, selector: 'data' });
-    const amountField = screen.getByLabelText('Amount');
-    expect(screen.queryByTestId('outreach-sends')).toBeNull();
-
-    await user.type(amountField, '2,5');
-    expect(screen.getByTestId('outreach-sends').textContent).toBe('Sends 2.5\u00a0CST');
-    expect(amountField.getAttribute('aria-describedby')).toContain(
-      screen.getByTestId('outreach-sends').id,
-    );
+    await user.type(screen.getByLabelText('forms.transfer.recipient.label'), RECIPIENT);
+    await user.type(screen.getByLabelText(/forms\.transfer\.amount\.label/), '2.5');
+    expect(screen.getByRole('button', { name: 'Send 2.5\u00a0CST' })).toBeInTheDocument();
     expect(mockTx.flow.run).not.toHaveBeenCalled();
   });
 
+  // The transfer cannot be undone: an English operator typing "1,000" once sent 1 CST.
   it('refuses a grouped amount like 1,000 and sends nothing', async () => {
     renderForm();
     await screen.findByText('10', { exact: false, selector: 'data' });
     await fill(RECIPIENT, '1,000');
-    expect(screen.getByText('Leave out thousands separators: type 1000, not 1,000.')).toBeVisible();
-    expect(screen.queryByTestId('outreach-sends')).toBeNull();
+    expect(
+      screen.getByText('forms.transfer.amount.errors.grouping(plain=1000,grouped=1,000)'),
+    ).toBeVisible();
+    expect(screen.queryByTestId('transfer-review')).toBeNull();
     expect(mockTx.flow.run).not.toHaveBeenCalled();
   });
 
@@ -210,7 +164,7 @@ describe('MarketingCstRewardForm', () => {
     renderForm();
     await screen.findByText('10', { exact: false, selector: 'data' });
 
-    await fill(RECIPIENT, '2,5');
+    await fill(RECIPIENT, '2.5');
 
     await waitFor(() => expect(mockTx.flow.run).toHaveBeenCalledTimes(1));
     expect(mockTx.writeContract).toHaveBeenCalledWith(
@@ -221,9 +175,12 @@ describe('MarketingCstRewardForm', () => {
       }),
     );
     expect(mockTx.lastSuccessMessage()).toBe('CST sent from the Outreach Reserve.');
-    await waitFor(() => expect(screen.getByLabelText('Amount')).toHaveValue(''));
+    await waitFor(() =>
+      expect(screen.getByLabelText(/forms\.transfer\.amount\.label/)).toHaveValue(''),
+    );
     expect(screen.getByLabelText('forms.transfer.recipient.label')).toHaveValue('');
-    expect(invalidate).toHaveBeenCalledWith({ queryKey: ['outreachReserveBalance'] });
+    // The reserve panel and the form's cap share one balance read.
+    expect(invalidate).toHaveBeenCalledWith({ queryKey: ['cstBalance'] });
     invalidate.mockRestore();
   });
 
@@ -244,7 +201,7 @@ describe('MarketingCstRewardForm', () => {
     expect(mockTx.flow.run).not.toHaveBeenCalled();
 
     await user.click(screen.getByLabelText('forms.transfer.review.acknowledge'));
-    await user.click(screen.getByRole('button', { name: 'Send CST' }));
+    await user.click(screen.getByRole('button', { name: /^Send / }));
     await waitFor(() => expect(mockTx.flow.run).toHaveBeenCalledTimes(1));
   });
 
@@ -255,7 +212,7 @@ describe('MarketingCstRewardForm', () => {
     await screen.findByText('10', { exact: false, selector: 'data' });
 
     await user.type(screen.getByLabelText('forms.transfer.recipient.label'), RECIPIENT);
-    await user.type(screen.getByLabelText('Amount'), '1');
+    await user.type(screen.getByLabelText(/forms\.transfer\.amount\.label/), '1');
     const checking = screen.getByRole('button', { name: /forms\.transfer\.review\.checking/ });
     expect(checking).toHaveAttribute('aria-busy', 'true');
     await user.click(checking);
@@ -277,31 +234,33 @@ describe('MarketingCstRewardForm', () => {
     expect(mockTx.writeContract).not.toHaveBeenCalled();
   });
 
-  it('assumes 18 decimals when the token does not answer decimals()', async () => {
-    setupReads({ decimals: new Error('no decimals') });
+  it('says the balance could not be read, and reviews a send with that caveat', async () => {
+    const err = new Error('balance failed');
+    mockReadContract.mockImplementation(() => Promise.reject(err));
     renderForm();
-    await screen.findByText('10', { exact: false, selector: 'data' });
-    await fill(RECIPIENT, '1');
-    await waitFor(() =>
-      expect(mockTx.writeContract).toHaveBeenCalledWith(
-        expect.objectContaining({ args: [RECIPIENT, 10n ** 18n] }),
-      ),
+    expect(
+      await screen.findByText("The reserve's CST balance could not be read."),
+    ).toBeInTheDocument();
+
+    const user = userEvent.setup();
+    await user.type(screen.getByLabelText('forms.transfer.recipient.label'), RECIPIENT);
+    await user.type(screen.getByLabelText(/forms\.transfer\.amount\.label/), '1');
+    expect(screen.getByTestId('transfer-review')).toHaveTextContent(
+      'forms.transfer.review.balanceUnchecked',
     );
+    await user.click(screen.getByRole('button', { name: /^Send / }));
+    await waitFor(() => expect(mockTx.flow.run).toHaveBeenCalledTimes(1));
   });
 
-  it('says the balance could not be read and does not offer to send', async () => {
-    const err = new Error('balance failed');
-    mockReadContract.mockImplementation(({ functionName }: { functionName: string }) =>
-      functionName === 'decimals' ? Promise.resolve(18) : Promise.reject(err),
+  it('offers no send while the treasurer is unknown', async () => {
+    renderWithQuery(
+      <MarketingCstRewardForm
+        marketingWalletAddress={TEST_MARKETING_WALLET}
+        ownerAddress={OWNER}
+        treasurerAddress={null}
+      />,
     );
-    renderForm();
-    // One retry first (useReserveBalance), so allow for its delay.
-    expect(
-      await screen.findByText('The reserve’s CST balance could not be read.', undefined, {
-        timeout: 4_000,
-      }),
-    ).toBeInTheDocument();
-    expect(mockReportError).toHaveBeenCalledWith(err, 'MarketingWallet CST balance read');
+    await screen.findByText('10', { exact: false, selector: 'data' });
     expect(screen.getByRole('button', { name: 'Send CST' })).toBeDisabled();
   });
 

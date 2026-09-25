@@ -32,8 +32,10 @@
         "format": "Enter a number, like {example}.",
         "precision": "Use at most {decimals} decimal places.",
         "zero": "Enter an amount greater than 0.",
-        "exceedsBalance": "That’s more than the {amount} available."
-      }
+        "exceedsBalance": "That’s more than the {amount} available.",
+        "grouping": "Leave out the thousands separator: type {plain}, not {grouped}."
+      },
+      "checkingBalance": "Reading the balance…"
     },
     "review": {
       "title": "Review",
@@ -42,7 +44,8 @@
       "final": "Transfers are final: tokens sent to a wrong address can’t be recovered.",
       "acknowledge": "I’ve checked this address and want to send to it.",
       "acknowledgeRequired": "Confirm that you’ve checked the address to continue.",
-      "checking": "Checking the address…"
+      "checking": "Checking the address…",
+      "balanceUnchecked": "The balance couldn't be read, so this amount hasn't been checked against it."
     }
   }
 }

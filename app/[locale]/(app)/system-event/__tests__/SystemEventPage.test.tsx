@@ -78,7 +78,7 @@ describe('SystemEventPage', () => {
     mockEvents({ data: rows });
     render(<SystemEventPage round={5} start={100} end={200} />);
     expect(
-      screen.getByRole('heading', { level: 1, name: 'Configuration before Cycle 5' }),
+      screen.getByRole('heading', { level: 1, name: /^Coordination changes before Cycle\s5$/ }),
     ).toBeInTheDocument();
     expect(
       screen.getByText(/The protocol parameters the contract owner changed before Cycle 5 opened/),
@@ -91,7 +91,10 @@ describe('SystemEventPage', () => {
     mockEvents({ data: rows });
     render(<SystemEventPage round={0} start={0} end={100} />);
     expect(
-      screen.getByRole('heading', { level: 1, name: 'Initial configuration' }),
+      screen.getByRole('heading', {
+        level: 1,
+        name: 'Coordination changes before the first cycle',
+      }),
     ).toBeInTheDocument();
   });
 
@@ -183,7 +186,7 @@ describe('SystemEventPage', () => {
       );
       expect(screen.queryByText(/Network response/)).not.toBeInTheDocument();
       expect(
-        screen.getByRole('heading', { level: 1, name: 'Configuration before Cycle 3' }),
+        screen.getByRole('heading', { level: 1, name: /^Coordination changes before Cycle\s3$/ }),
       ).toBeInTheDocument();
       screen.getByRole('button', { name: 'Try again' }).click();
       expect(mockRefetch).toHaveBeenCalled();

@@ -1,9 +1,19 @@
-import { expect, test } from '@playwright/test';
+import { expect, test, type Request } from '@playwright/test';
 
 import { switchLanguage } from './locale-smoke';
 import { dismissOpenTooltips, openTooltip } from './tooltip-helpers';
 import { mockZhQualityApi } from './zh-quality-mocks';
 import { ZH_ROUTE_FIXTURES } from './zh-route-inventory';
+
+/** A single JSON-RPC call a request carries, or null. */
+function jsonRpcCall(request: Request): { id?: number; method?: string } | null {
+  if (request.method() !== 'POST') return null;
+  try {
+    return request.postDataJSON() as { id?: number; method?: string } | null;
+  } catch {
+    return null;
+  }
+}
 
 const LANDING_HEADERS = { 'X-Forwarded-Host': 'cosmicsignature.com' };
 const { cycle, gestureId, learnSlug } = ZH_ROUTE_FIXTURES;
@@ -170,8 +180,15 @@ test.describe('Sprint 8 deterministic Chinese journeys', () => {
   // This journey once checked the localized error toast of a forward without a wallet.
   // The page no longer offers that dead button, so there is no error toast to check here.
   test('offers a wallet connection instead of a dead Public Goods forward', async ({ page }) => {
-    // The vault holds ETH in the mocks, but with no wallet the page offers to connect
-    // instead of a forward button that could only fail with a toast.
+    // The vault holds ETH, but with no wallet the page offers to connect instead of a
+    // forward button that could only fail with a toast. Whether it holds ETH is read
+    // from the chain (the indexer lags a forward), so that one call is answered here.
+    await page.route('**/*', async (route) => {
+      const call = jsonRpcCall(route.request());
+      if (call?.method !== 'eth_getBalance') return route.fallback();
+      // 1.5 ETH.
+      return route.fulfill({ json: { jsonrpc: '2.0', id: call.id, result: '0x14d1120d7b160000' } });
+    });
     await page.goto('/zh/contracts', { waitUntil: 'domcontentloaded' });
     const publicGoods = page.locator('section[aria-labelledby="public-goods-heading"]');
     await expect(publicGoods.getByRole('button', { name: '连接钱包' })).toBeVisible();

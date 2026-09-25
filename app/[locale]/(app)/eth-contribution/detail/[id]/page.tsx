@@ -1,4 +1,5 @@
 import type { Metadata, ResolvingMetadata } from 'next';
+import { notFound } from 'next/navigation';
 import { getTranslations, setRequestLocale } from 'next-intl/server';
 
 import { createPageMetadata } from '@/utils/seo';
@@ -45,13 +46,14 @@ export default async function Page({
   const { locale, id } = await params;
   setRequestLocale(locale);
   const recordId = Number(id);
-  // The record's server read: a found record is in the HTML, a missing one
-  // opens on its not-found state, and a failed read leaves both to the client.
+  // The record's server read: a found record is in the HTML, a missing one is a
+  // 404 (the segment's not-found state), and a failed read leaves both to the client.
   const read = await readContribution(recordId);
+  if (read.status === 'missing') notFound();
   return (
     <PageMessages namespaces={['ethContribution', 'tables']}>
       <QuerySeed seeds={contributionSeeds(recordId, read)}>
-        <EthDonationDetailPage id={recordId} knownMissing={read.status === 'missing'} />
+        <EthDonationDetailPage id={recordId} />
       </QuerySeed>
     </PageMessages>
   );

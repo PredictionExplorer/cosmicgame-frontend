@@ -33,13 +33,9 @@
     "title": "合约设置",
     "subtitle": "控制面板所报告的协议合约地址与参数。只读：只有协议所有者能在链上更改这些数值。",
     "loadError": "未能加载合约设置。",
-    "notReported": "控制面板 API 未提供",
     "contractsDescription": "每个协议合约，附 Arbiscan 上的地址；已验证的合约另附 Sourcify 上的源代码。",
     "groups": {
       "contracts": "合约",
-      "shares": "分配比例",
-      "selection": "星选",
-      "timing": "时间参数",
       "cost": "落笔价格"
     },
     "values": {
@@ -51,9 +47,7 @@
     },
     "fields": {
       "timeIncrease": "时间增量的每周期增幅",
-      "initialGestureCostFraction": "初始落笔价格比例",
       "activationTime": "启用时间",
-      "gestureRatio": "ETH 与 CST 落笔比率",
       "calibrationWindowLength": "周期开启时 CST 校准窗口时长"
     }
   },
@@ -73,9 +67,6 @@
     "form": {
       "title": "转出 CST",
       "description": "一笔交易即把该数额从推广储备转给接收方，且无法撤销。",
-      "amount": "数额",
-      "amountHint": "小数可用小数点或逗号。",
-      "sends": "将转出 {amount}",
       "submit": "转出 CST",
       "reserveHeading": "推广储备",
       "reserve": "储备地址",
@@ -84,12 +75,7 @@
       "balanceError": "未能读取推广储备的 CST 余额。",
       "confirmed": "已从推广储备转出 CST。",
       "failed": "CST 未能转出。请检查钱包后重试。",
-      "errors": {
-        "amount": "请输入大于零的数额。",
-        "precision": "{decimals, plural, other {最多使用 # 位小数。}}",
-        "grouping": "请勿使用千位分隔符：输入 1000，而非 1,000。",
-        "insufficient": "推广储备的 CST 少于此数额。"
-      }
+      "sendAmount": "转出 {amount}"
     }
   }
 }

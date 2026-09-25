@@ -71,3 +71,19 @@ export function calibrationWindowStatus(
     progress: elapsed / duration,
   };
 }
+
+/**
+ * Until when (epoch ms) the panel needs a clock: the moment the last of these
+ * readings stops changing state (a not-started window starts, a running one
+ * completes). `null` when every reading has already settled, or none is read.
+ */
+export function windowClockUntil(
+  readings: readonly (CalibrationWindowReading | null | undefined)[],
+): number | null {
+  const ends = readings.flatMap((reading) => {
+    if (!reading) return [];
+    const remaining = Math.max(0, reading.durationSeconds) - reading.elapsedSeconds;
+    return remaining > 0 ? [reading.readAtMs + remaining * 1000] : [];
+  });
+  return ends.length > 0 ? Math.max(...ends) : null;
+}

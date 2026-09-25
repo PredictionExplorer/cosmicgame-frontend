@@ -193,7 +193,7 @@ export const termsCopyEn = {
         'Attempting to manipulate or exploit the protocol mechanics through bugs, glitches, or vulnerabilities',
         'Using bots, scripts, or automated tools to interact with the platform',
         'Engaging in any form of market manipulation or collusion with other users',
-        "Attempting to hack, reverse engineer, or compromise the platform's security",
+        'Attempting to hack, reverse engineer, or compromise the platform’s security',
         'Violating any applicable laws or regulations',
         'Creating multiple accounts to gain unfair advantages',
         'Uploading malicious content or attempting denial-of-service attacks',

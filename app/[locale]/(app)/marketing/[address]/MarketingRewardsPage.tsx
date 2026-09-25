@@ -6,12 +6,13 @@ import { useLocale, useTranslations } from 'next-intl';
 import { getAddress, isAddress } from 'viem';
 
 import { Link } from '@/i18n/navigation';
-import { formatCount } from '@/utils/format';
-import { useMarketingRewardsByUser } from '@/hooks/useApiQuery';
+import { formatCount, formatPercent, sameAddress } from '@/utils/format';
+import { useMarketingRewards, useMarketingRewardsByUser } from '@/hooks/useApiQuery';
 import { useHydrated } from '@/hooks/useHydrated';
 import type { MarketingReward } from '@/services/api/types';
 import {
   allocatedOnOneDay,
+  rankOutreachContributors,
   summarizeOutreachAllocations,
 } from '@/components/marketing/outreachTotals';
 import { LedgerPage } from '@/components/ledger/LedgerPage';
@@ -32,10 +33,12 @@ interface MarketingRewardsPageProps {
 /**
  * One contributor's outreach allocations, under the Outreach Reserve: an
  * identity header (whose record it is, directly under the title: the address
- * with copy and a way to their profile), what the allocations add up to and
- * when they began and last arrived, then the allocations themselves in one
- * reading column (a two-column table on phones too). No allocations, or a
- * failed read, stand centred on the full width like every ledger state.
+ * with copy and a way to their profile), what the allocations add up to,
+ * where the contributor stands among all of them (the leaderboard's rank and
+ * share, from the same list), and when they began and last arrived, then
+ * the allocations themselves in one reading column (a two-column table on
+ * phones too). No allocations, or a failed read, stand centred on the full
+ * width like every ledger state.
  */
 export default function MarketingRewardsPage({ address: rawAddress }: MarketingRewardsPageProps) {
   const t = useTranslations('marketing');
@@ -45,6 +48,13 @@ export default function MarketingRewardsPage({ address: rawAddress }: MarketingR
   const query = useMarketingRewardsByUser(address ?? undefined);
   const rewards = query.data ?? NO_REWARDS;
   const summary = useMemo(() => summarizeOutreachAllocations(rewards), [rewards]);
+  // Where this contributor stands on the leaderboard, from the list /marketing ranks.
+  const everyone = useMarketingRewards();
+  const ranking = useMemo(
+    () => (everyone.data ? rankOutreachContributors(everyone.data) : null),
+    [everyone.data],
+  );
+  const standing = ranking?.find((entry) => sameAddress(entry.address, address)) ?? null;
   // The zone <DateTime> shows the dates in: UTC until hydration, then the reader's.
   const dateZone = useHydrated() ? 'local' : 'utc';
 
@@ -67,14 +77,31 @@ export default function MarketingRewardsPage({ address: rawAddress }: MarketingR
       value: ready ? formatCount(summary.allocations, locale) : pending,
     },
   ];
-  // Each date once, at figure-md and without the current year: allocations
+  if (standing && ranking) {
+    figures.push({
+      id: 'rank',
+      label: t('address.figures.rank'),
+      value: t('address.figures.rankValue', {
+        rank: formatCount(standing.rank, locale),
+        total: formatCount(ranking.length, locale),
+      }),
+      caption: t('address.figures.shareCaption', {
+        share: formatPercent(standing.sharePercent, locale, {
+          minimumFractionDigits: 1,
+          maximumFractionDigits: 1,
+        }),
+      }),
+    });
+  }
+  // Each date once, at figure-md and with its year (two formats on one page read
+  // as two kinds of date): allocations
   // that all arrived on one day get a single date, not a first and a latest
   // minutes apart that each wrap onto two lines on a phone.
   if (ready && summary.allocations > 0 && allocatedOnOneDay(summary, dateZone)) {
     figures.push({
       id: 'allocated',
       label: t('address.figures.allocated'),
-      value: <DateTime timestamp={summary.latest} year="auto" />,
+      value: <DateTime timestamp={summary.latest} year="always" />,
       size: 'md',
     });
   } else if (!ready || summary.allocations > 0) {
@@ -82,13 +109,13 @@ export default function MarketingRewardsPage({ address: rawAddress }: MarketingR
       {
         id: 'first',
         label: t('address.figures.first'),
-        value: ready ? <DateTime timestamp={summary.first} year="auto" /> : pending,
+        value: ready ? <DateTime timestamp={summary.first} year="always" /> : pending,
         size: 'md',
       },
       {
         id: 'latest',
         label: t('address.figures.latest'),
-        value: ready ? <DateTime timestamp={summary.latest} year="auto" /> : pending,
+        value: ready ? <DateTime timestamp={summary.latest} year="always" /> : pending,
         size: 'md',
       },
     );

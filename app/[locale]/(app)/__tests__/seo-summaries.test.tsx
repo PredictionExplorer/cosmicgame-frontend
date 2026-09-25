@@ -337,9 +337,8 @@ describe('server-rendered page headers', () => {
     it('renders the header without repeating the body’s address list', async () => {
       render(await ContractsSeoSummary());
 
-      expect(
-        screen.getByRole('heading', { level: 1, name: 'Cosmic Signature contracts' }),
-      ).toBeInTheDocument();
+      // The tab's name, like its Trust Center siblings; the brand stays in the title.
+      expect(screen.getByRole('heading', { level: 1, name: 'Contracts' })).toBeInTheDocument();
       expect(screen.getByText(`Chain ${networkConfig.chainId}`)).toBeInTheDocument();
       // The address grid in the page body lists every contract (with verified fallbacks).
       expect(
@@ -371,10 +370,13 @@ describe('server-rendered page headers', () => {
       );
     });
 
-    it('says when the addresses come from the verified fallback', async () => {
+    // The addresses are the verified list whatever the indexer answers; an
+    // outage costs only the live figures, and the header says so plainly.
+    it('says only that the live figures are missing when the indexer is down', async () => {
       mockGetDashboardInfo.mockRejectedValue(new Error('offline'));
       render(await ContractsSeoSummary());
-      expect(screen.getByText(/static fallback/)).toBeInTheDocument();
+      expect(screen.getByText(/Live figures are unavailable right now/)).toBeInTheDocument();
+      expect(screen.queryByText(/static fallback|server snapshot/)).toBeNull();
     });
   });
 
@@ -385,9 +387,7 @@ describe('server-rendered page headers', () => {
         <CodeRepositories />
       </>,
     );
-    expect(
-      screen.getByRole('heading', { level: 1, name: 'Cosmic Signature source code' }),
-    ).toBeInTheDocument();
+    expect(screen.getByRole('heading', { level: 1, name: 'Source code' })).toBeInTheDocument();
     expect(
       screen.getByRole('heading', { level: 2, name: 'Project repositories' }),
     ).toBeInTheDocument();
@@ -667,7 +667,8 @@ describe('server-rendered page headers', () => {
 
       expect(mockDirectContributions).toHaveBeenCalled();
       expect(figureValue('records')).toHaveTextContent(String(rows.length));
-      expect(figureValue('totalEth')).toHaveTextContent('30.5000 ETH');
+      // A headline figure: no table padding ("30.5000 ETH").
+      expect(figureValue('totalEth')).toHaveTextContent(/^30\.5\sETH$/);
       expect(figureValue('contributors')).toHaveTextContent('2');
     });
 
@@ -683,7 +684,7 @@ describe('server-rendered page headers', () => {
       seededContributions([...rows, { AmountEth: 2, DonorAddr: WALLET_B }]);
       rerender(await PublicDataRouteSeoSummary({ route: 'eth-contribution' }));
       expect(figureValue('records')).toHaveTextContent(/^2$/);
-      expect(figureValue('totalEth')).toHaveTextContent('3.0000 ETH');
+      expect(figureValue('totalEth')).toHaveTextContent(/^3\sETH$/);
       expect(figureValue('contributors')).toHaveTextContent(/^2$/);
     });
 

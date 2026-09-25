@@ -76,7 +76,8 @@ export default function AdminPage() {
       description={t('moderation.description')}
       gestureHistory={messages ?? []}
       loading={isLoading || (messages === null && !isError)}
-      error={isError && messages === null ? t('moderation.loadError') : undefined}
+      // A failed refresh keeps the loaded messages; DataTable says so above them.
+      error={isError ? t('moderation.loadError') : undefined}
       onRetry={() => void refetch()}
       moderatorAddress={moderatorAddress}
       actionsDisabled={noRole || rolesPending}

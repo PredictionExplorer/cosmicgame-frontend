@@ -71,6 +71,27 @@ describe('TransferCstPage', () => {
     );
   });
 
+  it('puts the checks before the form, in reading order', () => {
+    render(<TransferCstPage />);
+    const checks = screen.getByText('myPages.transferCst.guide.final');
+    const form = screen.getByTestId('cst-transfer-form');
+    expect(checks.compareDocumentPosition(form)).toBe(Node.DOCUMENT_POSITION_FOLLOWING);
+  });
+
+  it('keeps Connect the one action when disconnected, with trading as a link under it', () => {
+    mockAccount = null;
+    mockActive = false;
+    render(<TransferCstPage />);
+
+    const state = screen.getByTestId('wallet-required-state');
+    const trade = screen.getByRole('link', { name: /nav\.ecosystem\.uniswap\.defaultLabel/ });
+    expect(state).toContainElement(trade);
+    expect(trade).toHaveAttribute('href', CST_UNISWAP_SWAP_URL);
+    expect(screen.getByTestId('connect-wallet-button').compareDocumentPosition(trade)).toBe(
+      Node.DOCUMENT_POSITION_FOLLOWING,
+    );
+  });
+
   it('has no accessibility violations', async () => {
     const { container } = render(<TransferCstPage />);
     await checkA11y(container);

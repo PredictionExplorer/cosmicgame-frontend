@@ -5,6 +5,7 @@ import { useLocale, useTranslations } from 'next-intl';
 
 import { protocolFacts } from '@/content/protocol-facts';
 
+import { useNow } from '@/hooks/useNow';
 import { CalibrationWindowIcon } from '@/lib/conceptIcons';
 import { formatPercent } from '@/utils/format';
 import { Amount } from '@/components/ui/amount';
@@ -17,6 +18,7 @@ import { UnknownValue } from '@/components/ui/unknown-value';
 
 import {
   calibrationWindowStatus,
+  windowClockUntil,
   type CalibrationWindowReading,
   type CalibrationWindowStatus,
 } from './calibrationWindow';
@@ -37,17 +39,6 @@ export interface CalibrationWindowsProps {
   cycleHasGestures: boolean | null | undefined;
 }
 
-/** Re-renders once a second while `active`, so a running window's figures advance. */
-function useNow(active: boolean): number {
-  const [now, setNow] = useState(() => Date.now());
-  useEffect(() => {
-    if (!active) return;
-    const id = window.setInterval(() => setNow(Date.now()), 1_000);
-    return () => window.clearInterval(id);
-  }, [active]);
-  return now;
-}
-
 const STATE_TONE = {
   running: 'live',
   notStarted: 'neutral',
@@ -58,16 +49,48 @@ const STATE_TONE = {
 /**
  * The two Calibration Windows, each with its state in words, a progress rule
  * while it runs, and the time left, so a window that has run its course reads
- * as complete instead of as an elapsed time longer than the window.
+ * as complete instead of as an elapsed time longer than the window. The panel
+ * follows the shared one-second clock only while a window can still change
+ * state (running, or not started); once both have settled it stops ticking,
+ * until a new reading arrives.
  */
-export function CalibrationWindows({
+export function CalibrationWindows(props: CalibrationWindowsProps) {
+  const { cst, eth, cycleHasGestures } = props;
+  // The ETH window no longer moves once the cycle has a gesture (or while that is unknown).
+  const clockUntil = windowClockUntil([cst, cycleHasGestures === false ? eth : null]);
+  const [settledAt, setSettledAt] = useState<number | null>(null);
+
+  useEffect(() => {
+    if (clockUntil === null) return;
+    const id = window.setTimeout(
+      () => setSettledAt(clockUntil),
+      Math.max(0, clockUntil - Date.now()) + 1_000,
+    );
+    return () => window.clearTimeout(id);
+  }, [clockUntil]);
+
+  const readAt = Math.max(cst?.readAtMs ?? 0, eth?.readAtMs ?? 0);
+  return clockUntil !== null && settledAt !== clockUntil ? (
+    <TickingWindows {...props} readAt={readAt} />
+  ) : (
+    <WindowsAt {...props} nowMs={Math.max(readAt, settledAt ?? 0)} />
+  );
+}
+
+/** The windows on the shared one-second clock, while one of them is still moving. */
+function TickingWindows({ readAt, ...props }: CalibrationWindowsProps & { readAt: number }) {
+  const now = useNow(1_000);
+  return <WindowsAt {...props} nowMs={now || readAt} />;
+}
+
+function WindowsAt({
   cst,
   eth,
   cstStartingCost,
   cycleHasGestures,
-}: CalibrationWindowsProps) {
+  nowMs: now,
+}: CalibrationWindowsProps & { nowMs: number }) {
   const t = useTranslations('contracts');
-  const now = useNow(Boolean(cst || eth));
   const cstStatus = cst ? calibrationWindowStatus(cst, now) : cst;
   // The ETH window's state needs both its reading and whether the cycle has a gesture.
   const ethStatus = !eth
@@ -83,7 +106,8 @@ export function CalibrationWindows({
         title={t('parameters.windowsTitle')}
         description={t('parameters.windowsDescription')}
       />
-      <div className="mt-6 grid gap-4 lg:grid-cols-2">
+      {/* A settled window (closed or complete) keeps its own height beside a running one. */}
+      <div className="mt-6 grid gap-4 lg:grid-cols-2 lg:items-start">
         <WindowPanel
           id="cst"
           title={t('parameters.cstTitle')}
@@ -93,7 +117,6 @@ export function CalibrationWindows({
             increase: protocolFacts.cstCalibrationWindowIncreasePercentPerCstGesture,
             decrease: protocolFacts.cstCalibrationWindowDecreasePercentPerEthGesture,
           })}
-          elapsedDefinition={t('parameters.cstElapsedTooltip')}
           note={cstStatus?.state === 'complete' ? t('parameters.cstComplete') : null}
           extra={{
             label: t('parameters.ceiling'),
@@ -106,8 +129,6 @@ export function CalibrationWindows({
           title={t('parameters.ethTitle')}
           reading={eth}
           status={ethStatus}
-          durationDefinition={t('parameters.ethDurationTooltip')}
-          elapsedDefinition={t('parameters.ethElapsedTooltip')}
           note={
             ethStatus?.state === 'closed'
               ? t('parameters.ethClosed')
@@ -127,7 +148,6 @@ function WindowPanel({
   reading,
   status,
   durationDefinition,
-  elapsedDefinition,
   note,
   extra,
 }: {
@@ -137,8 +157,8 @@ function WindowPanel({
   reading: Reading;
   /** Where the window stands: `undefined` while that is being read, `null` when unknown. */
   status: CalibrationWindowStatus | null | undefined;
-  durationDefinition: string;
-  elapsedDefinition: string;
+  /** What the window's length does, when it is not self-explanatory (the CST window's). */
+  durationDefinition?: string;
   note: string | null;
   extra?: { label: string; definition: string; value: number | null | undefined };
 }) {
@@ -157,7 +177,7 @@ function WindowPanel({
     {
       id: 'duration',
       label: t('parameters.duration'),
-      definition: durationDefinition,
+      definition: durationDefinition ?? null,
       value:
         reading === undefined ? (
           pending
@@ -172,7 +192,7 @@ function WindowPanel({
           {
             id: 'elapsed',
             label: t('parameters.elapsed'),
-            definition: elapsedDefinition,
+            definition: null,
             value: value((ready) => <Duration seconds={ready.elapsedSeconds} />),
           },
           {

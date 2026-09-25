@@ -5,7 +5,7 @@ import { useLocale, useTranslations } from 'next-intl';
 import {
   ALLOCATION_TRACK_COLORS,
   ALLOCATION_TRACK_COPY_KEYS,
-  withNextCycleShare,
+  allocationSharesFromDashboard,
   type AllocationTrackId,
 } from '@/config/allocationTracks';
 import { cn } from '@/lib/utils';
@@ -29,12 +29,6 @@ export interface ReserveTrack {
   eth: number | null;
 }
 
-/** A track's share of the reserve, clamped into [0, 100]; `null` when it could not be read. */
-function toShare(value: unknown): number | null {
-  const numeric = toFiniteNumber(value);
-  return numeric === null ? null : Math.min(100, Math.max(0, numeric));
-}
-
 /**
  * The Cycle Reserve split in the order and colours every chart of it uses
  * (config/allocationTracks), completed with the share that carries into the
@@ -43,13 +37,7 @@ function toShare(value: unknown): number | null {
  */
 export function reserveTracks(data?: ReserveSplitData | null): ReserveTrack[] {
   const balanceEth = toFiniteNumber(data?.CosmicGameBalanceEth);
-  return withNextCycleShare([
-    { id: 'signature', percent: toShare(data?.PrizePercentage) },
-    { id: 'chrono', percent: toShare(data?.ChronoWarriorPercentage) },
-    { id: 'stellar', percent: toShare(data?.RafflePercentage) },
-    { id: 'anchor', percent: toShare(data?.StakingPercentage) },
-    { id: 'publicGoods', percent: toShare(data?.CharityPercentage) },
-  ]).map(({ id, percent }) => ({
+  return allocationSharesFromDashboard(data).map(({ id, percent }) => ({
     id,
     percent,
     eth: percent !== null && balanceEth !== null ? (percent * balanceEth) / 100 : null,

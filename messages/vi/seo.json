@@ -91,7 +91,7 @@
       },
       "eth-contribution": {
         "heading": "Đóng góp ETH trực tiếp",
-        "description": "ETH gửi thẳng vào Dự trữ chu kỳ, kèm lời nhắn và chu kỳ của từng người đóng góp.",
+        "description": "ETH gửi thẳng vào Dự trữ chu kỳ, theo chu kỳ và người đóng góp. Khoản đóng góp kèm lời nhắn có trang bản ghi riêng.",
         "links": {
           "reserve": "Cách phân bổ dự trữ chu kỳ",
           "protocol": "Phần Hàng hóa công được chuyển đến đâu",

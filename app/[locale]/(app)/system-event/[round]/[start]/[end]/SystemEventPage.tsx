@@ -15,7 +15,12 @@ import { DateTime } from '@/components/ui/date-time';
 import { EmptyState } from '@/components/ui/empty-state';
 import { Skeleton } from '@/components/ui/skeleton';
 
-import { isValidWindow, type SystemEventWindow } from './systemEventWindow';
+import {
+  historyRange,
+  isValidWindow,
+  windowRange,
+  type SystemEventWindow,
+} from './systemEventWindow';
 
 type SystemEventPageProps = SystemEventWindow;
 
@@ -31,20 +36,26 @@ function changeSpan(rows: readonly AdminEventRow[]): { first: number; latest: nu
 }
 
 /**
- * The configuration changes the contract owner recorded in one maintenance
- * window, the one before a cycle opened: how many, when they began and
- * ended, and each change with its new value and transaction, in one reading
- * column. The window is named by its cycle, never by its event log ids. A
- * window without changes says so once, with one way back to the full log,
- * centred on the full width like every ledger state (so is a failed read).
+ * The coordination changes the contract owner recorded in one window, the
+ * one before a cycle opened: how many, when they began and ended, and each
+ * change with its new value, the value it replaced (from every change before
+ * the window) and its transaction, in one reading column. The window is
+ * named by its cycle, never by its event log ids (the route's layout keeps
+ * those ids the cycle's own). A window without changes says so once, under
+ * the H1 and with no section title or lede promising rows, with one way back
+ * to the full log, centred on the full width like every ledger state (so is
+ * a failed read).
  */
 const SystemEventPage = (props: SystemEventPageProps) => {
   const { round, start, end } = props;
   const t = useTranslations('coordination');
-  const tTables = useTranslations('tables');
   const locale = useLocale();
   const valid = isValidWindow(props);
-  const { data, isLoading, error, refetch } = useSystemEvents(valid ? start : -1, valid ? end : -1);
+  const range = valid ? windowRange(props) : { start: -1, end: -1 };
+  const { data, isLoading, error, refetch } = useSystemEvents(range.start, range.end);
+  // Every change before the window: what each parameter was before it changed here.
+  const before = (valid && historyRange({ round, start, end })) || { start: -1, end: -1 };
+  const history = useSystemEvents(before.start, before.end);
 
   useEffect(() => {
     if (error) reportError(error, 'fetch system events');
@@ -52,6 +63,7 @@ const SystemEventPage = (props: SystemEventPageProps) => {
 
   // The ledger's own title, so the trail reads as the page it leads back to.
   const trail = [{ label: t('page.title'), href: '/coordination-changes' }];
+  // The header meta keeps the quiet style; an empty state's next step is a real link.
   const allChanges = (
     <Link
       href="/coordination-changes"
@@ -59,6 +71,15 @@ const SystemEventPage = (props: SystemEventPageProps) => {
     >
       {t('systemEvent.allChanges')}
       <ArrowRight aria-hidden className="size-3.5 text-subtle" />
+    </Link>
+  );
+  const allChangesAction = (
+    <Link
+      href="/coordination-changes"
+      className="link inline-flex min-h-11 items-center gap-1.5 sm:min-h-6"
+    >
+      {t('systemEvent.allChanges')}
+      <ArrowRight aria-hidden className="size-3.5" />
     </Link>
   );
 
@@ -75,7 +96,7 @@ const SystemEventPage = (props: SystemEventPageProps) => {
           icon={<Link2Off aria-hidden />}
           title={t('systemEvent.invalidTitle')}
           description={t('systemEvent.invalidDescription')}
-          action={allChanges}
+          action={allChangesAction}
         />
       </LedgerPage>
     );
@@ -133,8 +154,13 @@ const SystemEventPage = (props: SystemEventPageProps) => {
           section="records"
           breadcrumbs={trail}
           title={initial ? t('systemEvent.titleInitial') : t('systemEvent.title', { cycle: round })}
+          // The lede promises rows; an empty window's state says what there is instead.
           subtitle={
-            initial ? t('systemEvent.ledeInitial') : t('systemEvent.lede', { cycle: round })
+            empty
+              ? undefined
+              : initial
+                ? t('systemEvent.ledeInitial')
+                : t('systemEvent.lede', { cycle: round })
           }
           figures={empty ? undefined : figures}
           meta={empty ? undefined : allChanges}
@@ -143,16 +169,19 @@ const SystemEventPage = (props: SystemEventPageProps) => {
     >
       <AdminEventsTable
         list={rows}
+        history={history.data}
         loading={isLoading}
         error={error ? t('systemEvent.loadError') : undefined}
         onRetry={() => void refetch()}
-        title={tTables('names.parameterChanges')}
+        // No section title over an empty window: the state is the page's one statement.
+        title={empty ? undefined : t('systemEvent.tableTitle')}
+        emptyTitle={t('systemEvent.emptyTitle')}
         emptyDescription={
           initial
             ? t('systemEvent.emptyDescriptionInitial')
             : t('systemEvent.emptyDescription', { cycle: round })
         }
-        emptyAction={allChanges}
+        emptyAction={allChangesAction}
       />
     </LedgerPage>
   );

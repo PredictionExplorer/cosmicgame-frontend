@@ -32,8 +32,10 @@
         "format": "Hãy nhập một số, ví dụ {example}.",
         "precision": "Tối đa {decimals} chữ số thập phân.",
         "zero": "Hãy nhập số lượng lớn hơn 0.",
-        "exceedsBalance": "Vượt quá {amount} khả dụng."
-      }
+        "exceedsBalance": "Vượt quá {amount} khả dụng.",
+        "grouping": "Không dùng dấu phân cách hàng nghìn: nhập {plain}, không phải {grouped}."
+      },
+      "checkingBalance": "Đang đọc số dư…"
     },
     "review": {
       "title": "Kiểm tra lại",
@@ -42,7 +44,8 @@
       "final": "Không thể hoàn tác sau khi gửi: token gửi nhầm địa chỉ sẽ không thể khôi phục.",
       "acknowledge": "Tôi đã kiểm tra địa chỉ này và muốn gửi đến đó.",
       "acknowledgeRequired": "Hãy xác nhận bạn đã kiểm tra địa chỉ để tiếp tục.",
-      "checking": "Đang kiểm tra địa chỉ…"
+      "checking": "Đang kiểm tra địa chỉ…",
+      "balanceUnchecked": "Không đọc được số dư, nên số lượng này chưa được đối chiếu với số dư."
     }
   }
 }

@@ -141,9 +141,9 @@
     "description": "查看此參與者透過星選獲配的全部 Cosmic Signature NFT。"
   },
   "systemEvent": {
-    "title": "第 {cycle} 個週期前的設定",
+    "title": "第 {cycle} 個週期前的協調變更",
     "description": "第 {cycle} 個週期開啟前，合約所有者變更的協議參數，每項均附新值及交易。",
-    "titleInitial": "初始設定",
+    "titleInitial": "首個週期前的協調變更",
     "descriptionInitial": "首個週期開啟前，合約所有者設定的協議參數，每項均附數值及交易。"
   },
   "faq": {
@@ -180,7 +180,7 @@
   },
   "code": {
     "title": "源代碼：CC0 鏈上藝術協議",
-    "description": "瀏覽 Cosmic Signature 源代碼、渲染流水線、合約儲存庫、驗證流程與 CC0 公有領域許可。"
+    "description": "瀏覽 Cosmic Signature 源代碼、渲染流水線、項目代碼庫與 CC0 公有領域許可。"
   },
   "mint": {
     "title": "銘刻 Random Walk NFT",

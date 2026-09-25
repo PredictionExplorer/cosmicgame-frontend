@@ -88,8 +88,18 @@ export function movesInDirection(row: ActivityRow, direction: TransferDirection)
 }
 
 /**
- * Base units of a transfer, exactly: the indexer's wei string when it has
- * one, the float otherwise (rounded to the nearest wei).
+ * A transfer between the address and another wallet (received or sent, a
+ * self-transfer included): not something the protocol imprinted or consumed,
+ * and not an anchoring move.
+ */
+export function isPeerTransfer(row: ActivityRow): boolean {
+  return row.activity === 'received' || row.activity === 'sent';
+}
+
+/**
+ * Base units of a transfer: exactly, from the indexer's wei string when it
+ * has one; otherwise from the float, which carries about six decimals, so
+ * that fallback is rounded to a millionth of a token (never to the wei).
  */
 export function transferWei(value: unknown, valueFloat: unknown): bigint | null {
   if (typeof value === 'string' && /^\d+$/.test(value)) return BigInt(value);

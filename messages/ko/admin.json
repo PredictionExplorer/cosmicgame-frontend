@@ -33,13 +33,9 @@
     "title": "컨트랙트 설정",
     "subtitle": "대시보드가 보고하는 프로토콜 컨트랙트 주소와 매개변수입니다. 읽기 전용이며, 이 값은 프로토콜 소유자만 온체인에서 변경할 수 있습니다.",
     "loadError": "컨트랙트 설정을 불러올 수 없습니다.",
-    "notReported": "대시보드 API에서 제공하지 않음",
     "contractsDescription": "모든 프로토콜 컨트랙트와 Arbiscan의 주소, 검증된 경우 Sourcify의 소스 코드입니다.",
     "groups": {
       "contracts": "컨트랙트",
-      "shares": "배분 비율",
-      "selection": "별빛 선정",
-      "timing": "시간",
       "cost": "제스처 비용"
     },
     "values": {
@@ -51,9 +47,7 @@
     },
     "fields": {
       "timeIncrease": "사이클별 시간 증가량 증가율",
-      "initialGestureCostFraction": "초기 제스처 비용 비율",
       "activationTime": "활성화 시각",
-      "gestureRatio": "ETH 제스처 대 CST 제스처 비율",
       "calibrationWindowLength": "사이클 시작 CST 보정 구간 길이"
     }
   },
@@ -73,9 +67,6 @@
     "form": {
       "title": "CST 보내기",
       "description": "한 번의 트랜잭션으로 금액이 홍보 준비금에서 수령자에게 이동합니다. 되돌릴 수 없습니다.",
-      "amount": "금액",
-      "amountHint": "소수점은 마침표나 쉼표로 입력합니다.",
-      "sends": "보낼 금액: {amount}",
       "submit": "CST 보내기",
       "reserveHeading": "홍보 준비금",
       "reserve": "준비금 주소",
@@ -84,12 +75,7 @@
       "balanceError": "준비금의 CST 잔액을 읽을 수 없습니다.",
       "confirmed": "홍보 준비금에서 CST를 보냈습니다.",
       "failed": "CST를 보내지 못했습니다. 지갑을 확인한 뒤 다시 시도하십시오.",
-      "errors": {
-        "amount": "0보다 큰 금액을 입력하십시오.",
-        "precision": "{decimals, plural, other {소수점 이하 최대 #자리까지 입력합니다.}}",
-        "grouping": "천 단위 구분 기호 없이 1000처럼 입력하십시오.",
-        "insufficient": "준비금의 CST가 이 금액보다 적습니다."
-      }
+      "sendAmount": "{amount} 보내기"
     }
   }
 }

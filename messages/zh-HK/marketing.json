@@ -44,7 +44,8 @@
     "contact": "以電郵聯絡推廣團隊",
     "note": "團隊會協助準備推廣材料，並說明分配的決定方式。",
     "copyEmail": "複製電郵地址",
-    "emailCopied": "電郵地址已複製"
+    "emailCopied": "電郵地址已複製",
+    "rulesLink": "聯絡團隊前請閱讀參與須知"
   },
   "address": {
     "parent": "推廣分配",
@@ -56,7 +57,10 @@
       "allocations": "分配筆數",
       "first": "首筆分配",
       "latest": "最近一筆分配",
-      "allocated": "分配時間"
+      "allocated": "分配時間",
+      "rank": "排名",
+      "rankValue": "第 {rank} 名，共 {total} 名",
+      "shareCaption": "佔全部推廣 CST 的 {share}"
     },
     "emptyDescription": "推廣團隊向此地址發出 CST 後，分配會顯示在這裏。",
     "invalidAddress": {
@@ -66,5 +70,12 @@
     }
   },
   "learnHow": "了解參與方式",
-  "loadError": "無法載入推廣分配記錄。"
+  "loadError": "無法載入推廣分配記錄。",
+  "rules": {
+    "title": "參與須知",
+    "review": "任何人都可以提出推廣方案；每項方案在分配前都會經團隊審核。",
+    "discretion": "分配由團隊酌情決定：是否批准推廣、何時發送 CST 以及發送多少，均由團隊決定。未獲批准的推廣不會獲得分配。",
+    "excluded": "垃圾訊息、購買的追蹤或互動，以及誤導性說法（包括關於 CST 價值的說法）均不計入。",
+    "disclose": "每次發布關於 Cosmic Signature 的內容時，請說明你可能因此獲得 CST。"
+  }
 }

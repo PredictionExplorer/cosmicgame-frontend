@@ -11,6 +11,7 @@ import {
 import { AuditsContent } from '@/content/legal/AuditsContent';
 import { AUDIT_FINDINGS_TOTAL, HACKEN_AUDIT } from '@/content/legal/audit';
 import type { LegalDocumentLabels } from '@/content/legal/labels';
+import { LEGAL_LINKS } from '@/content/legal/links';
 import {
   OFFICIAL_CONTRACTS,
   sourcifyContractUrl,
@@ -19,7 +20,7 @@ import {
 import { PrivacyContent, privacyCopyForDeployment } from '@/content/legal/PrivacyContent';
 import { activePrivacyServices, activePrivacyStorage } from '@/content/legal/privacyInventory';
 import { RiskContent } from '@/content/legal/RiskContent';
-import { SecurityContent } from '@/content/legal/SecurityContent';
+import { SecurityContent, type ProtocolOwner } from '@/content/legal/SecurityContent';
 import { TermsContent } from '@/content/legal/TermsContent';
 import { TRUST_CENTER_TABS, TRUST_DOCUMENT_DATES } from '@/content/legal/trustCenter';
 import { protocolFacts } from '@/content/protocol-facts';
@@ -38,7 +39,7 @@ function labelsFor(locale: string): LegalDocumentLabels {
     contents: legal.document.contents ?? '',
     backToTop: legal.document.backToTop ?? '',
     backToContents: legal.document.backToContents ?? '',
-    sectionLink: legal.document.sectionLink ?? '',
+    sectionLink: (section) => (legal.document.sectionLink ?? '').replace('{section}', section),
     revisionHistory: legal.document.revisionHistory ?? '',
     tabs: Object.fromEntries(
       TRUST_CENTER_TABS.map(({ id }) => [id, legal.breadcrumbs[id] ?? id]),
@@ -56,16 +57,26 @@ function contractNamesFor(locale: string): Record<OfficialContractId, string> {
   ) as Record<OfficialContractId, string>;
 }
 
-/** Every Trust Center page, rendered from a locale's copy. */
-const PAGES = {
-  security: (locale: string) => (
+/** A single-key owner, as the chain reported it when this was written. */
+const OWNER_ADDRESS = checksumAddress('0x14c82ce4e5713e88c9462680e9c02bf4a3089871');
+const OWNER: ProtocolOwner = { status: 'account', address: OWNER_ADDRESS, kind: 'singleKey' };
+
+function securityPage(locale: string, owner: ProtocolOwner = OWNER) {
+  return (
     <SecurityContent
       copy={getSecurityCopy(locale)}
       locale={locale}
       labels={labelsFor(locale)}
       contractNames={contractNamesFor(locale)}
+      implementationNote="The current implementation behind the Cosmic Signature Protocol proxy contract"
+      owner={owner}
     />
-  ),
+  );
+}
+
+/** Every Trust Center page, rendered from a locale's copy. */
+const PAGES = {
+  security: (locale: string) => securityPage(locale),
   audits: (locale: string) => (
     <AuditsContent copy={getAuditsCopy(locale)} locale={locale} labels={labelsFor(locale)} />
   ),
@@ -79,6 +90,10 @@ const PAGES = {
     <PrivacyContent copy={getPrivacyCopy(locale)} locale={locale} labels={labelsFor(locale)} />
   ),
 } as const;
+
+function escapeRegExp(text: string): string {
+  return text.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+}
 
 /** The visible text: explanation popovers keep a hidden copy of their definition. */
 function visibleText(): string {
@@ -121,9 +136,12 @@ describe('Trust Center template', () => {
       for (const section of sections) {
         const heading = section.querySelector('h2');
         expect(section).toHaveAttribute('aria-labelledby', heading?.id);
-        expect(
-          within(rail).getByRole('link', { name: heading?.textContent ?? '' }),
-        ).toHaveAttribute('href', `#${section.id}`);
+        // A numbered document (Terms, Privacy) leads each entry with its number.
+        const entry = new RegExp(`^(\\d+\\. )?${escapeRegExp(heading?.textContent ?? '')}$`);
+        expect(within(rail).getByRole('link', { name: entry })).toHaveAttribute(
+          'href',
+          `#${section.id}`,
+        );
         // The heading's own link names the section it points at.
         expect(
           within(section as HTMLElement).getByRole('link', {
@@ -209,7 +227,7 @@ describe('Security', () => {
     expect(handle.className).toMatch(/min-h-6/);
   });
 
-  it('says where to report a vulnerability', () => {
+  it('says where to report a vulnerability, what a report needs and what is in scope', () => {
     render(PAGES.security('en'));
     expect(screen.getByRole('link', { name: 'support@cosmicsignature.com' })).toHaveAttribute(
       'href',
@@ -219,6 +237,69 @@ describe('Security', () => {
       'href',
       '/.well-known/security.txt',
     );
+    const report = document.getElementById('report') as HTMLElement;
+    expect(within(report).getAllByRole('listitem')).toHaveLength(4);
+    expect(within(report).getByRole('heading', { level: 3, name: 'Scope' })).toBeInTheDocument();
+    expect(within(report).getByText('In scope')).toBeInTheDocument();
+    expect(within(report).getByText('Not in scope')).toBeInTheDocument();
+    expect(within(report).getByRole('link', { name: 'Official addresses' })).toHaveAttribute(
+      'href',
+      '/security#official',
+    );
+  });
+
+  it('says who controls the protocol, what it can change and how it upgrades', () => {
+    render(PAGES.security('en'));
+    const controls = document.getElementById('controls') as HTMLElement;
+    // Second, right after the official addresses.
+    expect(controls.previousElementSibling?.id).toBe('official');
+    expect(
+      within(controls).getByRole('heading', { level: 2, name: 'Owner controls and upgrades' }),
+    ).toBeInTheDocument();
+    // The owner in full, with its explorer page and the kind of account it is.
+    expect(within(controls).getByTitle(OWNER_ADDRESS)).toHaveTextContent(OWNER_ADDRESS);
+    expect(within(controls).getByText(/^A single-key wallet/)).toBeInTheDocument();
+    expect(within(controls).getByRole('link', { name: /Arbiscan/ })).toHaveAttribute(
+      'href',
+      expect.stringContaining(OWNER_ADDRESS),
+    );
+    for (const term of ['Between cycles', 'During a cycle', 'At any time', 'Upgrades']) {
+      expect(within(controls).getByText(term)).toBeInTheDocument();
+    }
+    expect(within(controls).getByText(/UUPS proxy/)).toBeInTheDocument();
+    expect(within(controls).getByRole('link', { name: 'coordination changes' })).toHaveAttribute(
+      'href',
+      '/coordination-changes',
+    );
+    // The implementation row says what it is.
+    expect(
+      screen.getByText(
+        'The current implementation behind the Cosmic Signature Protocol proxy contract',
+      ),
+    ).toBeInTheDocument();
+  });
+
+  it('points at the contract on the explorer when the owner cannot be read', () => {
+    render(securityPage('en', { status: 'unavailable' }));
+    const controls = document.getElementById('controls') as HTMLElement;
+    expect(within(controls).getByText(/The owner could not be read/)).toBeInTheDocument();
+    expect(within(controls).getByRole('link', { name: /Arbiscan/ })).toHaveAttribute(
+      'href',
+      expect.stringContaining(protocolFacts.contractAddresses.proxy),
+    );
+  });
+
+  it('says so when ownership has been renounced', () => {
+    render(securityPage('en', { status: 'renounced' }));
+    expect(screen.getByText(/Ownership has been renounced/)).toBeInTheDocument();
+  });
+
+  it.each(routing.locales)('%s: describes the same owner controls as English', (locale) => {
+    const copy = getSecurityCopy(locale);
+    const en = getSecurityCopy('en');
+    expect(copy.controls.rows).toHaveLength(en.controls.rows.length);
+    expect(copy.report.include).toHaveLength(en.report.include.length);
+    expect(copy.report.scope).toHaveLength(en.report.scope.length);
   });
 });
 
@@ -297,22 +378,82 @@ describe('Risk disclosures', () => {
   });
 });
 
-describe('Terms of Service', () => {
-  it('gives every clause the anchor the risk disclosures link to', () => {
-    render(PAGES.terms('en'));
-    for (const id of [
-      'mechanics',
-      'mechanics-random-walk',
-      'mechanics-cst-window',
-      'allocations-retrieval',
-      'allocations-no-guarantee',
-      'eligibility',
-      'risks',
-    ]) {
-      expect(document.getElementById(id)).not.toBeNull();
-    }
+/** The Trust Center page each app path renders. */
+const PAGE_BY_PATH: Record<string, keyof typeof PAGES> = {
+  '/security': 'security',
+  '/audits': 'audits',
+  '/risk-disclosures': 'risk',
+  '/terms': 'terms',
+  '/privacy': 'privacy',
+};
+
+/** Every deep link the copy may name (`LEGAL_LINKS`) into a Trust Center page, by page. */
+const DEEP_LINKS = Object.values(LEGAL_LINKS).flatMap((target) => {
+  const [path = '', fragment] = target.href.split('#');
+  const page = target.kind === 'app' ? PAGE_BY_PATH[path] : undefined;
+  return page && fragment ? [{ page, fragment }] : [];
+});
+
+describe('Trust Center deep links', () => {
+  it('covers the clauses the risk disclosures cite', () => {
+    expect(DEEP_LINKS.map(({ fragment }) => fragment)).toEqual(
+      expect.arrayContaining(['mechanics-cst-window', 'allocations-retrieval', 'services']),
+    );
   });
 
+  // The anchors are locale-agnostic (/uk/terms#allocations-retrieval), so a
+  // translator's typo in one locale's clause id would break the links there.
+  it.each(routing.locales)('%s: every deep link lands on an anchor', (locale) => {
+    for (const page of new Set(DEEP_LINKS.map((link) => link.page))) {
+      const { unmount } = render(PAGES[page](locale));
+      for (const { fragment } of DEEP_LINKS.filter((link) => link.page === page)) {
+        expect({
+          locale,
+          page,
+          fragment,
+          found: document.getElementById(fragment) !== null,
+        }).toEqual({ locale, page, fragment, found: true });
+      }
+      unmount();
+    }
+  });
+});
+
+describe('Numbered legal documents', () => {
+  it.each(['terms', 'privacy'] as const)(
+    '%s: numbers its sections in the contents and links every clause heading to itself',
+    (page) => {
+      render(PAGES[page]('en'));
+      const rail = screen.getByRole('navigation', { name: 'On this page' });
+      const entries = within(rail)
+        .getAllByRole('link')
+        .filter((link) => link.getAttribute('href')?.startsWith('#') && link.textContent)
+        .slice(0, 2)
+        .map((link) => link.textContent);
+      expect(entries[0]).toMatch(/^1\. /);
+      expect(entries[1]).toMatch(/^2\. /);
+      // The numbers are counters: the headings keep the copy's own words.
+      expect(document.querySelector('[data-numbered="true"]')).not.toBeNull();
+      for (const heading of document.querySelectorAll('main h2, main h3')) {
+        expect(heading.textContent).not.toMatch(/^\d/);
+      }
+      const clause = document.querySelector('main div[id] > div > h3');
+      const id = clause?.closest('[id]')?.id;
+      expect(
+        within(clause?.parentElement as HTMLElement).getByRole('link', {
+          name: `Link to ${clause?.textContent}`,
+        }),
+      ).toHaveAttribute('href', `#${id}`);
+    },
+  );
+
+  it('leaves the explanatory pages unnumbered', () => {
+    render(PAGES.security('en'));
+    expect(document.querySelector('[data-numbered="true"]')).toBeNull();
+  });
+});
+
+describe('Terms of Service', () => {
   it('lists the prohibited activities as a real list', () => {
     render(PAGES.terms('en'));
     const items = document.querySelectorAll('#prohibited ul > li');

@@ -7,6 +7,7 @@ import {
   IMAGE_GENERATION_IPFS_URL,
 } from '@/content/code/structure';
 
+import { CopyValue } from '@/components/legal/CopyValue';
 import { SiteLink } from '@/components/layout/SiteLink';
 import { SectionHeader } from '@/components/ui/section-header';
 
@@ -18,6 +19,10 @@ const SOURCE_LINK_CLASS =
   'link-quiet inline-flex min-h-6 items-center gap-1 type-label text-muted-foreground transition-colors duration-[var(--duration-fast)] hover:text-foreground';
 
 const IMAGE_GENERATION_REPOSITORY = CODE_REPOSITORIES.find(({ id }) => id === 'images')!.href;
+
+const IPFS_URI = `ipfs://${IMAGE_GENERATION_IPFS_CID}`;
+/** "ipfs://QmWEao…gyXTm": the ends a reader compares, whole on a phone. */
+const IPFS_URI_SHORT = `ipfs://${IMAGE_GENERATION_IPFS_CID.slice(0, 6)}…${IMAGE_GENERATION_IPFS_CID.slice(-5)}`;
 
 /**
  * The image generation program, rendered on the server: highlighted, with
@@ -51,11 +56,21 @@ export default function CodeViewer() {
         <SourceCode source={COSMIC_SIGNATURE_CODE} />
       </SourceViewer>
       <div className="mt-3 flex flex-wrap items-baseline justify-between gap-x-8 gap-y-2">
-        <p className="flex min-w-0 flex-wrap items-baseline gap-x-2 type-caption text-subtle">
+        <p className="flex min-w-0 flex-wrap items-center gap-x-2 type-caption text-subtle">
           <span>{t('viewer.cid')}</span>
-          <span className="type-hash break-all text-muted-foreground">
-            ipfs://{IMAGE_GENERATION_IPFS_CID}
-          </span>
+          <CopyValue
+            value={IPFS_URI}
+            display={IPFS_URI_SHORT}
+            copyLabel={t('viewer.copyCid')}
+            copiedLabel={t('viewer.copied')}
+            className="sm:hidden"
+          />
+          <CopyValue
+            value={IPFS_URI}
+            copyLabel={t('viewer.copyCid')}
+            copiedLabel={t('viewer.copied')}
+            className="max-sm:hidden"
+          />
         </p>
         <p className="flex items-center gap-x-5">
           <SiteLink

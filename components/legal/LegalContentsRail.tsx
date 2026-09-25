@@ -8,6 +8,8 @@ import { cn } from '@/lib/utils';
 export interface LegalContentsItem {
   id: string;
   label: string;
+  /** The section's number in a numbered document ("3."), shown before its label. */
+  number?: string;
 }
 
 /**
@@ -80,22 +82,26 @@ export function LegalContentsRail({
   return (
     <nav aria-labelledby="legal-contents-rail-title" className="hidden lg:block">
       <div className="sticky top-[calc(var(--sticky-offset)+1.5rem)]">
-        <p id="legal-contents-rail-title" className="type-eyebrow text-subtle">
+        <p id="legal-contents-rail-title" className="type-label text-muted-foreground">
           {title}
         </p>
         <ol className="mt-4 border-s border-rule">
-          {items.map(({ id, label }) => (
+          {items.map(({ id, label, number }) => (
             <li key={id}>
               <a
                 href={`#${id}`}
                 aria-current={active === id ? 'location' : undefined}
                 className={cn(
-                  'focus-ring-inset -ms-px block border-s-2 py-1.5 ps-4 type-body-sm transition-colors duration-[var(--duration-fast)]',
+                  'focus-ring-inset -ms-px flex items-baseline gap-2 border-s-2 py-1.5 ps-4 type-body-sm transition-colors duration-[var(--duration-fast)]',
                   active === id
                     ? 'border-primary text-foreground'
                     : 'border-transparent text-muted-foreground hover:border-input hover:text-foreground',
                 )}
               >
+                {/* The space keeps "3. Allocations" one phrase for assistive tech; the gap draws it. */}
+                {number ? (
+                  <span className="shrink-0 tabular-nums text-subtle">{`${number} `}</span>
+                ) : null}
                 {label}
               </a>
             </li>

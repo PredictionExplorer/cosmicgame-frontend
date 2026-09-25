@@ -23,6 +23,8 @@ export interface TransferReviewProps {
   /** The person tried to send without acknowledging a warning. */
   acknowledgementMissing?: boolean;
   acknowledgementRef?: Ref<HTMLInputElement>;
+  /** One more caveat before the final line (a balance that could not be read). */
+  note?: ReactNode;
   className?: string;
 }
 
@@ -70,6 +72,7 @@ export function TransferReview({
   onAcknowledgedChange,
   acknowledgementMissing = false,
   acknowledgementRef,
+  note,
   className,
 }: TransferReviewProps) {
   const t = useTranslations('forms.transfer.review');
@@ -116,6 +119,13 @@ export function TransferReview({
         <p className="mt-2 flex items-start gap-2 type-body-sm text-foreground">
           <AlertTriangle aria-hidden className="mt-0.5 size-4 shrink-0 text-attention" />
           {warningSentence}
+        </p>
+      ) : null}
+
+      {note ? (
+        <p className="mt-2 flex items-start gap-2 type-body-sm text-foreground">
+          <AlertTriangle aria-hidden className="mt-0.5 size-4 shrink-0 text-attention" />
+          {note}
         </p>
       ) : null}
 

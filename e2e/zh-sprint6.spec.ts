@@ -74,11 +74,13 @@ test.describe('zh Sprint 6 — FAQ, legal, trust, contracts, code, and imprint',
 
   test('renders Chinese contracts, code, and imprint surfaces', async ({ page }) => {
     await openZh(page, '/zh/contracts');
-    await expect(page.getByRole('heading', { name: 'Cosmic Signature 合约' })).toBeVisible();
-    await expect(page.getByText('合约地址', { exact: true }).first()).toBeVisible();
+    await expect(page.getByRole('heading', { level: 1, name: '合约', exact: true })).toBeVisible();
+    await expect(page.getByRole('heading', { name: '核心合约', exact: true })).toBeVisible();
 
     await openZh(page, '/zh/code');
-    await expect(page.getByRole('heading', { name: 'Cosmic Signature 源代码' })).toBeVisible();
+    await expect(
+      page.getByRole('heading', { level: 1, name: '源代码', exact: true }),
+    ).toBeVisible();
     await expect(page.getByText('代码查看器', { exact: true })).toBeVisible();
 
     await openZh(page, '/zh/imprint');

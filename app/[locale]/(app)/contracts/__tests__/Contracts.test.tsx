@@ -3,6 +3,7 @@ import { renderToString } from 'react-dom/server';
 
 import { protocolFacts } from '@/content/protocol-facts';
 
+import { CST_GECKOTERMINAL_POOL_URL } from '@/config/geckoterminal';
 import { COSMIC_SIGNATURE_MARKETPLACE_URL } from '@/config/marketplace';
 import { CST_UNISWAP_SWAP_URL } from '@/config/uniswap';
 import { TooltipProvider } from '@/components/ui/tooltip';
@@ -17,6 +18,12 @@ interface LiveCstPreviewTestGlobals {
   __COSMIC_ENABLE_LIVE_CST_PREVIEW_TEST_TIMERS__?: boolean;
   __COSMIC_LIVE_CST_PREVIEW_TEST_INTERVAL_MS__?: number;
 }
+
+// The production network: the address list is the verified Arbitrum One set.
+jest.mock('@/config/chains', () => ({
+  ...jest.requireActual('@/config/chains'),
+  activeChain: jest.requireActual('viem/chains').arbitrum,
+}));
 
 jest.mock('viem', () => ({
   ...jest.requireActual('viem'),
@@ -136,20 +143,20 @@ describe('Contracts', () => {
     ]);
   });
 
-  it('lists each address once, grouped, with its explorer and Sourcify evidence', () => {
+  it('lists each verified address once, grouped, with its explorer and Sourcify evidence', () => {
     mockUseDashboardInfo.mockReturnValue({ data: makeDashboardData(), isLoading: false });
     render(<Contracts />);
     expect(screen.getByRole('heading', { level: 3, name: 'Core contracts' })).toBeInTheDocument();
     expect(screen.getByRole('heading', { level: 3, name: 'Wallets' })).toBeInTheDocument();
     expect(screen.getByRole('heading', { level: 3, name: 'Anchoring' })).toBeInTheDocument();
     expect(document.querySelectorAll('[data-contract]')).toHaveLength(11);
+    // The verified address, whatever the indexer answers, with both kinds of evidence.
     const token = document.querySelector('[data-contract="cst"]');
+    const cst = protocolFacts.contractAddresses.cstToken;
     expect(
-      token?.querySelector(`a[href="https://sepolia.arbiscan.io/address/${addr('2')}"]`),
+      token?.querySelector(`a[href="https://sepolia.arbiscan.io/address/${cst}"]`),
     ).not.toBeNull();
-    // An address the API reports that was never checked on Sourcify gets no Sourcify link.
-    expect(token?.querySelector('a[href*="sourcify"]')).toBeNull();
-    // The verified implementation, from protocolFacts, links its Sourcify source.
+    expect(token?.querySelector('a[href*="repo.sourcify.dev"]')).not.toBeNull();
     const implementation = document.querySelector('[data-contract="implementation"]');
     expect(implementation?.querySelector('a[href*="repo.sourcify.dev"]')).not.toBeNull();
     // What that link vouches for is said once for the list, not as a badge on every row.
@@ -181,15 +188,36 @@ describe('Contracts', () => {
     expect(document.querySelectorAll('[data-contract]')).toHaveLength(11);
   });
 
-  it('keeps the market links on the CST and NFT rows', () => {
+  // The market buttons once broke the CST and NFT rows and put promotion inside the
+  // verification list; they are one quiet line under the core contracts now.
+  it('lists the markets once, under the core contracts, outside every address row', () => {
     mockUseDashboardInfo.mockReturnValue({ data: makeDashboardData(), isLoading: false });
     render(<Contracts />);
+    const markets = document.querySelector('[data-slot="contract-markets"]');
+    for (const href of [
+      CST_UNISWAP_SWAP_URL,
+      CST_GECKOTERMINAL_POOL_URL,
+      COSMIC_SIGNATURE_MARKETPLACE_URL,
+    ]) {
+      expect(markets?.querySelector(`a[href="${href}"]`)).not.toBeNull();
+    }
+    expect(document.querySelector('[data-contract] a[href*="uniswap"]')).toBeNull();
+    expect(document.querySelector('[data-contract] a[href*="axiomzero"]')).toBeNull();
+  });
+
+  // Regression: the API silently replaced verified addresses, and an outage dropped 9 of 11.
+  it('shows an indexer address that differs as a caption, never in its place', () => {
+    mockUseDashboardInfo.mockReturnValue({ data: makeDashboardData(), isLoading: false });
+    render(<Contracts />);
+    const token = document.querySelector('[data-contract="cst"]');
+    expect(token?.textContent).toContain(checksumAddress(protocolFacts.contractAddresses.cstToken));
+    expect(token?.querySelector('[data-slot="contract-drift"]')).toHaveTextContent(
+      `The indexer reports ${addr('2')}, which has not been verified.`,
+    );
+    // The dashboard lags an upgrade: a different implementation is not drift.
     expect(
-      document.querySelector(`[data-contract="cst"] a[href="${CST_UNISWAP_SWAP_URL}"]`),
-    ).not.toBeNull();
-    expect(
-      document.querySelector(`[data-contract="nft"] a[href="${COSMIC_SIGNATURE_MARKETPLACE_URL}"]`),
-    ).not.toBeNull();
+      document.querySelector('[data-contract="implementation"] [data-slot="contract-drift"]'),
+    ).toBeNull();
   });
 
   it('shows the verified implementation address over a stale dashboard value', () => {
@@ -302,6 +330,35 @@ describe('Contracts', () => {
     expect(eth()).toHaveAttribute('data-state', 'closed');
   });
 
+  // Every gesture changes the windows; they were read once per page and then extrapolated.
+  it('reads the Calibration Windows again when the gesture count moves or this tab gestures', async () => {
+    mockUseDashboardInfo.mockReturnValue({ data: makeDashboardData(), isLoading: false });
+    const readCst = jest.fn().mockResolvedValue([43_200n, 10_800n]);
+    const readStart = jest.fn().mockResolvedValue(400_000_000_000_000_000_000n);
+    mockUseContractNoSigner.mockReturnValue(
+      contractReads({
+        getCstDutchAuctionDurations: readCst,
+        cstDutchAuctionBeginningBidPrice: readStart,
+      }),
+    );
+    const { rerender } = render(<Contracts />);
+    await waitFor(() => expect(readCst).toHaveBeenCalledTimes(1));
+
+    readStart.mockResolvedValue(520_000_000_000_000_000_000n);
+    mockUseDashboardInfo.mockReturnValue({
+      data: makeDashboardData({ CurNumBids: 13 }),
+      isLoading: false,
+    });
+    rerender(<Contracts />);
+    await waitFor(() => expect(readCst).toHaveBeenCalledTimes(2));
+    await waitFor(() =>
+      expect(document.querySelector('[data-window="cst"]')?.textContent).toMatch(/520/),
+    );
+
+    window.dispatchEvent(new Event('cosmic:gesture-placed'));
+    await waitFor(() => expect(readCst).toHaveBeenCalledTimes(3));
+  });
+
   it('refreshes the participation CST preview live', async () => {
     const liveCstGlobals = globalThis as LiveCstPreviewTestGlobals;
     liveCstGlobals.__COSMIC_ENABLE_LIVE_CST_PREVIEW_TEST_TIMERS__ = true;
@@ -359,22 +416,22 @@ describe('Contracts', () => {
       );
     const serverAddrs = makeDashboardData().ContractAddrs;
 
-    it('lists every contract address from the route’s server read', () => {
+    it('lists every verified contract address in the server HTML', () => {
       mockUseDashboardInfo.mockReturnValue({ data: undefined, isLoading: true });
       const html = serverHtml(<Contracts initialContractAddrs={serverAddrs} />);
-      for (const [key, address] of Object.entries(serverAddrs)) {
-        // The verified implementation address always wins over the dashboard's.
-        if (key === 'ImplementationAddr') continue;
+      for (const address of Object.values(protocolFacts.contractAddresses)) {
         expect(html).toContain(checksumAddress(address));
       }
-      expect(html).toContain(checksumAddress(protocolFacts.contractAddresses.implementation));
     });
 
-    it('falls back to the verified addresses when the server read failed', () => {
+    // Regression: an indexer outage once left 2 of the 11 official addresses.
+    it('lists all eleven verified addresses when the server read failed', () => {
       mockUseDashboardInfo.mockReturnValue({ data: undefined, isLoading: true });
       const html = serverHtml(<Contracts initialContractAddrs={null} />);
-      expect(html).toContain(protocolFacts.contractAddresses.proxy);
-      expect(html).toContain(protocolFacts.contractAddresses.implementation);
+      for (const address of Object.values(protocolFacts.contractAddresses)) {
+        expect(html).toContain(checksumAddress(address));
+      }
+      expect(html.match(/data-contract="/g)).toHaveLength(11);
     });
   });
 

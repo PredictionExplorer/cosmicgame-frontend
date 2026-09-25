@@ -87,7 +87,7 @@
   },
   "code": {
     "title": "Source Code: CC0 On-Chain Art Protocol",
-    "description": "Explore the Cosmic Signature source code, rendering pipeline, contract repository, verification workflow, and CC0 public-domain license."
+    "description": "Explore the Cosmic Signature source code, its rendering pipeline, the project repositories and the CC0 public-domain license."
   },
   "tokenDetail": {
     "titleFor": "Cosmic Signature #{id}",
@@ -112,9 +112,9 @@
     "description": "Imprint a Random Walk NFT on Cosmic Signature. Each unused Random Walk NFT can be attached to one ETH gesture for a 50% ETH Gesture Cost discount."
   },
   "systemEvent": {
-    "title": "Configuration before Cycle {cycle}",
+    "title": "Coordination changes before Cycle {cycle}",
     "description": "The protocol parameters the contract owner changed before Cycle {cycle} opened, each with its new value and transaction.",
-    "titleInitial": "Initial configuration",
+    "titleInitial": "Coordination changes before the first cycle",
     "descriptionInitial": "The protocol parameters the contract owner set before the first cycle opened, each with its value and transaction."
   },
   "currentCycleFull": {

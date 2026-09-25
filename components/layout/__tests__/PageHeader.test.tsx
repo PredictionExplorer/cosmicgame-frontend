@@ -47,6 +47,16 @@ describe('PageHeader', () => {
       expect(screen.queryByRole('link', { name: section('collection') })).toBeNull();
     });
 
+    // A hub and its siblings share a tab row: the text eyebrow takes the
+    // linked one's 24px slot, so the H1 and the tabs do not move between them.
+    it('gives the hub eyebrow the same slot as the linked one (regression)', () => {
+      const { unmount } = render(<PageHeader section="trust" sectionHub title="Security" />);
+      expect(screen.getByText(section('trust'))).toHaveClass('min-h-6');
+      unmount();
+      render(<PageHeader section="trust" title="Audits" />);
+      expect(screen.getByRole('link', { name: section('trust') })).toHaveClass('min-h-6');
+    });
+
     it('drops the eyebrow of a hub titled with its section name', () => {
       // The catalog mock answers with keys, so a title equal to the key is the echo.
       render(<PageHeader section="admin" sectionHub title={section('admin')} />);
@@ -467,6 +477,21 @@ describe('PageHeader', () => {
     const beneficiary = document.querySelector('[data-figure="beneficiary"]');
     expect(latest).toHaveClass('max-sm:col-span-2');
     expect(beneficiary).toHaveClass('max-sm:col-span-2');
+  });
+
+  it("reserves the family's lede lines from lg on pages with tabs, and only there", () => {
+    const tabs = <nav aria-label="Siblings" />;
+    const { unmount } = render(
+      <PageHeader variant="reading" title="Terms" subtitle="Short." meta="Reviewed" tabs={tabs} />,
+    );
+    expect(screen.getByText('Short.')).toHaveClass('lg:min-h-[3lh]');
+    expect(screen.getByText('Reviewed')).toHaveClass('min-h-6');
+    unmount();
+    const second = render(<PageHeader title="Settings" subtitle="Short." tabs={tabs} />);
+    expect(screen.getByText('Short.')).toHaveClass('lg:min-h-[2lh]');
+    second.unmount();
+    render(<PageHeader title="Gallery" subtitle="Short." />);
+    expect(screen.getByText('Short.').className).not.toMatch(/min-h/);
   });
 
   it('never clamps the lede of a reading page', () => {

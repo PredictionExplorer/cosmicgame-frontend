@@ -1,8 +1,9 @@
 import { formatDuration } from '@/utils/format';
+import { allocationSharesFromDashboard as allocationShares } from '@/config/allocationTracks';
 
 import { checkA11y, render, screen, within } from '@/test-utils';
 
-import AdminSettingsPage, { allocationShares } from '../AdminSettingsPage';
+import AdminSettingsPage from '../AdminSettingsPage';
 
 const mockUseDashboardInfo = jest.fn();
 const mockRefetch = jest.fn();
@@ -73,16 +74,19 @@ describe('AdminSettingsPage', () => {
     expect(screen.queryByRole('button', { name: /^set/i })).not.toBeInTheDocument();
   });
 
-  it('groups the parameters under headings', () => {
+  // The groups /contracts also shows carry its names, and every tool's
+  // sections share one title tier (Moderation's).
+  it('groups the parameters under the /contracts names, at the section tier', () => {
     render(<AdminSettingsPage />);
-    const headings = screen.getAllByRole('heading', { level: 2 }).map((h) => h.textContent);
-    expect(headings).toEqual([
+    const headings = screen.getAllByRole('heading', { level: 2 });
+    expect(headings.map((h) => h.textContent)).toEqual([
       'Contracts',
-      'Allocation shares',
+      'Allocation tracks',
       'Stellar Selection',
       'Timing',
       'Gesture Cost',
     ]);
+    for (const heading of headings) expect(heading).toHaveClass('type-section');
   });
 
   it('lists every protocol address under its Contracts page name, with explorer evidence', () => {
@@ -111,7 +115,7 @@ describe('AdminSettingsPage', () => {
   // remainder carried to the next cycle, which /contracts draws, were missing.
   it('lists the whole Cycle Reserve split, every track /contracts draws', () => {
     render(<AdminSettingsPage />);
-    const shares = screen.getByRole('region', { name: 'Allocation shares' });
+    const shares = screen.getByRole('region', { name: 'Allocation tracks' });
     const rows = Array.from(shares.querySelectorAll('[data-parameter]'));
     expect(rows.map((row) => row.querySelector('dt')?.textContent)).toEqual([
       'Signature Allocation',
@@ -160,19 +164,18 @@ describe('AdminSettingsPage', () => {
     expect(activation).toHaveTextContent('Active');
   });
 
-  it('says which values the dashboard does not report instead of an empty field', () => {
+  // Two rows could only apologise ("Not reported by the dashboard API"): a
+  // value the page cannot read is not a setting to show.
+  it('lists only the parameters it can read', () => {
     render(<AdminSettingsPage />);
-    expect(valueOf('Initial Gesture Cost fraction')).toHaveTextContent(
-      'Not reported by the dashboard API',
-    );
-    expect(valueOf('ETH to CST Gesture ratio')).toHaveTextContent(
-      'Not reported by the dashboard API',
-    );
+    expect(screen.queryByText(/Not reported/)).toBeNull();
+    expect(screen.queryByText('ETH to CST Gesture ratio')).toBeNull();
+    expect(screen.queryByText('Initial Gesture Cost fraction')).toBeNull();
   });
 
   // A long value once kept its full width (shrink-0) and squeezed the label to a
   // syllable per line on phones, clipping the value at the row's edge.
-  it.each(['ETH to CST Gesture ratio', 'Initial Gesture Cost fraction', 'Activation time'])(
+  it.each(['Time increment growth per cycle', 'Activation time'])(
     'lets the %s value wrap beside a label that keeps its room',
     (label) => {
       render(<AdminSettingsPage />);

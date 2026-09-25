@@ -82,7 +82,7 @@ const ROUTES: readonly TooltipRoute[] = [
   { path: `/zh/allocation/${cycle}`, readyText: `第 ${cycle} 个周期`, minimum: 5 },
   { path: '/zh/anchoring', readyText: '锚定运作原理', minimum: 3 },
   { path: '/zh/statistics', readyText: '协议统计', minimum: 4 },
-  { path: '/zh/contracts', readyText: 'Cosmic Signature 合约', minimum: 2 },
+  { path: '/zh/contracts', readyText: '核心合约', minimum: 2 },
   { path: '/zh/marketing', readyText: '推广分配', minimum: 1, mock: mockOutreachRecords },
 ];
 

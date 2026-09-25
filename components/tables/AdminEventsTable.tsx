@@ -26,6 +26,11 @@ const WEB_URL = /^(?:https?|ipfs):\/\//i;
 
 interface AdminEventsTableProps extends LedgerStateProps {
   list: AdminEventRow[];
+  /**
+   * Changes from before the list (a window's earlier history), so the first
+   * change of a parameter in the list can still say what it replaced.
+   */
+  history?: readonly AdminEventRow[];
 }
 
 /**
@@ -52,13 +57,21 @@ export function previousChanges(list: readonly AdminEventRow[]): Map<string, Adm
  * formatted by what the parameter measures (a duration, a percentage, an
  * address, a date).
  */
-export const AdminEventsTable = ({ list, ...state }: AdminEventsTableProps) => {
+export const AdminEventsTable = ({
+  list,
+  history,
+  emptyTitle,
+  ...state
+}: AdminEventsTableProps) => {
   const t = useTranslations('tables');
   const tCoordination = useTranslations('coordination');
   const tStatistics = useTranslations('statistics');
   const locale = useLocale();
 
-  const previous = useMemo(() => previousChanges(list), [list]);
+  const previous = useMemo(
+    () => previousChanges(history ? [...history, ...list] : list),
+    [history, list],
+  );
 
   const columns = useMemo<DataTableColumn<AdminEventRow>[]>(() => {
     const eventOf = (row: AdminEventRow): AdminEvent | undefined =>
@@ -173,7 +186,7 @@ export const AdminEventsTable = ({ list, ...state }: AdminEventsTableProps) => {
       columns={columns}
       ariaLabel={t('names.parameterChanges')}
       getRowKey={(row) => row.EvtLogId}
-      emptyTitle={t('adminEvents.empty')}
+      emptyTitle={emptyTitle ?? t('adminEvents.empty')}
       initialSort={{ id: 'datetime', direction: 'desc' }}
       layout="cards"
       {...state}

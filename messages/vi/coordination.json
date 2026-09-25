@@ -6,8 +6,8 @@
     "loadError": "Không tải được các thay đổi điều phối."
   },
   "systemEvent": {
-    "title": "Cấu hình trước chu kỳ {cycle}",
-    "titleInitial": "Cấu hình ban đầu",
+    "title": "Thay đổi điều phối trước chu kỳ {cycle}",
+    "titleInitial": "Thay đổi điều phối trước chu kỳ đầu tiên",
     "lede": "Các tham số giao thức mà chủ sở hữu hợp đồng đã thay đổi trước khi chu kỳ {cycle} mở, kèm giá trị mới và giao dịch của từng thay đổi.",
     "ledeInitial": "Các tham số giao thức mà chủ sở hữu hợp đồng đã đặt trước khi chu kỳ đầu tiên mở, kèm giá trị và giao dịch của từng tham số.",
     "figures": {
@@ -18,10 +18,12 @@
     },
     "allChanges": "Tất cả thay đổi điều phối",
     "loadError": "Không tải được các thay đổi cấu hình.",
-    "emptyDescription": "Chủ sở hữu hợp đồng không thay đổi thiết lập nào trước khi chu kỳ {cycle} mở.",
+    "emptyDescription": "Chủ sở hữu hợp đồng không thay đổi thiết lập nào trước khi chu kỳ {cycle} mở.",
     "invalidTitle": "Không có khoảng cấu hình này",
     "invalidDescription": "Chu kỳ hoặc phạm vi sự kiện trong liên kết không hợp lệ.",
-    "emptyDescriptionInitial": "Chủ sở hữu hợp đồng không thay đổi thiết lập nào trước khi chu kỳ đầu tiên mở."
+    "emptyDescriptionInitial": "Chủ sở hữu hợp đồng không thay đổi thiết lập nào trước khi chu kỳ đầu tiên mở.",
+    "tableTitle": "Các thay đổi",
+    "emptyTitle": "Không có thay đổi trong khoảng này"
   },
   "events": {
     "undefined": "Không xác định",

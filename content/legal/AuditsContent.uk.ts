@@ -23,7 +23,7 @@ export const auditsCopyUk: AuditsCopy = {
       informational: 'Інформаційні',
     },
     reportCta: 'Прочитати звіт Hacken',
-    repositoryCta: 'Переглянути перевірені контракти',
+    repositoryCta: 'Переглянути репозиторій контрактів',
   },
   audit: {
     heading: 'Незалежний аудит від Hacken',

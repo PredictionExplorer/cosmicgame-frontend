@@ -5,7 +5,9 @@
     "due": "Due from this cycle",
     "dueCaption": "{percent} of the Cycle Reserve so far",
     "inVault": "In the vault now",
-    "retrieved": "Retrieved so far"
+    "retrieved": "Retrieved so far",
+    "beneficiaryNote": "<guild>Protocol Guild</guild> funds the contributors who maintain Ethereum's core protocol.",
+    "forwardNote": "Anyone can forward the vault's balance to Protocol Guild; it costs only gas."
   },
   "ledger": {
     "contributions": "Contributions",

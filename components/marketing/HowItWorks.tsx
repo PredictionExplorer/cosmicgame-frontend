@@ -15,8 +15,8 @@ const STEPS = [
  * How outreach allocations work, in three steps between hairlines: a number,
  * a glyph, the step and what it involves, in full (the detail that used to
  * hide behind an info button under each step is part of the text). Three
- * columns across a tablet; one column in the page's side column from `lg`.
- * Server-safe: no motion, no client code.
+ * columns from a tablet up, one on a phone. Server-safe: no motion, no
+ * client code.
  */
 export function HowItWorks() {
   const t = useTranslations('marketing.howItWorks');
@@ -34,11 +34,11 @@ export function HowItWorks() {
         title={t('title')}
         description={t('description')}
       />
-      <ol className="grid list-none divide-y divide-rule-faint border-y border-rule-faint ps-0 md:grid-cols-3 md:divide-x md:divide-y-0 lg:grid-cols-1 lg:divide-x-0 lg:divide-y">
+      <ol className="grid list-none divide-y divide-rule-faint border-y border-rule-faint ps-0 md:grid-cols-3 md:divide-x md:divide-y-0">
         {STEPS.map(({ id, Icon }, index) => (
           <li
             key={id}
-            className="flex flex-col gap-3 py-6 md:px-6 md:py-8 md:first:ps-0 md:last:pe-0 lg:gap-2 lg:px-0 lg:py-5"
+            className="flex flex-col gap-3 py-6 md:px-6 md:py-8 md:first:ps-0 md:last:pe-0"
           >
             <div className="flex items-center gap-3">
               <span className="type-figure-sm text-subtle" aria-hidden>

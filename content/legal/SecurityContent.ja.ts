@@ -27,6 +27,48 @@ export const securityCopyJa: SecurityCopy = {
     copyLabel: '{value}をコピー',
     copiedLabel: 'コピーしました',
   },
+  controls: {
+    heading: '所有者の権限とアップグレード',
+    paragraph:
+      'Cosmic Signatureプロトコルのコントラクトには所有者がいます。下記の範囲で一部のパラメーターを変更し、コントラクトのコードをアップグレードできる一つのアカウントです。すべての変更はオンチェーンに記録され、<coordination>調整の変更履歴</coordination>に一覧されます。',
+    ownerLabel: '所有者',
+    ownerUnavailable:
+      '現在、所有者を読み取れません。Arbiscanでコントラクトのowner()関数を呼び出すと確認できます。',
+    account: {
+      singleKey:
+        '単一の鍵で管理するウォレット（外部所有アカウント）で、マルチシグでもタイムロックでもありません。',
+      contract: 'マルチシグやタイムロックなどのスマートコントラクトのアカウントです。',
+      renounced:
+        '所有権は放棄されています。パラメーターの変更やコードのアップグレードができるアカウントはありません。',
+    },
+    rows: [
+      {
+        term: 'サイクル間',
+        detail:
+          '所有者は、一筆ごとに加わる時間や配分トラックの割合など、プロトコルのパラメーターを変更できます。',
+      },
+      {
+        term: 'サイクル中',
+        detail:
+          '中核となるパラメーターは、サイクルが有効になった時点（最初の一筆の前）から、そのサイクルが確定するまでロックされます。',
+      },
+      {
+        term: 'いつでも',
+        detail:
+          '所有者は、最初の一筆が届くまでサイクルの有効化を延期でき、次のサイクルまでの遅延を変更でき、周辺のコントラクト（公共財の受け手、NFTメタデータのリンク、配分ウォレットの受け取りタイムアウト）を管理できます。',
+      },
+      {
+        term: 'アップグレード',
+        detail:
+          'プロトコルはUUPSプロキシの背後で動作するため、アドレスは変わりません。所有者が新しいコードを指定できるのはサイクルの間だけです。現在使われているのは、上に記載した公開検証済みのV2実装です。',
+      },
+      {
+        term: '宇宙評議会',
+        detail:
+          'プロトコルが安定したら、所有権を宇宙評議会へ移す予定です。それ以降、パラメーターは調整定足数を満たしたプロトコル調整提案を通じてのみ変更されます。',
+      },
+    ],
+  },
   model: {
     heading: 'セキュリティモデル',
     paragraph:
@@ -41,10 +83,28 @@ export const securityCopyJa: SecurityCopy = {
   },
   report: {
     heading: '脆弱性の報告',
-    paragraphs: [
-      'コントラクト、アプリ、このウェブサイトに脆弱性を見つけた場合は、件名に「Security」と入れて<support>support@cosmicsignature.com</support>までメールしてください。見つけた内容、再現の手順、影響する範囲を記載してください。',
-      '公開する前に、チームが返信して修正するための時間をください。また、稼働中のコントラクトや他の参加者の資金に対して、攻撃手法を試さないでください。同じ連絡先はサイトの<securityTxt>security.txt</securityTxt>ファイルにも記載しています。',
+    lead: 'Cosmic Signatureのコントラクト、アプリ、このウェブサイトに脆弱性を見つけた場合は、件名に「Security」と入れて<support>support@cosmicsignature.com</support>までメールしてください。役に立つ報告には、次の内容が含まれます。',
+    include: [
+      '見つけた内容と、影響するコントラクト、ページ、アドレス。',
+      '再現の手順。',
+      'それによって何ができるか、誰の資金に関わるか。',
+      'チームからの連絡方法。',
     ],
+    scopeHeading: '対象範囲',
+    scope: [
+      {
+        term: '対象',
+        detail:
+          '<securityOfficial>公式のアドレス</securityOfficial>に記載したコントラクト、app.cosmicsignature.com、cosmicsignature.com。',
+      },
+      {
+        term: '対象外',
+        detail:
+          'ウォレット、マーケットプレイス、ブリッジ、Arbitrumネットワーク自体など、Cosmic Signatureが運営していないサービス。それぞれのチームに報告してください。',
+      },
+    ],
+    closing:
+      '公開する前に、チームが返信して修正するための時間をください。また、稼働中のコントラクトや他の参加者の資金に対して、攻撃手法を試さないでください。同じ連絡先はサイトの<securityTxt>security.txt</securityTxt>ファイルにも記載しています。',
   },
   verify: {
     heading: '自分で確かめる',

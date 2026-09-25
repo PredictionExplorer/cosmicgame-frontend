@@ -6,6 +6,15 @@ import { PublicGoodsVaultAction } from '../components/PublicGoodsVaultAction';
 
 const mockTx = createFakeTxFlow('0xabcdefabcdefabcdefabcdefabcdefabcdefabcd');
 const mockUseActiveWeb3React = jest.fn();
+let mockPublicClient: { getBalance: jest.Mock } | undefined;
+
+// The form reads the vault's balance through React Query: use the real one.
+jest.mock('@tanstack/react-query', () => jest.requireActual('@tanstack/react-query'));
+
+jest.mock('wagmi', () => ({
+  ...jest.requireActual('../../../../../__mocks__/wagmi'),
+  usePublicClient: () => mockPublicClient,
+}));
 
 jest.mock('@/hooks/useTxFlow', () => ({
   useTxFlow: () => mockTx.flow,
@@ -37,6 +46,7 @@ describe('PublicGoodsVaultAction', () => {
 
   beforeEach(() => {
     mockTx.reset();
+    mockPublicClient = undefined;
     mockUseActiveWeb3React.mockReturnValue({
       account: '0xabcdefabcdefabcdefabcdefabcdefabcdefabcd',
       active: true,
@@ -114,6 +124,26 @@ describe('PublicGoodsVaultAction', () => {
     renderWithQuery(<PublicGoodsVaultAction {...props} vaultBalanceEth={undefined} />);
     expect(document.querySelector('[data-row="balance"] dd')).not.toHaveTextContent(/\d/);
     expect(screen.queryByTestId('vault-empty')).toBeNull();
+  });
+
+  // The indexer lags a forward: after one confirms (or someone else's), it can still
+  // report ETH the vault no longer holds, and a forward then moves nothing.
+  it('decides from the chain, not the indexer, whether there is anything to forward', async () => {
+    mockPublicClient = { getBalance: jest.fn().mockResolvedValue(0n) };
+    renderWithQuery(<PublicGoodsVaultAction {...props} vaultBalanceEth={0.5} />);
+    expect(await screen.findByTestId('vault-empty')).toBeInTheDocument();
+    expect(mockPublicClient.getBalance).toHaveBeenCalledWith({ address: VAULT });
+    expect(document.querySelector('[data-row="balance"] dd')).toHaveTextContent(/^0/);
+    expect(screen.queryByRole('button', { name: /publicGoodsVault\.forward/ })).toBeNull();
+  });
+
+  it('offers the forward once the chain shows a balance', async () => {
+    mockPublicClient = { getBalance: jest.fn().mockResolvedValue(250_000_000_000_000_000n) };
+    renderWithQuery(<PublicGoodsVaultAction {...props} vaultBalanceEth={0} />);
+    expect(
+      await screen.findByRole('button', { name: /contribution\.publicGoodsVault\.forward/ }),
+    ).toBeInTheDocument();
+    expect(document.querySelector('[data-row="balance"] dd')).toHaveTextContent(/0\.25/);
   });
 
   it('renders nothing without a vault address', () => {

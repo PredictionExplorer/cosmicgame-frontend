@@ -11,7 +11,7 @@ import { REQUIRED_CHAIN_NAME } from '@/lib/chainGuard';
 import { cn } from '@/lib/utils';
 import { formatAmount } from '@/utils/format';
 import { AmountField } from '@/components/tokens/transfer/AmountField';
-import { commaIsDecimal, parseTokenAmount } from '@/components/tokens/transfer/amount';
+import { parseTokenAmount } from '@/components/tokens/transfer/amount';
 import { Button } from '@/components/ui/button';
 import { TxStatus } from '@/components/ui/tx-status';
 import { ChainGuard } from '@/components/wallet/NetworkGuard';
@@ -55,10 +55,8 @@ export function VaultContributionForm({
   const [amountTouched, setAmountTouched] = useState(false);
   const amountRef = useRef<HTMLInputElement>(null);
 
-  const amount = parseTokenAmount(amountText, {
-    max: balance?.value ?? null,
-    decimalComma: commaIsDecimal(locale),
-  });
+  // Read in the reader's own number style: a vi "1.000" is refused, never sent as 1.
+  const amount = parseTokenAmount(amountText, { max: balance?.value ?? null, locale });
   const sendable = amount.error === null ? amount.wei : null;
   const amountLabel =
     sendable !== null ? formatAmount(sendable, { unit: 'ETH', locale, context: 'exact' }) : null;

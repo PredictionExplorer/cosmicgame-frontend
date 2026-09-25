@@ -5,7 +5,6 @@ import { MessageSquare } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 
 import { DataTable, TableLink, type DataTableColumn } from '@/components/ui/data-table';
-import { UnknownValue } from '@/components/ui/unknown-value';
 import type { LedgerStateProps } from '@/components/tables/ledger-props';
 
 export interface EthDonation {
@@ -28,10 +27,13 @@ interface EthDonationTableProps extends LedgerStateProps {
 }
 
 /**
- * Direct ETH contributions to the Cycle Reserve, newest first. A
- * contribution with a note says "With note" and leads to its record page;
- * one without shows a dash and links its date to the transaction. The cycle
- * links to that cycle's contribution list.
+ * Direct ETH contributions to the Cycle Reserve, newest first, read as when,
+ * which cycle, who and how much. A contribution with a note says "With note"
+ * in a last column and leads to its record page; one without leaves that
+ * cell blank (its phone record drops the line) and links its date to the
+ * transaction, and a page where no row has a note shows no Note column at
+ * all. The cycle links to that cycle's contribution list. Every row carries
+ * several links, so they stay quiet until hovered or focused.
  */
 const EthDonationTable = ({
   list,
@@ -63,23 +65,6 @@ const EthDonationTable = ({
         sortable: true,
         phone: 'title',
       },
-      showType && {
-        id: 'note',
-        kind: 'text',
-        header: t('columns.note'),
-        // One bit per row, in the form's own words: the contract calls a
-        // contribution with a note `donateEthWithInfo`.
-        value: (row) => (row.RecordType > 0 ? t('ethContribution.withNote') : null),
-        cell: (row) =>
-          row.RecordType > 0 ? (
-            <span className="inline-flex items-center gap-1.5 whitespace-nowrap text-foreground">
-              <MessageSquare aria-hidden className="size-3.5 shrink-0 text-subtle" />
-              {t('ethContribution.withNote')}
-            </span>
-          ) : (
-            <UnknownValue label={t('status.none')} />
-          ),
-      },
       showCycle && {
         id: 'cycle',
         kind: 'link',
@@ -108,6 +93,24 @@ const EthDonationTable = ({
         showUnit: false,
         sortable: true,
       },
+      showType && {
+        id: 'note',
+        kind: 'text',
+        header: t('columns.note'),
+        // One bit per row, in the form's own words: the contract calls a
+        // contribution with a note `donateEthWithInfo`.
+        value: (row) => (row.RecordType > 0 ? t('ethContribution.withNote') : null),
+        // A blank cell, not a dash, for a contribution without one, so the
+        // phone record has no empty "Note" line; no note on the page, no column.
+        cell: (row) =>
+          row.RecordType > 0 ? (
+            <span className="inline-flex items-center gap-1.5 whitespace-nowrap text-foreground">
+              <MessageSquare aria-hidden className="size-3.5 shrink-0 text-subtle" />
+              {t('ethContribution.withNote')}
+            </span>
+          ) : null,
+        hideWhenEmpty: true,
+      },
     ];
     return all.filter((column): column is DataTableColumn<EthDonation> => Boolean(column));
   }, [t, showType, showCycle]);
@@ -122,6 +125,7 @@ const EthDonationTable = ({
       getRowLabel={(row) => t('ethContribution.viewContribution', { id: String(row.CGRecordId) })}
       emptyTitle={t('empty.contributions')}
       initialSort={{ id: 'datetime', direction: 'desc' }}
+      links="quiet"
       {...state}
     />
   );

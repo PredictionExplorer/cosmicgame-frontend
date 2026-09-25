@@ -44,7 +44,8 @@
     "contact": "Email the outreach team",
     "note": "The team can help with outreach materials and explain how allocations are decided.",
     "copyEmail": "Copy email address",
-    "emailCopied": "Email address copied"
+    "emailCopied": "Email address copied",
+    "rulesLink": "Read the program rules before you email the team"
   },
   "address": {
     "parent": "Outreach allocations",
@@ -56,7 +57,10 @@
       "allocations": "Allocations",
       "first": "First allocation",
       "latest": "Latest allocation",
-      "allocated": "Allocated"
+      "allocated": "Allocated on",
+      "rank": "Rank",
+      "rankValue": "{rank} of {total}",
+      "shareCaption": "{share} of all outreach CST"
     },
     "emptyDescription": "Allocations appear here once the outreach team sends CST to this address.",
     "invalidAddress": {
@@ -66,5 +70,12 @@
     }
   },
   "learnHow": "Learn how",
-  "loadError": "The outreach allocations couldn’t be loaded."
+  "loadError": "The outreach allocations couldn’t be loaded.",
+  "rules": {
+    "title": "Program rules",
+    "review": "Anyone can propose outreach; the team reviews each proposal before any allocation.",
+    "discretion": "Allocations are at the team's discretion: it decides whether to approve outreach, when to send CST and how much. Outreach that isn't approved receives nothing.",
+    "excluded": "Spam, bought followers or engagement, and misleading claims, including claims about what CST is worth, don't count.",
+    "disclose": "Say that you may receive CST whenever you post about Cosmic Signature."
+  }
 }

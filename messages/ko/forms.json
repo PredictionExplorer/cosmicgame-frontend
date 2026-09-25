@@ -32,8 +32,10 @@
         "format": "{example}처럼 숫자로 입력해 주세요.",
         "precision": "소수점 이하는 {decimals}자리까지 입력할 수 있습니다.",
         "zero": "0보다 큰 수량을 입력해 주세요.",
-        "exceedsBalance": "보낼 수 있는 {amount}보다 많습니다."
-      }
+        "exceedsBalance": "보낼 수 있는 {amount}보다 많습니다.",
+        "grouping": "천 단위 구분 기호 없이 입력하십시오. 예: {grouped} 대신 {plain}"
+      },
+      "checkingBalance": "잔액 확인 중…"
     },
     "review": {
       "title": "확인",
@@ -42,7 +44,8 @@
       "final": "전송은 되돌릴 수 없습니다. 잘못된 주소로 보낸 토큰은 되찾을 수 없습니다.",
       "acknowledge": "주소를 확인했으며 이 주소로 보내겠습니다.",
       "acknowledgeRequired": "계속하려면 주소를 확인했다고 표시해 주세요.",
-      "checking": "주소 확인 중…"
+      "checking": "주소 확인 중…",
+      "balanceUnchecked": "잔액을 확인할 수 없어 이 수량을 잔액과 대조하지 못했습니다."
     }
   }
 }

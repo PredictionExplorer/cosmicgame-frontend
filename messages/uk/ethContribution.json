@@ -23,7 +23,8 @@
     "urlError": "Вкажіть повне посилання, що починається з https:// або http://.",
     "summary": "{amount} надійде до резерву циклу {cycle}.",
     "summaryNoCycle": "{amount} надійде до резерву циклу.",
-    "submitAmount": "Внести {amount}"
+    "submitAmount": "Внести {amount}",
+    "riskLink": "Перш ніж зробити внесок, прочитайте розкриття ризиків"
   },
   "detail": {
     "invalidId": "Недійсний ідентифікатор внеску",

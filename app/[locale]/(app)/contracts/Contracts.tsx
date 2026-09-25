@@ -24,17 +24,23 @@ import { PageHeader } from '@/components/layout/PageHeader';
 
 import { CalibrationWindows } from './components/CalibrationWindows';
 import { ContractAddressList } from './components/ContractAddressList';
-import { FundDistribution } from './components/FundDistribution';
-import { ProtocolConfiguration } from './components/ProtocolConfiguration';
+import { AllocationTracksSection } from './components/AllocationTracksSection';
+import {
+  ProtocolConfiguration,
+  type ProtocolConfigurationProps,
+} from './components/ProtocolConfiguration';
 import { PublicGoodsVaultAction } from './components/PublicGoodsVaultAction';
 import type { CalibrationWindowReading } from './components/calibrationWindow';
-import { ContractReadStatus, type ContractReadHealth } from './components/ContractReadStatus';
+import { ContractReadStatus, useContractReadHealthStore } from './components/ContractReadStatus';
 
 /**
  * The preview grows with the seconds since the last gesture, so it stays live, but at a pace
  * that does not hammer the RPC from every open tab; hidden tabs stop polling entirely.
  */
 const CST_REWARD_PREVIEW_REFRESH_MS = 2_000;
+
+/** A gesture made in this tab (the gesture panel dispatches it once the transaction confirms). */
+const GESTURE_PLACED_EVENT = 'cosmic:gesture-placed';
 
 interface LiveCstPreviewTestGlobals {
   expect?: unknown;
@@ -75,131 +81,96 @@ function getLiveCstPreviewRefreshMs(): number {
 /** A contract read: `undefined` while it is in flight, `null` when it failed. */
 type Read<T> = T | null | undefined;
 
-interface ContractsProps {
-  /** The server-rendered page header, the page's only header. */
-  seoSummary?: ReactNode;
-  /**
-   * The server-rendered address list (`ContractAddressList`), so every address is in
-   * the server HTML. Without it (tests, a render outside the route) the body renders
-   * the list itself from the addresses it has.
-   */
-  addresses?: ReactNode;
-  /** The contract addresses from the page's server read, for the fallback list. */
-  initialContractAddrs?: ContractAddresses | null;
+type CosmicGameReader = NonNullable<ReturnType<typeof useContractNoSigner>>;
+
+/** Runs one read; a failure is reported and stored as `null` (unknown). */
+async function read<T>(
+  name: string,
+  fn: () => Promise<T | null>,
+  set: (value: T | null) => void,
+): Promise<void> {
+  try {
+    set(await fn());
+  } catch (e) {
+    reportError(e, `contracts read ${name}`);
+    set(null);
+  }
 }
 
 /**
- * /contracts, below its header: the address list, the allocation tracks, the live
- * protocol configuration, the two Calibration Windows and Public Goods. Figures read
- * from the contracts show a skeleton while they load and a dash when a read fails.
+ * The two Calibration Windows and the CST window's starting cost. Every
+ * gesture changes them (a CST gesture restarts the CST window and resizes
+ * it, an ETH gesture shortens it, a new cycle reopens the ETH window), so
+ * they are read again whenever the dashboard's cycle or gesture count moves
+ * and when this tab makes a gesture, each reading stamped with its time.
  */
-const Contracts = ({ seoSummary, addresses, initialContractAddrs = null }: ContractsProps) => {
-  const t = useTranslations('contracts');
-  const { data, isLoading: loading } = useDashboardInfo();
-  const { charity: appVaultAddress, cosmicGame } = useContractAddresses();
-  // The vault from the app-wide addresses, else from this page's own reads, so the
-  // Public Goods section is in the server HTML rather than appearing after hydration.
-  const vaultAddress =
-    [
-      appVaultAddress,
-      data?.ContractAddrs?.CharityWalletAddr,
-      initialContractAddrs?.CharityWalletAddr,
-    ].find(Boolean) ?? '';
-
-  const [charityAddress, setCharityAddress] = useState<Read<string>>(undefined);
-  const [priceIncrease, setPriceIncrease] = useState<Read<number>>(undefined);
-  const [timeIncrease, setTimeIncrease] = useState<Read<number>>(undefined);
-  const [timeIncrement, setTimeIncrement] = useState<Read<number>>(undefined);
-  const [initialIncrement, setInitialIncrement] = useState<Read<number>>(undefined);
-  const [msgMaxLen, setMsgMaxLen] = useState<Read<number>>(undefined);
-  const [cstRewardAmountForBidding, setCstRewardAmountForBidding] =
-    useState<Read<number>>(undefined);
+function useCalibrationWindowReads(
+  contract: CosmicGameReader | null,
+  cycle: unknown,
+  gestureCount: unknown,
+) {
   const [cstWindow, setCstWindow] = useState<Read<CalibrationWindowReading>>(undefined);
   const [ethWindow, setEthWindow] = useState<Read<CalibrationWindowReading>>(undefined);
   const [cstStartingCost, setCstStartingCost] = useState<Read<number>>(undefined);
-  // The polled read's health, for the configuration's freshness stamp.
-  const [liveReadHealth, setLiveReadHealth] = useState<ContractReadHealth>({
-    lastSuccessAtMs: null,
-    lastAttemptFailed: false,
-  });
-
-  const charityWalletContract = useContractNoSigner(vaultAddress, CHARITY_WALLET_ABI);
-  const cosmicGameContract = useContractNoSigner(cosmicGame, COSMICGAME_ABI);
 
   useEffect(() => {
-    if (!cosmicGameContract) return;
-
-    /** Runs one read; a failure is reported and stored as `null` (unknown). */
-    const read = async <T,>(
-      name: string,
-      fn: () => Promise<T | null>,
-      set: (value: T | null) => void,
-    ) => {
-      try {
-        set(await fn());
-      } catch (e) {
-        reportError(e, `contracts read ${name}`);
-        set(null);
-      }
+    if (!contract) return;
+    let cancelled = false;
+    const guard =
+      <T,>(set: (value: T | null) => void) =>
+      (value: T | null) => {
+        if (!cancelled) set(value);
+      };
+    const refresh = () => {
+      void read(
+        'getCstDutchAuctionDurations',
+        async () => windowReading(await contract.read.getCstDutchAuctionDurations?.()),
+        guard(setCstWindow),
+      );
+      void read(
+        'getEthDutchAuctionDurations',
+        async () => windowReading(await contract.read.getEthDutchAuctionDurations?.()),
+        guard(setEthWindow),
+      );
+      // The current CST window's own starting cost, not its lower bound.
+      void read(
+        'cstDutchAuctionBeginningBidPrice',
+        async () => {
+          const v = await contract.read.cstDutchAuctionBeginningBidPrice?.();
+          return typeof v === 'bigint' ? Number(formatEther(v)) : null;
+        },
+        guard(setCstStartingCost),
+      );
     };
+    refresh();
+    window.addEventListener(GESTURE_PLACED_EVENT, refresh);
+    return () => {
+      cancelled = true;
+      window.removeEventListener(GESTURE_PLACED_EVENT, refresh);
+    };
+  }, [contract, cycle, gestureCount]);
 
-    void read(
-      'bidMessageLengthMaxLimit',
-      async () => positiveOrNull(await cosmicGameContract.read.bidMessageLengthMaxLimit?.()),
-      setMsgMaxLen,
-    );
-    void read(
-      'ethBidPriceIncreaseDivisor',
-      async () => percentFromDivisor(await cosmicGameContract.read.ethBidPriceIncreaseDivisor?.()),
-      setPriceIncrease,
-    );
-    void read(
-      'mainPrizeTimeIncrementIncreaseDivisor',
-      async () =>
-        percentFromDivisor(await cosmicGameContract.read.mainPrizeTimeIncrementIncreaseDivisor?.()),
-      setTimeIncrease,
-    );
-    void read(
-      'mainPrizeTimeIncrementInMicroSeconds',
-      async () => {
-        const v = positiveOrNull(
-          await cosmicGameContract.read.mainPrizeTimeIncrementInMicroSeconds?.(),
-        );
-        return v === null ? null : v / 1_000_000;
-      },
-      setTimeIncrement,
-    );
-    // The resolved initial duration (seconds), read from the contract rather than the
-    // legacy `InitialSecondsUntilPrize` API field, which carries a divisor, not seconds.
-    void read(
-      'getInitialDurationUntilMainPrize',
-      async () =>
-        positiveOrNull(await cosmicGameContract.read.getInitialDurationUntilMainPrize?.()),
-      setInitialIncrement,
-    );
-    void read(
-      'getCstDutchAuctionDurations',
-      async () => windowReading(await cosmicGameContract.read.getCstDutchAuctionDurations?.()),
-      setCstWindow,
-    );
-    void read(
-      'getEthDutchAuctionDurations',
-      async () => windowReading(await cosmicGameContract.read.getEthDutchAuctionDurations?.()),
-      setEthWindow,
-    );
-    // The current CST window's own starting cost, not its lower bound.
-    void read(
-      'cstDutchAuctionBeginningBidPrice',
-      async () => {
-        const v = await cosmicGameContract.read.cstDutchAuctionBeginningBidPrice?.();
-        return typeof v === 'bigint' ? Number(formatEther(v)) : null;
-      },
-      setCstStartingCost,
-    );
-  }, [cosmicGameContract]);
+  return { cstWindow, ethWindow, cstStartingCost };
+}
+
+/**
+ * The live protocol configuration: the fixed parameters come from the page,
+ * and the Participation CST preview is polled here, so only this section
+ * re-renders on every poll. The freshness of that poll lives in a store the
+ * status stamp subscribes to, so a successful poll re-renders the stamp, not
+ * the page.
+ */
+function LiveProtocolConfiguration({
+  contract,
+  ...configuration
+}: Omit<ProtocolConfigurationProps, 'cstRewardPerBid' | 'status'> & {
+  contract: CosmicGameReader | null;
+}) {
+  const [cstRewardPerBid, setCstRewardPerBid] = useState<Read<number>>(undefined);
+  const health = useContractReadHealthStore();
 
   useEffect(() => {
-    if (!cosmicGameContract) return;
+    if (!contract) return;
 
     let cancelled = false;
     let inFlight = false;
@@ -211,23 +182,19 @@ const Contracts = ({ seoSummary, addresses, initialContractAddrs = null }: Contr
 
       try {
         const v = await readCosmicGameWithFallback<bigint>([
-          () => cosmicGameContract.read.getBidCstRewardAmount?.() as Promise<bigint | undefined>,
-          () =>
-            cosmicGameContract.read.getBidCstRewardAmountAdvanced?.([0n]) as Promise<
-              bigint | undefined
-            >,
-          () =>
-            cosmicGameContract.read.cstRewardAmountForBidding?.() as Promise<bigint | undefined>,
+          () => contract.read.getBidCstRewardAmount?.() as Promise<bigint | undefined>,
+          () => contract.read.getBidCstRewardAmountAdvanced?.([0n]) as Promise<bigint | undefined>,
+          () => contract.read.cstRewardAmountForBidding?.() as Promise<bigint | undefined>,
         ]);
         const amount = Number(formatEther(v ?? 0n));
         if (!cancelled) {
-          setCstRewardAmountForBidding(Number.isFinite(amount) ? amount : null);
-          setLiveReadHealth({ lastSuccessAtMs: Date.now(), lastAttemptFailed: false });
+          setCstRewardPerBid(Number.isFinite(amount) ? amount : null);
+          health.succeeded();
         }
       } catch (e) {
         if (!cancelled) {
-          setCstRewardAmountForBidding(null);
-          setLiveReadHealth((previous) => ({ ...previous, lastAttemptFailed: true }));
+          setCstRewardPerBid(null);
+          health.failed();
           reportError(e, 'contracts live cstRewardAmountForBidding');
         }
       } finally {
@@ -270,14 +237,109 @@ const Contracts = ({ seoSummary, addresses, initialContractAddrs = null }: Contr
     const handleGesturePlaced = () => {
       void refreshCstRewardPreview();
     };
-    window.addEventListener('cosmic:gesture-placed', handleGesturePlaced);
+    window.addEventListener(GESTURE_PLACED_EVENT, handleGesturePlaced);
 
     return () => {
       cancelled = true;
       if (timeoutId !== null) window.clearTimeout(timeoutId);
       document.removeEventListener('visibilitychange', handleVisibilityChange);
-      window.removeEventListener('cosmic:gesture-placed', handleGesturePlaced);
+      window.removeEventListener(GESTURE_PLACED_EVENT, handleGesturePlaced);
     };
+  }, [contract, health]);
+
+  return (
+    <ProtocolConfiguration
+      {...configuration}
+      cstRewardPerBid={cstRewardPerBid}
+      status={<ContractReadStatus store={health} pollIntervalMs={CST_REWARD_PREVIEW_REFRESH_MS} />}
+    />
+  );
+}
+
+interface ContractsProps {
+  /** The server-rendered page header, the page's only header. */
+  seoSummary?: ReactNode;
+  /**
+   * The server-rendered address list (`ContractAddressList`), so every address is in
+   * the server HTML. Without it (tests, a render outside the route) the body renders
+   * the list itself from the addresses it has.
+   */
+  addresses?: ReactNode;
+  /** The contract addresses from the page's server read, for the fallback list. */
+  initialContractAddrs?: ContractAddresses | null;
+}
+
+/**
+ * /contracts, below its header: the address list, the allocation tracks, the live
+ * protocol configuration, the two Calibration Windows and Public Goods. Figures read
+ * from the contracts show a skeleton while they load and a dash when a read fails.
+ */
+const Contracts = ({ seoSummary, addresses, initialContractAddrs = null }: ContractsProps) => {
+  const t = useTranslations('contracts');
+  const { data, isLoading: loading } = useDashboardInfo();
+  const { charity: appVaultAddress, cosmicGame } = useContractAddresses();
+  // The vault from the app-wide addresses, else from this page's own reads, so the
+  // Public Goods section is in the server HTML rather than appearing after hydration.
+  const vaultAddress =
+    [
+      appVaultAddress,
+      data?.ContractAddrs?.CharityWalletAddr,
+      initialContractAddrs?.CharityWalletAddr,
+    ].find(Boolean) ?? '';
+
+  const [charityAddress, setCharityAddress] = useState<Read<string>>(undefined);
+  const [priceIncrease, setPriceIncrease] = useState<Read<number>>(undefined);
+  const [timeIncrease, setTimeIncrease] = useState<Read<number>>(undefined);
+  const [timeIncrement, setTimeIncrement] = useState<Read<number>>(undefined);
+  const [initialIncrement, setInitialIncrement] = useState<Read<number>>(undefined);
+  const [msgMaxLen, setMsgMaxLen] = useState<Read<number>>(undefined);
+
+  const charityWalletContract = useContractNoSigner(vaultAddress, CHARITY_WALLET_ABI);
+  const cosmicGameContract = useContractNoSigner(cosmicGame, COSMICGAME_ABI);
+  const { cstWindow, ethWindow, cstStartingCost } = useCalibrationWindowReads(
+    cosmicGameContract,
+    data?.CurRoundNum,
+    data?.CurNumBids,
+  );
+
+  // Parameters that change only between cycles: read once per page.
+  useEffect(() => {
+    if (!cosmicGameContract) return;
+
+    void read(
+      'bidMessageLengthMaxLimit',
+      async () => positiveOrNull(await cosmicGameContract.read.bidMessageLengthMaxLimit?.()),
+      setMsgMaxLen,
+    );
+    void read(
+      'ethBidPriceIncreaseDivisor',
+      async () => percentFromDivisor(await cosmicGameContract.read.ethBidPriceIncreaseDivisor?.()),
+      setPriceIncrease,
+    );
+    void read(
+      'mainPrizeTimeIncrementIncreaseDivisor',
+      async () =>
+        percentFromDivisor(await cosmicGameContract.read.mainPrizeTimeIncrementIncreaseDivisor?.()),
+      setTimeIncrease,
+    );
+    void read(
+      'mainPrizeTimeIncrementInMicroSeconds',
+      async () => {
+        const v = positiveOrNull(
+          await cosmicGameContract.read.mainPrizeTimeIncrementInMicroSeconds?.(),
+        );
+        return v === null ? null : v / 1_000_000;
+      },
+      setTimeIncrement,
+    );
+    // The resolved initial duration (seconds), read from the contract rather than the
+    // legacy `InitialSecondsUntilPrize` API field, which carries a divisor, not seconds.
+    void read(
+      'getInitialDurationUntilMainPrize',
+      async () =>
+        positiveOrNull(await cosmicGameContract.read.getInitialDurationUntilMainPrize?.()),
+      setInitialIncrement,
+    );
   }, [cosmicGameContract]);
 
   useEffect(() => {
@@ -310,7 +372,7 @@ const Contracts = ({ seoSummary, addresses, initialContractAddrs = null }: Contr
           variant="reading"
           section="trust"
           title={t('page.title')}
-          subtitle={t('page.subtitle')}
+          subtitle={t('addresses.description')}
           meta={
             <>
               <span className="text-muted-foreground">{networkConfig.chainName}</span>
@@ -325,32 +387,19 @@ const Contracts = ({ seoSummary, addresses, initialContractAddrs = null }: Contr
           <ContractAddressList apiAddresses={data?.ContractAddrs ?? initialContractAddrs} />
         )}
 
-        <FundDistribution
-          prizePercentage={data?.PrizePercentage}
-          chronoWarriorPercentage={data?.ChronoWarriorPercentage}
-          stellarSelectionPercentage={data?.RafflePercentage}
-          stakingPercentage={data?.StakingPercentage}
-          charityPercentage={data?.CharityPercentage}
-          loading={loading}
-        />
+        <AllocationTracksSection data={data} loading={loading} />
 
-        <ProtocolConfiguration
+        <LiveProtocolConfiguration
+          contract={cosmicGameContract}
           priceIncrease={priceIncrease}
           timeIncrease={timeIncrease ?? null}
           timeIncrement={timeIncrement}
-          cstRewardPerBid={cstRewardAmountForBidding}
           maxMessageLength={msgMaxLen}
           claimTimeout={loading && !data ? undefined : positiveOrNull(data?.TimeoutClaimPrize)}
           initialIncrement={initialIncrement}
           ethStellarRecipients={dashboardNumber(data?.NumRaffleEthWinnersBidding)}
           nftStellarRecipients={dashboardNumber(data?.NumRaffleNFTWinnersBidding)}
           anchoredStellarRecipients={dashboardNumber(data?.NumRaffleNFTWinnersStakingRWalk)}
-          status={
-            <ContractReadStatus
-              health={liveReadHealth}
-              pollIntervalMs={CST_REWARD_PREVIEW_REFRESH_MS}
-            />
-          }
         />
 
         <CalibrationWindows

@@ -14,7 +14,8 @@
     "wrap": "自動換行",
     "ipfs": "IPFS",
     "github": "GitHub",
-    "cid": "IPFS 內容識別碼"
+    "cid": "IPFS 內容識別碼",
+    "copyCid": "複製 IPFS 識別碼"
   },
   "pipeline": {
     "heading": "從種子到圖像",
@@ -44,8 +45,7 @@
     }
   },
   "seo": {
-    "heading": "Cosmic Signature 源代碼",
-    "description": "查看 Cosmic Signature 的前端、Go 後端、智能合約與圖像生成源代碼。透過下方查看器，了解鏈上種子如何生成可重現的 NFT 藝術作品。"
+    "heading": "Cosmic Signature 源代碼"
   },
   "repositories": {
     "heading": "項目代碼庫",
@@ -67,5 +67,9 @@
         "description": "以 Rust 編寫的三體模擬與渲染器，用於生成 Cosmic Signature 圖像和影片。"
       }
     }
+  },
+  "page": {
+    "lede": "Cosmic Signature 各個部分的源代碼，以及把每個種子變成作品的程式。",
+    "license": "授權：CC0 1.0"
   }
 }

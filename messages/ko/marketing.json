@@ -44,7 +44,8 @@
     "contact": "홍보 팀에 이메일 보내기",
     "note": "팀이 홍보 자료 준비를 돕고 배분이 정해지는 방식을 안내합니다.",
     "copyEmail": "이메일 주소 복사",
-    "emailCopied": "이메일 주소를 복사했습니다"
+    "emailCopied": "이메일 주소를 복사했습니다",
+    "rulesLink": "팀에 이메일을 보내기 전에 참여 조건을 읽어 보십시오"
   },
   "address": {
     "parent": "홍보 배분",
@@ -56,7 +57,10 @@
       "allocations": "배분 건수",
       "first": "첫 배분",
       "latest": "최근 배분",
-      "allocated": "배분 일시"
+      "allocated": "배분 일시",
+      "rank": "순위",
+      "rankValue": "{total}명 중 {rank}위",
+      "shareCaption": "전체 홍보 CST의 {share}"
     },
     "emptyDescription": "홍보 팀이 이 주소로 CST를 보내면 배분이 여기에 표시됩니다.",
     "invalidAddress": {
@@ -66,5 +70,12 @@
     }
   },
   "learnHow": "참여 방법 보기",
-  "loadError": "홍보 배분 내역을 불러오지 못했습니다."
+  "loadError": "홍보 배분 내역을 불러오지 못했습니다.",
+  "rules": {
+    "title": "참여 조건",
+    "review": "누구나 홍보 활동을 제안할 수 있으며, 팀은 배분 전에 모든 제안을 검토합니다.",
+    "discretion": "배분은 팀의 재량입니다. 홍보 활동의 승인 여부와 CST 전송 시점, 수량을 팀이 정합니다. 승인되지 않은 홍보 활동은 배분을 받지 않습니다.",
+    "excluded": "스팸, 구매한 팔로워나 참여, CST의 가치에 관한 주장을 포함해 오해의 소지가 있는 주장은 인정되지 않습니다.",
+    "disclose": "Cosmic Signature에 관해 게시할 때마다 그로 인해 CST를 받을 수 있다는 사실을 밝히십시오."
+  }
 }

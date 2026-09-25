@@ -63,6 +63,10 @@ export function TopMarketersLeaderboard({ rewards, ...state }: TopMarketersLeade
         header: t('columns.contributor'),
         value: (row) => row.address,
         href: (row) => `/marketing/${row.address}`,
+        // The short address is one unit and never gives up its width: a table
+        // too narrow for it turns into records instead of breaking the hex.
+        cellClassName:
+          'min-w-[14ch] [&_.font-mono]:[overflow-wrap:normal]! [&_.font-mono]:[text-wrap-mode:nowrap]!',
       },
       {
         id: 'share',
@@ -70,8 +74,8 @@ export function TopMarketersLeaderboard({ rewards, ...state }: TopMarketersLeade
         header: t('columns.share'),
         help: t('columns.shareHelp'),
         value: (row) => row.sharePercent,
+        // Sized by its content: the bar only shows from sm, so a phone keeps the room.
         cell: (row) => <ShareCell percent={row.sharePercent} />,
-        width: '12rem',
       },
       {
         id: 'received',
@@ -79,7 +83,6 @@ export function TopMarketersLeaderboard({ rewards, ...state }: TopMarketersLeade
         header: t('columns.received'),
         unit: 'CST',
         value: (row) => row.totalCst,
-        width: '10rem',
       },
       {
         id: 'allocations',
@@ -87,7 +90,6 @@ export function TopMarketersLeaderboard({ rewards, ...state }: TopMarketersLeade
         header: t('columns.allocations'),
         value: (row) => row.allocations,
         priority: 'secondary',
-        width: '7rem',
       },
     ],
     [t],

@@ -14,7 +14,8 @@
     "wrap": "行を折り返す",
     "ipfs": "IPFS",
     "github": "GitHub",
-    "cid": "IPFSコンテンツ識別子"
+    "cid": "IPFSコンテンツ識別子",
+    "copyCid": "IPFS識別子をコピー"
   },
   "pipeline": {
     "heading": "シードから画像まで",
@@ -44,8 +45,7 @@
     }
   },
   "seo": {
-    "heading": "Cosmic Signatureソースコード",
-    "description": "Cosmic Signatureのフロントエンド、Goバックエンド、スマートコントラクト、画像生成のソースコードを公開しています。以下のビューアーで、オンチェーンのシードから再現可能なNFTアートを生成する仕組みを確認できます。"
+    "heading": "Cosmic Signatureソースコード"
   },
   "repositories": {
     "heading": "プロジェクトのリポジトリ",
@@ -67,5 +67,9 @@
         "description": "Cosmic Signatureの画像と動画を生成する、Rust製の三体シミュレーションとレンダラーです。"
       }
     }
+  },
+  "page": {
+    "lede": "Cosmic Signatureの各部分のソースコードと、各シードを作品に変えるプログラムです。",
+    "license": "ライセンス：CC0 1.0"
   }
 }

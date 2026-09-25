@@ -18,7 +18,8 @@ import { AUDIT_FINDINGS_TOTAL, AUDIT_SEVERITIES, HACKEN_AUDIT, type AuditSeverit
 import { LEGAL_LINKS } from './links';
 
 /** A link button whose label may take two lines on a phone: the height follows the text. */
-const WRAPPING_BUTTON_CLASS = 'h-auto max-w-full whitespace-normal py-2.5 text-start';
+const WRAPPING_BUTTON_CLASS =
+  'h-auto max-w-full whitespace-normal py-2.5 text-start max-sm:w-full max-sm:justify-between';
 
 export interface AuditsCopy {
   readonly title: string;
@@ -102,7 +103,7 @@ function AuditSummary({ copy, locale }: { copy: AuditsCopy['summary']; locale: s
       className="rounded-surface border border-rule bg-surface p-5 sm:p-7"
     >
       <div className="flex flex-wrap items-baseline justify-between gap-x-6 gap-y-1">
-        <h2 id="audit-summary-title" className="type-eyebrow text-subtle">
+        <h2 id="audit-summary-title" className="type-label text-muted-foreground">
           {copy.label}
         </h2>
         <p className="type-label text-muted-foreground">
@@ -161,7 +162,7 @@ function AuditSummary({ copy, locale }: { copy: AuditsCopy['summary']; locale: s
       </div>
 
       {/* A long label (uk, vi) wraps inside its button rather than push the card past a 320px screen. */}
-      <div className="mt-7 flex flex-wrap gap-3">
+      <div className="mt-7 flex flex-col gap-3 sm:flex-row sm:flex-wrap">
         <SiteLink
           href={HACKEN_AUDIT.reportUrl}
           kind="external"

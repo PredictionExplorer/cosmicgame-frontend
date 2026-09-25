@@ -23,7 +23,8 @@
     "urlError": "Hãy dùng liên kết đầy đủ bắt đầu bằng https:// hoặc http://.",
     "summary": "{amount} sẽ vào dự trữ chu kỳ của chu kỳ {cycle}.",
     "summaryNoCycle": "{amount} sẽ vào dự trữ chu kỳ.",
-    "submitAmount": "Đóng góp {amount}"
+    "submitAmount": "Đóng góp {amount}",
+    "riskLink": "Hãy đọc công bố rủi ro trước khi đóng góp"
   },
   "detail": {
     "invalidId": "Mã đóng góp không hợp lệ",

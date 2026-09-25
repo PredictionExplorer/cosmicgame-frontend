@@ -7,17 +7,16 @@ import type { Address } from 'viem';
 
 import { protocolFacts } from '@/content/protocol-facts';
 
-import { EXPLORER_NAME, REQUIRED_CHAIN_NAME } from '@/lib/chainGuard';
+import { REQUIRED_CHAIN_NAME } from '@/lib/chainGuard';
 import { useCharityVoluntary } from '@/hooks/useApiQuery';
 import { useContractAddresses } from '@/contexts/ContractAddressesContext';
 import { VaultContributionForm } from '@/components/contributions/VaultContributionForm';
-import { ContractEvidence } from '@/components/legal/ContractEvidence';
+import { VaultAddressRow } from '@/components/donations/VaultAddressRow';
 import { LedgerPage } from '@/components/ledger/LedgerPage';
 import {
   CharityDepositTable,
   type PublicGoodsContributionEntry,
 } from '@/components/tables/CharityDepositTable';
-import { AddressChip } from '@/components/ui/address-chip';
 import { Badge } from '@/components/ui/badge';
 import { SectionHeader } from '@/components/ui/section-header';
 
@@ -31,7 +30,6 @@ import { SectionHeader } from '@/components/ui/section-header';
  */
 function ContributeToVault({ onContributed }: { onContributed: () => void }) {
   const t = useTranslations('publicGoods');
-  const tFormats = useTranslations('formats');
   const { charity } = useContractAddresses();
   const headingId = useId();
   const beneficiary = protocolFacts.publicGoodsBeneficiary.name;
@@ -46,26 +44,7 @@ function ContributeToVault({ onContributed }: { onContributed: () => void }) {
       {charity ? (
         <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_minmax(0,24rem)] lg:items-start lg:gap-12">
           <div className="flex min-w-0 flex-col gap-4">
-            <dl className="flex flex-col gap-4 border-y border-rule-faint py-4">
-              <div className="flex min-w-0 flex-col gap-1.5">
-                <dt className="type-label text-subtle">{tFormats('address.known.publicGoods')}</dt>
-                <dd className="flex min-w-0 flex-col items-start gap-2">
-                  {/* The whole checksummed address, wrapping on a phone, so it
-                      can be checked against a wallet's by eye. */}
-                  <AddressChip
-                    address={charity}
-                    variant="plain"
-                    label={false}
-                    href={false}
-                    display="full"
-                    className="type-hash whitespace-normal text-foreground [overflow-wrap:anywhere]"
-                  />
-                  <ContractEvidence
-                    address={charity}
-                    labels={{ explorer: EXPLORER_NAME, sourcify: 'Sourcify' }}
-                  />
-                </dd>
-              </div>
+            <VaultAddressRow address={charity}>
               <div className="flex flex-wrap items-center gap-x-4 gap-y-1.5">
                 <dt className="type-label text-subtle">{t('contribute.network')}</dt>
                 <dd>
@@ -74,7 +53,7 @@ function ContributeToVault({ onContributed }: { onContributed: () => void }) {
                   </Badge>
                 </dd>
               </div>
-            </dl>
+            </VaultAddressRow>
             <p className="flex gap-2 type-body-sm text-muted-foreground">
               <TriangleAlert aria-hidden className="mt-0.5 size-4 shrink-0 text-attention" />
               <span>{t('contribute.networkWarning', { network: REQUIRED_CHAIN_NAME })}</span>

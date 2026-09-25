@@ -319,7 +319,8 @@
       "figures": {
         "imprinted": "Imprinted",
         "received": "Received",
-        "sent": "Sent"
+        "sent": "Sent",
+        "anchoring": "Anchored or released"
       }
     },
     "cst": {
@@ -328,8 +329,8 @@
       "lede": "CST imprinted to this address, received and sent by it, and consumed by its CST gestures.",
       "emptyDescription": "CST reaches an address when a gesture imprints it or another wallet sends it.",
       "figures": {
-        "received": "Received",
-        "sent": "Sent",
+        "received": "Total in",
+        "sent": "Total out",
         "net": "Net change",
         "imprintedCaption": "Imprinted: {amount}",
         "consumedCaption": "Consumed: {amount}"
@@ -353,7 +354,8 @@
       "all": "All",
       "in": "Incoming",
       "out": "Outgoing",
-      "empty": "Nothing in this direction yet."
+      "empty": "Nothing in this direction yet.",
+      "transfers": "Between wallets"
     },
     "columns": {
       "activity": "Activity",

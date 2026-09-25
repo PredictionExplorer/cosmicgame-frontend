@@ -1,3 +1,5 @@
+import { toFiniteNumber } from '@/utils/finiteNumber';
+
 /**
  * The Cycle Reserve's allocation tracks, in the order every chart of the split lists them.
  * One color per track, taken from the palette tokens, so a reader who learns the colors on
@@ -47,6 +49,40 @@ export const ALLOCATION_TRACK_COPY_KEYS: Readonly<Record<AllocationTrackId, stri
 export interface AllocationTrackShare {
   id: AllocationTrackId;
   percent: number | null;
+}
+
+/** The dashboard fields that carry each distributed track's share of the Cycle Reserve. */
+export interface DashboardTrackShares {
+  PrizePercentage?: unknown;
+  ChronoWarriorPercentage?: unknown;
+  RafflePercentage?: unknown;
+  StakingPercentage?: unknown;
+  CharityPercentage?: unknown;
+}
+
+/** A share in percent, clamped into [0, 100]; `null` when it is not a finite number. */
+function clampShare(value: unknown): number | null {
+  const numeric = toFiniteNumber(value);
+  return numeric === null ? null : Math.min(100, Math.max(0, numeric));
+}
+
+/**
+ * The Cycle Reserve split as the dashboard reports it: every track in the
+ * shared order, each share clamped into [0, 100], completed with the
+ * remainder that carries into the next cycle. The one mapping behind
+ * /contracts, /current-cycle and the operator settings, so an out-of-range
+ * figure reads the same everywhere.
+ */
+export function allocationSharesFromDashboard(
+  data: DashboardTrackShares | null | undefined,
+): AllocationTrackShare[] {
+  return withNextCycleShare([
+    { id: 'signature', percent: clampShare(data?.PrizePercentage) },
+    { id: 'chrono', percent: clampShare(data?.ChronoWarriorPercentage) },
+    { id: 'stellar', percent: clampShare(data?.RafflePercentage) },
+    { id: 'anchor', percent: clampShare(data?.StakingPercentage) },
+    { id: 'publicGoods', percent: clampShare(data?.CharityPercentage) },
+  ]);
 }
 
 /**

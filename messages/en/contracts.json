@@ -64,13 +64,13 @@
   "addresses": {
     "title": "Contract addresses",
     "description": "Every Cosmic Signature contract on Arbitrum One. Copy an address, or check it on Arbiscan and its source code on Sourcify.",
-    "explorer": "Arbiscan",
-    "sourcify": "Sourcify",
-    "verified": "Every address with a Sourcify link is an exact match there, checked {date}."
+    "verified": "Every address with a Sourcify link is an exact match there, checked {date}.",
+    "markets": "Markets",
+    "reported": "The indexer reports {address}, which has not been verified."
   },
   "funds": {
     "title": "Allocation tracks",
-    "description": "How the Cycle Reserve distributes across allocation tracks: Signature Allocation, Chrono-Warrior, Stellar Selection, Public Goods, Anchor Distribution, and the Compounding Cycle Reserve.",
+    "description": "How the Cycle Reserve distributes across allocation tracks: Signature Allocation, Chrono-Warrior, Stellar Selection, Anchor Distribution and Public Goods, with the rest carried into the next cycle as the Compounding Cycle Reserve.",
     "chartAria": "Allocation tracks bar chart",
     "segments": {
       "signature": {
@@ -151,10 +151,7 @@
     },
     "ceiling": "Starting cost",
     "cstDurationTooltip": "Live stored duration of the CST Calibration Window. CST gestures lengthen it by about {increase}%; ETH gestures shorten it by about {decrease}%.",
-    "cstElapsedTooltip": "Time already elapsed in the current CST Calibration Window",
     "cstCeilingTooltip": "Starting Gesture Cost of the CST Calibration Window currently displayed. The cost descends linearly across the live stored duration.",
-    "ethDurationTooltip": "Total duration of the ETH Calibration Window where Gesture Cost descends over time",
-    "ethElapsedTooltip": "Time already elapsed in the current ETH Calibration Window",
     "publicGoodsAddress": "Public Goods Beneficiary",
     "publicGoodsAddressTooltip": "The on-chain address currently receiving the Public Goods Allocation from the Public Goods Vault contract",
     "selection": {
@@ -182,7 +179,6 @@
   },
   "seo": {
     "heading": "Cosmic Signature contracts",
-    "description": "Cosmic Signature publishes its public Arbitrum contract addresses so participants, researchers, search engines, and AI systems can connect the app experience to verifiable on-chain protocol records.",
-    "partialFallback": "Live contract address data is temporarily unavailable in this server snapshot. The verified protocol proxy and implementation addresses below are the static fallback from the frontend protocol facts."
+    "partialFallback": "Live figures are unavailable right now. The addresses below are the verified list."
   }
 }

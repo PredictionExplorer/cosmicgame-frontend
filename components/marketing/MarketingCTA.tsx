@@ -29,6 +29,13 @@ export function MarketingCTA() {
         </h2>
         <p className="mt-3 type-body-md text-muted-foreground">{t('description')}</p>
         <p className="mt-2 type-body-sm text-subtle">{t('note')}</p>
+        {/* The rules sit in the reading column: below the ledgers from lg, above this on phones. */}
+        <a
+          href="#outreach-rules"
+          className="link mt-3 inline-flex min-h-6 items-center type-body-sm"
+        >
+          {t('rulesLink')}
+        </a>
       </div>
       <div className="mt-8 flex flex-col gap-4 sm:flex-row sm:flex-wrap sm:items-center sm:gap-6 lg:mt-6 lg:flex-col lg:items-start lg:gap-3">
         <a

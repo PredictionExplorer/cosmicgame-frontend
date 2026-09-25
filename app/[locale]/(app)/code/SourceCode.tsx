@@ -33,7 +33,7 @@ export function countSourceLines(source: string): number {
 export function SourceCode({ source }: { source: string }) {
   const lines = highlightRust(source);
   return (
-    <code className="block min-w-max py-3 group-data-[wrap=true]/code:min-w-0">
+    <code className="block min-w-max py-3 group-data-[wrap=true]/code:min-w-0 max-sm:group-data-[wrap=auto]/code:min-w-0">
       {lines.map((tokens, index) => {
         const number = index + 1;
         return (
@@ -54,7 +54,7 @@ export function SourceCode({ source }: { source: string }) {
             </a>
             <span
               data-line-code=""
-              className="min-w-0 whitespace-pre pe-6 text-foreground group-data-[wrap=true]/code:whitespace-pre-wrap"
+              className="min-w-0 whitespace-pre pe-6 text-foreground group-data-[wrap=true]/code:whitespace-pre-wrap group-data-[wrap=true]/code:[overflow-wrap:anywhere] max-sm:group-data-[wrap=auto]/code:whitespace-pre-wrap max-sm:group-data-[wrap=auto]/code:[overflow-wrap:anywhere]"
             >
               {/* An empty line keeps its height from its number. */}
               {tokens.map((token, i) =>

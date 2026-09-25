@@ -23,7 +23,7 @@ export const auditsCopyZh: AuditsCopy = {
       informational: '提示',
     },
     reportCta: '阅读 Hacken 审计报告',
-    repositoryCta: '浏览被审计的合约',
+    repositoryCta: '浏览合约代码仓库',
   },
   audit: {
     heading: 'Hacken 独立审计',

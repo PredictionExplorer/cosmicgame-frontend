@@ -33,13 +33,9 @@
     "title": "コントラクト設定",
     "subtitle": "ダッシュボードが報告するプロトコルのコントラクトアドレスとパラメーターです。閲覧のみで、これらの値はプロトコル所有者だけがオンチェーンで変更できます。",
     "loadError": "コントラクト設定を読み込めませんでした。",
-    "notReported": "ダッシュボードAPIでは提供されていません",
     "contractsDescription": "すべてのプロトコルコントラクトと、Arbiscanのアドレス、検証済みの場合はSourcifyのソースコードです。",
     "groups": {
       "contracts": "コントラクト",
-      "shares": "配分の割合",
-      "selection": "星選",
-      "timing": "時間",
       "cost": "一筆の費用"
     },
     "values": {
@@ -51,9 +47,7 @@
     },
     "fields": {
       "timeIncrease": "サイクルごとの時間増分の増加率",
-      "initialGestureCostFraction": "初期一筆の費用の比率",
       "activationTime": "有効化時刻",
-      "gestureRatio": "ETHとCSTの一筆の比率",
       "calibrationWindowLength": "サイクル開始時のCST調律期間の長さ"
     }
   },
@@ -73,9 +67,6 @@
     "form": {
       "title": "CSTを送付",
       "description": "1回のトランザクションで、金額が広報準備金から受領者へ移ります。取り消すことはできません。",
-      "amount": "金額",
-      "amountHint": "小数点にはピリオドまたはカンマを使えます。",
-      "sends": "送付額：{amount}",
       "submit": "CSTを送付",
       "reserveHeading": "広報準備金",
       "reserve": "準備金のアドレス",
@@ -84,12 +75,7 @@
       "balanceError": "準備金のCST残高を読み取れませんでした。",
       "confirmed": "広報準備金からCSTを送付しました。",
       "failed": "CSTを送付できませんでした。ウォレットを確認して、もう一度お試しください。",
-      "errors": {
-        "amount": "0より大きい金額を入力してください。",
-        "precision": "{decimals, plural, other {小数点以下は#桁までです。}}",
-        "grouping": "桁区切りの記号を使わず、1000のように入力してください。",
-        "insufficient": "準備金のCSTがこの金額より少ないです。"
-      }
+      "sendAmount": "{amount}を送付"
     }
   }
 }

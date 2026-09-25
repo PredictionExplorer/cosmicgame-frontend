@@ -1,7 +1,7 @@
 'use client';
 
 import { useId, useRef, useState, type FormEvent } from 'react';
-import { ChevronDown } from 'lucide-react';
+import { ArrowRight, ChevronDown } from 'lucide-react';
 import { useLocale, useTranslations } from 'next-intl';
 import type { Address } from 'viem';
 import { useBalance, useConnection } from 'wagmi';
@@ -13,11 +13,12 @@ import { useContractAddresses } from '@/contexts/ContractAddressesContext';
 import { useDashboardInfo } from '@/hooks/useApiQuery';
 import { useNotify } from '@/hooks/useNotify';
 import { useTxFlow, useTxStageLabel } from '@/hooks/useTxFlow';
+import { Link } from '@/i18n/navigation';
 import { REQUIRED_CHAIN_NAME } from '@/lib/chainGuard';
 import { cn } from '@/lib/utils';
 import { formatAmount } from '@/utils/format';
 import { AmountField } from '@/components/tokens/transfer/AmountField';
-import { commaIsDecimal, parseTokenAmount } from '@/components/tokens/transfer/amount';
+import { parseTokenAmount } from '@/components/tokens/transfer/amount';
 import { Button } from '@/components/ui/button';
 import { FormField } from '@/components/ui/form-field';
 import { Input } from '@/components/ui/input';
@@ -73,10 +74,7 @@ export function EthContributionForm({ id, onSuccess, className }: EthContributio
   const amountRef = useRef<HTMLInputElement>(null);
   const urlRef = useRef<HTMLInputElement>(null);
 
-  const amount = parseTokenAmount(amountText, {
-    max: balance?.value ?? null,
-    decimalComma: commaIsDecimal(locale),
-  });
+  const amount = parseTokenAmount(amountText, { max: balance?.value ?? null, locale });
   const urlValid = isNoteUrl(note.url);
   const sendable = amount.error === null ? amount.wei : null;
   const amountLabel =
@@ -155,7 +153,8 @@ export function EthContributionForm({ id, onSuccess, className }: EthContributio
         className,
       )}
     >
-      <h2 id={titleId} className="type-heading-3 text-foreground">
+      {/* The same section tier as the ledger's title beside it. */}
+      <h2 id={titleId} className="type-section text-foreground">
         {t('title')}
       </h2>
       <p className="mt-1.5 type-body-sm text-muted-foreground">{t('description')}</p>
@@ -257,6 +256,15 @@ export function EthContributionForm({ id, onSuccess, className }: EthContributio
             </Button>
           </ChainGuard>
           <TxStatus stage={stage} />
+          {/* At every width: the header's chip is hidden on phones, and this is the
+              form that takes ETH. */}
+          <Link
+            href="/risk-disclosures"
+            className="link-quiet inline-flex min-h-6 items-center gap-1.5 self-start type-caption text-muted-foreground hover:text-foreground"
+          >
+            {t('riskLink')}
+            <ArrowRight aria-hidden className="size-3.5 text-subtle" />
+          </Link>
         </div>
       </form>
     </section>

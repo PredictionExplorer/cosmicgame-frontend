@@ -91,7 +91,7 @@
       },
       "eth-contribution": {
         "heading": "直接 ETH 貢獻",
-        "description": "直接轉入週期儲備的 ETH，附每位貢獻者的留言與所屬週期。",
+        "description": "直接轉入週期儲備的 ETH，依週期與貢獻者列出；附留言的貢獻另有獨立紀錄頁。",
         "links": {
           "reserve": "週期儲備如何分配",
           "protocol": "公共財份額的去向",

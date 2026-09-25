@@ -5,7 +5,9 @@
     "due": "本周期应转入",
     "dueCaption": "目前周期储备的 {percent}",
     "inVault": "金库现存",
-    "retrieved": "累计已取回"
+    "retrieved": "累计已取回",
+    "beneficiaryNote": "<guild>Protocol Guild</guild> 是资助以太坊核心贡献者的集体机制。",
+    "forwardNote": "任何人都可以把金库余额转拨给 Protocol Guild，只需支付 Gas 费。"
   },
   "ledger": {
     "contributions": "资助记录",

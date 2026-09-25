@@ -23,7 +23,7 @@ export const auditsCopyKo: AuditsCopy = {
       informational: '정보성',
     },
     reportCta: 'Hacken 보고서 읽기',
-    repositoryCta: '감사받은 컨트랙트 보기',
+    repositoryCta: '컨트랙트 저장소 보기',
   },
   audit: {
     heading: 'Hacken의 독립 보안 감사',

@@ -64,13 +64,13 @@
   "addresses": {
     "title": "コントラクトアドレス",
     "description": "Arbitrum One上のCosmic Signatureのすべてのコントラクトです。アドレスをコピーするか、Arbiscanでアドレスを、Sourcifyでソースコードを確認できます。",
-    "explorer": "Arbiscan",
-    "sourcify": "Sourcify",
-    "verified": "Sourcifyへのリンクがあるアドレスは、すべてSourcifyで完全一致しています（{date}に確認）。"
+    "verified": "Sourcifyへのリンクがあるアドレスは、すべてSourcifyで完全一致しています（{date}に確認）。",
+    "markets": "マーケット",
+    "reported": "インデクサーが報告するアドレス{address}は検証されていません。"
   },
   "funds": {
     "title": "配分トラック",
-    "description": "サイクル準備金が配分トラックにどう分かれるか：シグネチャー配分、時の戦士、星選、公共財、係留配分、そして累積準備金。",
+    "description": "サイクル準備金が配分トラックにどう分かれるか：シグネチャー配分、時の戦士、星選、係留配分、公共財。残りは累積準備金として次のサイクルへ繰り越されます。",
     "chartAria": "配分トラックの棒グラフ",
     "segments": {
       "signature": {
@@ -151,10 +151,7 @@
     },
     "ceiling": "開始時の費用",
     "cstDurationTooltip": "CST調律期間のライブの保存された長さ。CST一筆は約{increase}%長くし、ETH一筆は約{decrease}%短くします。",
-    "cstElapsedTooltip": "現在のCST調律期間ですでに経過した時間",
     "cstCeilingTooltip": "現在表示されているCST調律期間の開始時の一筆の費用。費用は保存された長さの間に線形に下がります。",
-    "ethDurationTooltip": "一筆の費用が時間とともに下がるETH調律期間の全体の長さ",
-    "ethElapsedTooltip": "現在のETH調律期間ですでに経過した時間",
     "publicGoodsAddress": "公共財の受け手",
     "publicGoodsAddressTooltip": "公共財金庫コントラクトから公共財配分を現在受け取っているオンチェーンアドレス",
     "selection": {
@@ -182,7 +179,6 @@
   },
   "seo": {
     "heading": "Cosmic Signatureコントラクト",
-    "description": "Cosmic Signatureの公開Arbitrumコントラクトを確認できます。アプリに表示された内容を、オンチェーンの記録と照らし合わせて検証するための資料です。",
-    "partialFallback": "現在のコントラクトアドレスを取得できないため、以下にプロジェクトで公開しているプロキシと実装のアドレスを表示しています。"
+    "partialFallback": "現在、ライブの数値を取得できません。下のアドレスは検証済みの一覧です。"
   }
 }

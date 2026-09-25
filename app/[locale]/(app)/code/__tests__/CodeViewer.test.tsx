@@ -54,12 +54,13 @@ describe('CodeViewer', () => {
     expect(region.className).toContain('overflow-auto');
   });
 
+  // Until the reader chooses, CSS decides: phones wrap, wider screens scroll.
   it('wraps lines on request', () => {
     render(<CodeViewer />);
     const region = screen.getByRole('region', { name: 'Image generation source code in Rust' });
     const toggle = screen.getByRole('button', { name: 'Wrap lines' });
     expect(toggle).toHaveAttribute('aria-pressed', 'false');
-    expect(region).toHaveAttribute('data-wrap', 'false');
+    expect(region).toHaveAttribute('data-wrap', 'auto');
     fireEvent.click(toggle);
     expect(toggle).toHaveAttribute('aria-pressed', 'true');
     expect(region).toHaveAttribute('data-wrap', 'true');
@@ -71,7 +72,8 @@ describe('CodeViewer', () => {
       fireEvent.click(screen.getByRole('button', { name: 'Copy code' }));
     });
     expect(mockCopy).toHaveBeenCalledWith(COSMIC_SIGNATURE_CODE);
-    expect(screen.getByRole('status')).toHaveTextContent('Copied');
+    // The viewer's own announcement, beside the IPFS identifier's copy button.
+    expect(screen.getAllByRole('status').map((status) => status.textContent)).toContain('Copied');
   });
 
   it('links the published copies and shows the IPFS identifier in full', () => {

@@ -33,13 +33,9 @@
     "title": "Thiết lập hợp đồng",
     "subtitle": "Địa chỉ hợp đồng và tham số của giao thức theo báo cáo của bảng điều khiển. Chỉ xem: chỉ chủ sở hữu giao thức mới thay đổi được các giá trị này, trên chuỗi.",
     "loadError": "Không tải được thiết lập hợp đồng.",
-    "notReported": "API bảng điều khiển không cung cấp",
     "contractsDescription": "Mọi hợp đồng của giao thức, kèm địa chỉ trên Arbiscan và, nếu đã xác minh, mã nguồn trên Sourcify.",
     "groups": {
       "contracts": "Hợp đồng",
-      "shares": "Tỷ lệ phân bổ",
-      "selection": "Tinh tuyển",
-      "timing": "Thời gian",
       "cost": "Chi phí nét bút"
     },
     "values": {
@@ -51,9 +47,7 @@
     },
     "fields": {
       "timeIncrease": "Mức tăng thời gian tăng thêm mỗi chu kỳ",
-      "initialGestureCostFraction": "Tỷ lệ chi phí nét bút ban đầu",
       "activationTime": "Thời điểm kích hoạt",
-      "gestureRatio": "Tỷ lệ nét bút ETH so với CST",
       "calibrationWindowLength": "Độ dài cửa sổ hiệu chỉnh CST khi mở chu kỳ"
     }
   },
@@ -73,9 +67,6 @@
     "form": {
       "title": "Gửi CST",
       "description": "Một giao dịch chuyển số lượng này từ Dự trữ truyền thông đến người nhận. Không thể hoàn tác.",
-      "amount": "Số lượng",
-      "amountHint": "Dùng dấu chấm hoặc dấu phẩy cho phần thập phân.",
-      "sends": "Sẽ gửi {amount}",
       "submit": "Gửi CST",
       "reserveHeading": "Dự trữ truyền thông",
       "reserve": "Địa chỉ quỹ dự trữ",
@@ -84,12 +75,7 @@
       "balanceError": "Không đọc được số dư CST của quỹ dự trữ.",
       "confirmed": "Đã gửi CST từ Dự trữ truyền thông.",
       "failed": "Không gửi được CST. Hãy kiểm tra ví rồi thử lại.",
-      "errors": {
-        "amount": "Nhập số lượng lớn hơn 0.",
-        "precision": "{decimals, plural, other {Dùng tối đa # chữ số thập phân.}}",
-        "grouping": "Không dùng dấu phân cách hàng nghìn: nhập 1000, không phải 1.000.",
-        "insufficient": "Quỹ dự trữ có ít CST hơn số lượng này."
-      }
+      "sendAmount": "Gửi {amount}"
     }
   }
 }

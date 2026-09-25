@@ -23,7 +23,8 @@
     "urlError": "https:// 또는 http://로 시작하는 전체 링크를 입력해 주세요.",
     "summary": "{amount} 전액이 사이클 {cycle}의 사이클 준비금에 들어갑니다.",
     "summaryNoCycle": "{amount} 전액이 사이클 준비금에 들어갑니다.",
-    "submitAmount": "{amount} 기여하기"
+    "submitAmount": "{amount} 기여하기",
+    "riskLink": "기여하기 전에 위험 고지를 읽어 보십시오"
   },
   "detail": {
     "invalidId": "유효하지 않은 기여 ID",

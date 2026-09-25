@@ -8,6 +8,7 @@ import { buttonVariants } from '@/components/ui/button';
 import { LedgerPage } from '@/components/ledger/LedgerPage';
 import { HowItWorks } from '@/components/marketing/HowItWorks';
 import { MarketingCTA } from '@/components/marketing/MarketingCTA';
+import { OutreachRules } from '@/components/marketing/OutreachRules';
 
 import { PublicDataQuerySeed } from '../PublicDataQuerySeed';
 import { PublicDataRouteSeoSummary } from '../PublicDataRouteSeoSummary';
@@ -39,11 +40,12 @@ export const revalidate = 300;
 /**
  * The Outreach Reserve: the server-rendered header with the programme's
  * figures, then the records — the top contributors and every allocation —
- * leading the body. How to take part (the invitation with its email, then
- * the three steps) stands beside them from `lg`, sticky, so the one real
- * action is never below the fold; on narrower screens it follows the
- * ledgers, steps first, and the header offers a jump to it. Only the two
- * ledgers and the copy button run on the client.
+ * leading the body, followed by how it works and the programme's rules. The
+ * invitation (the email) stands alone beside them from `lg`, short enough to
+ * stay in view while it is sticky, so the one real action is never below
+ * the fold; on narrower screens it follows the rules it links to, and the
+ * header offers a jump to how it works. Only the two ledgers and the copy
+ * button run on the client.
  */
 export default async function Page({ params }: PageProps) {
   const { locale } = await params;
@@ -69,18 +71,11 @@ export default async function Page({ params }: PageProps) {
               }
             />
           }
-          aside={
-            <div className="flex flex-col gap-[var(--block-gap)]">
-              <div className="lg:order-2">
-                <HowItWorks />
-              </div>
-              <div className="lg:order-1">
-                <MarketingCTA />
-              </div>
-            </div>
-          }
+          aside={<MarketingCTA />}
         >
           <MarketingRewards />
+          <HowItWorks />
+          <OutreachRules />
         </LedgerPage>
       </PublicDataQuerySeed>
     </PageMessages>

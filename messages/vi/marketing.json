@@ -44,7 +44,8 @@
     "contact": "Gửi email cho đội ngũ truyền thông",
     "note": "Đội ngũ có thể hỗ trợ tài liệu giới thiệu và giải thích cách quyết định phân bổ.",
     "copyEmail": "Sao chép địa chỉ email",
-    "emailCopied": "Đã sao chép địa chỉ email"
+    "emailCopied": "Đã sao chép địa chỉ email",
+    "rulesLink": "Hãy đọc điều kiện tham gia trước khi gửi email cho đội ngũ"
   },
   "address": {
     "parent": "Phân bổ truyền thông",
@@ -56,7 +57,10 @@
       "allocations": "Số lần phân bổ",
       "first": "Lần phân bổ đầu",
       "latest": "Lần phân bổ gần nhất",
-      "allocated": "Thời điểm phân bổ"
+      "allocated": "Thời điểm phân bổ",
+      "rank": "Hạng",
+      "rankValue": "{rank} trên {total}",
+      "shareCaption": "{share} tổng CST truyền thông"
     },
     "emptyDescription": "Các khoản phân bổ sẽ hiện ở đây khi đội ngũ truyền thông gửi CST đến địa chỉ này.",
     "invalidAddress": {
@@ -66,5 +70,12 @@
     }
   },
   "learnHow": "Tìm hiểu cách thức",
-  "loadError": "Không tải được các khoản phân bổ truyền thông."
+  "loadError": "Không tải được các khoản phân bổ truyền thông.",
+  "rules": {
+    "title": "Điều kiện tham gia",
+    "review": "Ai cũng có thể đề xuất hoạt động giới thiệu; đội ngũ xem xét từng đề xuất trước khi phân bổ.",
+    "discretion": "Phân bổ do đội ngũ quyết định: đội ngũ quyết định có duyệt hoạt động giới thiệu hay không, khi nào gửi CST và gửi bao nhiêu. Hoạt động không được duyệt sẽ không nhận được gì.",
+    "excluded": "Thư rác, lượt theo dõi hay tương tác mua được và các tuyên bố gây hiểu lầm, kể cả về giá trị của CST, đều không được tính.",
+    "disclose": "Mỗi khi đăng bài về Cosmic Signature, hãy nói rõ rằng bạn có thể nhận CST cho việc đó."
+  }
 }

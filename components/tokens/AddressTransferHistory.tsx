@@ -18,7 +18,12 @@ import { PageHeader, PageHeaderTabs, type PageHeaderFigure } from '@/components/
 import { useParticipantTrail } from '@/components/layout/participantTrail';
 import { AddressChip } from '@/components/ui/address-chip';
 import { Amount } from '@/components/ui/amount';
-import { DataTable, useTablePageSize, type DataTableColumn } from '@/components/ui/data-table';
+import {
+  DataTable,
+  KindValue,
+  useTablePageSize,
+  type DataTableColumn,
+} from '@/components/ui/data-table';
 import { EmptyState } from '@/components/ui/empty-state';
 import { SegmentedControl } from '@/components/ui/segmented-control';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -27,6 +32,7 @@ import {
   ACTIVITY_DIRECTION,
   classifyTransfer,
   countByActivity,
+  isPeerTransfer,
   movesInDirection,
   sumCstTransfers,
   transferWei,
@@ -38,9 +44,16 @@ import { TransferTokenCell } from './TransferTokenCell';
 /** Which history: the CST token's transfers, or the Cosmic Signature NFTs'. */
 export type TransferAsset = 'cst' | 'nft';
 
-type Filter = 'all' | TransferDirection;
+/** All rows, the peer transfers alone (no protocol imprints or consumptions), or one direction. */
+type Filter = 'all' | 'transfers' | TransferDirection;
 
-const FILTERS: readonly Filter[] = ['all', 'in', 'out'];
+const FILTERS: readonly Filter[] = ['all', 'transfers', 'in', 'out'];
+
+function matchesFilter(entry: TransferEntry, filter: Filter): boolean {
+  if (filter === 'all') return true;
+  if (filter === 'transfers') return isPeerTransfer(entry);
+  return movesInDirection(entry, filter);
+}
 
 /** One row of either history, classified from the page address's side. */
 interface TransferEntry {
@@ -82,13 +95,6 @@ const HISTORY_PATH: Record<TransferAsset, string> = {
   nft: '/cosmic-signature-transfer',
 };
 
-/**
- * The phone counterparty line under the activity word: a real ledger link
- * (foreground ink, the quiet underline, a 24px row), not muted caption text.
- */
-const PHONE_COUNTERPARTY_CLASS =
-  'type-body-sm text-muted-foreground sm:hidden [&_a]:min-h-6 [&_a]:text-foreground [&_a]:underline [&_a]:decoration-1 [&_a]:underline-offset-[0.2em] [&_a]:decoration-[color-mix(in_oklab,currentColor_30%,transparent)] [&_a:hover]:text-primary [&_a:hover]:decoration-current';
-
 function numberOrZero(value: unknown): number {
   return typeof value === 'number' && Number.isFinite(value) ? value : 0;
 }
@@ -100,26 +106,55 @@ function stringOrEmpty(value: unknown): string {
 /**
  * The activity word with its glyph: the direction reads before the amount
  * does. The word sits on the row's baseline and the glyph is centred on it.
- * On a phone, where the counterparty column is dropped to keep each record
- * short, a transfer's other side follows under the word (the protocol's own
- * imprints and consumptions need no second line).
  */
-function ActivityCell({
-  activity,
-  counterparty,
-}: {
-  activity: TransferActivity;
-  counterparty?: ReactNode;
-}) {
+function ActivityCell({ activity }: { activity: TransferActivity }) {
   const t = useTranslations('myPages.transferHistory');
   const Icon = ACTIVITY_ICONS[activity];
   return (
-    <span className="inline-flex flex-col items-end gap-0.5 sm:items-start">
-      <span className="inline-flex items-baseline gap-2 whitespace-nowrap">
-        <Icon aria-hidden className="size-4 shrink-0 self-center text-subtle" />
-        {t(`activity.${activity}`)}
+    <span className="inline-flex items-baseline gap-2 whitespace-nowrap">
+      <Icon aria-hidden className="size-4 shrink-0 self-center text-subtle" />
+      {t(`activity.${activity}`)}
+    </span>
+  );
+}
+
+/**
+ * One transfer as a phone reads it: a two-line record instead of a label
+ * beside every value. The activity and what moved (the signed amount, or the
+ * artwork and its number) share the first line; the other side of a
+ * transfer and the date, linked to its transaction, sit under it in the
+ * subtle tier. The ledger's columns hold the same values from `sm`, where
+ * this record is hidden.
+ */
+function TransferPhoneRecord({
+  activity,
+  moved,
+  counterparty,
+  date,
+}: {
+  activity: TransferActivity;
+  moved: ReactNode;
+  counterparty: ReactNode;
+  date: ReactNode;
+}) {
+  return (
+    <span className="flex flex-col gap-1 sm:hidden">
+      <span className="flex items-center justify-between gap-4">
+        <ActivityCell activity={activity} />
+        <span className="shrink-0 font-medium text-foreground">{moved}</span>
       </span>
-      {counterparty ? <span className={PHONE_COUNTERPARTY_CLASS}>{counterparty}</span> : null}
+      {/* The second tier: its links keep the line's ink until hovered, each a 24px target. */}
+      <span className="flex flex-wrap items-baseline gap-x-2 type-body-sm font-normal text-muted-foreground [&_a]:inline-block [&_a]:min-h-6 [&_a]:leading-6 [&_a]:text-muted-foreground">
+        {counterparty ? (
+          <>
+            {counterparty}
+            <span aria-hidden className="text-subtle">
+              ·
+            </span>
+          </>
+        ) : null}
+        {date}
+      </span>
     </span>
   );
 }
@@ -164,6 +199,9 @@ export function AddressTransferHistory({
   });
   const seedsPending = signatures.state === 'loading';
   const { seedFor } = signatures;
+  // When the collection could not be read, each plate says so instead of
+  // looking its token up one by one.
+  const collectionFailed = signatures.state === 'failed';
 
   const entries = useMemo<TransferEntry[]>(() => {
     if (!address) return [];
@@ -190,11 +228,45 @@ export function AddressTransferHistory({
   }, [address, asset, query.data, stakingCst, stakingRwalk]);
 
   const shown = useMemo(
-    () => (filter === 'all' ? entries : entries.filter((entry) => movesInDirection(entry, filter))),
+    () => (filter === 'all' ? entries : entries.filter((entry) => matchesFilter(entry, filter))),
     [entries, filter],
   );
 
   const columns = useMemo<DataTableColumn<TransferEntry>[]>(() => {
+    // The protocol imprints and consumes: those rows name it rather than
+    // print the zero address, and a transfer's other side is its address.
+    const protocolName = tFormats('address.known.protocol');
+    const counterpartyChip = (other: string) => (
+      <AddressChip address={other} variant="plain" showCopy={false} currentAddress={address} />
+    );
+    // Signed from this address's side, so a column of changes adds up; a
+    // transfer that changes no hands carries no sign.
+    const cstAmount = (entry: TransferEntry) => {
+      if (entry.wei === null) return null;
+      const sign = signOf(entry);
+      return (
+        <Amount
+          value={sign === 0 ? entry.wei : BigInt(sign) * entry.wei}
+          unit="CST"
+          context="table"
+          showUnit={false}
+          signDisplay={sign === 0 ? 'never' : 'exceptZero'}
+        />
+      );
+    };
+    // The artwork's plate beside its number: the rows are Signatures.
+    const token = (entry: TransferEntry) =>
+      entry.tokenId === null ? null : (
+        <TransferTokenCell
+          tokenId={entry.tokenId}
+          seed={seedFor(entry.tokenId)}
+          seedPending={seedsPending}
+          lookUpMissing={!collectionFailed}
+        />
+      );
+
+    // On a phone each row is one two-line record in the activity cell (its
+    // title), so the other columns leave the phone and no label repeats.
     const date: DataTableColumn<TransferEntry> = {
       id: 'date',
       kind: 'datetime',
@@ -204,31 +276,40 @@ export function AddressTransferHistory({
       year: 'auto',
       sortable: true,
       width: '12rem',
+      priority: 'secondary',
     };
-    const counterpartyChip = (other: string) => (
-      <AddressChip address={other} variant="plain" showCopy={false} currentAddress={address} />
-    );
     const activity: DataTableColumn<TransferEntry> = {
       id: 'activity',
       kind: 'text',
       header: t('columns.activity'),
       value: (entry) => t(`activity.${entry.activity}`),
+      phone: 'title',
       cell: (entry) => (
-        <ActivityCell
-          activity={entry.activity}
-          counterparty={entry.counterparty ? counterpartyChip(entry.counterparty) : null}
-        />
+        <>
+          <span className="max-sm:hidden">
+            <ActivityCell activity={entry.activity} />
+          </span>
+          <TransferPhoneRecord
+            activity={entry.activity}
+            moved={asset === 'cst' ? cstAmount(entry) : token(entry)}
+            counterparty={entry.counterparty ? counterpartyChip(entry.counterparty) : null}
+            date={
+              <KindValue
+                kind="datetime"
+                value={entry.timestamp}
+                txHash={entry.txHash}
+                year="auto"
+              />
+            }
+          />
+        </>
       ),
       width: '11rem',
     };
-    // The protocol imprints and consumes: those rows name it rather than
-    // print the zero address, and a transfer's other side is its address.
-    const protocolName = tFormats('address.known.protocol');
     const counterparty: DataTableColumn<TransferEntry> = {
       id: 'counterparty',
       kind: 'address',
       header: t('columns.counterparty'),
-      // On a phone the activity cell carries it instead.
       priority: 'secondary',
       value: (entry) => entry.counterparty ?? protocolName,
       cell: (entry) =>
@@ -249,22 +330,10 @@ export function AddressTransferHistory({
           header: tTables('columns.amountCst'),
           unit: 'CST',
           width: '10rem',
-          // Signed from this address's side, so a column of changes adds up;
-          // a transfer that changes no hands carries no sign.
-          value: (entry) => (entry.wei === null ? null : Number(entry.wei) * signOf(entry)),
-          cell: (entry) => {
-            if (entry.wei === null) return null;
-            const sign = signOf(entry);
-            return (
-              <Amount
-                value={sign === 0 ? entry.wei : BigInt(sign) * entry.wei}
-                unit="CST"
-                context="table"
-                showUnit={false}
-                signDisplay={sign === 0 ? 'never' : 'exceptZero'}
-              />
-            );
-          },
+          priority: 'secondary',
+          // A transfer that changes no hands sorts by its size, not as zero.
+          value: (entry) => (entry.wei === null ? null : Number(entry.wei) * (signOf(entry) || 1)),
+          cell: cstAmount,
           sortable: true,
         },
       ];
@@ -277,21 +346,14 @@ export function AddressTransferHistory({
         kind: 'link',
         header: tTables('columns.tokenId'),
         value: (entry) => entry.tokenId,
-        // The artwork's plate beside its number: the rows are Signatures.
-        cell: (entry) =>
-          entry.tokenId === null ? null : (
-            <TransferTokenCell
-              tokenId={entry.tokenId}
-              seed={seedFor(entry.tokenId)}
-              seedPending={seedsPending}
-            />
-          ),
+        cell: token,
         sortable: true,
         width: '12rem',
+        priority: 'secondary',
       },
       counterparty,
     ];
-  }, [address, asset, seedFor, seedsPending, t, tFormats, tTables]);
+  }, [address, asset, collectionFailed, seedFor, seedsPending, t, tFormats, tTables]);
 
   // While the history loads a figure is a skeleton, with its caption line
   // held open; when it fails, the header's unavailable dash (`null`). Totals
@@ -330,11 +392,17 @@ export function AddressTransferHistory({
   } else {
     const counts = countByActivity(entries);
     const count = (value: number) => (ready ? formatCount(value, locale) : pending);
+    // Every row counts in one figure, so the four add up to the ledger's rows.
     figures = [
       { id: 'imprinted', label: t('nft.figures.imprinted'), value: count(counts.imprinted) },
       { id: 'received', label: t('nft.figures.received'), value: count(counts.received) },
       { id: 'sent', label: t('nft.figures.sent'), value: count(counts.sent) },
-    ];
+      {
+        id: 'anchoring',
+        label: t('nft.figures.anchoring'),
+        value: count(counts.anchored + counts.released),
+      },
+    ].map((figure) => ({ ...figure, compact: true }));
   }
 
   const header = (
@@ -426,15 +494,19 @@ export function AddressTransferHistory({
         emptyTitle={t(filter === 'all' ? `${asset}.empty` : 'filter.empty')}
         emptyDescription={filter === 'all' ? t(`${asset}.emptyDescription`) : undefined}
         resetPageKey={filter}
-        // Short values: the ledger keeps to a readable width instead of
-        // spreading four columns across the whole screen.
-        className="max-w-5xl"
+        // Several links per row (the date's proof, the token, the counterparty):
+        // they keep their ink and underline on hover and focus.
+        links="quiet"
+        // The ledger, its filter and its count share the header's and tabs' edges.
+        width="fill"
         toolbar={
           showToolbar ? (
             <div className="mb-4 flex flex-wrap items-center justify-between gap-x-4 gap-y-2">
               <SegmentedControl
                 label={t('filter.label')}
                 hideLabel
+                // Four filters: one row that scrolls on a phone, never a wrapped orphan.
+                scroll
                 options={FILTERS.map((option) => ({ value: option, label: t(`filter.${option}`) }))}
                 value={filter}
                 onValueChange={setFilter}

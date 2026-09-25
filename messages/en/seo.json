@@ -91,7 +91,7 @@
       },
       "eth-contribution": {
         "heading": "Direct ETH contributions",
-        "description": "ETH sent straight to the Cycle Reserve, with each contributor’s note and cycle.",
+        "description": "ETH sent straight to the Cycle Reserve, by cycle and contributor. A contribution made with a note has its own record page.",
         "links": {
           "reserve": "How the Cycle Reserve is split",
           "protocol": "Where the Public Goods share goes",

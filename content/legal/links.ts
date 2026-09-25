@@ -64,6 +64,7 @@ export const LEGAL_LINKS = {
   privacy: { kind: 'app', href: '/privacy' },
   privacyServices: { kind: 'app', href: '/privacy#services' },
   privacyStorage: { kind: 'app', href: '/privacy#storage' },
+  coordination: { kind: 'app', href: '/coordination-changes' },
   // Terms clauses the risk disclosures point at.
   termsMechanics: { kind: 'app', href: '/terms#mechanics' },
   termsCalibration: { kind: 'app', href: '/terms#mechanics-cst-window' },

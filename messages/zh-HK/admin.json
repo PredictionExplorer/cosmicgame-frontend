@@ -33,13 +33,9 @@
     "title": "合約設定",
     "subtitle": "控制面板提供的協議合約地址與參數。只讀：只有協議所有者能在鏈上更改這些數值。",
     "loadError": "未能載入合約設定。",
-    "notReported": "控制面板 API 未有提供",
     "contractsDescription": "每個協議合約，附 Arbiscan 上的地址；已驗證的合約另附 Sourcify 上的源代碼。",
     "groups": {
       "contracts": "合約",
-      "shares": "分配比例",
-      "selection": "星選",
-      "timing": "時間參數",
       "cost": "落筆價格"
     },
     "values": {
@@ -51,9 +47,7 @@
     },
     "fields": {
       "timeIncrease": "時間增量的每週期增幅",
-      "initialGestureCostFraction": "初始落筆價格比例",
       "activationTime": "啟用時間",
-      "gestureRatio": "ETH 與 CST 落筆比率",
       "calibrationWindowLength": "週期開啟時 CST 校準窗口時長"
     }
   },
@@ -73,9 +67,6 @@
     "form": {
       "title": "轉出 CST",
       "description": "一筆交易即把該數額從推廣儲備轉給接收方，而且無法撤銷。",
-      "amount": "數額",
-      "amountHint": "小數可用小數點或逗號。",
-      "sends": "將轉出 {amount}",
       "submit": "轉出 CST",
       "reserveHeading": "推廣儲備",
       "reserve": "儲備地址",
@@ -84,12 +75,7 @@
       "balanceError": "未能讀取推廣儲備的 CST 餘額。",
       "confirmed": "已從推廣儲備轉出 CST。",
       "failed": "CST 未能轉出。請檢查錢包後再試。",
-      "errors": {
-        "amount": "請輸入大於零的數額。",
-        "precision": "{decimals, plural, other {最多使用 # 位小數。}}",
-        "grouping": "請勿使用千位分隔符：輸入 1000，而非 1,000。",
-        "insufficient": "推廣儲備的 CST 少於此數額。"
-      }
+      "sendAmount": "轉出 {amount}"
     }
   }
 }
