@@ -236,6 +236,7 @@ export function SiteDrawer({
       <SheetTrigger asChild>{trigger}</SheetTrigger>
       <SheetContent
         side="right"
+        closePlacement="header"
         aria-describedby={undefined}
         className="flex w-[min(22rem,100vw)] max-w-full flex-col gap-0 border-l border-rule bg-background p-0 sm:max-w-[22rem]"
       >

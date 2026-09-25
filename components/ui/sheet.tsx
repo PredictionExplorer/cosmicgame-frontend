@@ -62,18 +62,33 @@ const sheetVariants = cva(
 interface SheetContentProps
   extends
     React.ComponentPropsWithoutRef<typeof SheetPrimitive.Content>,
-    VariantProps<typeof sheetVariants> {}
+    VariantProps<typeof sheetVariants> {
+  /**
+   * `corner` (default): the dialog's close control in the top corner.
+   * `header`: for a drawer that opens with a header-height row (the site
+   * menus): the close control sits where the menu button that opened it was,
+   * a 44px target centred on the row, with the menu button's 20px glyph.
+   */
+  closePlacement?: 'corner' | 'header';
+}
+
+/** On a drawer's header row: centred on the row, 8px from the edge, like the menu button. */
+const HEADER_CLOSE_CLASS =
+  'right-2 top-[calc((var(--header-height)-2.75rem)/2)] size-11 min-h-11 min-w-11 sm:m-0 sm:size-11';
 
 const SheetContent = React.forwardRef<
   React.ComponentRef<typeof SheetPrimitive.Content>,
   SheetContentProps
->(({ side = 'right', className, children, ...props }, ref) => (
+>(({ side = 'right', closePlacement = 'corner', className, children, ...props }, ref) => (
   <SheetPortal>
     <SheetOverlay />
     <SheetPrimitive.Content ref={ref} className={cn(sheetVariants({ side }), className)} {...props}>
       {/* First in the DOM so focus order matches the corner it paints in. */}
-      <SheetPrimitive.Close className={OVERLAY_CLOSE_CLASS}>
-        <X aria-hidden className="size-4" />
+      <SheetPrimitive.Close
+        className={cn(OVERLAY_CLOSE_CLASS, closePlacement === 'header' && HEADER_CLOSE_CLASS)}
+        data-placement={closePlacement}
+      >
+        <X aria-hidden className={closePlacement === 'header' ? 'size-5' : 'size-4'} />
         <SheetCloseLabel />
       </SheetPrimitive.Close>
       {children}
