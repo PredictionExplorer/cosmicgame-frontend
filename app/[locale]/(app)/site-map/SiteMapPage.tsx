@@ -1,5 +1,5 @@
 import { Fragment, type ReactNode } from 'react';
-import { ChevronRight, type LucideIcon } from 'lucide-react';
+import { ChevronRight, LibraryBig, type LucideIcon } from 'lucide-react';
 import { useLocale, useTranslations } from 'next-intl';
 
 import {
@@ -35,14 +35,29 @@ export interface SiteMapArticle {
 
 /**
  * Phones: a compact two-column row, name only, a long single word (GeckoTerminal)
- * breaking rather than overflowing its half. From 640px: icon, name and description.
+ * breaking rather than overflowing its half. From 640px: a bare icon, name and
+ * description. Rows align to their first line, so two names side by side share
+ * a baseline when one of them wraps.
  */
 const ROW_CLASS =
-  'group/row flex min-h-11 items-center gap-3 rounded-control px-2 py-1.5 no-underline transition-colors duration-150 [overflow-wrap:anywhere] hover:bg-muted sm:min-h-0 sm:px-3 sm:py-2 sm:[overflow-wrap:normal]';
+  'group/row flex min-h-11 items-start gap-3 rounded-control px-2 py-3 no-underline transition-colors duration-150 [overflow-wrap:anywhere] hover:bg-muted sm:min-h-0 sm:px-3 sm:py-2 sm:[overflow-wrap:normal]';
 
-/** Phones drop the row's icon and description, so two names fit side by side. */
-const ROW_ICON_CLASS = 'max-sm:hidden';
+/**
+ * A bare 16px glyph on the label's first line, not a tile: an index reads as
+ * a list of names, and the header menus keep the tiles. Phones drop the icon
+ * and the description, so two names fit side by side.
+ */
+const ROW_ICON_CLASS = 'mt-0.5 max-sm:hidden';
 const ROW_DESCRIPTION_CLASS = 'max-sm:hidden';
+
+/**
+ * The pages under a destination (the Statistics sections), on a hairline
+ * under the parent's icon, their names aligned with the parent's name from
+ * 640px (the drawer's inset). On phones they keep the rule and the two
+ * columns, a step in from the parent.
+ */
+const NESTED_ROWS_CLASS =
+  'ml-2 grid grid-cols-2 gap-x-2 border-l border-rule-faint pl-1 sm:ml-[1.1875rem] sm:flex sm:flex-col sm:gap-0.5 sm:pl-2';
 
 /** A section's rows: one column from 640px, two on phones. */
 const ROWS_CLASS = 'mt-2 grid grid-cols-2 gap-x-2 sm:mt-4 sm:flex sm:flex-col sm:gap-0.5';
@@ -113,33 +128,62 @@ function SiteMapSection({
   );
 }
 
-function RouteRow({ route }: { route: SiteRoute }) {
+interface RouteEntry {
+  readonly route: SiteRoute;
+  /** The pages filed under this one (a Statistics section under Statistics). */
+  readonly children: readonly SiteRoute[];
+}
+
+/** A section's routes as the menus nest them: each top-level page with its own pages under it. */
+export function routeTree(routes: readonly SiteRoute[]): RouteEntry[] {
+  const ids = new Set(routes.map((route) => route.id));
+  return routes
+    .filter((route) => !route.parent || !ids.has(route.parent))
+    .map((route) => ({ route, children: routes.filter((child) => child.parent === route.id) }));
+}
+
+function RouteLink({ route, nested = false }: { route: SiteRoute; nested?: boolean }) {
   const locale = useLocale();
   const copy = useSiteNavCopy();
   const target = resolveRouteHref(route, 'app', locale);
-  const nested = !!route.parent;
   return (
-    <li
-      className={cn(
-        'min-w-0',
-        nested && 'sm:ml-[1.625rem] sm:border-l sm:border-rule-faint sm:pl-2',
-      )}
-    >
-      <SiteLink href={target.href} kind={target.kind} prefetch="intent" className={ROW_CLASS}>
-        <NavRowContent
-          icon={nested ? undefined : SITE_ROUTE_ICONS[route.id]}
-          iconClassName={ROW_ICON_CLASS}
-          label={copy.routeLabel(route.id)}
-          description={copy.routeDescription(route.id)}
-          descriptionClassName={ROW_DESCRIPTION_CLASS}
+    <SiteLink href={target.href} kind={target.kind} prefetch="intent" className={ROW_CLASS}>
+      <NavRowContent
+        icon={nested ? undefined : SITE_ROUTE_ICONS[route.id]}
+        iconStyle="inline"
+        iconClassName={ROW_ICON_CLASS}
+        label={copy.routeLabel(route.id)}
+        description={copy.routeDescription(route.id)}
+        descriptionClassName={ROW_DESCRIPTION_CLASS}
+      />
+      {target.kind === 'internal' ? (
+        <ChevronRight
+          aria-hidden
+          className="mt-0.5 size-4 shrink-0 text-subtle opacity-0 transition-opacity duration-150 group-hover/row:opacity-100 max-sm:hidden rtl:-scale-x-100"
         />
-        {target.kind === 'internal' ? (
-          <ChevronRight
-            aria-hidden
-            className="size-4 shrink-0 text-subtle opacity-0 transition-opacity duration-150 group-hover/row:opacity-100 max-sm:hidden"
-          />
-        ) : null}
-      </SiteLink>
+      ) : null}
+    </SiteLink>
+  );
+}
+
+/**
+ * One destination, and the pages under it as a nested list, so the hierarchy
+ * the desktop shows is also what a screen reader announces. On phones a
+ * destination with pages under it takes the full row.
+ */
+function RouteRow({ route, children }: RouteEntry) {
+  return (
+    <li className={cn('min-w-0', children.length > 0 && 'col-span-2')}>
+      <RouteLink route={route} />
+      {children.length > 0 ? (
+        <ul className={NESTED_ROWS_CLASS}>
+          {children.map((child) => (
+            <li key={child.id} className="min-w-0">
+              <RouteLink route={child} nested />
+            </li>
+          ))}
+        </ul>
+      ) : null}
     </li>
   );
 }
@@ -160,6 +204,7 @@ function OutboundSection({ group }: { group: OutboundGroupId }) {
           <SiteLink href={link.href} kind="external" className={ROW_CLASS}>
             <NavRowContent
               icon={OUTBOUND_ICONS[link.id]}
+              iconStyle="inline"
               iconClassName={ROW_ICON_CLASS}
               label={copy.outboundLabel(link.id)}
               description={copy.outboundDescription(link.id)}
@@ -175,12 +220,14 @@ function OutboundSection({ group }: { group: OutboundGroupId }) {
 /**
  * The Learn Hub's guides, as a full-width band under the sections: listed
  * inside the Learn section they made its column twice as long as the rest.
+ * Headed "Guides", not with the hub's own name: the Learn section and its
+ * Learn row already use that one, and two regions named "Learn" cannot be
+ * told apart (axe landmark-unique).
  */
 function GuidesBand({ articles }: { articles: readonly SiteMapArticle[] }) {
   const locale = useLocale();
-  const copy = useSiteNavCopy();
+  const t = useTranslations('siteMap');
   const learnHub = getSiteRoute('learnHub');
-  const Icon = SITE_ROUTE_ICONS.learnHub;
   return (
     <section
       id="guides"
@@ -191,11 +238,11 @@ function GuidesBand({ articles }: { articles: readonly SiteMapArticle[] }) {
         id="sitemap-guides-heading"
         className="type-heading-3 flex items-center gap-2.5 text-foreground"
       >
-        <Icon aria-hidden className="size-5 shrink-0 text-primary" />
-        {copy.routeLabel('learnHub')}
+        <LibraryBig aria-hidden className="size-5 shrink-0 text-primary" />
+        {t('guides.title')}
       </h2>
       <p className="type-body-sm mt-1.5 text-muted-foreground">
-        {copy.routeDescription('learnHub')} · {siteHostLabel(learnHub.host)}
+        {t('guides.description', { host: siteHostLabel(learnHub.host) })}
       </p>
       <ul className="mt-2 grid grid-cols-1 gap-x-2 sm:mt-4 sm:grid-cols-2 sm:gap-x-12 sm:gap-y-0.5 xl:grid-cols-3">
         {articles.map((article) => (
@@ -235,11 +282,11 @@ const SiteMapPage = ({ articles = [] }: SiteMapPageProps) => {
     // The marker tells the footer to leave out its copy of this directory.
     <PageShell variant="data" backdrop="signature" {...SITE_MAP_MARKER_PROPS}>
       {/* From 640px each column opens on its own section rule; a header
-          rule 40px above it would draw two hairlines. */}
+          rule 40px above it would draw two hairlines. No section eyebrow:
+          the map is every section's index, not a page of one of them. */}
       <PageHeader
         title={t('page.title')}
         subtitle={t('page.subtitle')}
-        section="trust"
         className="mb-6 sm:mb-10 sm:border-b-0 sm:pb-0"
       />
 
@@ -259,17 +306,17 @@ const SiteMapPage = ({ articles = [] }: SiteMapPageProps) => {
                 icon={SITE_SECTION_ICONS[section]}
                 lead={section === leadSection}
               >
-                {routesInSection(section).map((route, index, routes) => (
-                  <Fragment key={route.id}>
-                    {route.host !== (routes[index - 1]?.host ?? 'app') ? (
+                {routeTree(routesInSection(section)).map((entry, index, entries) => (
+                  <Fragment key={entry.route.id}>
+                    {entry.route.host !== (entries[index - 1]?.route.host ?? 'app') ? (
                       <li className="col-span-2">
                         <HostDivider
-                          label={siteHostLabel(route.host)}
+                          label={siteHostLabel(entry.route.host)}
                           className="px-2 pb-1 pt-3 sm:px-3"
                         />
                       </li>
                     ) : null}
-                    <RouteRow route={route} />
+                    <RouteRow {...entry} />
                   </Fragment>
                 ))}
               </SiteMapSection>
