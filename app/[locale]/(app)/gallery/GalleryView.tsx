@@ -1,6 +1,14 @@
 'use client';
 
-import { useCallback, useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
+import {
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+  useTransition,
+  type ReactNode,
+} from 'react';
 import { ChevronDown, Dna } from 'lucide-react';
 import { useLocale, useTranslations } from 'next-intl';
 
@@ -182,6 +190,16 @@ export function GalleryView({ search, snapshotCount = null }: GalleryViewProps) 
   // search that lands late cannot undo a choice made meanwhile.
   const latestSearchRef = useRef(search);
   const pendingSearchesRef = useRef<string[]>([]);
+  // Our writes run in this transition, so `navigating` stays true until the
+  // last of them has committed.
+  const [navigating, startNavigation] = useTransition();
+  useEffect(() => {
+    // Every write has landed or given way to a later one. A write that took
+    // the URL back to where it was (a facet on, then off) never changes
+    // `search`, so it is dropped here, or a link to that same query later
+    // would pass for our write landing and leave the latest query stale.
+    if (!navigating) pendingSearchesRef.current = [];
+  }, [navigating]);
   useEffect(() => {
     const pending = pendingSearchesRef.current;
     const landed = pending.indexOf(search);
@@ -207,7 +225,7 @@ export function GalleryView({ search, snapshotCount = null }: GalleryViewProps) 
       const nextSearch = next.replace(/^\?/, '');
       latestSearchRef.current = nextSearch;
       pendingSearchesRef.current.push(nextSearch);
-      router[method](`${pathname}${next}`, { scroll: false });
+      startNavigation(() => router[method](`${pathname}${next}`, { scroll: false }));
     },
     [router, pathname],
   );

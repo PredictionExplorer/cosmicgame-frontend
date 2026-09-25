@@ -196,6 +196,21 @@ describe('GalleryView', () => {
     }
   });
 
+  it('takes a link to a query it once wrote and then undid as a link', () => {
+    const { rerender } = render(<GalleryView search="" />);
+    fireEvent.click(screen.getByRole('radio', { name: 'gallery.filters.named.label' }));
+    // Back where it was before the first write committed: `search` never moves.
+    fireEvent.click(screen.getByRole('radio', { name: 'gallery.filters.all.label' }));
+    // Later a link lands on the query the first write had named.
+    rerender(<GalleryView search="show=named" />);
+    fireEvent.click(screen.getByTestId('facets-toggle'));
+    const dna = screen.getByTestId('dna-fate');
+    fireEvent.click(within(dna).getByRole('button', { name: /^Ejection: 1\sNFTs/ }));
+    expect(mockReplace).toHaveBeenLastCalledWith('/gallery?show=named&fate=Ejection', {
+      scroll: false,
+    });
+  });
+
   it('starts over from the URL after Back or a link', () => {
     const { rerender } = render(<GalleryView search="" />);
     fireEvent.click(screen.getByRole('radio', { name: 'gallery.filters.named.label' }));
