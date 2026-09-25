@@ -126,8 +126,12 @@ const mockGestureForm = {
   onGestureWithCST: jest.fn().mockResolvedValue(true),
 };
 
+const mockUseGestureFormOptions = jest.fn();
 jest.mock('@/hooks/useGestureForm', () => ({
-  useGestureForm: () => mockGestureForm,
+  useGestureForm: (options: unknown) => {
+    mockUseGestureFormOptions(options);
+    return mockGestureForm;
+  },
 }));
 
 const mockAllocationFinalize = {
@@ -859,9 +863,18 @@ describe('ExperimentalHomePage', () => {
       renderPage();
     });
 
+    // The form itself holds ETH, so a CST pick from the previous cycle can
+    // neither leave the one radio unchecked nor send a CST first Gesture.
+    expect(mockUseGestureFormOptions).toHaveBeenLastCalledWith({ firstGesture: true });
     expect(
       within(screen.getByTestId('gesture-method-selector')).getAllByRole('radio'),
     ).toHaveLength(1);
     expect(screen.getByTestId('latest-participant-intel')).toHaveAttribute('data-empty', 'true');
+  });
+
+  it('lets the form keep any method once the cycle has its first Gesture', () => {
+    renderPage();
+
+    expect(mockUseGestureFormOptions).toHaveBeenLastCalledWith({ firstGesture: false });
   });
 });
