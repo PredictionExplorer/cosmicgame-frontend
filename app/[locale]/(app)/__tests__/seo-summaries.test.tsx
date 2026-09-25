@@ -614,8 +614,10 @@ describe('server-rendered page headers', () => {
       for (const id of ['imprintCost', 'cost', 'cycle']) {
         expect(document.querySelector(`[data-figure="${id}"]`)).toBeNull();
       }
-      // Three short figures: one row on phones.
-      expect(document.querySelector('dl')).toHaveAttribute('data-layout', 'strip');
+      // Three short figures, but labels too long for a third of a phone's row
+      // ("Random Walk NFTs imprinted"): label-and-value rows, never a label
+      // broken over three lines.
+      expect(document.querySelector('dl')).toHaveAttribute('data-layout', 'rows');
       // The source names where the figures come from: the chain and the API.
       expect(
         screen.getByText(new RegExp(seoMessages.publicData.routes.imprint.source)),
@@ -876,8 +878,9 @@ describe('server-rendered page headers', () => {
       expect(figureValue('ethDeposits')).toHaveTextContent('1');
       expect(figureValue('stellarImprints')).toHaveTextContent('20');
       expect(document.querySelector('[data-figure="tokens"]')).toBeNull();
-      // Three short counts: one row on phones, not three stacked rows.
-      expect(document.querySelector('dl')).toHaveAttribute('data-layout', 'strip');
+      // Three short counts whose labels ("ETH Anchor Distribution deposits")
+      // cannot fit a third of a phone's row: rows, not three-line labels.
+      expect(document.querySelector('dl')).toHaveAttribute('data-layout', 'rows');
     });
 
     it('fills an anchoring figure the server could not read from the page’s own queries', async () => {

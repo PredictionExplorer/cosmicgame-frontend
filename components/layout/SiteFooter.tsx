@@ -85,11 +85,6 @@ function OutboundGroup({ group }: { group: OutboundGroupId }) {
 interface SiteFooterProps {
   /** The host this footer renders on: links to the other host go out in the same tab. */
   host: SiteHost;
-  tagline: string;
-  /** Copyright line; `{year}` is replaced with the current year. */
-  copyright: string;
-  /** The "CC0 · Verified · Reproducible" colophon, linked to its sources on /security. */
-  colophon: string;
   /** Extra content beside the wordmark (e.g. the landing's "Open the app"). */
   action?: ReactNode;
   /** Extra lines under the copyright (e.g. the preview build's commit). */
@@ -103,8 +98,10 @@ interface SiteFooterProps {
 
 /**
  * The one footer both hosts render, from the navigation taxonomy
- * (config/siteNav.ts): six section columns, the ecosystem, community and
- * language rows, and the legal line. Directory links prefetch on intent
+ * (config/siteNav.ts) and one copy source (the `footer` catalog): six section
+ * columns, the ecosystem, community and language rows, and the legal line
+ * with the colophon, linked to its sources on /security, and the name's
+ * disambiguation. Only the host's action and a preview build stamp differ. Directory links prefetch on intent
  * only, so scrolling to the footer no longer downloads every route.
  *
  * A server component wherever its parent is one (the landing shell gets it
@@ -115,16 +112,13 @@ interface SiteFooterProps {
  * legal line keeps clear of a fixed action dock (`--dock-clearance`, set in
  * styles/global.css while one is on the page).
  */
-export function SiteFooter({
-  host,
-  tagline,
-  copyright,
-  colophon,
-  action,
-  meta,
-  directory = true,
-}: SiteFooterProps) {
+export function SiteFooter({ host, action, meta, directory = true }: SiteFooterProps) {
   const t = useTranslations('common');
+  // One copy source for both hosts (footer.*): the same brand line, legal line
+  // and colophon on the landing and in the app.
+  const footerT = useTranslations('footer');
+  const tagline = footerT('tagline');
+  const colophon = footerT('colophon');
   const navT = useTranslations('nav');
   const locale = useLocale();
   const copy = useSiteNavCopy();
@@ -212,7 +206,9 @@ export function SiteFooter({
 
         <div className="flex flex-col gap-3 border-rule-faint pb-[calc(1.5rem+var(--dock-clearance,0px))] pt-5 sm:flex-row sm:items-center sm:justify-between sm:gap-4 sm:border-t sm:pt-6">
           <div className="type-caption flex flex-col gap-1 text-subtle">
-            <p>{copyright.replace('{year}', String(new Date().getFullYear()))}</p>
+            <p>{footerT('copyright', { year: String(new Date().getFullYear()) })}</p>
+            {/* What the name is not (the COSMIC cancer database): in the legal row, never a lead. */}
+            <p className="max-w-[65ch]">{footerT('disambiguation')}</p>
             {meta}
           </div>
           <div className="flex flex-wrap items-center gap-x-5 gap-y-0">

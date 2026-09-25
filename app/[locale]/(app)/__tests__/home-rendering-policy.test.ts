@@ -70,7 +70,9 @@ describe('home page client component rendering policy', () => {
 
     expect(header).toContain('data-maintenance-banner');
     expect(globalCss).toContain('body:has([data-maintenance-banner]) .home-control-shell');
-    expect(globalCss).toContain('calc(var(--header-height) + 3.75rem)');
+    // The banner's measured height, published by the banner (useBannerClearance).
+    expect(globalCss).toContain('var(--banner-clearance');
+    expect(header).toContain('useBannerClearance');
   });
 });
 

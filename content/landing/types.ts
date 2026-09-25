@@ -188,16 +188,6 @@ export interface LandingClosingContent {
   readonly galleryCta: LandingLink;
 }
 
-/** The landing footer's own copy; its links come from config/siteNav.ts. */
-export interface LandingFooterContent {
-  readonly tagline: string;
-  /** Serializable template. Replace `{year}` with the current four-digit year. */
-  readonly copyright: string;
-  readonly colophon: string;
-  /** Says what Cosmic Signature is not (the COSMIC cancer database), in the legal row. */
-  readonly disambiguation: string;
-}
-
 export interface LandingContent {
   readonly meta: LandingMetaContent;
   readonly hero: LandingHeroContent;
@@ -210,5 +200,4 @@ export interface LandingContent {
   readonly verifiability: LandingVerifiabilityContent;
   readonly faq: LandingFaqContent;
   readonly closing: LandingClosingContent;
-  readonly footer: LandingFooterContent;
 }

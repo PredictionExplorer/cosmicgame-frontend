@@ -301,12 +301,4 @@ export const landingTextZhHk = {
     heading: '每個週期，都為作品集\u200B添上新作。',
     body: '關注即時週期、落筆參與，或瀏覽至今銘刻的每一幅簽名作品。',
   },
-
-  footer: {
-    tagline: 'Arbitrum 上的程序化鏈上藝術協議。',
-    copyright: '© {year} Cosmic Signature。項目自有材料採用 CC0 1.0。',
-    colophon: 'CC0 1.0 · 公開可驗證 · 可復現藝術',
-    disambiguation:
-      'Cosmic Signature 與 COSMIC 癌症突變數據庫及生物學中的 COSMIC 突變特徵沒有關聯。本項目是鏈上藝術協議及應用程式。',
-  },
 } satisfies LandingText;

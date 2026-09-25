@@ -1,3 +1,6 @@
+import { readFileSync } from 'node:fs';
+import { join } from 'node:path';
+
 import { getLandingContent, landingContentEn, landingContentZh } from '@/content/landing';
 
 import { CST_GECKOTERMINAL_POOL_URL } from '@/config/geckoterminal';
@@ -37,7 +40,6 @@ describe('landing content shape', () => {
       verifiability: expect.any(Object),
       faq: expect.any(Object),
       closing: expect.any(Object),
-      footer: expect.any(Object),
     });
   });
 
@@ -80,10 +82,19 @@ describe('landing content shape', () => {
     expect(landingContent.faq.items.length).toBeGreaterThanOrEqual(5);
   });
 
-  it('footer copy carries the tagline, a {year} copyright template and the colophon', () => {
-    expect(landingContent.footer.tagline).toEqual(expect.any(String));
-    expect(landingContent.footer.copyright).toContain('{year}');
-    expect(landingContent.footer.colophon).toEqual(expect.any(String));
+  it('leaves the footer copy to the one footer catalog both hosts read', () => {
+    expect(landingContent).not.toHaveProperty('footer');
+    for (const locale of routing.locales) {
+      const footer = JSON.parse(
+        readFileSync(join(process.cwd(), 'messages', locale, 'footer.json'), 'utf8'),
+      ) as Record<string, string>;
+      expect(footer.copyright).toContain('{year}');
+      expect(footer.tagline).toEqual(expect.any(String));
+      // A sourced claim, not a bare "Verified": the colophon links to /security.
+      expect(footer.colophon).not.toMatch(
+        /·\s*(Verified|已验证|已驗證|Верифіковано|검증됨|検証済み|Đã xác minh)\s*·/,
+      );
+    }
   });
 
   it('the shared footer ecosystem row links Axiom Zero, Chaos Zero, Uniswap, and GeckoTerminal', () => {
@@ -144,8 +155,11 @@ describe('landing content contract accuracy', () => {
     expect(landingContent.meta.description).toMatch(/more than ten tracks/);
   });
 
-  it('moves the COSMIC database disambiguation to the footer of every landing page', () => {
-    expect(landingContent.footer.disambiguation).toMatch(/not related to the COSMIC/);
+  it('says what the name is not (the COSMIC database) in the footer of both hosts', () => {
+    const footer = JSON.parse(
+      readFileSync(join(process.cwd(), 'messages', 'en', 'footer.json'), 'utf8'),
+    ) as Record<string, string>;
+    expect(footer.disambiguation).toMatch(/not related to the COSMIC/);
   });
 
   it('scopes CC0 claims to project-owned materials with third-party exceptions', () => {

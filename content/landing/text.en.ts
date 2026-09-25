@@ -297,12 +297,4 @@ export const landingTextEn = {
     heading: 'Every cycle adds to the collection.',
     body: 'Follow the live cycle, make a gesture, or browse every Signature imprinted so far.',
   },
-
-  footer: {
-    tagline: 'A procedural on-chain art protocol on Arbitrum.',
-    copyright: '© {year} Cosmic Signature. Project-owned materials: CC0 1.0.',
-    colophon: 'CC0 1.0 · Publicly verifiable · Reproducible art',
-    disambiguation:
-      'Cosmic Signature is not related to the COSMIC cancer mutation database or COSMIC mutational signatures in biology. It is an on-chain art protocol and app.',
-  },
 } satisfies LandingText;

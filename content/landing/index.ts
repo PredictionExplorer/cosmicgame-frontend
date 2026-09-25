@@ -158,7 +158,6 @@ function buildLandingContent(text: LandingText, locale: AppLocale): LandingConte
         href: LANDING_STRUCTURE.closing.galleryCtaHref,
       },
     },
-    footer: text.footer,
   };
 }
 
