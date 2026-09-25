@@ -27,7 +27,10 @@ describe('HowToPlayPage', () => {
     renderPage();
     const h1 = screen.getByRole('heading', { level: 1 });
     expect(h1).toHaveTextContent(/^How Cosmic Signature works$/);
-    expect(h1.childNodes).toHaveLength(1);
+    // One string: no markup but the span that holds the brand on one line (V425).
+    expect([...h1.querySelectorAll('*')].map((node) => node.textContent)).toEqual([
+      'Cosmic Signature',
+    ]);
   });
 
   it('draws the mechanism once, then what a gesture leads to and costs, how to start, what to know and one call to action', () => {
