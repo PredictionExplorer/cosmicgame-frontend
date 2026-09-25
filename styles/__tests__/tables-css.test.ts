@@ -185,11 +185,18 @@ describe('styles/tables.css', () => {
   it('never splits a shortened address, at any width or in either phone layout', () => {
     const hex =
       ".cs-table tbody td[data-kind='address'] > [data-slot='value'] :is(.font-mono, .font-mono *)";
-    expect(declaration(topRules, hex, 'text-wrap-mode')).toBe('nowrap');
-    expect(declaration(topRules, hex, 'overflow-wrap')).toBe('normal');
+    // A two-line phone record carries addresses in another column's cell.
+    const recordHex =
+      ".cs-table tbody td > [data-slot='value'] [data-slot='phone-record'] :is(.font-mono, .font-mono *)";
+    for (const selector of [hex, recordHex]) {
+      expect(declaration(topRules, selector, 'text-wrap-mode')).toBe('nowrap');
+      expect(declaration(topRules, selector, 'overflow-wrap')).toBe('normal');
+    }
     // It follows the phone block that turns wrapping back on, so equal
     // specificity would still resolve to it; it outranks both wrap rules too.
-    const hexIndex = root.nodes.findIndex((node) => node.type === 'rule' && node.selector === hex);
+    const hexIndex = root.nodes.findIndex(
+      (node) => node.type === 'rule' && (node as Rule).selectors.includes(hex),
+    );
     expect(hexIndex).toBeGreaterThan(root.nodes.indexOf(phone!));
   });
 
