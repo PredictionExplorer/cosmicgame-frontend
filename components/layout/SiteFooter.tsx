@@ -136,6 +136,14 @@ export function SiteFooter({ host, tagline, copyright, colophon, action, meta }:
   const copy = useSiteNavCopy();
   const security = resolveRouteHref(getSiteRoute('security'), host, locale);
   const home = host === 'app' ? getSiteRoute('observatory') : getSiteRoute('projectSite');
+  // The landing names the app's home the way each of its buttons does ("Open
+  // the app"): the name "Observatory" appears nowhere else on that host.
+  const entryLabel = (route: SiteRoute, group?: keyof typeof SITE_ROUTE_GROUPS) =>
+    group
+      ? copy.groupLabel(group)
+      : host === 'landing' && route.id === 'observatory'
+        ? navT('cta.openApp')
+        : copy.routeLabel(route.id);
 
   return (
     <footer className="relative mt-auto border-t border-rule bg-background">
@@ -183,7 +191,7 @@ export function SiteFooter({ host, tagline, copyright, colophon, action, meta }:
                         prefetch="intent"
                         className={LINK_CLASS}
                       >
-                        {group ? copy.groupLabel(group) : copy.routeLabel(route.id)}
+                        {entryLabel(route, group)}
                       </SiteLink>
                     </li>
                   );

@@ -43,12 +43,18 @@ describe('<LandingFooter />', () => {
     expect(anchors).toHaveLength(0);
   });
 
-  it('offers a way into the app', () => {
+  it('offers a way into the app, and names the app home that way in the directory too', () => {
     render(<LandingFooter footer={landingContentEn.footer} />);
-    expect(screen.getByRole('link', { name: 'nav.cta.openApp' })).toHaveAttribute(
-      'href',
-      localeHref(APP_ORIGIN, '/', 'en'),
-    );
+    const links = screen.getAllByRole('link', { name: 'nav.cta.openApp' });
+    // The action beside the wordmark, and the Participate column's first row.
+    expect(links).toHaveLength(2);
+    for (const link of links) {
+      expect(link).toHaveAttribute('href', localeHref(APP_ORIGIN, '/', 'en'));
+    }
+    const nav = screen.getByRole('navigation', { name: 'common.accessibility.footer' });
+    expect(within(nav).queryByRole('link', { name: 'nav.routes.observatory.label' })).toBeNull();
+    // Nor does it link the landing home it is on as "Project Site".
+    expect(within(nav).queryByRole('link', { name: 'nav.routes.projectSite.label' })).toBeNull();
   });
 
   it('renders the crawlable language directory', () => {
