@@ -5,12 +5,12 @@ import { getTranslations, setRequestLocale } from 'next-intl/server';
 import { readDashboard } from '@/app/[locale]/(app)/publicDataReads';
 import { seedsDisabled } from '@/app/[locale]/(app)/QuerySeed';
 
-import { get_bid_list_by_round } from '@/services/api/rounds';
 import { toFiniteNumber } from '@/utils/finiteNumber';
 import { parseCanonicalNonNegativeSafeInteger } from '@/utils/routeParams';
 import { createMetadata } from '@/utils/seo';
 
 import EmbedEnduranceChart from './EmbedEnduranceChart';
+import { readLeadLaneCount } from './leadLaneCount';
 
 /**
  * The cycle in the URL; anything but a canonical cycle number ("abc", "-1",
@@ -22,33 +22,6 @@ function cycleOrNotFound(round: string): number {
   const cycle = parseCanonicalNonNegativeSafeInteger(round);
   if (cycle === null) notFound();
   return cycle;
-}
-
-/**
- * How many addresses held the lead in `cycle`: every gesture hands its maker
- * the lead, so it is the number of distinct gesture makers. It sizes the
- * chart's loading lanes, so the window keeps its height when they arrive.
- *
- * The API has no per-cycle count of makers, so this reads the cycle's
- * gesture list, which the chart then reads again in the browser. Seeding the
- * chart's query instead would inline the whole list in the HTML (about 1 MB
- * of JSON for cycle 1) to save one read; the count is one number. The route
- * renders per request: caching it (ISR, an empty `generateStaticParams`)
- * turns the embed's 404 into a 500, since the 404's metadata reads the
- * locale from the request headers.
- */
-async function readLeadLaneCount(cycle: number): Promise<number | undefined> {
-  try {
-    const gestures = await get_bid_list_by_round(cycle, 'asc');
-    const makers = new Set(
-      gestures
-        .map((gesture) => gesture.BidderAddr?.toLowerCase())
-        .filter((address): address is string => Boolean(address)),
-    );
-    return makers.size;
-  } catch {
-    return undefined;
-  }
 }
 
 export async function generateMetadata({
@@ -82,8 +55,18 @@ export async function generateMetadata({
   };
 }
 
-// Dynamic-param pages render on demand; revalidate keeps live protocol data
-// fresh instead of freezing the first render forever (see route-group refactor).
+/**
+ * No cycle renders at build time: each one renders on its first visit and is
+ * then served from the cache for five minutes, so a shared link costs one
+ * server render per cycle and locale, not one per visitor. The chart itself
+ * reads the cycle's gestures in the browser; the cached HTML carries only the
+ * live cycle (for the badge) and the lane count (for the skeleton's height),
+ * and the browser's own dashboard read corrects a badge that went stale.
+ */
+export function generateStaticParams() {
+  return [];
+}
+
 export const revalidate = 300;
 
 export default async function Page({
@@ -96,11 +79,11 @@ export default async function Page({
   setRequestLocale(locale);
   // Under the e2e harness the browser's mocked API is the only source, so
   // nothing is read here (the same rule as QuerySeed).
-  const seeded = !seedsDisabled();
-  const [dashboard, lanes] = seeded
-    ? await Promise.all([readDashboard(), readLeadLaneCount(cycle)])
-    : [null, undefined];
-  const liveCycle = toFiniteNumber(dashboard?.data?.CurRoundNum) ?? undefined;
+  if (seedsDisabled()) return <EmbedEnduranceChart roundNum={cycle} />;
+
+  const dashboard = await readDashboard();
+  const liveCycle = toFiniteNumber(dashboard.data?.CurRoundNum) ?? undefined;
+  const lanes = await readLeadLaneCount(cycle, liveCycle);
   // The embed layout serializes the chart's namespaces (EMBED_NAMESPACES).
   return <EmbedEnduranceChart roundNum={cycle} seedLiveCycle={liveCycle} expectedLanes={lanes} />;
 }
