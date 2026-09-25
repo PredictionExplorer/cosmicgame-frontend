@@ -3,9 +3,12 @@ import { dailySeries } from '@/app/[locale]/(app)/statistics/CycleRhythm';
 import {
   bucketGestureMix,
   defaultMixInterval,
+  mixAxisCap,
   mixIntervalsFor,
   mixTotals,
+  plotMixBuckets,
   MAX_MIX_BUCKETS,
+  MIX_OUTLIER_RATIO,
 } from '../gestureMix';
 import { sliceRange, supplyByDate, supplyByGesture } from '../../CstSupplyHistory';
 import { outcomeTotals } from '../../ParticipantOutcomesSection';
@@ -44,6 +47,41 @@ describe('gesture mix', () => {
     expect(mixIntervalsFor(span)).not.toContain(HOUR);
     expect(defaultMixInterval(span)).toBe(DAY);
     expect(defaultMixInterval(DAY)).toBe(HOUR);
+  });
+
+  it('counts a gesture at the end of the range in the last window', () => {
+    const buckets = bucketGestureMix(gestures, T0, T0 + 3 * HOUR, HOUR);
+    expect(buckets.at(-1)).toMatchObject({ start: T0 + 3 * HOUR, cst: 1, total: 1 });
+  });
+
+  const window = (total: number) => ({ eth: total, ethRandomWalk: 0, cst: 0, total });
+
+  it('stops the axis short of one window far above the rest (a cycle’s opening)', () => {
+    const windows = [450, ...Array.from({ length: 30 }, (_, index) => 20 + (index % 10))].map(
+      window,
+    );
+    const cap = mixAxisCap(windows);
+    expect(cap).not.toBeNull();
+    expect(cap!).toBeLessThan(450 / MIX_OUTLIER_RATIO);
+    expect(cap!).toBeGreaterThanOrEqual(29);
+  });
+
+  it('draws every window whole when none stands out, or there are too few to judge', () => {
+    expect(mixAxisCap(Array.from({ length: 30 }, (_, index) => window(20 + index)))).toBeNull();
+    expect(mixAxisCap([450, 20, 25].map(window))).toBeNull();
+  });
+
+  it('scales a clipped window to the axis, keeping its mix and its true counts', () => {
+    const [clipped, whole] = plotMixBuckets(
+      [
+        { start: T0, eth: 300, ethRandomWalk: 100, cst: 200, total: 600 },
+        { start: T0 + DAY, eth: 10, ethRandomWalk: 5, cst: 5, total: 20 },
+      ],
+      60,
+    );
+    expect(clipped).toMatchObject({ clipped: true, total: 600, eth: 300 });
+    expect(clipped!.plotted).toEqual({ eth: 30, ethRandomWalk: 10, cst: 20 });
+    expect(whole).toMatchObject({ clipped: false, plotted: { eth: 10, ethRandomWalk: 5, cst: 5 } });
   });
 });
 

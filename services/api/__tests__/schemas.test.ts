@@ -11,7 +11,6 @@
 import {
   AnchoredTokenCSTSchema,
   AnchoredTokenRWalkSchema,
-  BidTypeRatioBucketSchema,
   CharityWithdrawalSchema,
   DashboardInfoSchema,
   ETHDonationSchema,
@@ -466,21 +465,6 @@ describe('newly covered modules', () => {
 
   it('accepts a stellar-selection deposit row with only the fields the API sends', () => {
     expect(() => StellarSelectionETHDepositSchema.parse({ Amount: 0.5 })).not.toThrow();
-  });
-
-  it('accepts a gesture-type ratio bucket', () => {
-    expect(() =>
-      BidTypeRatioBucketSchema.parse({
-        BucketTs: 1_700_000_000,
-        EthBids: 3,
-        RwalkBids: 1,
-        CstBids: 2,
-        TotalBids: 6,
-        EthPct: 50,
-        RwalkPct: 16.7,
-        CstPct: 33.3,
-      }),
-    ).not.toThrow();
   });
 
   it('accepts a top-participant active-periods response', () => {

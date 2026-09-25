@@ -3,7 +3,7 @@ import type { CSSProperties } from 'react';
 import { cn } from '@/lib/utils';
 
 /** How a series draws, so its legend key looks like its mark. */
-export type LegendShape = 'dot' | 'square' | 'line' | 'dash' | 'ring';
+export type LegendShape = 'dot' | 'hollowDot' | 'square' | 'line' | 'dash' | 'ring';
 
 export interface LegendItem {
   key: string;
@@ -13,7 +13,10 @@ export interface LegendItem {
   shape?: LegendShape;
 }
 
-/** The key of one series: a dot, a square, a stroke, a dashed stroke or an outlined square. */
+/**
+ * The key of one series: a dot, an open dot, a square, a stroke, a dashed
+ * stroke or an outlined square.
+ */
 export function LegendSwatch({
   color,
   shape = 'square',
@@ -28,7 +31,7 @@ export function LegendSwatch({
       ? { borderTop: `2px solid ${color}` }
       : shape === 'dash'
         ? { borderTop: `2px dashed ${color}` }
-        : shape === 'ring'
+        : shape === 'ring' || shape === 'hollowDot'
           ? { boxShadow: `inset 0 0 0 1.5px ${color}` }
           : { backgroundColor: color };
   return (
@@ -38,7 +41,7 @@ export function LegendSwatch({
         'inline-block shrink-0',
         shape === 'line' || shape === 'dash'
           ? 'h-0 w-4'
-          : shape === 'dot'
+          : shape === 'dot' || shape === 'hollowDot'
             ? 'size-2.5 rounded-pill'
             : 'size-2.5 rounded-edge',
         className,

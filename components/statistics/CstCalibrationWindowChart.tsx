@@ -19,8 +19,7 @@ import {
   type CstCalibrationTimeline,
 } from '@/utils/cstCalibration';
 import type { GestureInfo } from '@/services/api/types';
-import { useGestureListByCycle, useRoundInfo, useCurrentTime } from '@/hooks/useApiQuery';
-import { useNow } from '@/hooks/useNow';
+import { useGestureListByCycle } from '@/hooks/useApiQuery';
 import { GESTURE_METHOD_COLOR, gestureMethodColor } from '@/lib/theme/dataColors';
 import { DataTable, type DataTableColumn } from '@/components/ui/data-table';
 import { EmptyState } from '@/components/ui/empty-state';
@@ -29,6 +28,7 @@ import { SkeletonChart } from '@/components/ui/skeleton';
 
 import { ChartFigure } from './charts/ChartFigure';
 import { ChartLegend } from './charts/ChartLegend';
+import type { ReadoutItem } from './charts/ChartReadout';
 import { ChartTooltipCard } from './charts/ChartTooltipCard';
 import { useDurationAxis, useElapsedHoursAxis } from './charts/axes';
 import {
@@ -40,6 +40,7 @@ import {
   X_AXIS_PROPS,
   Y_AXIS_PROPS,
 } from './charts/theme';
+import { useCycleClock } from './charts/useCycleClock';
 
 const CHART_HEIGHT = 320;
 
@@ -198,10 +199,14 @@ type CstCalibrationWindowViewProps = {
   gestures: GestureInfo[];
   /** True when showing the in-progress cycle (the timeline stays open at "now"). */
   isLive: boolean;
-  /** Finalized cycles end at their claim timestamp; ignored when `isLive`. */
-  roundEndTs?: number;
+  /** When a finalized cycle ended (`useCycleClock`); ignored when `isLive`. */
+  endTs?: number;
+  /** "Now" for the live cycle, in whole minutes (`useCycleClock`). */
+  nowTs?: number;
   /** Names the figure. */
   label: string;
+  /** The cycle or its end is still loading: the figure's frame with placeholders. */
+  loading?: boolean;
 };
 
 /**
@@ -213,19 +218,17 @@ type CstCalibrationWindowViewProps = {
 export const CstCalibrationWindowView: FC<CstCalibrationWindowViewProps> = ({
   gestures,
   isLive,
-  roundEndTs = 0,
+  endTs = 0,
+  nowTs = 0,
   label,
+  loading = false,
 }) => {
   const t = useTranslations('statistics');
   const locale = useLocale();
-  const { data: serverNow } = useCurrentTime();
-  const clientNow = Math.floor(useNow(60_000) / 1000);
-  const nowSec = serverNow && serverNow > 0 ? serverNow : clientNow;
-  const nowForCalc = isLive ? Math.floor(nowSec / 60) * 60 : 0;
 
   const timeline: CstCalibrationTimeline = useMemo(
-    () => getCstCalibrationTimeline(gestures, isLive ? 0 : roundEndTs, nowForCalc),
-    [gestures, isLive, roundEndTs, nowForCalc],
+    () => getCstCalibrationTimeline(gestures, isLive ? 0 : endTs, isLive ? nowTs : 0),
+    [gestures, isLive, endTs, nowTs],
   );
 
   const rows = useMemo<WindowRow[]>(
@@ -274,18 +277,28 @@ export const CstCalibrationWindowView: FC<CstCalibrationWindowViewProps> = ({
     [locale, t],
   );
 
-  if (timeline.points.length === 0) {
+  if (!loading && timeline.points.length === 0) {
     return <EmptyState headingLevel={4} variant="inline" title={t('charts.cstWindow.empty')} />;
   }
+
+  const seconds = (value: number) => (loading ? null : formatSeconds(value, locale));
+  const readout: ReadoutItem[] = [
+    {
+      id: 'current',
+      label: t(isLive ? 'charts.cstWindow.windowNow' : 'charts.cstWindow.windowFinal'),
+      value: seconds(timeline.currentSeconds),
+      swatch: { color: SERIES_COLOR.measure, shape: 'line' },
+    },
+    { id: 'low', label: t('charts.cstWindow.shortest'), value: seconds(timeline.minSeconds) },
+    { id: 'high', label: t('charts.cstWindow.longest'), value: seconds(timeline.maxSeconds) },
+  ];
 
   return (
     <ChartFigure
       label={label}
-      summary={t(isLive ? 'charts.cstWindow.summaryLive' : 'charts.cstWindow.summaryFinal', {
-        current: formatSeconds(timeline.currentSeconds, locale),
-        low: formatSeconds(timeline.minSeconds, locale),
-        high: formatSeconds(timeline.maxSeconds, locale),
-      })}
+      readout={readout}
+      state={loading ? <SkeletonChart height={CHART_HEIGHT} bars={18} /> : undefined}
+      loading={loading}
       legend={
         <ChartLegend
           items={[
@@ -322,7 +335,7 @@ export const CstCalibrationWindowView: FC<CstCalibrationWindowViewProps> = ({
           ]}
         />
       }
-      note={t('charts.cstWindow.description')}
+      note={t('charts.cstWindow.note')}
       table={<DataTable data={rows} columns={columns} ariaLabel={label} />}
     >
       <div data-testid="cst-calibration-window-chart">
@@ -353,22 +366,21 @@ const CstCalibrationWindowChart: FC<CstCalibrationWindowChartProps> = ({
   const t = useTranslations('statistics');
   const hasRound = round >= 0;
   const { data: gestures, isLoading, isError, refetch } = useGestureListByCycle(round, 'asc');
-  const { data: roundInfo } = useRoundInfo(hasRound && !isLive ? round : -1);
-  const roundEndTs = !isLive && roundInfo?.TimeStamp ? roundInfo.TimeStamp : 0;
+  // Ends where the other cycle charts end the cycle, and waits for that end.
+  const clock = useCycleClock(round, isLive);
 
   if (!hasRound) {
     return (
       <EmptyState headingLevel={4} variant="inline" title={t('charts.cstWindow.selectCycle')} />
     );
   }
-  if (isLoading) return <SkeletonChart height={CHART_HEIGHT} bars={18} />;
-  if (isError) {
+  if (isError || clock.status === 'error') {
     return (
       <ErrorState
         headingLevel={4}
         title={t('charts.cstWindow.loadErrorTitle')}
-        message={t('charts.cstWindow.loadErrorMessage')}
-        onRetry={() => refetch()}
+        message={isError ? t('charts.cstWindow.loadErrorMessage') : t('shared.serviceError')}
+        onRetry={() => (isError ? refetch() : clock.retry())}
       />
     );
   }
@@ -376,8 +388,10 @@ const CstCalibrationWindowChart: FC<CstCalibrationWindowChartProps> = ({
     <CstCalibrationWindowView
       gestures={gestures ?? []}
       isLive={isLive}
-      roundEndTs={roundEndTs}
+      endTs={clock.endTs}
+      nowTs={clock.nowTs}
       label={label}
+      loading={isLoading || clock.status === 'loading'}
     />
   );
 };

@@ -18,8 +18,6 @@ export interface AllocationsWalletEth {
   stellarDeposited: number | null;
   /** Chrono-Warrior ETH deposited into the wallet, or null when unread. */
   chronoDeposited: number | null;
-  /** Both tracks' deposits, or null when either is unread. */
-  deposited: number | null;
   /** ETH retrieved from the wallet across both tracks, or null when unread. */
   retrieved: number | null;
 }
@@ -33,10 +31,6 @@ export function allocationsWalletEth(main: DashboardInfo['MainStats']): Allocati
   return {
     stellarDeposited,
     chronoDeposited,
-    deposited:
-      stellarDeposited === null || chronoDeposited === null
-        ? null
-        : stellarDeposited + chronoDeposited,
     retrieved: toFiniteNumber(wire.TotalRaffleEthWithdrawn),
   };
 }

@@ -72,7 +72,9 @@ export function defaultMixInterval(span: number): MixInterval {
 /**
  * Counts per method in consecutive `interval`-second windows from `fromTs`
  * (aligned down to the interval) through `toTs`, every window present even
- * when empty. Gestures outside the range are ignored.
+ * when empty. Each window is half-open, [start, start + interval), and the
+ * last one holds `toTs`, so a gesture at `toTs` (the live cycle's latest)
+ * counts. Gestures outside the range are ignored.
  */
 export function bucketGestureMix(
   gestures: readonly GestureLike[],
@@ -97,4 +99,56 @@ export function bucketGestureMix(
     bucket.total += 1;
   }
   return buckets;
+}
+
+/** A window this many times the 95th percentile of the others is an outlier. */
+export const MIX_OUTLIER_RATIO = 2.5;
+/** Below this many non-empty windows the chart draws every window whole. */
+const MIN_WINDOWS_FOR_CAP = 12;
+
+/**
+ * Where a mix chart's value axis stops, or null to draw every window whole.
+ * One window far above the rest (a cycle's opening surge) would otherwise set
+ * the axis and flatten every other bar to the floor. When the tallest window
+ * passes `MIX_OUTLIER_RATIO` times the 95th percentile of the non-empty
+ * windows, the axis stops a fifth above that percentile; taller windows are
+ * drawn clipped (`plotMixBuckets`) and labelled with their true count.
+ */
+export function mixAxisCap(buckets: readonly MixCounts[]): number | null {
+  const totals = buckets
+    .map((bucket) => bucket.total)
+    .filter((total) => total > 0)
+    .sort((a, b) => a - b);
+  if (totals.length < MIN_WINDOWS_FOR_CAP) return null;
+  const p95 = totals[Math.ceil(totals.length * 0.95) - 1]!;
+  const max = totals[totals.length - 1]!;
+  return max > MIX_OUTLIER_RATIO * p95 ? Math.ceil(p95 * 1.2) : null;
+}
+
+export interface MixPlotBucket extends MixBucket {
+  /** The heights drawn: the counts, or scaled into the axis for a clipped window. */
+  plotted: Record<GestureMethodKey, number>;
+  /** The window is taller than the axis: drawn to its top, with its true count. */
+  clipped: boolean;
+}
+
+/**
+ * The windows as the chart draws them against an axis that stops at `limit`:
+ * a window above it keeps its method mix, scaled to the axis's full height,
+ * and is marked `clipped`; every other window draws its counts as they are.
+ */
+export function plotMixBuckets(buckets: readonly MixBucket[], limit: number): MixPlotBucket[] {
+  return buckets.map((bucket) => {
+    const clipped = limit > 0 && bucket.total > limit;
+    const scale = clipped ? limit / bucket.total : 1;
+    return {
+      ...bucket,
+      clipped,
+      plotted: {
+        eth: bucket.eth * scale,
+        ethRandomWalk: bucket.ethRandomWalk * scale,
+        cst: bucket.cst * scale,
+      },
+    };
+  });
 }

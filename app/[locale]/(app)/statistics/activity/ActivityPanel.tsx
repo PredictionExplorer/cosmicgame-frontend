@@ -1,6 +1,5 @@
 'use client';
 
-// lexicon-allow-start: internal analytics identifiers mirror backend wire names
 import dynamic from 'next/dynamic';
 import { ArrowUpRight } from 'lucide-react';
 import { useTranslations } from 'next-intl';
@@ -10,50 +9,53 @@ import { useDashboardInfo, useSystemModelist } from '@/hooks/useApiQuery';
 import { useHydrated } from '@/hooks/useHydrated';
 import { StatsSection } from '@/components/statistics/StatsSection';
 import { SectionShell } from '@/components/statistics/SectionShell';
-import { SkeletonChart } from '@/components/ui/skeleton';
+import { DefinitionsDisclosure } from '@/components/statistics/DefinitionsDisclosure';
 import { CycleScopeControl } from '@/components/statistics/CycleScopeControl';
 import { useCycleScope } from '@/components/statistics/useCycleScope';
-import { BidFrequencyChart } from '@/components/statistics/BidFrequencyChart';
-import { LastBidSpikeChart } from '@/components/statistics/LastBidSpikeChart';
-import { BidderActivePeriodsTimeline } from '@/components/statistics/BidderActivePeriodsTimeline';
+import { GestureFrequencyChart } from '@/components/statistics/GestureFrequencyChart';
+import { GestureSpikeChart } from '@/components/statistics/GestureSpikeChart';
+import {
+  ACTIVE_PERIODS_TOP_N,
+  ParticipantActivePeriodsTimeline,
+} from '@/components/statistics/ParticipantActivePeriodsTimeline';
+import { EnduranceTimelineSkeleton } from '@/components/statistics/EnduranceTimelineSkeleton';
+import { ChartFigureSkeleton } from '@/components/statistics/charts/ChartFigureSkeleton';
 import { SystemModesTable, type EventRow } from '@/components/tables/SystemModesTable';
 
 /**
  * The one-cycle charts sit below three all-time sections: each loads in its
- * own chunk after the page, behind a skeleton of its height, so the page's
- * first load carries only the charts at the top.
+ * own chunk after the page, behind a skeleton in the finished figure's shape
+ * (readout, toolbar, plot), so the page's first load carries only the charts
+ * at the top and nothing moves when a chart replaces its skeleton.
  */
-const chartSkeleton = (height: number) =>
-  function ChartLoading() {
-    return <SkeletonChart height={height} bars={18} />;
-  };
 const GestureTypeMixChart = dynamic(
   () => import('@/components/statistics/GestureTypeMixChart').then((m) => m.GestureTypeMixChart),
-  { ssr: false, loading: chartSkeleton(300) },
+  { ssr: false, loading: () => <ChartFigureSkeleton figures={4} captions height={300} /> },
 );
 const EnduranceTimelineChart = dynamic(
   () => import('@/components/statistics/EnduranceTimelineChart'),
-  { ssr: false, loading: chartSkeleton(320) },
+  { ssr: false, loading: () => <EnduranceTimelineSkeleton lanes={14} /> },
 );
 const CstCalibrationWindowChart = dynamic(
   () => import('@/components/statistics/CstCalibrationWindowChart'),
-  { ssr: false, loading: chartSkeleton(320) },
+  { ssr: false, loading: () => <ChartFigureSkeleton figures={3} height={320} /> },
 );
 const CstGestureCostChart = dynamic(() => import('@/components/statistics/CstGestureCostChart'), {
   ssr: false,
-  loading: chartSkeleton(320),
+  loading: () => <ChartFigureSkeleton figures={3} captions height={344} />,
 });
 
 /**
  * Gesture activity: frequency, spikes and the most active participants over
  * all time, then one cycle's story (method mix, lead history, Calibration
  * Window, CST cost) under the page's one cycle picker, kept in `?cycle=`,
- * and the cycle activations log. The cycle charts mount only once the
- * dashboard names the live cycle: until then the section shows a chart
- * skeleton, and a failed read shows an error with a retry, never a chart's
- * "not started" or "select a cycle" state for a cycle that is live. The live
- * cycle is read only after hydration, so the first client render matches the
- * server's skeleton even when the dashboard query has already answered.
+ * and the cycle activations log. Each chart reads out its point in figures
+ * and keeps a one- or two-line note; what each section measures and how is
+ * in one Definitions disclosure at the end, not an ⓘ on every heading. The
+ * cycle charts mount only once the dashboard names the live cycle: until
+ * then the section shows a chart skeleton, and a failed read shows an error
+ * with a retry. The live cycle is read only after hydration, so the first
+ * client render matches the server's skeleton.
  */
 const ActivityPanel = () => {
   const t = useTranslations('statistics');
@@ -69,19 +71,16 @@ const ActivityPanel = () => {
 
   return (
     <div className="space-y-12 sm:space-y-16" data-testid="activity-panel">
-      <StatsSection title={title('frequency')} tooltip={t('sectionTooltips.gestureFrequency')}>
-        <BidFrequencyChart label={title('frequency')} />
+      <StatsSection title={title('frequency')}>
+        <GestureFrequencyChart label={title('frequency')} />
       </StatsSection>
 
-      <StatsSection title={title('spikes')} tooltip={t('sectionTooltips.gestureSpikes')}>
-        <LastBidSpikeChart label={title('spikes')} />
+      <StatsSection title={title('spikes')}>
+        <GestureSpikeChart label={title('spikes')} />
       </StatsSection>
 
-      <StatsSection
-        title={title('activePeriods')}
-        tooltip={t('sectionTooltips.participantActivePeriods')}
-      >
-        <BidderActivePeriodsTimeline label={title('activePeriods')} />
+      <StatsSection title={title('activePeriods')}>
+        <ParticipantActivePeriodsTimeline label={title('activePeriods')} />
       </StatsSection>
 
       <StatsSection
@@ -92,14 +91,10 @@ const ActivityPanel = () => {
         isLoading={!cycleKnown && !dashboardFailed}
         isError={!cycleKnown && dashboardFailed}
         onRetry={() => dashboardQuery.refetch()}
-        skeleton={<SkeletonChart />}
+        skeleton={<ChartFigureSkeleton figures={4} captions height={300} />}
       >
         <div className="space-y-12">
-          <SectionShell
-            headingLevel={3}
-            title={title('typeDistribution')}
-            tooltip={t('sectionTooltips.gestureTypeDistribution')}
-          >
+          <SectionShell headingLevel={3} title={title('typeDistribution')}>
             <GestureTypeMixChart
               round={scope.cycle}
               isLive={scope.isLive}
@@ -110,7 +105,6 @@ const ActivityPanel = () => {
           <SectionShell
             headingLevel={3}
             title={title('enduranceTimeline')}
-            tooltip={t('sectionTooltips.enduranceTimeline')}
             actions={
               scope.cycle >= 0 ? (
                 <Link
@@ -121,6 +115,7 @@ const ActivityPanel = () => {
                 >
                   {t('charts.endurance.openWindow')}
                   <ArrowUpRight aria-hidden className="size-3.5 text-subtle" />
+                  <span className="sr-only"> {t('embed.opensNewWindow')}</span>
                 </Link>
               ) : null
             }
@@ -132,11 +127,7 @@ const ActivityPanel = () => {
             />
           </SectionShell>
 
-          <SectionShell
-            headingLevel={3}
-            title={title('cstWindow')}
-            tooltip={t('sectionTooltips.cstWindow')}
-          >
+          <SectionShell headingLevel={3} title={title('cstWindow')}>
             <CstCalibrationWindowChart
               round={scope.cycle}
               isLive={scope.isLive}
@@ -144,11 +135,7 @@ const ActivityPanel = () => {
             />
           </SectionShell>
 
-          <SectionShell
-            headingLevel={3}
-            title={title('cstCost')}
-            tooltip={t('sectionTooltips.cstCost')}
-          >
+          <SectionShell headingLevel={3} title={title('cstCost')}>
             <CstGestureCostChart round={scope.cycle} label={title('cstCost')} />
           </SectionShell>
         </div>
@@ -156,7 +143,6 @@ const ActivityPanel = () => {
 
       <StatsSection
         title={title('cycleActivations')}
-        tooltip={t('sectionTooltips.cycleActivations')}
         defaultOpen={false}
         lazy
         collapsedSummary={
@@ -172,9 +158,29 @@ const ActivityPanel = () => {
       >
         <SystemModesTable list={systemModeChanges} />
       </StatsSection>
+
+      <DefinitionsDisclosure
+        className="border-t border-rule pt-8 sm:pt-10"
+        label={t('shared.definitions')}
+        items={[
+          { term: title('frequency'), definition: t('charts.frequency.openingExcluded') },
+          { term: title('spikes'), definition: t('sectionTooltips.gestureSpikes') },
+          {
+            term: title('activePeriods'),
+            definition: t('charts.activePeriods.description', { count: ACTIVE_PERIODS_TOP_N }),
+          },
+          {
+            term: title('typeDistribution'),
+            definition: t('sectionTooltips.gestureTypeDistribution'),
+          },
+          { term: title('enduranceTimeline'), definition: t('charts.endurance.description') },
+          { term: title('cstWindow'), definition: t('charts.cstWindow.description') },
+          { term: title('cstCost'), definition: t('charts.cstCost.description') },
+          { term: title('cycleActivations'), definition: t('sectionTooltips.cycleActivations') },
+        ]}
+      />
     </div>
   );
 };
 
 export default ActivityPanel;
-// lexicon-allow-end

@@ -16,7 +16,6 @@ import { get_bid_list } from './rounds';
 import {
   BidFrequencyBucketSchema,
   BidTimeBoundsSchema,
-  BidTypeRatioBucketSchema,
   BiddingActivityResponseSchema,
   TopBidderActivePeriodsResponseSchema,
   safeValidate,
@@ -24,7 +23,6 @@ import {
 } from './schemas';
 import type {
   BidFrequencyBucket,
-  BidTypeRatioBucket,
   BiddingActivityResponse,
   BidTimeBounds,
   TopBidderActivePeriodsResponse,
@@ -137,35 +135,6 @@ export async function get_bid_time_bounds(opts?: ApiRequestOptions): Promise<Bid
     if (!isMissingEndpoint(err)) throw err;
     const gestures = await loadGestures();
     return computeTimeBounds(gestures);
-  }
-}
-
-/**
- * Fetches the per-interval bid-type composition (ETH / RandomWalk / CST) over a
- * time range. Each bucket carries raw counts plus windowed percentages summing
- * to ~100%. Windows with no bids report zeros (a dip to baseline, not a gap).
- *
- * There is no client-side reconstruction for this series, so a server without
- * the route yields an empty series; every other failure propagates.
- */
-export async function get_bid_type_ratio(
-  fromTs: number,
-  toTs: number,
-  intervalSecs: number,
-  opts?: ApiRequestOptions,
-): Promise<BidTypeRatioBucket[]> {
-  try {
-    const { data } = await apiGet(getAPIUrl('bid/bid_type_ratio'), opts, {
-      params: { from_ts: fromTs, to_ts: toTs, interval_secs: intervalSecs },
-    });
-    return safeValidateListSample(
-      BidTypeRatioBucketSchema,
-      data.RatioHistory ?? [],
-      'bidTypeRatio',
-    ) as BidTypeRatioBucket[];
-  } catch (err) {
-    if (!isMissingEndpoint(err)) throw err;
-    return [];
   }
 }
 

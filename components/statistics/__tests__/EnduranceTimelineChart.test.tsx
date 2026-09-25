@@ -33,11 +33,11 @@ const gestures = [
 
 const ok = <T,>(data: T) => ({ data, isLoading: false, isError: false, refetch: jest.fn() });
 
-/** A summary line by its whole text: the address inside it is a link of its own. */
-const summaryLine = (pattern: RegExp) => (_: string, element: Element | null) =>
-  element?.tagName === 'SPAN' &&
-  element.classList.contains('block') &&
-  pattern.test(element.textContent ?? '');
+/** A chart's readout as [label, figure, caption] rows. */
+const readoutOf = (figure: Element) =>
+  [...figure.querySelectorAll('figcaption dl > div')].map((item) =>
+    [...item.querySelectorAll('dt, dd')].map((cell) => cell.textContent ?? ''),
+  );
 
 beforeEach(() => {
   jest.clearAllMocks();
@@ -47,13 +47,28 @@ beforeEach(() => {
 });
 
 describe('EnduranceTimelineChart', () => {
-  it('names the Endurance Champion and the Chrono-Warrior, one line each', () => {
+  it('reads out the Endurance Champion, the Chrono-Warrior and the lanes as figures', () => {
     render(<EnduranceTimelineChart round={2} isLive label="Endurance" />);
     const figure = screen.getByRole('figure', { name: 'Endurance' });
-    expect(
-      within(figure).getByText(summaryLine(/^Endurance Champion: 0xb1b2….*held 1[67]h/i)),
-    ).toBeInTheDocument();
-    expect(within(figure).getByText(summaryLine(/^Chrono-Warrior: /))).toBeInTheDocument();
+    const figures = readoutOf(figure);
+    expect(figures.map(([label]) => label)).toEqual([
+      'Endurance Champion',
+      'Chrono-Warrior',
+      'Addresses in the lead',
+    ]);
+    expect(figures[0]![1]).toMatch(/^1[67]h/);
+    expect(figures[0]![2]).toMatch(/^0xb1b2…/i);
+    expect(figures[2]![1]).toBe('2');
+  });
+
+  it('pins the record’s callout over its stint, drawn never thinner than 6px', () => {
+    render(<EnduranceTimelineChart round={2} isLive label="Endurance" />);
+    const gantt = screen.getByRole('group', { name: 'Lead stints by participant' });
+    const record = within(gantt)
+      .getAllByRole('img')
+      .find((stint) => /Endurance Champion/.test(stint.getAttribute('aria-label') ?? ''))!;
+    expect(record).toHaveClass('[--mark-min:6px]');
+    expect(within(gantt).getByText(/^Endurance record · 1[67]h/)).toBeInTheDocument();
   });
 
   it('lays the time axis and every lane on the same columns, so they cannot drift apart', () => {
@@ -75,9 +90,9 @@ describe('EnduranceTimelineChart', () => {
     const gantt = screen.getByRole('group', { name: 'Lead stints by participant' });
     const lanes = within(gantt).getAllByRole('group');
     expect(lanes).toHaveLength(2);
-    expect(within(gantt).getAllByText('Endurance Champion', { selector: '.sr-only' })).toHaveLength(
-      1,
-    );
+    // V301: the title is spelled out beside its legend swatch, not abbreviated to "EC".
+    expect(within(gantt).getAllByText('Endurance Champion')).toHaveLength(1);
+    expect(within(gantt).queryByText('EC')).not.toBeInTheDocument();
   });
 
   it('keeps one tab stop across every stint and reads the focused one out', async () => {
@@ -202,13 +217,23 @@ describe('EnduranceTimelineChart', () => {
 
   it('holds the Gantt shape at the expected lane count while the gestures load', () => {
     mockUseGestureListByCycle.mockReturnValue({ ...ok(undefined), isLoading: true });
-    const { container } = render(
-      <EnduranceTimelineChart round={2} isLive label="Endurance" expectedLanes={19} />,
+    const { container, rerender } = render(
+      <EnduranceTimelineChart
+        round={2}
+        isLive
+        label="Endurance"
+        expectedLanes={19}
+        laneLimit={null}
+      />,
     );
-    const status = screen.getByRole('status', { name: /loading/i });
-    expect(status.querySelectorAll('.bg-surface-sunken')).toHaveLength(19);
-    // The caption's two lines are held too, so the view switch below does not move.
-    expect(container.querySelector('figcaption')).toBeInTheDocument();
+    const lanes = () =>
+      screen.getByRole('status', { name: /loading/i }).querySelectorAll('.bg-surface-sunken');
+    expect(lanes()).toHaveLength(19);
+    // The readout's figures are held too, so the view switch below does not move.
+    expect(readoutOf(container.querySelector('figure')!)).toHaveLength(3);
+    // A page that shows 14 lanes before "Show all" holds 14.
+    rerender(<EnduranceTimelineChart round={2} isLive label="Endurance" expectedLanes={19} />);
+    expect(lanes()).toHaveLength(14);
   });
 
   it('switches to the records as lines', async () => {
@@ -233,9 +258,28 @@ describe('EnduranceTimelineChart', () => {
     render(<EnduranceTimelineChart round={1} isLive={false} label="Endurance" />);
     expect(mockUseRoundInfo).toHaveBeenCalledWith(1);
     // Bob's last stint now runs 7h, under Alice's 10h opening hold.
-    expect(
-      screen.getByText(summaryLine(/^Endurance Champion: 0xa1b2….*held 10h/i)),
-    ).toBeInTheDocument();
+    const [champion] = readoutOf(screen.getByRole('figure', { name: 'Endurance' }));
+    expect(champion).toEqual(['Endurance Champion', '10h', expect.stringMatching(/^0xa1b2…/i)]);
+  });
+
+  it('names no champion before a finalized cycle’s end is known', () => {
+    // V108: without the end, the last holder's stint is missing and the record may be wrong.
+    mockUseRoundInfo.mockReturnValue({ data: undefined, isLoading: true, isError: false });
+    render(<EnduranceTimelineChart round={1} isLive={false} label="Endurance" />);
+    const figure = screen.getByRole('figure', { name: 'Endurance' });
+    expect(readoutOf(figure).every((item) => item.length === 1 || item[1] === '')).toBe(true);
+    expect(screen.queryByRole('group', { name: 'Lead stints by participant' })).toBeNull();
+  });
+
+  it('says so, with a retry, when a finalized cycle’s end cannot be read', async () => {
+    const user = userEvent.setup();
+    const refetch = jest.fn();
+    mockUseRoundInfo.mockReturnValue({ data: undefined, isLoading: false, isError: true, refetch });
+    render(<EnduranceTimelineChart round={1} isLive={false} label="Endurance" />);
+    expect(screen.getByText('Failed to load endurance timeline')).toBeInTheDocument();
+    expect(screen.queryByText(/Endurance record/)).not.toBeInTheDocument();
+    await user.click(screen.getByRole('button', { name: /try again|retry/i }));
+    expect(refetch).toHaveBeenCalled();
   });
 
   it('asks for a cycle, and says when the cycle has no lead yet', () => {
