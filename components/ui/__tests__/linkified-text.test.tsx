@@ -45,6 +45,50 @@ describe('LinkifiedText', () => {
     expect(openSpy).not.toHaveBeenCalled();
   });
 
+  it('leads with the punycode host, so a lookalike cannot pass as the real site', async () => {
+    const user = userEvent.setup();
+    render(<LinkifiedText text="claim at https://аpple.com/login" />);
+
+    await user.click(screen.getByRole('button', { name: 'https://аpple.com/login' }));
+
+    expect(await screen.findByTestId('external-link-host')).toHaveTextContent('xn--pple-43d.com');
+    expect(screen.getByTestId('external-link-destination')).toHaveTextContent(
+      'https://xn--pple-43d.com/login',
+    );
+    await user.click(screen.getByRole('button', { name: 'common.externalLink.open' }));
+    expect(openSpy).toHaveBeenCalledWith(
+      'https://xn--pple-43d.com/login',
+      '_blank',
+      'noopener,noreferrer',
+    );
+  });
+
+  it('keeps the dialog usable when clipboard access is denied', async () => {
+    const originalClipboard = navigator.clipboard;
+    const writeText = jest.fn().mockRejectedValue(new DOMException('Denied', 'NotAllowedError'));
+    Object.defineProperty(navigator, 'clipboard', {
+      value: { writeText },
+      writable: true,
+      configurable: true,
+    });
+    try {
+      // fireEvent, not userEvent: userEvent installs its own clipboard stub.
+      render(<LinkifiedText text="https://example.com" />);
+      fireEvent.click(screen.getByRole('button', { name: 'https://example.com' }));
+      fireEvent.click(await screen.findByRole('button', { name: 'common.externalLink.copy' }));
+      await Promise.resolve();
+
+      expect(writeText).toHaveBeenCalled();
+      expect(screen.getByRole('button', { name: 'common.externalLink.copy' })).toBeInTheDocument();
+    } finally {
+      Object.defineProperty(navigator, 'clipboard', {
+        value: originalClipboard,
+        writable: true,
+        configurable: true,
+      });
+    }
+  });
+
   it('cancelling the dialog does not open the link', async () => {
     const user = userEvent.setup();
     render(<LinkifiedText text="https://example.com" />);
@@ -64,7 +108,7 @@ describe('LinkifiedText', () => {
     await user.click(await screen.findByRole('button', { name: 'common.externalLink.open' }));
 
     expect(openSpy).toHaveBeenCalledWith(
-      'https://www.example.com',
+      'https://www.example.com/',
       '_blank',
       'noopener,noreferrer',
     );
@@ -85,7 +129,7 @@ describe('LinkifiedText', () => {
       fireEvent.click(screen.getByRole('button', { name: 'https://example.com' }));
       fireEvent.click(await screen.findByRole('button', { name: 'common.externalLink.copy' }));
 
-      expect(writeText).toHaveBeenCalledWith('https://example.com');
+      expect(writeText).toHaveBeenCalledWith('https://example.com/');
       expect(
         await screen.findByRole('button', { name: 'common.externalLink.copied' }),
       ).toBeInTheDocument();

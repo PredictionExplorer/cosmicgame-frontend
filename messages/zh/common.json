@@ -108,6 +108,7 @@
   "externalLink": {
     "title": "即将离开 Cosmic Signature",
     "description": "此链接来自参与者存储在链上的消息，未经审核或验证。请确认下方网址无误。",
+    "site": "网站",
     "copy": "复制链接",
     "copied": "已复制链接",
     "warning": "切勿在外部网站输入钱包助记词或私钥。",
