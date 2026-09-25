@@ -539,8 +539,11 @@ export function DataTable<T>({
   );
   const layout: TableLayout = kindLayout === 'compact' && !compactFits ? 'cards' : kindLayout;
 
-  // Set by "Show my row": once its page is on screen, focus moves to the
-  // connected wallet's row, since the button that was pressed is gone.
+  // Set by "Show my row" and settled by the render that follows it: once its
+  // page is on screen, focus moves to the connected wallet's row, since the
+  // button that was pressed is gone. A parent that controls `page` and keeps
+  // it leaves the row off screen, and the request lapses there rather than
+  // pull focus to the row on some later, unrelated page change.
   const focusCurrentRowRef = React.useRef(false);
 
   const goToPage = (next: number, { scroll = true }: { scroll?: boolean } = {}) => {
@@ -560,6 +563,8 @@ export function DataTable<T>({
     });
   };
 
+  // No dependency list: the request is settled by the very next commit,
+  // whether or not that commit changed the page.
   React.useEffect(() => {
     if (!focusCurrentRowRef.current) return;
     focusCurrentRowRef.current = false;
@@ -579,7 +584,7 @@ export function DataTable<T>({
         behavior: prefersReducedMotion() ? 'auto' : 'smooth',
       });
     }
-  }, [page]);
+  });
 
   // Development only: a link inside the row link is invalid HTML and an axe
   // `nested-interactive` failure. The kinds' own links are dropped from the

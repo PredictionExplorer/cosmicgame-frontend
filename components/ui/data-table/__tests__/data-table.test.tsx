@@ -574,6 +574,36 @@ describe('DataTable rows', () => {
     expect(document.activeElement?.tagName).toBe('A');
   });
 
+  it('lets a "Show my row" request lapse when a controlling parent keeps the page', async () => {
+    // Regression: the request stayed armed while the page did not change, and
+    // a later, unrelated page change pulled focus to the wallet's row.
+    const user = userEvent.setup();
+    const onPageChange = jest.fn();
+    const table = (page: number) => (
+      <DataTable
+        ariaLabel="Holders"
+        data={manyRows(45)}
+        columns={columns}
+        getRowKey={(r) => r.id}
+        isCurrentRow={(r) => r.id === 23}
+        page={page}
+        onPageChange={onPageChange}
+      />
+    );
+    const { rerender } = render(table(1));
+
+    await user.click(screen.getByRole('button', { name: 'tables.currentRow.show' }));
+    expect(onPageChange).toHaveBeenCalledWith(2);
+
+    // The parent ignored the request; later it moves to the row's page for
+    // its own reasons, with focus elsewhere.
+    const elsewhere = screen.getByRole('button', { name: 'tables.pagination.next' });
+    elsewhere.focus();
+    rerender(table(2));
+
+    expect(document.activeElement).toBe(elsewhere);
+  });
+
   it('focuses the row itself after "Show my row" when it holds no link', async () => {
     const user = userEvent.setup();
     render(
