@@ -89,9 +89,11 @@ describe('StatisticsHubPanel', () => {
         CharityPercentage: 7,
       }),
     });
-    const { container } = render(<StatisticsHubPanel />);
+    render(<StatisticsHubPanel />);
     expect(screen.getByRole('heading', { name: hub.cycle.splitTitle })).toBeInTheDocument();
-    const segments = [...container.querySelectorAll<HTMLElement>('[data-track]')];
+    // The one compact split, as on /allocation: its bar segments, then its legend rows.
+    const split = screen.getByTestId('allocation-split');
+    const segments = [...split.querySelectorAll<HTMLElement>('[role="img"] [data-track]')];
     expect(segments.map((segment) => segment.dataset.track)).toEqual([
       'signature',
       'chrono',
@@ -101,7 +103,12 @@ describe('StatisticsHubPanel', () => {
       'nextCycle',
     ]);
     // What the tracks leave carries into the next cycle: the bar always sums to 100%.
-    expect(segments.at(-1)).toHaveStyle({ width: '50%' });
+    expect(segments.at(-1)).toHaveStyle({ flexGrow: '50' });
+    // The remainder is approximate here too, and every swatch has the 2px edge.
+    expect(split.querySelector('dl [data-track="nextCycle"] dd')).toHaveTextContent(/^~/);
+    for (const swatch of split.querySelectorAll('[data-slot="swatch"]')) {
+      expect(swatch).toHaveClass('rounded-edge');
+    }
   });
 
   it('indexes every section page with what it covers and its key figure', () => {

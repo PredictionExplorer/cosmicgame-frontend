@@ -467,21 +467,6 @@ html:is(:lang(zh), :lang(ja)) .headline {
   }
 }
 
-/* The remainder compounds into the next cycle: drawn hatched, carried forward. */
-.hatched {
-  background-color: hsl(var(--track-compounding) / 0.14);
-  background-image: repeating-linear-gradient(
-    -45deg,
-    hsl(var(--track-compounding) / 0.55) 0 1px,
-    transparent 1px 7px
-  );
-  box-shadow: inset 0 0 0 1px hsl(var(--track-compounding) / 0.6);
-}
-
-.hatched .segmentLabel {
-  color: hsl(var(--foreground));
-}
-
 .legend {
   display: grid;
   grid-template-columns: minmax(0, 1fr);

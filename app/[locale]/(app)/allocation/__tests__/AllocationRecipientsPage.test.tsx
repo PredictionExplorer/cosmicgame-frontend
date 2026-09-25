@@ -113,7 +113,7 @@ describe('AllocationRecipientsPage', () => {
       'Stellar Selection',
       'Anchor Distribution',
       'Public Goods',
-      'Next cycle',
+      'Compounding Cycle Reserve',
     ]) {
       expect(screen.getByRole('button', { name: label })).toBeInTheDocument();
     }

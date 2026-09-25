@@ -40,10 +40,7 @@ import AttachedERC20Table, {
 import RecipientHistoryTable, {
   type WinningHistoryEntry,
 } from '@/components/tables/RecipientHistoryTable';
-import {
-  AllocationSplitBar,
-  type AllocationSplitSegment,
-} from '@/components/winnings/AllocationSplitBar';
+import { AllocationSplitBar, type AllocationSplitSegment } from '@/components/ui/allocation-split';
 import {
   cycleReserveSplit,
   type DistributedTrackId,

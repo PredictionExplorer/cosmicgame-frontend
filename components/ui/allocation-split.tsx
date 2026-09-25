@@ -31,10 +31,14 @@ interface AllocationSplitBarProps {
 }
 
 /**
- * How ETH splits across the allocation tracks: one proportional bar that
- * spans 100%, in the track colours every chart of the split uses
- * (config/allocationTracks), then a two-column legend in tabular figures:
- * each track's name (explained), its ETH where known, and its share. The
+ * How the Cycle Reserve splits across the allocation tracks, the one compact
+ * drawing of it in the app (/statistics, /allocation, a cycle record): a
+ * proportional bar that spans 100%, in the track colours and order every
+ * chart of the split uses (config/allocationTracks), the remainder solid in
+ * the compounding track's neutral, then a two-column legend in tabular
+ * figures: each track's 2px-edged swatch, its name (explained), its ETH where
+ * known, and its share, "~" on the approximate remainder. The landing's
+ * AllocationBar is the same split drawn tall with its figures inside. The
  * bar itself is one image with a text alternative; the legend carries the
  * numbers, so nothing depends on colour or hover.
  */
@@ -75,7 +79,8 @@ export function AllocationSplitBar({
         ))}
       </div>
 
-      <dl className="mt-6 grid gap-x-10 sm:grid-cols-2">
+      {/* Columns stop at 20rem, so a share sits near its label on a wide screen. */}
+      <dl className="mt-6 grid gap-x-10 sm:grid-cols-[repeat(2,minmax(0,20rem))]">
         {segments.map((segment) => {
           const percent = percentText(segment);
           return (
@@ -88,8 +93,9 @@ export function AllocationSplitBar({
               <dt className="flex min-w-0 flex-1 items-center gap-3 type-body-sm text-muted-foreground">
                 <span
                   aria-hidden
+                  data-slot="swatch"
                   className={cn(
-                    'size-2.5 shrink-0 rounded-full',
+                    'size-2.5 shrink-0 rounded-edge',
                     ALLOCATION_TRACK_COLORS[segment.id],
                   )}
                 />

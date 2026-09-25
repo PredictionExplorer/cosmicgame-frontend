@@ -9,12 +9,12 @@ import styles from './Landing.module.css';
 
 /**
  * A track's fill for a bar segment or legend swatch: the colour every chart
- * of the split uses (config/allocationTracks), except that the remainder
- * compounding into the next cycle is drawn hatched in its own hue — it is
- * carried forward, not paid out.
+ * of the split uses (config/allocationTracks), the compounding remainder
+ * included, solid in its neutral as on every app page (a hatched fill is the
+ * Stellar Selection NFT track's, never the remainder's).
  */
 export function trackFill(id: AllocationTrackId): string {
-  return id === 'nextCycle' ? (styles.hatched ?? '') : ALLOCATION_TRACK_COLORS[id];
+  return ALLOCATION_TRACK_COLORS[id];
 }
 
 interface AllocationBarProps {
@@ -29,7 +29,8 @@ interface AllocationBarProps {
  * The ETH split of a Cycle Reserve as one bar drawn to scale against 100%:
  * each segment grows by its share, in the order and colours every chart of
  * the split uses (config/allocationTracks), with the share inside the
- * segment wherever it fits and the compounding remainder hatched.
+ * segment wherever it fits; the landing's feature form of the split the app
+ * draws compactly (components/ui/allocation-split).
  * Decorative (`aria-hidden`): pair it with a legend, an AllocationKey or a
  * table that carries the figures. Server-safe, for any landing-host page
  * (the landing's Allocation Tracks, the white paper's §5.1 figure).

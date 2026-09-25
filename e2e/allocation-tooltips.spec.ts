@@ -25,7 +25,7 @@ const ALLOCATION_LIST_TERMS = [
     expected: /retrieved by the participant who made the Final Gesture/,
   },
   { label: 'Stellar Selection', expected: /randomly selected participants/ },
-  { label: 'Next cycle', expected: /Compounding Cycle Reserve/ },
+  { label: 'Compounding Cycle Reserve', expected: /roll forward into the next cycle/ },
 ];
 
 const ALLOCATION_DETAIL_TOOLTIPS = [

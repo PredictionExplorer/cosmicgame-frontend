@@ -94,7 +94,7 @@
         "tooltip": "Forwarded to the Public Goods Beneficiary (Protocol Guild) each cycle"
       },
       "next": {
-        "label": "Next cycle",
+        "label": "Compounding Cycle Reserve",
         "tooltip": "Remaining funds that roll forward into the next cycle as the Compounding Cycle Reserve."
       }
     }

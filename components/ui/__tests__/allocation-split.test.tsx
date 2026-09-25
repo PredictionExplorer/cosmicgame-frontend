@@ -1,6 +1,6 @@
 import { checkA11y, render, screen, within } from '@/test-utils';
 
-import { AllocationSplitBar } from '../AllocationSplitBar';
+import { AllocationSplitBar } from '../allocation-split';
 
 describe('AllocationSplitBar', () => {
   it('draws each track in proportion and names every share for screen readers', () => {
