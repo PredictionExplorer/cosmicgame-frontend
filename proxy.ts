@@ -7,6 +7,7 @@ import {
   LANDING_ORIGIN,
   isAppOnlyPath,
   isAppHost,
+  isKnownPublicPath,
   isLandingHost,
   isLandingOnlyPath,
   isLegacyWwwLandingHost,
@@ -143,5 +144,9 @@ export default function middleware(req: NextRequest) {
     return NextResponse.next();
   }
 
-  return withoutLocaleCookieWrites(intlMiddleware(req));
+  const response = withoutLocaleCookieWrites(intlMiddleware(req));
+  // A path no page starts with is a 404 (app/global-not-found.tsx): it has no
+  // editions in other languages to advertise.
+  if (!isKnownPublicPath(publicPath)) response.headers.delete('link');
+  return response;
 }

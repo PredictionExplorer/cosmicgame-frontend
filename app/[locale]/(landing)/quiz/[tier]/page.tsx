@@ -31,12 +31,14 @@ interface PageProps {
   params: Promise<{ locale: string; tier: string }>;
 }
 
-// Let unknown tiers reach the guard below and the landing not-found boundary.
-// With dynamicParams=false, Next can select the app group's catch-all before
-// this route renders, which gives a missing quiz the wallet-enabled app shell.
 export function generateStaticParams() {
   return QUIZ_TIER_IDS.map((tier) => ({ tier }));
 }
+
+// Every tier is prerendered; any other tier matches no route, so
+// app/global-not-found.tsx answers it with the landing chrome, rendered on
+// the server like any page.
+export const dynamicParams = false;
 
 export async function generateMetadata(
   { params }: PageProps,

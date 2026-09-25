@@ -1,3 +1,6 @@
+import { readdirSync } from 'node:fs';
+import { join } from 'node:path';
+
 import { routing } from '@/i18n/routing';
 import {
   APP_ORIGIN,
@@ -6,6 +9,7 @@ import {
   LANDING_ONLY_PATH_PREFIXES,
   isAppHost,
   isAppOnlyPath,
+  isKnownPublicPath,
   isLandingHost,
   isLandingOnlyPath,
   isLegacyWwwLandingHost,
@@ -308,57 +312,47 @@ describe('hostRouting', () => {
       }
     });
 
-    it('prefixes contain expected entries in a stable order', () => {
-      // The list is maintained for human readability rather than strict
-      // alphabetical order — new entries (e.g. /attached-nfts) may be
-      // grouped with semantically related prefixes. We still verify the
-      // list contains the expected complete set with no extras.
-      const expected = [
-        '/admin',
-        '/allocation',
-        '/allocation-finalized',
-        '/anchor-action',
-        '/anchoring',
-        '/api',
-        '/attached-nfts',
-        '/code',
-        '/contracts',
-        '/coordination-changes',
-        '/current-cycle',
-        '/detail',
-        '/distributions-by-token',
-        '/eth-contribution',
-        '/experimental-ui',
-        '/faq',
-        '/gallery',
-        '/gesture',
-        '/how-it-works',
-        '/marketing',
-        '/imprint',
-        '/internal',
-        '/my-allocations',
-        '/my-anchors',
-        '/my-statistics',
-        '/my-tokens',
-        '/named-nfts',
-        '/public-goods-contributions-cg',
-        '/public-goods-contributions-voluntary',
-        '/public-goods-retrievals',
-        '/recipient-history',
-        '/privacy',
-        '/risk-disclosures',
-        '/audits',
-        '/security',
-        '/site-map',
-        '/source-code',
-        '/statistics',
-        '/system-event',
-        '/terms',
-        '/transfer-cst',
-        '/used-rwlk-nfts',
-        '/user',
-      ];
-      expect([...APP_ONLY_PATH_PREFIXES].sort()).toEqual(expected.sort());
+    /** The first path segment of every page a route group serves. */
+    const routeSegments = (group: string) =>
+      readdirSync(join(__dirname, '../../app/[locale]', group), { withFileTypes: true })
+        .filter(
+          (entry) =>
+            entry.isDirectory() &&
+            !entry.name.startsWith('__') &&
+            !entry.name.includes('.') &&
+            entry.name !== 'landing-site',
+        )
+        .map((entry) => `/${entry.name}`);
+
+    it('covers every page of the app and embed groups, so the landing host redirects them all', () => {
+      // A directory missing here rendered on cosmicsignature.com with the app's
+      // root layout and wallet stack (the transfer histories did).
+      for (const prefix of [...routeSegments('(app)'), ...routeSegments('(embed)')]) {
+        expect(APP_ONLY_PATH_PREFIXES).toContain(prefix);
+      }
+    });
+
+    it('names only real pages (plus the API)', () => {
+      const pages = new Set([...routeSegments('(app)'), ...routeSegments('(embed)'), '/api']);
+      for (const prefix of APP_ONLY_PATH_PREFIXES) expect(pages).toContain(prefix);
+    });
+
+    it('leaves every landing page to the landing list', () => {
+      expect([...LANDING_ONLY_PATH_PREFIXES].sort()).toEqual(routeSegments('(landing)').sort());
+    });
+  });
+
+  describe('isKnownPublicPath', () => {
+    it('knows the home and every prefix of both hosts', () => {
+      expect(isKnownPublicPath('/')).toBe(true);
+      expect(isKnownPublicPath('/gallery')).toBe(true);
+      expect(isKnownPublicPath('/detail/25')).toBe(true);
+      expect(isKnownPublicPath('/learn/anchoring-nfts')).toBe(true);
+    });
+
+    it('does not know a path no page starts with', () => {
+      expect(isKnownPublicPath('/quality-assurance-route-not-found')).toBe(false);
+      expect(isKnownPublicPath('/galleryx')).toBe(false);
     });
   });
 

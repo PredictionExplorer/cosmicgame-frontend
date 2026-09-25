@@ -125,6 +125,39 @@ test.describe('proxy middleware', () => {
       await ctx.dispose();
     });
 
+    test('redirects the transfer histories and embeds to the app host', async () => {
+      const ctx = await request.newContext({
+        extraHTTPHeaders: { Host: 'cosmicsignature.com' },
+      });
+      for (const path of [
+        '/cosmic-token-transfer/0x0000000000000000000000000000000000000001',
+        '/cosmic-signature-transfer/0x0000000000000000000000000000000000000001',
+        '/embed/endurance/1',
+      ]) {
+        const res = await ctx.get(`${BASE}${path}`, { maxRedirects: 0 });
+        expect(res.status(), path).toBe(308);
+        expect(res.headers()['location']).toMatch(expectedAppLocation(path));
+      }
+      await ctx.dispose();
+    });
+
+    test('answers an unknown URL with the landing 404: its own chrome, no wallet stack', async () => {
+      const ctx = await request.newContext({
+        extraHTTPHeaders: { Host: 'cosmicsignature.com' },
+      });
+      const res = await ctx.get(`${BASE}/quality-assurance-route-not-found`, { maxRedirects: 0 });
+      expect(res.status()).toBe(404);
+      // A missing page has no editions in other languages to advertise.
+      expect(res.headers()['link'] ?? '').not.toContain('hreflang');
+      const body = await res.text();
+      expect(body).toContain('id="not-found-heading"');
+      expect(body).toMatch(/<link[^>]+rel="stylesheet"/);
+      // The landing header links the Learn hub; the app header's wallet button is absent.
+      expect(body).toContain('href="/learn"');
+      expect(body).not.toMatch(/connect wallet/i);
+      await ctx.dispose();
+    });
+
     test('redirects www landing host to apex canonical host', async () => {
       const ctx = await request.newContext({
         extraHTTPHeaders: { Host: 'www.cosmicsignature.com' },
@@ -192,6 +225,22 @@ test.describe('proxy middleware', () => {
       });
       const res = await ctx.get(`${BASE}/faq`, { maxRedirects: 0 });
       expect(res.status()).toBe(200);
+      await ctx.dispose();
+    });
+
+    test('answers an unknown URL with a server-rendered 404 in the app chrome', async () => {
+      const ctx = await request.newContext({
+        extraHTTPHeaders: { Host: 'app.cosmicsignature.com' },
+      });
+      const res = await ctx.get(`${BASE}/zh/quality-assurance-route-not-found`, {
+        maxRedirects: 0,
+      });
+      expect(res.status()).toBe(404);
+      expect(res.headers()['link'] ?? '').not.toContain('hreflang');
+      const body = await res.text();
+      expect(body).toMatch(/<html[^>]+lang="zh"/);
+      expect(body).toContain('id="not-found-heading"');
+      expect(body).toMatch(/<link[^>]+rel="stylesheet"/);
       await ctx.dispose();
     });
 

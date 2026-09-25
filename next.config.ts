@@ -105,6 +105,16 @@ const nextConfig: NextConfig = {
    * the build output justifies it (rare).
    */
   experimental: {
+    /**
+     * `app/global-not-found.tsx` renders every URL no route matches. The site
+     * has three root layouts under a dynamic `[locale]` segment, so no
+     * layout-level not-found file can serve an unmatched URL: a catch-all
+     * page that called `notFound()` sent an empty error shell with no
+     * stylesheet, and the branded page appeared only after the app bundle
+     * hydrated (node_modules/next/dist/docs/01-app/03-api-reference/
+     * 03-file-conventions/not-found.md, `global-not-found.js`).
+     */
+    globalNotFound: true,
     optimizePackageImports: [
       'lucide-react',
       'framer-motion',

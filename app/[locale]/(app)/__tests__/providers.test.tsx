@@ -59,11 +59,6 @@ jest.mock('../../../../components/layout/Header', () => ({
   default: () => <header data-testid="header">Header</header>,
 }));
 
-jest.mock('../../../../components/layout/Footer', () => ({
-  __esModule: true,
-  default: () => <footer data-testid="footer">Footer</footer>,
-}));
-
 jest.mock('../../../../components/layout/ErrorBoundary', () => ({
   __esModule: true,
   default: ({ children }: { children: React.ReactNode }) => (
@@ -97,6 +92,9 @@ describe('CookiesProvider (react-cookie v8 + React 19)', () => {
   });
 });
 
+/** The server-rendered footer the root layout hands Providers as a slot. */
+const footerSlot = <footer data-testid="footer">Footer</footer>;
+
 describe('Providers', () => {
   beforeEach(() => {
     jest.clearAllMocks();
@@ -105,7 +103,7 @@ describe('Providers', () => {
 
   it('renders children', () => {
     render(
-      <Providers>
+      <Providers footer={footerSlot}>
         <div data-testid="child">Hello</div>
       </Providers>,
     );
@@ -115,7 +113,7 @@ describe('Providers', () => {
 
   it('renders multiple children', () => {
     render(
-      <Providers>
+      <Providers footer={footerSlot}>
         <div data-testid="first">First</div>
         <div data-testid="second">Second</div>
       </Providers>,
@@ -126,7 +124,7 @@ describe('Providers', () => {
 
   it('renders Header and Footer', () => {
     render(
-      <Providers>
+      <Providers footer={footerSlot}>
         <div>Content</div>
       </Providers>,
     );
@@ -139,7 +137,7 @@ describe('Providers', () => {
     (pathname) => {
       mockPathname.mockReturnValue(pathname);
       render(
-        <Providers>
+        <Providers footer={footerSlot}>
           <main id="main">Content</main>
         </Providers>,
       );
@@ -151,7 +149,7 @@ describe('Providers', () => {
 
   it('places Header before children and Footer after in DOM order', () => {
     render(
-      <Providers>
+      <Providers footer={footerSlot}>
         <div data-testid="child">Content</div>
       </Providers>,
     );
@@ -165,7 +163,7 @@ describe('Providers', () => {
 
   it('renders Toaster with top-right position', () => {
     render(
-      <Providers>
+      <Providers footer={footerSlot}>
         <div>Content</div>
       </Providers>,
     );
@@ -174,7 +172,7 @@ describe('Providers', () => {
 
   it('configures Toaster duration from NOTIFICATION_AUTO_HIDE_MS', () => {
     render(
-      <Providers>
+      <Providers footer={footerSlot}>
         <div>Content</div>
       </Providers>,
     );
@@ -186,7 +184,7 @@ describe('Providers', () => {
 
   it('configures Toaster className for theme styling', () => {
     render(
-      <Providers>
+      <Providers footer={footerSlot}>
         <div>Content</div>
       </Providers>,
     );
@@ -198,7 +196,7 @@ describe('Providers', () => {
 
   it('wraps content in two ErrorBoundary layers', () => {
     render(
-      <Providers>
+      <Providers footer={footerSlot}>
         <div data-testid="child">Content</div>
       </Providers>,
     );
@@ -207,7 +205,7 @@ describe('Providers', () => {
 
   it('wraps children inside the inner ErrorBoundary', () => {
     render(
-      <Providers>
+      <Providers footer={footerSlot}>
         <div data-testid="child">Content</div>
       </Providers>,
     );
@@ -217,7 +215,7 @@ describe('Providers', () => {
 
   it('nests context providers in the correct order', () => {
     render(
-      <Providers>
+      <Providers footer={footerSlot}>
         <div data-testid="child">Content</div>
       </Providers>,
     );
@@ -238,7 +236,7 @@ describe('Providers', () => {
     // the palette. The atmosphere is the static, palette-aware AmbientBackdrop
     // that PageShell renders; nothing here runs a canvas or a frame loop.
     const { container } = render(
-      <Providers>
+      <Providers footer={footerSlot}>
         <div>Content</div>
       </Providers>,
     );
@@ -247,7 +245,7 @@ describe('Providers', () => {
 
   it('has no accessibility violations', async () => {
     const { container } = render(
-      <Providers>
+      <Providers footer={footerSlot}>
         <div>Content</div>
       </Providers>,
     );

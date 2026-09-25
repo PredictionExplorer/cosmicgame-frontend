@@ -149,18 +149,25 @@ describe('Footer', () => {
     expect(directory.closest(`.${CSS.escape(FOLDED)}`)).toBeNull();
   });
 
-  it('leaves the directory to the site map on /site-map, keeping languages and legal links', () => {
-    mockPathname.mockReturnValue('/site-map');
+  it('leaves the directory to the site map, keeping languages and legal links', () => {
+    // The footer renders on the server in the root layout, where the page is
+    // unknown: the site map marks itself and a stylesheet rule hides the
+    // footer's copy of the directory and its ecosystem and community rows.
+    const hiddenOnSiteMap = '[:root:has([data-site-map])_&]:hidden';
     render(<Footer />);
-    expect(screen.queryByRole('navigation', { name: 'common.accessibility.footer' })).toBeNull();
-    expect(screen.queryByRole('button', { expanded: false })).toBeNull();
-    expect(
-      screen.getByRole('navigation', { name: 'common.languageSwitcher.label' }),
-    ).toBeInTheDocument();
-    expect(screen.getByRole('link', { name: 'nav.routes.terms.label' })).toHaveAttribute(
-      'href',
-      '/terms',
+    expect(screen.getByRole('navigation', { name: 'common.accessibility.footer' })).toHaveClass(
+      hiddenOnSiteMap,
     );
+    for (const group of ['ecosystem', 'community']) {
+      expect(
+        screen.getByRole('heading', { level: 2, name: `nav.sections.${group}` }).parentElement,
+      ).toHaveClass(hiddenOnSiteMap);
+    }
+    const languages = screen.getByRole('navigation', { name: 'common.languageSwitcher.label' });
+    expect(languages.closest(`.${CSS.escape(hiddenOnSiteMap)}`)).toBeNull();
+    const terms = screen.getByRole('link', { name: 'nav.routes.terms.label' });
+    expect(terms).toHaveAttribute('href', '/terms');
+    expect(terms.closest(`.${CSS.escape(hiddenOnSiteMap)}`)).toBeNull();
   });
 
   it('drops the tagline on phones and keeps the legal line clear of a fixed dock', () => {

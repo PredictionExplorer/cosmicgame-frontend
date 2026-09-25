@@ -46,6 +46,11 @@ export function generateStaticParams() {
   return getLearnSlugs().map((slug) => ({ slug }));
 }
 
+// Every guide is prerendered; any other slug matches no route, so
+// app/global-not-found.tsx answers it with the landing chrome, rendered on
+// the server like any page.
+export const dynamicParams = false;
+
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const { locale, slug } = await params;
   setRequestLocale(locale);

@@ -21,6 +21,7 @@ import {
 } from '@/config/siteNavIcons';
 import { HostDivider, NavRowContent } from '@/components/layout/NavRow';
 import { PageHeader } from '@/components/layout/PageHeader';
+import { SITE_MAP_MARKER_PROPS } from '@/components/layout/SiteFooter';
 import { SiteLink } from '@/components/layout/SiteLink';
 import { useSiteNavCopy } from '@/components/layout/siteNavCopy';
 import { PageShell } from '@/components/ui/page-shell';
@@ -231,7 +232,8 @@ const SiteMapPage = ({ articles = [] }: SiteMapPageProps) => {
   const leadSection = SITE_MAP_COLUMNS[0]?.[0];
 
   return (
-    <PageShell variant="data" backdrop="signature">
+    // The marker tells the footer to leave out its copy of this directory.
+    <PageShell variant="data" backdrop="signature" {...SITE_MAP_MARKER_PROPS}>
       {/* From 640px each column opens on its own section rule; a header
           rule 40px above it would draw two hairlines. */}
       <PageHeader

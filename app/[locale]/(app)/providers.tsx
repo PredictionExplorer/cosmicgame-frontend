@@ -13,7 +13,6 @@ import { wagmiConfig } from '@/config/wagmi';
 import { networkConfig, getEnvValidation } from '@/config/networks';
 import ErrorBoundary from '@/components/layout/ErrorBoundary';
 import Header from '@/components/layout/Header';
-import Footer from '@/components/layout/Footer';
 import { AppToaster } from '@/components/ui/app-toaster';
 import { SkipLink } from '@/components/ui/skip-link';
 import { TooltipProvider } from '@/components/ui/tooltip';
@@ -95,11 +94,14 @@ function EnvErrorScreen({ missing }: { missing: string[] }) {
 
 export function Providers({
   children,
-  showAppChrome = true,
+  footer,
 }: {
   children: ReactNode;
-  /** When false (marketing hosts), header/footer are hidden. */
-  showAppChrome?: boolean;
+  /**
+   * The footer, rendered by the (server) root layout: `<Footer>`. A slot
+   * keeps the footer's directory out of this client bundle.
+   */
+  footer: ReactNode;
 }) {
   const [queryClient] = useState(() => makeQueryClient());
 
@@ -177,17 +179,13 @@ export function Providers({
                       <ApiDataProvider>
                         <NotificationProvider>
                           <TooltipProvider delayDuration={200} skipDelayDuration={300}>
-                            <div
-                              className={
-                                showAppChrome ? 'site-shell flex min-h-screen flex-col' : undefined
-                              }
-                            >
+                            <div className="site-shell flex min-h-screen flex-col">
                               <SkipLink />
-                              {showAppChrome && <Header />}
-                              <div className={showAppChrome ? 'min-w-0 flex-1' : undefined}>
+                              <Header />
+                              <div className="min-w-0 flex-1">
                                 <ErrorBoundary>{children}</ErrorBoundary>
                               </div>
-                              {showAppChrome && <Footer />}
+                              {footer}
                             </div>
                           </TooltipProvider>
                         </NotificationProvider>
