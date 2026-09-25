@@ -16,6 +16,7 @@ import api from '@/services/api';
 import type { CSTAnchorDistribution } from '@/services/api/types';
 import { useNotifyRedBox, useCSTAnchorDistributionsToRetrieveByUser } from '@/hooks/useApiQuery';
 import { reportError } from '@/utils/errors';
+import { toFiniteNumber } from '@/utils/finiteNumber';
 
 import { useAnchoredToken } from './AnchoredTokenContext';
 
@@ -47,6 +48,16 @@ interface ApiDataContextValue {
   unclaimedRewards: CSTAnchorDistribution[];
   error: string | null;
   isLoading: boolean;
+  /**
+   * The wallet's unretrieved Anchor Distribution ETH, straight from its read
+   * rather than from `apiData` (which holds 0 until processing finishes):
+   * `undefined` while the notice or the reward list is loading, `null` when
+   * either could not be read, so a page never shows a confident 0 or says
+   * "nothing waiting" on a guess.
+   */
+  unretrievedAnchorEth: number | null | undefined;
+  /** Reads the notice and the reward list again. */
+  retryAnchorRead: () => void;
 }
 
 const ApiDataContext = createContext<ApiDataContextValue | undefined>(undefined);
@@ -70,11 +81,13 @@ export const ApiDataProvider = ({ children }: ApiDataProviderProps) => {
     data: redBoxData,
     refetch: refetchRedBox,
     isLoading: redBoxLoading,
+    isError: redBoxFailed,
   } = useNotifyRedBox(account);
   const {
     data: rewardsData,
     refetch: refetchRewards,
     isLoading: rewardsLoading,
+    isError: rewardsFailed,
   } = useCSTAnchorDistributionsToRetrieveByUser(account);
 
   const unclaimedRewards = useMemo(() => rewardsData ?? [], [rewardsData]);
@@ -187,10 +200,30 @@ export const ApiDataProvider = ({ children }: ApiDataProviderProps) => {
   }, [refetchRedBox, refetchRewards]);
 
   const isLoading = redBoxLoading || rewardsLoading;
+  const anchorReadFailed =
+    (redBoxFailed && redBoxData === undefined) || (rewardsFailed && rewardsData === undefined);
+  const unretrievedAnchorEth = anchorReadFailed
+    ? null
+    : isLoading || redBoxData === undefined
+      ? undefined
+      : toFiniteNumber(redBoxData?.UnretrievedAnchorDistribution);
+  const retryAnchorRead = useCallback(() => {
+    void refetchRedBox();
+    void refetchRewards();
+  }, [refetchRedBox, refetchRewards]);
 
   return (
     <ApiDataContext.Provider
-      value={{ apiData, setApiData, fetchData, unclaimedRewards, error, isLoading }}
+      value={{
+        apiData,
+        setApiData,
+        fetchData,
+        unclaimedRewards,
+        error,
+        isLoading,
+        unretrievedAnchorEth,
+        retryAnchorRead,
+      }}
     >
       {children}
     </ApiDataContext.Provider>

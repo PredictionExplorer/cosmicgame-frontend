@@ -8,6 +8,10 @@
     "subtitle": "프로토콜이 이 지갑에 마련한 배분을 한곳에서 모두 회수합니다.",
     "loadErrorTitle": "배분을 불러오지 못했습니다",
     "loadErrorMessage": "미회수 배분 데이터를 불러오지 못했습니다. 잠시 후 다시 시도해 주세요.",
+    "anchorLoadError": {
+      "title": "앵커링 지급을 불러오지 못했습니다",
+      "message": "이 지갑의 앵커링 지급을 일시적으로 불러올 수 없습니다. 잠시 후 다시 시도해 주세요."
+    },
     "summary": {
       "title": "회수 가능",
       "description": "한 번의 트랜잭션으로 이 지갑에 보관된 ETH, 첨부된 NFT, 첨부된 토큰을 회수합니다.",
@@ -17,7 +21,7 @@
       "anchor": "앵커링 지급",
       "cycles": "{count, plural, other {사이클 #개}}",
       "anchorCaption": "아래에서 따로 회수합니다",
-      "retrieveEverything": "한 번에 모두 회수",
+      "retrieveEverything": "ETH, NFT, 토큰 회수",
       "retrieveBy": "<date></date>까지 회수해 주세요. 이후에는 누구나 회수할 수 있습니다.",
       "expired": "회수 기한이 <date></date>에 지났습니다. 다른 사람이 회수하기 전까지는 계속 회수할 수 있습니다.",
       "success": "모든 항목을 지갑으로 회수했습니다."

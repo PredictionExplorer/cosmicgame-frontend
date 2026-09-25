@@ -8,6 +8,10 @@
     "subtitle": "Mọi phân bổ giao thức dành cho ví này, nhận về tất cả tại một nơi.",
     "loadErrorTitle": "Không tải được phân bổ của bạn",
     "loadErrorMessage": "Không tải được các phân bổ đang chờ. Hãy thử lại sau giây lát.",
+    "anchorLoadError": {
+      "title": "Không tải được phân phối neo giữ của bạn",
+      "message": "Phân phối neo giữ của ví này tạm thời không khả dụng. Hãy thử lại sau giây lát."
+    },
     "summary": {
       "title": "Sẵn sàng nhận về",
       "description": "Một giao dịch nhận về ETH, NFT đính kèm và token đính kèm đang chờ ví này.",
@@ -17,7 +21,7 @@
       "anchor": "Phân phối neo giữ",
       "cycles": "{count, plural, other {Từ # chu kỳ}}",
       "anchorCaption": "Nhận về riêng ở bên dưới",
-      "retrieveEverything": "Nhận về tất cả một lần",
+      "retrieveEverything": "Nhận về ETH, NFT và token",
       "retrieveBy": "Hãy nhận về trước <date></date>. Sau thời điểm đó, bất kỳ ai cũng có thể nhận về.",
       "expired": "Hạn nhận về đã qua vào <date></date>. Bạn vẫn có thể nhận về cho đến khi có người khác nhận trước.",
       "success": "Đã nhận về tất cả vào ví của bạn."

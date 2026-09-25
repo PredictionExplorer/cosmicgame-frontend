@@ -11,8 +11,10 @@ const mockClaimDonatedNFT = jest.fn();
 const mockClaimAllDonatedNFTs = jest.fn();
 const mockClaimDonatedERC20 = jest.fn();
 const mockClaimAllDonatedERC20 = jest.fn();
-let mockApiData: Record<string, unknown> = { UnretrievedAnchorDistribution: 0 };
+/** The context's Anchor Distribution read: `undefined` loading, `null` failed. */
+let mockAnchorEth: number | null | undefined = 0;
 let mockUnclaimedRewards: unknown[] = [];
+const mockRetryAnchorRead = jest.fn();
 
 const query = (data: unknown, extra: Record<string, unknown> = {}) => ({
   data,
@@ -39,8 +41,9 @@ jest.mock('../../../../../hooks/web3', () => ({
 
 jest.mock('../../../../../contexts/ApiDataContext', () => ({
   useApiData: () => ({
-    apiData: mockApiData,
+    unretrievedAnchorEth: mockAnchorEth,
     unclaimedRewards: mockUnclaimedRewards,
+    retryAnchorRead: mockRetryAnchorRead,
     fetchData: jest.fn(),
   }),
 }));
@@ -177,7 +180,7 @@ function withItems({
 beforeEach(() => {
   jest.clearAllMocks();
   mockAccount = '0xUser';
-  mockApiData = { UnretrievedAnchorDistribution: 0 };
+  mockAnchorEth = 0;
   mockUnclaimedRewards = [];
   mockIsClaiming = { everything: false, raffleETH: false, donatedNFT: false, donatedERC20: false };
   withItems();
@@ -286,7 +289,7 @@ describe('MyWinnings', () => {
   });
 
   it('shows the Anchor Distributions section and figure when some are waiting', () => {
-    mockApiData = { UnretrievedAnchorDistribution: 0.156 };
+    mockAnchorEth = 0.156;
     render(<MyWinnings />);
     expect(screen.getByTestId('anchor-distributions')).toBeInTheDocument();
     expect(
@@ -302,6 +305,29 @@ describe('MyWinnings', () => {
     ).toBeInTheDocument();
     expect(screen.queryByTestId('retrieval-summary')).not.toBeInTheDocument();
     expect(screen.queryByTestId('eth-allocations-table')).not.toBeInTheDocument();
+  });
+
+  it('never says "nothing waiting" before the Anchor Distribution read settles', () => {
+    withItems({ deposits: [], nfts: [], tokens: [] });
+    mockAnchorEth = undefined;
+    render(<MyWinnings />);
+    expect(screen.queryByText('myPages.allocations.nothing.title')).not.toBeInTheDocument();
+    // The summary holds its skeletons, not a confident 0 ETH.
+    const anchor = screen.getByTestId('retrieval-summary').querySelector('[data-figure="anchor"]');
+    expect(anchor).not.toHaveTextContent('0');
+  });
+
+  it('keeps a failed Anchor Distribution read unknown, with a retry in its section', () => {
+    withItems({ deposits: [], nfts: [], tokens: [] });
+    mockAnchorEth = null;
+    render(<MyWinnings />);
+    expect(screen.queryByText('myPages.allocations.nothing.title')).not.toBeInTheDocument();
+    const anchor = screen.getByTestId('retrieval-summary').querySelector('[data-figure="anchor"]');
+    expect(anchor).toHaveTextContent('common.status.unavailable');
+    expect(screen.getByText('myPages.allocations.anchorLoadError.title')).toBeInTheDocument();
+    expect(screen.queryByTestId('anchor-distributions')).not.toBeInTheDocument();
+    fireEvent.click(screen.getByRole('button', { name: /try again/i }));
+    expect(mockRetryAnchorRead).toHaveBeenCalledTimes(1);
   });
 
   it('holds the commit button while its transaction runs', () => {

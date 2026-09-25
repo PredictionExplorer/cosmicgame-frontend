@@ -8,6 +8,10 @@
     "subtitle": "協議為此錢包預留的所有分配，都可以在這裡一併取回。",
     "loadErrorTitle": "未能載入分配",
     "loadErrorMessage": "未能載入待取回分配資料，請稍後再試。",
+    "anchorLoadError": {
+      "title": "無法載入你的錨定配發",
+      "message": "此錢包的錨定配發暫時無法取得，請稍後再試。"
+    },
     "summary": {
       "title": "可取回",
       "description": "一筆交易即可取回為此錢包保留的 ETH、已附加 NFT 和已附加代幣。",
@@ -17,7 +21,7 @@
       "anchor": "錨定配發",
       "cycles": "{count, plural, other {來自 # 個週期}}",
       "anchorCaption": "在下方另行取回",
-      "retrieveEverything": "一次全部取回",
+      "retrieveEverything": "取回 ETH、NFT 和代幣",
       "retrieveBy": "請在 <date></date> 前取回，之後任何人都可以取回。",
       "expired": "取回期限已於 <date></date> 截止。在其他人取回之前，你仍可取回。",
       "success": "已全部取回到你的錢包。"

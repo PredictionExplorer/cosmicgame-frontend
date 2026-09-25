@@ -31,11 +31,15 @@ function WinningHistory() {
   const { data, isLoading, error, refetch } = useClaimHistoryByUser(account);
 
   if (!account) {
-    // The prompt below says what the page shows once connected: the header adds no lede of
-    // its own to repeat it.
+    // The header keeps its lede in every state, so the page reads the same before and after
+    // connecting; the prompt below says what connecting adds.
     return (
       <PageShell variant="data" backdrop="signature">
-        <PageHeader section="account" title={t('recipientHistory.pageTitle')} />
+        <PageHeader
+          section="account"
+          title={t('recipientHistory.pageTitle')}
+          subtitle={t('recipientHistory.connectedDescription')}
+        />
         <WalletRequiredState
           title={tWallet('required.history.title')}
           description={tWallet('required.history.description')}
