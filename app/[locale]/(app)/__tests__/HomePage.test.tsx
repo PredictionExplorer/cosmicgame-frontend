@@ -115,8 +115,12 @@ const mockGestureForm = {
   getLastGestureHash: jest.fn(() => '0xfeed'),
 };
 
+const mockUseGestureFormOptions = jest.fn();
 jest.mock('../../../../hooks/useGestureForm', () => ({
-  useGestureForm: () => mockGestureForm,
+  useGestureForm: (options: unknown) => {
+    mockUseGestureFormOptions(options);
+    return mockGestureForm;
+  },
 }));
 
 /* ── useChampions ─────────────────────────────────────────────────── */
@@ -1277,13 +1281,24 @@ describe('HomePage', () => {
 
     const tabs = screen.getByTestId('panel-method-tabs');
     expect(
-      within(tabs).getByRole('button', { name: /home\.form\.method\.eth\.label/ }),
-    ).toHaveAttribute('aria-pressed', 'true');
+      within(tabs).getByRole('radio', { name: /home\.form\.method\.eth\.label/ }),
+    ).toHaveAttribute('aria-checked', 'true');
 
-    await user.click(within(tabs).getByRole('button', { name: /home\.form\.method\.cst\.label/ }));
+    await user.click(within(tabs).getByRole('radio', { name: /home\.form\.method\.cst\.label/ }));
 
     expect(mockGestureForm.setRwlkId).toHaveBeenCalledWith(-1);
     expect(mockGestureForm.setBidType).toHaveBeenCalledWith('CST');
+  });
+
+  it('asks the form to hold ETH before the cycle has its first Gesture', () => {
+    mockUseDashboardInfo.mockReturnValue({
+      data: makeDashboardData({ LastBidderAddr: '0x0000000000000000000000000000000000000000' }),
+      isLoading: false,
+    });
+
+    render(<HomePage />);
+
+    expect(mockUseGestureFormOptions).toHaveBeenLastCalledWith({ firstGesture: true });
   });
 
   it('submits an ETH gesture and refreshes live data optimistically', async () => {
@@ -1359,6 +1374,7 @@ describe('HomePage', () => {
     const user = userEvent.setup();
     mockGestureForm.gestureType = 'RandomWalk';
     mockGestureForm.rwlkId = -1;
+    Object.assign(mockGestureForm, { rwlknftIds: [3], rwlkListStatus: 'ready' });
     mockUseDashboardInfo.mockReturnValue({
       data: makeDashboardData(),
       isLoading: false,
@@ -1403,6 +1419,20 @@ describe('HomePage', () => {
     expect(mockGestureForm.setRwlkId).toHaveBeenCalledWith(77);
     expect(mockGestureForm.setBidType).toHaveBeenCalledWith('RandomWalk');
   });
+
+  it.each(['?randomwalk=1', '?randomwalk=1&tokenId=abc', '?randomwalk=1&tokenId=-1'])(
+    'chooses the method but never guesses a token from %s',
+    (search) => {
+      window.history.pushState({}, '', `/${search}`);
+      mockUseDashboardInfo.mockReturnValue({ data: makeDashboardData(), isLoading: false });
+
+      render(<HomePage />);
+
+      expect(mockGestureForm.setBidType).toHaveBeenCalledWith('RandomWalk');
+      // Never token #0 or NaN: the participant picks one from their own list.
+      expect(mockGestureForm.setRwlkId).not.toHaveBeenCalled();
+    },
+  );
 
   /* ── Finalize (the clock's action) ──────────────────────────── */
 

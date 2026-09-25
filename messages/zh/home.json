@@ -299,6 +299,7 @@
       "title": "你的 Random Walk NFT",
       "connect": "连接钱包后，即可列出其中的 Random Walk NFT。",
       "error": "未能读取此钱包的 Random Walk NFT，请稍后重试。",
+      "linkedUnavailable": "Random Walk NFT #{tokenId} 不是此钱包中未使用过的 NFT，因此未被选中。",
       "tooltipAria": "了解 Random Walk 落笔价格减半规则",
       "tooltip": "ETH 落笔附加一枚 Random Walk NFT，落笔价格即减半。每枚 NFT 仅可使用一次。"
     },
@@ -326,7 +327,7 @@
     "advanced": {
       "title": "高级选项",
       "messageLabel": "留言",
-      "messageOptionalHint": "（选填，至多 {maxLength} 字符）",
+      "messageOptionalHint": "（选填，至多 {maxLength} 字节）",
       "messageTooltipAria": "了解落笔留言机制",
       "messageTooltip": "留言会出现在落笔留言板中，与这一笔一同记录在链上，并永久保存。",
       "messagePlaceholder": "为这一笔留下一句话…",

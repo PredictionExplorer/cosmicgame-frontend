@@ -299,6 +299,7 @@
       "title": "Random Walk NFT của bạn",
       "connect": "Kết nối ví để xem danh sách Random Walk NFT trong ví.",
       "error": "Không đọc được Random Walk NFT của ví này. Hãy thử lại sau ít phút.",
+      "linkedUnavailable": "Random Walk NFT #{tokenId} không phải là NFT chưa dùng trong ví này nên chưa được chọn.",
       "tooltipAria": "Về mức giảm chi phí nét bút với Random Walk",
       "tooltip": "Đính kèm một Random Walk NFT vào nét bút ETH để được giảm 50% chi phí nét bút. Mỗi NFT chỉ dùng được một lần."
     },
@@ -326,7 +327,7 @@
     "advanced": {
       "title": "Nâng cao",
       "messageLabel": "Lời nhắn",
-      "messageOptionalHint": "(tùy chọn, {maxLength} ký tự)",
+      "messageOptionalHint": "(tùy chọn, tối đa {maxLength} byte)",
       "messageTooltipAria": "Lời nhắn nét bút hoạt động thế nào",
       "messageTooltip": "Để lại lời nhắn để hiển thị trong Trò chuyện nét bút. Lời nhắn được ghi trên chuỗi cùng nét bút và tồn tại vĩnh viễn trên blockchain.",
       "messagePlaceholder": "Để lại lời nhắn cùng nét bút của bạn…",

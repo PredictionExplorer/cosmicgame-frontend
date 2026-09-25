@@ -152,7 +152,6 @@ export function GestureAdvanced({
     setTokenDonateAddress,
     tokenAmount,
     setTokenAmount,
-    setRwlkId,
     gestureCostPlus,
     setBidPricePlus,
     gestureCstRewardAmountMin = null,
@@ -173,10 +172,9 @@ export function GestureAdvanced({
           name={attachLabelId}
           value={contributionType}
           aria-labelledby={attachLabelId}
-          onValueChange={(value) => {
-            setRwlkId(-1);
-            setContributionType(value);
-          }}
+          // An attachment rides along with any method: a Random Walk NFT
+          // chosen above stays chosen (bidWithEthAndDonateNft/Token take both).
+          onValueChange={setContributionType}
           className="flex flex-row flex-wrap gap-x-5 gap-y-2"
         >
           {(

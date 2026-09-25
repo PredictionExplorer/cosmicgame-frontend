@@ -6,9 +6,32 @@ import {
   clampCollisionBufferPercent,
   ethGestureBaseCost,
   ethGestureSendAmount,
+  formatEthMethodQuote,
   formatEthQuote,
   imprintSendValueWei,
 } from '../gestureQuote';
+
+describe('formatEthMethodQuote', () => {
+  it('prints both ETH methods at the ETH quote precision', () => {
+    const price = 0.10210695701197195;
+    expect(formatEthMethodQuote(price, 'ETH')).toBe('0.10211');
+    // Five decimals, like the price beside it; never "0.051053".
+    expect(formatEthMethodQuote(price, 'RandomWalk')).toBe('0.05105');
+  });
+
+  it('drops the trailing zeros of a round price', () => {
+    expect(formatEthMethodQuote(0.01, 'ETH')).toBe('0.01');
+    expect(formatEthMethodQuote(0.01, 'RandomWalk')).toBe('0.005');
+  });
+
+  it("uses the locale's decimal mark", () => {
+    expect(formatEthMethodQuote(0.10210695701197195, 'RandomWalk', 'vi')).toBe('0,05105');
+  });
+
+  it('prints a zero price as 0', () => {
+    expect(formatEthMethodQuote(0, 'ETH')).toBe('0');
+  });
+});
 
 describe('formatEthQuote', () => {
   it('keeps five significant digits instead of rounding to two decimals', () => {

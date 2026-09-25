@@ -299,6 +299,7 @@
       "title": "自分のRandom Walk NFT",
       "connect": "ウォレットを接続すると、保有しているRandom Walk NFTが一覧表示されます。",
       "error": "このウォレットのRandom Walk NFTを読み込めませんでした。しばらくしてからもう一度お試しください。",
+      "linkedUnavailable": "Random Walk NFT #{tokenId}は、このウォレットの未使用のNFTではないため、選択されていません。",
       "tooltipAria": "Random Walkによる一筆の割引について",
       "tooltip": "Random Walk NFTをETH一筆に添付すると、一筆の費用が50%引き下げられます。各NFTは一度しか使えません。"
     },
@@ -326,7 +327,7 @@
     "advanced": {
       "title": "詳細設定",
       "messageLabel": "メッセージ",
-      "messageOptionalHint": "（任意、{maxLength}文字）",
+      "messageOptionalHint": "（任意、最大{maxLength}バイト）",
       "messageTooltipAria": "一筆のメッセージの仕組み",
       "messageTooltip": "一筆チャットに表示されるメッセージを添えられます。メッセージは一筆とともにオンチェーンに記録され、ブロックチェーン上に永久に残ります。",
       "messagePlaceholder": "一筆に添えるメッセージ…",

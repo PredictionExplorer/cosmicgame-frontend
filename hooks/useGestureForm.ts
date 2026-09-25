@@ -30,7 +30,14 @@ import { mapCTPriceInfo, type CstAuctionDurations, type CstGestureData } from '@
 import { REQUIRED_CHAIN_NAME } from '@/lib/chainGuard';
 import { sumImprintedTo } from '@/lib/receiptTransfers';
 import { clampCollisionBufferPercent } from '@/utils/gestureQuote';
+import { sameAddress } from '@/utils/format/addresses';
 import { useUxScenarioSnapshot } from '@/lib/uxCycleScenarios';
+import {
+  GESTURE_MESSAGE_MAX_BYTES,
+  fitGestureMessage,
+  gestureMessageBytes,
+  isUsableRandomWalkToken,
+} from '@/components/home/gestureInput';
 
 export type { CstGestureData } from '@/utils/cstGesture';
 export type CSTGestureData = CstGestureData;
@@ -77,7 +84,16 @@ function getLiveCstPreviewRefreshMs(): number {
 /** Where the list of the wallet's unused Random Walk NFTs stands. */
 export type RwlkListStatus = 'no-wallet' | 'loading' | 'ready' | 'error';
 
-export function useGestureForm() {
+export interface UseGestureFormOptions {
+  /**
+   * The cycle has no Gesture yet. Its first Gesture is made with ETH (the
+   * contract rejects a CST or Random Walk first Gesture), so the form holds
+   * ETH whatever was chosen before, for example CST in the previous cycle.
+   */
+  firstGesture?: boolean;
+}
+
+export function useGestureForm({ firstGesture = false }: UseGestureFormOptions = {}) {
   const t = useTranslations('toasts');
   const locale = useLocale();
   const contractAddrs = useContractAddresses();
@@ -102,12 +118,17 @@ export function useGestureForm() {
   // No attachment until the person picks one: opening Advanced to change
   // another setting must not present empty NFT fields as the default.
   const [contributionType, setContributionType] = useState('');
-  const [message, setMessage] = useState('');
+  const [message, setMessageState] = useState('');
+  // The contract's live cap, in UTF-8 bytes; the documented default until read.
+  const [messageMaxBytes, setMessageMaxBytes] = useState<number>(GESTURE_MESSAGE_MAX_BYTES);
   const [nftDonateAddress, setNftDonateAddress] = useState('');
   const [nftId, setNftId] = useState('');
   const [tokenDonateAddress, setTokenDonateAddress] = useState('');
   const [tokenAmount, setTokenAmount] = useState('');
-  const [rwlkId, setRwlkId] = useState(-1);
+  const [rwlkId, setRwlkIdState] = useState(-1);
+  // A token the form let go because it is not one of this wallet's unused
+  // Random Walk NFTs (a deep link, another wallet's pick): said once, in the picker.
+  const [rwlkRejectedId, setRwlkRejectedId] = useState<number | null>(null);
   const [gestureCostPlus, setBidPricePlus] = useState(2);
   const [isGesturing, setIsBidding] = useState(false);
   const [advancedExpanded, setAdvancedExpanded] = useState(false);
@@ -129,6 +150,64 @@ export function useGestureForm() {
   const [cstRewardReadFailed, setCstRewardReadFailed] = useState(false);
   const [cstRewardTolerancePercent, setCstRewardTolerancePercent] = useState(1);
   const [acceptAnyCstReward, setAcceptAnyCstReward] = useState(false);
+
+  /** The wallet's unused Random Walk NFTs: not read without a wallet, then loading, ready or failed. */
+  const rwlkListStatus: RwlkListStatus = !account
+    ? 'no-wallet'
+    : rwlkListSettled?.account !== account
+      ? 'loading'
+      : rwlkListSettled.failed
+        ? 'error'
+        : 'ready';
+
+  // Keep the chosen method and token valid for the phase and the wallet, in
+  // one place for every surface that renders this form. Adjusted during
+  // render, so no surface ever paints (or submits) the invalid combination.
+  if (firstGesture && (gestureType !== 'ETH' || rwlkId !== -1)) {
+    setBidType('ETH');
+    setRwlkIdState(-1);
+  }
+  if (
+    rwlkId !== -1 &&
+    rwlkListStatus === 'ready' &&
+    !isUsableRandomWalkToken(rwlkId, rwlkListStatus, rwlknftIds)
+  ) {
+    setRwlkIdState(-1);
+    setRwlkRejectedId(rwlkId);
+  }
+
+  /** Picks a Random Walk NFT (or none, with -1); a new pick clears the rejected-link note. */
+  const setRwlkId = useCallback((value: number) => {
+    setRwlkIdState(value);
+    setRwlkRejectedId(null);
+  }, []);
+
+  /** Sets the message, cut at the contract's byte cap after the last whole character. */
+  const setMessage = useCallback(
+    (value: string) => setMessageState(fitGestureMessage(value, messageMaxBytes)),
+    [messageMaxBytes],
+  );
+
+  // The owner can change the message cap; read the live one once per contract.
+  useEffect(() => {
+    if (!cosmicGameContract || uxScenario) return undefined;
+    let cancelled = false;
+    (
+      (cosmicGameContract.read.bidMessageLengthMaxLimit?.() as Promise<bigint | undefined>) ??
+      Promise.resolve(undefined)
+    )
+      .then((value) => {
+        if (cancelled || typeof value !== 'bigint' || value <= 0n) return;
+        if (value > BigInt(Number.MAX_SAFE_INTEGER)) return;
+        setMessageMaxBytes(Number(value));
+      })
+      .catch((e) => {
+        if (!cancelled) reportErrorThrottled(e, 'bidMessageLengthMaxLimit');
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [cosmicGameContract, uxScenario]);
 
   const cstGestureData = useMemo<CSTGestureData>(() => {
     return mapCTPriceInfo(ctPriceData, contractCstDurations, contractCstPriceWei);
@@ -480,6 +559,64 @@ export function useGestureForm() {
   };
 
   /**
+   * The message fits the contract's byte cap. Past it the Gesture would
+   * revert with TooLongBidMessage after the wallet prompt (and, for a plain
+   * ETH Gesture sent with a fixed gas limit, still cost the network fee).
+   */
+  const ensureMessageFits = () => {
+    if (gestureMessageBytes(message) <= messageMaxBytes) return true;
+    notify('error', t('gesture.contractErrors.tooLongBidMessage'));
+    return false;
+  };
+
+  /**
+   * The Random Walk NFT still belongs to this wallet and was never used for
+   * a Gesture, read from the chain right before the wallet prompt: a token
+   * transferred or used since the list was read would otherwise revert with
+   * CallerIsNotNftOwner or UsedRandomWalkNft. A read that fails leaves the
+   * decision to the contract, as the list check already passed.
+   */
+  const ensureRandomWalkTokenUsable = async (tokenId: number): Promise<boolean> => {
+    if (!isUsableRandomWalkToken(tokenId, rwlkListStatus, rwlknftIds)) {
+      notify('error', t('gesture.contractErrors.usedRandomWalkNft'));
+      return false;
+    }
+    const [owner, used] = await Promise.all([
+      publicClient
+        ?.readContract({
+          address: contractAddrs.randomWalkNft as `0x${string}`,
+          abi: NFT_ABI,
+          functionName: 'ownerOf',
+          args: [BigInt(tokenId)],
+        })
+        .catch((e) => {
+          reportError(e, 'check Random Walk NFT owner');
+          return null;
+        }),
+      publicClient
+        ?.readContract({
+          address: contractAddrs.cosmicGame as `0x${string}`,
+          abi: cosmicGameAbi,
+          functionName: 'usedRandomWalkNfts',
+          args: [BigInt(tokenId)],
+        })
+        .catch((e) => {
+          reportError(e, 'check Random Walk NFT use');
+          return null;
+        }),
+    ]);
+    if (typeof owner === 'string' && !sameAddress(owner, account)) {
+      notify('error', t('gesture.contractErrors.callerIsNotNftOwner'));
+      return false;
+    }
+    if (typeof used === 'bigint' && used !== 0n) {
+      notify('error', t('gesture.contractErrors.usedRandomWalkNft'));
+      return false;
+    }
+    return true;
+  };
+
+  /**
    * Validates the attachment the form describes and returns what to attach,
    * `null` for none, or `false` (after telling the person why) when the
    * gesture must not be sent.
@@ -680,12 +817,18 @@ export function useGestureForm() {
       return false;
     }
 
+    // Only the Random Walk method carries a token; every other ETH Gesture sends -1.
+    const tokenId = gestureType === 'RandomWalk' ? rwlkId : -1;
     setIsBidding(true);
     let ethGestureCost = 0n;
     let attachment: PreparedAttachment | null = null;
     try {
       const result = await tx.run({
         prepare: async () => {
+          if (!ensureMessageFits()) return false;
+          if (gestureType === 'RandomWalk' && !(await ensureRandomWalkTokenUsable(tokenId))) {
+            return false;
+          }
           ethGestureCost = await getNextEthGestureCostWithModifiers();
           const balance = await readEthBalance();
           if (balance !== null && balance < ethGestureCost) {
@@ -708,7 +851,7 @@ export function useGestureForm() {
         write: async (ctx) => {
           const prepared: PreparedAttachment | null = attachment;
           if (!prepared) {
-            return writeGesture('bidWithEth', [rwlkId, message], ctx.account, {
+            return writeGesture('bidWithEth', [tokenId, message], ctx.account, {
               value: ethGestureCost,
               gas: GESTURE_GAS_LIMIT,
             });
@@ -717,17 +860,24 @@ export function useGestureForm() {
             prepared.kind === 'nft'
               ? ([
                   'bidWithEthAndDonateNft',
-                  [rwlkId, message, prepared.address, prepared.tokenId],
+                  [tokenId, message, prepared.address, prepared.tokenId],
                 ] as const)
               : ([
                   'bidWithEthAndDonateToken',
-                  [rwlkId, message, prepared.address, prepared.amountWei],
+                  [tokenId, message, prepared.address, prepared.amountWei],
                 ] as const);
           const gas = await estimateDonationGas(functionName, args, ethGestureCost);
           return writeGesture(functionName, args, ctx.account, { value: ethGestureCost, gas });
         },
         successMessage: gestureSuccessMessage,
-        onConfirmed: () => clearAttachment(attachment),
+        onConfirmed: () => {
+          clearAttachment(attachment);
+          // The token is used now: it leaves the list, and the form lets it go.
+          if (tokenId !== -1) {
+            setRwlknftIds((ids) => ids.filter((id) => id !== tokenId));
+            setRwlkIdState(-1);
+          }
+        },
         describeError: (err) => {
           const descriptor = getContractErrorDescriptor(err, {
             gestureCurrency: 'ETH',
@@ -761,6 +911,11 @@ export function useGestureForm() {
       notify('error', t('wallet.connectCorrectNetwork'));
       return false;
     }
+    // The cycle's first Gesture is made with ETH: a CST one would revert.
+    if (firstGesture) {
+      notify('error', t('gesture.contractErrors.wrongBidType'));
+      return false;
+    }
 
     setIsBidding(true);
     let priceMaxLimit: bigint | null = null;
@@ -768,6 +923,7 @@ export function useGestureForm() {
     try {
       const result = await tx.run({
         prepare: async () => {
+          if (!ensureMessageFits()) return false;
           const limit =
             ((await cosmicGameContract.read.getNextCstBidPrice?.()) as bigint | undefined) ??
             cstGestureData.CSTPriceWei;
@@ -859,15 +1015,6 @@ export function useGestureForm() {
     };
   }, [nftRWLKContract, account, usedRWLKData]);
 
-  /** The wallet's unused Random Walk NFTs: not read without a wallet, then loading, ready or failed. */
-  const rwlkListStatus: RwlkListStatus = !account
-    ? 'no-wallet'
-    : rwlkListSettled?.account !== account
-      ? 'loading'
-      : rwlkListSettled.failed
-        ? 'error'
-        : 'ready';
-
   const updateCstRewardTolerancePercent = useCallback((value: number) => {
     if (!Number.isFinite(value)) return;
     setCstRewardTolerancePercent(Math.min(100, Math.max(0, value)));
@@ -891,6 +1038,8 @@ export function useGestureForm() {
     setAcceptAnyCstReward,
     message,
     setMessage,
+    /** The contract's cap on the message, in UTF-8 bytes (read live; the documented default until then). */
+    messageMaxBytes,
     nftDonateAddress,
     setNftDonateAddress,
     nftId,
@@ -901,6 +1050,8 @@ export function useGestureForm() {
     setTokenAmount,
     rwlkId,
     setRwlkId,
+    /** A token the form let go because it is not one of this wallet's unused Random Walk NFTs. */
+    rwlkRejectedId,
     gestureCostPlus,
     setBidPricePlus,
     isGesturing,

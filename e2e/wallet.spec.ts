@@ -267,7 +267,7 @@ test.describe('Wallet connection state (disconnected)', () => {
     // The selected method's controls remain usable alongside the visible draft.
     await panel.getByTestId('panel-method-randomWalk').click();
     await expect(panel.getByTestId('panel-method-randomWalk')).toHaveAttribute(
-      'aria-pressed',
+      'aria-checked',
       'true',
     );
     const tokenPicker = panel.getByTestId('panel-rwlk-picker');

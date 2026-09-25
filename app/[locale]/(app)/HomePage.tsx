@@ -18,6 +18,7 @@ import { Sheet, SheetContent, SheetTitle } from '@/components/ui/sheet';
 import { useActiveWeb3React } from '@/hooks/web3';
 import { CyclePhaseGuide, PHASE_GUIDE_LINK_CLASS } from '@/components/home/CyclePhaseGuide';
 import { GestureMessageChat } from '@/components/home/GestureMessageChat';
+import { readRandomWalkLink } from '@/components/home/gestureInput';
 import { deriveFeedSystemEvents } from '@/components/home/deck/feedSystemEvents';
 import { ActionDock } from '@/components/home/observatory/ActionDock';
 import { AllocationLedger } from '@/components/home/observatory/AllocationLedger';
@@ -274,8 +275,10 @@ const HomePage = ({
   // Signatures refetches it through the dashboard's imprint count.
   const latestSignatures = useLatestSignatures(imprintedTokenCount, initialLatestSignatures);
 
-  const gestureForm = useGestureForm();
   const hasCurrentGesture = !!data && data.LastBidderAddr !== zeroAddress;
+  // Before the cycle's first Gesture the form holds ETH, the only method the
+  // contract accepts then, even if CST was chosen in the previous cycle.
+  const gestureForm = useGestureForm({ firstGesture: data?.LastBidderAddr === zeroAddress });
   // The page clock seeds the standings, so server rendering and hydration
   // measure holds against the same instant as the countdown (F007).
   const champions = useChampions(initialSpecialRecipients, latestEvidence, hasCurrentGesture, now);
@@ -480,13 +483,14 @@ const HomePage = ({
   // search-params hook: on this statically generated route that hook forces
   // a bailout to client-side rendering, which threw away the entire
   // server-rendered HTML (the exact LCP/CLS regression the ISR work exists
-  // to prevent). Guarded by home-rendering-policy and the no-JS e2e.
+  // to prevent). Guarded by home-rendering-policy and the no-JS e2e. A token
+  // id that is not a whole number is ignored, and the form keeps a linked
+  // token only while it is one of the wallet's unused Random Walk NFTs.
   useEffect(() => {
-    const params = new URLSearchParams(window.location.search);
-    if (params.get('randomwalk')) {
-      setRwlkId(Number(params.get('tokenId')));
-      setBidType('RandomWalk');
-    }
+    const link = readRandomWalkLink(window.location.search);
+    if (!link) return;
+    setBidType('RandomWalk');
+    if (link.tokenId != null) setRwlkId(link.tokenId);
     // eslint-disable-next-line react-hooks/exhaustive-deps -- a one-time read of the landing URL
   }, []);
 
@@ -504,7 +508,9 @@ const HomePage = ({
     now,
     finalizationConfirmed,
   });
-  const canGesture = allocationTime > now || data?.LastBidderAddr !== account;
+  // Addresses compare case-insensitively (utils/address): a wallet may
+  // report lowercase where the API returns the checksummed form.
+  const canGesture = allocationTime > now || !sameAddress(data?.LastBidderAddr, account);
   // The claim CTA additionally waits for the on-chain zero-cross confirmation
   // so a last-second gesture can't leave users clicking into a revert.
   const canClaim =

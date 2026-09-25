@@ -299,6 +299,7 @@
       "title": "Ваші Random Walk NFT",
       "connect": "Під’єднайте гаманець, щоб побачити Random Walk NFT у ньому.",
       "error": "Не вдалося прочитати Random Walk NFT цього гаманця. Спробуйте трохи згодом.",
+      "linkedUnavailable": "Random Walk NFT #{tokenId} не є невикористаним NFT цього гаманця, тож його не вибрано.",
       "tooltipAria": "Про знижки Random Walk на жести",
       "tooltip": "Долучіть Random Walk NFT до ETH-жесту, щоб зменшити вартість жесту на 50%. Кожен NFT можна використати лише раз."
     },
@@ -326,7 +327,7 @@
     "advanced": {
       "title": "Додатково",
       "messageLabel": "Повідомлення",
-      "messageOptionalHint": "(необов’язково, до {maxLength} символів)",
+      "messageOptionalHint": "(необов’язково, до {maxLength} байтів)",
       "messageTooltipAria": "Як працюють повідомлення жестів",
       "messageTooltip": "Залиште повідомлення, яке з’явиться в чаті жестів. Воно записується ончейн разом із вашим жестом і залишається в блокчейні назавжди.",
       "messagePlaceholder": "Залиште повідомлення разом із жестом…",

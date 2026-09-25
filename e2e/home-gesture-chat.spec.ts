@@ -163,7 +163,7 @@ async function expectEfficientDesktopLayout(page: Page) {
 
   // Every method on one line, each with its price.
   const tops = await methods
-    .locator('button[aria-pressed]')
+    .getByRole('radio')
     .evaluateAll((buttons) => buttons.map((button) => button.getBoundingClientRect().top));
   expect(tops.length).toBeGreaterThanOrEqual(1);
   for (const top of tops) expect(Math.abs(top - tops[0]!)).toBeLessThanOrEqual(1);
@@ -376,7 +376,7 @@ test.describe('home gesture chat', () => {
       }
 
       await page.getByTestId('panel-method-cst').click();
-      await expect(page.getByTestId('panel-method-cst')).toHaveAttribute('aria-pressed', 'true');
+      await expect(page.getByTestId('panel-method-cst')).toHaveAttribute('aria-checked', 'true');
       await page.evaluate(() => window.scrollTo({ top: 0, behavior: 'instant' }));
       await expectDecisionDashboardInViewport(page);
       await expectEfficientDesktopLayout(page);
@@ -448,7 +448,7 @@ test.describe('home gesture chat', () => {
       await expectEfficientDesktopLayout(page);
       await expectCommentFormReachable(page);
       await page.getByTestId('panel-method-cst').click();
-      await expect(page.getByTestId('panel-method-cst')).toHaveAttribute('aria-pressed', 'true');
+      await expect(page.getByTestId('panel-method-cst')).toHaveAttribute('aria-checked', 'true');
       await expectEfficientDesktopLayout(page);
       await expectTextWithoutOverlap(page.getByTestId('panel-method-tabs'));
       await expectTextWithoutOverlap(page.getByTestId('control-desk-calibration'));

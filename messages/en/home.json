@@ -299,6 +299,7 @@
       "title": "Your Random Walk NFTs",
       "connect": "Connect a wallet to list the Random Walk NFTs it holds.",
       "error": "Could not read this wallet’s Random Walk NFTs. Try again in a moment.",
+      "linkedUnavailable": "Random Walk NFT #{tokenId} is not an unused NFT in this wallet, so it is not selected.",
       "tooltipAria": "About Random Walk gesture discounts",
       "tooltip": "Attach a Random Walk NFT to an ETH gesture to receive a 50% Gesture Cost reduction. Each NFT can only be used once."
     },
@@ -326,7 +327,7 @@
     "advanced": {
       "title": "Advanced options",
       "messageLabel": "Message",
-      "messageOptionalHint": "(optional, {maxLength} chars)",
+      "messageOptionalHint": "(optional, up to {maxLength} bytes)",
       "messageTooltipAria": "How gesture messages work",
       "messageTooltip": "Leave a message to appear in Gesture Chat. Your message is recorded on-chain with your gesture and remains on the blockchain permanently.",
       "messagePlaceholder": "Leave a message with your gesture…",
