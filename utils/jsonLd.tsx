@@ -407,8 +407,40 @@ export function liveCycleJsonLd({
   };
 }
 
+/**
+ * Characters that can end or confuse an inline `<script>` element, each
+ * mapped to the JSON escape that parses back to the same character: `<` and
+ * `>` (so neither `</script>` nor `<!--` can appear in the markup), `&`, and
+ * U+2028 / U+2029 (line terminators to older JavaScript engines).
+ */
+const SCRIPT_UNSAFE_CHARS = /[<>&\u2028\u2029]/g;
+const SCRIPT_SAFE_ESCAPES: Readonly<Record<string, string>> = {
+  '<': '\\u003c',
+  '>': '\\u003e',
+  '&': '\\u0026',
+  '\u2028': '\\u2028',
+  '\u2029': '\\u2029',
+};
+
+/**
+ * JSON for an inline `<script type="application/ld+json">` body. Structured
+ * data carries text other people write (an owner-set Signature name, for
+ * one), and `JSON.stringify` leaves `<` and `>` as they are, so a value
+ * holding `</script>` would close the element and run markup of its choosing.
+ * Every escape parses back to the same JSON value.
+ */
+export function serializeJsonLd(data: unknown): string {
+  return JSON.stringify(data).replace(
+    SCRIPT_UNSAFE_CHARS,
+    (char) => SCRIPT_SAFE_ESCAPES[char] ?? char,
+  );
+}
+
 export function JsonLd({ data }: { data: Record<string, unknown> | Record<string, unknown>[] }) {
   return (
-    <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(data) }} />
+    <script
+      type="application/ld+json"
+      dangerouslySetInnerHTML={{ __html: serializeJsonLd(data) }}
+    />
   );
 }

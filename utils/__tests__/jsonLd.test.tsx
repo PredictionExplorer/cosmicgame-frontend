@@ -1,11 +1,49 @@
+import { renderToStaticMarkup } from 'react-dom/server';
+
 import {
   breadcrumbJsonLd,
   collectionPageJsonLd,
   datasetJsonLd,
+  JsonLd,
+  nftProductJsonLd,
   organizationJsonLd,
+  serializeJsonLd,
   webPageJsonLd,
   websiteJsonLd,
 } from '@/utils/jsonLd';
+
+describe('JsonLd script body', () => {
+  // An owner can write any 32-byte name on-chain; this one is 29 bytes.
+  const HOSTILE_NAME = '</script><script src=//ab.cd>';
+
+  it('never lets an owner-set name close the script element', () => {
+    const markup = renderToStaticMarkup(
+      <JsonLd
+        data={[
+          nftProductJsonLd({
+            tokenId: 25,
+            name: HOSTILE_NAME,
+            description: 'A Signature',
+            imageUrl: 'https://example.com/25.png',
+          }),
+          breadcrumbJsonLd([{ name: HOSTILE_NAME, path: '/detail/25' }]),
+        ]}
+      />,
+    );
+    const body = markup.slice(markup.indexOf('>') + 1, markup.lastIndexOf('</script>'));
+    expect(body.toLowerCase()).not.toContain('</script');
+    expect(body).not.toMatch(/[<>]/);
+    expect(markup.match(/<script/g)).toHaveLength(1);
+    expect(JSON.parse(body)[0].name).toBe(HOSTILE_NAME);
+  });
+
+  it('parses back to exactly the original value', () => {
+    const data = { name: `${HOSTILE_NAME} & <!-- \u2028\u2029 ✓ 漢字` };
+    const serialized = serializeJsonLd(data);
+    expect(serialized).not.toMatch(/[<>&\u2028\u2029]/);
+    expect(JSON.parse(serialized)).toEqual(data);
+  });
+});
 
 describe('JSON-LD builders', () => {
   it('uses stable Organization and WebSite IDs on the canonical landing host', () => {
