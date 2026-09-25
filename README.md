@@ -106,7 +106,7 @@ The app serves two hosts from one codebase: the marketing site (`cosmicsignature
 │   ├── home/         Homepage sections (observatory/ control desk: CycleClock,
 │   │                 participant intel, GesturePanel, AllocationLedger, ActionDock)
 │   ├── layout/       Header, Footer, ErrorBoundary
-│   ├── nft/          NFT display (NFTTrait, NFTImage, LatestNFTs, grids)
+│   ├── nft/          NFT display (NFTImage, SignatureCard, PagedWall, SignatureViewer)
 │   ├── anchoring/    Anchoring (staking) tables and actions
 │   ├── attachments/  Attached NFT / ERC-20 showcases
 │   ├── tables/       Data tables (gestures, allocations, recipients, ...)

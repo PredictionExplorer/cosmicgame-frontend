@@ -57,10 +57,11 @@ export interface PagedWallProps<T> {
 /**
  * PagedWall — the one paged wall of works: the error, loading and empty
  * states in one order, the page clamped to the pages there are, the wall
- * scrolled back to its top on a page change, and the shared pagination. The
- * gallery's Signature walls, named Signatures, a wallet's collection, the
- * attached NFTs and the used Random Walk NFTs all hang on it, so a fix to how
- * a wall pages reaches every wall.
+ * scrolled back to its top on a page change, and the shared pagination.
+ * Named Signatures and a wallet's collection (both through SignatureWall),
+ * the attached NFTs and the used Random Walk NFTs all hang on it, so a fix to
+ * how a wall pages reaches every wall. The gallery pages its filtered
+ * results with its own URL-driven grid.
  */
 export function PagedWall<T>({
   items,
