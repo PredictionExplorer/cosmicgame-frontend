@@ -10,6 +10,7 @@ import { AnchoringIcon } from '@/lib/conceptIcons';
 import { cn } from '@/lib/utils';
 import { Link } from '@/i18n/navigation';
 import { ArtFrame, type ArtSource } from '@/components/ui/art-frame';
+import { SignatureNumber, useSignatureLabel } from '@/components/ui/signature-label';
 import { Skeleton } from '@/components/ui/skeleton';
 
 import { signatureMedia, useSignatureAlt } from './signatureArt';
@@ -66,10 +67,12 @@ export function signatureCardSources(
 
 /**
  * SignatureCard — one Signature on a wall: the art on its black plate at the
- * native ratio with nothing over it, and a quiet wall label under it. The
- * title is the token's name, or its number when it has none; the caption
- * carries the number (for a named token), then structure and palette from
- * `sm` (a phone's two-across label keeps to the name and number). The whole
+ * native ratio with nothing over it, and a quiet wall label under it, by the
+ * one rule every art surface follows (`components/ui/signature-label`): the
+ * title is the token's name, or "Signature #000047" with the number in mono
+ * (the number alone below `sm`, so a phone's two-across titles keep to one
+ * line); the caption carries the number (for a named token), then structure
+ * and palette from `sm` (a phone's label keeps to the name and number). The whole
  * card is one link to the detail page, named by the plate's alt text (composed
  * from the traits); the visible label repeats part of it, so it is hidden
  * from assistive technology rather than read twice.
@@ -90,14 +93,13 @@ export function SignatureCard({
   const tTraits = useTranslations('traits');
   const { label: unavailableLabel } = useSignatureArtLabel(imprintedAt);
   const signatureAlt = useSignatureAlt();
+  const label = useSignatureLabel();
   const { valueLabel } = useTraitLabels();
   const id = formatId(tokenId);
   const trimmedName = name?.trim() || null;
   const alt = signatureAlt({ id, name: trimmedName, entry });
   const traitsLoading = entry === undefined;
-  const idFact = trimmedName
-    ? { key: 'id', node: <span className="tabular-nums">{id}</span> }
-    : null;
+  const idFact = trimmedName ? { key: 'id', node: <SignatureNumber tokenId={tokenId} /> } : null;
   const structure = entry?.structure ? valueLabel('structure', entry.structure) : null;
   const palette = entry?.palette ? valueLabel('palette', entry.palette) : null;
   // One locale-aware pair: a palette name may itself hold a middle dot (uk).
@@ -133,10 +135,9 @@ export function SignatureCard({
                 className={cn(
                   'line-clamp-2 type-body-md font-medium text-foreground [overflow-wrap:anywhere]',
                   'decoration-rule underline-offset-4 group-hover:underline',
-                  !trimmedName && 'tabular-nums',
                 )}
               >
-                {trimmedName ?? id}
+                {label.title({ tokenId, name: trimmedName }, { compact: true })}
               </p>
               {traitsLoading ? (
                 <>

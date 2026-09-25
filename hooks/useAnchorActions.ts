@@ -1,14 +1,12 @@
 import { useCallback, useEffect, useRef } from 'react';
 import { useTranslations } from 'next-intl';
 import { useQueryClient } from '@tanstack/react-query';
-import type { Hash } from 'viem';
 
 import { useContractAddresses } from '@/contexts/ContractAddressesContext';
 import { useAnchoredToken } from '@/contexts/AnchoredTokenContext';
 import { useNotify } from '@/hooks/useNotify';
 import { useTxFlow, type TxResult } from '@/hooks/useTxFlow';
 import { REQUIRED_CHAIN_NAME } from '@/lib/chainGuard';
-import { assertTransactionHash } from '@/utils/transactions';
 
 import useAnchoringWalletCSTContract from './useAnchoringWalletCSTContract';
 import useAnchoringWalletRWLKContract from './useAnchoringWalletRWLKContract';
@@ -34,12 +32,6 @@ const ANCHORING_QUERY_KEYS = [
 ] as const;
 
 const NOT_RUN: TxResult = { status: 'aborted' };
-
-function hashOf(value: unknown): Hash {
-  const hash = value as Hash | undefined;
-  assertTransactionHash(hash);
-  return hash;
-}
 
 /**
  * Anchoring and releasing for Cosmic Signature and RandomWalk NFTs.
@@ -119,16 +111,23 @@ export function useAnchorActions() {
             description: t('anchor.approval'),
             isNeeded: async (ctx) =>
               !(await nftContract.read.isApprovedForAll?.([ctx.account, anchoringWallet])),
-            write: async () =>
-              hashOf(await nftContract.write.setApprovalForAll?.([anchoringWallet, true])),
+            write: (ctx) =>
+              ctx.writeContract({
+                address: nftContract.address,
+                abi: nftContract.abi,
+                functionName: 'setApprovalForAll',
+                args: [anchoringWallet as `0x${string}`, true],
+              }),
           },
         ],
-        write: async () =>
-          hashOf(
-            Array.isArray(tokenIds)
-              ? await anchoringContract.write.stakeMany?.([tokenIds])
-              : await anchoringContract.write.stake?.([tokenIds]),
-          ),
+        write: (ctx) =>
+          ctx.writeContract({
+            address: anchoringContract.address,
+            abi: anchoringContract.abi,
+            ...(Array.isArray(tokenIds)
+              ? { functionName: 'stakeMany', args: [tokenIds] }
+              : { functionName: 'stake', args: [tokenIds] }),
+          }),
         successMessage: t('anchor.anchored', { count }),
         failureMessage: t('anchor.failed'),
         errorContext: 'anchor',
@@ -160,12 +159,14 @@ export function useAnchorActions() {
       const count = Array.isArray(actionIds) ? actionIds.length : 1;
 
       return runTx({
-        write: async () =>
-          hashOf(
-            Array.isArray(actionIds)
-              ? await anchoringContract.write.unstakeMany?.([actionIds])
-              : await anchoringContract.write.unstake?.([actionIds]),
-          ),
+        write: (ctx) =>
+          ctx.writeContract({
+            address: anchoringContract.address,
+            abi: anchoringContract.abi,
+            ...(Array.isArray(actionIds)
+              ? { functionName: 'unstakeMany', args: [actionIds] }
+              : { functionName: 'unstake', args: [actionIds] }),
+          }),
         // Releasing a Cosmic Signature NFT also retrieves its accumulated ETH Anchor
         // Distributions: the toast says so. A Random Walk NFT has none to retrieve.
         successMessage: isRwalk

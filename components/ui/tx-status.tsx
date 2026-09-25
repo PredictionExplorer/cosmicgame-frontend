@@ -1,11 +1,10 @@
 'use client';
 
 import type { ReactNode } from 'react';
-import { AlertCircle, Check, CircleSlash, ExternalLink, Loader2 } from 'lucide-react';
+import { AlertCircle, ArrowUpRight, Check, CircleSlash, Loader2 } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 
 import { useTxStageLabel } from '@/hooks/useTxStageLabel';
-import { stateTone } from '@/lib/stateTone';
 import type { TxStage } from '@/lib/txStage';
 import { cn } from '@/lib/utils';
 import { getExplorerUrl } from '@/utils/urls';
@@ -27,7 +26,7 @@ export function TxExplorerLink({ hash, label, className }: TxExplorerLinkProps) 
       className={cn('link inline-flex items-center gap-1 font-medium', className)}
     >
       {label}
-      <ExternalLink className="h-3.5 w-3.5 shrink-0" aria-hidden />
+      <ArrowUpRight className="size-3.5 shrink-0 text-subtle" aria-hidden />
     </a>
   );
 }
@@ -62,10 +61,10 @@ function StepDot({ state }: { state: StepState }) {
       aria-hidden
       className={cn(
         'relative inline-flex h-2 w-2 shrink-0 rounded-full',
-        state === 'done' && stateTone.positiveDot,
+        state === 'done' && 'bg-positive',
         state === 'current' && 'bg-primary',
         state === 'upcoming' && 'bg-muted-foreground/40',
-        state === 'failed' && stateTone.criticalDot,
+        state === 'failed' && 'bg-critical',
       )}
     />
   );
@@ -103,20 +102,24 @@ export function TxStatus({ stage, variant = 'line', className }: TxStatusProps) 
     case 'idle':
       break;
     case 'confirmed':
-      icon = <Check className={cn('h-4 w-4 shrink-0', stateTone.positiveText)} aria-hidden />;
+      icon = <Check className={cn('h-4 w-4 shrink-0', 'text-positive')} aria-hidden />;
       message = t('tx.status.confirmed');
       tone = 'text-foreground';
       break;
     case 'failed':
-      icon = <AlertCircle className={cn('h-4 w-4 shrink-0', stateTone.criticalText)} aria-hidden />;
+      icon = <AlertCircle className={cn('h-4 w-4 shrink-0', 'text-critical')} aria-hidden />;
       message = stage.message;
       tone = 'text-foreground';
       break;
     case 'cancelled':
       icon = <CircleSlash className="h-4 w-4 shrink-0" aria-hidden />;
-      // With a hash, the wallet's "cancel" replaced a sent transaction: the
-      // replacement paid a fee, so "nothing was sent" would be wrong.
-      message = stage.hash ? t('tx.status.cancelledInWallet') : t('tx.status.cancelled');
+      // With a hash, the wallet replaced a sent transaction: the replacement
+      // paid a fee, so "nothing was sent" would be wrong.
+      message = stage.replaced
+        ? t('tx.status.replacedInWallet')
+        : stage.hash
+          ? t('tx.status.cancelledInWallet')
+          : t('tx.status.cancelled');
       break;
     default:
       icon = <Loader2 className="h-4 w-4 shrink-0 animate-spin text-primary" aria-hidden />;
@@ -141,7 +144,7 @@ export function TxStatus({ stage, variant = 'line', className }: TxStatusProps) 
               <span
                 className={cn(
                   steps[key] === 'current' && 'font-semibold text-foreground',
-                  steps[key] === 'failed' && stateTone.criticalText,
+                  steps[key] === 'failed' && 'text-critical',
                 )}
               >
                 {t(`tx.steps.${key}`)}

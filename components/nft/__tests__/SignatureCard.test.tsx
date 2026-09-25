@@ -19,12 +19,28 @@ const entry = normalizeTraitEntry(parseCosmicSignatureMetadata(TOKEN_1_METADATA_
 const link = () => screen.getByRole('link');
 
 describe('SignatureCard', () => {
-  it('titles an unnamed Signature by its number and captions its structure and palette', () => {
+  it('titles an unnamed Signature "Signature #…" and captions its structure and palette', () => {
     render(<SignatureCard tokenId={1} seed="a1" entry={entry} sizes="400px" />);
     const card = screen.getByTestId('signature-card');
-    expect(within(card).getByText('#000001')).toBeInTheDocument();
+    // The wall-label rule: the localized noun, the number in the identifier face.
+    expect(within(card).getByText('#000001')).toHaveClass('type-mono-inline');
+    expect(within(card).getByText('#000001').parentElement).toHaveTextContent(
+      'common.signature.untitled(id=#000001)',
+    );
     // The space before the dot does not break: a wrapped caption ends a line with it.
     expect(card.textContent).toMatch(/Orbit Ribbons\u00a0· \S/);
+  });
+
+  it("keeps a phone's two-across title to the number alone (regression)", () => {
+    // "Signature #000047" wrapped to two lines beside the anchor at 390px, and
+    // every card wrapped at 320px: below sm the noun hides and the number stays.
+    render(<SignatureCard tokenId={47} seed="a1" entry={entry} anchored sizes="400px" />);
+    const number = screen.getByText('#000047');
+    expect(number).not.toHaveClass('max-sm:hidden');
+    const noun = screen.getByText('common.signature.untitled(id=');
+    expect(noun).toHaveClass('max-sm:hidden');
+    // The whole title is still one text for tests and the alt text beside it.
+    expect(number.parentElement).toHaveTextContent('common.signature.untitled(id=#000047)');
   });
 
   it('says "Rendering" for a fresh imprint without art, as its own page does', () => {
@@ -46,7 +62,7 @@ describe('SignatureCard', () => {
       <SignatureCard tokenId={25} seed="a1" name="Twisted Mind" entry={entry} sizes="400px" />,
     );
     expect(screen.getByText('Twisted Mind')).toBeInTheDocument();
-    expect(screen.getByText('#000025')).toHaveClass('tabular-nums');
+    expect(screen.getByText('#000025')).toHaveClass('type-mono');
   });
 
   it('is one link to the detail page, named by the alt text composed from the traits', () => {

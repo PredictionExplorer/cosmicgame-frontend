@@ -13,6 +13,7 @@ import { EmptyState } from '@/components/ui/empty-state';
 import { ErrorState } from '@/components/ui/error-state';
 import { PageShell } from '@/components/ui/page-shell';
 import { TablePagination } from '@/components/ui/pagination';
+import { useSignatureLabel } from '@/components/ui/signature-label';
 import { Skeleton } from '@/components/ui/skeleton';
 import { SignatureCard } from '@/components/winnings/SignatureCard';
 import {
@@ -52,6 +53,7 @@ function selectionSource(row: StellarSelectionNFTRecipient): SelectionSource {
 function UserStellarSelectionNFTPage({ address: rawAddress }: { address: string }) {
   const t = useTranslations('statistics');
   const tDetail = useTranslations('detail');
+  const label = useSignatureLabel();
   const format = useFormat();
   const address = participantAddress(rawAddress);
   const [page, setPage] = useState(1);
@@ -160,16 +162,17 @@ function UserStellarSelectionNFTPage({ address: rawAddress }: { address: string 
                     tokenId={tokenId}
                     seed={entry?.seed}
                     artState={signatures.state}
-                    title={entry?.name ?? t('stellarSelectionNft.unnamed', { id })}
-                    meta={[
-                      entry?.name ? <span className="type-mono">{id}</span> : null,
-                      typeof row.RoundNum === 'number' ? (
-                        <Link href={`/allocation/${row.RoundNum}`} className="link-quiet">
-                          {t('stellarSelectionNft.cycle', { cycle: row.RoundNum })}
-                        </Link>
-                      ) : null,
-                      row.TimeStamp ? <DateTime timestamp={row.TimeStamp} /> : null,
-                    ]}
+                    title={label.title({ tokenId, name: entry?.name })}
+                    meta={label.meta({
+                      tokenId,
+                      name: entry?.name,
+                      cycle: row.RoundNum,
+                      cycleHref:
+                        typeof row.RoundNum === 'number'
+                          ? `/allocation/${row.RoundNum}`
+                          : undefined,
+                      date: row.TimeStamp ? <DateTime timestamp={row.TimeStamp} /> : null,
+                    })}
                     // Two short tags rather than one long one, so neither wraps in a phone column.
                     tags={
                       <>

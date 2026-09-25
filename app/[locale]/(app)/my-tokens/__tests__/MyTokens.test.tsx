@@ -128,7 +128,7 @@ describe('MyTokens', () => {
 
   it('links to the Cosmic Signature marketplace from the page header', () => {
     render(<MyTokens />);
-    expect(screen.getByRole('link', { name: 'nav.ecosystem.axiomZero.ariaLabel' })).toHaveAttribute(
+    expect(screen.getByRole('link', { name: /nav\.ecosystem\.axiomZero\.label/ })).toHaveAttribute(
       'href',
       COSMIC_SIGNATURE_MARKETPLACE_URL,
     );

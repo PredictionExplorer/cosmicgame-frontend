@@ -94,7 +94,7 @@
         "tooltip": "Được chuyển đến đơn vị thụ hưởng Hàng hóa công (Protocol Guild) mỗi chu kỳ"
       },
       "next": {
-        "label": "Chu kỳ tiếp theo",
+        "label": "Dự trữ tích lũy",
         "tooltip": "Phần còn lại được chuyển sang chu kỳ tiếp theo dưới dạng Dự trữ tích lũy."
       }
     }

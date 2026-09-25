@@ -33,20 +33,20 @@ const mockWriteClaimManyDonatedNfts = jest.fn();
 const mockWriteClaimDonatedToken = jest.fn();
 const mockWriteClaimManyDonatedTokens = jest.fn();
 
-const walletContract = {
-  write: {
-    withdrawEverything: mockWriteWithdrawEverything,
-    claimDonatedNft: mockWriteClaimDonatedNft,
-    claimManyDonatedNfts: mockWriteClaimManyDonatedNfts,
-    claimDonatedToken: mockWriteClaimDonatedToken,
-    claimManyDonatedTokens: mockWriteClaimManyDonatedTokens,
-  },
+/** Each PrizesWallet function's args, as the flow's `ctx.writeContract` received them. */
+const WRITES: Record<string, jest.Mock> = {
+  withdrawEverything: mockWriteWithdrawEverything,
+  claimDonatedNft: mockWriteClaimDonatedNft,
+  claimManyDonatedNfts: mockWriteClaimManyDonatedNfts,
+  claimDonatedToken: mockWriteClaimDonatedToken,
+  claimManyDonatedTokens: mockWriteClaimManyDonatedTokens,
 };
-const mockUseStellarSelectionWalletContract = jest.fn(() => walletContract as unknown);
 
-jest.mock('../useStellarSelectionWalletContract', () => ({
-  __esModule: true,
-  default: () => mockUseStellarSelectionWalletContract(),
+const ALLOCATIONS_WALLET = '0x00000000000000000000000000000000000000b2';
+let mockAllocationsWallet = ALLOCATIONS_WALLET;
+
+jest.mock('../../contexts/ContractAddressesContext', () => ({
+  useContractAddresses: () => ({ prizesWallet: mockAllocationsWallet }),
 }));
 
 import { useClaimAllocations } from '../useClaimAllocations';
@@ -54,7 +54,15 @@ import { useClaimAllocations } from '../useClaimAllocations';
 beforeEach(() => {
   jest.clearAllMocks();
   mockTx.reset();
-  mockUseStellarSelectionWalletContract.mockReturnValue(walletContract);
+  mockAllocationsWallet = ALLOCATIONS_WALLET;
+  // Every retrieve goes through the flow's one write path, to the
+  // Allocations wallet; route each call to its function's mock.
+  mockTx.writeContract.mockImplementation(
+    async (request: { address: string; functionName: string; args: unknown[] }) => {
+      expect(request.address).toBe(ALLOCATIONS_WALLET);
+      return WRITES[request.functionName]!(request.args);
+    },
+  );
   mockWriteWithdrawEverything.mockResolvedValue('0xtx1');
   mockWriteClaimDonatedNft.mockResolvedValue('0xtx2');
   mockWriteClaimManyDonatedNfts.mockResolvedValue('0xtx3');
@@ -89,6 +97,12 @@ describe('useClaimAllocations', () => {
         });
       });
 
+      expect(mockTx.writeContract).toHaveBeenCalledWith(
+        expect.objectContaining({
+          address: ALLOCATIONS_WALLET,
+          functionName: 'withdrawEverything',
+        }),
+      );
       expect(mockWriteWithdrawEverything).toHaveBeenCalledTimes(1);
       expect(mockWriteWithdrawEverything).toHaveBeenCalledWith([
         [1, 3],
@@ -191,7 +205,7 @@ describe('useClaimAllocations', () => {
     });
 
     it('tells the person when the contract is not available yet', async () => {
-      mockUseStellarSelectionWalletContract.mockReturnValue(null);
+      mockAllocationsWallet = '';
       const { result } = renderHook(() => useClaimAllocations());
       await act(async () => {
         await result.current.retrieveAllStellarSelectionETH([1]);
@@ -199,18 +213,6 @@ describe('useClaimAllocations', () => {
 
       expect(mockTx.runs).toHaveLength(0);
       expect(mockNotify).toHaveBeenCalledWith('error', 'toasts.claim.walletNotConnected');
-    });
-
-    it('treats a missing transaction hash as a failure, never a success', async () => {
-      mockWriteWithdrawEverything.mockResolvedValueOnce(undefined);
-      const { result } = renderHook(() => useClaimAllocations());
-      await act(async () => {
-        await result.current.retrieveAllStellarSelectionETH([1]);
-      });
-
-      expect(mockTx.lastSuccessMessage()).toBeUndefined();
-      expect(mockTx.lastFailureMessage()).toBe('toasts.claim.failed');
-      expect(mockFetchStatusData).not.toHaveBeenCalled();
     });
 
     it('does not refresh when the wallet prompt is dismissed', async () => {

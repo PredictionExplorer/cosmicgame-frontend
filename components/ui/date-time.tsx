@@ -17,15 +17,21 @@ import { cn } from '@/lib/utils';
 import { useHydrated } from '@/hooks/useHydrated';
 import { useNow } from '@/hooks/useNow';
 
-// Date-times render in UTC until hydration (`useHydrated`), so the server
-// HTML and the first client render agree, then switch to the reader's zone
-// without a hydration mismatch.
+/*
+ * Every protocol record is dated in UTC, the block explorers' convention, on
+ * the server and in the browser alike: the server HTML and every later render
+ * agree, so a date never rewrites itself after load (it once flipped to the
+ * reader's zone at hydration, sometimes to another calendar day, and moved the
+ * record pages). The reader's own time is on hover, added once the page has
+ * hydrated (a `title` change never moves anything). `timeZone="local"` still
+ * exists for a surface that must show the reader's clock; it renders UTC until
+ * hydration.
+ */
 
 /**
- * The compact date-time of a timestamp as a string: deterministic UTC during
- * SSR and hydration, then the browser's local time. For attributes and
- * composed strings; render `<DateTime>` wherever markup is possible.
- * `locale` defaults to the active locale.
+ * The compact date-time of a timestamp as a string, in UTC on the server and
+ * in the browser, for attributes and composed strings; render `<DateTime>`
+ * wherever markup is possible. `locale` defaults to the active locale.
  */
 export function useHydrationSafeDateTime(
   timestamp: number,
@@ -33,30 +39,24 @@ export function useHydrationSafeDateTime(
   locale?: string,
 ): string {
   const activeLocale = useLocale();
-  const hydrated = useHydrated();
   return formatDateTime(timestamp, {
     locale: locale ?? activeLocale,
     seconds: showSecond,
-    timeZone: hydrated ? 'local' : 'utc',
+    timeZone: 'utc',
   });
 }
 
 /**
- * Returns a deterministic server fallback through hydration, then captures
- * browser time after mount (refreshed every minute). Use it for relative-time
- * labels that would otherwise call `Date.now()` during render.
- */
-export function useHydrationSafeNowSeconds(serverFallbackSeconds: number): number {
-  const nowMs = useNow(60_000);
-  return nowMs > 0 ? Math.floor(nowMs / 1000) : serverFallbackSeconds;
-}
-
-/**
- * The zone date-times are shown in ("UTC" on the server, "UTC+3" in the
- * browser after hydration), for a table or chart caption.
+ * The zone every date-time is shown in ("UTC"), for a table or chart caption
+ * and for a date that names its zone inline.
  */
 export function useTimeZoneLabel(): string {
-  return formatTimeZoneLabel(useHydrated() ? 'local' : 'utc');
+  return formatTimeZoneLabel('utc');
+}
+
+/** Whether the reader's clock differs from UTC at that instant. */
+function localDiffersFromUtc(timestamp: number): boolean {
+  return new Date(timestamp * 1000).getTimezoneOffset() !== 0;
 }
 
 export interface DateTimeProps extends Omit<HTMLAttributes<HTMLElement>, 'children' | 'title'> {
@@ -75,14 +75,15 @@ export interface DateTimeProps extends Omit<HTMLAttributes<HTMLElement>, 'childr
   /** Defaults to the active locale. */
   locale?: string;
   /**
-   * The zone shown after hydration. Default `local` (the reader's zone); pass
-   * `utc` where a page states UTC. SSR always renders UTC.
+   * Default `utc`, the zone of every record, rendered the same on the server
+   * and in the browser. `local` shows the reader's clock after hydration
+   * (UTC until then), for the rare surface that must.
    */
   timeZone?: DateTimeZone;
   /**
-   * Print the zone after the value ("Sep 22, 2026, 23:04:45 UTC-5"). Every
-   * date is in the reader's zone, so one that stands alone (a record page, a
-   * header figure) says which; a table says it once with `<TimeZoneNote>`.
+   * Print the zone after the value ("Sep 23, 2026, 04:04:45 UTC"): a date
+   * that stands alone (a record page, a header figure) says which zone it is
+   * in; a table says it once with `<TimeZoneNote>`.
    */
   showZone?: boolean;
   /** Render prop for composing the formatted value into other markup. */
@@ -91,9 +92,10 @@ export interface DateTimeProps extends Omit<HTMLAttributes<HTMLElement>, 'childr
 
 /**
  * One date-time, rendered as `<time dateTime title>`: the visible value in
- * the locale's compact or full form, the exact instant for machines, and the
- * full date with seconds, zone and age on hover. Hydration-safe (UTC on the
- * server, the reader's zone after mount) and never wrapping.
+ * the locale's compact or full form (UTC), the exact instant for machines,
+ * and on hover the full date with seconds and zone, the reader's own time
+ * and the age. The same text on the server and after hydration, never
+ * wrapping.
  */
 export function DateTime({
   timestamp,
@@ -101,7 +103,7 @@ export function DateTime({
   seconds = false,
   year,
   locale,
-  timeZone = 'local',
+  timeZone = 'utc',
   showZone = false,
   className,
   children,
@@ -111,7 +113,7 @@ export function DateTime({
   const resolvedLocale = locale ?? activeLocale;
   const hydrated = useHydrated();
   const nowMs = useNow(60_000);
-  const zone: DateTimeZone = hydrated ? timeZone : 'utc';
+  const zone: DateTimeZone = timeZone === 'local' && !hydrated ? 'utc' : timeZone;
   const iso = toIsoDateTime(timestamp);
 
   if (!iso) {
@@ -136,7 +138,19 @@ export function DateTime({
   const value = relative
     ? formatRelativeTime(timestamp, { locale: resolvedLocale, now })
     : absolute;
-  const title = formatDateTimeTitle(timestamp, { locale: resolvedLocale, timeZone: zone, now });
+  // On hover: the full date in its zone, then (once hydrated, where it
+  // differs) the reader's own time, then the age.
+  const readerTime =
+    hydrated && zone !== 'local' && typeof timestamp === 'number' && localDiffersFromUtc(timestamp)
+      ? formatDateTimeTitle(timestamp, { locale: resolvedLocale, timeZone: 'local' })
+      : null;
+  const title = [
+    formatDateTimeTitle(timestamp, { locale: resolvedLocale, timeZone: zone }),
+    readerTime,
+    now ? formatRelativeTime(timestamp, { locale: resolvedLocale, now }) : null,
+  ]
+    .filter(Boolean)
+    .join(' · ');
   // The zone reads like a unit: subtle, and in proportional figures, so
   // "UTC-5" does not take a tabular figure's spacing inside a readout.
   const zoned =
@@ -162,8 +176,8 @@ export function DateTime({
 }
 
 /**
- * "Time zone: UTC+3", once per table or chart that shows local date-times,
- * so no single cell has to carry the zone.
+ * "Time zone: UTC", once per table or chart that shows date-times, so no
+ * single cell has to carry the zone.
  */
 export function TimeZoneNote({ className }: { className?: string }) {
   const t = useTranslations('formats');

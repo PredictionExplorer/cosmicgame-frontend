@@ -13,16 +13,17 @@ import { cn } from '@/lib/utils';
  * "Loading…" panel replaced by a 700px table moved the footer and measured
  * a CLS of 0.22.
  *
- * Composites announce themselves once as a polite status. Inside a page
- * skeleton that already announces, pass `announce={false}` so a screen
- * reader hears "Loading" once, not once per block.
+ * Composites announce themselves once as a polite status: the region holds
+ * its label as visually hidden text, since a live region speaks its content,
+ * not its accessible name (the bars are all hidden). Inside a page skeleton
+ * that already announces, pass `announce={false}` so a screen reader hears
+ * "Loading" once, not once per block. Every bar carries
+ * `data-slot="skeleton"`, the hook for tests and checks.
  */
 
 const skeletonVariants = cva(
-  // Base keeps `animate-pulse` for backward compatibility: tests and
-  // screenshot checks key off that class. The shimmer runs on ::before, so
-  // the two coexist; under reduced motion neither moves.
-  'relative overflow-hidden rounded-edge bg-muted/70 animate-pulse motion-reduce:animate-none motion-reduce:before:hidden',
+  // One motion: the shimmer on ::before. Under reduced motion it stays still.
+  'relative overflow-hidden rounded-edge bg-muted/70 motion-reduce:before:hidden',
   {
     variants: {
       shine: {
@@ -48,6 +49,7 @@ export const Skeleton = React.forwardRef<HTMLDivElement, SkeletonProps>(
     as === 'span' ? (
       <span
         aria-hidden
+        data-slot="skeleton"
         className={cn(skeletonVariants({ shine }), className)}
         {...(props as React.HTMLAttributes<HTMLSpanElement>)}
       />
@@ -55,6 +57,7 @@ export const Skeleton = React.forwardRef<HTMLDivElement, SkeletonProps>(
       <div
         ref={ref}
         aria-hidden
+        data-slot="skeleton"
         className={cn(skeletonVariants({ shine }), className)}
         {...props}
       />
@@ -68,7 +71,11 @@ interface CompositeProps {
   announce?: boolean;
 }
 
-/** The status wrapper every composite shares. */
+/**
+ * The status wrapper every composite shares: a polite live region whose
+ * spoken content is its label (visually hidden text, the same pattern as the
+ * page skeletons' `LoadingRegion`), and whose name is that same text.
+ */
 function SkeletonRegion({
   label,
   announce = true,
@@ -76,12 +83,19 @@ function SkeletonRegion({
   children,
   ...props
 }: React.HTMLAttributes<HTMLDivElement> & { label: string; announce?: boolean }) {
+  const labelId = React.useId();
+  if (!announce) {
+    return (
+      <div aria-hidden className={className} {...props}>
+        {children}
+      </div>
+    );
+  }
   return (
-    <div
-      className={className}
-      {...(announce ? { role: 'status', 'aria-label': label } : { 'aria-hidden': true })}
-      {...props}
-    >
+    <div role="status" aria-busy="true" aria-labelledby={labelId} className={className} {...props}>
+      <span id={labelId} className="sr-only">
+        {label}
+      </span>
       {children}
     </div>
   );
@@ -112,27 +126,11 @@ export function SkeletonText({
   );
 }
 
-/** A StatCard-shaped placeholder: label, icon slot and figure. */
-export function SkeletonStatCard({ className, announce }: CompositeProps) {
-  const t = useTranslations('tables');
-
-  return (
-    <SkeletonRegion
-      label={t('skeleton.loadingStat')}
-      announce={announce}
-      className={cn('rounded-surface border border-rule-faint bg-surface/60 p-5', className)}
-    >
-      <div className="flex items-center justify-between gap-3">
-        <Skeleton className="h-3.5 w-24" />
-        <Skeleton className="size-4" />
-      </div>
-      <Skeleton className="mt-3 h-7 w-2/3" />
-    </SkeletonRegion>
-  );
-}
-
-/** A row of StatCard placeholders on the StatGrid's columns. */
-export function SkeletonStatGrid({
+/**
+ * A figure strip placeholder (PageHeaderFigures): a label over a figure in
+ * each column, on the page ground with no card around it.
+ */
+export function SkeletonFigures({
   count = 4,
   className,
   announce,
@@ -142,33 +140,13 @@ export function SkeletonStatGrid({
     <SkeletonRegion
       label={t('skeleton.loadingStat')}
       announce={announce}
-      className={cn('grid grid-cols-1 gap-3 sm:grid-cols-2 sm:gap-4 lg:grid-cols-4', className)}
+      className={cn('grid grid-cols-2 gap-x-8 gap-y-6 lg:grid-cols-4', className)}
     >
       {Array.from({ length: count }).map((_, i) => (
-        <SkeletonStatCard key={i} announce={false} />
-      ))}
-    </SkeletonRegion>
-  );
-}
-
-export function SkeletonTableRow({
-  cols = 4,
-  className,
-  announce,
-}: CompositeProps & { cols?: number }) {
-  const t = useTranslations('tables');
-
-  return (
-    <SkeletonRegion
-      label={t('skeleton.loadingRow')}
-      announce={announce}
-      className={cn(
-        'flex min-h-[var(--row-h)] items-center gap-4 border-b border-rule-faint px-4 py-3',
-        className,
-      )}
-    >
-      {Array.from({ length: cols }).map((_, i) => (
-        <Skeleton key={i} className="h-3" style={{ width: `${100 / cols - 4}%`, flexShrink: 0 }} />
+        <div key={i} className="min-w-0">
+          <Skeleton shine={false} className="h-3 w-24" />
+          <Skeleton className="mt-2.5 h-8 w-2/3" />
+        </div>
       ))}
     </SkeletonRegion>
   );

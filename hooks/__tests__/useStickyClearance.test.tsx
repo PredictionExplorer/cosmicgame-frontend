@@ -2,9 +2,11 @@ import { useRef } from 'react';
 import { render } from '@testing-library/react';
 
 import {
+  BANNER_CLEARANCE_PROPERTY,
   STICKY_CLEARANCE_PROPERTY,
   cssLengthToPx,
   stickyClearancePx,
+  useBannerClearance,
   useStickyClearance,
 } from '../useStickyClearance';
 
@@ -50,5 +52,30 @@ describe('useStickyClearance', () => {
   it('publishes nothing while the bar is not sticky', () => {
     render(<Bar sticky={false} />);
     expect(document.documentElement.style.getPropertyValue(STICKY_CLEARANCE_PROPERTY)).toBe('');
+  });
+});
+
+function Banner() {
+  const ref = useRef<HTMLDivElement>(null);
+  useBannerClearance(ref);
+  return <div ref={ref} data-maintenance-banner />;
+}
+
+describe('useBannerClearance', () => {
+  it('publishes the banner height for the page shell and scroll padding, and removes it with the banner', () => {
+    const height = jest
+      .spyOn(HTMLElement.prototype, 'getBoundingClientRect')
+      .mockReturnValue({ height: 57.4 } as DOMRect);
+    try {
+      const { unmount } = render(<Banner />);
+      // Rounded up: a fraction of a pixel under the banner would still cover the H1's top.
+      expect(document.documentElement.style.getPropertyValue(BANNER_CLEARANCE_PROPERTY)).toBe(
+        '58px',
+      );
+      unmount();
+      expect(document.documentElement.style.getPropertyValue(BANNER_CLEARANCE_PROPERTY)).toBe('');
+    } finally {
+      height.mockRestore();
+    }
   });
 });

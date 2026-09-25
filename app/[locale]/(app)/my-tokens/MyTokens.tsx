@@ -88,7 +88,7 @@ export default function MyTokens() {
                 {t('tokens.page.anchorLink')}
               </Link>
             ) : null}
-            <NftMarketplaceButton variant="secondary" label={t('tokens.page.marketplace')} />
+            <NftMarketplaceButton />
           </>
         }
         figures={

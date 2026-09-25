@@ -62,8 +62,7 @@ export const learnTextZh = {
     readingTimeTemplate: '约 {minutes} 分钟读完',
     nextGuideLabel: '下一篇指南',
     contents: {
-      heading: '本篇目录',
-      railLabel: '本页目录',
+      railLabel: '本页内容',
       openLabel: '目录',
       backToTopLabel: '回到顶部',
     },

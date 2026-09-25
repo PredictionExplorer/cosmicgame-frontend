@@ -612,12 +612,6 @@
       "calendarTitle": "Cosmic Signature 第 {number} 個週期開啟",
       "calendarBody": "下一演繹週期即將開放落筆。第一筆會啟動收官倒數。",
       "calendarCta": "把開啟時間加入日曆",
-      "unitLabels": {
-        "days": "天",
-        "hours": "小時",
-        "minutes": "分",
-        "seconds": "秒"
-      },
       "state": {
         "ready": "已可收官",
         "confirming": "確認中"

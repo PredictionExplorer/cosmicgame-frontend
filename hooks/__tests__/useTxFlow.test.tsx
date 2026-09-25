@@ -6,8 +6,11 @@ import { getChainId } from 'viem/actions';
 // The real encoder (the `viem` entry is a jest mock).
 import { encodeErrorResult } from 'viem/utils';
 
+import { cosmicGameAbi } from '@/contracts/abis';
+
 import { WalletUiProvider } from '@/contexts/WalletUiContext';
-import { reportError } from '@/utils/errors';
+import { clearTrustedAddressCache } from '@/lib/writeTargets';
+import { reportError, reportErrorThrottled } from '@/utils/errors';
 
 import { useTxFlow, useTxStageLabel, type TxRunOptions, type TxStage } from '../useTxFlow';
 
@@ -24,6 +27,7 @@ jest.mock('viem/actions', () => ({ getChainId: jest.fn() }));
 jest.mock('../../utils/errors', () => ({
   ...jest.requireActual('../../utils/errors'),
   reportError: jest.fn(),
+  reportErrorThrottled: jest.fn(),
 }));
 
 const APP_CHAIN = 421614;
@@ -31,14 +35,35 @@ const mockConfig = { id: 'config' };
 let mockAddress: `0x${string}` | undefined = '0xUser';
 const mockSwitchChainAsync = jest.fn();
 const mockWaitForReceipt = jest.fn();
+const mockReadContract = jest.fn();
+const mockSimulateContract = jest.fn();
 let mockHasPublicClient = true;
+
+/** The game the dashboard names, and what it names on-chain. */
+const GAME = '0x00000000000000000000000000000000000000a1';
+const ALLOCATIONS_WALLET = '0x00000000000000000000000000000000000000b2';
+const ANCHORING_WALLET = '0x00000000000000000000000000000000000000c3';
+const OUTSIDER = '0x00000000000000000000000000000000000000ee';
+const ON_CHAIN: Record<string, string> = {
+  prizesWallet: ALLOCATIONS_WALLET,
+  stakingWalletCosmicSignatureNft: ANCHORING_WALLET,
+};
 
 jest.mock('wagmi', () => ({
   useConfig: () => mockConfig,
   useConnection: () => ({ address: mockAddress, chainId: APP_CHAIN }),
   usePublicClient: () =>
-    mockHasPublicClient ? { waitForTransactionReceipt: mockWaitForReceipt } : undefined,
+    mockHasPublicClient
+      ? {
+          waitForTransactionReceipt: mockWaitForReceipt,
+          readContract: mockReadContract,
+          simulateContract: mockSimulateContract,
+        }
+      : undefined,
   useSwitchChain: () => ({ mutateAsync: mockSwitchChainAsync }),
+}));
+jest.mock('../../contexts/ContractAddressesContext', () => ({
+  useContractAddresses: () => ({ cosmicGame: '0x00000000000000000000000000000000000000a1' }),
 }));
 
 const mockToast = toast as unknown as Record<
@@ -50,12 +75,13 @@ const mockGetConnectorClient = getConnectorClient as jest.Mock;
 const mockGetChainId = getChainId as jest.Mock;
 const mockReportError = reportError as jest.Mock;
 
-const SIGN_REQUEST = { address: '0xContract', abi: [], functionName: 'doIt' } as const;
+const SIGN_REQUEST = { address: GAME, abi: [], functionName: 'doIt' } as const;
+
+type WriteRequest = Parameters<Parameters<TxRunOptions['write']>[0]['writeContract']>[0];
 
 function baseOptions(overrides: Partial<TxRunOptions> = {}): TxRunOptions {
   return {
-    write: (ctx) =>
-      ctx.writeContract(SIGN_REQUEST as unknown as Parameters<typeof ctx.writeContract>[0]),
+    write: (ctx) => ctx.writeContract(SIGN_REQUEST as unknown as WriteRequest),
     successMessage: 'Done.',
     failureMessage: 'Action fallback.',
     ...overrides,
@@ -64,11 +90,17 @@ function baseOptions(overrides: Partial<TxRunOptions> = {}): TxRunOptions {
 
 beforeEach(() => {
   jest.clearAllMocks();
+  clearTrustedAddressCache();
   mockAddress = '0xUser';
   mockHasPublicClient = true;
   mockGetConnectorClient.mockResolvedValue({ id: 'connector-client' });
   mockGetChainId.mockResolvedValue(APP_CHAIN);
   mockSwitchChainAsync.mockResolvedValue(undefined);
+  mockReadContract.mockImplementation(
+    async ({ functionName }: { functionName: string }) =>
+      ON_CHAIN[functionName] ?? '0x0000000000000000000000000000000000000000',
+  );
+  mockSimulateContract.mockResolvedValue({ result: undefined });
   mockWriteContract.mockResolvedValue('0xhash');
   mockWaitForReceipt.mockImplementation(async ({ hash }: { hash: string }) => ({
     status: 'success',
@@ -468,6 +500,28 @@ describe('useTxFlow — receipts', () => {
     expect(mockToast.error).not.toHaveBeenCalled();
   });
 
+  it('never reports a different transaction on the same nonce as this action confirming', async () => {
+    mockWaitForReceipt.mockImplementation(async ({ onReplaced }) => {
+      onReplaced?.({ reason: 'replaced', transaction: { hash: '0xother' } });
+      return { status: 'success', transactionHash: '0xother', logs: [] };
+    });
+    const onConfirmed = jest.fn();
+    const { result, hook } = await run(baseOptions({ onConfirmed }));
+
+    expect(result).toEqual({ status: 'cancelled', hash: '0xother', replaced: true });
+    expect(hook.result.current.stage).toEqual({
+      status: 'cancelled',
+      hash: '0xother',
+      replaced: true,
+    });
+    expect(onConfirmed).not.toHaveBeenCalled();
+    expect(mockToast.success).not.toHaveBeenCalled();
+    expect(mockToast.info).toHaveBeenCalledWith(
+      'toasts.tx.status.replacedInWallet',
+      expect.objectContaining({ description: expect.anything() }),
+    );
+  });
+
   it('fails before any wallet prompt when it could not follow the transaction', async () => {
     mockHasPublicClient = false;
     mockGetChainId.mockResolvedValue(1);
@@ -477,6 +531,184 @@ describe('useTxFlow — receipts', () => {
     expect(mockSwitchChainAsync).not.toHaveBeenCalled();
     expect(mockWriteContract).not.toHaveBeenCalled();
     expect(mockToast.error).toHaveBeenCalledWith('toasts.tx.error.network', expect.anything());
+  });
+});
+
+describe('useTxFlow — write targets', () => {
+  const writeTo = (request: Record<string, unknown>) =>
+    baseOptions({ write: (ctx) => ctx.writeContract(request as unknown as WriteRequest) });
+
+  it('reads the protocol contracts from the game on-chain, once per run', async () => {
+    const { result } = await run(
+      baseOptions({
+        approvals: [
+          {
+            description: 'Why',
+            write: (ctx) =>
+              ctx.writeContract({
+                address: OUTSIDER,
+                abi: [],
+                functionName: 'approve',
+                args: [ALLOCATIONS_WALLET, 5n],
+              } as unknown as WriteRequest),
+          },
+        ],
+      }),
+    );
+
+    expect(result.status).toBe('confirmed');
+    expect(mockReadContract).toHaveBeenCalledWith(
+      expect.objectContaining({ address: GAME, functionName: 'prizesWallet' }),
+    );
+    // Eight getters, read once although the run wrote twice.
+    expect(mockReadContract).toHaveBeenCalledTimes(8);
+  });
+
+  it('refuses a write to a contract the game does not name, before any prompt', async () => {
+    const { result, hook } = await run(
+      writeTo({ address: OUTSIDER, abi: [], functionName: 'bidWithEth', value: 1n }),
+    );
+
+    expect(result).toMatchObject({ status: 'failed', error: { kind: 'untrusted-contract' } });
+    expect(result).not.toHaveProperty('hash');
+    expect(mockSimulateContract).not.toHaveBeenCalled();
+    expect(mockWriteContract).not.toHaveBeenCalled();
+    expect(mockToast.error).toHaveBeenCalledWith(
+      'toasts.tx.error.untrustedContract',
+      expect.anything(),
+    );
+    expect(hook.result.current.stage).toMatchObject({ status: 'failed' });
+  });
+
+  it('refuses an approval that names a spender the game does not name', async () => {
+    const { result } = await run(
+      writeTo({
+        address: OUTSIDER,
+        abi: [],
+        functionName: 'setApprovalForAll',
+        args: [OUTSIDER, true],
+      }),
+    );
+    expect(result).toMatchObject({ status: 'failed', error: { kind: 'untrusted-contract' } });
+    expect(mockWriteContract).not.toHaveBeenCalled();
+  });
+
+  it("allows an approval on the participant's own token to a protocol contract", async () => {
+    const { result } = await run(
+      writeTo({
+        address: OUTSIDER,
+        abi: [],
+        functionName: 'setApprovalForAll',
+        args: [ANCHORING_WALLET, true],
+      }),
+    );
+    expect(result.status).toBe('confirmed');
+  });
+});
+
+describe('useTxFlow — simulation', () => {
+  it('simulates the call from the connected account before the wallet prompt', async () => {
+    await run(
+      baseOptions({
+        write: (ctx) =>
+          ctx.writeContract({
+            ...SIGN_REQUEST,
+            args: [1n],
+            value: 5n,
+            gas: 21_000n,
+            maxFeePerGas: 9n,
+          } as unknown as WriteRequest),
+      }),
+    );
+
+    expect(mockSimulateContract).toHaveBeenCalledWith({
+      address: GAME,
+      abi: [],
+      functionName: 'doIt',
+      args: [1n],
+      value: 5n,
+      account: '0xUser',
+    });
+    expect(mockSimulateContract.mock.invocationCallOrder[0]).toBeLessThan(
+      mockWriteContract.mock.invocationCallOrder[0]!,
+    );
+  });
+
+  it('stops a transaction the contract would reject: nothing is signed or mined', async () => {
+    // The revert as the node returns it, against the game's real error
+    // definition: `UsedRandomWalkNft(string errStr, uint256 randomWalkNftId)`.
+    const data = encodeErrorResult({
+      abi: cosmicGameAbi,
+      errorName: 'UsedRandomWalkNft',
+      args: ['Already used.', 7n],
+    });
+    mockSimulateContract.mockRejectedValue(
+      Object.assign(new Error('execution reverted'), {
+        name: 'ContractFunctionExecutionError',
+        cause: { name: 'ContractFunctionRevertedError', raw: data },
+      }),
+    );
+    const { result } = await run(baseOptions());
+
+    expect(result).toMatchObject({
+      status: 'failed',
+      error: { kind: 'would-revert', contractErrorName: 'UsedRandomWalkNft' },
+    });
+    expect(result).not.toHaveProperty('hash');
+    expect(mockWriteContract).not.toHaveBeenCalled();
+    expect(mockToast.error).toHaveBeenCalledWith(
+      'toasts.gesture.contractErrors.usedRandomWalkNft',
+      expect.anything(),
+    );
+  });
+
+  it('stops a transaction the wallet cannot pay for', async () => {
+    mockSimulateContract.mockRejectedValue({
+      name: 'InsufficientFundsError',
+      message: 'insufficient funds for gas * price + value',
+    });
+    const { result } = await run(baseOptions());
+    expect(result).toMatchObject({ status: 'failed', error: { kind: 'insufficient-funds' } });
+    expect(mockWriteContract).not.toHaveBeenCalled();
+  });
+
+  it('lets the wallet decide when the simulation itself cannot run', async () => {
+    mockSimulateContract.mockRejectedValue(
+      Object.assign(new Error('HTTP request failed.'), { name: 'HttpRequestError' }),
+    );
+    const { result } = await run(baseOptions());
+    expect(result).toMatchObject({ status: 'confirmed' });
+    expect(mockWriteContract).toHaveBeenCalled();
+    expect(reportErrorThrottled).toHaveBeenCalledWith(expect.any(Error), 'tx-simulate');
+  });
+
+  it('reports a failure after a confirmed approval without the approval hash', async () => {
+    mockWriteContract.mockResolvedValueOnce('0xapprove').mockRejectedValueOnce({
+      name: 'InsufficientFundsError',
+      message: 'insufficient funds for gas',
+    });
+    const { result, hook } = await run(
+      baseOptions({
+        approvals: [
+          {
+            description: 'Why',
+            write: (ctx) =>
+              ctx.writeContract({
+                address: OUTSIDER,
+                abi: [],
+                functionName: 'approve',
+                args: [ALLOCATIONS_WALLET, 5n],
+              } as unknown as WriteRequest),
+          },
+        ],
+      }),
+    );
+
+    expect(result).toMatchObject({ status: 'failed', error: { kind: 'insufficient-funds' } });
+    expect(result).not.toHaveProperty('hash');
+    const stage = hook.result.current.stage as Extract<TxStage, { status: 'failed' }>;
+    expect(stage.hash).toBeUndefined();
+    expect(mockToast.error.mock.calls[0]![1]).not.toHaveProperty('description');
   });
 });
 

@@ -84,7 +84,7 @@ describe('CycleTimeline', () => {
       `Public Goods${protocolFacts.publicGoodsPercentage}%`,
     );
     expect(track('nextCycle')).toHaveTextContent(
-      `Next cycle${protocolFacts.compoundingReservePercentage}%`,
+      `Compounding Cycle Reserve${protocolFacts.compoundingReservePercentage}%`,
     );
   });
 
@@ -107,8 +107,11 @@ describe('CycleTimeline', () => {
 
   it('closes on a real Signature with its wall label and a link to the record', () => {
     renderTimeline();
-    expect(screen.getByText('The Signature of Cycle 1')).toBeInTheDocument();
-    expect(screen.getByText('Cosmic Signature #000024')).toBeInTheDocument();
+    // The shared wall label: "Signature #000024" (the number in mono), then its cycle.
+    const caption = screen.getByText('#000024').closest('figcaption')!;
+    expect(screen.getByText('#000024')).toHaveClass('type-mono-inline');
+    expect(caption).toHaveTextContent('common.signature.untitled(id=#000024)');
+    expect(caption).toHaveTextContent('common.signature.cycle(n=1)');
     expect(screen.getByRole('link', { name: /View this Signature/ })).toHaveAttribute(
       'href',
       '/detail/24',

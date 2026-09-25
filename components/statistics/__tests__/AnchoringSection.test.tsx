@@ -106,7 +106,7 @@ describe('AnchoringSection', () => {
     );
     const panel = screen.getByRole('tabpanel', { name: 'Cosmic Signature NFT' });
     for (const value of overviewValues(panel)) expect(value).not.toMatch(/\d|—/);
-    expect(panel.querySelector('dl .animate-pulse')).not.toBeNull();
+    expect(panel.querySelector('dl [data-slot="skeleton"]')).not.toBeNull();
   });
 
   it('shows a dashboard that failed as unavailable figures, not zeros', () => {

@@ -1,17 +1,11 @@
 import { renderHook } from '@testing-library/react';
 import { usePublicClient, useWalletClient, useConnectorClient } from 'wagmi';
 import { getContract, type Abi } from 'viem';
-import { writeContract } from '@wagmi/core';
 
-import { ensureWalletOnRequiredChain } from '@/lib/chainGuard';
 import { reportError } from '@/utils/errors';
 import useContract from '@/hooks/useContract';
 
-// wagmi's config is one stable object for the app's lifetime.
-const mockConfig = { id: 'config' };
-
 jest.mock('wagmi', () => ({
-  useConfig: () => mockConfig,
   usePublicClient: jest.fn(),
   useWalletClient: jest.fn(() => ({ data: undefined })),
   useConnectorClient: jest.fn(() => ({ data: undefined })),
@@ -26,18 +20,11 @@ jest.mock('../../utils/errors', () => ({
   reportError: jest.fn(),
 }));
 
-jest.mock('../../lib/chainGuard', () => {
-  const actual = jest.requireActual('../../lib/chainGuard');
-  return { ...actual, ensureWalletOnRequiredChain: jest.fn(async () => 'ok') };
-});
-
 const mockUsePublicClient = usePublicClient as jest.Mock;
 const mockUseWalletClient = useWalletClient as jest.Mock;
 const mockUseConnectorClient = useConnectorClient as jest.Mock;
 const mockGetContract = getContract as unknown as jest.Mock;
 const mockReportError = reportError as jest.Mock;
-const mockWriteContract = writeContract as jest.Mock;
-const mockEnsureChain = ensureWalletOnRequiredChain as jest.Mock;
 
 const TEST_ABI = [
   {
@@ -169,86 +156,18 @@ describe('useContract', () => {
     });
   });
 
-  describe('chain-guarded writes', () => {
-    const WRITE_ABI = [
-      ...TEST_ABI,
-      {
-        type: 'function' as const,
-        name: 'transfer',
-        inputs: [
-          { name: 'to', type: 'address' },
-          { name: 'amount', type: 'uint256' },
-        ],
-        outputs: [],
-        stateMutability: 'nonpayable' as const,
-      },
-      {
-        type: 'function' as const,
-        name: 'poke',
-        inputs: [],
-        outputs: [],
-        stateMutability: 'nonpayable' as const,
-      },
-    ] as const;
-
-    /** The guarded writes, untyped: viem's typed signatures want a full wallet client. */
-    type GuardedWrites = Record<string, (...params: unknown[]) => Promise<string>>;
-    const writesOf = (contract: unknown) => (contract as { write: GuardedWrites }).write;
-
-    beforeEach(() => {
+  describe('no second write path', () => {
+    it('returns the read-only contract as viem builds it, with no write proxy', () => {
+      const readOnly = { read: {}, address: TEST_ADDRESS, abi: TEST_ABI };
       mockUsePublicClient.mockReturnValue({ chain: { id: 421614 } });
-      mockGetContract.mockImplementation(() => ({ read: {}, write: {} }));
-      mockEnsureChain.mockResolvedValue('ok');
-      mockWriteContract.mockResolvedValue('0xwritten');
-    });
+      mockGetContract.mockReturnValue(readOnly);
 
-    it('checks the wallet chain, then writes on the app chain with the current signer', async () => {
-      const { result } = renderHook(() => useContract(TEST_ADDRESS, WRITE_ABI));
+      const { result } = renderHook(() => useContract(TEST_ADDRESS, TEST_ABI));
 
-      const hash = await writesOf(result.current).transfer!(
-        ['0x0000000000000000000000000000000000000002', 5n],
-        { gas: 21_000n },
-      );
-
-      expect(hash).toBe('0xwritten');
-      expect(mockEnsureChain).toHaveBeenCalledWith({ id: 'config' });
-      expect(mockWriteContract).toHaveBeenCalledWith(
-        { id: 'config' },
-        expect.objectContaining({
-          address: TEST_ADDRESS,
-          functionName: 'transfer',
-          args: ['0x0000000000000000000000000000000000000002', 5n],
-          gas: 21_000n,
-          chainId: 421614,
-        }),
-      );
-    });
-
-    it('treats a lone argument of an argument-less function as options', async () => {
-      const { result } = renderHook(() => useContract(TEST_ADDRESS, WRITE_ABI));
-
-      await writesOf(result.current).poke!({ value: 1n });
-
-      const request = mockWriteContract.mock.calls[0]![1] as Record<string, unknown>;
-      expect(request).toMatchObject({ functionName: 'poke', value: 1n });
-      expect(request).not.toHaveProperty('args');
-    });
-
-    it('does not write when the wallet stays on another network', async () => {
-      mockEnsureChain.mockResolvedValue('failed');
-      const { result } = renderHook(() => useContract(TEST_ADDRESS, WRITE_ABI));
-
-      await expect(writesOf(result.current).poke!()).rejects.toMatchObject({
-        name: 'ChainMismatchError',
-      });
-      expect(mockWriteContract).not.toHaveBeenCalled();
-    });
-
-    it('reports a declined switch as a rejection', async () => {
-      mockEnsureChain.mockResolvedValue('rejected');
-      const { result } = renderHook(() => useContract(TEST_ADDRESS, WRITE_ABI));
-
-      await expect(writesOf(result.current).poke!()).rejects.toMatchObject({ code: 4001 });
+      // Every write goes through useTxFlow's ctx.writeContract (target check,
+      // simulation, lifecycle toast); a contract.write here would skip it.
+      expect(result.current).toBe(readOnly);
+      expect(result.current).not.toHaveProperty('write');
     });
   });
 

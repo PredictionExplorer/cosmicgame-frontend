@@ -412,7 +412,6 @@ export default async function WhitePaperPage({ params }: PageProps) {
   );
 
   const contentsCopy = {
-    heading: content.tocHeading,
     railLabel: reading.railLabel,
     openLabel: reading.openContentsLabel,
     backToTopLabel: reading.backToTopLabel,
@@ -469,7 +468,7 @@ export default async function WhitePaperPage({ params }: PageProps) {
         }
       />
 
-      <div className="lg:grid lg:grid-cols-[minmax(0,14rem)_minmax(0,1fr)] lg:gap-12 xl:grid-cols-[minmax(0,16rem)_minmax(0,1fr)] xl:gap-16">
+      <div className="reading-grid">
         <div className="lg:row-span-4">
           <ReadingContents
             entries={entries}

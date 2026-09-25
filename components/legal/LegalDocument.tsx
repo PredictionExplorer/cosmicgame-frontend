@@ -109,7 +109,7 @@ export function LegalDocument({
         tabs={<TrustCenterTabs current={page} labels={labels.tabs} />}
       />
 
-      <div className="lg:grid lg:grid-cols-[minmax(0,12rem)_minmax(0,1fr)] lg:gap-x-16">
+      <div className="reading-grid">
         <LegalContentsRail
           items={items}
           title={labels.contents}

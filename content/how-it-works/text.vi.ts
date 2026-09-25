@@ -112,7 +112,6 @@ export const howItWorksTextVi = {
   payoff: {
     heading: 'Mỗi chu kỳ khép lại bằng một Signature',
     body: 'Mỗi nét bút góp phần tạo nên tác phẩm của chu kỳ. Khi chu kỳ hoàn tất, Signature được khắc thành một Cosmic Signature NFT và trao cho người đặt nét bút cuối cùng cùng với phân bổ Signature.',
-    caption: 'Signature của chu kỳ {cycle}',
     linkLabel: 'Xem Signature này',
   },
   stepByStep: {

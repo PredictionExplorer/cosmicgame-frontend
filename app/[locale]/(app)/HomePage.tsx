@@ -958,7 +958,9 @@ const HomePage = ({
         claimWait={claimWait}
         onFinalize={() => void handleFinalize('dock')}
         moment={position.moment}
-        onOpenSheet={openGestureSheet}
+        // While any of the form is on screen, the dock takes the reader to it
+        // rather than opening a second copy of it in the sheet.
+        onOpenSheet={formInView ? scrollToGesturePanel : openGestureSheet}
         onJumpToPanel={scrollToGesturePanel}
       />
 

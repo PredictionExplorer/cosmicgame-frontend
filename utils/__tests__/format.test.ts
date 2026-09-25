@@ -23,7 +23,6 @@ import {
   formatZonedDateTimeParts,
   isZeroAddress,
   sameAddress,
-  shortenHex,
   toIsoDateTime,
   toIsoDuration,
   type AmountContext,
@@ -243,7 +242,7 @@ describe('formatDateTime', () => {
       uk: '22 вер., 23:04',
       ko: '9월 22일 23:04',
       ja: '9月22日 23:04',
-      vi: '22/9, 23:04',
+      vi: '22/09, 23:04',
     });
   });
 
@@ -258,7 +257,7 @@ describe('formatDateTime', () => {
         uk: '5 січ. 2025 р., 07:08:09',
         ko: '2025년 1월 5일 07:08:09',
         ja: '2025年1月5日 07:08:09',
-        vi: '5/1/2025, 07:08:09',
+        vi: '05/01/2025, 07:08:09',
       },
     );
     expect(formatDateTime(lastYear, { timeZone: 'utc', now, year: 'never' })).toBe('Jan 05, 07:08');
@@ -278,7 +277,7 @@ describe('formatDateTime', () => {
         uk: '22 вер. 2026 р., 23:04:45',
         ko: '2026년 9월 22일 23:04:45',
         ja: '2026年9月22日 23:04:45',
-        vi: '22/9/2026, 23:04:45',
+        vi: '22/09/2026, 23:04:45',
       },
     );
   });
@@ -365,7 +364,7 @@ describe('formatTimeZoneLabel / formatDateTimeTitle / formatRelativeTime', () =>
         uk: '22 вер. 2026 р., 23:04:45 UTC · 3 години тому',
         ko: '2026년 9월 22일 23:04:45 UTC · 3시간 전',
         ja: '2026年9月22日 23:04:45（UTC） · 3時間前',
-        vi: '22/9/2026, 23:04:45 UTC · 3 giờ trước',
+        vi: '22/09/2026, 23:04:45 UTC · 3 giờ trước',
       },
     );
     expect(formatDateTimeTitle(timestamp, { timeZone: 'Asia/Kolkata' })).toBe(
@@ -475,12 +474,6 @@ describe('addresses', () => {
     expect(formatAddress('vitalik.eth')).toBe('vitalik.eth');
     expect(formatAddress('')).toBe('');
     expect(formatAddress(undefined)).toBe('');
-  });
-
-  it('routes the legacy shortenHex through the one standard, whatever length is passed', () => {
-    expect(shortenHex(lower, 6)).toBe(formatAddress(lower));
-    expect(shortenHex(lower, 8)).toBe(formatAddress(lower));
-    expect(shortenHex(lower)).toBe(formatAddress(lower));
   });
 
   it('recognizes the zero address and compares addresses case-insensitively', () => {

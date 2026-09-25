@@ -880,7 +880,7 @@ export const whitePaperTextZhTw = {
   },
   licenseNote: '本文與 Cosmic Signature 全部專案自有材料一樣，依 CC0 1.0 獻入公有領域。',
   reading: {
-    railLabel: '本頁目錄',
+    railLabel: '本頁內容',
     openContentsLabel: '目錄',
     backToTopLabel: '回到頂端',
     headingLinkTemplate: '本節連結：{title}',

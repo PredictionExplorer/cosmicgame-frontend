@@ -201,7 +201,7 @@ export interface AllocationsDisclosureProps {
 }
 
 /**
- * Where the cycle reserve goes: the full allocation ledger behind a native
+ * Where the Cycle Reserve goes: the full allocation ledger behind a native
  * disclosure, so it stays in the server HTML and opens from the keyboard.
  */
 export function AllocationsDisclosure({ children, className }: AllocationsDisclosureProps) {

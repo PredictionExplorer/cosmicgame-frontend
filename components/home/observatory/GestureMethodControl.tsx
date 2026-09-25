@@ -4,6 +4,7 @@ import { useId } from 'react';
 import { useTranslations } from 'next-intl';
 
 import { cn } from '@/lib/utils';
+import { SEGMENT_SELECTED_CLASS } from '@/components/ui/tabs-variants';
 
 import { ValuePending } from './ValuePending';
 
@@ -112,11 +113,10 @@ export function GestureMethodControl({
                 columns &&
                   '@min-[30rem]/gesture:min-h-13 @min-[30rem]/gesture:flex-col @min-[30rem]/gesture:items-start @min-[30rem]/gesture:justify-center',
                 'transition-[background-color,color,box-shadow] duration-[var(--duration-fast)] ease-[var(--ease-out-soft)]',
+                // The system's segmented selection (tabs.tsx): raised, edged by
+                // the 3:1 control boundary, never a --primary rule.
                 isSelected
-                  ? cn(
-                      'bg-surface-raised text-foreground shadow-[inset_2px_0_0_hsl(var(--primary))]',
-                      columns && '@min-[30rem]/gesture:shadow-[inset_0_-2px_0_hsl(var(--primary))]',
-                    )
+                  ? SEGMENT_SELECTED_CLASS
                   : 'text-muted-foreground hover:bg-surface hover:text-foreground',
               )}
             >

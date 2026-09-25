@@ -1,6 +1,6 @@
 import '@testing-library/jest-dom';
 
-import { convertTimestampToDateTime, shortenHex } from '@/utils';
+import { formatAddress } from '@/utils';
 
 import AttachedNFTTable from '@/components/attachments/AttachedNFTTable';
 
@@ -71,12 +71,10 @@ describe('AttachedNFTTable', () => {
     ]) {
       expect(interactive.getAllByText(header).length).toBeGreaterThanOrEqual(1);
     }
-    expect(
-      interactive.getByText(convertTimestampToDateTime(mockData[0]!.TimeStamp)),
-    ).toBeInTheDocument();
-    expect(interactive.getByText(shortenHex(mockData[0]!.DonorAddr, 6))).toBeInTheDocument();
+    expect(interactive.getByText('Sep 14, 2023, 02:45')).toBeInTheDocument();
+    expect(interactive.getByText(formatAddress(mockData[0]!.DonorAddr))).toBeInTheDocument();
     expect(interactive.getByText(String(mockData[0]!.RoundNum))).toBeInTheDocument();
-    expect(interactive.getByText(shortenHex(mockData[0]!.TokenAddr, 6))).toBeInTheDocument();
+    expect(interactive.getByText(formatAddress(mockData[0]!.TokenAddr))).toBeInTheDocument();
     // Without a name in its metadata, the piece is titled by its number.
     expect(interactive.getByText(`#${mockData[0]!.NFTTokenId}`)).toBeInTheDocument();
 

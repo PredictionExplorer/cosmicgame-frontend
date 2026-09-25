@@ -152,8 +152,7 @@
       "emptyTitle": "未持有 Cosmic Signature NFT",
       "emptyDescription": "此地址持有的 Cosmic Signature NFT 会显示在这里。",
       "showAll": "显示全部 {count} 枚",
-      "showFewer": "收起",
-      "anchoredTag": "已锚定"
+      "showFewer": "收起"
     },
     "quickActions": {
       "anchor": {
@@ -227,7 +226,6 @@
     "page": {
       "title": "我的 NFT",
       "subtitle": "已连接钱包中的 Cosmic Signature NFT",
-      "marketplace": "买卖 NFT",
       "anchorLink": "锚定 NFT",
       "loadErrorTitle": "未能加载代币",
       "loadErrorMessage": "未能加载 Cosmic Signature NFT。",

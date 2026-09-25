@@ -40,6 +40,8 @@ export function useTxErrorMessage(): (info: TxErrorInfo, fallback?: string) => s
           return t('tx.error.timeout', { explorer: EXPLORER_NAME });
         case 'network':
           return t('tx.error.network');
+        case 'untrusted-contract':
+          return t('tx.error.untrustedContract');
         default:
           return fallback ?? t('generic.rpcFailure');
       }

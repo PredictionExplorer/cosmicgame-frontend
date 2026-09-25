@@ -37,14 +37,26 @@ jest.mock('../web3', () => ({
   useActiveWeb3React: () => ({ account: USER, chainId: 421614, active: true }),
 }));
 
-function nftContract() {
+/**
+ * A read-only contract (as `useContract` returns it) plus, under `write`, one
+ * mock per function that receives the args the flow's `ctx.writeContract`
+ * was called with for this contract's address.
+ */
+function nftContract(address: string) {
   return {
+    address,
+    abi: [],
     read: { isApprovedForAll: jest.fn().mockResolvedValue(false) },
-    write: { setApprovalForAll: jest.fn().mockResolvedValue('0xapprove') },
+    write: { setApprovalForAll: jest.fn().mockResolvedValue('0xapprove') } as Record<
+      string,
+      jest.Mock
+    >,
   };
 }
-function anchoringContract() {
+function anchoringContract(address: string) {
   return {
+    address,
+    abi: [],
     write: {
       stake: jest.fn().mockResolvedValue('0xstake'),
       stakeMany: jest.fn().mockResolvedValue('0xstakemany'),
@@ -54,10 +66,12 @@ function anchoringContract() {
   };
 }
 
-let mockCsNft = nftContract();
-let mockRwalkNft = nftContract();
-let mockCstAnchoring: ReturnType<typeof anchoringContract> | null = anchoringContract();
-let mockRwlkAnchoring: ReturnType<typeof anchoringContract> | null = anchoringContract();
+let mockCsNft = nftContract('0xCsNft');
+let mockRwalkNft = nftContract('0xRwalkNft');
+let mockCstAnchoring: ReturnType<typeof anchoringContract> | null =
+  anchoringContract(ANCHORING_CST_WALLET);
+let mockRwlkAnchoring: ReturnType<typeof anchoringContract> | null =
+  anchoringContract(ANCHORING_RWALK_WALLET);
 
 jest.mock('../useCosmicSignatureContract', () => ({
   __esModule: true,
@@ -79,10 +93,20 @@ beforeEach(() => {
   jest.useFakeTimers();
   jest.clearAllMocks();
   mockTx.reset();
-  mockCsNft = nftContract();
-  mockRwalkNft = nftContract();
-  mockCstAnchoring = anchoringContract();
-  mockRwlkAnchoring = anchoringContract();
+  mockCsNft = nftContract('0xCsNft');
+  mockRwalkNft = nftContract('0xRwalkNft');
+  mockCstAnchoring = anchoringContract(ANCHORING_CST_WALLET);
+  mockRwlkAnchoring = anchoringContract(ANCHORING_RWALK_WALLET);
+  // Every write goes through the flow's one write path; route it to the
+  // mock of the contract it targets.
+  mockTx.writeContract.mockImplementation(
+    async (request: { address: string; functionName: string; args: unknown[] }) => {
+      const target = [mockCsNft, mockRwalkNft, mockCstAnchoring, mockRwlkAnchoring].find(
+        (contract) => contract?.address === request.address,
+      );
+      return (target!.write as Record<string, jest.Mock>)[request.functionName]!(request.args);
+    },
+  );
 });
 
 afterEach(() => {
@@ -156,8 +180,8 @@ describe('useAnchorActions', () => {
       expect(mockNotify).toHaveBeenCalledWith('error', 'toasts.anchor.walletNotReady');
     });
 
-    it('fails with the anchoring fallback when the write returns no hash', async () => {
-      mockCstAnchoring!.write.stake.mockResolvedValueOnce(undefined);
+    it('fails with the anchoring fallback when the write fails', async () => {
+      mockCstAnchoring!.write.stake.mockRejectedValueOnce(new Error('execution reverted'));
       mockCsNft.read.isApprovedForAll.mockResolvedValue(true);
       const { result } = renderHook(() => useAnchorActions());
       await act(async () => {

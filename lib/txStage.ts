@@ -28,11 +28,17 @@ export type TxStage =
   | {
       status: 'cancelled';
       /**
-       * Set when the wallet's "cancel" replaced a sent transaction: the mined
+       * Set when the wallet replaced a sent transaction: the mined
        * replacement, which paid a network fee. Absent for a declined prompt,
        * where nothing was sent.
        */
       hash?: Hash;
+      /**
+       * True when the replacement was a different transaction reusing the
+       * nonce rather than the wallet's "cancel": it may have sent something
+       * else, so "nothing else was sent" would be wrong.
+       */
+      replaced?: boolean;
     };
 
 export type TxStatusName = TxStage['status'];

@@ -45,7 +45,7 @@ describe('Learn guide share cards', () => {
     expect(card.art).toEqual([
       {
         src: expect.stringMatching(/^data:image\/png;base64,/),
-        label: 'Signature #000014 · Cycle 0',
+        label: 'Signature #000014 · Cycle #0',
       },
     ]);
     expect(learnArticleCardAlt('en', 'how-gestures-work')).toBe(
@@ -89,7 +89,7 @@ describe('Learn guide share cards', () => {
         eyebrow: 'WHITE PAPER',
         title: 'Cosmic Signature',
         subhead: 'A Procedural On-Chain Art Protocol on Arbitrum',
-        art: [expect.objectContaining({ label: 'Signature #000024 · Cycle 1' })],
+        art: [expect.objectContaining({ label: 'Signature #000024 · Cycle #1' })],
       }),
     );
 
@@ -103,7 +103,7 @@ describe('Learn guide share cards', () => {
       expect.objectContaining({
         eyebrow: 'ABOUT THE PROTOCOL',
         title: 'About Cosmic Signature',
-        art: [expect.objectContaining({ label: 'Signature #000002 · Cycle 0' })],
+        art: [expect.objectContaining({ label: 'Signature #000002 · Cycle #0' })],
       }),
     );
   });

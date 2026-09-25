@@ -46,12 +46,6 @@
     "liveClock": "Live cycle clock",
     "cycleClock": "Cycle clock",
     "gestureCount": "{count, plural, one {# Gesture} other {# Gestures}}",
-    "units": {
-      "days": "days",
-      "hours": "hours",
-      "minutes": "minutes",
-      "seconds": "seconds"
-    },
     "duration": {
       "days": "{count, plural, one {# day} other {# days}}",
       "hours": "{count, plural, one {# hour} other {# hours}}",
@@ -70,7 +64,6 @@
     "resumeRotation": "Resume the artwork rotation",
     "playAnimation": "Play the animation",
     "pauseAnimation": "Pause the animation",
-    "unavailable": "Artwork unavailable",
-    "untitled": "Signature {tokenLabel}"
+    "unavailable": "Artwork unavailable"
   }
 }

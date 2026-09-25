@@ -34,6 +34,7 @@ describe('TxStatus', () => {
     [{ status: 'cancelled' }, 'toasts.tx.status.cancelled'],
     // A wallet "cancel" after sending: the replacement paid a fee.
     [{ status: 'cancelled', hash: '0xc4' }, 'toasts.tx.status.cancelledInWallet'],
+    [{ status: 'cancelled', hash: '0xc5', replaced: true }, 'toasts.tx.status.replacedInWallet'],
   ])('describes %o', (stage, text) => {
     render(<TxStatus stage={stage} />);
     expect(screen.getByRole('status')).toHaveTextContent(text);

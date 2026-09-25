@@ -299,12 +299,4 @@ export const landingTextVi = {
     heading: 'Mỗi chu kỳ bồi đắp thêm cho bộ sưu tập.',
     body: 'Theo dõi chu kỳ đang diễn ra, đặt nét bút, hoặc xem mọi Signature đã được khắc đến nay.',
   },
-
-  footer: {
-    tagline: 'Giao thức nghệ thuật tạo sinh trên chuỗi Arbitrum.',
-    copyright: '© {year} Cosmic Signature. Tài liệu thuộc dự án: CC0 1.0.',
-    colophon: 'CC0 1.0 · Có thể xác minh công khai · Nghệ thuật tái tạo được',
-    disambiguation:
-      'Cosmic Signature không liên quan đến cơ sở dữ liệu đột biến ung thư COSMIC hay các chữ ký đột biến COSMIC trong sinh học. Đây là một giao thức và ứng dụng nghệ thuật trên chuỗi.',
-  },
 } satisfies LandingText;

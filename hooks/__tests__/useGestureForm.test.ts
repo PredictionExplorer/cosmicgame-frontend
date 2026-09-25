@@ -1,9 +1,7 @@
 import { renderHook, act, waitFor } from '@testing-library/react';
-import { writeContract as wagmiWriteContract } from '@wagmi/core';
 
 import { useGestureForm } from '../useGestureForm';
 import useCosmicGameContract from '../../hooks/useCosmicGameContract';
-import api from '../../services/api';
 import { resetUxScenarioForTest } from '../../lib/uxCycleScenarios';
 import { createFakeTxFlow } from '../../test-utils/txFlow';
 import { ERC20_TRANSFER_TOPIC } from '../../lib/receiptTransfers';
@@ -17,8 +15,6 @@ jest.mock('@wagmi/core', () => ({
   getConnectorClient: jest.fn().mockResolvedValue(undefined),
   writeContract: jest.fn().mockResolvedValue('0xhash'),
 }));
-
-const mockWagmiWriteContract = wagmiWriteContract as jest.MockedFunction<typeof wagmiWriteContract>;
 
 interface LiveCstPreviewTestGlobals {
   __COSMIC_ENABLE_LIVE_CST_PREVIEW_TEST_TIMERS__?: boolean;
@@ -226,7 +222,6 @@ jest.mock('../../config/networks', () => ({
 
 jest.mock('../../config/constants', () => ({
   ERC721_INTERFACE_ID: '0x80ac58cd',
-  GESTURE_GAS_LIMIT: BigInt(30000000),
 }));
 
 jest.mock('../../contracts/abis', () => ({
@@ -252,9 +247,10 @@ jest.mock('../../utils/contractErrors', () => ({
 /* ────────────────────────────────────────────────────────────────── */
 
 const mockUseCosmicGameContract = useCosmicGameContract as jest.Mock;
-const mockApiGetUserBalance = api.get_user_balance as jest.Mock;
 
 const MAX_UINT256 = BigInt('0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff');
+/** The wallet's CST, read on-chain (`balanceOf`), never from the lagging indexer. */
+const CST_BALANCE = BigInt('1000000000000000000000');
 
 /* ────────────────────────────────────────────────────────────────── */
 /*  Setup / Teardown                                                 */
@@ -270,7 +266,7 @@ beforeEach(() => {
   liveCstGlobals.__COSMIC_LIVE_CST_PREVIEW_TEST_INTERVAL_MS__ = undefined;
   window.history.pushState({}, '', '/');
   resetUxScenarioForTest();
-  mockWagmiWriteContract.mockResolvedValue('0xhash' as `0x${string}`);
+  mockTx.writeContract.mockResolvedValue('0xhash' as `0x${string}`);
 
   mockGestureWithEth.mockResolvedValue('0xhash');
   mockGestureWithCst.mockResolvedValue('0xhash');
@@ -286,6 +282,7 @@ beforeEach(() => {
   mockGetCode.mockResolvedValue('0x1234');
   mockReadContract.mockImplementation(async ({ functionName }: { functionName: string }) => {
     if (functionName === 'allowance') return MAX_UINT256;
+    if (functionName === 'balanceOf') return CST_BALANCE;
     return true;
   });
   mockWriteContract.mockResolvedValue('0xhash');
@@ -296,9 +293,6 @@ beforeEach(() => {
   mockGetContractErrorDescriptor.mockReturnValue(null);
   mockEstimateContractGas.mockResolvedValue(BigInt(500_000));
   mockUseCosmicGameContract.mockReturnValue(mockContractObj);
-  mockApiGetUserBalance.mockResolvedValue({
-    CosmicTokenBalance: '1000000000000000000000',
-  });
 
   mockRWLKContract.read.walletOfOwner.mockResolvedValue([BigInt(1), BigInt(2), BigInt(3)]);
 
@@ -721,8 +715,7 @@ describe('useGestureForm', () => {
     await flushAsyncWork();
 
     expect(success).toBe(true);
-    expect(mockWagmiWriteContract).toHaveBeenCalledWith(
-      expect.anything(),
+    expect(mockTx.writeContract).toHaveBeenCalledWith(
       expect.objectContaining({ functionName: 'bidWithEth', account: '0xUser' }),
     );
     expect(mockTx.sentApprovals()).toEqual([]);
@@ -773,8 +766,7 @@ describe('useGestureForm', () => {
     await flushAsyncWork();
 
     expect(success).toBe(true);
-    expect(mockWagmiWriteContract).toHaveBeenCalledWith(
-      expect.anything(),
+    expect(mockTx.writeContract).toHaveBeenCalledWith(
       expect.objectContaining({ functionName: 'bidWithEthAndDonateNft' }),
     );
     await waitFor(() => expect(result.current.nftDonateAddress).toBe(''));
@@ -800,12 +792,10 @@ describe('useGestureForm', () => {
     await result.current.onGesture();
 
     expect(mockTx.sentApprovals()).toEqual(['toasts.gesture.approval.nft(tokenId=42)']);
-    expect(mockWagmiWriteContract).toHaveBeenCalledWith(
-      expect.anything(),
+    expect(mockTx.writeContract).toHaveBeenCalledWith(
       expect.objectContaining({ functionName: 'approve', args: ['0xRaffle', 42n] }),
     );
-    expect(mockWagmiWriteContract).not.toHaveBeenCalledWith(
-      expect.anything(),
+    expect(mockTx.writeContract).not.toHaveBeenCalledWith(
       expect.objectContaining({ functionName: 'setApprovalForAll' }),
     );
   });
@@ -853,8 +843,7 @@ describe('useGestureForm', () => {
     await flushAsyncWork();
 
     expect(success).toBe(true);
-    expect(mockWagmiWriteContract).toHaveBeenCalledWith(
-      expect.anything(),
+    expect(mockTx.writeContract).toHaveBeenCalledWith(
       expect.objectContaining({ functionName: 'bidWithEthAndDonateToken' }),
     );
     await waitFor(() => expect(result.current.tokenDonateAddress).toBe(''));
@@ -880,12 +869,10 @@ describe('useGestureForm', () => {
     await result.current.onGesture();
 
     expect(mockTx.sentApprovals()).toEqual(['toasts.gesture.approval.token(amount=10)']);
-    expect(mockWagmiWriteContract).toHaveBeenCalledWith(
-      expect.anything(),
+    expect(mockTx.writeContract).toHaveBeenCalledWith(
       expect.objectContaining({ functionName: 'approve', args: ['0xRaffle', BigInt(10e18)] }),
     );
-    expect(mockWagmiWriteContract).not.toHaveBeenCalledWith(
-      expect.anything(),
+    expect(mockTx.writeContract).not.toHaveBeenCalledWith(
       expect.objectContaining({ args: ['0xRaffle', MAX_UINT256] }),
     );
   });
@@ -901,11 +888,12 @@ describe('useGestureForm', () => {
     await flushAsyncWork();
 
     expect(success).toBe(true);
-    expect(mockWagmiWriteContract).toHaveBeenCalledWith(
-      expect.anything(),
+    expect(mockTx.writeContract).toHaveBeenCalledWith(
       expect.objectContaining({ functionName: 'bidWithCst' }),
     );
-    expect(mockApiGetUserBalance).toHaveBeenCalled();
+    expect(mockReadContract).toHaveBeenCalledWith(
+      expect.objectContaining({ functionName: 'balanceOf', args: ['0xUser'] }),
+    );
     expect(result.current.isGesturing).toBe(false);
   });
 
@@ -920,8 +908,7 @@ describe('useGestureForm', () => {
     await result.current.onGestureWithCST();
     await flushAsyncWork();
 
-    expect(mockWagmiWriteContract).toHaveBeenCalledWith(
-      expect.anything(),
+    expect(mockTx.writeContract).toHaveBeenCalledWith(
       expect.objectContaining({
         functionName: 'bidWithCst',
         args: [BigInt('1000000000000000000'), '', BigInt('95000000000000000000')],
@@ -941,8 +928,7 @@ describe('useGestureForm', () => {
     await flushAsyncWork();
 
     expect(result.current.gestureCstRewardAmountMinLimitWei).toBe(0n);
-    expect(mockWagmiWriteContract).toHaveBeenCalledWith(
-      expect.anything(),
+    expect(mockTx.writeContract).toHaveBeenCalledWith(
       expect.objectContaining({
         functionName: 'bidWithCst',
         args: [BigInt('1000000000000000000'), '', 0n],
@@ -963,11 +949,12 @@ describe('useGestureForm', () => {
     await flushAsyncWork();
 
     expect(success).toBe(true);
-    expect(mockWagmiWriteContract).toHaveBeenCalledWith(
-      expect.anything(),
+    expect(mockTx.writeContract).toHaveBeenCalledWith(
       expect.objectContaining({ functionName: 'bidWithCst' }),
     );
-    expect(mockApiGetUserBalance).not.toHaveBeenCalled();
+    expect(mockReadContract).not.toHaveBeenCalledWith(
+      expect.objectContaining({ functionName: 'balanceOf' }),
+    );
   });
 
   it('onGesture notifies on insufficient ETH balance', async () => {
@@ -986,7 +973,7 @@ describe('useGestureForm', () => {
       'error',
       'toasts.gesture.validation.insufficientEth(required=0.0102,available=0,network=Arbitrum Sepolia)',
     );
-    expect(mockWagmiWriteContract).not.toHaveBeenCalled();
+    expect(mockTx.writeContract).not.toHaveBeenCalled();
   });
 
   it('lets the wallet decide when the ETH balance cannot be read', async () => {
@@ -1005,7 +992,9 @@ describe('useGestureForm', () => {
   });
 
   it('onGestureWithCST notifies on insufficient CST balance', async () => {
-    mockApiGetUserBalance.mockResolvedValue({ CosmicTokenBalance: '0' });
+    mockReadContract.mockImplementation(async ({ functionName }: { functionName: string }) =>
+      functionName === 'balanceOf' ? 0n : true,
+    );
 
     const { result } = renderHook(() => useGestureForm());
     await flushAsyncWork();
@@ -1040,7 +1029,7 @@ describe('useGestureForm', () => {
 
   it('onGesture treats a dismissed wallet prompt as cancelled, not failed', async () => {
     const rejectionError = { code: 4001, message: 'User rejected' };
-    mockWagmiWriteContract.mockRejectedValueOnce(rejectionError);
+    mockTx.writeContract.mockRejectedValueOnce(rejectionError);
 
     const { result } = renderHook(() => useGestureForm());
     await flushAsyncWork();
@@ -1084,13 +1073,13 @@ describe('useGestureForm', () => {
 
     expect(ok).toBe(false);
     expect(mockNotify).toHaveBeenCalledWith('error', 'toasts.wallet.connect');
-    expect(mockWagmiWriteContract).not.toHaveBeenCalled();
+    expect(mockTx.writeContract).not.toHaveBeenCalled();
     // Restore
     useWeb3.useActiveWeb3React.mockReturnValue({ account: '0xUser', chainId: 1, active: true });
   });
 
   it('onGesture falls back to the gesture failure sentence for unnamed errors', async () => {
-    mockWagmiWriteContract.mockRejectedValueOnce(new Error('something odd'));
+    mockTx.writeContract.mockRejectedValueOnce(new Error('something odd'));
     mockGetContractErrorDescriptor.mockReturnValue(null);
 
     const { result } = renderHook(() => useGestureForm());
@@ -1105,7 +1094,7 @@ describe('useGestureForm', () => {
 
   it('onGesture selects the localized descriptor key for a known contract revert', async () => {
     const revertErr = new Error('execution reverted');
-    mockWagmiWriteContract.mockRejectedValueOnce(revertErr);
+    mockTx.writeContract.mockRejectedValueOnce(revertErr);
     mockGetContractErrorDescriptor.mockReturnValueOnce({
       key: 'gesture.contractErrors.insufficientReceivedBidAmount',
       errorName: 'InsufficientReceivedBidAmount',
@@ -1126,7 +1115,7 @@ describe('useGestureForm', () => {
   });
 
   it('onGestureWithCST runs under the "gesture-cst" error context', async () => {
-    mockWagmiWriteContract.mockRejectedValueOnce(new Error('cst failure'));
+    mockTx.writeContract.mockRejectedValueOnce(new Error('cst failure'));
     mockGetContractErrorDescriptor.mockReturnValue(null);
 
     const { result } = renderHook(() => useGestureForm());
@@ -1140,7 +1129,7 @@ describe('useGestureForm', () => {
 
   it('explains CST protection reverts when no specific contract message is decoded', async () => {
     const cstErr = new Error('execution reverted');
-    mockWagmiWriteContract.mockRejectedValueOnce(cstErr);
+    mockTx.writeContract.mockRejectedValueOnce(cstErr);
     mockGetContractErrorDescriptor.mockReturnValue(null);
 
     const { result } = renderHook(() => useGestureForm());
@@ -1197,5 +1186,194 @@ describe('useGestureForm', () => {
     expect(ok).toBe(false);
     expect(mockNotify).toHaveBeenCalledWith('error', 'toasts.gesture.validation.notErc721');
     mockReadContract.mockResolvedValue(true);
+  });
+
+  /* ────────────────────────────────────────────────────────────────
+   *  Pre-flight: gas, balances, attachments, the Participation CST floor
+   * ──────────────────────────────────────────────────────────────── */
+
+  it('sends an ETH gesture with the estimate plus headroom, never a fixed 30M gas limit', async () => {
+    const { result } = renderHook(() => useGestureForm());
+    await flushAsyncWork();
+
+    await result.current.onGesture();
+
+    const request = mockTx.writeContract.mock.calls[0]![0] as { gas?: bigint };
+    expect(request.gas).toBe(1_000_000n);
+    expect(request.gas).not.toBe(30_000_000n);
+  });
+
+  it('stops before the wallet when the gas estimate says the contract would reject', async () => {
+    mockEstimateContractGas.mockRejectedValueOnce(
+      Object.assign(new Error('execution reverted'), { name: 'ContractFunctionExecutionError' }),
+    );
+    const { result } = renderHook(() => useGestureForm());
+    await flushAsyncWork();
+
+    const ok = await result.current.onGesture();
+
+    expect(ok).toBe(false);
+    expect(mockTx.writeContract).not.toHaveBeenCalled();
+    expect(mockTx.lastFailureMessage()).toBe('toasts.gesture.transaction.failed');
+  });
+
+  it('lets the wallet estimate when the gas estimate cannot run', async () => {
+    mockEstimateContractGas.mockRejectedValueOnce(
+      Object.assign(new Error('HTTP request failed.'), { name: 'HttpRequestError' }),
+    );
+    const { result } = renderHook(() => useGestureForm());
+    await flushAsyncWork();
+
+    const ok = await result.current.onGesture();
+
+    expect(ok).toBe(true);
+    expect(mockTx.writeContract.mock.calls[0]![0]).not.toHaveProperty('gas');
+  });
+
+  it('reads CST on-chain, so CST that just arrived is not refused by a lagging indexer', async () => {
+    const { result } = renderHook(() => useGestureForm());
+    await flushAsyncWork();
+
+    const ok = await result.current.onGestureWithCST();
+
+    expect(ok).toBe(true);
+    expect(mockReadContract).toHaveBeenCalledWith(
+      expect.objectContaining({ functionName: 'balanceOf', args: ['0xUser'] }),
+    );
+  });
+
+  it('does not block a CST gesture when the on-chain balance cannot be read', async () => {
+    mockReadContract.mockImplementation(async ({ functionName }: { functionName: string }) => {
+      if (functionName === 'balanceOf') throw new Error('rpc down');
+      return true;
+    });
+    const { result } = renderHook(() => useGestureForm());
+    await flushAsyncWork();
+
+    const ok = await result.current.onGestureWithCST();
+
+    expect(ok).toBe(true);
+    expect(mockNotify).not.toHaveBeenCalledWith(
+      'error',
+      expect.stringContaining('insufficientCst'),
+    );
+  });
+
+  it('keeps hash-sized NFT ids exact instead of rounding them through Number', async () => {
+    const hugeId = '77194726158210796949047323339125271902179989777093709359638389338608753093290';
+    mockReadContract.mockImplementation(async ({ functionName }: { functionName: string }) => {
+      if (functionName === 'ownerOf') return '0xUser';
+      return true;
+    });
+    const { result } = renderHook(() => useGestureForm());
+    await flushAsyncWork();
+    act(() => {
+      result.current.setContributionType('NFT');
+      result.current.setNftDonateAddress('0xNftContract');
+      result.current.setNftId(hugeId);
+    });
+
+    await result.current.onGesture();
+
+    expect(mockReadContract).toHaveBeenCalledWith(
+      expect.objectContaining({ functionName: 'ownerOf', args: [BigInt(hugeId)] }),
+    );
+    expect(mockTx.writeContract).toHaveBeenCalledWith(
+      expect.objectContaining({
+        functionName: 'bidWithEthAndDonateNft',
+        args: expect.arrayContaining([BigInt(hugeId)]),
+      }),
+    );
+  });
+
+  it.each(['1e3', '-1', '4.5', 'abc'])('refuses the NFT id %s with a named error', async (id) => {
+    const { result } = renderHook(() => useGestureForm());
+    await flushAsyncWork();
+    act(() => {
+      result.current.setContributionType('NFT');
+      result.current.setNftDonateAddress('0xNftContract');
+      result.current.setNftId(id);
+    });
+
+    const ok = await result.current.onGesture();
+
+    expect(ok).toBe(false);
+    expect(mockNotify).toHaveBeenCalledWith('error', 'toasts.gesture.validation.invalidNftId');
+    expect(mockTx.writeContract).not.toHaveBeenCalled();
+  });
+
+  it.each(['-5', '1e3', '0', '0.0000000000000000001'])(
+    'refuses the token amount %s with a named error',
+    async (amount) => {
+      mockReadContract.mockImplementation(async ({ functionName }: { functionName: string }) => {
+        if (functionName === 'decimals') return 18;
+        if (functionName === 'balanceOf') return BigInt(1000e18);
+        return true;
+      });
+      const { result } = renderHook(() => useGestureForm());
+      await flushAsyncWork();
+      act(() => {
+        result.current.setContributionType('Token');
+        result.current.setTokenDonateAddress('0xTokenContract');
+        result.current.setTokenAmount(amount);
+      });
+
+      const ok = await result.current.onGesture();
+
+      expect(ok).toBe(false);
+      expect(mockNotify).toHaveBeenCalledWith(
+        'error',
+        'toasts.gesture.validation.invalidTokenAmount',
+      );
+      expect(mockTx.writeContract).not.toHaveBeenCalled();
+    },
+  );
+
+  it('reads the Participation CST fresh when the preview is missing, keeping the floor', async () => {
+    // The preview's read fails; the one in prepare succeeds.
+    mockGetGestureCstRewardAmount.mockRejectedValueOnce(new Error('execution reverted'));
+    const { result } = renderHook(() => useGestureForm());
+    await flushAsyncWork();
+    expect(result.current.gestureCstRewardAmountMinLimitWei).toBe(0n);
+
+    await result.current.onGestureWithCST();
+
+    expect(mockTx.writeContract).toHaveBeenCalledWith(
+      expect.objectContaining({
+        functionName: 'bidWithCst',
+        args: [BigInt('1000000000000000000'), '', BigInt('99000000000000000000')],
+      }),
+    );
+  });
+
+  it('stops and explains when no Participation CST can be read for the floor', async () => {
+    mockGetGestureCstRewardAmount.mockRejectedValue(new Error('execution reverted'));
+    const { result } = renderHook(() => useGestureForm());
+    await flushAsyncWork();
+
+    const ok = await result.current.onGestureWithCST();
+
+    expect(ok).toBe(false);
+    expect(mockNotify).toHaveBeenCalledWith(
+      'error',
+      'toasts.gesture.validation.cstRewardUnavailable',
+    );
+    expect(mockTx.writeContract).not.toHaveBeenCalled();
+  });
+
+  it('needs no reward read when the person accepts any Participation CST', async () => {
+    mockGetGestureCstRewardAmount.mockRejectedValue(new Error('execution reverted'));
+    const { result } = renderHook(() => useGestureForm());
+    await flushAsyncWork();
+    act(() => {
+      result.current.setAcceptAnyCstReward(true);
+    });
+
+    const ok = await result.current.onGesture();
+
+    expect(ok).toBe(true);
+    expect(mockTx.writeContract).toHaveBeenCalledWith(
+      expect.objectContaining({ functionName: 'bidWithEth', args: [-1n, '', 0n] }),
+    );
   });
 });

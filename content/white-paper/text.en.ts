@@ -718,7 +718,7 @@ export const whitePaperTextEn = {
             // lexicon-allow-start: denial copy must name the concepts it denies, matching FAQ practice.
             {
               kind: 'paragraph',
-              text: 'Cosmic Signature is not a lottery, a casino, or a gambling product. There is no house, no dealer, and no bet. Participants exchange value for participation itself: every gesture is an expressive act that shapes the artwork, extends the cycle, and is recorded permanently on-chain. The protocol retains no operator\u2019s margin of any kind; every allocation track in Section 5 flows to participants, to anchored NFTs, to the compounding reserve, or to public goods.',
+              text: 'Cosmic Signature is not a lottery, a casino, or a gambling product. There is no house, no dealer, and no bet. Participants exchange value for participation itself: every gesture is an expressive act that shapes the artwork, extends the cycle, and is recorded permanently on-chain. The protocol retains no operator\u2019s margin of any kind; every allocation track in Section 5 flows to participants, to anchored NFTs, to the compounding reserve, or to Public Goods.',
             },
             {
               kind: 'paragraph',

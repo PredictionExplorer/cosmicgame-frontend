@@ -38,6 +38,31 @@ const DURATION_UNITS: LocaleRecord<DurationUnitLabels> = {
   vi: { days: 'ng', hours: 'g', minutes: 'ph', seconds: 's' },
 };
 
+/** A unit of the Cycle clock's figures. */
+export type ClockUnit = 'days' | 'hours' | 'minutes' | 'seconds';
+
+/**
+ * The Cycle clock's unit captions, the one source for every clock on both
+ * hosts (the landing band, the app home, /current-cycle): a fixed column
+ * label under each group of figures. One word per unit, never inflected by
+ * the value, so a caption never changes word or width as the digits tick.
+ */
+const CLOCK_UNIT_LABELS: LocaleRecord<Readonly<Record<ClockUnit, string>>> = {
+  en: { days: 'days', hours: 'hours', minutes: 'minutes', seconds: 'seconds' },
+  zh: { days: '天', hours: '小时', minutes: '分', seconds: '秒' },
+  'zh-TW': { days: '天', hours: '小時', minutes: '分', seconds: '秒' },
+  'zh-HK': { days: '天', hours: '小時', minutes: '分', seconds: '秒' },
+  uk: { days: 'дні', hours: 'години', minutes: 'хвилини', seconds: 'секунди' },
+  ko: { days: '일', hours: '시간', minutes: '분', seconds: '초' },
+  ja: { days: '日', hours: '時間', minutes: '分', seconds: '秒' },
+  vi: { days: 'ngày', hours: 'giờ', minutes: 'phút', seconds: 'giây' },
+};
+
+/** The locale's caption for each unit of the Cycle clock. */
+export function clockUnitLabels(locale: string): Readonly<Record<ClockUnit, string>> {
+  return pickByLocale(CLOCK_UNIT_LABELS, locale);
+}
+
 /** Joins the tokens of one duration: a no-break space, or nothing without word spaces. */
 const tokenJoiner = (locale: string): string => (getLocaleConfig(locale).wordSpacing ? NBSP : '');
 
@@ -136,15 +161,6 @@ export function toIsoDuration(totalSeconds: number | null | undefined): string |
  */
 export const formatSeconds = (seconds: number, locale: string = 'en'): string =>
   seconds < 0 ? ' ' : formatDuration(seconds, { locale });
-
-/**
- * Time elapsed since a Unix timestamp as a compact duration ("1d 2h 30m
- * 45s"), or an empty string for a timestamp in the future.
- */
-export const calculateTimeDiff = (timestamp: number, locale: string = 'en'): string => {
-  const seconds = Math.floor(Date.now() / 1000) - timestamp;
-  return seconds < 0 ? '' : formatDuration(seconds, { locale });
-};
 
 /** One decimal at most, in the locale's number style ("1.5", vi "1,5"). */
 const tickNumber = (value: number, locale: string): string =>

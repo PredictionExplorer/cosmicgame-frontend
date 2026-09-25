@@ -2,7 +2,6 @@ import {
   DATA_POLL_INTERVAL_MS,
   HEADER_POLL_INTERVAL_MS,
   NOTIFICATION_AUTO_HIDE_MS,
-  GESTURE_GAS_LIMIT,
   ERC721_INTERFACE_ID,
 } from '../constants';
 
@@ -49,20 +48,6 @@ describe('config/constants', () => {
     });
   });
 
-  describe('GESTURE_GAS_LIMIT', () => {
-    it('equals 30 000 000n', () => {
-      expect(GESTURE_GAS_LIMIT).toBe(30_000_000n);
-    });
-
-    it('is a bigint', () => {
-      expect(typeof GESTURE_GAS_LIMIT).toBe('bigint');
-    });
-
-    it('is positive', () => {
-      expect(GESTURE_GAS_LIMIT).toBeGreaterThan(0n);
-    });
-  });
-
   describe('ERC721_INTERFACE_ID', () => {
     it('equals 0x80ac58cd', () => {
       expect(ERC721_INTERFACE_ID).toBe('0x80ac58cd');
@@ -94,7 +79,6 @@ describe('config/constants', () => {
       expect(exportedKeys).toEqual([
         'DATA_POLL_INTERVAL_MS',
         'ERC721_INTERFACE_ID',
-        'GESTURE_GAS_LIMIT',
         'HEADER_POLL_INTERVAL_MS',
         'NOTIFICATION_AUTO_HIDE_MS',
       ]);

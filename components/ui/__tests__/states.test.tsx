@@ -8,7 +8,7 @@ import {
   SkeletonChart,
   SkeletonDetailRows,
   SkeletonPageHeader,
-  SkeletonStatGrid,
+  SkeletonFigures,
   SkeletonTable,
 } from '@/components/ui/skeleton';
 
@@ -56,7 +56,7 @@ describe('ErrorState', () => {
 describe('layout-matched skeletons', () => {
   it('draws a ledger at the finished row height with a phone card layout', () => {
     const { container } = render(<SkeletonTable rows={5} columns={3} />);
-    expect(screen.getByRole('status', { name: 'tables.skeleton.loadingRows' })).toBeInTheDocument();
+    expect(screen.getByRole('status')).toHaveTextContent('tables.skeleton.loadingRows');
     expect(container.querySelectorAll('.min-h-\\[var\\(--row-h\\)\\]')).toHaveLength(5);
     expect(container.querySelector('.sm\\:hidden')).not.toBeNull();
   });
@@ -65,7 +65,7 @@ describe('layout-matched skeletons', () => {
     render(
       <div role="status" aria-label="Loading">
         <SkeletonPageHeader />
-        <SkeletonStatGrid announce={false} />
+        <SkeletonFigures announce={false} />
         <SkeletonDetailRows announce={false} rows={3} />
         <SkeletonChart announce={false} />
         <SkeletonArtPlate />

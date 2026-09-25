@@ -108,7 +108,6 @@ export const howItWorksTextJa = {
   payoff: {
     heading: 'すべてのサイクルはシグネチャーで締めくくられます',
     body: '一筆ごとにサイクルの作品が形づくられます。サイクルが確定すると、そのシグネチャーはCosmic Signature NFTとして刻印され、シグネチャー配分とともに最後の一筆を入れた参加者に渡ります。',
-    caption: 'サイクル{cycle}のシグネチャー',
     linkLabel: 'このシグネチャーを見る',
   },
   stepByStep: {

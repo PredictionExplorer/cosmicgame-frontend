@@ -1,30 +1,4 @@
-import { UNAVAILABLE_VALUE, formatFixed, weiToEthNumber } from '../format';
-
-describe('formatFixed', () => {
-  it('matches toFixed byte-for-byte for finite input', () => {
-    expect(formatFixed(3.1, 2)).toBe('3.10');
-    expect(formatFixed(3.1, 2)).toBe((3.1).toFixed(2));
-    expect(formatFixed(0, 4)).toBe('0.0000');
-    expect(formatFixed(-0.5, 4)).toBe('-0.5000');
-    expect(formatFixed(12096.254179, 6)).toBe('12096.254179');
-  });
-
-  it('returns the sentinel instead of throwing on missing values', () => {
-    expect(formatFixed(undefined, 4)).toBe(UNAVAILABLE_VALUE);
-    expect(formatFixed(null, 4)).toBe(UNAVAILABLE_VALUE);
-    expect(formatFixed(Number.NaN, 4)).toBe(UNAVAILABLE_VALUE);
-    expect(formatFixed(Number.POSITIVE_INFINITY, 4)).toBe(UNAVAILABLE_VALUE);
-    expect(formatFixed(Number.NEGATIVE_INFINITY, 4)).toBe(UNAVAILABLE_VALUE);
-  });
-
-  it('accepts a caller-supplied fallback', () => {
-    expect(formatFixed(undefined, 4, '0.0000')).toBe('0.0000');
-  });
-
-  it('does not add grouping separators (unlike formatTableAmount)', () => {
-    expect(formatFixed(1234567.5, 2)).toBe('1234567.50');
-  });
-});
+import { weiToEthNumber } from '../format';
 
 describe('weiToEthNumber', () => {
   it('converts whole ETH amounts exactly', () => {

@@ -2,7 +2,7 @@
   "timer": {
     "cycle": {
       "current": "chu kỳ hiện tại",
-      "numbered": "Chu kỳ #{number}",
+      "numbered": "Chu kỳ {number}",
       "generic": "Chu kỳ trình diễn"
     },
     "phases": {
@@ -46,12 +46,6 @@
     "liveClock": "Đồng hồ chu kỳ trực tiếp",
     "cycleClock": "Đồng hồ chu kỳ",
     "gestureCount": "{count, plural, other {# nét bút}}",
-    "units": {
-      "days": "ngày",
-      "hours": "giờ",
-      "minutes": "phút",
-      "seconds": "giây"
-    },
     "duration": {
       "days": "{count, plural, other {# ngày}}",
       "hours": "{count, plural, other {# giờ}}",
@@ -70,7 +64,6 @@
     "resumeRotation": "Tiếp tục chuyển tác phẩm",
     "playAnimation": "Phát hoạt ảnh",
     "pauseAnimation": "Tạm dừng hoạt ảnh",
-    "unavailable": "Tác phẩm không khả dụng",
-    "untitled": "Signature {tokenLabel}"
+    "unavailable": "Tác phẩm không khả dụng"
   }
 }

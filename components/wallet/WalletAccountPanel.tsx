@@ -1,14 +1,13 @@
 'use client';
 
-import { AlertTriangle, Check, Copy, ExternalLink, LogOut, Repeat } from 'lucide-react';
+import { AlertTriangle, ArrowUpRight, Check, Copy, LogOut, Repeat } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 
 import { Button } from '@/components/ui/button';
 import { DropdownMenuItem } from '@/components/ui/dropdown-menu';
 import { useWalletAccount, type WalletAccountState } from '@/hooks/useWalletAccount';
-import { stateTone } from '@/lib/stateTone';
 import { cn } from '@/lib/utils';
-import { shortenHex } from '@/utils/format';
+import { formatAddress } from '@/utils/format';
 
 import { SwitchNetworkButton } from './NetworkGuard';
 
@@ -18,7 +17,7 @@ function NetworkLine({ account }: { account: WalletAccountState }) {
     return (
       <p className="flex items-start gap-2 text-xs text-muted-foreground">
         <AlertTriangle
-          className={cn('mt-0.5 h-3.5 w-3.5 shrink-0', stateTone.attentionText)}
+          className={cn('mt-0.5 h-3.5 w-3.5 shrink-0', 'text-attention')}
           aria-hidden
         />
         <span>
@@ -34,10 +33,7 @@ function NetworkLine({ account }: { account: WalletAccountState }) {
   }
   return (
     <p className="flex items-center gap-2 text-xs text-muted-foreground">
-      <span
-        aria-hidden
-        className={cn('h-1.5 w-1.5 shrink-0 rounded-full', stateTone.positiveDot)}
-      />
+      <span aria-hidden className={cn('h-1.5 w-1.5 shrink-0 rounded-full', 'bg-positive')} />
       {t('network.connectedTo', { network: account.requiredChainName })}
     </p>
   );
@@ -53,7 +49,7 @@ function AddressRow({ account }: { account: WalletAccountState }) {
           <p className="text-xs text-muted-foreground">{account.walletName}</p>
         )}
         <p className="truncate font-mono text-sm text-foreground" title={account.address}>
-          {shortenHex(account.address, 6)}
+          {formatAddress(account.address)}
         </p>
       </div>
       <Button
@@ -102,7 +98,7 @@ export function WalletAccountPanel({ className }: { className?: string }) {
               rel="noopener noreferrer"
               className="flex min-h-11 items-center gap-2.5 rounded-md px-2 text-sm text-foreground transition-colors hover:bg-muted sm:min-h-9"
             >
-              <ExternalLink className="h-4 w-4 text-muted-foreground" aria-hidden />
+              <ArrowUpRight className="size-4 text-muted-foreground" aria-hidden />
               {t('account.viewOnExplorer', { explorer: account.explorerName })}
             </a>
           )}
@@ -151,7 +147,7 @@ export function WalletNetworkMenuItems() {
           className="cursor-pointer gap-2.5 px-2 font-semibold"
           onSelect={() => void account.switchToRequiredChain()}
         >
-          <Repeat className={cn('h-3.5 w-3.5', stateTone.attentionText)} aria-hidden />
+          <Repeat className={cn('h-3.5 w-3.5', 'text-attention')} aria-hidden />
           {t('network.switchTo', { network: account.requiredChainName })}
         </DropdownMenuItem>
       )}
@@ -174,7 +170,7 @@ export function WalletAccountMenuItems() {
       {account.explorerUrl && (
         <DropdownMenuItem asChild className="cursor-pointer gap-2.5 px-2">
           <a href={account.explorerUrl} target="_blank" rel="noopener noreferrer">
-            <ExternalLink className="h-3.5 w-3.5 text-muted-foreground" aria-hidden />
+            <ArrowUpRight className="size-3.5 text-subtle" aria-hidden />
             {t('account.viewOnExplorer', { explorer: account.explorerName })}
           </a>
         </DropdownMenuItem>

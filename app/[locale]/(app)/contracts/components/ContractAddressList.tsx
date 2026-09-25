@@ -98,7 +98,7 @@ function ContractAddressRow({
         <GeckoTerminalPoolButton />
       </>
     ) : contract.id === 'nft' ? (
-      <NftMarketplaceButton variant="card" />
+      <NftMarketplaceButton />
     ) : null;
 
   return (

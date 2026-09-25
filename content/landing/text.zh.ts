@@ -301,12 +301,4 @@ export const landingTextZh = {
     heading: '每个周期，都为作品集\u200B添上新作。',
     body: '关注实时周期、落笔参与，或浏览迄今铭刻的每一幅签名作品。',
   },
-
-  footer: {
-    tagline: 'Arbitrum 上的程序化链上艺术协议。',
-    copyright: '© {year} Cosmic Signature。项目自有材料采用 CC0 1.0。',
-    colophon: 'CC0 1.0 · 公开可验证 · 可复现艺术',
-    disambiguation:
-      'Cosmic Signature 与 COSMIC 癌症突变数据库及生物学中的 COSMIC 突变特征没有关联。本项目是链上艺术协议及应用。',
-  },
 } satisfies LandingText;

@@ -208,7 +208,7 @@ const FAQPage = ({ content }: FAQPageProps) => {
       )}
 
       {/* The contents is a direct child of this tall container, so it sticks in both shapes. */}
-      <div className="lg:grid lg:grid-cols-[13.5rem_minmax(0,1fr)] lg:gap-x-12 xl:gap-x-16">
+      <div className="reading-grid">
         {isSearching ? (
           <div aria-hidden className="hidden lg:block" />
         ) : (

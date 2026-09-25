@@ -41,6 +41,7 @@
   line-height: 1;
   font-weight: var(--display-weight);
   letter-spacing: calc(-0.03em * var(--display-tracking-scale));
+  word-spacing: var(--display-word-spacing-lg);
   text-wrap: balance;
   overflow-wrap: break-word;
 
@@ -62,6 +63,7 @@
   line-height: 1.05;
   font-weight: var(--display-weight);
   letter-spacing: calc(-0.025em * var(--display-tracking-scale));
+  word-spacing: var(--display-word-spacing-lg);
   text-wrap: balance;
   overflow-wrap: break-word;
 
@@ -77,6 +79,7 @@
   line-height: 1.1;
   font-weight: var(--display-weight);
   letter-spacing: calc(-0.02em * var(--display-tracking-scale));
+  word-spacing: var(--display-word-spacing);
   text-wrap: balance;
   overflow-wrap: break-word;
 }
@@ -179,8 +182,8 @@
 }
 
 /*
- * Long-form prose (legal, learn, white paper, FAQ answers): a 66-character
- * measure. Cyrillic and Vietnamese stacked diacritics need a little more
+ * Long-form prose (legal, learn, white paper, FAQ answers): a measure of
+ * about 66 characters (36em). Cyrillic and Vietnamese stacked diacritics need a little more
  * leading; CJK sets at 16px on a looser 1.85 line with a 40em measure.
  */
 @utility type-prose {
@@ -261,6 +264,18 @@
     letter-spacing: 0;
     text-transform: none;
   }
+
+  /*
+   * Vietnamese capitals stack a second diacritic above the cap height (Ỗ, Ứ,
+   * Ậ): at 12px, tracked, they crowd the line above and a long eyebrow wraps.
+   * The kicker sets as written, 13px and untracked, on a 1.5 line.
+   */
+  &:where(:lang(vi)) {
+    font-size: 0.8125rem;
+    line-height: 1.25rem;
+    letter-spacing: 0;
+    text-transform: none;
+  }
 }
 
 /*
@@ -325,21 +340,26 @@
   font-variant-numeric: tabular-nums lining-nums;
 }
 
+/* ── Identifiers: JetBrains Mono ──────────────────────────────────────── */
+
 /*
- * A static display figure in Clash (a hero total that never ticks). Clash's
- * zero is round, so keep this for figures read as a whole; anything that
- * updates or aligns in a column uses type-figure-*.
+ * A displayed formula (the white paper's Participation CST rule) and the
+ * symbols of its legend: one math face for both, so Δt in the legend is the
+ * Δt of the equation. The platform math fonts come first by name (STIX Two
+ * Math on Apple platforms, Cambria Math on Windows), each with the OpenType
+ * MATH table MathML needs to stretch a radical and its floor brackets.
  */
-@utility type-figure-display {
-  font-family: var(--font-family-display);
-  font-size: clamp(2.5rem, 2rem + 2vw, 3.5rem); /* 40 → 56px */
-  line-height: 1;
-  font-weight: var(--display-weight);
-  letter-spacing: calc(-0.02em * var(--display-tracking-scale));
-  font-variant-numeric: lining-nums;
+@utility type-formula {
+  font-family: 'STIX Two Math', 'Cambria Math', 'Latin Modern Math', math;
+  font-size: clamp(1.5rem, 1.2rem + 1vw, 2rem); /* 24 → 32px */
+  line-height: 1.3;
 }
 
-/* ── Identifiers: JetBrains Mono ──────────────────────────────────────── */
+@utility type-formula-symbol {
+  font-family: 'STIX Two Math', 'Cambria Math', 'Latin Modern Math', math;
+  font-size: 1.0625rem; /* 17px */
+  line-height: 1.5;
+}
 
 /* Addresses, hashes, seeds: no break opportunities of their own, so they may
  * wrap anywhere rather than widen their container. */
@@ -359,6 +379,20 @@
   font-size: 0.8125rem; /* 13px */
   line-height: 1.45;
   font-weight: 400;
+  font-feature-settings: 'zero' 1;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+/*
+ * An identifier inside a line of other text ("Signature #000023" as a wall
+ * label title): JetBrains Mono at the line's own size less a sixteenth, so
+ * its taller x-height sits level with Inter, and never broken. `withMonoId`
+ * (components/ui/mono-id) applies it.
+ */
+@utility type-mono-inline {
+  font-family: var(--mono-font-stack);
+  font-size: 0.9375em;
   font-feature-settings: 'zero' 1;
   font-variant-numeric: tabular-nums;
   white-space: nowrap;

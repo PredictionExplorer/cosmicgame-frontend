@@ -46,7 +46,10 @@
       "notErc20": "첨부한 토큰 컨트랙트가 ERC-20 토큰 컨트랙트가 아닙니다.",
       "insufficientAttachedToken": "이 제스처에 첨부할 토큰 잔액이 부족합니다.",
       "insufficientEth": "이 제스처에는 {required} ETH와 네트워크 수수료가 필요합니다. 지갑의 {network} 잔액은 {available} ETH입니다.",
-      "insufficientCst": "이 제스처에는 최대 {required} CST가 필요합니다. 지갑 잔액은 {available} CST입니다."
+      "insufficientCst": "이 제스처에는 최대 {required} CST가 필요합니다. 지갑 잔액은 {available} CST입니다.",
+      "invalidNftId": "NFT의 토큰 ID를 숫자로만 입력해 주세요.",
+      "invalidTokenAmount": "0보다 큰 수량을 숫자로 입력해 주세요. 소수 자릿수는 이 토큰이 지원하는 범위를 넘을 수 없습니다.",
+      "cstRewardUnavailable": "참여 CST 미리 보기를 읽을 수 없어 최소 참여 CST 보호를 적용할 수 없습니다. 잠시 후 다시 시도하거나 ‘모든 참여 CST 허용’을 선택해 주세요."
     },
     "transaction": {
       "failed": "제스처를 제출할 수 없습니다. 지갑과 네트워크 연결을 확인하고 현재 비용을 새로 고친 뒤 다시 시도해 주세요.",
@@ -61,7 +64,8 @@
       "wrongBidType": "제스처 유형이 잘못 선택되었습니다.",
       "fundTransferFailed": "자금 전송에 실패했습니다.",
       "ethCostChanged": "트랜잭션이 전송되는 동안 제스처 비용이 {increase} ETH 올랐습니다. 새로 필요한 비용은 {required} ETH입니다. 다시 시도해 주세요.",
-      "cstCostChanged": "트랜잭션이 전송되는 동안 CST 제스처 비용이 바뀌었습니다. 다른 제스처가 먼저 처리된 것으로 보입니다. 컨트랙트가 요구한 {required} CST가 설정한 최대치 {maximum} CST를 넘었습니다. 새로 고친 뒤 다시 시도해 주세요."
+      "cstCostChanged": "트랜잭션이 전송되는 동안 CST 제스처 비용이 바뀌었습니다. 다른 제스처가 먼저 처리된 것으로 보입니다. 컨트랙트가 요구한 {required} CST가 설정한 최대치 {maximum} CST를 넘었습니다. 새로 고친 뒤 다시 시도해 주세요.",
+      "cstRewardBelowMinimum": "이 제스처의 참여 CST가 설정한 최소 수량보다 적어집니다. 다른 제스처가 먼저 처리된 것으로 보입니다. 미리 보기를 새로 고친 뒤 다시 시도하거나 감소 허용 폭을 늘려 주세요."
     },
     "confirmedWithCst": "제스처가 기록되었습니다. 사이클 마감 시각이 연장되었고 참여 CST {cst}개가 지갑에 들어왔습니다.",
     "approval": {
@@ -177,7 +181,8 @@
     "status": {
       "confirmed": "온체인에서 확인되었습니다.",
       "cancelled": "지갑에서 취소되었습니다. 아무것도 전송되지 않았습니다.",
-      "cancelledInWallet": "지갑에서 취소되었습니다. 취소에 네트워크 수수료가 사용되었으며, 그 외에는 아무것도 전송되지 않았습니다."
+      "cancelledInWallet": "지갑에서 취소되었습니다. 취소에 네트워크 수수료가 사용되었으며, 그 외에는 아무것도 전송되지 않았습니다.",
+      "replacedInWallet": "지갑에서 다른 트랜잭션으로 대체되었으며, 그 트랜잭션에 네트워크 수수료가 사용되었습니다. 이 작업은 기록되지 않았습니다."
     },
     "confirmedRefresh": "온체인에서 확인되었습니다. 페이지가 아직 바뀌지 않았다면 새로 고쳐 주세요.",
     "error": {
@@ -188,7 +193,8 @@
       "wouldRevert": "컨트랙트가 이 트랜잭션을 거부하므로 전송하지 않았습니다. 페이지를 새로 고친 뒤 다시 시도해 주세요.",
       "reverted": "트랜잭션이 온체인에서 실패했습니다. 네트워크 수수료만 사용되었습니다. 페이지를 새로 고친 뒤 다시 시도해 주세요.",
       "timeout": "아직 확인을 기다리고 있습니다. 다시 시도하기 전에 {explorer} 사이트에서 트랜잭션을 확인해 주세요.",
-      "network": "네트워크에 연결할 수 없습니다. 연결 상태를 확인한 뒤 다시 시도해 주세요."
+      "network": "네트워크에 연결할 수 없습니다. 연결 상태를 확인한 뒤 다시 시도해 주세요.",
+      "untrustedContract": "이 트랜잭션의 대상 주소가 온체인 Cosmic Signature 컨트랙트와 일치하지 않아 전송하지 않았습니다. 페이지를 새로 고친 뒤 다시 시도해 주세요."
     },
     "viewOnExplorer": "{explorer} 사이트에서 보기",
     "viewOnExplorerShort": "트랜잭션 보기",

@@ -152,7 +152,10 @@ Every user-visible string ships in every locale in the same change:
   typed so a missing or invented id fails to compile. `content/about/` is small enough to
   keep plain `<locale>.ts`.
 - Legal and trust pages: per-locale copy objects `content/legal/*.<locale>.ts` rendered by
-  the shared `TermsContent`, `PrivacyContent`, and `TrustPageContent` components
+  one renderer per page (`SecurityContent`, `AuditsContent`, `RiskContent`, `TermsContent`,
+  `PrivacyContent`) over the shared `components/legal/LegalDocument` template; links inside
+  legal copy are tags that name an entry of `LEGAL_LINKS` (`content/legal/links.ts`),
+  rendered by `RichText`
 - Routing is next-intl: `en` is unprefixed, every other locale lives under its prefix
   (`/zh`, `/zh-TW`, `/zh-HK`, `/uk`, `/ko`, `/ja`, `/vi`) on both hosts (`i18n/routing.ts`). Locale codes are
   canonical BCP 47 tags: the bare language code is the CLDR default variant, further

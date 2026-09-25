@@ -85,7 +85,6 @@ export const learnTextUk = {
     readingTimeTemplate: '{minutes} хв читання',
     nextGuideLabel: 'Наступний посібник',
     contents: {
-      heading: 'У цьому посібнику',
       railLabel: 'На цій сторінці',
       openLabel: 'Зміст',
       backToTopLabel: 'Угору',

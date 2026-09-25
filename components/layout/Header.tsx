@@ -1,6 +1,6 @@
 'use client';
 
-import { useCallback, useState } from 'react';
+import { useCallback, useRef, useState } from 'react';
 import { Menu, Search } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 
@@ -10,6 +10,7 @@ import ConnectWalletButton from '@/components/common/ConnectWalletButton';
 import { ThemeSwitcher } from '@/components/theme/ThemeSwitcher';
 import { WrongNetworkChip } from '@/components/wallet/NetworkGuard';
 import { useSystemMode } from '@/contexts/SystemModeContext';
+import { useBannerClearance } from '@/hooks/useStickyClearance';
 
 import {
   CommandPalette,
@@ -25,8 +26,12 @@ import { Wordmark } from './Wordmark';
 
 function MaintenanceBanner({ mode }: { mode: number }) {
   const t = useTranslations('nav');
+  const ref = useRef<HTMLDivElement>(null);
+  // The page shell and scroll padding make room for it: it never covers an H1.
+  useBannerClearance(ref);
   return (
     <div
+      ref={ref}
       data-maintenance-banner
       role="status"
       className="fixed inset-x-0 top-[var(--header-height)] z-40 border-b border-rule bg-attention-surface px-6 py-2.5 text-foreground backdrop-blur-sm"
@@ -52,7 +57,7 @@ function SearchTrigger({ onOpen }: { onOpen: () => void }) {
       onClick={onOpen}
       aria-label={t('search.triggerLabel')}
       aria-keyshortcuts="Meta+K Control+K"
-      className="hidden size-10 shrink-0 items-center justify-center gap-2 rounded-pill border border-input bg-surface-sunken text-muted-foreground transition-colors duration-150 hover:border-foreground/40 hover:bg-muted hover:text-foreground sm:inline-flex xl:w-auto xl:justify-start xl:pl-3 xl:pr-2"
+      className="hidden size-10 shrink-0 items-center justify-center gap-2 rounded-control border border-input bg-surface-sunken text-muted-foreground transition-colors duration-150 hover:border-foreground/40 hover:bg-muted hover:text-foreground sm:inline-flex xl:w-auto xl:justify-start xl:pl-3 xl:pr-2"
     >
       <Search aria-hidden className="size-4 shrink-0" />
       <span className="hidden text-sm xl:inline">{t('search.trigger')}</span>

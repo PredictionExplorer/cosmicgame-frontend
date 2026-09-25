@@ -213,6 +213,7 @@ export function LandingHeader({ sections }: LandingHeaderProps) {
             </SheetTrigger>
             <SheetContent
               side="right"
+              closePlacement="header"
               aria-describedby={undefined}
               className="flex w-[min(20rem,100vw)] flex-col gap-0 border-l border-rule bg-background p-0"
             >

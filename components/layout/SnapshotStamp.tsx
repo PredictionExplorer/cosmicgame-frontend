@@ -14,11 +14,10 @@ export interface SnapshotStampProps {
 }
 
 /**
- * "Snapshot · Sep 23, 07:20 UTC+3" for `PageHeader`'s meta line: the time
- * the header's server-read figures were taken, with its zone (the ledgers
- * below name theirs too), as a `<time>` with the exact instant on hover.
- * UTC through hydration, then the reader's zone. Figures that poll live use
- * `LiveStatus` instead.
+ * "Snapshot · Sep 23, 04:20 UTC" for `PageHeader`'s meta line: the time the
+ * header's server-read figures were taken, with its zone (the ledgers below
+ * name theirs too), as a `<time>` with the reader's own time on hover.
+ * Figures that poll live use `LiveStatus` instead.
  */
 export function SnapshotStamp({ at, className }: SnapshotStampProps) {
   const t = useTranslations('common');

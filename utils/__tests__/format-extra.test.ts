@@ -1,14 +1,12 @@
 import {
   formatSeconds,
-  calculateTimeDiff,
   supplyHistoryBootstrapRange,
   formatYyyymmddLabel,
   formatUnixTsLabel,
-  formatUtcDateTimeStamp,
   formatHoursTick,
   formatDurationTick,
-  convertTimestampToDateTime,
-  formatGroupedNumber,
+  formatDateTime,
+  formatNumber,
 } from '../format';
 
 describe('chart tick formatters', () => {
@@ -48,29 +46,6 @@ describe('chart tick formatters', () => {
   });
 });
 
-describe('formatUtcDateTimeStamp', () => {
-  const stamp = new Date('2026-08-28T08:13:45Z');
-
-  it('keeps the ISO-style English stamp used by SEO summaries', () => {
-    expect(formatUtcDateTimeStamp(stamp)).toBe('2026-08-28 08:13 UTC');
-    expect(formatUtcDateTimeStamp(stamp, 'en-US')).toBe('2026-08-28 08:13 UTC');
-  });
-
-  it('renders the Chinese long form with fullwidth parentheses', () => {
-    expect(formatUtcDateTimeStamp(stamp, 'zh')).toBe('2026年8月28日 08:13（UTC）');
-    expect(formatUtcDateTimeStamp(new Date('2026-01-05T00:07:00Z'), 'zh-Hans')).toBe(
-      '2026年1月5日 00:07（UTC）',
-    );
-  });
-
-  it('renders the Ukrainian numeric day-first date', () => {
-    expect(formatUtcDateTimeStamp(stamp, 'uk')).toBe('28.08.2026 08:13 UTC');
-    expect(formatUtcDateTimeStamp(new Date('2026-01-05T00:07:00Z'), 'uk-UA')).toBe(
-      '05.01.2026 00:07 UTC',
-    );
-  });
-});
-
 describe('formatSeconds edge cases', () => {
   it('returns "1m" for exactly 60 seconds, without a trailing space', () => {
     expect(formatSeconds(60)).toBe('1m');
@@ -93,42 +68,6 @@ describe('formatSeconds edge cases', () => {
 
   it('returns "0s" for very small positive value', () => {
     expect(formatSeconds(0.1)).toBe('0s');
-  });
-});
-
-describe('calculateTimeDiff', () => {
-  beforeEach(() => {
-    jest.spyOn(Date, 'now').mockReturnValue(1_700_000_000_000);
-  });
-
-  afterEach(() => {
-    jest.restoreAllMocks();
-  });
-
-  it('returns formatted duration for a past timestamp', () => {
-    const timestamp = 1_700_000_000 - 3661;
-    const result = calculateTimeDiff(timestamp);
-    expect(result).toBe('1h\u00a01m\u00a01s');
-  });
-
-  it('returns empty string when timestamp is in the future', () => {
-    const futureTimestamp = 1_700_000_000 + 1000;
-    expect(calculateTimeDiff(futureTimestamp)).toBe('');
-  });
-
-  it('returns "0s" when timestamp is exactly now', () => {
-    expect(calculateTimeDiff(1_700_000_000)).toBe('0s');
-  });
-
-  it('returns days for large differences', () => {
-    const oneDayAgo = 1_700_000_000 - 86400;
-    expect(calculateTimeDiff(oneDayAgo)).toBe('1d');
-  });
-
-  it('returns multi-day difference with hours', () => {
-    const threeDaysAgo = 1_700_000_000 - 3 * 86400 - 7200;
-    expect(calculateTimeDiff(threeDaysAgo)).toBe('3d\u00a02h');
-    expect(calculateTimeDiff(threeDaysAgo, 'zh')).toBe('3天2小时');
   });
 });
 
@@ -157,23 +96,25 @@ describe('YYYYMMDD date helpers', () => {
     expect(formatUnixTsLabel(timestamp, false, 'uk')).toBe('01.01.2026');
   });
 
-  it('preserves historical browser-local output in every locale', () => {
+  it('prints the browser-local compact form in every locale when asked', () => {
     const timestamp = new Date(2026, 0, 1, 12, 34, 56).getTime() / 1000;
-    expect(convertTimestampToDateTime(timestamp, true)).toBe('Jan 01, 12:34:56');
-    expect(convertTimestampToDateTime(timestamp, true, 'zh')).toBe('1月1日 12:34:56');
-    expect(convertTimestampToDateTime(timestamp, true, 'uk')).toBe('1 січ., 12:34:56');
+    const local = { seconds: true, timeZone: 'local' } as const;
+    expect(formatDateTime(timestamp, { ...local, locale: 'en' })).toBe('Jan 01, 12:34:56');
+    expect(formatDateTime(timestamp, { ...local, locale: 'zh' })).toBe('1月1日 12:34:56');
+    expect(formatDateTime(timestamp, { ...local, locale: 'uk' })).toBe('1 січ., 12:34:56');
   });
 
-  it('uses an explicit deterministic UTC value for server snapshots', () => {
+  it('prints the deterministic UTC value every record uses', () => {
     const timestamp = Date.UTC(2026, 0, 1, 12, 34, 56) / 1000;
-    expect(convertTimestampToDateTime(timestamp, true, 'en', 'utc')).toBe('Jan 01, 12:34:56');
-    expect(convertTimestampToDateTime(timestamp, true, 'zh', 'utc')).toBe('1月1日 12:34:56');
-    expect(convertTimestampToDateTime(timestamp, true, 'uk', 'utc')).toBe('1 січ., 12:34:56');
+    const utc = { seconds: true, timeZone: 'utc' } as const;
+    expect(formatDateTime(timestamp, { ...utc, locale: 'en' })).toBe('Jan 01, 12:34:56');
+    expect(formatDateTime(timestamp, { ...utc, locale: 'zh' })).toBe('1月1日 12:34:56');
+    expect(formatDateTime(timestamp, { ...utc, locale: 'uk' })).toBe('1 січ., 12:34:56');
   });
 
   it('abbreviates every Ukrainian month through Intl rather than a hand-kept array', () => {
     const labels = Array.from({ length: 12 }, (_, month) =>
-      convertTimestampToDateTime(Date.UTC(2026, month, 15, 9, 0) / 1000, false, 'uk', 'utc'),
+      formatDateTime(Date.UTC(2026, month, 15, 9, 0) / 1000, { locale: 'uk', timeZone: 'utc' }),
     );
     expect(labels[0]).toBe('15 січ., 09:00');
     expect(labels[4]).toBe('15 трав., 09:00');
@@ -182,9 +123,9 @@ describe('YYYYMMDD date helpers', () => {
   });
 
   it('groups per locale: Western commas for en/zh, spaces for uk', () => {
-    expect(formatGroupedNumber(1_000_000)).toBe('1,000,000');
-    expect(formatGroupedNumber(1_000_000, 'zh')).toBe('1,000,000');
-    expect(formatGroupedNumber(1_000_000, 'uk').replace(/[\u00a0\u202f]/g, ' ')).toBe('1 000 000');
+    expect(formatNumber(1_000_000, 'en')).toBe('1,000,000');
+    expect(formatNumber(1_000_000, 'zh')).toBe('1,000,000');
+    expect(formatNumber(1_000_000, 'uk').replace(/[\u00a0\u202f]/g, ' ')).toBe('1 000 000');
   });
 
   it('returns bootstrap range from epoch to today', () => {

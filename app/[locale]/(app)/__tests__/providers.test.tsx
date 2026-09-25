@@ -17,6 +17,7 @@ jest.mock('@tanstack/react-query');
 jest.mock('sonner', () => ({
   Toaster: (props: {
     position?: string;
+    style?: Record<string, string>;
     toastOptions?: { duration?: number; className?: string };
   }) => (
     <div
@@ -24,6 +25,8 @@ jest.mock('sonner', () => ({
       data-position={props.position}
       data-duration={props.toastOptions?.duration}
       data-classname={props.toastOptions?.className}
+      data-normal-bg={props.style?.['--normal-bg']}
+      data-error-border={props.style?.['--error-border']}
     />
   ),
 }));
@@ -190,10 +193,13 @@ describe('Providers', () => {
         <div>Content</div>
       </Providers>,
     );
-    // The Toaster mock spreads className onto data-classname; the value
-    // changed when we themed the toast to brand tokens (border, popover
-    // surface, elevation shadow). Assert the recipe, not the exact string.
-    expect(screen.getByTestId('toaster').getAttribute('data-classname')).toMatch(/bg-popover/);
+    // Sonner's stylesheet outranks a class on the toast, so the palette
+    // reaches it through sonner's variables: the raised surface, and a state
+    // edge in the palette's own state colour. The float shadow is the class.
+    const toaster = screen.getByTestId('toaster');
+    expect(toaster.getAttribute('data-classname')).toMatch(/shadow-float/);
+    expect(toaster).toHaveAttribute('data-normal-bg', 'hsl(var(--popover))');
+    expect(toaster.getAttribute('data-error-border')).toMatch(/--critical/);
   });
 
   it('wraps content in two ErrorBoundary layers', () => {

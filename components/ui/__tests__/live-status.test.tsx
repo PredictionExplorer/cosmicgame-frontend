@@ -42,11 +42,24 @@ describe('LiveStatusView', () => {
     expect(screen.getByRole('status').previousElementSibling).not.toHaveClass('animate-live-dot');
   });
 
-  it('holds a secondary stamp still while live, keeping the state in words', () => {
-    render(<LiveStatusView state="live" variant="inline" still />);
-    const status = screen.getByRole('status');
-    expect(status).toHaveTextContent('common.liveStatus.live');
-    expect(status.previousElementSibling).not.toHaveClass('animate-live-dot');
+  it('holds a secondary stamp still and silent, keeping the state in words', () => {
+    // Regression: four stamps on the Observatory said "Reconnecting" four
+    // times over; only the primary one (the Cycle pill) speaks now.
+    const { container } = render(<LiveStatusView state="live" variant="inline" still />);
+    expect(screen.queryByRole('status')).not.toBeInTheDocument();
+    expect(container).toHaveTextContent('common.liveStatus.updated');
+    expect(container.querySelector('[data-live-state] > span')).not.toHaveClass('animate-live-dot');
+  });
+
+  it('lets a secondary stamp speak when a page has no other', () => {
+    render(<LiveStatusView state="delayed" variant="inline" still announce />);
+    expect(screen.getByRole('status')).toHaveTextContent('common.liveStatus.delayedShort');
+  });
+
+  it('keeps a silent dot named for a reader who reaches it', () => {
+    const { container } = render(<LiveStatusView state="offline" variant="dot" announce={false} />);
+    expect(screen.queryByRole('status')).not.toBeInTheDocument();
+    expect(container).toHaveTextContent('common.liveStatus.offline');
   });
 
   it('shows the freshness stamp inline', () => {

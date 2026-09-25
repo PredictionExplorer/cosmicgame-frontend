@@ -4,19 +4,18 @@ import { useTranslations } from 'next-intl';
 
 import { cn } from '@/lib/utils';
 import { getFreshnessAge, type LiveFreshness } from '@/lib/liveFreshness';
-import { stateTone } from '@/lib/stateTone';
 
 /*
- * State colours from the palette-tuned state tokens (lib/stateTone). Colour
- * never carries the state alone — every variant has the state as text
- * (visible or sr-only).
+ * State colours from the palette-tuned state tokens (text-positive,
+ * bg-attention…). Colour never carries the state alone: every variant has
+ * the state as text (visible or sr-only).
  */
 const DOT_CLASS: Record<LiveFreshness, string> = {
-  live: cn(stateTone.liveDot, 'animate-live-dot'),
-  connecting: 'bg-muted-foreground/60',
-  reconnecting: stateTone.attentionDot,
-  delayed: stateTone.attentionDot,
-  offline: stateTone.criticalDot,
+  live: cn('bg-live', 'animate-live-dot'),
+  connecting: 'bg-subtle-foreground',
+  reconnecting: 'bg-attention',
+  delayed: 'bg-attention',
+  offline: 'bg-critical',
 };
 
 export type LiveStatusVariant = 'dot' | 'chip' | 'inline';
@@ -38,6 +37,13 @@ export interface LiveStatusViewProps {
    * stamp on a page whose one breathing dot is elsewhere (the Cycle pill).
    */
   still?: boolean;
+  /**
+   * Whether the stamp speaks its state changes (a polite status region).
+   * Defaults to `!still`: a secondary stamp stays silent, so a page with
+   * four stamps says "Reconnecting" once, from its primary one, not four
+   * times over the announcements that matter.
+   */
+  announce?: boolean;
   className?: string;
 }
 
@@ -62,6 +68,7 @@ export function LiveStatusView({
   variant = 'chip',
   clockCaveat = false,
   still = false,
+  announce = !still,
   className,
 }: LiveStatusViewProps) {
   const t = useTranslations('common');
@@ -97,7 +104,7 @@ export function LiveStatusView({
       aria-hidden
       className={cn(
         'relative inline-flex h-1.5 w-1.5 shrink-0 rounded-full',
-        still && state === 'live' ? stateTone.liveDot : DOT_CLASS[state],
+        still && state === 'live' ? 'bg-live' : DOT_CLASS[state],
       )}
     />
   );
@@ -114,9 +121,16 @@ export function LiveStatusView({
       )}
     >
       {dot}
-      <span role="status" aria-live="polite" className="sr-only">
-        {state === 'delayed' ? t('liveStatus.delayedShort') : t(`liveStatus.${state}`)}
-      </span>
+      {announce ? (
+        <span role="status" aria-live="polite" className="sr-only">
+          {state === 'delayed' ? t('liveStatus.delayedShort') : t(`liveStatus.${state}`)}
+        </span>
+      ) : variant === 'dot' ? (
+        // A silent dot still names its state to a reader who reaches it.
+        <span className="sr-only">
+          {state === 'delayed' ? t('liveStatus.delayedShort') : t(`liveStatus.${state}`)}
+        </span>
+      ) : null}
       {variant !== 'dot' && (
         <span aria-hidden className="min-w-0 truncate">
           {visibleLabel}

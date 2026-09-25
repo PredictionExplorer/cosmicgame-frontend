@@ -1,10 +1,15 @@
 import type { Abi } from 'viem';
 // The real encoder (the `viem` entry is a jest mock).
-import { encodeErrorResult } from 'viem/utils';
+import { encodeErrorResult, getContractError } from 'viem/utils';
 
 import { cosmicGameAbi } from '@/contracts/abis';
 
-import { getContractErrorDescriptor, withDecodedContractError } from '../contractErrors';
+import {
+  contractErrorNameOf,
+  getContractErrorDescriptor,
+  withDecodedContractError,
+} from '../contractErrors';
+import { pickGestureWriteAbi, SUPPLEMENTAL_ERROR_ABI } from '../cosmicGameContractCompat';
 
 function makeRevertError(errorName: string, args: readonly unknown[]): Error {
   const reverted = Object.assign(new Error(errorName), {
@@ -104,5 +109,82 @@ describe('withDecodedContractError', () => {
 
   it('leaves the details alone when there is no revert data', () => {
     expect(withDecodedContractError('Error: offline', new Error('offline'))).toBe('Error: offline');
+  });
+});
+
+/**
+ * The errors viem really produces, not hand-built `data: { errorName }`
+ * fixtures: a node's revert wrapped by `getContractError` against the ABI the
+ * write was made with. Before the fix the gesture slice carried no error
+ * definitions, so viem left `data` undefined and nothing was ever explained.
+ */
+describe('decoding what viem really throws for a gesture', () => {
+  // The real viem (the `viem` entry is a jest mock); only its error classes.
+  const viem = jest.requireActual<typeof import('viem')>('viem');
+
+  function gestureRevert(abi: Abi, errorName: string, args: readonly unknown[]) {
+    const data = encodeErrorResult({
+      abi: [...(cosmicGameAbi as Abi), ...(SUPPLEMENTAL_ERROR_ABI as unknown as Abi)],
+      errorName,
+      args,
+    } as unknown as Parameters<typeof encodeErrorResult>[0]);
+    const rpcError = new viem.RawContractError({ data, message: 'execution reverted' });
+    return getContractError(rpcError, {
+      abi,
+      functionName: 'bidWithEth',
+      args: [-1n, '', 0n],
+      address: '0x0000000000000000000000000000000000000001',
+    });
+  }
+
+  it('names the custom error through the gesture ABI slice', () => {
+    const err = gestureRevert(
+      pickGestureWriteAbi('bidWithEth', [-1n, '', 0n]),
+      'UsedRandomWalkNft',
+      ['Used.', 7n],
+    );
+    expect(getContractErrorDescriptor(err)).toEqual({
+      key: 'gesture.contractErrors.usedRandomWalkNft',
+      errorName: 'UsedRandomWalkNft',
+    });
+    expect(contractErrorNameOf(err)).toBe('UsedRandomWalkNft');
+  });
+
+  it('explains the Participation CST floor revert, which the generated ABI lacks', () => {
+    const err = gestureRevert(
+      pickGestureWriteAbi('bidWithEth', [-1n, '', 0n]),
+      'BidCstRewardAmountMinLimitNotReached',
+      [5n, 6n],
+    );
+    expect(getContractErrorDescriptor(err)?.key).toBe(
+      'gesture.contractErrors.cstRewardBelowMinimum',
+    );
+  });
+
+  it('still decodes the raw revert data when the ABI used has no error definitions', () => {
+    const functionOnly = pickGestureWriteAbi('bidWithEth', [-1n, '', 0n]).filter(
+      (item) => item.type === 'function',
+    );
+    const err = gestureRevert(functionOnly, 'InsufficientReceivedBidAmount', [
+      'cost changed',
+      1_500_000_000_000_000_000n,
+      1_000_000_000_000_000_000n,
+    ]);
+    expect(getContractErrorDescriptor(err, 1)).toEqual({
+      key: 'gesture.contractErrors.ethCostChanged',
+      values: { increase: '0.5', required: '1.5' },
+      errorName: 'InsufficientReceivedBidAmount',
+    });
+  });
+
+  it('reads Error(string) and Panic as no custom error', () => {
+    const data = encodeErrorResult({
+      abi: [{ type: 'error', name: 'Error', inputs: [{ name: 'message', type: 'string' }] }],
+      errorName: 'Error',
+      args: ['nope'],
+    });
+    const err = Object.assign(new Error('execution reverted'), { cause: { data } });
+    expect(contractErrorNameOf(err)).toBeNull();
+    expect(getContractErrorDescriptor(err)).toBeNull();
   });
 });

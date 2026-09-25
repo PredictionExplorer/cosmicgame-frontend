@@ -149,8 +149,8 @@
     "quickViewAria": "Quick view of Cosmic Signature {id}",
     "traitsPending": "Traits pending",
     "traitSummary": "{structure} · {palette}",
-    "cycleLong": "Cycle {n}",
-    "viewCycle": "View cycle {n}",
+    "cycleLong": "Cycle #{n}",
+    "viewCycle": "View Cycle #{n}",
     "anchoredState": "Anchored"
   },
   "rarity": {

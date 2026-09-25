@@ -7,9 +7,10 @@ import { formatId } from '@/utils/format/ids';
 import { Link } from '@/i18n/navigation';
 import type { CSTTokenInfo } from '@/services/api';
 import { signatureMedia, signatureSources, useSignatureAlt } from '@/components/nft/signatureArt';
-import { ArtFrame, ArtTag, WallLabel } from '@/components/ui/art-frame';
+import { ArtFrame } from '@/components/ui/art-frame';
 import { Button } from '@/components/ui/button';
 import { EmptyState } from '@/components/ui/empty-state';
+import { SignatureWallLabel } from '@/components/ui/signature-label';
 import { SkeletonNFTCard } from '@/components/ui/skeleton';
 
 import type { AnchoredArtwork } from './profileSummary';
@@ -36,13 +37,13 @@ interface Plate {
 /**
  * The Cosmic Signature NFTs an address holds or has anchored, as the gallery
  * hangs them: each Signature on its black plate at the native ratio, nothing
- * over the art, and a wall label beneath (name or number, token number,
- * cycle, and an Anchored tag for the ones the anchoring wallet holds).
+ * over the art, and the shared wall label beneath (name or number, token
+ * number, cycle, and the quiet anchor for the ones the anchoring wallet
+ * holds).
  * Newest first; the first two rows show until "Show all".
  */
 export function ProfileArtworks({ tokens, anchored = [], loading }: ProfileArtworksProps) {
   const t = useTranslations('myPages');
-  const tTraits = useTranslations('traits');
   const tDetail = useTranslations('detail');
   const signatureAlt = useSignatureAlt();
   const [showAll, setShowAll] = useState(false);
@@ -102,21 +103,12 @@ export function ProfileArtworks({ tokens, anchored = [], loading }: ProfileArtwo
                     density="compact"
                     className="group-hover:after:shadow-[var(--art-edge-active)]"
                   />
-                  <WallLabel
+                  <SignatureWallLabel
                     as="figcaption"
-                    title={name ?? tTraits('quickView.title', { id })}
-                    meta={[
-                      name ? <span className="font-mono">{id}</span> : null,
-                      typeof token.RoundNum === 'number' && token.RoundNum >= 0
-                        ? // "Cycle 0", as the profile's badges, pool and overview name a cycle.
-                          t('shared.cycleNumber', { cycle: token.RoundNum })
-                        : null,
-                    ]}
-                    tags={
-                      token.anchored ? (
-                        <ArtTag>{t('statistics.artworks.anchoredTag')}</ArtTag>
-                      ) : undefined
-                    }
+                    tokenId={token.TokenId}
+                    name={name}
+                    cycle={token.RoundNum}
+                    anchored={token.anchored}
                   />
                 </figure>
               </Link>

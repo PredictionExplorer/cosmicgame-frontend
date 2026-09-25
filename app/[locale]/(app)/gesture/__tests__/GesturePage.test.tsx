@@ -258,14 +258,15 @@ describe('GesturePage', () => {
     );
   });
 
-  it('prints its times in the reader’s zone and names that zone, as every page does (D275)', () => {
+  it('prints its times in UTC and names the zone, as every record does', () => {
     const { container } = renderGesture();
     const times = container.querySelectorAll('time');
     expect(times).toHaveLength(2);
-    // The instant itself stays machine-readable in UTC.
     expect(times[0]).toHaveAttribute('dateTime', '2026-05-29T09:06:06.000Z');
-    const zone = formatTimeZoneLabel('local');
-    for (const time of times) expect(time.textContent?.endsWith(` ${zone}`)).toBe(true);
+    // The same text on the server and after hydration: it never rewrites itself.
+    expect(times[0]).toHaveTextContent('May 29, 2026, 09:06:06');
+    const zone = formatTimeZoneLabel('utc');
+    for (const time of times) expect(time.textContent).toMatch(new RegExp(`\\s${zone}$`));
   });
 
   it('shows the method once, with the Random Walk NFT when one was used', () => {

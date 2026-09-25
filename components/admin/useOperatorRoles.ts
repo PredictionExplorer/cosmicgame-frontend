@@ -7,7 +7,7 @@ import { cosmicGameAbi, marketingWalletAbi } from '@/contracts/abis';
 
 import { activeChain } from '@/config/chains';
 import { useContractAddresses } from '@/contexts/ContractAddressesContext';
-import { sameAddress } from '@/utils/address';
+import { sameAddress } from '@/utils/format';
 import { reportError } from '@/utils/errors';
 
 import type { OperatorRole } from './operatorTools';

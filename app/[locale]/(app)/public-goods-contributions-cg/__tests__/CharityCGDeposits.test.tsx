@@ -129,7 +129,7 @@ describe('CharityCGDeposits', () => {
       mockUseDashboardInfo.mockReturnValue({ data: undefined, isLoading: true });
       const { container } = render(<CharityCGDeposits header={HEADER} />);
       const vault = screen.getByRole('region', { name: 'formats.address.known.publicGoods' });
-      expect(vault.querySelectorAll('[data-slot="skeleton"], .animate-pulse').length).toBe(3);
+      expect(vault.querySelectorAll('[data-slot="skeleton"]').length).toBe(3);
       expect(container).not.toHaveTextContent('ETH');
     });
   });

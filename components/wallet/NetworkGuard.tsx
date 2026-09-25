@@ -7,7 +7,6 @@ import { useTranslations } from 'next-intl';
 import { Button, type ButtonProps } from '@/components/ui/button';
 import { useWalletNetwork, type WalletNetworkState } from '@/hooks/useWalletNetwork';
 import { useActiveWeb3React } from '@/hooks/web3';
-import { stateTone } from '@/lib/stateTone';
 import { cn } from '@/lib/utils';
 
 import { ConnectWalletAction } from './ConnectWalletAction';
@@ -82,8 +81,8 @@ export function WrongNetworkChip({ className }: { className?: string }) {
       className={cn(
         'hidden size-11 shrink-0 items-center justify-center gap-1.5 rounded-full border text-xs font-semibold whitespace-nowrap transition-colors min-[360px]:inline-flex xl:hidden',
         'sm:size-9 md:w-auto md:px-3',
-        stateTone.attentionChip,
-        stateTone.attentionText,
+        'border-attention/45 bg-attention-surface hover:bg-attention/20',
+        'text-attention',
         'focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring disabled:cursor-progress',
         className,
       )}
@@ -119,7 +118,7 @@ export function WrongNetworkBadge({ className }: { className?: string }) {
         className,
       )}
     >
-      <AlertTriangle className={cn('size-3.5', stateTone.attentionText)} aria-hidden />
+      <AlertTriangle className={cn('size-3.5', 'text-attention')} aria-hidden />
       <span className="sr-only">{t('network.wrong')}</span>
     </span>
   );
@@ -171,10 +170,7 @@ export function ChainGuard({
     <div className={cn('flex flex-col items-start gap-2', className)} data-testid="chain-guard">
       {explain && (
         <p className="flex items-start gap-2 text-sm text-muted-foreground">
-          <AlertTriangle
-            className={cn('mt-0.5 size-4 shrink-0', stateTone.attentionText)}
-            aria-hidden
-          />
+          <AlertTriangle className={cn('mt-0.5 size-4 shrink-0', 'text-attention')} aria-hidden />
           {sentence(network)}
         </p>
       )}

@@ -232,7 +232,7 @@ describe('NFTTrait', () => {
     withNameHistory();
     render(<NFTTrait tokenId={5} />);
 
-    expect(screen.getByRole('link', { name: 'nav.ecosystem.axiomZero.ariaLabel' })).toHaveAttribute(
+    expect(screen.getByRole('link', { name: /nav\.ecosystem\.axiomZero\.label/ })).toHaveAttribute(
       'href',
       COSMIC_SIGNATURE_MARKETPLACE_URL,
     );
@@ -273,12 +273,13 @@ describe('NFTTrait', () => {
     );
   });
 
-  it('titles an unnamed token "Cosmic Signature #000005" at full contrast', () => {
+  it('titles an unnamed token "Signature #000005" at full contrast', () => {
     withDashboard();
     withNft({ TokenName: '' });
     mockUseNameHistory.mockReturnValue({ data: [], isLoading: false, refetch: jest.fn() });
     render(<NFTTrait tokenId={5} />);
-    const title = screen.getByRole('heading', { level: 1, name: 'Cosmic Signature #000005' });
+    const title = screen.getByRole('heading', { level: 1 });
+    expect(title).toHaveTextContent('common.signature.untitled(id=#000005)');
     expect(title.className).not.toMatch(/muted-foreground\/|text-subtle/);
     expect(screen.queryByText('detail.hero.unnamedToken')).not.toBeInTheDocument();
   });
@@ -320,11 +321,8 @@ describe('NFTTrait', () => {
     withNft();
     withNameHistory();
     render(<NFTTrait tokenId={5} />);
-    const modes = screen.getByRole('group', { name: 'detail.viewer.modeLabel' });
-    expect(within(modes).getByRole('button', { name: /detail.viewer.still/ })).toHaveAttribute(
-      'aria-pressed',
-      'true',
-    );
+    const modes = screen.getByRole('radiogroup', { name: 'detail.viewer.modeLabel' });
+    expect(within(modes).getByRole('radio', { name: /detail.viewer.still/ })).toBeChecked();
     expect(screen.getByRole('button', { name: /detail.viewer.fullscreen/ })).toBeInTheDocument();
     const neighbours = screen.getByRole('navigation', { name: 'detail.navigation.label' });
     expect(within(neighbours).getByRole('link', { name: /Previous Signature/ })).toHaveAttribute(
@@ -532,8 +530,8 @@ describe('NFTTrait', () => {
       withDashboard();
       withNft();
       render(<NFTTrait tokenId={5} />);
-      const modes = screen.getByRole('group', { name: 'detail.viewer.modeLabel' });
-      const still = within(modes).getByRole('button', { name: /detail.viewer.still/ });
+      const modes = screen.getByRole('radiogroup', { name: 'detail.viewer.modeLabel' });
+      const still = within(modes).getByRole('radio', { name: /detail.viewer.still/ });
       still.focus();
       fireEvent.keyDown(still, { key: 'ArrowRight' });
       fireEvent.keyDown(screen.getByRole('button', { name: /detail.viewer.fullscreen/ }), {

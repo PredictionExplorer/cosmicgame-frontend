@@ -21,9 +21,6 @@
     "copyImageLink": "Sao chép liên kết hình ảnh",
     "copyPageLink": "Sao chép liên kết trang"
   },
-  "actions": {
-    "buyOrSellNfts": "Mua hoặc bán NFT"
-  },
   "navigation": {
     "label": "Signature trước và sau"
   },
@@ -59,7 +56,7 @@
     "cycle": "Chu kỳ",
     "recipient": "Người nhận",
     "owner": "Chủ sở hữu",
-    "roundNumber": "Chu kỳ #{round}",
+    "roundNumber": "Chu kỳ {round}",
     "anchoring": "Neo giữ",
     "seed": "Seed",
     "seedTooltip": "Seed ngẫu nhiên độc nhất được dùng để tạo tác phẩm và đặc tính của token này.",

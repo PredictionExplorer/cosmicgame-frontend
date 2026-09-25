@@ -2,7 +2,7 @@
 
 import '@testing-library/jest-dom';
 
-import { convertTimestampToDateTime, shortenHex } from '@/utils';
+import { formatAddress } from '@/utils';
 
 import GestureHistoryTable from '@/components/tables/GestureHistoryTable';
 
@@ -40,12 +40,10 @@ describe('GestureHistoryTable', () => {
       },
     ];
     render(<GestureHistoryTable gestureHistory={mockData} />);
-    // Component uses convertTimestampToDateTime(ts, true) - includes seconds
-    expect(
-      screen.getByText(convertTimestampToDateTime(mockData[0]!.TimeStamp, true)),
-    ).toBeInTheDocument();
+    // The date with seconds, in UTC (as on the server).
+    expect(screen.getByText('Nov 30, 2023, 12:18:38')).toBeInTheDocument();
     expect(document.querySelector('time[datetime="2023-11-30T12:18:38.000Z"]')).toBeInTheDocument();
-    expect(screen.getByText(shortenHex(mockData[0]!.BidderAddr, 6))).toBeInTheDocument();
+    expect(screen.getByText(formatAddress(mockData[0]!.BidderAddr))).toBeInTheDocument();
     // The cost reads at the ledger precision with its unit, never "Ξ".
     expect(screen.getByText('0.1004').textContent).toBe('0.1004\u00a0ETH');
     // The cycle reads "Cycle 4" and links to its allocation page (the live
@@ -121,7 +119,7 @@ describe('GestureHistoryTable', () => {
     // method tag that rides on the date line on phones; CSS hides it from
     // sm, jsdom does not), then names the gesture by the number its own
     // page carries in its title.
-    const date = convertTimestampToDateTime(list[0]!.TimeStamp, true);
+    const date = 'Nov 30, 2023, 12:18:38';
     const link = screen.getByRole('link', {
       name: `${date} ETH tables.gestureHistory.viewGesture(position=25)`,
     });
@@ -145,9 +143,10 @@ describe('GestureHistoryTable', () => {
       />,
     );
     // The date and the phone-only method tag on its line, nothing after them.
-    expect(
-      screen.getByRole('link', { name: `${convertTimestampToDateTime(1701346718, true)} ETH` }),
-    ).toHaveAttribute('href', '/gesture/77');
+    expect(screen.getByRole('link', { name: `Nov 30, 2023, 12:18:38 ETH` })).toHaveAttribute(
+      'href',
+      '/gesture/77',
+    );
   });
 
   test("drops who and how long on a participant's own page", () => {

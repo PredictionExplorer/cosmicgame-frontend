@@ -139,15 +139,45 @@ export function readAttentionPreferences(): AttentionPreferences {
 /** Test-only: forget the cached snapshot. */
 export function resetAttentionPreferencesForTest(): void {
   cachedPreferences = null;
+  notificationConstructorFailed = false;
   listeners.clear();
 }
 
 export type NotificationPermissionState = NotificationPermission | 'unsupported';
 
-/** The browser's notification permission, or `unsupported`. */
+/** Set once `new Notification()` threw in this page: the browser cannot show one. */
+let notificationConstructorFailed = false;
+
+/**
+ * Whether this browser exposes `Notification` but refuses to construct one
+ * outside a service worker: Chrome, Samsung Internet and Firefox on Android
+ * all throw "Illegal constructor. Use ServiceWorkerRegistration
+ * .showNotification()". The app registers no service worker, so the alert
+ * cannot work there and is not offered.
+ */
+function constructorUnavailable(): boolean {
+  if (notificationConstructorFailed) return true;
+  const nav = typeof navigator === 'undefined' ? undefined : navigator;
+  const mobileHint = (nav as (Navigator & { userAgentData?: { mobile?: boolean } }) | undefined)
+    ?.userAgentData?.mobile;
+  return mobileHint === true || /Android/i.test(nav?.userAgent ?? '');
+}
+
+/** The browser's notification permission, or `unsupported` where no notification can be shown. */
 export function getNotificationPermission(): NotificationPermissionState {
   if (typeof window === 'undefined' || typeof Notification === 'undefined') return 'unsupported';
+  if (constructorUnavailable()) return 'unsupported';
   return Notification.permission;
+}
+
+/**
+ * Records that constructing a notification threw (a browser the checks above
+ * did not recognise): the alert turns off, and the menu reads `unsupported`
+ * from then on instead of offering it again.
+ */
+export function markNotificationsUnsupported(): void {
+  notificationConstructorFailed = true;
+  updateAttentionPreferences({ finalizationAlert: false });
 }
 
 export interface UseAttentionPreferencesResult {

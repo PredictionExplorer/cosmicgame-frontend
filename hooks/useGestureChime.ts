@@ -3,7 +3,7 @@
 import { useEffect, useRef } from 'react';
 
 import { useAttentionPreferences } from '@/hooks/useAttentionPreferences';
-import { sameAddress } from '@/utils/address';
+import { sameAddress } from '@/utils/format';
 import { reportError } from '@/utils/errors';
 
 /** 0.9 s mono MP3 (about 6 KB), fetched only after the viewer turns sound on. */

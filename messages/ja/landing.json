@@ -46,12 +46,6 @@
     "liveClock": "ライブのサイクル時計",
     "cycleClock": "サイクルの時計",
     "gestureCount": "{count, plural, other {#筆}}",
-    "units": {
-      "days": "日",
-      "hours": "時間",
-      "minutes": "分",
-      "seconds": "秒"
-    },
     "duration": {
       "days": "{count, plural, other {#日}}",
       "hours": "{count, plural, other {#時間}}",
@@ -70,7 +64,6 @@
     "resumeRotation": "作品の切り替えを再開",
     "playAnimation": "アニメーションを再生",
     "pauseAnimation": "アニメーションを一時停止",
-    "unavailable": "アートワークを利用できません",
-    "untitled": "シグネチャー{tokenLabel}"
+    "unavailable": "アートワークを利用できません"
   }
 }

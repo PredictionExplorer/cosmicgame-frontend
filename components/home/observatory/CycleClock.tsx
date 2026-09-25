@@ -1,13 +1,16 @@
 'use client';
 
-import { Fragment, type ReactNode } from 'react';
-import type { CountdownRenderProps } from 'react-countdown';
+import type { ReactNode } from 'react';
 import { ArrowRight, CalendarPlus } from 'lucide-react';
 import { useLocale, useTranslations } from 'next-intl';
 
-import { SmoothCountdown } from '@/components/common/SmoothCountdown';
+import {
+  SmoothCountdown,
+  type LocalizedCountdownRenderProps,
+} from '@/components/common/SmoothCountdown';
 import { Amount } from '@/components/ui/amount';
 import { Button } from '@/components/ui/button';
+import { CountdownFigures, countdownGroups } from '@/components/ui/countdown-figures';
 import { Duration } from '@/components/ui/duration';
 import { InfoTooltip } from '@/components/ui/info-tooltip';
 import { useHydrated } from '@/hooks/useHydrated';
@@ -59,37 +62,14 @@ const ITEM_SEPARATOR =
   "relative ps-4 before:pointer-events-none before:absolute before:inset-y-0 before:start-0 before:flex before:w-4 before:items-center before:justify-center before:text-subtle before:content-['·']";
 
 /**
- * The clock's one size, fitted to its column: four two-digit groups and three
- * colons never outgrow a 288px phone column or a 380px laptop column. Words
- * that replace the figures (at zero, before the first Gesture) take the
- * slightly smaller word size so "Ready to finalize" stays on one line, but
- * the readout keeps its height: nothing on the clock shrinks at zero.
+ * The readout keeps the height of the figures (CountdownFigures' `desk`
+ * bounds plus their captions) whatever stands in it. Words that replace the
+ * figures (at zero, before the first Gesture) take the slightly smaller word
+ * size so "Ready to finalize" stays on one line, but nothing on the clock
+ * shrinks at zero.
  */
-const FIGURE_SIZE = 'text-[clamp(2.25rem,12cqi,3.5rem)]';
 const WORD_SIZE = 'text-[clamp(1.625rem,7.5cqi,2.75rem)]';
 const READOUT_HEIGHT = 'min-h-[calc(clamp(2.25rem,12cqi,3.5rem)+1.5rem)]';
-
-type UnitId = 'days' | 'hours' | 'minutes' | 'seconds';
-
-interface ClockGroup {
-  id: UnitId;
-  value: number;
-}
-
-/**
- * DD:HH:MM:SS while days remain, then HH:MM:SS: the width never jumps within
- * a phase. Each group is captioned by its unit as a fixed column label (the
- * spoken reading comes from the timer's own label), so a caption never
- * changes word or width as the digits tick.
- */
-function clockGroups({ days, hours, minutes, seconds }: CountdownRenderProps): ClockGroup[] {
-  const groups: ClockGroup[] = [
-    { id: 'hours', value: hours },
-    { id: 'minutes', value: minutes },
-    { id: 'seconds', value: seconds },
-  ];
-  return days > 0 ? [{ id: 'days', value: days }, ...groups] : groups;
-}
 
 /**
  * Ticks the server-rendered figures until React takes over. The page is
@@ -103,49 +83,7 @@ function clockGroups({ days, hours, minutes, seconds }: CountdownRenderProps): C
  */
 export const PREHYDRATION_TICK = `(function(){var s=document.currentScript,e=s&&s.previousElementSibling;if(!e)return;var t=Number(e.getAttribute('data-deadline'));if(!(t>0))return;var i=0;function k(){if(e.hasAttribute('data-hydrated')){clearInterval(i);return}var r=Math.max(0,t-Date.now()),v={days:Math.floor(r/864e5),hours:Math.floor(r%864e5/36e5),minutes:Math.floor(r%36e5/6e4),seconds:Math.floor(r%6e4/1e3)},n=e.querySelectorAll('[data-unit]');for(var j=0;j<n.length;j++){var u=n[j].getAttribute('data-unit');if(u in v)n[j].textContent=String(v[u]).padStart(2,'0')}if(r<=0)clearInterval(i)}i=setInterval(k,1000);k()})();`;
 
-/**
- * The clock as type: tabular Inter figures with hairline colons and a
- * localized caption unit under each group. No tiles, rings or glows.
- */
-function ClockFigures({ deadlineMs, ...props }: CountdownRenderProps & { deadlineMs: number }) {
-  const t = useTranslations('home.observatory.clock.unitLabels');
-  const groups = clockGroups(props);
-  const hydrated = useHydrated();
-
-  return (
-    <div
-      data-testid="clock-figures"
-      data-deadline={deadlineMs}
-      data-hydrated={hydrated || undefined}
-      // The size goes first: tailwind-merge drops a leading-* that precedes a
-      // text-[size], and the digits must set solid (line-height 1).
-      className={cn(
-        FIGURE_SIZE,
-        'flex items-start justify-start gap-[0.12em] font-normal leading-none tracking-[-0.03em] text-foreground tabular-nums lining-nums',
-      )}
-    >
-      {groups.map((group, index) => (
-        <Fragment key={group.id}>
-          {index > 0 && (
-            <span aria-hidden className="font-light text-subtle">
-              :
-            </span>
-          )}
-          <span className="flex flex-col items-center">
-            {/* The pre-hydration tick may already have moved these digits on;
-                React's first render keeps the server value it reconciles. */}
-            <span data-unit={group.id} suppressHydrationWarning>
-              {String(group.value).padStart(2, '0')}
-            </span>
-            <span className="type-caption mt-1 tracking-normal text-subtle">{t(group.id)}</span>
-          </span>
-        </Fragment>
-      ))}
-    </div>
-  );
-}
-
-function renderWindowCountdown({ total }: CountdownRenderProps) {
+function renderWindowCountdown({ total }: LocalizedCountdownRenderProps) {
   return (
     <Duration
       seconds={Math.ceil(total / 1000)}
@@ -263,7 +201,18 @@ export function CycleClock({
               <SmoothCountdown
                 date={targetMs}
                 initialNowMs={now}
-                renderer={(props) => <ClockFigures {...props} deadlineMs={targetMs} />}
+                renderer={(parts) => (
+                  // The one Cycle clock (the landing's and /current-cycle's
+                  // too): padded groups, one set of captions.
+                  <CountdownFigures
+                    groups={countdownGroups(parts, locale)}
+                    size="desk"
+                    align="start"
+                    deadlineMs={targetMs}
+                    hydrated={hydrated}
+                    data-testid="clock-figures"
+                  />
+                )}
                 intervalMs={1000}
               />
               {/* Server HTML and hydration only: a client-side render ticks

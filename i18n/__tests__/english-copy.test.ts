@@ -67,6 +67,47 @@ const CAPITALISED_GESTURE_ALLOWLIST = new Set([
   'admin:settings.fields.gestureRatio',
 ]);
 
+/**
+ * The coined names that keep their capitals wherever they appear in English
+ * (docs/design-system.md → Copy, AGENTS.md → the lexicon): "Cycle Reserve",
+ * never "cycle reserve" or "Cycle reserve".
+ */
+const COINED_TERMS = [
+  'Cycle Reserve',
+  'Gesture Cost',
+  'Public Goods',
+  'Outreach Reserve',
+  'Anchor Distribution',
+  'Endurance Champion',
+  'Stellar Selection',
+  'Signature Allocation',
+  'Calibration Window',
+] as const;
+
+/** "Cosmic Signature allocation…" names the protocol, not the Signature Allocation. */
+const COINED_TERM_EXCEPTIONS: readonly RegExp[] = [/Cosmic Signature allocation/i];
+
+/** A coined name written in lower case or half capitalised. */
+function lowercasedCoinedTerms(value: string): string[] {
+  const text = COINED_TERM_EXCEPTIONS.reduce(
+    (current, pattern) => current.replace(pattern, ''),
+    value,
+  );
+  const found: string[] = [];
+  for (const term of COINED_TERMS) {
+    const pattern = new RegExp(`(?<![\\w-])${term}(?=s?\\b)(?!-)`, 'gi');
+    for (const match of text.matchAll(pattern)) {
+      // A verb, not the quantity: "what a gesture costs".
+      if (term === 'Gesture Cost' && /^s/.test(text.slice(match.index + term.length))) {
+        const before = text.slice(0, match.index);
+        if (/\ba $|CST $/.test(before)) continue;
+      }
+      if (match[0] !== term) found.push(match[0]);
+    }
+  }
+  return found;
+}
+
 /** A capitalised common-noun gesture: not the role or a named quantity. */
 function capitalisedGestures(value: string): string[] {
   const found: string[] = [];
@@ -103,6 +144,26 @@ describe('copy conventions', () => {
         const id = `${namespace}:${key}`;
         if (CAPITALISED_GESTURE_ALLOWLIST.has(id)) continue;
         for (const hit of capitalisedGestures(value)) offenders.push(`${id}: …${hit}`);
+      }
+    }
+    expect(offenders).toEqual([]);
+  });
+
+  it('recognises a coined name in lower case, but not the protocol or a verb', () => {
+    expect(lowercasedCoinedTerms('Where the cycle reserve goes')).toEqual(['cycle reserve']);
+    expect(lowercasedCoinedTerms('Cycle reserve split')).toEqual(['Cycle reserve']);
+    expect(lowercasedCoinedTerms('Learn about public goods')).toEqual(['public goods']);
+    expect(lowercasedCoinedTerms('Cosmic Signature allocation history')).toEqual([]);
+    expect(lowercasedCoinedTerms('What a gesture costs')).toEqual([]);
+    expect(lowercasedCoinedTerms('Where the Cycle Reserve goes')).toEqual([]);
+  });
+
+  it('keeps the capitals of the coined names in English (Cycle Reserve, Public Goods…)', () => {
+    const offenders: string[] = [];
+    for (const namespace of NAMESPACES) {
+      for (const [key, value] of readCatalog(routing.defaultLocale, namespace)) {
+        for (const hit of lowercasedCoinedTerms(value))
+          offenders.push(`${namespace}:${key}: ${hit}`);
       }
     }
     expect(offenders).toEqual([]);

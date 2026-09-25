@@ -1,6 +1,7 @@
 import type { LandingContent } from '@/content/landing';
 
 import { cn } from '@/lib/utils';
+import { Steps } from '@/components/ui/steps';
 
 import { ArtAnimationPlate } from './ArtAnimationPlate';
 import { ImprintedFigure } from './ImprintedFigure';
@@ -36,20 +37,15 @@ export function TheArt({ art }: TheArtProps) {
             seedLabel={seed?.title ?? ''}
           />
         </div>
-        <ol className={styles.stages}>
-          {art.stages.map((stage) => (
-            <li key={stage.number} className={styles.stage}>
-              <span className="type-label pt-1 tabular-nums text-subtle">
-                <span className="sr-only">{art.stageLabel} </span>
-                {stage.number}
-              </span>
-              <div className="min-w-0">
-                <h3 className="type-heading-3">{stage.title}</h3>
-                <p className="type-body-sm mt-1.5 text-muted-foreground">{stage.body}</p>
-              </div>
-            </li>
-          ))}
-        </ol>
+        <Steps
+          className={styles.stages}
+          stepLabel={(n) => `${art.stageLabel} ${n}`}
+          items={art.stages.map((stage) => ({
+            id: stage.number,
+            title: stage.title,
+            body: <p>{stage.body}</p>,
+          }))}
+        />
       </div>
 
       <dl className={styles.figureStrip}>

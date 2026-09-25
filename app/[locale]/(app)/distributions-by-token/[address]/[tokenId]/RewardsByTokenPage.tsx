@@ -10,7 +10,6 @@ import { Link } from '@/i18n/navigation';
 import { PageHeader, type PageHeaderFigure } from '@/components/layout/PageHeader';
 import { useParticipantTrail } from '@/components/layout/participantTrail';
 import { AddressChip } from '@/components/ui/address-chip';
-import { WallLabel } from '@/components/ui/art-frame';
 import { Amount } from '@/components/ui/amount';
 import { buttonVariants } from '@/components/ui/button';
 import {
@@ -21,6 +20,7 @@ import {
 } from '@/components/ui/data-table';
 import { DateTime } from '@/components/ui/date-time';
 import { PageShell } from '@/components/ui/page-shell';
+import { SignatureWallLabel, useSignatureLabel } from '@/components/ui/signature-label';
 import { Skeleton } from '@/components/ui/skeleton';
 import { TokenPlate } from '@/components/anchoring/TokenPlate';
 import { anchorActionHref } from '@/components/anchoring/anchorLinks';
@@ -156,8 +156,9 @@ function RewardsByTokenPage({ address, tokenId }: { address: string; tokenId: nu
     [t, tCommon],
   );
 
+  const label = useSignatureLabel();
   const tokenName = token.data?.TokenName?.trim() || null;
-  const tokenTitle = tokenName ?? t('art.signatureTitle', { id: formatId(tokenId) });
+  const tokenTitle = label.text({ tokenId, name: tokenName });
   // An NFT with no deposit yet: the ledger's empty state says so once; zero figures above it
   // would repeat it.
   const noDeposits = !query.isLoading && !query.isError && deposits.length === 0;
@@ -183,25 +184,12 @@ function RewardsByTokenPage({ address, tokenId }: { address: string; tokenId: nu
           />
           <span className="sr-only">{tokenTitle}</span>
         </Link>
-        <WallLabel
-          title={tokenTitle}
-          meta={[
-            // An unnamed token's title already carries its number (as on its anchor actions).
-            tokenName ? (
-              <span key="id" className="font-mono">
-                {formatId(tokenId)}
-              </span>
-            ) : null,
-            typeof token.data?.RoundNum === 'number'
-              ? t('picker.cycle', { cycle: token.data.RoundNum })
-              : null,
-          ]}
-        >
+        <SignatureWallLabel tokenId={tokenId} name={tokenName} cycle={token.data?.RoundNum}>
           <p className="mt-2 flex flex-wrap items-center gap-x-2 gap-y-1 type-body-sm text-muted-foreground">
             <span className="type-label text-subtle">{t('distributionsByToken.holder')}</span>
             <AddressChip address={address} variant="plain" />
           </p>
-        </WallLabel>
+        </SignatureWallLabel>
       </div>
 
       <DataTable

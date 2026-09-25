@@ -46,12 +46,6 @@
     "liveClock": "即時週期時鐘",
     "cycleClock": "週期時鐘",
     "gestureCount": "{count, number} 次落筆",
-    "units": {
-      "days": "天",
-      "hours": "小時",
-      "minutes": "分",
-      "seconds": "秒"
-    },
     "duration": {
       "days": "{count, plural, other {# 天}}",
       "hours": "{count, plural, other {# 小時}}",
@@ -70,7 +64,6 @@
     "resumeRotation": "繼續作品輪換",
     "playAnimation": "播放動畫",
     "pauseAnimation": "暫停動畫",
-    "unavailable": "作品暫不可用",
-    "untitled": "簽名作品 {tokenLabel}"
+    "unavailable": "作品暫不可用"
   }
 }

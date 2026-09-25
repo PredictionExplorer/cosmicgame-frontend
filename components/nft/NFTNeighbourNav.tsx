@@ -1,12 +1,11 @@
 'use client';
 
-import { ArrowLeft, ArrowRight } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 
 import { formatId } from '@/utils';
 
-import { Link } from '@/i18n/navigation';
 import { cn } from '@/lib/utils';
+import { RecordPager } from '@/components/ui/record-pager';
 
 /** The tokens either side of `tokenId`; `next` is null while the collection size is unknown. */
 export interface NeighbourIds {
@@ -33,16 +32,15 @@ export interface NFTNeighbourNavProps {
   className?: string;
 }
 
-const linkClass = cn(
-  'inline-flex h-11 items-center gap-1.5 rounded-control px-2.5 text-muted-foreground no-underline',
-  'transition-colors duration-[var(--duration-fast)] hover:bg-surface hover:text-foreground sm:h-9',
-  '[&_svg]:size-4 [&_svg]:shrink-0',
-);
+/** A token number in a pager label: the identifier face, never broken. */
+function TokenNumber({ id }: { id: number }) {
+  return <span className="font-mono whitespace-nowrap">{formatId(id)}</span>;
+}
 
 /**
- * NFTNeighbourNav — labelled text links to the previous and next Signatures
- * ("← #000024", "#000026 →"). They are real links, so they prefetch, open in
- * a new tab and show their target, and the next one waits (reserving its
+ * NFTNeighbourNav — the previous and next Signatures ("← #000024",
+ * "#000026 →") through the one RecordPager every record page uses: real
+ * links named by direction and number, and the next one waits (reserving its
  * space) until the collection size is known rather than guessing.
  */
 export function NFTNeighbourNav({ tokenId, total, className }: NFTNeighbourNavProps) {
@@ -52,35 +50,19 @@ export function NFTNeighbourNav({ tokenId, total, className }: NFTNeighbourNavPr
   const nextPending = total === null && next === null;
 
   return (
-    <nav
-      aria-label={t('navigation.label')}
-      className={cn('flex w-full items-center gap-1 sm:w-auto', className)}
+    <RecordPager
       data-testid="neighbour-nav"
-    >
-      {previous !== null ? (
-        <Link href={`/detail/${previous}`} className={linkClass} data-testid="neighbour-previous">
-          <ArrowLeft aria-hidden />
-          <span className="sr-only">{tTraits('quickView.previous')}</span>
-          <span className="tabular-nums">{formatId(previous)}</span>
-        </Link>
-      ) : null}
-      {next !== null ? (
-        <Link
-          href={`/detail/${next}`}
-          // On a phone the pair spans the row: previous left, next right.
-          className={cn(linkClass, 'ml-auto')}
-          data-testid="neighbour-next"
-        >
-          <span className="sr-only">{tTraits('quickView.next')}</span>
-          <span className="tabular-nums">{formatId(next)}</span>
-          <ArrowRight aria-hidden />
-        </Link>
-      ) : nextPending ? (
-        <span aria-hidden className={cn(linkClass, 'invisible ml-auto')}>
-          <span className="tabular-nums">{formatId(tokenId + 1)}</span>
-          <ArrowRight />
-        </span>
-      ) : null}
-    </nav>
+      label={t('navigation.label')}
+      previousLabel={tTraits('quickView.previous')}
+      nextLabel={tTraits('quickView.next')}
+      previous={
+        previous !== null
+          ? { href: `/detail/${previous}`, label: <TokenNumber id={previous} /> }
+          : null
+      }
+      next={next !== null ? { href: `/detail/${next}`, label: <TokenNumber id={next} /> } : null}
+      nextPending={nextPending ? <TokenNumber id={tokenId + 1} /> : undefined}
+      className={cn('w-full sm:w-auto', className)}
+    />
   );
 }

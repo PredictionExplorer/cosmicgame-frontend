@@ -16,6 +16,7 @@ import type {
 
 import { activeChain } from '@/config/chains';
 import { TxExplorerLink } from '@/components/ui/tx-status';
+import { useContractAddresses } from '@/contexts/ContractAddressesContext';
 import { useOptionalWalletUi } from '@/contexts/WalletUiContext';
 import { useTxErrorMessage } from '@/hooks/useTxErrorMessage';
 import {
@@ -32,8 +33,13 @@ import {
   type TxErrorInfo,
 } from '@/lib/txErrors';
 import { IDLE_TX_STAGE, isTxBusy, type TxStage } from '@/lib/txStage';
-import { getContractErrorDescriptor, withDecodedContractError } from '@/utils/contractErrors';
-import { reportError } from '@/utils/errors';
+import { assertTrustedWrite, readTrustedAddresses, type ContractReader } from '@/lib/writeTargets';
+import {
+  contractErrorNameOf,
+  getContractErrorDescriptor,
+  withDecodedContractError,
+} from '@/utils/contractErrors';
+import { reportError, reportErrorThrottled } from '@/utils/errors';
 
 export { isTxBusy, txStageHash, type TxStage, type TxStatusName } from '@/lib/txStage';
 export { useTxStageLabel } from '@/hooks/useTxStageLabel';
@@ -67,8 +73,20 @@ export interface TxContext {
   /** The connected account the flow started with. */
   account: Address;
   /**
-   * Sends a contract write on the protocol's chain. The signer is resolved
-   * when this runs — after any network switch — never captured at render.
+   * Sends a contract write on the protocol's chain, and is the only way a
+   * flow writes. Before the wallet prompt it
+   *
+   * 1. checks the target (or, for an approval, the spender) against the
+   *    protocol's contracts read on-chain from the game proxy
+   *    (`lib/writeTargets`), and
+   * 2. simulates the call from the connected account, so a transaction the
+   *    contract would reject fails here, with its decoded custom error,
+   *    instead of being signed and mined. Only a simulation that cannot run
+   *    at all (the RPC is down) lets the write through to the wallet's own
+   *    estimate.
+   *
+   * The signer is resolved when this runs (after any network switch), never
+   * captured at render.
    */
   writeContract: <
     const abi extends Abi | readonly unknown[],
@@ -137,10 +155,12 @@ export type TxResult =
   | { status: 'confirmed'; hash: Hash; receipt: TransactionReceipt }
   | { status: 'failed'; error: TxErrorInfo; hash?: Hash }
   /**
-   * Declined in the wallet (nothing sent), or cancelled from the wallet after
-   * sending — then `hash` is the mined replacement, which paid a network fee.
+   * Declined in the wallet (nothing sent), or replaced from the wallet after
+   * sending: then `hash` is the mined replacement, which paid a network fee,
+   * and `replaced` says it was a different transaction rather than the
+   * wallet's "cancel".
    */
-  | { status: 'cancelled'; hash?: Hash }
+  | { status: 'cancelled'; hash?: Hash; replaced?: boolean }
   /** `prepare` returned false, or no wallet was connected. */
   | { status: 'aborted' }
   /** Another run of this flow is still in progress. */
@@ -160,6 +180,51 @@ const SUCCESS_TOAST_MS = 8_000;
 const RECEIPT_TIMEOUT_MS = 180_000;
 
 let toastSequence = 0;
+
+/* ────────────────────────────────────────────────────────────────── */
+/*  Simulation                                                       */
+/* ────────────────────────────────────────────────────────────────── */
+
+/** The fields of a write request that the target check and the simulation read. */
+interface WriteCall {
+  address: `0x${string}`;
+  abi: Abi;
+  functionName: string;
+  args?: readonly unknown[];
+  value?: bigint;
+}
+
+interface SimulatingClient {
+  simulateContract: (args: WriteCall & { account: Address }) => Promise<unknown>;
+}
+
+/**
+ * Runs the call as `eth_call` from the connected account before the wallet
+ * prompt. A revert (with its custom error) or a balance that cannot cover the
+ * value stops the flow here, so nothing is signed. Gas and fee fields are
+ * left out on purpose: with a fee set, a node charges its whole call gas cap
+ * against the balance and would refuse a wallet that can afford the real
+ * transaction. When the simulation itself cannot run (the RPC is down or
+ * rate limited), the write goes on and the wallet's own estimate decides.
+ */
+async function simulateWrite(client: unknown, call: WriteCall, account: Address): Promise<void> {
+  const simulator = client as Partial<SimulatingClient>;
+  if (typeof simulator.simulateContract !== 'function') return;
+  try {
+    await simulator.simulateContract({
+      address: call.address,
+      abi: call.abi,
+      functionName: call.functionName,
+      ...(call.args ? { args: call.args } : {}),
+      ...(call.value !== undefined ? { value: call.value } : {}),
+      account,
+    });
+  } catch (err) {
+    const { kind } = classifyTxError(err);
+    if (kind === 'would-revert' || kind === 'insufficient-funds') throw err;
+    reportErrorThrottled(err, 'tx-simulate');
+  }
+}
 
 /* ────────────────────────────────────────────────────────────────── */
 /*  Hook                                                             */
@@ -194,6 +259,7 @@ export function useTxFlow(): UseTxFlowResult {
   const { address, chainId: walletChainId } = useConnection();
   const { mutateAsync: switchChainAsync } = useSwitchChain();
   const walletUi = useOptionalWalletUi();
+  const { cosmicGame: apiGameAddress } = useContractAddresses();
 
   const [stage, setStage] = useState<TxStage>(IDLE_TX_STAGE);
   const inFlightRef = useRef(false);
@@ -266,34 +332,55 @@ export function useTxFlow(): UseTxFlowResult {
       }
 
       inFlightRef.current = true;
+      // The hash a failure refers to: the approval or main transaction being
+      // followed, never an earlier approval that already confirmed.
       let currentHash: Hash | undefined;
+      let trustedTargets: Promise<ReadonlySet<string>> | null = null;
       const ctx: TxContext = {
         account: address,
-        writeContract: (request) =>
-          writeContract(config, {
+        writeContract: async (request) => {
+          if (!publicClient) throw new TxClientUnavailableError();
+          const call = request as unknown as WriteCall;
+          trustedTargets ??= readTrustedAddresses(
+            publicClient as unknown as ContractReader,
+            activeChain.id,
+            apiGameAddress,
+          );
+          assertTrustedWrite(call, await trustedTargets);
+          await simulateWrite(publicClient, call, address);
+          return writeContract(config, {
             ...request,
             chainId: activeChain.id,
-          } as unknown as WriteContractParameters),
+          } as unknown as WriteContractParameters);
+        },
       };
 
       const waitForReceipt = async (
         client: NonNullable<typeof publicClient>,
         hash: Hash,
       ): Promise<TransactionReceipt> => {
-        let cancelledInWallet = false;
+        // A holder, not a `let`: the callback assigns it, which control-flow
+        // narrowing cannot see.
+        const replacedBy: { reason: 'cancelled' | 'replaced' | null } = { reason: null };
         const receipt = await client.waitForTransactionReceipt({
           hash,
           timeout: RECEIPT_TIMEOUT_MS,
           onReplaced: (replacement) => {
-            // A speed-up in the wallet replaces the hash; follow it so the
-            // explorer link stays right. A wallet "cancel" mines a zero-value
-            // replacement instead: a cancellation, but one that paid a fee.
-            if (replacement.reason === 'cancelled') cancelledInWallet = true;
+            // A speed-up in the wallet ('repriced') keeps the call and only
+            // changes the fee: follow its hash so the explorer link stays
+            // right. A wallet "cancel" mines a zero-value send to self, and
+            // 'replaced' is a different transaction that reused the nonce:
+            // either way this action was not recorded, and the replacement
+            // paid a fee.
+            if (replacement.reason !== 'repriced') replacedBy.reason = replacement.reason;
             currentHash = replacement.transaction.hash;
           },
         });
-        if (cancelledInWallet) {
-          throw new TxCancelledInWalletError(receipt.transactionHash ?? currentHash ?? hash);
+        if (replacedBy.reason) {
+          throw new TxCancelledInWalletError(
+            receipt.transactionHash ?? currentHash ?? hash,
+            replacedBy.reason === 'replaced',
+          );
         }
         if (receipt.status !== 'success') throw new TxRevertedError(receipt.transactionHash);
         return receipt;
@@ -364,6 +451,9 @@ export function useTxFlow(): UseTxFlowResult {
             description: explorerLink(approvalHash),
           });
           await waitForReceipt(publicClient, approvalHash);
+          // Confirmed: a later failure (the main write refused before it is
+          // sent) must not be reported against this approval's hash.
+          currentHash = undefined;
         }
 
         update({ status: 'awaiting-signature', step: total, total });
@@ -403,19 +493,24 @@ export function useTxFlow(): UseTxFlowResult {
         }
         if (err instanceof TxCancelledInWalletError) {
           const replacementHash = err.hash as Hash;
-          update({ status: 'cancelled', hash: replacementHash });
-          toast.info(t('tx.status.cancelledInWallet'), {
-            id: toastId,
-            description: explorerLink(replacementHash),
-            duration: SUCCESS_TOAST_MS,
-          });
-          return { status: 'cancelled', hash: replacementHash };
+          const replaced = err.replaced ? { replaced: true } : {};
+          update({ status: 'cancelled', hash: replacementHash, ...replaced });
+          toast.info(
+            t(err.replaced ? 'tx.status.replacedInWallet' : 'tx.status.cancelledInWallet'),
+            {
+              id: toastId,
+              description: explorerLink(replacementHash),
+              duration: SUCCESS_TOAST_MS,
+            },
+          );
+          return { status: 'cancelled', hash: replacementHash, ...replaced };
         }
 
         reportError(err, errorContext);
         // "Copy details" carries the decoded custom error and its arguments.
         const info: TxErrorInfo = {
           ...classified,
+          contractErrorName: classified.contractErrorName ?? contractErrorNameOf(err),
           details: withDecodedContractError(classified.details, err),
         };
         const descriptor = getContractErrorDescriptor(err);
@@ -442,6 +537,7 @@ export function useTxFlow(): UseTxFlowResult {
     },
     [
       address,
+      apiGameAddress,
       config,
       copyDetailsAction,
       explorerLink,

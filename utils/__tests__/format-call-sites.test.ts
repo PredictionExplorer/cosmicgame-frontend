@@ -5,8 +5,9 @@ import { join, relative } from 'node:path';
  * Ratchet for the formatting layer (utils/format.ts): numbers on screen go
  * through `formatAmount` / `formatCount` / `formatPercent` / `<Amount>`, which
  * group digits, follow the locale and apply one precision policy. A raw
- * `toFixed` (or its total twin `formatFixed`) does none of that: "60872.26
- * CST" beside "1,135", 4 digits in one card and 2 in the next.
+ * `toFixed` does none of that: "60872.26 CST" beside "1,135", 4 digits in
+ * one card and 2 in the next. (A `formatFixed` twin once wrapped it; it is
+ * gone, and the pattern still refuses it.)
  *
  * Files that still use them are listed with their exact current count. The
  * count may only go down, and the entry must follow it: migrate a call site,

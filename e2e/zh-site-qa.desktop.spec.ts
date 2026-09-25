@@ -50,7 +50,7 @@ const UNEXPECTED_EXACT_UI_COPY = new Set([
   'Public Goods',
   'Anchor Distribution',
   'Chrono-Warrior',
-  'Next cycle',
+  'Compounding Cycle Reserve',
   'Allocation Tracks',
   'Protocol Configuration',
 ]);

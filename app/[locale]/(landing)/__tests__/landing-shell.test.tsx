@@ -1,7 +1,5 @@
 import '@testing-library/jest-dom';
 
-import { getLandingContent } from '@/content/landing';
-
 import { LandingFooter } from '@/components/landing-v2/LandingFooter';
 import { routing } from '@/i18n/routing';
 import { APP_ORIGIN, localeHref } from '@/lib/hostRouting';
@@ -18,10 +16,7 @@ const SECTIONS = { cycle: 'The Cycle', art: 'The Art', tracks: 'Allocation Track
 function renderShell(locale = 'en') {
   mockLocale.mockReturnValue(locale);
   return render(
-    <LandingShell
-      footer={<LandingFooter footer={getLandingContent(locale).footer} />}
-      sections={SECTIONS}
-    >
+    <LandingShell footer={<LandingFooter />} sections={SECTIONS}>
       <main id="main" tabIndex={-1}>
         <h1>Page content</h1>
       </main>
@@ -104,10 +99,7 @@ describe('Landing chrome', () => {
     mockPathname.mockReturnValue('/');
     mockLocale.mockReturnValue('en');
     render(
-      <LandingShell
-        footer={<LandingFooter footer={getLandingContent('en').footer} />}
-        sections={SECTIONS}
-      >
+      <LandingShell footer={<LandingFooter />} sections={SECTIONS}>
         <main id="main" tabIndex={-1}>
           <section aria-labelledby="landing-headline">
             <h1 id="landing-headline">Hero</h1>
@@ -135,9 +127,8 @@ describe('Landing chrome', () => {
     expect(
       within(screen.getByRole('banner')).getByRole('link', { name: 'nav.cta.openApp' }),
     ).toHaveAttribute('href', localeHref(APP_ORIGIN, '/', locale));
-    expect(screen.getByRole('contentinfo')).toHaveTextContent(
-      getLandingContent(locale).footer.tagline,
-    );
+    // The footer's copy is the app's, from the one footer catalog.
+    expect(screen.getByRole('contentinfo')).toHaveTextContent('footer.tagline');
   });
 
   it('has accessible navigation and footer landmarks', async () => {

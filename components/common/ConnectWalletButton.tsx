@@ -13,6 +13,7 @@ import {
 } from '@/config/siteNav';
 import { OUTBOUND_ICONS, SITE_ROUTE_ICONS } from '@/config/siteNavIcons';
 import { usePathname } from '@/i18n/navigation';
+import { TOUCH_TARGET_EXTENDED_CLASS } from '@/lib/touch-target';
 import { cn } from '@/lib/utils';
 import { formatAmount, formatAddress, formatCount } from '@/utils/format';
 import {
@@ -494,6 +495,11 @@ const ConnectWalletButton = ({
       <div className="ml-auto">
         <ConnectWalletAction
           showIcon={false}
+          // In the header it is a quiet outline at 36px, so each page's own
+          // main action stays the one filled button in view; the touch pad
+          // keeps its 44px target.
+          variant={compactInHeader ? 'outline' : undefined}
+          data-touch-target={compactInHeader ? 'extended' : undefined}
           label={
             compactInHeader ? (
               <>
@@ -502,7 +508,13 @@ const ConnectWalletButton = ({
               </>
             ) : undefined
           }
-          className={cn('min-h-11 sm:min-h-10', liquid && 'liquid-glass-cta', className)}
+          className={cn(
+            compactInHeader
+              ? cn('h-9 min-h-9 px-3.5 sm:h-9', TOUCH_TARGET_EXTENDED_CLASS)
+              : 'min-h-11 sm:min-h-10',
+            liquid && 'liquid-glass-cta',
+            className,
+          )}
         />
       </div>
     );

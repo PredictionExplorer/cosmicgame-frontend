@@ -10,9 +10,11 @@ export interface ContentsEntry {
 
 /** The copy the contents rail and the phone contents sheet need. */
 export interface ContentsCopy {
-  /** Visible heading above the list ("Contents"). */
-  heading: string;
-  /** Accessible name of the sticky rail's navigation landmark ("On this page"). */
+  /**
+   * The rail's label ("On this page"): the visible label above the list and
+   * the name of its navigation landmark, the same words on every reading page
+   * (legal.document.contents).
+   */
   railLabel: string;
   /** Label of the floating button that opens the list on phones ("Contents"). */
   openLabel: string;

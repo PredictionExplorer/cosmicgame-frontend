@@ -44,7 +44,10 @@ function trimTrailingPunctuation(match: string): string {
   return url;
 }
 
-/** Validates a candidate URL, returning a normalized href or null when unsafe. */
+/**
+ * Validates a candidate URL, returning the normalized href (an
+ * internationalized host in its ASCII punycode form) or null when unsafe.
+ */
 function toSafeHref(rawUrl: string): string | null {
   const candidate = /^https?:\/\//i.test(rawUrl) ? rawUrl : `https://${rawUrl}`;
   let parsed: URL;
@@ -58,7 +61,23 @@ function toSafeHref(rawUrl: string): string | null {
   // like real public domains (dotted, not a bare word or trailing-dot stub).
   const { hostname } = parsed;
   if (!hostname.includes('.') || hostname.startsWith('.') || hostname.endsWith('.')) return null;
-  return candidate;
+  // Never the typed text: the parser's own serialization carries the punycode
+  // host, so a lookalike ("аpple.com" with a Cyrillic а) is shown and opened
+  // as what it is (xn--pple-43d.com).
+  return parsed.href;
+}
+
+/**
+ * The host a safe href opens (`xn--pple-43d.com`, `example.com:8080`), for
+ * the confirmation that names the destination. Null for anything that does
+ * not parse.
+ */
+export function hostOfSafeHref(href: string): string | null {
+  try {
+    return new URL(href).host || null;
+  } catch {
+    return null;
+  }
 }
 
 /**

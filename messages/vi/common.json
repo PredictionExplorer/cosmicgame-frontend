@@ -50,7 +50,7 @@
     "crumbs": {
       "participants": "Người tham gia",
       "allocationRecipients": "Người nhận phân bổ",
-      "cycle": "Chu kỳ #{cycle}"
+      "cycle": "Chu kỳ {cycle}"
     }
   },
   "status": {
@@ -108,9 +108,15 @@
   "externalLink": {
     "title": "Bạn đang rời Cosmic Signature",
     "description": "Liên kết này nằm trong lời nhắn của người tham gia được lưu trên chuỗi và chưa được kiểm tra hay xác minh. Trước khi mở, hãy kiểm tra địa chỉ bên dưới có đúng nơi bạn muốn đến hay không.",
+    "site": "Trang web",
     "copy": "Sao chép liên kết",
     "copied": "Đã sao chép liên kết",
     "warning": "Không bao giờ nhập cụm từ khôi phục hay khóa riêng của ví trên một trang web bên ngoài.",
     "open": "Mở liên kết"
+  },
+  "signature": {
+    "untitled": "Signature {id}",
+    "cycle": "Chu kỳ {n}",
+    "anchored": "Đang neo giữ"
   }
 }

@@ -900,7 +900,7 @@ export const whitePaperTextJa = {
   licenseNote:
     '本稿は、すべてのプロジェクト所有のCosmic Signatureの素材と同じく、CC0 1.0のもとでパブリックドメインに捧げられています。',
   reading: {
-    railLabel: 'このページの目次',
+    railLabel: 'このページの内容',
     openContentsLabel: '目次',
     backToTopLabel: 'ページの先頭へ',
     headingLinkTemplate: 'この節へのリンク：{title}',

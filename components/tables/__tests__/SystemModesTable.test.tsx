@@ -1,8 +1,6 @@
 import '@testing-library/jest-dom';
 import { fireEvent } from '@testing-library/react';
 
-import { convertTimestampToDateTime } from '@/utils';
-
 import { checkA11y, render, screen } from '@/test-utils';
 
 const mockPush = jest.fn();
@@ -68,9 +66,7 @@ describe('SystemModesTable', () => {
     ];
     render(<SystemModesTable list={list} />);
     expect(screen.getByText('tables.status.currentlyActive')).toBeInTheDocument();
-    expect(
-      screen.getAllByText(convertTimestampToDateTime(1701346718)).length,
-    ).toBeGreaterThanOrEqual(1);
+    expect(screen.getAllByText('Nov 30, 2023, 12:18').length).toBeGreaterThanOrEqual(1);
   });
 
   it('navigates on row click with correct URL', () => {

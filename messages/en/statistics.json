@@ -71,7 +71,7 @@
       "gesturesCaption": "{count, plural, one {# gesture} other {# gestures}} this cycle"
     },
     "cycle": {
-      "title": "Cycle {cycle} so far",
+      "title": "Cycle #{cycle} so far",
       "open": "Open the current cycle",
       "opened": "Opened",
       "rhythmLabel": "Gestures per UTC day, last {days, plural, one {# day} other {# days}}",
@@ -233,14 +233,14 @@
     },
     "publicGoods": {
       "label": "Public Goods & contributions",
-      "tooltip": "Protocol balances and contribution flows related to public goods and attached assets."
+      "tooltip": "Protocol balances and contribution flows related to Public Goods and attached assets."
     }
   },
   "sectionTooltips": {
     "attachedAssets": "ERC-721 and ERC-20 assets attached to gestures, viewable for all cycles or only the current Performance Cycle.",
     "gestureTypeDistribution": "Share of gestures made with ETH, Random Walk (ETH-paid), and CST over time, sampled at a chosen interval. Current cycle only.",
     "enduranceTimeline": "A Gantt of who held the lead during a cycle. Each bar is a lead stint (its width = how long that address held the lead). The widest bar is the Endurance Champion; the Chrono-Warrior is the participant whose single continuous reign as Endurance Champion lasted the longest. Pick any cycle to compare.",
-    "cstWindow": "How the CST Calibration Window evolved during a cycle. Every ETH gesture shortens the window slightly; every CST gesture lengthens it. The window sets how fast the CST gesture cost decays to free. Pick any cycle to compare.",
+    "cstWindow": "How the CST Calibration Window evolved during a cycle. Every ETH gesture shortens the window slightly; every CST gesture lengthens it. The window sets how fast the CST Gesture Cost decays to free. Pick any cycle to compare.",
     "cstCost": "What each CST gesture actually cost during a cycle, on a log scale, alongside the allocation clock remaining right before it. Mid-cycle gestures are often nearly free; in the endgame, rapid gesturing leaves the cost no time to descend and prices can reach thousands of CST.",
     "attachedTokenDistribution": "Contracts and token counts for ERC-721 assets attached to gestures.",
     "cosmicSignatureTokenDistribution": "Current owner distribution for Cosmic Signature NFT ERC-721 tokens.",
@@ -276,7 +276,7 @@
       "typeDistribution": "Gesture type distribution",
       "enduranceTimeline": "Endurance & Chrono timeline",
       "cstWindow": "CST Calibration Window timeline",
-      "cstCost": "CST gesture cost over time",
+      "cstCost": "CST Gesture Cost over time",
       "cycleActivations": "Cycle activations",
       "cycleTimelines": "One cycle in detail"
     },
@@ -412,9 +412,9 @@
       "allClaimed": "All retrieved",
       "unclaimedCount": "{count} unretrieved",
       "viewUnclaimed": "View unretrieved assets",
-      "cycleDetails": "Cycle {cycle} details",
+      "cycleDetails": "Cycle #{cycle} details",
       "dialog": {
-        "unclaimedTitle": "Unretrieved assets — Cycle {cycle}",
+        "unclaimedTitle": "Unretrieved assets — Cycle #{cycle}",
         "expired": "The retrieval window has closed. Anyone can now retrieve these assets for themselves.",
         "closesIn": "Retrieval window closes in {duration}.",
         "asset": "Asset",
@@ -563,8 +563,8 @@
       "nextCycleAria": "Next cycle",
       "liveCycle": "Live cycle",
       "jumpLive": "Jump to live",
-      "option": "Cycle {cycle}",
-      "optionLive": "Cycle {cycle} (live)"
+      "option": "Cycle #{cycle}",
+      "optionLive": "Cycle #{cycle} (live)"
     },
     "cstWindow": {
       "timeIntoCycle": "Time into cycle",
@@ -595,7 +595,7 @@
       "description": "Each dot is the CST actually paid for a gesture (log scale — hollow dots were free). After every CST gesture the cost resets near twice the paid amount and descends to free across the Calibration Window. The dashed line shows the allocation clock remaining right before each gesture: when the clock runs low, rapid gesturing leaves the cost no time to descend, so paid prices escalate.",
       "empty": "No CST gestures in this cycle.",
       "selectCycle": "Select a cycle to inspect.",
-      "loadErrorTitle": "Failed to load CST gesture costs",
+      "loadErrorTitle": "Failed to load CST Gesture Costs",
       "loadErrorMessage": "Could not fetch the gesture history for this cycle.",
       "when": "When",
       "summary": "{count, plural, one {# CST gesture} other {# CST gestures}} consumed {total}. The highest cost was {max}, {when} into the cycle."
@@ -633,7 +633,7 @@
     }
   },
   "embed": {
-    "title": "Endurance timeline · Cycle {cycle}",
+    "title": "Endurance timeline · Cycle #{cycle}",
     "final": "Final",
     "source": "Open in Cosmic Signature",
     "opensNewWindow": "(opens in a new window)"
@@ -702,8 +702,6 @@
       "cycles": "Cycles"
     },
     "gridLabel": "Stellar Selection NFTs",
-    "unnamed": "Cosmic Signature {id}",
-    "cycle": "Cycle {cycle}",
     "sources": {
       "participant": "Participant",
       "randomWalk": "Random Walk",
@@ -723,7 +721,7 @@
     "errorMessage": "The allocations of this address couldn't be read. Try again in a moment."
   },
   "systemEvent": {
-    "titleBeforeCycle": "System Configuration Made Before Cycle {cycle}",
+    "titleBeforeCycle": "System Configuration Made Before Cycle #{cycle}",
     "titleBeforeDeployment": "System Configuration Made Before Deployment",
     "range": "Event log range {start}–{end}",
     "breadcrumbs": {
@@ -737,12 +735,12 @@
       "publicGoodsPercentage": "The allocation percentage for the funds designated to the Public Goods Vault has been changed.",
       "signatureAllocationPercentage": "The Signature Allocation percentage has changed.",
       "stellarSelectionPercentage": "The allocation percentage for funds designated for Stellar Selection distributions has been changed.",
-      "anchorDistributionPercentage": "The allocation percentage for funds designated for anchor distributions has been changed.",
+      "anchorDistributionPercentage": "The allocation percentage for funds designated for Anchor Distributions has been changed.",
       "stellarEthRecipients": "The number of Stellar Selection recipients per cycle has been changed.",
       "stellarNftRecipients": "The number of Stellar Selection NFT recipients per cycle has been changed.",
       "cycleActivationDelay": "The delay duration time before cycle activation has been changed.",
       "anchoredRandomWalkRecipients": "The number of Stellar Selection NFT recipients for anchored Random Walk NFTs has been changed.",
-      "publicGoodsVaultAddress": "The address of the public goods vault has been changed.",
+      "publicGoodsVaultAddress": "The address of the Public Goods vault has been changed.",
       "randomWalkContractAddress": "The address of the Random Walk NFT contract has been changed.",
       "allocationsWalletAddress": "The address of the Allocations Wallet (allocation escrow) has been changed.",
       "anchoringWalletAddress": "The address of the anchoring wallet has been changed.",
@@ -760,7 +758,7 @@
       "activationTime": "The cycle activation time has been changed.",
       "cstCalibrationLength": "The length of the starting CST Calibration Window has been changed.",
       "erc20Multiplier": "The ERC-20 allocation multiplier has changed.",
-      "minimumCstGestureCost": "The minimum limit for the starting gesture cost with CST has been changed.",
+      "minimumCstGestureCost": "The minimum limit for the starting Gesture Cost with CST has been changed.",
       "outreachAllocationPercentage": "The allocation percentage for funds designated for outreach distributions has been changed.",
       "tokenAllocationPercentage": "The token allocation percentage has changed.",
       "maxMessageLength": "The max length of the gesture message has been changed.",
@@ -770,7 +768,7 @@
       "ownershipTransferred": "The ownership of the contract has been transferred.",
       "allocationRetrievalTimeout": "The timeout duration to retrieve allocations has been changed.",
       "ethCalibrationDurationDivisor": "The ETH Calibration Window duration has been changed.",
-      "ethCalibrationEndingCostDivisor": "The divisor for ETH Calibration Window ending gesture cost has been changed.",
+      "ethCalibrationEndingCostDivisor": "The divisor for ETH Calibration Window ending Gesture Cost has been changed.",
       "chronoWarriorEthPercentage": "The Chrono-Warrior ETH allocation percentage has changed."
     }
   },

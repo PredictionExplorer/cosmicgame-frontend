@@ -1,7 +1,7 @@
 'use client';
 
 import type { ReactNode } from 'react';
-import { ArrowLeft, ArrowRight, ExternalLink } from 'lucide-react';
+import { ArrowRight, ArrowUpRight } from 'lucide-react';
 import { useLocale, useTranslations } from 'next-intl';
 
 import { Link } from '@/i18n/navigation';
@@ -24,6 +24,7 @@ import { MEDIA_PLATE_CLASS, PendingPlate } from '@/components/ui/art-frame';
 import { SkeletonDetailRows } from '@/components/ui/skeleton';
 import { TxExplorerLink } from '@/components/ui/tx-status';
 import { UnknownValue } from '@/components/ui/unknown-value';
+import { RecordPager } from '@/components/ui/record-pager';
 import { RandomWalkPlate } from '@/components/nft/RandomWalkPlate';
 import NFTImage from '@/components/nft/NFTImage';
 import { useAttachedNftMetadata } from '@/components/attachments/useAttachedNftMetadata';
@@ -115,9 +116,8 @@ function metadataText(value: unknown): string | null {
 }
 
 /**
- * A citable instant: the full date in the reader's zone, as every other
- * page prints it, with that zone named beside it (UTC through hydration, so
- * the server HTML never guesses). The age and the full date stay on hover.
+ * A citable instant: the full date in UTC, as every record prints it, with
+ * the zone named beside it. The reader's own time and the age are on hover.
  */
 function RecordTime({ timestamp }: { timestamp: number | null | undefined }) {
   const zone = useTimeZoneLabel();
@@ -164,7 +164,7 @@ function TransactionHash({ hash }: { hash: string }) {
           TOUCH_TARGET_EXTENDED_CLASS,
         )}
       >
-        <ExternalLink aria-hidden className="size-3.5" />
+        <ArrowUpRight aria-hidden className="size-3.5 text-subtle" />
       </a>
     </span>
   );
@@ -201,7 +201,18 @@ function RecordRow({ label, children }: { label: string; children: ReactNode }) 
  * HTML. A read that fails offers a retry; a record that does not exist
  * says so and points to the current cycle.
  */
-const GesturePage = ({ gestureId }: { gestureId: number }) => {
+const GesturePage = ({
+  gestureId,
+  serverLiveCycle = null,
+}: {
+  gestureId: number;
+  /**
+   * The live cycle as the server read it for this request. The shell's
+   * dashboard query takes the seed only after hydration, so without it the
+   * server HTML drew a bare trail that re-routed itself once the page loaded.
+   */
+  serverLiveCycle?: number | null;
+}) => {
   const t = useTranslations('gesture');
   const tCommon = useTranslations('common');
   const locale = useLocale();
@@ -250,14 +261,15 @@ const GesturePage = ({ gestureId }: { gestureId: number }) => {
   const position = gestureInfo?.BidPosition;
   const hasPosition = typeof position === 'number' && position > 0;
   const cycle = gestureInfo?.RoundNum;
+  const liveCycle = dashboard?.CurRoundNum ?? serverLiveCycle ?? undefined;
   const { section, trail } = gestureTrail(
     cycle,
-    dashboardFailed ? null : dashboard?.CurRoundNum,
+    dashboardFailed ? null : liveCycle,
     dashboardFailed,
     (key, values) => tCommon(key, values),
   );
   const cycleHref =
-    typeof cycle === 'number' && !dashboardFailed && dashboard?.CurRoundNum === cycle
+    typeof cycle === 'number' && !dashboardFailed && liveCycle === cycle
       ? '/current-cycle#gesture-history'
       : `/allocation/${cycle}`;
   // A position is an ordinal, not a quantity: no digit grouping ("#1141", "record 29434").
@@ -318,40 +330,28 @@ const GesturePage = ({ gestureId }: { gestureId: number }) => {
     </Badge>
   );
 
-  const stepLink = (direction: 'previous' | 'next') => {
+  // The neighbours named as their own pages name them ("Gesture #1134"), with
+  // their direction spoken: the one record pager every record page uses.
+  const stepTarget = (direction: 'previous' | 'next') => {
     const target = neighbours[direction];
-    if (!target) return null;
-    return (
-      <Link
-        href={`/gesture/${target.id}`}
-        rel={direction === 'previous' ? 'prev' : 'next'}
-        // Phones: equal halves side by side, or equal full-width rows once
-        // the labels no longer fit two to a line (vi at 320px).
-        className={cn(
-          buttonVariants({ variant: 'outline', size: 'sm' }),
-          'max-sm:grow max-sm:basis-40',
-        )}
-      >
-        {direction === 'previous' ? <ArrowLeft aria-hidden /> : null}
-        <span>
-          {t(`nav.${direction}`)}
-          <span className="sr-only">
-            {' '}
-            {t('header.title', { position: String(target.position) })}
-          </span>
-        </span>
-        {direction === 'next' ? <ArrowRight aria-hidden /> : null}
-      </Link>
-    );
+    return target
+      ? {
+          href: `/gesture/${target.id}`,
+          label: t('header.title', { position: String(target.position) }),
+        }
+      : null;
   };
   const hasSteps = !!(neighbours.previous || neighbours.next);
-  const stepNav = (className: string) =>
-    hasSteps ? (
-      <nav aria-label={t('nav.aria')} className={cn('flex flex-wrap gap-2', className)}>
-        {stepLink('previous')}
-        {stepLink('next')}
-      </nav>
-    ) : null;
+  const stepNav = (className: string) => (
+    <RecordPager
+      label={t('nav.aria')}
+      previousLabel={t('nav.previous')}
+      nextLabel={t('nav.next')}
+      previous={stepTarget('previous')}
+      next={stepTarget('next')}
+      className={className}
+    />
+  );
   const nftMetadataRows = (
     [
       ['collectionName', t('nftPreview.collectionName'), tokenURI?.collection_name],
@@ -430,7 +430,7 @@ const GesturePage = ({ gestureId }: { gestureId: number }) => {
           ) : null}
 
           <section aria-labelledby="gesture-record-heading">
-            <h2 id="gesture-record-heading" className="mb-2 type-heading-3 text-foreground">
+            <h2 id="gesture-record-heading" className="mb-3 type-section text-foreground">
               {t('sections.details.title')}
             </h2>
             <dl className="divide-y divide-rule-faint border-y border-rule">
@@ -470,7 +470,7 @@ const GesturePage = ({ gestureId }: { gestureId: number }) => {
 
           {rwlkId !== null ? (
             <section aria-labelledby="gesture-rwlk-heading">
-              <h2 id="gesture-rwlk-heading" className="mb-4 type-heading-3 text-foreground">
+              <h2 id="gesture-rwlk-heading" className="mb-4 type-section text-foreground">
                 {t('randomWalk.heading')}
               </h2>
               {/* The header's method badge already names the token number. */}
@@ -484,7 +484,7 @@ const GesturePage = ({ gestureId }: { gestureId: number }) => {
 
           {hasNft ? (
             <section aria-labelledby="gesture-nft-heading">
-              <h2 id="gesture-nft-heading" className="mb-4 type-heading-3 text-foreground">
+              <h2 id="gesture-nft-heading" className="mb-4 type-section text-foreground">
                 {t('sections.nft.title')}
               </h2>
               <div className="grid gap-8 sm:grid-cols-[minmax(0,15rem)_minmax(0,1fr)]">

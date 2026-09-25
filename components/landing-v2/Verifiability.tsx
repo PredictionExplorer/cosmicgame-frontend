@@ -69,7 +69,7 @@ export function Verifiability({
             <li key={pillar.title} className={styles.row}>
               <Icon aria-hidden className="mt-0.5 size-5 text-subtle" strokeWidth={1.5} />
               <div className="min-w-0">
-                <h3 className="type-title">{pillar.title}</h3>
+                <h3 className="type-heading-3">{pillar.title}</h3>
                 <p className="type-body-sm mt-1.5 text-muted-foreground">{pillar.body}</p>
               </div>
             </li>

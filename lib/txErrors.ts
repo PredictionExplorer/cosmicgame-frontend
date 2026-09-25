@@ -39,6 +39,11 @@ export type TxErrorKind =
   | 'timeout'
   /** The RPC or network could not be reached. */
   | 'network'
+  /**
+   * The write would go to, or grant rights to, an address that is not one of
+   * the protocol's contracts on-chain (`lib/writeTargets`). Nothing was sent.
+   */
+  | 'untrusted-contract'
   | 'unknown';
 
 export interface TxErrorInfo {
@@ -62,15 +67,24 @@ export class TxRevertedError extends Error {
 }
 
 /**
- * Thrown by the transaction flow when the wallet's "cancel" replaced the
- * transaction: `hash` is the mined replacement, which spent a network fee.
+ * Thrown by the transaction flow when the wallet replaced the transaction
+ * before it was mined: `hash` is the mined replacement, which spent a network
+ * fee. `replaced` is false for the wallet's "cancel" (a zero-value send to
+ * self) and true for a different transaction that reused the nonce; either
+ * way the action the person started was not recorded.
  */
 export class TxCancelledInWalletError extends Error {
   readonly hash: string;
-  constructor(hash: string) {
-    super(`Transaction was cancelled in the wallet and replaced by ${hash}.`);
+  readonly replaced: boolean;
+  constructor(hash: string, replaced = false) {
+    super(
+      replaced
+        ? `Transaction was replaced in the wallet by a different transaction, ${hash}.`
+        : `Transaction was cancelled in the wallet and replaced by ${hash}.`,
+    );
     this.name = 'TxCancelledInWalletError';
     this.hash = hash;
+    this.replaced = replaced;
   }
 }
 
@@ -194,7 +208,15 @@ export function classifyTxError(err: unknown): TxErrorInfo {
     return result('cancelled-in-wallet', 'TxCancelledInWalletError');
   }
   if (isUserRejection(err)) return result('rejected', 'UserRejectedRequestError');
-  if (names.includes('TxClientUnavailableError')) return result('network');
+  if (names.includes('UntrustedContractError')) {
+    return result('untrusted-contract', 'UntrustedContractError');
+  }
+  if (
+    names.includes('TxClientUnavailableError') ||
+    names.includes('ProtocolAddressesUnavailableError')
+  ) {
+    return result('network');
+  }
 
   const wrongNetwork = find(WRONG_NETWORK_NAMES);
   if (wrongNetwork) return result('wrong-network', wrongNetwork);

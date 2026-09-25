@@ -12,7 +12,7 @@ const TOOLTIP_LABELS_AND_COPY: Array<{ label: string; expected: RegExp }> = [
   // Protocol configuration
   {
     label: 'ETH Gesture Cost step-up',
-    expected: /ETH gesture cost uses this step-up parameter/,
+    expected: /ETH Gesture Cost uses this step-up parameter/,
   },
   {
     label: 'Time added per gesture',

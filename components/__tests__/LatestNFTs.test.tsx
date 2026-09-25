@@ -14,7 +14,7 @@ describe('LatestNFTs', () => {
       'href',
       '/gallery',
     );
-    expect(screen.getByRole('link', { name: 'nav.ecosystem.axiomZero.ariaLabel' })).toHaveAttribute(
+    expect(screen.getByRole('link', { name: /nav\.ecosystem\.axiomZero\.label/ })).toHaveAttribute(
       'href',
       COSMIC_SIGNATURE_MARKETPLACE_URL,
     );

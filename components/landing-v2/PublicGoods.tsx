@@ -39,7 +39,7 @@ export function PublicGoods({ publicGoods }: { publicGoods: LandingContent['publ
 
         <div className={styles.figurePanel}>
           <p className="type-label text-subtle">{card.label}</p>
-          <p className="type-figure-display mt-3">{card.percentage}</p>
+          <p className="type-figure-xl mt-3">{card.percentage}</p>
           <p className="type-body-md mt-3 text-muted-foreground">{card.description}</p>
           <dl className={styles.specRows}>
             {card.tableRows.map((row) => (

@@ -1,6 +1,6 @@
 import '@testing-library/jest-dom';
 
-import { convertTimestampToDateTime, shortenHex } from '@/utils';
+import { formatAddress } from '@/utils';
 import {
   TEST_STAKING_CST_LABEL,
   TEST_STAKING_RWALK_LABEL,
@@ -86,7 +86,7 @@ describe('TransferHistoryTable', () => {
   it('renders datetime as explorer link with rel attrs', () => {
     const record = createRecord();
     render(<TransferHistoryTable list={[record]} />);
-    const datetime = screen.getByText(convertTimestampToDateTime(record.TimeStamp));
+    const datetime = screen.getByText('Nov 30, 2023, 12:18');
     expect(datetime.closest('a')).toHaveAttribute('target', '_blank');
     expect(datetime.closest('a')).toHaveAttribute('rel', 'noopener noreferrer');
   });
@@ -100,7 +100,7 @@ describe('TransferHistoryTable', () => {
         ]}
       />,
     );
-    const datetimes = screen.getAllByText(convertTimestampToDateTime(1701346718));
+    const datetimes = screen.getAllByText('Nov 30, 2023, 12:18');
     expect(datetimes).toHaveLength(1);
   });
 
@@ -117,7 +117,7 @@ describe('TransferHistoryTable', () => {
   it('shows shortened hex for regular addresses', () => {
     const addr = '0x1111111111111111111111111111111111111111';
     render(<TransferHistoryTable list={[createRecord({ FromAddr: addr })]} />);
-    expect(screen.getByText(shortenHex(addr, 6))).toBeInTheDocument();
+    expect(screen.getByText(formatAddress(addr))).toBeInTheDocument();
   });
 
   it('renders From and To as links to user pages', () => {

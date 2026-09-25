@@ -46,12 +46,6 @@
     "liveClock": "Годинник циклу наживо",
     "cycleClock": "Годинник циклу",
     "gestureCount": "{count, plural, one {# жест} few {# жести} many {# жестів} other {# жесту}}",
-    "units": {
-      "days": "дні",
-      "hours": "години",
-      "minutes": "хвилини",
-      "seconds": "секунди"
-    },
     "duration": {
       "days": "{count, plural, one {# день} few {# дні} many {# днів} other {# дня}}",
       "hours": "{count, plural, one {# година} few {# години} many {# годин} other {# години}}",
@@ -70,7 +64,6 @@
     "resumeRotation": "Відновити зміну творів",
     "playAnimation": "Відтворити анімацію",
     "pauseAnimation": "Призупинити анімацію",
-    "unavailable": "Твір недоступний",
-    "untitled": "Сигнатура {tokenLabel}"
+    "unavailable": "Твір недоступний"
   }
 }

@@ -35,10 +35,15 @@ describe('cosmicGameContractCompat', () => {
   test('pickGestureWriteAbi selects overload by argument count', () => {
     const v1 = pickGestureWriteAbi('bidWithEth', [-1n, 'hello']);
     const v2 = pickGestureWriteAbi('bidWithEth', [-1n, 'hello', 0n]);
-    expect(v1).toHaveLength(1);
-    expect(v2).toHaveLength(1);
+    // One function per slice (no overload ambiguity) plus every custom error,
+    // so viem can decode a revert against the ABI the write was made with.
+    expect(v1.filter((item) => item.type === 'function')).toHaveLength(1);
+    expect(v2.filter((item) => item.type === 'function')).toHaveLength(1);
     expect((v1[0] as AbiFunction).inputs?.length).toBe(2);
     expect((v2[0] as AbiFunction).inputs?.length).toBe(3);
+    const errorNames = v2.flatMap((item) => (item.type === 'error' ? [item.name] : []));
+    expect(errorNames).toEqual(expect.arrayContaining(['UsedRandomWalkNft', 'TooLongBidMessage']));
+    expect(errorNames).toContain('BidCstRewardAmountMinLimitNotReached');
   });
 
   test('readCosmicGameWithFallback tries later readers after selector errors', async () => {

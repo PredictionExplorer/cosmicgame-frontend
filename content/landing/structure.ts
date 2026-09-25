@@ -283,10 +283,4 @@ export type LandingText = {
     readonly heading: string;
     readonly body: string;
   };
-  readonly footer: {
-    readonly tagline: string;
-    readonly copyright: string;
-    readonly colophon: string;
-    readonly disambiguation: string;
-  };
 };

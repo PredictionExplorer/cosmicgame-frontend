@@ -2,8 +2,6 @@ import userEvent from '@testing-library/user-event';
 
 import statisticsMessages from '@/messages/en/statistics.json';
 
-import { formatDateTime, formatTimeZoneLabel } from '@/utils/format';
-
 import { render, screen, within, checkA11y } from '@/test-utils';
 
 import StatisticsHubPanel from '../StatisticsHubPanel';
@@ -68,7 +66,7 @@ describe('StatisticsHubPanel', () => {
 
   it('opens on the live cycle: when it opened, what it has taken in, and its daily rhythm', () => {
     render(<StatisticsHubPanel />);
-    const cycle = screen.getByRole('region', { name: 'Cycle 3 so far' });
+    const cycle = screen.getByRole('region', { name: 'Cycle #3 so far' });
     expect(within(cycle).getByText(hub.cycle.opened)).toBeInTheDocument();
     expect(within(cycle).getByText(metrics.ethInGesturesCurrentCycle.label)).toBeInTheDocument();
     const eth = within(cycle).getByText(metrics.ethInGesturesCurrentCycle.label).parentElement!;
@@ -91,9 +89,11 @@ describe('StatisticsHubPanel', () => {
         CharityPercentage: 7,
       }),
     });
-    const { container } = render(<StatisticsHubPanel />);
+    render(<StatisticsHubPanel />);
     expect(screen.getByRole('heading', { name: hub.cycle.splitTitle })).toBeInTheDocument();
-    const segments = [...container.querySelectorAll<HTMLElement>('[data-track]')];
+    // The one compact split, as on /allocation: its bar segments, then its legend rows.
+    const split = screen.getByTestId('allocation-split');
+    const segments = [...split.querySelectorAll<HTMLElement>('[role="img"] [data-track]')];
     expect(segments.map((segment) => segment.dataset.track)).toEqual([
       'signature',
       'chrono',
@@ -103,7 +103,12 @@ describe('StatisticsHubPanel', () => {
       'nextCycle',
     ]);
     // What the tracks leave carries into the next cycle: the bar always sums to 100%.
-    expect(segments.at(-1)).toHaveStyle({ width: '50%' });
+    expect(segments.at(-1)).toHaveStyle({ flexGrow: '50' });
+    // The remainder is approximate here too, and every swatch has the 2px edge.
+    expect(split.querySelector('dl [data-track="nextCycle"] dd')).toHaveTextContent(/^~/);
+    for (const swatch of split.querySelectorAll('[data-slot="swatch"]')) {
+      expect(swatch).toHaveClass('rounded-edge');
+    }
   });
 
   it('indexes every section page with what it covers and its key figure', () => {
@@ -204,20 +209,12 @@ describe('StatisticsHubPanel', () => {
     expect(container.querySelector('[data-live-state]')).not.toBeInTheDocument();
   });
 
-  it("dates the opening of the cycle in the reader's zone, as every page does, named inline", () => {
+  it('dates the opening of the cycle in UTC, as every page does, with the zone named inline', () => {
     render(<StatisticsHubPanel />);
-    const cycle = screen.getByRole('region', { name: 'Cycle 3 so far' });
+    const cycle = screen.getByRole('region', { name: 'Cycle #3 so far' });
     const opened = within(cycle).getByText(hub.cycle.opened).parentElement!;
-    // The same compact local date-time the current cycle prints for this moment...
-    const local = formatDateTime(1_700_000_000, {
-      locale: 'en',
-      timeZone: 'local',
-      now: Date.now(),
-    });
-    // ...followed by its zone ("UTC", "UTC+3", "UTC-5:30").
-    expect(opened.querySelector('time')).toHaveTextContent(
-      `${local} ${formatTimeZoneLabel('local')}`,
-    );
+    // 1,700,000,000 is Nov 14, 2023, 22:13:20 UTC: the same text the server printed.
+    expect(opened.querySelector('time')).toHaveTextContent('Nov 14, 2023, 22:13 UTC');
     // No separate "Time zone" line: the zone travels with the time.
     expect(screen.queryByText(/formats\.dateTime\.timeZone/)).not.toBeInTheDocument();
   });

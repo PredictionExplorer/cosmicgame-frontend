@@ -108,7 +108,6 @@ export const howItWorksTextKo = {
   payoff: {
     heading: '모든 사이클은 시그니처로 마무리됩니다',
     body: '모든 제스처가 사이클의 작품을 빚어냅니다. 사이클이 마감되면 시그니처가 Cosmic Signature NFT로 각인되어 시그니처 배분과 함께 최종 제스처를 남긴 참여자에게 전달됩니다.',
-    caption: '사이클 {cycle}의 시그니처',
     linkLabel: '이 시그니처 보기',
   },
   stepByStep: {

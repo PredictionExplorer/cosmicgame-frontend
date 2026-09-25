@@ -111,9 +111,9 @@ describe('<TheArt />', () => {
     );
     const caption = screen.getByRole('figure').querySelector('figcaption')!;
     // The unnamed form, "Signature #000024", titles the label.
-    expect(caption).toHaveTextContent('landing.artwork.untitled(tokenLabel=#000024)');
+    expect(caption).toHaveTextContent('common.signature.untitled(id=#000024)');
     expect(caption.textContent?.match(/#000024/g)).toHaveLength(1);
-    expect(caption).toHaveTextContent('landing.timer.cycle.numbered(number=1)');
+    expect(caption).toHaveTextContent('common.signature.cycle(n=1)');
     expect(caption).toHaveTextContent('Aug 2026');
     expect(caption).toHaveTextContent('Seed5084a873…4dfc33ad');
   });

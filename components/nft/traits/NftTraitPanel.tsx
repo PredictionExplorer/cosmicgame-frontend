@@ -1,7 +1,7 @@
 'use client';
 
 import { useId, type ReactNode } from 'react';
-import { Check, Copy, ExternalLink } from 'lucide-react';
+import { ArrowUpRight, Check, Copy } from 'lucide-react';
 import { useLocale, useTranslations } from 'next-intl';
 
 import { useCopyFeedback } from '@/hooks/useCopyFeedback';
@@ -97,7 +97,7 @@ function MediaLink({ href, label, hint }: { href: string; label: string; hint: s
       className="flex min-h-11 items-center justify-between gap-3 rounded-control bg-surface-sunken px-4 py-2 type-body-sm text-foreground no-underline transition-colors duration-[var(--duration-fast)] hover:bg-surface"
     >
       <span>{label}</span>
-      <ExternalLink className="h-3.5 w-3.5 shrink-0 text-subtle" aria-hidden />
+      <ArrowUpRight className="size-3.5 shrink-0 text-subtle" aria-hidden />
     </a>
   );
 }

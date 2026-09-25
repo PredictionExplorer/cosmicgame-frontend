@@ -298,10 +298,7 @@
       "shortLabel": "CSTプールを見る"
     },
     "axiomZero": {
-      "ariaLabel": "Axiom Zero NFTマーケットプレイス",
-      "defaultLabel": "Axiom ZeroのNFT",
-      "menuLabel": "Axiom Zeroマーケットプレイス",
-      "shortLabel": "Axiom Zero"
+      "label": "Axiom Zeroで売買する"
     }
   },
   "maintenance": {

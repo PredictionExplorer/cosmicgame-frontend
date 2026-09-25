@@ -98,7 +98,7 @@
     "title": "Gesture Information",
     "titleFor": "Gesture #{position} · Cycle #{cycle}",
     "titleForId": "Gesture record {id}",
-    "description": "View detailed gesture information including timestamp, participant address, gesture cost, and cycle context for the Cosmic Signature protocol."
+    "description": "View detailed gesture information including timestamp, participant address, Gesture Cost, and cycle context for the Cosmic Signature protocol."
   },
   "coordinationChanges": {
     "title": "Coordination Changes",
@@ -112,8 +112,8 @@
     "description": "Imprint a Random Walk NFT on Cosmic Signature. Each unused Random Walk NFT can be attached to one ETH gesture for a 50% ETH Gesture Cost discount."
   },
   "systemEvent": {
-    "title": "Configuration before cycle {cycle}",
-    "description": "The protocol parameters the contract owner changed before cycle {cycle} opened, each with its new value and transaction.",
+    "title": "Configuration before Cycle #{cycle}",
+    "description": "The protocol parameters the contract owner changed before Cycle #{cycle} opened, each with its new value and transaction.",
     "titleInitial": "Initial configuration",
     "descriptionInitial": "The protocol parameters the contract owner set before the first cycle opened, each with its value and transaction."
   },
@@ -123,7 +123,7 @@
   },
   "allocationInfo": {
     "titleFor": "Cycle #{id} Allocation Information",
-    "descriptionFor": "Detailed allocation information for Cosmic Signature cycle #{id} — recipient details, Signature Allocation distribution, Stellar Selection results, and attached NFT allocations."
+    "descriptionFor": "Detailed allocation information for Cosmic Signature Cycle #{id} — recipient details, Signature Allocation distribution, Stellar Selection results, and attached NFT allocations."
   },
   "anchorAction": {
     "description": "Details of a specific anchor action in Cosmic Signature — token type, anchored amounts, and distribution retrieval status."
@@ -173,8 +173,8 @@
     "description": "Details of a specific ETH contribution to the Cosmic Signature Cycle Reserve — contributor address, amount, cycle, and optional note."
   },
   "ethContributionByCycle": {
-    "title": "Cycle {cycle} contributions",
-    "description": "Direct ETH contributions to the Cycle Reserve during cycle {cycle}."
+    "title": "Cycle #{cycle} contributions",
+    "description": "Direct ETH contributions to the Cycle Reserve during Cycle #{cycle}."
   },
   "myStatistics": {
     "title": "My Statistics",
@@ -243,7 +243,7 @@
   },
   "learn": {
     "title": "Learn Cosmic Signature: on-chain art, Performance Cycles and Arbitrum",
-    "description": "Learn how Cosmic Signature works: Performance Cycles, gestures, CST, three-body NFT art, Arbitrum contracts, anchoring, public goods, and risk clarifications."
+    "description": "Learn how Cosmic Signature works: Performance Cycles, gestures, CST, three-body NFT art, Arbitrum contracts, anchoring, Public Goods, and risk clarifications."
   },
   "whitePaper": {
     "title": "White Paper: A Procedural On-Chain Art Protocol",

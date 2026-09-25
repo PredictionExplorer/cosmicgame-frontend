@@ -53,13 +53,12 @@ describe('how-it-works content', () => {
     expect(callToAction.discordCta.href).toMatch(/^https:\/\/discord\.gg\/[A-Za-z0-9]+$/);
   });
 
-  it('shows a real Signature as the payoff, captioned with its cycle', () => {
+  it('shows a real Signature as the payoff, with the cycle its wall label names', () => {
     for (const locale of routing.locales) {
       const { payoff } = getHowItWorksContent(locale);
       expect(payoff.sample.seed).toMatch(/^[0-9a-f]{64}$/);
       expect(payoff.link.href).toBe(`/detail/${payoff.sample.tokenId}`);
-      expect(payoff.caption).toContain(String(payoff.sample.cycle));
-      expect(payoff.caption).not.toContain('{cycle}');
+      expect(Number.isInteger(payoff.sample.cycle)).toBe(true);
     }
   });
 

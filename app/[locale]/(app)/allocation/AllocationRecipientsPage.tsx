@@ -12,7 +12,7 @@ import { InfoTooltip } from '@/components/ui/info-tooltip';
 import { PageShell } from '@/components/ui/page-shell';
 import { SectionHeader } from '@/components/ui/section-header';
 import { AllocationTable } from '@/components/tables/AllocationTable';
-import { AllocationSplitBar } from '@/components/winnings/AllocationSplitBar';
+import { AllocationSplitBar } from '@/components/ui/allocation-split';
 import { useRoundList } from '@/hooks/useApiQuery';
 
 /**

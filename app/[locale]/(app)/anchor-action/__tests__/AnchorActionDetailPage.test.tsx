@@ -62,7 +62,8 @@ describe('AnchorActionDetailPage', () => {
     ).toBeInTheDocument();
     expect(screen.getByTestId('anchor-status')).toHaveTextContent('anchoring.status.anchored');
     expect(screen.getByTestId('art-frame')).toBeInTheDocument();
-    expect(screen.getByText('anchoring.art.signatureTitle(id=#000009)')).toBeInTheDocument();
+    // The shared wall label: "Signature #000009", the number in the identifier face.
+    expect(screen.getByRole('figure')).toHaveTextContent('common.signature.untitled(id=#000009)');
     expect(document.querySelector(`a[href="/user/${HOLDER}"]`)).toBeInTheDocument();
     expect(
       screen.getByText('anchoring.anchorActionDetail.timeline.stillAnchored'),

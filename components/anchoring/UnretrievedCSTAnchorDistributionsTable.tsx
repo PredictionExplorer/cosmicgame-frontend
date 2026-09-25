@@ -3,7 +3,7 @@
 import { useMemo, useState } from 'react';
 import { useTranslations } from 'next-intl';
 
-import { sameAddress } from '@/utils/address';
+import { sameAddress } from '@/utils/format';
 import { useActiveWeb3React } from '@/hooks/web3';
 import { useAnchorActions } from '@/hooks/useAnchorActions';
 import {

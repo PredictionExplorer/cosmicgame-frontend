@@ -1,4 +1,4 @@
-import { sameAddress } from '../address';
+import { sameAddress } from '../format';
 
 describe('sameAddress', () => {
   const checksummed = '0x1Ec14a3F6C1D5E4b7C2A9a0b9D3E8f7A6B5cD7E9';

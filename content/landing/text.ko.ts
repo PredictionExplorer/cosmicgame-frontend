@@ -297,12 +297,4 @@ export const landingTextKo = {
     heading: '사이클마다 컬렉션이 늘어납니다.',
     body: '진행 중인 사이클을 지켜보거나, 제스처를 남기거나, 지금까지 각인된 모든 시그니처를 둘러볼 수 있습니다.',
   },
-
-  footer: {
-    tagline: 'Arbitrum 위의 절차적 온체인 아트 프로토콜.',
-    copyright: '© {year} Cosmic Signature. 프로젝트 소유 자료: CC0 1.0.',
-    colophon: 'CC0 1.0 · 공개 검증 가능 · 재현 가능한 아트',
-    disambiguation:
-      'Cosmic Signature는 COSMIC 암 돌연변이 데이터베이스나 생물학의 COSMIC 돌연변이 시그니처와 관련이 없습니다. 온체인 아트 프로토콜이자 앱입니다.',
-  },
 } satisfies LandingText;

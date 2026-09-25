@@ -78,7 +78,6 @@ export interface LearnArticleUi {
   readonly readingTimeTemplate: string;
   readonly nextGuideLabel: string;
   readonly contents: {
-    readonly heading: string;
     readonly railLabel: string;
     readonly openLabel: string;
     readonly backToTopLabel: string;

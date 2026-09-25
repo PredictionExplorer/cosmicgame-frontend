@@ -300,12 +300,4 @@ export const landingTextJa = {
     heading: 'サイクルごとに、コレクションが育ちます。',
     body: 'ライブのサイクルを見る、一筆を入れる、これまでに刻印されたシグネチャーを眺める。どこからでも始められます。',
   },
-
-  footer: {
-    tagline: 'Arbitrum上のプロシージャル・オンチェーンアート・プロトコル。',
-    copyright: '© {year} Cosmic Signature. プロジェクト所有の素材：CC0 1.0。',
-    colophon: 'CC0 1.0 · 公開検証可能 · 再現可能なアート',
-    disambiguation:
-      'Cosmic Signatureは、生物学におけるCOSMICがん変異データベースやCOSMIC変異シグネチャーとは関係がありません。オンチェーンアートのプロトコルとアプリです。',
-  },
 } satisfies LandingText;

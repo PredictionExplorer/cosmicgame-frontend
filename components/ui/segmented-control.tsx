@@ -11,6 +11,10 @@ export interface SegmentedOption<T extends string> {
   label: ReactNode;
   /** The option's name when `label` is not text alone ("1d" → "1 day"). */
   ariaLabel?: string;
+  /** A 16px glyph before the label (decorative: pass it `aria-hidden`). */
+  icon?: ReactNode;
+  /** Unavailable now (the art viewer's motion when the video failed). */
+  disabled?: boolean;
 }
 
 export interface SegmentedControlProps<T extends string> {
@@ -31,9 +35,10 @@ export interface SegmentedControlProps<T extends string> {
 
 /**
  * SegmentedControl — one choice among a few options that changes what a
- * chart or list shows (Daily / Hourly, a sampling interval, a range, a
- * scope), drawn as the segmented tab track with the chosen option raised
- * and underlined. It swaps no panels: a view switch that does uses `Tabs`.
+ * chart, list or plate shows (Daily / Hourly, a range, a scope, Still / In
+ * motion), drawn as the segmented tab track with the chosen option raised
+ * and edged by the 3:1 control boundary (never a --primary rule). It swaps
+ * no panels: a view switch that does uses `Tabs`.
  *
  * The options are native radio buttons, so the browser gives the group one
  * tab stop and moves the choice with the arrow keys; the keyboard ring is
@@ -71,9 +76,11 @@ export function SegmentedControl<T extends string>({
           <label
             key={option.value}
             data-state={checked ? 'active' : 'inactive'}
+            data-disabled={option.disabled || undefined}
             className={cn(
               tabsTriggerVariants({ variant: 'segmented', scroll: true }),
               'focus-ring-within cursor-pointer tabular-nums max-sm:min-w-11',
+              'data-[disabled]:cursor-not-allowed data-[disabled]:opacity-50 data-[disabled]:hover:text-muted-foreground',
             )}
           >
             <input
@@ -81,10 +88,12 @@ export function SegmentedControl<T extends string>({
               name={name}
               value={option.value}
               checked={checked}
+              disabled={option.disabled}
               aria-label={option.ariaLabel}
               onChange={() => onValueChange(option.value)}
               className="sr-only"
             />
+            {option.icon}
             {option.label}
           </label>
         );

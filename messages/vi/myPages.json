@@ -152,8 +152,7 @@
       "emptyTitle": "Không nắm giữ Cosmic Signature NFT nào",
       "emptyDescription": "Cosmic Signature NFT mà địa chỉ này nắm giữ sẽ hiển thị ở đây.",
       "showAll": "Hiện tất cả {count}",
-      "showFewer": "Thu gọn",
-      "anchoredTag": "Đang neo giữ"
+      "showFewer": "Thu gọn"
     },
     "quickActions": {
       "anchor": {
@@ -227,7 +226,6 @@
     "page": {
       "title": "NFT của tôi",
       "subtitle": "Các Cosmic Signature NFT trong ví đang kết nối",
-      "marketplace": "Mua hoặc bán NFT",
       "anchorLink": "Neo giữ NFT",
       "loadErrorTitle": "Không tải được token",
       "loadErrorMessage": "Không tải được Cosmic Signature NFT.",

@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useRef, useState, type MouseEvent, type ReactNode } from 'react';
+import { useEffect, useId, useRef, useState, type MouseEvent, type ReactNode } from 'react';
 import { ArrowUp, ListTree } from 'lucide-react';
 
 import { Sheet, SheetContent, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
@@ -19,8 +19,12 @@ import { useReadingPosition, type ReadingPosition } from './useReadingPosition';
 interface ContentsListProps {
   entries: readonly ContentsEntry[];
   activeId: string | null;
-  /** `active`: only the current section's subsections open (the rail); `all`: every level (the sheet). */
-  expand: 'active' | 'all';
+  /**
+   * `sections`: the top level only, the section being read marked (the rail:
+   * it never grows or shrinks while the reader scrolls, so nothing in it
+   * shifts); `all`: every level (the sheet).
+   */
+  expand: 'sections' | 'all';
   onNavigate?: (id: string, event: MouseEvent<HTMLAnchorElement>) => void;
   depth?: number;
 }
@@ -33,9 +37,10 @@ function ContentsList({ entries, activeId, expand, onNavigate, depth = 0 }: Cont
   return (
     <ol className={cn(depth === 0 ? 'space-y-px' : 'mb-1.5 mt-px space-y-px')}>
       {entries.map((entry) => {
-        const isActive = entry.id === activeId;
         const onBranch = entry.id === branch;
-        const showChildren = Boolean(entry.children?.length) && (expand === 'all' || onBranch);
+        // In the rail a section stands for its subsections: it is marked while one is read.
+        const isActive = entry.id === activeId || (expand === 'sections' && onBranch);
+        const showChildren = Boolean(entry.children?.length) && expand === 'all';
         return (
           <li key={entry.id}>
             <a
@@ -89,13 +94,15 @@ interface RailProps {
 }
 
 /**
- * The sticky rail (from `lg`): every section, the current one's subsections
- * opened, a hairline that fills as the reader progresses, and a way back to
- * the top. It scrolls on its own when the list is taller than the screen,
+ * The sticky rail (from `lg`): every section, the one being read marked (its
+ * subsections are in the in-flow contents and the sheet, so the rail keeps
+ * one height while the reader scrolls), a hairline that fills as the reader
+ * progresses, and a way back to the top. It scrolls on its own when the list is taller than the screen,
  * keeping the current entry in view without moving the page.
  */
 function ContentsRail({ entries, copy, position, topId, footer }: RailProps) {
   const { activeId, progress } = position;
+  const labelId = useId();
   const scrollerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -114,11 +121,13 @@ function ContentsRail({ entries, copy, position, topId, footer }: RailProps) {
 
   return (
     <nav
-      aria-label={copy.railLabel}
+      aria-labelledby={labelId}
       className="sticky top-[var(--sticky-offset)] hidden max-h-[calc(100dvh-var(--sticky-offset)-1.5rem)] flex-col lg:flex"
       data-testid="contents-rail"
     >
-      <p className="type-eyebrow text-subtle">{copy.heading}</p>
+      <p id={labelId} className="type-eyebrow text-subtle">
+        {copy.railLabel}
+      </p>
       <div
         ref={scrollerRef}
         className="relative mt-4 min-h-0 flex-1 overflow-y-auto overscroll-contain scrollbar-none"
@@ -131,7 +140,7 @@ function ContentsRail({ entries, copy, position, topId, footer }: RailProps) {
           style={{ height: `${Math.round(progress * 1000) / 10}%` }}
           data-testid="reading-progress"
         />
-        <ContentsList entries={entries} activeId={activeId} expand="active" />
+        <ContentsList entries={entries} activeId={activeId} expand="sections" />
       </div>
       <div className="mt-4 flex flex-col items-start gap-2 border-t border-rule-faint pt-4">
         {footer}
@@ -190,7 +199,9 @@ function ContentsSheet({ entries, copy, position }: SheetProps) {
             aria-hidden={visible ? undefined : true}
             data-testid="contents-sheet-trigger"
             className={cn(
-              'glass relative inline-flex min-h-11 max-w-full items-center gap-2.5 overflow-hidden rounded-pill border border-rule py-2 pl-4 pr-5 shadow-float type-label text-foreground',
+              // One fixed width, the section's name truncating inside it: the pill
+              // never resizes as the reader moves from section to section.
+              'glass relative inline-flex min-h-11 w-[min(22rem,100%)] items-center gap-2.5 overflow-hidden rounded-pill border border-rule py-2 pl-4 pr-5 shadow-float type-label text-foreground',
               visible && 'pointer-events-auto',
             )}
           >
@@ -232,7 +243,7 @@ function ContentsSheet({ entries, copy, position }: SheetProps) {
           className="flex max-h-[85dvh] flex-col gap-0 rounded-t-surface border-t border-rule bg-background p-0"
         >
           <div className="border-b border-rule-faint px-5 pb-3 pt-5 pr-16">
-            <SheetTitle className="type-eyebrow text-subtle">{copy.heading}</SheetTitle>
+            <SheetTitle className="type-eyebrow text-subtle">{copy.railLabel}</SheetTitle>
           </div>
           <nav
             aria-label={copy.railLabel}

@@ -2,21 +2,28 @@
 
 import * as React from 'react';
 import * as TabsPrimitive from '@radix-ui/react-tabs';
-import { cva, type VariantProps } from 'class-variance-authority';
+import type { VariantProps } from 'class-variance-authority';
 
 import { cn } from '@/lib/utils';
 import { ScrollRail } from '@/components/ui/scroll-rail';
+import {
+  SEGMENT_SELECTED_CLASS,
+  tabsListVariants,
+  tabsTriggerVariants,
+} from '@/components/ui/tabs-variants';
 
 /**
  * Tabs in three shapes, one behaviour (Radix: arrow keys move between tabs,
  * Home and End jump, one tab stop for the list):
  *
  *   segmented  a sunken track with the selected option raised on it, edged
- *              by a hairline: switching views of one thing (the default). It
- *              draws no --primary rule, so it never competes with an
- *              underline tab row above it for "current".
+ *              by the 3:1 control boundary (--input): switching views of one
+ *              thing (the default). It draws no --primary rule, so it never
+ *              competes with an underline tab row above it for "current".
  *   underline  a hairline with a 2px --primary indicator under the selected
- *              tab: page sub-navigation (statistics, detail, Trust Center)
+ *              tab: page sub-navigation (statistics, detail, Trust Center).
+ *              Flush: the first label starts on the content edge and the
+ *              indicator spans the word, the labels 1.5rem apart.
  *   pills      separate chips, the selected one tinted: filters and short sets
  *
  * `scroll` puts the list on a ScrollRail: one row that scrolls sideways with
@@ -30,62 +37,6 @@ const TabsVariantContext = React.createContext<{ variant: TabsVariant; scroll: b
   variant: 'segmented',
   scroll: false,
 });
-
-const tabsListVariants = cva('min-w-0 items-center text-muted-foreground', {
-  variants: {
-    variant: {
-      // The list is content-height below `sm` so its triggers can reach the
-      // 44px touch target; a fixed height would pin them to 32px. The sunken
-      // fill alone draws the track: a default border would survive a
-      // caller's `border-b` (tailwind-merge keeps both) and box in lists
-      // that reshape themselves into a rule.
-      segmented: 'inline-flex h-auto justify-center gap-1 rounded-control bg-surface-sunken p-1',
-      underline: 'flex h-auto justify-start gap-1 border-b border-rule',
-      pills: 'flex h-auto flex-wrap justify-start gap-2',
-    },
-  },
-  defaultVariants: { variant: 'segmented' },
-});
-
-const tabsTriggerVariants = cva(
-  [
-    // 44×44 below `sm` (a one-word segment such as "All" is narrower than
-    // its height); from `sm` the variants set their own compact heights.
-    'relative inline-flex min-h-11 min-w-11 select-none items-center justify-center gap-2 text-center text-sm font-medium sm:min-w-0',
-    'transition-[color,background-color,border-color,box-shadow] duration-[var(--duration-fast)] ease-[var(--ease-out-soft)]',
-    'hover:text-foreground disabled:pointer-events-none disabled:opacity-50 [&_svg]:size-4 [&_svg]:shrink-0',
-  ],
-  {
-    variants: {
-      variant: {
-        segmented: [
-          'rounded-[calc(var(--radius-control)-2px)] px-3 py-1.5 sm:min-h-9',
-          'data-[state=active]:bg-surface-raised data-[state=active]:text-foreground data-[state=active]:shadow-[inset_0_0_0_1px_hsl(var(--rule))]',
-          'aria-[current=page]:bg-surface-raised aria-[current=page]:text-foreground aria-[current=page]:shadow-[inset_0_0_0_1px_hsl(var(--rule))]',
-        ],
-        underline: [
-          '-mb-px rounded-t-control px-3 pb-2.5 pt-2 sm:min-h-10',
-          'shadow-[inset_0_-2px_0_0_transparent] hover:shadow-[inset_0_-2px_0_0_hsl(var(--rule))]',
-          'data-[state=active]:text-foreground data-[state=active]:shadow-[inset_0_-2px_0_0_hsl(var(--primary))]',
-          'aria-[current=page]:text-foreground aria-[current=page]:shadow-[inset_0_-2px_0_0_hsl(var(--primary))]',
-        ],
-        pills: [
-          'rounded-pill border border-rule px-3.5 py-1.5 sm:min-h-9',
-          'hover:border-foreground/40',
-          'data-[state=active]:border-primary/50 data-[state=active]:bg-primary/12 data-[state=active]:text-foreground',
-          'aria-[current=page]:border-primary/50 aria-[current=page]:bg-primary/12 aria-[current=page]:text-foreground',
-        ],
-      },
-      scroll: {
-        true: 'shrink-0 whitespace-nowrap',
-        // Labels wrap on a phone when the row does not scroll: `nowrap` made
-        // multi-word tabs such as "Endurance Champions" overrun the list.
-        false: 'break-words sm:whitespace-nowrap',
-      },
-    },
-    defaultVariants: { variant: 'segmented', scroll: false },
-  },
-);
 
 const Tabs = TabsPrimitive.Root;
 
@@ -147,4 +98,12 @@ const TabsContent = React.forwardRef<
 ));
 TabsContent.displayName = TabsPrimitive.Content.displayName;
 
-export { Tabs, TabsList, TabsTrigger, TabsContent, tabsListVariants, tabsTriggerVariants };
+export {
+  Tabs,
+  TabsList,
+  TabsTrigger,
+  TabsContent,
+  SEGMENT_SELECTED_CLASS,
+  tabsListVariants,
+  tabsTriggerVariants,
+};

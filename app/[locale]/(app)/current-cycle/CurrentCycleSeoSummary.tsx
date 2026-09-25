@@ -1,7 +1,6 @@
 import { getLocale, getTranslations } from 'next-intl/server';
 
 import { PageHeader } from '@/components/layout/PageHeader';
-import { TimeZoneNote } from '@/components/ui/date-time';
 
 import { DashboardFigure } from '../DashboardFigure';
 import { dashboardSeed, type DashboardMetric } from '../dashboardMetrics';
@@ -53,9 +52,8 @@ export async function CurrentCycleSeoSummary() {
           id: 'opened',
           label: t('currentCycleSummary.cards.opened'),
           value: figure('opened'),
-          // A date is set a size down from the amounts, and names its zone.
+          // A date is set a size down from the amounts; it names its zone inline.
           size: 'md',
-          caption: <TimeZoneNote />,
         },
       ]}
       related={[

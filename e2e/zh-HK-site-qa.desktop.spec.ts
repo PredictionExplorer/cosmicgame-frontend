@@ -20,7 +20,7 @@ defineLocaleSiteQa({
     'Public Goods',
     'Anchor Distribution',
     'Chrono-Warrior',
-    'Next cycle',
+    'Compounding Cycle Reserve',
     'Allocation Tracks',
     'Protocol Configuration',
   ]),

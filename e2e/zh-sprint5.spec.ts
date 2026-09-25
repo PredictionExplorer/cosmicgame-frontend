@@ -222,7 +222,8 @@ async function openZhRoute(page: Page, path: string, title?: string): Promise<vo
 }
 
 test.describe('zh Sprint 5 — statistics, tables, and formatting', () => {
-  // A reader in China: date-times print in the reader's zone, so the zone is pinned.
+  // A reader in China: every record is dated in UTC all the same (the reader's own
+  // time is on hover), so the zone is pinned to prove nothing follows it.
   test.use({ timezoneId: 'Asia/Shanghai' });
 
   test.beforeEach(async ({ page }) => {
@@ -282,10 +283,11 @@ test.describe('zh Sprint 5 — statistics, tables, and formatting', () => {
     await openTooltip(tooltipTrigger);
     await expectTooltipFullyVisible(page, /当前索引的演绎周期编号/);
     await dismissOpenTooltips(page);
-    // The cycle's opening (11:34 UTC), in the zh calendar style and the reader's zone,
-    // named inline; the year shows only outside the current one. (The named NFTs page
-    // this used to check is a gallery of plates now, with no dates.)
-    await expect(page.getByText(/^(2026年)?1月1日 19:34 UTC\+8$/)).toBeVisible();
+    // The cycle's opening, in the zh calendar style and in UTC with the zone named
+    // inline, the same for a reader in Shanghai as on the server (it once flipped to
+    // UTC+8 after hydration); the year shows only outside the current one. (The named
+    // NFTs page this used to check is a gallery of plates now, with no dates.)
+    await expect(page.getByText(/^(2026年)?1月1日 11:34 UTC$/)).toBeVisible();
 
     await openZhRoute(page, '/zh/statistics/tokens', '代币分布统计 · Cosmic Signature');
     // The supply summary dates the reading in the zh calendar style.

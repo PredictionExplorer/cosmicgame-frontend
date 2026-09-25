@@ -9,6 +9,7 @@ import { createMetadata } from '@/utils/seo';
 import { PageMessages } from '@/components/i18n/PageMessages';
 
 import { DashboardQuerySeed, QuerySeed, seedsDisabled } from '../../QuerySeed';
+import { readDashboard } from '../../publicDataReads';
 
 import GesturePage from './GesturePage';
 
@@ -75,7 +76,10 @@ export default async function Page({ params }: PageProps) {
   setRequestLocale(locale);
   // The same strict parse as the metadata: "12abc" is an invalid id, never gesture 12.
   const gestureId = parseGestureId(id) ?? -1;
-  const gesture = gestureId >= 0 ? await readGesture(gestureId) : null;
+  const [gesture, dashboard] = await Promise.all([
+    gestureId >= 0 ? readGesture(gestureId) : null,
+    seedsDisabled() ? null : readDashboard(),
+  ]);
   return (
     <PageMessages namespaces={['detail', 'gesture', 'tables']}>
       {/* The live cycle decides the record's trail and cycle link; the record is its own seed. */}
@@ -89,7 +93,10 @@ export default async function Page({ params }: PageProps) {
             },
           ]}
         >
-          <GesturePage gestureId={gestureId} />
+          <GesturePage
+            gestureId={gestureId}
+            serverLiveCycle={dashboard?.data?.CurRoundNum ?? null}
+          />
         </QuerySeed>
       </DashboardQuerySeed>
     </PageMessages>

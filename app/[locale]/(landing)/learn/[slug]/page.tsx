@@ -189,7 +189,8 @@ export default async function LearnArticlePage({ params }: PageProps) {
        * section start in the first screen. On phones and tablets it follows
        * the first section instead of pushing the text below the fold.
        */}
-      <div className="mb-8 border-b border-rule sm:mb-10 lg:grid lg:grid-cols-[minmax(0,1fr)_minmax(0,26rem)] lg:items-end lg:gap-12 xl:gap-16">
+      {/* Top-aligned, so the trail and the H1 sit where every other page puts them. */}
+      <div className="mb-8 border-b border-rule sm:mb-10 lg:grid lg:grid-cols-[minmax(0,1fr)_minmax(0,26rem)] lg:items-start lg:gap-12 xl:gap-16">
         <PageHeader
           variant="reading"
           breadcrumbs={[{ label: articleUi.breadcrumbs.learnLabel, href: '/learn' }]}
@@ -219,7 +220,7 @@ export default async function LearnArticlePage({ params }: PageProps) {
         {plateView ? <div className="hidden pb-10 lg:block">{plateView('26rem')}</div> : null}
       </div>
 
-      <div className="lg:grid lg:grid-cols-[minmax(0,14rem)_minmax(0,1fr)] lg:gap-12 xl:grid-cols-[minmax(0,16rem)_minmax(0,1fr)] xl:gap-16">
+      <div className="reading-grid">
         <div>
           <ReadingContents
             entries={entries}

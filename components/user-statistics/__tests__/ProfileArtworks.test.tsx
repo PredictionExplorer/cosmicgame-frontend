@@ -19,8 +19,13 @@ describe('ProfileArtworks', () => {
     expect(links[0]).toHaveAttribute('href', '/detail/25');
     expect(links[1]).toHaveAttribute('href', '/detail/3');
     expect(screen.getByText('Twisted Mind')).toBeInTheDocument();
-    // An unnamed token reads as "Cosmic Signature #000003".
-    expect(screen.getByText('Cosmic Signature #000003')).toBeInTheDocument();
+    // An unnamed token reads "Signature #000003", the number in the identifier face.
+    expect(screen.getByText('#000003')).toHaveClass('type-mono-inline');
+    expect(screen.getByText('#000003').parentElement).toHaveTextContent(
+      'common.signature.untitled(id=#000003)',
+    );
+    // A named one keeps its number in the caption, in the same face.
+    expect(screen.getByText('#000025')).toHaveClass('type-mono');
   });
 
   it('shows two rows until "Show all"', () => {
@@ -33,7 +38,7 @@ describe('ProfileArtworks', () => {
     expect(screen.getAllByRole('link')).toHaveLength(11);
   });
 
-  it('hangs anchored Signatures too, tagged, without repeating a held one', () => {
+  it('hangs anchored Signatures too, marked with the quiet anchor, without repeating a held one', () => {
     render(
       <ProfileArtworks
         tokens={[token(3)]}
@@ -46,8 +51,11 @@ describe('ProfileArtworks', () => {
     );
     const links = screen.getAllByRole('link');
     expect(links.map((link) => link.getAttribute('href'))).toEqual(['/detail/9', '/detail/3']);
-    expect(links[0]).toHaveTextContent('myPages.statistics.artworks.anchoredTag');
-    expect(links[1]).not.toHaveTextContent('myPages.statistics.artworks.anchoredTag');
+    // The anchored state is the one anchor mark every wall label uses, never a text tag.
+    expect(links[0]!.querySelector('[data-testid="anchored-mark"]')).toHaveTextContent(
+      'common.signature.anchored',
+    );
+    expect(links[1]!.querySelector('[data-testid="anchored-mark"]')).toBeNull();
   });
 
   it('explains an empty collection', () => {

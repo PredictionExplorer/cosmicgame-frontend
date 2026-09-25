@@ -10,6 +10,11 @@ import { cn } from '@/lib/utils';
 import { Amount } from '@/components/ui/amount';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
+import {
+  CountdownFigures,
+  countdownGroups,
+  countdownPartsFromMs,
+} from '@/components/ui/countdown-figures';
 import { DateTime } from '@/components/ui/date-time';
 import { Duration } from '@/components/ui/duration';
 import { LiveStatus, LiveStatusView } from '@/components/ui/live-status';
@@ -151,22 +156,29 @@ export function CycleStatus({
               label: phaseCopy('label'),
               status: phaseCopy('status'),
             })}
-            className="mt-2"
+            className="@container mt-2"
           >
-            {/* A clock whose last poll failed may have been extended: it dims until data returns. */}
-            <Duration
-              seconds={remainingSeconds}
-              variant="clock"
-              className={cn(
-                'block type-figure-xl',
-                clockStale ? 'text-muted-foreground' : 'text-foreground',
-              )}
+            {/* The one Cycle clock, as on the app home and the landing. A clock
+                whose last poll failed may have been extended: it dims until
+                data returns. */}
+            <CountdownFigures
+              groups={countdownGroups(countdownPartsFromMs(remainingSeconds * 1000), locale)}
+              size="desk"
+              align="start"
+              tone={clockStale ? 'stale' : 'live'}
+              data-testid="cycle-status-clock"
             />
           </div>
         ) : phase.showsZero ? (
-          <p className="mt-2 type-figure-xl text-muted-foreground" aria-hidden>
-            <Duration seconds={0} variant="clock" />
-          </p>
+          <div className="@container mt-2">
+            <CountdownFigures
+              groups={countdownGroups(countdownPartsFromMs(0), locale)}
+              size="desk"
+              align="start"
+              tone="stale"
+              data-testid="cycle-status-clock"
+            />
+          </div>
         ) : null}
         <p className="mt-3 max-w-[var(--measure-lede)] type-body-sm text-muted-foreground">
           {phaseCopy('status')}

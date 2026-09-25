@@ -265,7 +265,7 @@
     "results": {
       "address": "Người tham gia {address}",
       "token": "Signature {id}",
-      "cycle": "Chu kỳ #{cycle}",
+      "cycle": "Chu kỳ {cycle}",
       "gesture": "Nét bút có ID {id}",
       "transaction": "Giao dịch trên {explorer}"
     },
@@ -298,10 +298,7 @@
       "shortLabel": "Xem pool CST"
     },
     "axiomZero": {
-      "ariaLabel": "Sàn NFT Axiom Zero",
-      "defaultLabel": "NFT trên Axiom Zero",
-      "menuLabel": "Sàn Axiom Zero",
-      "shortLabel": "Axiom Zero"
+      "label": "Mua hoặc bán trên Axiom Zero"
     }
   },
   "maintenance": {

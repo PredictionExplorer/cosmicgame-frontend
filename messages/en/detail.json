@@ -21,9 +21,6 @@
     "copyImageLink": "Copy Image Link",
     "copyPageLink": "Copy Page Link"
   },
-  "actions": {
-    "buyOrSellNfts": "Buy or sell NFTs"
-  },
   "navigation": {
     "label": "Previous and next Signatures"
   },

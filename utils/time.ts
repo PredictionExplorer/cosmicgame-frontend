@@ -61,13 +61,18 @@ const chineseRelativeTime = (units: Record<RelativeTimeUnit, string>, justNow: s
  * delegates too: Vietnamese has no plural inflection, and CLDR's spaced
  * "2 giờ trước" / "3 tháng trước" is exactly the style guide's form.
  */
-const intlRelativeTime = (locale: string) => ({
-  ago: (count: number, unit: RelativeTimeUnit) =>
-    new Intl.RelativeTimeFormat(getLocaleConfig(locale).intlLocale, { numeric: 'always' }).format(
-      -count,
-      unit,
-    ),
-});
+const intlRelativeTime = (locale: string) => {
+  // Built once per locale, on first use: construction is the expensive part.
+  let formatter: Intl.RelativeTimeFormat | undefined;
+  return {
+    ago: (count: number, unit: RelativeTimeUnit) => {
+      formatter ??= new Intl.RelativeTimeFormat(getLocaleConfig(locale).intlLocale, {
+        numeric: 'always',
+      });
+      return formatter.format(-count, unit);
+    },
+  };
+};
 const RELATIVE_TIME_LABELS: LocaleRecord<RelativeTimeLabels> = {
   en: {
     justNow: 'just now',

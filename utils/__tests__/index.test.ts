@@ -1,7 +1,6 @@
 import {
-  shortenHex,
+  formatAddress,
   formatId,
-  convertTimestampToDateTime,
   formatSeconds,
   getExplorerUrl,
   getAssetsUrl,
@@ -9,28 +8,20 @@ import {
   getEnduranceChampions,
 } from '@/utils/index';
 
-describe('shortenHex', () => {
+describe('formatAddress through the utils entry', () => {
   it('shortens a standard Ethereum address to the checksummed 0x + 4 … 4 form', () => {
     const addr = '0x1234567890abcdef1234567890abcdef12345678';
-    expect(shortenHex(addr, 4)).toBe('0x1234…\u20605678');
+    expect(formatAddress(addr)).toBe('0x1234…\u20605678');
   });
 
-  it('ignores the legacy length so every address reads the same', () => {
-    const addr = '0x1234567890abcdef1234567890abcdef12345678';
-    expect(shortenHex(addr, 6)).toBe('0x1234…\u20605678');
-  });
-
-  it('returns empty string for falsy input', () => {
-    expect(shortenHex('', 4)).toBe('');
-  });
-
-  it('returns empty string for null-like inputs', () => {
-    expect(shortenHex(null as unknown as string, 4)).toBe('');
-    expect(shortenHex(undefined as unknown as string, 4)).toBe('');
+  it('returns an empty string for empty input', () => {
+    expect(formatAddress('')).toBe('');
+    expect(formatAddress(null)).toBe('');
+    expect(formatAddress(undefined)).toBe('');
   });
 
   it('returns strings too short to shorten unchanged', () => {
-    expect(shortenHex('0x12', 4)).toBe('0x12');
+    expect(formatAddress('0x12')).toBe('0x12');
   });
 });
 
@@ -41,21 +32,6 @@ describe('formatId', () => {
 
   it('pads larger numbers', () => {
     expect(formatId(123456)).toBe('#123456');
-  });
-});
-
-describe('convertTimestampToDateTime', () => {
-  it('converts a Unix timestamp to a date string, with the year of a past year', () => {
-    // 1609459200 = 2021-01-01 00:00 UTC; output varies by timezone (e.g. Jan 01 or Dec 31)
-    const result = convertTimestampToDateTime(1609459200);
-    expect(result).toMatch(/^[A-Za-z]{3} \d{2}, 202[01], \d{2}:\d{2}$/);
-  });
-
-  it('includes seconds when flag is set', () => {
-    const withSeconds = convertTimestampToDateTime(1609459200, true);
-    const without = convertTimestampToDateTime(1609459200, false);
-    expect(withSeconds).toMatch(/^[A-Za-z]{3} \d{2}, 202[01], \d{2}:\d{2}:\d{2}$/);
-    expect(without).toMatch(/^[A-Za-z]{3} \d{2}, 202[01], \d{2}:\d{2}$/);
   });
 });
 

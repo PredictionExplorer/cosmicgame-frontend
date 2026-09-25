@@ -1,7 +1,5 @@
 'use client';
 
-import { useTranslations } from 'next-intl';
-
 import { getSiteRoute } from '@/config/siteNav';
 import { usePathname } from '@/i18n/navigation';
 import { getClientBuildInfo, isVercelProductionDeploy } from '@/lib/buildInfo';
@@ -17,7 +15,6 @@ import { SiteFooter } from './SiteFooter';
  * is that directory, it leaves the directory out.
  */
 const Footer = () => {
-  const t = useTranslations('footer');
   const pathname = usePathname();
   const build = getClientBuildInfo();
   const showBuild =
@@ -26,9 +23,6 @@ const Footer = () => {
   return (
     <SiteFooter
       host="app"
-      tagline={t('tagline')}
-      copyright={t('copyright', { year: String(new Date().getFullYear()) })}
-      colophon={t('colophon')}
       directory={pathname !== getSiteRoute('siteMap').path}
       meta={
         showBuild ? (

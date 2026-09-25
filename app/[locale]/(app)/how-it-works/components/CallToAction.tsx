@@ -24,7 +24,7 @@ export function CallToAction({
       <div className="mt-7 flex flex-col items-stretch gap-3 sm:flex-row sm:items-center">
         <Link
           href={callToAction.primaryCta.href}
-          className={buttonVariants({ variant: 'commit', size: 'lg' })}
+          className={buttonVariants({ variant: 'default', size: 'lg' })}
         >
           {callToAction.primaryCta.label}
         </Link>

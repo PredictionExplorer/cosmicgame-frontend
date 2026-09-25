@@ -212,6 +212,8 @@ const CurrentRoundPage = ({ seoSummary }: { seoSummary?: ReactNode }) => {
             <div id="standings" className={`min-w-0 lg:col-span-7 ${CYCLE_SECTION_SCROLL_MARGIN}`}>
               <StandingsLedger
                 headingLevel={3}
+                // A peer of "Cycle status" beside it: the same section tier.
+                headingSize="section"
                 headingId="cycle-standings-heading"
                 description={tTables('specialAllocation.headingHelp')}
                 champions={champions}

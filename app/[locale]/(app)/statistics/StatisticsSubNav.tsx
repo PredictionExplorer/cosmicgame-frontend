@@ -80,7 +80,7 @@ export function StatisticsSubNav() {
           <ul
             className={cn(
               tabsListVariants({ variant: 'underline' }),
-              'w-max min-w-full flex-nowrap gap-0 sm:gap-2',
+              'w-max min-w-full flex-nowrap',
             )}
           >
             {ALL_STATISTICS_SECTIONS.map((section) => {

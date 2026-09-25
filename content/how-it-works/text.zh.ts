@@ -108,7 +108,6 @@ export const howItWorksTextZh = {
   payoff: {
     heading: '每个周期都以一幅签名收官',
     body: '每一次落笔都在塑造本周期的作品。周期收官时，这幅签名会铭刻为 Cosmic Signature NFT，随签名分配交给完成收官之笔的参与者。',
-    caption: '第 {cycle} 个周期的签名',
     linkLabel: '查看这幅签名',
   },
   stepByStep: {

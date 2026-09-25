@@ -7,6 +7,8 @@ import {
   TabsContent,
   TabsList,
   TabsTrigger,
+  SEGMENT_SELECTED_CLASS,
+  tabsListVariants,
   tabsTriggerVariants,
 } from '@/components/ui/tabs';
 
@@ -81,9 +83,9 @@ describe('Tabs', () => {
 
 describe('ScrollRail', () => {
   it('scrolls the current item into view without moving the page', () => {
-    const scrollBy = jest.fn();
-    const original = HTMLElement.prototype.scrollBy;
-    HTMLElement.prototype.scrollBy = scrollBy;
+    const scrollTo = jest.fn();
+    const original = HTMLElement.prototype.scrollTo;
+    HTMLElement.prototype.scrollTo = scrollTo;
     jest.useFakeTimers();
     try {
       render(
@@ -102,14 +104,33 @@ describe('ScrollRail', () => {
       act(() => {
         jest.runOnlyPendingTimers();
       });
-      expect(scrollBy).toHaveBeenCalledWith(
+      expect(scrollTo).toHaveBeenCalledWith(
         expect.objectContaining({ behavior: 'instant', left: expect.any(Number) }),
       );
-      const [{ left }] = scrollBy.mock.calls[0] as [{ left: number }];
-      expect(left).toBeGreaterThan(140);
+      const [{ left }] = scrollTo.mock.calls[0] as [{ left: number }];
+      // B comes to rest whole, one rest inset from the start: the gap to A,
+      // no wider than the fade (40px).
+      expect(left).toBe(180 - 40);
     } finally {
       jest.useRealTimers();
-      HTMLElement.prototype.scrollBy = original;
+      HTMLElement.prototype.scrollTo = original;
     }
+  });
+});
+
+describe('one selected look and one underline row', () => {
+  it('applies the exported segment selection exactly as the segmented variant does', () => {
+    const segmented = tabsTriggerVariants({ variant: 'segmented' });
+    for (const token of SEGMENT_SELECTED_CLASS.split(' ')) {
+      expect(segmented).toContain(`data-[state=active]:${token}`);
+      expect(segmented).toContain(`aria-[current=page]:${token}`);
+    }
+    // A segment never draws the --primary rule an underline row uses.
+    expect(SEGMENT_SELECTED_CLASS).not.toMatch(/primary/);
+  });
+
+  it('sets underline tabs flush on the content edge, 1.5rem apart', () => {
+    expect(tabsListVariants({ variant: 'underline' })).toContain('gap-x-6');
+    expect(tabsTriggerVariants({ variant: 'underline' })).toContain('px-0');
   });
 });

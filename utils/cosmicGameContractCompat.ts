@@ -14,6 +14,36 @@ import { networkConfig } from '@/config/networks';
 
 const cosmicGameAbiFull = cosmicGameJson as Abi;
 
+type AbiError = Extract<Abi[number], { type: 'error' }>;
+
+/**
+ * Custom errors that the V2 gesture paths can revert with but that are
+ * missing from the generated ABI (it has the V2 gesture *functions*, not
+ * these V2 error definitions). Regenerating the ABI from the V2 contracts
+ * would make this list unnecessary; keep it in sync until then.
+ */
+export const SUPPLEMENTAL_ERROR_ABI = [
+  {
+    type: 'error',
+    name: 'BidCstRewardAmountMinLimitNotReached',
+    inputs: [
+      { name: 'bidCstRewardAmount', type: 'uint256', internalType: 'uint256' },
+      { name: 'bidCstRewardAmountMinLimit', type: 'uint256', internalType: 'uint256' },
+    ],
+  },
+] as const satisfies readonly AbiError[];
+
+/**
+ * Every custom error the game can revert with. A write's ABI must carry
+ * these: viem decodes a revert against the ABI the call was made with, and a
+ * slice without error definitions leaves the error name and arguments
+ * undefined, so no reverted gesture could be explained.
+ */
+export const COSMIC_GAME_ERROR_ABI: readonly AbiError[] = [
+  ...cosmicGameAbiFull.filter((item): item is AbiError => item.type === 'error'),
+  ...SUPPLEMENTAL_ERROR_ABI,
+];
+
 /** Default min CST reward accepted on V2 gesture entrypoints (0 = accept contract value). */
 export const GESTURE_CST_REWARD_AMOUNT_MIN_LIMIT_V2 = 0n;
 
@@ -94,7 +124,10 @@ export function preferV2GestureArgsFirst(): boolean {
   return [42161, 421614, 31337].includes(networkConfig.chainId);
 }
 
-/** Narrow ABI slice for a single bid overload (avoids duplicate-name encoding ambiguity). */
+/**
+ * Narrow ABI slice for a single gesture overload (avoids duplicate-name
+ * encoding ambiguity), plus every custom error so a revert decodes.
+ */
 export function pickGestureWriteAbi(
   functionName: CosmicGameGestureFunctionName,
   callArgs: readonly unknown[],
@@ -105,7 +138,9 @@ export function pickGestureWriteAbi(
       item.name === functionName &&
       (item.inputs?.length ?? 0) === callArgs.length,
   );
-  return match ? [match] : cosmicGameAbiFull;
+  return match
+    ? [match, ...COSMIC_GAME_ERROR_ABI]
+    : [...cosmicGameAbiFull, ...SUPPLEMENTAL_ERROR_ABI];
 }
 
 /** Coerce gesture args to viem-friendly shapes before encoding. */

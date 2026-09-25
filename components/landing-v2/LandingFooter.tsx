@@ -1,30 +1,18 @@
-import type { LandingContent } from '@/content/landing';
-
 import { SiteFooter } from '@/components/layout/SiteFooter';
 
 import { OpenAppLink } from './OpenAppLink';
 
 /**
- * The landing footer: the same directory as the app footer (both render
- * `SiteFooter` from the navigation taxonomy), with the landing's own
- * tagline and colophon and a way into the app. Links to the app go out in
- * the same tab; the FAQ resolves to the app's FAQ on every landing page.
- * The legal row carries the disambiguation from the COSMIC cancer database,
- * a note every landing page needs and no page should lead with.
+ * The landing footer: the same footer as the app (both render `SiteFooter`,
+ * with the same directory from the navigation taxonomy and the same copy
+ * from the `footer` catalog), plus a way into the app. Links to the app go
+ * out in the same tab; the FAQ resolves to the app's FAQ on every landing
+ * page.
  *
  * A server component: the landing layout renders it and hands it to the
  * client shell as its `footer` slot, so only the footer's small islands
  * (the phone folds, the links, the language directory) ship as client code.
  */
-export function LandingFooter({ footer }: { footer: LandingContent['footer'] }) {
-  return (
-    <SiteFooter
-      host="landing"
-      tagline={footer.tagline}
-      copyright={footer.copyright}
-      colophon={footer.colophon}
-      action={<OpenAppLink size="lg" />}
-      meta={<p className="max-w-[65ch]">{footer.disambiguation}</p>}
-    />
-  );
+export function LandingFooter() {
+  return <SiteFooter host="landing" action={<OpenAppLink size="lg" />} />;
 }

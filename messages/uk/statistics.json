@@ -702,8 +702,6 @@
       "cycles": "Цикли"
     },
     "gridLabel": "NFT зоряного відбору",
-    "unnamed": "Cosmic Signature {id}",
-    "cycle": "Цикл {cycle}",
     "sources": {
       "participant": "Учасник",
       "randomWalk": "Random Walk",

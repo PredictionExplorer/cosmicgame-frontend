@@ -1,6 +1,6 @@
 import userEvent from '@testing-library/user-event';
 
-import { shortenHex } from '@/utils';
+import { formatAddress } from '@/utils';
 
 import { resetUxScenarioForTest } from '@/lib/uxCycleScenarios';
 
@@ -1150,7 +1150,7 @@ describe('HomePage', () => {
     const art = screen.getByTestId('latest-signature');
     expect(screen.getByTestId('control-desk-art')).toContainElement(art);
     expect(within(art).getByTestId('latest-signature-link')).toHaveAttribute('href', '/detail/47');
-    expect(within(art).getByText('home.latestSignature.imprintedIn(number=6)')).toBeVisible();
+    expect(within(art).getByText('common.signature.cycle(n=6)')).toBeVisible();
     expect(
       within(art).getByRole('link', { name: /home\.latestSignature\.gallery/ }),
     ).toHaveAttribute('href', '/gallery');
@@ -1781,7 +1781,7 @@ describe('HomePage', () => {
 
       expect(eventsOfKind('enduranceGrowing')).toHaveLength(2);
       const newEndurance = eventsOfKind('enduranceGrowing')[0]!;
-      expect(newEndurance).toHaveTextContent(`address=${shortenHex(secondAddress, 4)}`);
+      expect(newEndurance).toHaveTextContent(`address=${formatAddress(secondAddress)}`);
       expect(newEndurance.querySelector('time')).toHaveAttribute(
         'dateTime',
         new Date((cycleStart + 201) * 1000).toISOString(),
@@ -1792,7 +1792,7 @@ describe('HomePage', () => {
 
       expect(eventsOfKind('chronoLead')).toHaveLength(2);
       const newChrono = eventsOfKind('chronoLead')[0]!;
-      expect(newChrono).toHaveTextContent(`address=${shortenHex(secondAddress, 4)}`);
+      expect(newChrono).toHaveTextContent(`address=${formatAddress(secondAddress)}`);
       expect(newChrono.querySelector('time')).toHaveAttribute(
         'dateTime',
         new Date((cycleStart + 401) * 1000).toISOString(),

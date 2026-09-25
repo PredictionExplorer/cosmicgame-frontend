@@ -49,8 +49,12 @@ describe('ActionDock', () => {
     render(<ActionDock {...baseProps} />);
 
     const dock = screen.getByTestId('action-dock');
-    // The day unit comes from the locale, never a hard-coded "d" per locale.
-    expect(within(dock).getByRole('timer')).toHaveTextContent(/^6d.\d{2}:\d{2}:\d{2}$/);
+    // The Cycle clock's one-line form: the same padded, colon-separated
+    // groups as the clock above it, never a second shape ("6d 00:59:59").
+    expect(within(dock).getByTestId('dock-clock')).toHaveTextContent(/^06:\d{2}:\d{2}:\d{2}$/);
+    expect(within(dock).getByTestId('dock-clock')).toHaveAttribute('aria-hidden', 'true');
+    // Screen readers hear the time spelled out, with the locale's units.
+    expect(within(dock).getByRole('timer')).toHaveTextContent(/6d.1h/);
     expect(within(dock).getByText('home.observatory.clock.reserveLabel')).toBeInTheDocument();
     expect(dock).not.toHaveTextContent('Reserve ');
 

@@ -46,12 +46,6 @@
     "liveClock": "실시간 사이클 시계",
     "cycleClock": "사이클 시계",
     "gestureCount": "{count, plural, other {제스처 #개}}",
-    "units": {
-      "days": "일",
-      "hours": "시간",
-      "minutes": "분",
-      "seconds": "초"
-    },
     "duration": {
       "days": "{count, plural, other {#일}}",
       "hours": "{count, plural, other {#시간}}",
@@ -70,7 +64,6 @@
     "resumeRotation": "작품 전환 다시 시작",
     "playAnimation": "애니메이션 재생",
     "pauseAnimation": "애니메이션 일시 정지",
-    "unavailable": "작품을 불러올 수 없습니다",
-    "untitled": "시그니처 {tokenLabel}"
+    "unavailable": "작품을 불러올 수 없습니다"
   }
 }

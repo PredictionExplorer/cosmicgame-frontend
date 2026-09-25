@@ -62,8 +62,7 @@ export const learnTextZhHk = {
     readingTimeTemplate: '約 {minutes} 分鐘讀完',
     nextGuideLabel: '下一篇指南',
     contents: {
-      heading: '本篇目錄',
-      railLabel: '本頁目錄',
+      railLabel: '本頁內容',
       openLabel: '目錄',
       backToTopLabel: '返回頁頂',
     },

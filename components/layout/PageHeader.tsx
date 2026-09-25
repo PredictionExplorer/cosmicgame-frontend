@@ -8,6 +8,7 @@ import { cn } from '@/lib/utils';
 import { Breadcrumbs, type BreadcrumbItem } from '@/components/ui/breadcrumbs';
 import { ExplainedTerm } from '@/components/ui/explain-popover';
 import { ScrollRail } from '@/components/ui/scroll-rail';
+import { tabsTriggerVariants } from '@/components/ui/tabs-variants';
 import { UnknownValue } from '@/components/ui/unknown-value';
 import { HeaderLede } from '@/components/layout/HeaderLede';
 import { PAGE_SECTIONS, type PageSectionId } from '@/components/layout/pageSections';
@@ -308,7 +309,9 @@ export function PageHeader({
         ) : null}
       </div>
 
-      {figures && figures.length > 0 ? <PageHeaderFigures figures={figures} /> : null}
+      {figures && figures.length > 0 ? (
+        <PageHeaderFigures figures={figures} placement="header" />
+      ) : null}
 
       {meta ? (
         <div
@@ -385,17 +388,16 @@ export function PageHeaderTabs({
   return (
     <nav aria-label={label} className="-mb-px">
       <ScrollRail>
-        <ul className="flex gap-6">
+        {/* The system's one underline row (tabs.tsx), as every sibling-page row. */}
+        <ul className="flex gap-x-6 text-muted-foreground">
           {items.map((item) => (
             <li key={item.href} className="shrink-0">
               <Link
                 href={item.href}
                 aria-current={item.current ? 'page' : undefined}
                 className={cn(
-                  'focus-ring-inset inline-flex min-h-11 items-center whitespace-nowrap border-b-2 type-label transition-colors duration-[var(--duration-fast)]',
-                  item.current
-                    ? 'border-primary text-foreground'
-                    : 'border-transparent text-muted-foreground hover:border-rule hover:text-foreground',
+                  tabsTriggerVariants({ variant: 'underline', scroll: true }),
+                  'focus-ring-inset no-underline',
                 )}
               >
                 {item.label}
@@ -409,8 +411,24 @@ export function PageHeaderTabs({
 }
 
 /**
+ * Whether a label reads on one line in a third of a phone's row (about
+ * 110px of 13px type): 14 Latin letters, or 7 CJK characters, which set about
+ * twice as wide.
+ */
+function fitsStripColumn(label: string): boolean {
+  let width = 0;
+  for (const char of label)
+    width += /[\u1100-\u11ff\u2e80-\ua4cf\uac00-\ud7af\uf900-\ufaff\uff00-\uffef]/.test(char)
+      ? 2
+      : 1;
+  return width <= 14;
+}
+
+/**
  * The layout of the figure row on phones:
- * - `strip`: three compact figures (short counts) side by side.
+ * - `strip`: three compact figures (short counts) side by side, when every
+ *   label fits its column on one line; a longer label would break into
+ *   three lines there, so the figures take rows instead.
  * - `grid`: two columns; figures with `size: 'md'` (dates, addresses) sit
  *   under the paired others, across the full width, or side by side when
  *   there are two of them.
@@ -418,16 +436,34 @@ export function PageHeaderTabs({
  *   hole in the grid, every figure becomes a label-and-value row instead.
  */
 export function figurePhoneLayout(figures: readonly PageHeaderFigure[]): 'grid' | 'rows' | 'strip' {
-  if (figures.length === 3 && figures.every((figure) => figure.compact)) return 'strip';
+  if (
+    figures.length === 3 &&
+    figures.every((figure) => figure.compact && fitsStripColumn(figure.label))
+  ) {
+    return 'strip';
+  }
   const paired = figures.filter((figure) => figure.size !== 'md').length;
   return figures.length > 1 && paired % 2 === 1 ? 'rows' : 'grid';
 }
 
 /** The phone columns of the figure row, by layout. */
 const PHONE_FIGURE_LAYOUT_CLASS: Record<ReturnType<typeof figurePhoneLayout>, string> = {
-  grid: 'grid-cols-2 max-sm:-mb-3',
-  strip: 'grid-cols-3 max-sm:-mb-3',
+  grid: 'grid-cols-2',
+  strip: 'grid-cols-3',
   rows: 'grid-cols-1 max-sm:flex max-sm:flex-col max-sm:divide-y max-sm:divide-rule',
+};
+
+/**
+ * In a page header the row tucks into the header's closing rule: a negative
+ * bottom margin hands back each figure's bottom padding. In a section there
+ * is no rule to tuck into, and the margin would override the section's own
+ * spacing (a parent's `space-y-*` puts its gap on this margin at zero
+ * specificity), landing a caption on the next heading.
+ */
+const HEADER_PLACEMENT_CLASS: Record<ReturnType<typeof figurePhoneLayout>, string> = {
+  grid: 'max-sm:-mb-3 sm:-mb-5 lg:mb-0',
+  strip: 'max-sm:-mb-3 sm:-mb-5 lg:mb-0',
+  rows: 'sm:-mb-5 lg:mb-0',
 };
 
 /**
@@ -444,9 +480,12 @@ const PHONE_FIGURE_LAYOUT_CLASS: Record<ReturnType<typeof figurePhoneLayout>, st
  */
 export function PageHeaderFigures({
   figures,
+  placement = 'section',
   className,
 }: {
   figures: readonly PageHeaderFigure[];
+  /** `header` inside a PageHeader (tucks into its rule); `section` everywhere else. */
+  placement?: 'header' | 'section';
   className?: string;
 }) {
   const t = useTranslations('common');
@@ -464,8 +503,8 @@ export function PageHeaderFigures({
         'mt-4 grid gap-x-4 gap-y-1 sm:mt-8 sm:gap-x-6',
         PHONE_FIGURE_LAYOUT_CLASS[layout],
         FIGURE_COLUMNS[Math.min(figures.length, 4)],
-        'sm:-mb-5',
-        'lg:mb-0 lg:grid-flow-col lg:grid-cols-none lg:grid-rows-[auto_auto_auto] lg:auto-cols-[minmax(0,max-content)] lg:justify-start lg:gap-x-0 lg:divide-x lg:divide-rule',
+        placement === 'header' && HEADER_PLACEMENT_CLASS[layout],
+        'lg:grid-flow-col lg:grid-cols-none lg:grid-rows-[auto_auto_auto] lg:auto-cols-[minmax(0,max-content)] lg:justify-start lg:gap-x-0 lg:divide-x lg:divide-rule',
         className,
       )}
     >

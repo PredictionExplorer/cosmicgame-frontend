@@ -1,5 +1,6 @@
 {
   "tagline": "Giao thức nghệ thuật tạo sinh trên chuỗi Arbitrum. Mỗi nét bút đều định hình Signature cuối cùng của chu kỳ.",
   "copyright": "© {year} Cosmic Signature · Tài liệu thuộc dự án · CC0 1.0",
-  "colophon": "CC0 · Đã xác minh · Có thể tái tạo"
+  "colophon": "CC0 1.0 · Có thể xác minh công khai · Nghệ thuật tái tạo được",
+  "disambiguation": "Cosmic Signature không liên quan đến cơ sở dữ liệu đột biến ung thư COSMIC hay các chữ ký đột biến COSMIC trong sinh học. Đây là một giao thức và ứng dụng nghệ thuật trên chuỗi."
 }

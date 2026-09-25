@@ -94,7 +94,7 @@
         "tooltip": "Forwarded to the Public Goods Beneficiary (Protocol Guild) each cycle"
       },
       "next": {
-        "label": "Next cycle",
+        "label": "Compounding Cycle Reserve",
         "tooltip": "Remaining funds that roll forward into the next cycle as the Compounding Cycle Reserve."
       }
     }
@@ -105,7 +105,7 @@
     "cards": {
       "ethStep": {
         "label": "ETH Gesture Cost step-up",
-        "tooltip": "ETH gesture cost uses this step-up parameter. CST gesture cost follows the live CST Calibration Window."
+        "tooltip": "ETH Gesture Cost uses this step-up parameter. CST Gesture Cost follows the live CST Calibration Window."
       },
       "timeIncrement": {
         "label": "Time added per gesture",

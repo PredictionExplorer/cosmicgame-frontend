@@ -85,8 +85,7 @@ export const learnTextJa = {
     readingTimeTemplate: '約{minutes}分で読めます',
     nextGuideLabel: '次のガイド',
     contents: {
-      heading: 'このガイドの内容',
-      railLabel: 'このページの目次',
+      railLabel: 'このページの内容',
       openLabel: '目次',
       backToTopLabel: 'ページの先頭へ',
     },

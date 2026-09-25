@@ -21,7 +21,7 @@
     "noteAdded": "Added",
     "noteHint": "The note is stored on-chain with your contribution and shown on its public record.",
     "urlError": "Use a full link that starts with https:// or http://.",
-    "summary": "{amount} goes to the Cycle Reserve of cycle {cycle}.",
+    "summary": "{amount} goes to the Cycle Reserve of Cycle #{cycle}.",
     "summaryNoCycle": "{amount} goes to the Cycle Reserve.",
     "submitAmount": "Contribute {amount}"
   },
@@ -29,7 +29,7 @@
     "invalidId": "Invalid contribution id",
     "title": "Contribution #{id}",
     "breadcrumbContributions": "Direct ETH contributions",
-    "lede": "A direct ETH contribution to the Cycle Reserve of cycle {cycle}.",
+    "lede": "A direct ETH contribution to the Cycle Reserve of Cycle #{cycle}.",
     "figures": {
       "amount": "Amount",
       "from": "From",
@@ -42,7 +42,7 @@
     "opensInNewTab": "Opens in a new tab",
     "recordTitle": "Record",
     "transactionLabel": "Transaction",
-    "cycleLink": "All contributions in cycle {cycle}",
+    "cycleLink": "All contributions in Cycle #{cycle}",
     "recordLabel": "Record id",
     "recordValue": "#{id}",
     "invalidIdTitle": "This link doesn't point to a contribution",
@@ -55,9 +55,9 @@
   },
   "cycle": {
     "invalidNumber": "Invalid cycle number",
-    "title": "Cycle {cycle} contributions",
+    "title": "Cycle #{cycle} contributions",
     "breadcrumbContributions": "Direct ETH contributions",
-    "lede": "Direct ETH contributions to the Cycle Reserve during cycle {cycle}.",
+    "lede": "Direct ETH contributions to the Cycle Reserve during Cycle #{cycle}.",
     "figures": {
       "count": "Contributions",
       "total": "Total contributed",
@@ -66,13 +66,13 @@
     "otherCycles": "Other cycles",
     "previous": "Previous cycle",
     "next": "Next cycle",
-    "cycleLabel": "Cycle {cycle}",
-    "viewAllocation": "Cycle {cycle} allocation",
+    "cycleLabel": "Cycle #{cycle}",
+    "viewAllocation": "Cycle #{cycle} allocation",
     "viewLive": "The live cycle",
-    "emptyDescription": "Contributions sent while cycle {cycle} is active appear here.",
+    "emptyDescription": "Contributions sent while Cycle #{cycle} is active appear here.",
     "loadError": "The contributions of this cycle couldn't be loaded.",
     "invalidTitle": "This link doesn't point to a cycle",
     "invalidDescription": "Cycle numbers are whole numbers from 0, like 3.",
-    "emptyDescriptionPast": "No direct ETH contributions were made during cycle {cycle}."
+    "emptyDescriptionPast": "No direct ETH contributions were made during Cycle #{cycle}."
   }
 }

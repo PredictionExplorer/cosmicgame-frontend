@@ -44,7 +44,7 @@ export const LOCALE_SHORT_LABELS: LocaleRecord<string> = {
 const NAME_CLASS = "[font-feature-settings:'halt']";
 
 const TRIGGER_CLASS =
-  'rounded-pill border border-input bg-surface-sunken text-foreground hover:border-foreground/40 hover:bg-muted hover:text-foreground data-[state=open]:border-secondary/40 data-[state=open]:bg-secondary/10 data-[state=open]:text-foreground';
+  'rounded-control border border-input bg-surface-sunken text-foreground hover:border-foreground/40 hover:bg-muted hover:text-foreground data-[state=open]:border-foreground/40 data-[state=open]:bg-muted data-[state=open]:text-foreground';
 
 interface LanguageSwitcherProps {
   className?: string;
@@ -106,7 +106,7 @@ export function LanguageSwitcher({ className, variant = 'pill' }: LanguageSwitch
           className,
         )}
       >
-        <Globe className="shrink-0 text-secondary" aria-hidden />
+        <Globe className="shrink-0 text-muted-foreground" aria-hidden />
         <span lang={locale} className={cn('max-w-[9rem] truncate', NAME_CLASS)}>
           {current}
         </span>
@@ -120,7 +120,7 @@ export function LanguageSwitcher({ className, variant = 'pill' }: LanguageSwitch
         aria-label={triggerName}
         className={cn(TRIGGER_CLASS, 'size-11 shrink-0 sm:size-10', className)}
       >
-        <Globe className="shrink-0 text-secondary" aria-hidden />
+        <Globe className="shrink-0 text-muted-foreground" aria-hidden />
       </Button>
     ),
     responsive: (
@@ -134,7 +134,7 @@ export function LanguageSwitcher({ className, variant = 'pill' }: LanguageSwitch
           className,
         )}
       >
-        <Globe className="shrink-0 text-secondary" aria-hidden />
+        <Globe className="shrink-0 text-muted-foreground" aria-hidden />
         <span lang={locale} className={cn('hidden xl:inline 2xl:hidden', NAME_CLASS)}>
           {short}
         </span>

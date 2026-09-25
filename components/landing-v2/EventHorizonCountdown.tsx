@@ -10,7 +10,11 @@ import { getLiveDataPollIntervalMs } from '@/lib/pollingCadence';
 import { cn } from '@/lib/utils';
 import { SiteLink } from '@/components/layout/SiteLink';
 import { buttonVariants } from '@/components/ui/button';
-import { CountdownFigures, type CountdownGroup } from '@/components/ui/countdown-figures';
+import {
+  CountdownFigures,
+  countdownGroups,
+  type CountdownParts,
+} from '@/components/ui/countdown-figures';
 import { LiveStatusView } from '@/components/ui/live-status-view';
 
 import {
@@ -208,13 +212,13 @@ export function EventHorizonCountdown() {
   const stateWord =
     copyKey === 'ready' || copyKey === 'confirming' ? timerT(`phases.${copyKey}.state`) : null;
 
-  // The same fixed column labels as the app's clock: a caption never changes
-  // word or width as the digits tick; the timer's name spells the value out.
-  const groups: CountdownGroup[] = snapshot.shards.map((shard) => ({
-    id: shard.unit,
-    value: shard.value,
-    label: timerT(`units.${shard.unit}`),
-  }));
+  // The one Cycle clock (countdownGroups): the app's groups, padding and
+  // fixed captions, so the same number never changes shape between hosts;
+  // the timer's name spells the value out.
+  const parts = Object.fromEntries(
+    snapshot.shards.map((shard) => [shard.unit, shard.value]),
+  ) as unknown as CountdownParts;
+  const groups = countdownGroups(parts, locale);
   const timerLabel = showCountdown
     ? timerT('countdownAria', {
         label: title,

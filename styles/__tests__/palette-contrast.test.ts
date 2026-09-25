@@ -151,6 +151,14 @@ describe.each(SITE_THEMES)('%s palette', (theme) => {
     expect(contrast(color(control), color(surface))).toBeGreaterThanOrEqual(3);
   });
 
+  it('edges the selected segment at 3:1 on its sunken track and its raised fill', () => {
+    // The segmented control's selected cue is the --input edge: the fill step
+    // (raised on sunken) alone measures 1.1-1.3:1.
+    for (const surface of ['--surface-sunken', '--popover']) {
+      expect(contrast(color('--input'), color(surface))).toBeGreaterThanOrEqual(3);
+    }
+  });
+
   it('keeps button labels readable across the whole signature gradient', () => {
     const label = color('--primary-foreground');
     expect(contrast(label, color('--primary'))).toBeGreaterThanOrEqual(4.5);

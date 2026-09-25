@@ -71,7 +71,7 @@ export default async function LandingRootLayout({ children, params }: LayoutProp
     notFound();
   }
   setRequestLocale(locale);
-  const { meta, footer, cycle, art, tracks } = getLandingContent(locale);
+  const { meta, cycle, art, tracks } = getLandingContent(locale);
   // The home page's section names, linked from the header on every landing page.
   const sections = { cycle: cycle.eyebrow, art: art.eyebrow, tracks: tracks.eyebrow };
   const seo = await getTranslations({ locale, namespace: 'seo' });
@@ -110,7 +110,7 @@ export default async function LandingRootLayout({ children, params }: LayoutProp
       }
     >
       <NextIntlClientProvider messages={chromeMessages}>
-        <LandingShell footer={<LandingFooter footer={footer} />} sections={sections}>
+        <LandingShell footer={<LandingFooter />} sections={sections}>
           {children}
         </LandingShell>
       </NextIntlClientProvider>

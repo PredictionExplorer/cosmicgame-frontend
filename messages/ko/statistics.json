@@ -702,8 +702,6 @@
       "cycles": "사이클 수"
     },
     "gridLabel": "별빛 선정 NFT",
-    "unnamed": "Cosmic Signature {id}",
-    "cycle": "사이클 {cycle}",
     "sources": {
       "participant": "참여자",
       "randomWalk": "Random Walk",

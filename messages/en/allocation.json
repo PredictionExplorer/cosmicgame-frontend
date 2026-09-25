@@ -1,6 +1,6 @@
 {
   "formats": {
-    "cycle": "Cycle {cycle}",
+    "cycle": "Cycle #{cycle}",
     "cycleHash": "Cycle #{cycle}",
     "cosmicSignatureToken": "Cosmic Signature #{token}"
   },
@@ -13,13 +13,14 @@
     },
     "intro": "When a Performance Cycle finalizes, the participant who made the Final Gesture retrieves the Signature Allocation — {percentage}% of the Cycle Reserve, 1,000 CST, and a unique Cosmic Signature NFT. Additional allocations flow through Chrono-Warrior, Stellar Selection, Anchor Distributions, Public Goods, and the Compounding Cycle Reserve.",
     "reserveSplit": {
-      "label": "Cycle reserve split",
+      "label": "Cycle Reserve split",
       "tooltip": "Percentages show how a finalized cycle's ETH reserve is allocated across protocol tracks."
     },
     "ledgerTitle": "Finalized cycles"
   },
   "details": {
     "navigation": {
+      "label": "Neighbouring cycles",
       "previousAria": "Previous cycle",
       "nextAria": "Next cycle"
     },

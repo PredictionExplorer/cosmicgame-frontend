@@ -43,7 +43,6 @@ function buildHowItWorksContent(text: HowItWorksText): HowItWorksContent {
     payoff: {
       heading: text.payoff.heading,
       body: text.payoff.body,
-      caption: text.payoff.caption.replace('{cycle}', String(structure.payoffSample.cycle)),
       link: {
         label: text.payoff.linkLabel,
         href: `/detail/${structure.payoffSample.tokenId}`,

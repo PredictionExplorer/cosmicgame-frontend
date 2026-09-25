@@ -39,6 +39,19 @@ as the web fallback of the Korean display punctuation alias (`styles/global.css`
 It remains licensed under the SIL Open Font License 1.1; see
 [assets/fonts/OFL-NotoSansCJK.txt](assets/fonts/OFL-NotoSansCJK.txt).
 
+The site also serves two display-alias web fonts (`styles/global.css`) that
+`npm run og:fonts` cuts from the checked-in share-card subsets (`WEB_FONT_CUTS` in
+`scripts/build-og-fonts-core.ts`):
+
+- `public/fonts/display-figures/Inter-figures.woff2`, the digits `0`–`9` and `#` of
+  `assets/fonts/Inter-500.subset.ttf`, a subset of Inter; see
+  [assets/fonts/OFL-Inter.txt](assets/fonts/OFL-Inter.txt).
+- `public/fonts/noto-sans-cjk/NotoSansCJK-digits.woff2`, the digits `0`–`9` of
+  `assets/fonts/NotoSansSC-700.subset.ttf`, a subset of Noto Sans SC; see
+  [assets/fonts/OFL-NotoSansCJK.txt](assets/fonts/OFL-NotoSansCJK.txt).
+
+Both remain licensed under the SIL Open Font License 1.1.
+
 The Japanese and Korean white paper PDFs also embed regular (400) and bold (700)
 subsets of Noto Sans JP and Noto Sans KR. `npm run white-paper:pdf` generates these
 from the same pinned google/fonts sources, using each complete paper's glyph set.

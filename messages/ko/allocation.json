@@ -20,6 +20,7 @@
   },
   "details": {
     "navigation": {
+      "label": "인접 사이클",
       "previousAria": "이전 사이클",
       "nextAria": "다음 사이클"
     },

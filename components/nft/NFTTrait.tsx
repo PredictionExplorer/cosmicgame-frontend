@@ -275,11 +275,7 @@ const NFTTrait = ({ tokenId, initialMetadata, initialToken }: NFTTraitProps) => 
             actions={
               <>
                 <NFTShareMenu imageUrl={media?.sourceImage} videoUrl={media?.video} />
-                <NftMarketplaceButton
-                  variant="card"
-                  label={t('actions.buyOrSellNfts')}
-                  className="h-11 border-input bg-transparent px-3 text-sm font-medium normal-case text-foreground hover:bg-surface sm:h-9"
-                />
+                <NftMarketplaceButton size="sm" />
               </>
             }
           />
