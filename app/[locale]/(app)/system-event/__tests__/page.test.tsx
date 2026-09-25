@@ -2,6 +2,7 @@ import { isValidElement, type ReactElement, type ReactNode } from 'react';
 
 import { documentTitleOf } from '@/test-utils/metadata';
 
+import { CanonicalAddress } from '../[round]/[start]/[end]/CanonicalAddress';
 import Page, { generateMetadata } from '../[round]/[start]/[end]/page';
 import SystemEventPage from '../[round]/[start]/[end]/SystemEventPage';
 import { checkSystemEventWindow } from '../[round]/[start]/[end]/systemEventLink';
@@ -32,20 +33,23 @@ const props = (round: string, start: string, end: string) => ({
   params: Promise.resolve({ locale: 'en', round, start, end }),
 });
 
-/** The props the route hands the client page. */
-function renderedPageProps(tree: ReactNode): Record<string, unknown> | undefined {
+/** The props the route hands one of its components (`type`) in the tree. */
+function renderedProps(tree: ReactNode, type: unknown): Record<string, unknown> | undefined {
   if (!isValidElement(tree)) return undefined;
   const element = tree as ReactElement<{ children?: ReactNode }>;
-  if (element.type === SystemEventPage) return element.props as Record<string, unknown>;
+  if (element.type === type) return element.props as Record<string, unknown>;
   const children = Array.isArray(element.props.children)
     ? element.props.children
     : [element.props.children];
   for (const child of children) {
-    const found = renderedPageProps(child as ReactNode);
+    const found = renderedProps(child as ReactNode, type);
     if (found) return found;
   }
   return undefined;
 }
+
+/** The props the route hands the client page. */
+const renderedPageProps = (tree: ReactNode) => renderedProps(tree, SystemEventPage);
 
 const SEEDS = [{ queryKey: ['systemEvents', 200, 350], data: [], at: 0 }];
 
@@ -59,7 +63,23 @@ describe('system-event/[round]/[start]/[end] page', () => {
     mockCheck.mockResolvedValue({ status: 'canonical' });
     const tree = await Page(props('2', '200', '350'));
     expect(renderedPageProps(tree)).toEqual({ round: 2, start: 200, end: 350 });
+    expect(renderedProps(tree, CanonicalAddress)).toBeUndefined();
     expect(mockCapCacheWindow).toHaveBeenCalledWith('final');
+  });
+
+  // Raised in the cached render, a redirect left with its Location header twice on a miss.
+  it('answers a link to the cycle’s window by other ids in place, naming the window’s one URL', async () => {
+    const canonical = { round: 2, start: 200, end: 350 };
+    mockCheck.mockResolvedValue({ status: 'moved', window: canonical });
+    const tree = await Page(props('2', '200', '340'));
+    expect(renderedPageProps(tree)).toEqual(canonical);
+    expect(mockSeed).toHaveBeenCalledWith(canonical);
+    expect(renderedProps(tree, CanonicalAddress)).toEqual({ href: '/system-event/2/200/350' });
+    expect(mockCapCacheWindow).toHaveBeenCalledWith('pending');
+
+    const metadata = await generateMetadata(props('2', '200', '340'), Promise.resolve({}) as never);
+    expect(String(metadata.alternates?.canonical)).toMatch(/\/system-event\/2\/200\/350$/);
+    expect(documentTitleOf(metadata)).toMatch(/Cycle 2/);
   });
 
   // A segment's notFound() reaches the browser as the bare error shell: the page renders the
