@@ -26,11 +26,6 @@ export const faqTextJa = {
         answer:
           'Cosmic SignatureはArbitrum上のプロシージャル・オンチェーンアート・プロトコルです。参加者はパフォーマンス・サイクルの間に一筆を入れ、その一つひとつがサイクルの最終シグネチャーを形づくります。サイクルが確定すると、プロトコルは準備金を10を超える配分トラックへ配ります。その中には、170人以上のEthereumコア貢献者の資金支援メカニズムであるProtocol Guildも含まれます。',
       },
-      'is-cosmic-signature-related-to-biology': {
-        question: 'Cosmic Signatureは生物学のCOSMICデータベースと関係がありますか？',
-        answer:
-          'いいえ。Cosmic Signatureは、生物学におけるCOSMICがん変異データベースやCOSMIC変異シグネチャーとは関係がありません。決定論的な三体NFTアートに焦点を当てたオンチェーンアートのプロトコルとアプリです。',
-      },
       'how-does-the-bidding-game-work': {
         question: 'パフォーマンス・サイクルはどのように進みますか？',
         answer: `各サイクルは、最初の一筆のためのETH調律期間で始まります。その最初の一筆がサイクル確定時刻を動かします。現在の既定はおよそ24時間です。その後のETHまたはCSTの一筆は、保存された確定時刻に現在の時間増分を加えます。増分はちょうど一時間から始まり、確定したサイクルごとに${protocolFacts.cycleTimeIncrementIncreasePercentPerCycle}%ずつ大きくなります。サイクル確定時刻を過ぎると、最後の一筆を入れた参加者には、サイクルを確定してシグネチャー配分を受け取るための${protocolFacts.finalGestureExclusivityHours}時間の優先期間があります。サイクルが実際に確定するまで、一筆は引き続き入れられます。`,
@@ -309,6 +304,11 @@ export const faqTextJa = {
         question: '手数料はかかりますか？',
         answer:
           '一筆の費用そのものに加えて、トランザクションごとにArbitrumネットワークのガス代を支払います。ガス代はネットワークの状況によって変動し、Cosmic Signatureが管理するものではありません。',
+      },
+      'is-cosmic-signature-related-to-biology': {
+        question: 'Cosmic Signatureは生物学のCOSMICデータベースと関係がありますか？',
+        answer:
+          'いいえ。Cosmic Signatureは、生物学におけるCOSMICがん変異データベースやCOSMIC変異シグネチャーとは関係がありません。決定論的な三体NFTアートに焦点を当てたオンチェーンアートのプロトコルとアプリです。',
       },
     },
   },

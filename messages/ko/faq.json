@@ -20,11 +20,12 @@
   "category": {
     "expandAll": "모두 펼치기",
     "collapseAll": "모두 접기",
-    "expandAllAria": "모든 질문 펼치기",
-    "collapseAllAria": "모든 질문 접기",
+    "expandAllAria": "모두 펼치기: {category}",
+    "collapseAllAria": "모두 접기: {category}",
     "copyLink": "링크 복사",
     "copied": "복사됨",
-    "copyLinkAria": "이 질문의 링크 복사"
+    "copyLinkAria": "링크 복사: {question}",
+    "linkCopied": "링크를 복사했습니다"
   },
   "popular": {
     "heading": "인기 질문"

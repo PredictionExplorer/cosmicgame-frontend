@@ -30,7 +30,6 @@ export const FAQ_STRUCTURE = [
     icon: 'rocket',
     items: [
       { id: 'what-is-cosmic-signature' },
-      { id: 'is-cosmic-signature-related-to-biology' },
       { id: 'how-does-the-bidding-game-work' },
       { id: 'what-type-of-gestures-are-available' },
       { id: 'can-i-participate-without-nfts' },
@@ -109,6 +108,8 @@ export const FAQ_STRUCTURE = [
       { id: 'verify-bid-success' },
       { id: 'game-security' },
       { id: 'fees-involved' },
+      // A disambiguation readers arrive at from search; newcomers start with the protocol itself.
+      { id: 'is-cosmic-signature-related-to-biology' },
     ],
   },
   {

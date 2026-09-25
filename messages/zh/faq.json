@@ -20,11 +20,12 @@
   "category": {
     "expandAll": "全部展开",
     "collapseAll": "全部收起",
-    "expandAllAria": "展开本分类的所有问题",
-    "collapseAllAria": "收起本分类的所有问题",
+    "expandAllAria": "全部展开：{category}",
+    "collapseAllAria": "全部收起：{category}",
     "copyLink": "复制链接",
     "copied": "已复制",
-    "copyLinkAria": "复制此问题的链接"
+    "copyLinkAria": "复制链接：{question}",
+    "linkCopied": "链接已复制"
   },
   "popular": {
     "heading": "热门问题"

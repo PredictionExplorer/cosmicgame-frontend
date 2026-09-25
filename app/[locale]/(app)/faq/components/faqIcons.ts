@@ -1,6 +1,6 @@
 import { Blocks, Gem, Rocket, ShieldCheck, type LucideIcon } from 'lucide-react';
 
-import type { FAQCategoryIcon } from '@/content/faq';
+import type { FAQCategoryIcon } from '@/content/faq/types';
 
 import { AllocationIcon, CycleIcon } from '@/lib/conceptIcons';
 

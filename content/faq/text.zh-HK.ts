@@ -25,11 +25,6 @@ export const faqTextZhHk = {
         answer:
           'Cosmic Signature 是 Arbitrum 上的程序化鏈上藝術協議。參與者在演繹週期中落筆，每一筆都會塑造這一週期最終的簽名。週期收官後，協議將儲備分配至十餘條軌道，其中包括支持 170 多位以太坊核心貢獻者的 Protocol Guild。',
       },
-      'is-cosmic-signature-related-to-biology': {
-        question: 'Cosmic Signature 與生物學領域的 COSMIC 數據庫有關嗎？',
-        answer:
-          '沒有關係。Cosmic Signature 與 COSMIC 癌症突變數據庫及生物學中的 COSMIC 突變特徵均無關聯。它是鏈上藝術協議及應用程式，聚焦由確定性三體運動生成的 NFT 藝術。',
-      },
       'how-does-the-bidding-game-work': {
         question: '演繹週期如何運作？',
         answer: `每個週期都以首筆落筆的 ETH 校準窗口開啟。首筆落筆會啟動週期收官倒數，目前預設約為 24 小時。此後每筆 ETH 或 CST 落筆都會把目前時間增量加到鏈上收官時間；該增量初始為 1 小時，並在每個週期收官後增長 ${protocolFacts.cycleTimeIncrementIncreasePercentPerCycle}%。倒數結束後，收官之筆的參與者享有 ${protocolFacts.finalGestureExclusivityHours} 小時的專屬收官窗口，可完成週期收官並取回簽名分配；在週期實際收官前，仍可繼續落筆。`,
@@ -307,6 +302,11 @@ export const faqTextZhHk = {
         question: '參與需要支付哪些費用？',
         answer:
           '除落筆價格外，每筆交易還需支付 Arbitrum 網絡燃料費。燃料費會隨網絡狀況波動，不由 Cosmic Signature 控制。',
+      },
+      'is-cosmic-signature-related-to-biology': {
+        question: 'Cosmic Signature 與生物學領域的 COSMIC 數據庫有關嗎？',
+        answer:
+          '沒有關係。Cosmic Signature 與 COSMIC 癌症突變數據庫及生物學中的 COSMIC 突變特徵均無關聯。它是鏈上藝術協議及應用程式，聚焦由確定性三體運動生成的 NFT 藝術。',
       },
     },
   },

@@ -4,12 +4,8 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { BookA } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 
-import {
-  findFaqItemByHash,
-  findFaqItemById,
-  getTotalFaqQuestionCount,
-  type FAQContent,
-} from '@/content/faq';
+import { findFaqItemByHash, findFaqItemById, getTotalFaqQuestionCount } from '@/content/faq/lookup';
+import type { FAQContent } from '@/content/faq/types';
 
 import { jumpToSection, sectionScrollBehavior } from '@/lib/jumpToSection';
 import { PageShell } from '@/components/ui/page-shell';
@@ -23,6 +19,7 @@ import { FAQCategorySection } from './components/FAQCategory';
 import { FAQGlossary, GLOSSARY_ENTRY_ID } from './components/FAQGlossary';
 import { ContactCTA } from './components/ContactCTA';
 import { FAQ_ICONS } from './components/faqIcons';
+import { matchesQuery } from './components/answerText';
 
 function useDebounce(value: string, delay: number): string {
   const [debounced, setDebounced] = useState(value);
@@ -73,15 +70,17 @@ const FAQPage = ({ content }: FAQPageProps) => {
   const { categories } = content;
   const isSearching = debouncedSearch.trim().length > 0;
 
+  // The same matcher as each category's list and highlight (answerText), so
+  // the count, the empty state and the rendered answers always agree.
   const filteredCategories = useMemo(() => {
     if (!isSearching) return categories;
-    const q = debouncedSearch.toLowerCase();
     return categories
       .map((cat) => ({
         ...cat,
         items: cat.items.filter(
           (item) =>
-            item.question.toLowerCase().includes(q) || item.answer.toLowerCase().includes(q),
+            matchesQuery(item.question, debouncedSearch) ||
+            matchesQuery(item.answer, debouncedSearch),
         ),
       }))
       .filter((cat) => cat.items.length > 0);

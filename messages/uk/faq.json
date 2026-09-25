@@ -20,11 +20,12 @@
   "category": {
     "expandAll": "Розгорнути все",
     "collapseAll": "Згорнути все",
-    "expandAllAria": "Розгорнути всі запитання",
-    "collapseAllAria": "Згорнути всі запитання",
+    "expandAllAria": "Розгорнути все: {category}",
+    "collapseAllAria": "Згорнути все: {category}",
     "copyLink": "Копіювати посилання",
     "copied": "Скопійовано",
-    "copyLinkAria": "Копіювати посилання на це запитання"
+    "copyLinkAria": "Копіювати посилання: {question}",
+    "linkCopied": "Посилання скопійовано"
   },
   "popular": {
     "heading": "Популярні запитання"

@@ -175,6 +175,16 @@ describe('FAQPage', () => {
     expect(screen.queryByRole('navigation', { name: 'FAQ categories' })).not.toBeInTheDocument();
   }, 30_000);
 
+  it('counts and lists the same answers the matcher finds, for a typed apostrophe (V073)', async () => {
+    const user = userEvent.setup();
+    render(<FAQPage content={faqContentEn} />);
+    await searchFor(user, "don't own");
+    await screen.findByText(/Showing 1 of \d+ questions/i, {}, { timeout: 10_000 });
+    expect(
+      screen.getByRole('button', { name: 'Can I participate if I don’t own any NFTs?' }),
+    ).toBeInTheDocument();
+  }, 30_000);
+
   it('offers to clear a search that matches nothing', async () => {
     const user = userEvent.setup();
     render(<FAQPage content={faqContentEn} />);

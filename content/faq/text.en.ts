@@ -13,11 +13,6 @@ export const faqTextEn = {
         answer:
           'Cosmic Signature is a procedural on-chain art protocol on Arbitrum. Participants make gestures during a Performance Cycle; every gesture shapes the cycle’s final Signature. When the cycle finalizes, the protocol distributes its reserves across more than ten allocation tracks — including Protocol Guild, the funding mechanism for 170+ Ethereum core contributors.',
       },
-      'is-cosmic-signature-related-to-biology': {
-        question: 'Is Cosmic Signature related to the COSMIC biology database?',
-        answer:
-          'No. Cosmic Signature is not related to the COSMIC cancer mutation database or COSMIC mutational signatures in biology. It is an on-chain art protocol and app focused on deterministic three-body NFT art.',
-      },
       'how-does-the-bidding-game-work': {
         question: 'How does a Performance Cycle work?',
         answer: `Each cycle opens with an ETH Calibration Window for the first gesture. That first gesture starts the Cycle Finalization Time, currently about 24 hours by default. Subsequent gestures with ETH or CST add the current time increment to the stored finalization time, with the increment starting at one hour and growing ${protocolFacts.cycleTimeIncrementIncreasePercentPerCycle}% per finalized cycle. When the Cycle Finalization Time expires, the participant who made the Final Gesture has an exclusive ${protocolFacts.finalGestureExclusivityHours}-hour window to finalize the cycle and retrieve the Signature Allocation; gestures remain possible until the cycle is actually finalized.`,
@@ -295,6 +290,11 @@ export const faqTextEn = {
         question: 'Are there any fees involved?',
         answer:
           'Beyond the Gesture Cost itself, you pay Arbitrum network gas fees for each transaction. Gas fees fluctuate with network conditions and are not controlled by Cosmic Signature.',
+      },
+      'is-cosmic-signature-related-to-biology': {
+        question: 'Is Cosmic Signature related to the COSMIC biology database?',
+        answer:
+          'No. Cosmic Signature is not related to the COSMIC cancer mutation database or COSMIC mutational signatures in biology. It is an on-chain art protocol and app focused on deterministic three-body NFT art.',
       },
     },
   },

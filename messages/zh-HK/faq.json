@@ -20,11 +20,12 @@
   "category": {
     "expandAll": "全部展開",
     "collapseAll": "全部收起",
-    "expandAllAria": "展開本分類的所有問題",
-    "collapseAllAria": "收起本分類的所有問題",
+    "expandAllAria": "全部展開：{category}",
+    "collapseAllAria": "全部收起：{category}",
     "copyLink": "複製連結",
     "copied": "已複製",
-    "copyLinkAria": "複製此問題的連結"
+    "copyLinkAria": "複製連結：{question}",
+    "linkCopied": "連結已複製"
   },
   "popular": {
     "heading": "熱門問題"

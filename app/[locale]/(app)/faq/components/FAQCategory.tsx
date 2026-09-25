@@ -4,7 +4,7 @@ import { forwardRef, useCallback, useMemo, useState } from 'react';
 import { Check, ChevronsUpDown, Link2 } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 
-import { type FAQCategory as FAQCategoryType, type FAQItem } from '@/content/faq';
+import type { FAQCategory as FAQCategoryType, FAQItem } from '@/content/faq/types';
 import { protocolFacts } from '@/content/protocol-facts';
 
 import { cn } from '@/lib/utils';
@@ -22,7 +22,7 @@ import {
   EXPLAINED_GLOSSARY_IDS,
   enrichAnswer,
   highlightMatches,
-  normalizeForMatch,
+  matchesQuery,
   type AnswerTerm,
 } from './answerText';
 import { FAQ_SCROLL_MARGIN_CLASS } from './scrollMargin';
@@ -80,11 +80,8 @@ export const FAQCategorySection = forwardRef<HTMLElement, FAQCategoryProps>(
 
     const filteredItems = useMemo(() => {
       if (!searching) return category.items;
-      const q = normalizeForMatch(query);
       return category.items.filter(
-        (item) =>
-          normalizeForMatch(item.question).includes(q) ||
-          normalizeForMatch(item.answer).includes(q),
+        (item) => matchesQuery(item.question, query) || matchesQuery(item.answer, query),
       );
     }, [category.items, query, searching]);
 
@@ -107,6 +104,7 @@ export const FAQCategorySection = forwardRef<HTMLElement, FAQCategoryProps>(
       : expandedItems.filter((id) => filteredItems.some((item) => item.id === id));
     const allExpanded = category.items.every((item) => expandedItems.includes(item.id));
     const headingId = `faq-cat-${category.id}`;
+    const copiedHere = filteredItems.some((item) => item.id === copiedId);
 
     return (
       <section
@@ -123,12 +121,17 @@ export const FAQCategorySection = forwardRef<HTMLElement, FAQCategoryProps>(
             <p className="mt-1.5 type-body-sm text-muted-foreground">{category.description}</p>
           </div>
           {searching ? null : (
+            // The label says what a press does next ("Collapse all") and names the
+            // category, so six of them read apart; no aria-expanded to say it twice.
+            // Its icon lines up with the content edge wherever the row puts it.
             <Button
               variant="quiet"
               size="sm"
               onClick={() => onExpandAll(category.id)}
-              aria-label={allExpanded ? t('category.collapseAllAria') : t('category.expandAllAria')}
-              aria-expanded={allExpanded}
+              aria-label={t(allExpanded ? 'category.collapseAllAria' : 'category.expandAllAria', {
+                category: category.title,
+              })}
+              className="-ml-3 sm:-mr-3 sm:ml-0"
             >
               <ChevronsUpDown aria-hidden />
               {allExpanded ? t('category.collapseAll') : t('category.expandAll')}
@@ -180,18 +183,19 @@ export const FAQCategorySection = forwardRef<HTMLElement, FAQCategoryProps>(
                       ? highlightMatches(item.answer, searchQuery)
                       : enrichAnswer(item.answer, terms, ANSWER_CODE)}
                   </p>
+                  {/* Named after its question, so a list of buttons tells the links apart. */}
                   <button
                     type="button"
                     onClick={() => copyLink(item)}
                     className="mt-3 inline-flex min-h-11 items-center gap-1.5 rounded-control type-caption text-subtle transition-colors duration-fast hover:text-foreground sm:min-h-8"
-                    aria-label={t('category.copyLinkAria')}
+                    aria-label={t('category.copyLinkAria', { question: item.question })}
                   >
                     {copiedId === item.id ? (
                       <Check className="size-3.5 text-positive" aria-hidden />
                     ) : (
                       <Link2 className="size-3.5" aria-hidden />
                     )}
-                    <span aria-live="polite">
+                    <span>
                       {copiedId === item.id ? t('category.copied') : t('category.copyLink')}
                     </span>
                   </button>
@@ -200,6 +204,11 @@ export const FAQCategorySection = forwardRef<HTMLElement, FAQCategoryProps>(
             );
           })}
         </Accordion>
+        {/* The confirmation is spoken from outside the button, whose name overrides its
+            text; the region is always present, so the change is announced. */}
+        <p role="status" className="sr-only" data-testid="faq-copy-status">
+          {copiedHere ? t('category.linkCopied') : null}
+        </p>
       </section>
     );
   },

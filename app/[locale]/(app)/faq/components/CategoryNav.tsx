@@ -50,12 +50,13 @@ export function CategoryNav({ entries, activeId, onSelect, className }: Category
       ref={navRef}
       aria-label={t('navigation.ariaLabel')}
       className={cn(
-        // Phones and tablets: a glass bar under the header, bleeding to the page
-        // gutters. z-30 is the layer scale's sticky-nav step (styles/global.css):
-        // the theme's `--z-*` tokens generate no `z-*` utility, and without a
-        // z-index a positioned control scrolling under the bar (a Button) paints
-        // over it.
-        'glass sticky top-[var(--header-height)] z-30 -mx-4 border-b border-rule px-4 py-2 sm:-mx-6 sm:px-6',
+        // Phones and tablets: a glass bar under the header, bleeding across the
+        // page gutter (--gutter, which widens with the viewport) to the screen's
+        // edges, so nothing scrolls visibly beside it. z-30 is the layer scale's
+        // sticky-nav step (styles/global.css): the theme's `--z-*` tokens generate
+        // no `z-*` utility, and without a z-index a positioned control scrolling
+        // under the bar (a Button) paints over it.
+        'glass sticky top-[var(--header-height)] z-30 -mx-[var(--gutter)] border-b border-rule px-[var(--gutter)] py-2',
         // Desktop: the contents column.
         'lg:top-[var(--sticky-offset)] lg:mx-0 lg:max-h-[calc(100dvh-var(--sticky-offset)-1.5rem)] lg:self-start lg:overflow-y-auto lg:border-0 lg:bg-transparent lg:p-0 lg:backdrop-blur-none',
         className,
@@ -79,7 +80,8 @@ export function CategoryNav({ entries, activeId, onSelect, className }: Category
                 onSelect(entry.id);
               }}
               className={cn(
-                'group flex min-h-11 shrink-0 items-center gap-2.5 whitespace-nowrap rounded-pill border px-3.5 type-body-sm transition-colors duration-fast',
+                // Chips take the control radius: the pill is the live status's shape.
+                'group flex min-h-11 shrink-0 items-center gap-2.5 whitespace-nowrap rounded-control border px-3.5 type-body-sm transition-colors duration-fast',
                 'lg:-ml-px lg:min-h-10 lg:whitespace-normal lg:rounded-none lg:border-0 lg:border-l-2 lg:py-2 lg:pl-3.5 lg:pr-2',
                 current
                   ? 'border-primary/50 bg-primary/12 text-foreground lg:border-primary lg:bg-transparent'

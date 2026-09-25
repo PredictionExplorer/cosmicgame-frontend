@@ -25,11 +25,6 @@ export const faqTextKo = {
         answer:
           'Cosmic Signature는 Arbitrum 위의 절차적 온체인 아트 프로토콜입니다. 참여자는 퍼포먼스 사이클 동안 제스처를 남기고, 모든 제스처가 사이클의 최종 시그니처를 빚어냅니다. 사이클이 마감되면 프로토콜은 준비금을 10개가 넘는 배분 경로로 배분합니다. 이더리움 핵심 기여자 170명 이상을 위한 자금 지원 메커니즘인 Protocol Guild도 그중 하나입니다.',
       },
-      'is-cosmic-signature-related-to-biology': {
-        question: 'Cosmic Signature는 생물학의 COSMIC 데이터베이스와 관련이 있나요?',
-        answer:
-          '아닙니다. Cosmic Signature는 COSMIC 암 돌연변이 데이터베이스나 생물학의 COSMIC 돌연변이 시그니처와 아무 관련이 없습니다. 결정론적 삼체 NFT 아트에 집중하는 온체인 아트 프로토콜이자 앱입니다.',
-      },
       'how-does-the-bidding-game-work': {
         question: '퍼포먼스 사이클은 어떻게 진행되나요?',
         answer: `사이클은 첫 제스처를 위한 ETH 보정 구간으로 시작됩니다. 이 첫 제스처가 사이클 마감 시각을 설정하며, 현재 기본값은 약 24시간입니다. 이후의 ETH 또는 CST 제스처는 저장된 마감 시각에 현재 시간 증가량을 더합니다. 시간 증가량은 1시간에서 시작해 사이클이 마감될 때마다 ${protocolFacts.cycleTimeIncrementIncreasePercentPerCycle}% 늘어납니다. 사이클 마감 시각이 지나면 최종 제스처를 남긴 참여자가 ${protocolFacts.finalGestureExclusivityHours}시간 동안 단독으로 사이클을 마감하고 시그니처 배분을 회수할 수 있습니다. 사이클이 실제로 마감되기 전까지는 누구나 제스처를 남길 수 있습니다.`,
@@ -307,6 +302,11 @@ export const faqTextKo = {
         question: '수수료가 있나요?',
         answer:
           '제스처 비용 외에 트랜잭션마다 Arbitrum 네트워크 가스 비용을 냅니다. 가스 비용은 네트워크 상황에 따라 변동하며, Cosmic Signature가 정하는 것이 아닙니다.',
+      },
+      'is-cosmic-signature-related-to-biology': {
+        question: 'Cosmic Signature는 생물학의 COSMIC 데이터베이스와 관련이 있나요?',
+        answer:
+          '아닙니다. Cosmic Signature는 COSMIC 암 돌연변이 데이터베이스나 생물학의 COSMIC 돌연변이 시그니처와 아무 관련이 없습니다. 결정론적 삼체 NFT 아트에 집중하는 온체인 아트 프로토콜이자 앱입니다.',
       },
     },
   },

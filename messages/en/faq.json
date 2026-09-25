@@ -20,11 +20,12 @@
   "category": {
     "expandAll": "Expand all",
     "collapseAll": "Collapse all",
-    "expandAllAria": "Expand all questions",
-    "collapseAllAria": "Collapse all questions",
+    "expandAllAria": "Expand all questions in {category}",
+    "collapseAllAria": "Collapse all questions in {category}",
     "copyLink": "Copy link",
     "copied": "Copied",
-    "copyLinkAria": "Copy link to this question"
+    "copyLinkAria": "Copy link to “{question}”",
+    "linkCopied": "Link copied"
   },
   "popular": {
     "heading": "Popular questions"

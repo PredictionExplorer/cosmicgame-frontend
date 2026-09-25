@@ -34,11 +34,6 @@ export const faqTextVi = {
         answer:
           'Cosmic Signature là giao thức nghệ thuật tạo sinh trên chuỗi Arbitrum. Người tham gia đặt nét bút trong một chu kỳ trình diễn; mỗi nét bút đều định hình Signature cuối cùng của chu kỳ. Khi chu kỳ hoàn tất, giao thức phân phối dự trữ của mình qua hơn mười luồng phân bổ — bao gồm Protocol Guild, cơ chế tài trợ cho hơn 170 người đóng góp cốt lõi cho Ethereum.',
       },
-      'is-cosmic-signature-related-to-biology': {
-        question: 'Cosmic Signature có liên quan đến cơ sở dữ liệu sinh học COSMIC không?',
-        answer:
-          'Không. Cosmic Signature không liên quan đến cơ sở dữ liệu đột biến ung thư COSMIC hay các chữ ký đột biến COSMIC trong sinh học. Đây là một giao thức và ứng dụng nghệ thuật trên chuỗi tập trung vào nghệ thuật NFT ba vật thể tất định.',
-      },
       'how-does-the-bidding-game-work': {
         question: 'Một chu kỳ trình diễn hoạt động như thế nào?',
         answer: `Mỗi chu kỳ mở ra với một cửa sổ hiệu chỉnh ETH cho nét bút đầu tiên. Nét bút đầu tiên đó khởi động thời điểm hoàn tất chu kỳ, hiện mặc định khoảng 24 giờ. Các nét bút tiếp theo bằng ETH hoặc CST cộng mức tăng thời gian hiện tại vào thời điểm hoàn tất đã lưu, với mức tăng khởi đầu là một giờ và lớn thêm ${protocolFacts.cycleTimeIncrementIncreasePercentPerCycle}% sau mỗi chu kỳ hoàn tất. Khi đếm ngược hoàn tất về 0, người tham gia đặt nét bút cuối cùng có một cửa sổ ưu tiên ${protocolFacts.finalGestureExclusivityHours} giờ để hoàn tất chu kỳ và nhận về phân bổ Signature; vẫn có thể đặt nét bút cho đến khi chu kỳ thực sự được hoàn tất.`,
@@ -316,6 +311,11 @@ export const faqTextVi = {
         question: 'Có khoản phí nào không?',
         answer:
           'Ngoài chính chi phí nét bút, bạn trả phí gas của mạng Arbitrum cho mỗi giao dịch. Phí gas dao động theo điều kiện mạng và không do Cosmic Signature kiểm soát.',
+      },
+      'is-cosmic-signature-related-to-biology': {
+        question: 'Cosmic Signature có liên quan đến cơ sở dữ liệu sinh học COSMIC không?',
+        answer:
+          'Không. Cosmic Signature không liên quan đến cơ sở dữ liệu đột biến ung thư COSMIC hay các chữ ký đột biến COSMIC trong sinh học. Đây là một giao thức và ứng dụng nghệ thuật trên chuỗi tập trung vào nghệ thuật NFT ba vật thể tất định.',
       },
     },
   },
