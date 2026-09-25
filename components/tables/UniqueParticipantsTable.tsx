@@ -58,6 +58,8 @@ export const UniqueParticipantsTable = ({ list, ...state }: UniqueParticipantsTa
       columns={columns}
       ariaLabel={t('names.participants')}
       getRowKey={(row) => row.BidderAid}
+      // Most gestures first, as the page lists them: the header shows it.
+      initialSort={{ id: 'gestures', direction: 'desc' }}
       emptyTitle={t('empty.participants')}
       {...state}
     />

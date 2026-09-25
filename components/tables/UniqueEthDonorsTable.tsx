@@ -51,6 +51,8 @@ export const UniqueEthDonorsTable = ({ list, ...state }: UniqueEthDonorsTablePro
       columns={columns}
       ariaLabel={t('names.ethContributors')}
       getRowKey={(row) => row.DonorAid}
+      // Largest total first: the header shows it.
+      initialSort={{ id: 'total', direction: 'desc' }}
       emptyTitle={t('empty.contributors')}
       {...state}
     />

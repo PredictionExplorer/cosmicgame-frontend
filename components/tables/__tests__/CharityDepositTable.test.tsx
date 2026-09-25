@@ -89,6 +89,16 @@ describe('CharityDepositTable', () => {
     }
   });
 
+  it('leaves out the contributor on the protocol’s own ledger, where every row is the protocol', () => {
+    render(<CharityDepositTable list={[createDonation()]} showContributor={false} />);
+    expect(
+      screen.queryByRole('columnheader', { name: 'tables.columns.contributor' }),
+    ).not.toBeInTheDocument();
+    expect(
+      screen.getByRole('columnheader', { name: /tables\.columns\.amountEth/ }),
+    ).toBeInTheDocument();
+  });
+
   it('has no accessibility violations', async () => {
     const { container } = render(<CharityDepositTable list={[]} />);
     await checkA11y(container);

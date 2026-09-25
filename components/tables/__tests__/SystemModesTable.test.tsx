@@ -11,7 +11,7 @@ jest.mock('next/navigation', () => ({
 }));
 
 // eslint-disable-next-line import/order
-import { SystemModesTable } from '@/components/tables/SystemModesTable';
+import { SystemModesTable, activationEnds } from '@/components/tables/SystemModesTable';
 
 const createEvent = (overrides = {}) => ({
   RoundNum: 5,
@@ -89,6 +89,21 @@ describe('SystemModesTable', () => {
     const { container } = render(<SystemModesTable list={list} />);
     expect(container.querySelectorAll('tbody tr')).toHaveLength(20);
     expect(screen.getByText('tables.pagination.range(from=1,to=20,total=25)')).toBeInTheDocument();
+  });
+
+  // Regression: "Ended" read the row before it in the sorted list, so any
+  // order but newest first showed wrong end dates.
+  it('ends each activation when the next one in time began, whatever the order', () => {
+    const events = [
+      createEvent({ EvtLogId: 1, TimeStamp: 100 }),
+      createEvent({ EvtLogId: 3, TimeStamp: 300 }),
+      createEvent({ EvtLogId: 2, TimeStamp: 200 }),
+    ];
+    const ends = activationEnds(events);
+    expect(ends.get(1)).toBe(200);
+    expect(ends.get(2)).toBe(300);
+    expect(ends.get(3)).toBeNull();
+    expect(activationEnds([...events].reverse())).toEqual(ends);
   });
 
   it('has no accessibility violations', async () => {

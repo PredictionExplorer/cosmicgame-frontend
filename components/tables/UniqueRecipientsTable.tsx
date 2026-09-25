@@ -75,6 +75,8 @@ export const UniqueRecipientsTable = ({ list, ...state }: UniqueRecipientsTableP
       columns={columns}
       ariaLabel={t('names.recipients')}
       getRowKey={(row) => row.WinnerAid}
+      // Most allocations first, as the API lists them: the header shows it.
+      initialSort={{ id: 'allocations', direction: 'desc' }}
       emptyTitle={t('empty.recipients')}
       {...state}
     />
