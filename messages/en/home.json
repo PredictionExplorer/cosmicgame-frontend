@@ -663,7 +663,7 @@
       "waiting": "Waiting to retrieve",
       "waitingNothing": "Nothing",
       "waitingNfts": "{count, plural, one {# NFT} other {# NFTs}}",
-      "retrieveHint": "Retrieve it on My Allocations",
+      "retrieveHint": "Retrieve it on My allocations",
       "connectBody": "Connect a wallet to see where you stand, how many of this cycle’s gestures are yours and anything waiting to retrieve.",
       "spent": "You spent this cycle",
       "landed": "Your gesture landed. You hold the Last Gesture."

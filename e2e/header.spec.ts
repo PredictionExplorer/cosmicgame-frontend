@@ -107,7 +107,7 @@ test.describe('Header', () => {
     test.skip(await usesDrawer(page), 'Rich panels are a desktop affordance');
 
     const panel = await openHeaderPanel(page, /^Explore$/);
-    await expect(panel.getByRole('link', { name: /Current Cycle/ })).toBeVisible();
+    await expect(panel.getByRole('link', { name: /Current cycle/ })).toBeVisible();
     await expect(
       panel.getByText('The live cycle in full: every gesture and standing'),
     ).toBeVisible();
@@ -133,7 +133,7 @@ test.describe('Header', () => {
       'href',
       '/security',
     );
-    await expect(panel.getByRole('link', { name: /^Risk Disclosures/ })).toHaveAttribute(
+    await expect(panel.getByRole('link', { name: /^Risk disclosures/ })).toHaveAttribute(
       'href',
       '/risk-disclosures',
     );

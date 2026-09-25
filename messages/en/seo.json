@@ -7,7 +7,7 @@
     },
     "routes": {
       "allocation": {
-        "heading": "Allocation Recipients",
+        "heading": "Allocation recipients",
         "description": "Browse public Cosmic Signature allocation history across finalized Performance Cycles, including Signature Allocations, Stellar Selection, Anchor Distributions, and public-goods flows.",
         "source": "Cosmic Signature public cycle data",
         "links": {
@@ -120,7 +120,7 @@
         }
       },
       "attached-nfts": {
-        "heading": "Attached NFT Contributions",
+        "heading": "Attached NFT contributions",
         "description": "Browse NFTs attached to Cosmic Signature gestures. Attached ERC-721 tokens forward to the participant who receives the Signature Allocation when a cycle finalizes.",
         "source": "Cosmic Signature public attached NFT APIs",
         "links": {
@@ -141,7 +141,7 @@
         }
       },
       "allocation-finalized": {
-        "heading": "Finalized Allocations",
+        "heading": "Finalized allocations",
         "description": "What each finalized cycle allocated, from its Signature Allocation to every Stellar Selection and Anchor Distribution record.",
         "source": "Cosmic Signature public allocation retrieval APIs",
         "links": {
@@ -364,7 +364,7 @@
     },
     "currentCycle": {
       "alt": "Cosmic Signature — The Performance Cycle, live.",
-      "eyebrow": "Current Cycle",
+      "eyebrow": "Current cycle",
       "title": "The Performance Cycle, live.",
       "subhead": "Gesture history, leaderboards, attached contributions, and allocation distribution — in real time.",
       "fact": "Live on Arbitrum One"
@@ -384,8 +384,8 @@
       "fact": "CC0 · Open source · 7% to Protocol Guild"
     },
     "howItWorks": {
-      "alt": "Cosmic Signature — How It Works",
-      "eyebrow": "How It Works",
+      "alt": "Cosmic Signature — How it works",
+      "eyebrow": "How it works",
       "title": "From Calibration to Allocation, in four stages.",
       "subhead": "Open the cycle. Make a gesture. Finalize. The protocol distributes the reserve.",
       "fact": "Calibration · Gestures · Allocations"

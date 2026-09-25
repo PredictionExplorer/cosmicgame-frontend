@@ -73,7 +73,7 @@
   },
   "finalize": {
     "roundDidNotAdvance": "The finalization transaction succeeded, but the cycle has not advanced. Please refresh the page.",
-    "metadataUpdating": "Cycle finalized on-chain. Token metadata may still be updating — check My Allocations or refresh later.",
+    "metadataUpdating": "Cycle finalized on-chain. Token metadata may still be updating — check My allocations or refresh later.",
     "failed": "Unable to finalize the cycle. Check your wallet and network connection, then try again.",
     "contractErrors": {
       "mainPrizeEarlyClaim": "Not enough time has elapsed to retrieve the Signature Allocation.",

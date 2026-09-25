@@ -623,7 +623,7 @@
     "opensNewWindow": "(opens in a new window)"
   },
   "recipientHistory": {
-    "pageTitle": "My Allocation History",
+    "pageTitle": "My allocation history",
     "connectedDescription": "Every allocation this wallet has received, cycle by cycle, and whether each was retrieved.",
     "loadError": "Failed to load allocation history",
     "loadErrorDescription": "Please try again in a moment.",
@@ -640,7 +640,7 @@
     "galleryLink": "See them in the gallery"
   },
   "attachedNfts": {
-    "title": "Attached NFT Contributions",
+    "title": "Attached NFT contributions",
     "subtitle": "NFTs attached to gestures by community members across cycles",
     "loadErrorTitle": "Attached NFTs could not be loaded",
     "loadErrorMessage": "The attached NFT records could not be read. Try again.",

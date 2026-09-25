@@ -12,7 +12,7 @@ export const whitePaperTextEn = {
     description:
       'The reference description of Cosmic Signature: Performance Cycles, gestures, allocation tracks, deterministic three-body NFT art, CST, anchoring, the Cosmic Council, protocol upgrades, and the path to full decentralization.',
   },
-  breadcrumbLabel: 'White Paper',
+  breadcrumbLabel: 'White paper',
   breadcrumbs: {
     ariaLabel: 'Breadcrumb',
     homeLabel: 'Home',

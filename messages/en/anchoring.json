@@ -54,7 +54,7 @@
   "steps": {
     "anchor": {
       "title": "Anchor your NFTs",
-      "body": "On <link>My Anchors</link>, choose Cosmic Signature or Random Walk NFTs from your wallet. The first time, your wallet asks you to approve the anchoring contract for that collection, then to anchor."
+      "body": "On <link>My anchors</link>, choose Cosmic Signature or Random Walk NFTs from your wallet. The first time, your wallet asks you to approve the anchoring contract for that collection, then to anchor."
     },
     "receive": {
       "title": "Receive every cycle",

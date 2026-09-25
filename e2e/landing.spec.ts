@@ -495,7 +495,7 @@ test.describe('Landing page @ cosmicsignature.com', () => {
     const evidence = page.getByRole('list', { name: 'Check it yourself' });
     for (const [name, path] of [
       ['Contracts', '/contracts'],
-      ['Source Code', '/code'],
+      ['Source code', '/code'],
       ['Audits', '/audits'],
       ['Security', '/security'],
     ] as const) {

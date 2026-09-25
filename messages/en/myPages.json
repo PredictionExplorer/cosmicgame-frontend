@@ -4,7 +4,7 @@
     "cycleNumber": "Cycle {cycle}"
   },
   "allocations": {
-    "title": "My Allocations",
+    "title": "My allocations",
     "subtitle": "What the protocol has set aside for this wallet, and one place to retrieve it all.",
     "loadErrorTitle": "Couldn’t load your allocations",
     "loadErrorMessage": "Your pending allocations could not be loaded. Try again in a moment.",
@@ -37,7 +37,7 @@
     "retrieveAll": "Retrieve all"
   },
   "anchors": {
-    "title": "My Anchors",
+    "title": "My anchors",
     "subtitle": "Anchor your NFTs, follow what they receive, and release them when you are ready.",
     "tabs": {
       "label": "Collection",

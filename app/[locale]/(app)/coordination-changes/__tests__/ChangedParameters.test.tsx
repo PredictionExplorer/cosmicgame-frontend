@@ -102,12 +102,14 @@ describe('ChangedParameters', () => {
     expect(mockUseSystemEvents).toHaveBeenCalledWith(-1, 9999999999);
   });
 
-  it('says who can change the parameters, above the rows they apply to', () => {
+  it('says when the parameters can change, above the rows they apply to', () => {
     mockUseSystemModelist.mockReturnValue({ data: [{ EvtLogId: 1 }], isLoading: false });
     mockUseSystemEvents.mockReturnValue({ data: [], isLoading: false });
     render(<ChangedParameters />);
     expect(
-      within(screen.getByTestId('events-table')).getByText(/The contract owner can adjust/),
+      within(screen.getByTestId('events-table')).getByText(
+        /^Parameters change only during cycle activation windows/,
+      ),
     ).toBeInTheDocument();
   });
 

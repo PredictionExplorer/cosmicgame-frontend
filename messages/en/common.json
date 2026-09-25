@@ -49,7 +49,7 @@
     "readLess": "Show less",
     "crumbs": {
       "participants": "Participants",
-      "allocationRecipients": "Allocation Recipients",
+      "allocationRecipients": "Allocation recipients",
       "cycle": "Cycle #{cycle}"
     }
   },

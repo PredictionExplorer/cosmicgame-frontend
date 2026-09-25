@@ -4,7 +4,7 @@ import type { RiskCopy } from './RiskContent';
 
 /** English copy for /risk-disclosures, rendered by RiskContent. */
 export const riskCopyEn: RiskCopy = {
-  title: 'Risk Disclosures',
+  title: 'Risk disclosures',
   // lexicon-allow-start: explicit legal denial copy must name the denied categories.
   intro:
     'Cosmic Signature is a procedural on-chain art protocol on Arbitrum. It is not a lottery, casino, gambling product, investment product, or promise of financial results.',

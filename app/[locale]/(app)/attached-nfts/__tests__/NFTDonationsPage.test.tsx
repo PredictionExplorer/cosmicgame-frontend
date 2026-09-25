@@ -40,7 +40,7 @@ describe('NFTDonationsPage', () => {
     mockUseDonationsNFTList.mockReturnValue(state({ data: [] }));
     render(<NFTDonationsPage />);
     expect(
-      screen.getByRole('heading', { level: 1, name: 'Attached NFT Contributions' }),
+      screen.getByRole('heading', { level: 1, name: 'Attached NFT contributions' }),
     ).toBeInTheDocument();
   });
 

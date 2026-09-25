@@ -18,7 +18,7 @@ export const howItWorksTextEn = {
   },
   breadcrumbs: {
     homeLabel: 'Home',
-    pageLabel: 'How It Works',
+    pageLabel: 'How it works',
   },
   hero: {
     heading: 'How Cosmic Signature works',

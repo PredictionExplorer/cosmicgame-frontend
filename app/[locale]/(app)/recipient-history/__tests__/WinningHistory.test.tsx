@@ -45,14 +45,14 @@ describe('WinningHistory', () => {
     history({ data: [] });
     const { unmount } = render(<WinningHistory />);
     expect(
-      screen.getByRole('heading', { level: 1, name: 'My Allocation History' }),
+      screen.getByRole('heading', { level: 1, name: 'My allocation history' }),
     ).toBeInTheDocument();
     unmount();
 
     mockUseActiveWeb3React.mockReturnValue({ account: null });
     render(<WinningHistory />);
     expect(
-      screen.getByRole('heading', { level: 1, name: 'My Allocation History' }),
+      screen.getByRole('heading', { level: 1, name: 'My allocation history' }),
     ).toBeInTheDocument();
   });
 

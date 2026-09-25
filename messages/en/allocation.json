@@ -6,7 +6,7 @@
   },
   "recipients": {
     "header": {
-      "title": "Allocation Recipients",
+      "title": "Allocation recipients",
       "subtitle": "Browse the complete history of allocation recipients, cycle statistics, and allocation distributions across all finalized Performance Cycles.",
       "scope": "Finalized cycle records only",
       "scopeTooltip": "Totals cover finalized Performance Cycles. Active cycles and separate allocation retrieval records are excluded."
@@ -39,7 +39,7 @@
       "message": "Cycle #{cycle} data failed to load. Try again, or go back to the recipients list."
     },
     "breadcrumbs": {
-      "recipients": "Allocation Recipients"
+      "recipients": "Allocation recipients"
     },
     "loading": "Loading the cycle",
     "hero": {
@@ -69,7 +69,7 @@
     },
     "distribution": {
       "title": "Allocation distribution",
-      "tooltip": "Each track’s share of the Cycle Reserve when this cycle was finalized, the same split the Allocation Recipients page shows. What was not allocated carries into the next cycle.",
+      "tooltip": "Each track’s share of the Cycle Reserve when this cycle was finalized, the same split the Allocation recipients page shows. What was not allocated carries into the next cycle.",
       "total": "{amount} ETH distributed this cycle"
     },
     "statistics": {
@@ -171,7 +171,7 @@
     },
     "links": {
       "viewCycle": "View Cycle #{cycle}",
-      "myAllocations": "My Allocations",
+      "myAllocations": "My allocations",
       "allCycles": "All cycles"
     },
     "result": {
@@ -191,7 +191,7 @@
     "nextCycle": "The next cycle is open. <link>Go to the Observatory</link>",
     "next": {
       "title": "Next steps",
-      "body": "There could also be additional allocations from Stellar Selection. To view your allocations, go to the <allocations>My Allocations</allocations> page. For Anchor Distributions, visit the <anchors>My Anchors</anchors> page."
+      "body": "There could also be additional allocations from Stellar Selection. To view your allocations, go to the <allocations>My allocations</allocations> page. For Anchor Distributions, visit the <anchors>My anchors</anchors> page."
     }
   }
 }

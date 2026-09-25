@@ -113,7 +113,7 @@ const publicPages: PublicPage[] = [
     jsonLd: ['WebPage', 'BreadcrumbList'],
   },
   { path: '/anchoring', host: APP_HOST, h1: 'Anchor Distributions' },
-  { path: '/allocation', host: APP_HOST, h1: 'Allocation Recipients' },
+  { path: '/allocation', host: APP_HOST, h1: 'Allocation recipients' },
   {
     path: '/contracts',
     host: APP_HOST,

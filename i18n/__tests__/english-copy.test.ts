@@ -80,7 +80,62 @@ function capitalisedGestures(value: string): string[] {
   return found;
 }
 
+/**
+ * Words a page name keeps capitalised after its first: the brand, named
+ * collections and coined terms, acronyms, and the two legal documents'
+ * proper names. Everything else in a page name is sentence case.
+ */
+const PAGE_NAME_PROPER_WORDS = new Set([
+  'Cosmic',
+  'Signature',
+  'Random',
+  'Walk',
+  'NFT',
+  'NFTs',
+  'ETH',
+  'CST',
+  'FAQ',
+  'Public',
+  'Goods',
+  'Anchor',
+  'Distributions',
+  'Service',
+  'Policy',
+]);
+
+/** Page names: every navigation label, the Trust tabs and the site map's title. */
+function pageNames(): [string, string][] {
+  const nav = readCatalog(routing.defaultLocale, 'nav').filter(([key]) =>
+    /^routes\.[^.]+\.label$/.test(key),
+  );
+  const legal = readCatalog(routing.defaultLocale, 'legal').filter(([key]) =>
+    key.startsWith('breadcrumbs.'),
+  );
+  const siteMap = readCatalog(routing.defaultLocale, 'siteMap').filter(
+    ([key]) => key === 'page.title',
+  );
+  return [
+    ...nav.map(([key, value]) => [`nav:${key}`, value] as [string, string]),
+    ...legal.map(([key, value]) => [`legal:${key}`, value] as [string, string]),
+    ...siteMap.map(([key, value]) => [`siteMap:${key}`, value] as [string, string]),
+  ];
+}
+
 describe('copy conventions', () => {
+  // V360 / V370: "Source code" in the Trust tabs sat beside "Risk Disclosures",
+  // and the footer said "Source Code" for the same page.
+  it('writes page names in sentence case in English', () => {
+    const offenders = pageNames().flatMap(([id, value]) => {
+      const capitalised = value
+        .split(/\s+/)
+        .slice(1)
+        .filter((word) => /^[A-Z]/.test(word) && !PAGE_NAME_PROPER_WORDS.has(word));
+      return capitalised.length > 0 ? [`${id}: ${value}`] : [];
+    });
+    expect(pageNames().length).toBeGreaterThan(40);
+    expect(offenders).toEqual([]);
+  });
+
   it('spells Random Walk NFT as two words in every locale', () => {
     const offenders: string[] = [];
     for (const locale of routing.locales) {
