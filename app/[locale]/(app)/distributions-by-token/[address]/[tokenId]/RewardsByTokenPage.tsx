@@ -28,6 +28,7 @@ import { DataTable, TxProofLink, type DataTableColumn } from '@/components/ui/da
 import { DateTime } from '@/components/ui/date-time';
 import { PageShell } from '@/components/ui/page-shell';
 import { SignatureWallLabel, useSignatureLabel } from '@/components/ui/signature-label';
+import { SiteNameText } from '@/components/ui/site-name-text';
 import { Skeleton } from '@/components/ui/skeleton';
 import { SpecList, SpecRow } from '@/components/ui/spec-list';
 import { UnknownValue } from '@/components/ui/unknown-value';
@@ -222,10 +223,13 @@ function RewardsByTokenPage({ address, tokenId }: { address: string; tokenId: nu
           { label: t('overview.title'), href: '/anchoring' },
           { label: formatAddress(address), href: `/user/${address}`, mono: true },
         ]}
-        // A long title balances its lines instead of leaving one word on the last.
+        // A long title balances its lines instead of leaving one word on the last,
+        // and keeps the collection's name on one line, as every string title does.
         title={
           <span className="block text-balance">
-            {t('distributionsByToken.title', { id: formatId(tokenId) })}
+            <SiteNameText>
+              {t('distributionsByToken.title', { id: formatId(tokenId) })}
+            </SiteNameText>
           </span>
         }
         subtitle={t('distributionsByToken.subtitle')}
