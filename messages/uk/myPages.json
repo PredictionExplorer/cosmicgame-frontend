@@ -199,11 +199,12 @@
       "sections": {
         "actions": "Дії закріплення та відкріплення",
         "distributionsByToken": "Надходження за закріплення за токенами",
-        "distributionsByDeposit": "Надходження за закріплення за депозитами",
-        "retrievedDistributions": "Забрані надходження за закріплення",
-        "unretrievedDistributions": "Незабрані надходження за закріплення",
         "anchoredNftSelection": "Зоряний відбір закріплених NFT"
-      }
+      },
+      "showDeposits": "Показати депозити",
+      "hideDeposits": "Сховати депозити",
+      "depositsHeader": "Депозити",
+      "nothingRetrieved": "Ще нічого не забрано: надходження за закріплення NFT забирається під час його відкріплення."
     },
     "donatedAssets": {
       "nfts": {

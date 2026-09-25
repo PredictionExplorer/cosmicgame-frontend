@@ -18,7 +18,6 @@ import {
   useMarketingRewardsByUser,
   useCSTTokensByUser,
   useAnchorDistributionsByUser,
-  useCSTAnchorDistributionsRetrievedByUser,
   useCSTAnchorDistributionsByUserByDeposit,
   useRWLKAnchorImprintsByUser,
   useClaimedDonatedNFTByUser,
@@ -39,7 +38,6 @@ import { SITE_EDGE_SHELL_CLASS } from '@/components/statistics/shell';
 
 import type { WinningHistoryEntry } from './tables/RecipientHistoryTable';
 import type { MarketingReward } from './tables/MarketingRewardsTable';
-import type { CSTAnchorDistributionByDeposit } from './anchoring/CSTAnchorDistributionsByDepositTable';
 import type { NFTRecord } from './attachments/AttachedNFTTable';
 import type { DonatedERC20Token } from './attachments/AttachedERC20Table';
 import GestureHistoryTable from './tables/GestureHistoryTable';
@@ -121,7 +119,6 @@ const UserStatisticsView = ({ address, isOwnProfile }: UserStatisticsViewProps) 
   const marketingQuery = useMarketingRewardsByUser(address);
   const cstTokensQuery = useCSTTokensByUser(address);
   const anchorDistributionsQuery = useAnchorDistributionsByUser(address);
-  const retrievedDistributionsQuery = useCSTAnchorDistributionsRetrievedByUser(address);
   const distributionsByDepositQuery = useCSTAnchorDistributionsByUserByDeposit(address);
   const rwlkImprintsQuery = useRWLKAnchorImprintsByUser(address);
   const claimedNFTsQuery = useClaimedDonatedNFTByUser(address);
@@ -136,7 +133,6 @@ const UserStatisticsView = ({ address, isOwnProfile }: UserStatisticsViewProps) 
   const { data: claimedNFTsRaw = [], isLoading: loadingClaimedNFTs } = claimedNFTsQuery;
   const { data: unclaimedNFTsRaw = [], isLoading: loadingUnclaimedNFTs } = unclaimedNFTsQuery;
   const { data: erc20Raw = [], isLoading: loadingERC20 } = erc20Query;
-  const { data: collectedCstStakingRewardsRaw = [] } = retrievedDistributionsQuery;
   const { data: cstStakingRewardsByDepositRaw = [] } = distributionsByDepositQuery;
   const { data: rwlkImprints = [] } = rwlkImprintsQuery;
 
@@ -152,8 +148,6 @@ const UserStatisticsView = ({ address, isOwnProfile }: UserStatisticsViewProps) 
     () => (cstStakingRewardsRaw ?? []) as AnchorDistributionRow[],
     [cstStakingRewardsRaw],
   );
-  const cstAnchorDistributionsByDeposit = (cstStakingRewardsByDepositRaw ??
-    []) as CSTAnchorDistributionByDeposit[];
   const claimedDonatedNFTsList = Array.isArray(claimedNFTsRaw)
     ? (claimedNFTsRaw as NFTRecord[])
     : [];
@@ -176,6 +170,19 @@ const UserStatisticsView = ({ address, isOwnProfile }: UserStatisticsViewProps) 
     const cst = tokenBalance(balanceData.CosmicTokenBalance);
     return eth === null || cst === null ? null : { eth, cst };
   }, [balanceData]);
+
+  // The seeds of every Signature the page read (held, and anchored through the wallet), so
+  // the anchoring ledger's plates need no lookup of their own.
+  const signatureSeeds = useMemo(() => {
+    const seeds = new Map<number, string>();
+    for (const token of cstListRaw ?? []) {
+      if (typeof token.Seed === 'string' && token.Seed) seeds.set(token.TokenId, token.Seed);
+    }
+    for (const token of anchoredArtworks(userInfoRaw?.CurrentlyStakedTokens ?? [])) {
+      if (token.Seed) seeds.set(token.TokenId, token.Seed);
+    }
+    return seeds;
+  }, [cstListRaw, userInfoRaw]);
 
   const latestGestureTs = useMemo(() => {
     const stamps = gestureHistory
@@ -248,7 +255,6 @@ const UserStatisticsView = ({ address, isOwnProfile }: UserStatisticsViewProps) 
     cstAnchorActionsQuery,
     rwlkAnchorActionsQuery,
     anchorDistributionsQuery,
-    retrievedDistributionsQuery,
     distributionsByDepositQuery,
     rwlkImprintsQuery,
   ];
@@ -395,11 +401,12 @@ const UserStatisticsView = ({ address, isOwnProfile }: UserStatisticsViewProps) 
               <UserAnchoringSection
                 address={address}
                 userInfo={userInfo}
+                canRelease={canClaim}
                 cstAnchorActions={cstAnchorActions}
                 rwlkAnchorActions={rwlkAnchorActions}
                 cstAnchorDistributions={cstAnchorDistributions}
-                cstAnchorDistributionsByDeposit={cstAnchorDistributionsByDeposit}
-                retrievedCstAnchorDistributions={collectedCstStakingRewardsRaw ?? []}
+                cstAnchorDistributionsByDeposit={cstStakingRewardsByDepositRaw ?? []}
+                seeds={signatureSeeds}
                 rwlkImprints={rwlkImprints}
               />
             )}

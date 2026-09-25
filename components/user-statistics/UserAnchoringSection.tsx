@@ -1,24 +1,20 @@
 'use client';
 
-import { useId, type ReactNode } from 'react';
+import { useId, useMemo, type ReactNode } from 'react';
 import { useTranslations } from 'next-intl';
 
 import { AnchoringIcon } from '@/lib/conceptIcons';
 import { useFormat } from '@/hooks/useFormat';
 import type { AnchorAction, AnchorDistributionImprint } from '@/services/api';
-import type { CSTAnchorDistribution } from '@/services/api/types';
-import { PageHeaderFigures } from '@/components/layout/PageHeader';
 import { Amount } from '@/components/ui/amount';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { EmptyState } from '@/components/ui/empty-state';
+import { FigureStrip } from '@/components/statistics/FigureStrip';
 import AnchorActionsTable from '@/components/anchoring/AnchorActionsTable';
-import { AnchorDistributionsTable } from '@/components/anchoring/AnchorDistributionsTable';
-import { CSTAnchorDistributionsByDepositTable } from '@/components/anchoring/CSTAnchorDistributionsByDepositTable';
-import { RetrievedCSTAnchorDistributionsTable } from '@/components/anchoring/RetrievedCSTAnchorDistributionsTable';
-import { UnretrievedCSTAnchorDistributionsTable } from '@/components/anchoring/UnretrievedCSTAnchorDistributionsTable';
 import { RwalkAnchorDistributionImprintsTable } from '@/components/anchoring/RwalkAnchorDistributionImprintsTable';
-import type { CSTAnchorDistributionByDeposit } from '@/components/anchoring/CSTAnchorDistributionsByDepositTable';
 
+import { AnchorDistributionsLedger } from './AnchorDistributionsLedger';
+import { anchoredNftDistributions } from './anchorLedger';
 import type { UserProfileInfo } from './types';
 
 export interface AnchorDistributionRow {
@@ -28,16 +24,24 @@ export interface AnchorDistributionRow {
   [key: string]: unknown;
 }
 
+/** Rows of the anchor and release history before it pages. */
+const HISTORY_PAGE_SIZE = 10;
+
 /** Props for the user anchoring section. */
 export interface UserAnchoringSectionProps {
   address: string;
   /** The profile record, or null for an address without one (its Random Walk totals read as none). */
   userInfo: UserProfileInfo | null;
+  /** The connected wallet's own profile: the ledger offers "Release all and retrieve". */
+  canRelease: boolean;
   cstAnchorActions: AnchorAction[];
   rwlkAnchorActions: AnchorAction[];
+  /** Anchor Distributions per anchored Cosmic Signature NFT. */
   cstAnchorDistributions: AnchorDistributionRow[];
-  cstAnchorDistributionsByDeposit: CSTAnchorDistributionByDeposit[];
-  retrievedCstAnchorDistributions: CSTAnchorDistribution[];
+  /** The same distributions per deposit, each naming the anchors it paid. */
+  cstAnchorDistributionsByDeposit: readonly unknown[];
+  /** Seeds of the Signatures the page already read (held and anchored), for the plates. */
+  seeds: ReadonlyMap<number, string>;
   rwlkImprints: AnchorDistributionImprint[];
 }
 
@@ -55,37 +59,45 @@ function Ledger({ title, children }: { title: string; children: ReactNode }) {
 }
 
 /**
- * A participant's anchoring, one underline tab per NFT kind: a figure strip
- * (anchor and release actions, NFTs, distributions), then the ledgers. Copy
- * names "this address", so the section reads right on anyone's profile.
+ * A participant's anchoring, one underline tab per NFT kind. The Cosmic
+ * Signature tab is a figure strip (anchor and release actions, Anchor
+ * Distributions, what is left to retrieve), one ledger with a row per
+ * anchored NFT that opens onto the deposits it shared in, and the anchor and
+ * release history below it: each figure once, never the same amount again
+ * per deposit. Copy names "this address", so the section reads right on
+ * anyone's profile.
  */
 export function UserAnchoringSection({
   address,
   userInfo,
+  canRelease,
   cstAnchorActions,
   rwlkAnchorActions,
   cstAnchorDistributions,
   cstAnchorDistributionsByDeposit,
-  retrievedCstAnchorDistributions,
+  seeds,
   rwlkImprints,
 }: UserAnchoringSectionProps) {
   const t = useTranslations('myPages');
   const format = useFormat();
   const s = (key: string) => t(`statistics.anchoring.${key}`);
 
+  const ledger = useMemo(
+    () =>
+      anchoredNftDistributions(
+        cstAnchorDistributions,
+        cstAnchorDistributionsByDeposit,
+        cstAnchorActions,
+      ),
+    [cstAnchorDistributions, cstAnchorDistributionsByDeposit, cstAnchorActions],
+  );
   const anchorCount = cstAnchorActions.filter((a) => a.ActionType !== 1).length;
   const releaseCount = cstAnchorActions.filter((a) => a.ActionType === 1).length;
-  const totalDistributionEth = cstAnchorDistributions.reduce(
-    (sum, r) => sum + (r.RewardCollectedEth ?? 0) + (r.RewardToCollectEth ?? 0),
-    0,
-  );
-  const unretrievedEth = cstAnchorDistributions.reduce(
-    (sum, r) => sum + (r.RewardToCollectEth ?? 0),
-    0,
-  );
+  const retrievedEth = ledger.reduce((sum, row) => sum + row.retrievedEth, 0);
+  const unretrievedEth = ledger.reduce((sum, row) => sum + row.toRetrieveEth, 0);
 
   const rwlkStats = userInfo?.StakingStatisticsRWalk;
-  const hasCstActivity = cstAnchorActions.length > 0 || cstAnchorDistributions.length > 0;
+  const hasCstActivity = cstAnchorActions.length > 0 || ledger.length > 0;
   const hasRwlkActivity =
     (rwlkStats?.TotalNumStakeActions ?? 0) > 0 || rwlkAnchorActions.length > 0;
 
@@ -107,8 +119,7 @@ export function UserAnchoringSection({
             />
           ) : (
             <div className="space-y-12">
-              <PageHeaderFigures
-                className="mt-0 sm:mt-0"
+              <FigureStrip
                 figures={[
                   {
                     id: 'anchors',
@@ -123,10 +134,8 @@ export function UserAnchoringSection({
                   {
                     id: 'distributions',
                     label: s('stats.totalDistributions'),
-                    value: <Amount value={totalDistributionEth} unit="ETH" />,
-                    caption: t('statistics.anchoring.stats.acrossNfts', {
-                      count: cstAnchorDistributions.length,
-                    }),
+                    value: <Amount value={retrievedEth + unretrievedEth} unit="ETH" />,
+                    caption: t('statistics.anchoring.stats.acrossNfts', { count: ledger.length }),
                   },
                   {
                     id: 'unretrieved',
@@ -135,20 +144,22 @@ export function UserAnchoringSection({
                   },
                 ]}
               />
-              <Ledger title={s('sections.actions')}>
-                <AnchorActionsTable list={cstAnchorActions} IsRwalk={false} />
-              </Ledger>
               <Ledger title={s('sections.distributionsByToken')}>
-                <AnchorDistributionsTable list={cstAnchorDistributions} address={address} />
+                <AnchorDistributionsLedger
+                  address={address}
+                  rows={ledger}
+                  deposits={cstAnchorDistributionsByDeposit}
+                  seeds={seeds}
+                  canRelease={canRelease}
+                />
               </Ledger>
-              <Ledger title={s('sections.distributionsByDeposit')}>
-                <CSTAnchorDistributionsByDepositTable list={cstAnchorDistributionsByDeposit} />
-              </Ledger>
-              <Ledger title={s('sections.retrievedDistributions')}>
-                <RetrievedCSTAnchorDistributionsTable list={retrievedCstAnchorDistributions} />
-              </Ledger>
-              <Ledger title={s('sections.unretrievedDistributions')}>
-                <UnretrievedCSTAnchorDistributionsTable user={address} />
+              <Ledger title={s('sections.actions')}>
+                <AnchorActionsTable
+                  list={cstAnchorActions}
+                  IsRwalk={false}
+                  headingLevel={4}
+                  pageSize={HISTORY_PAGE_SIZE}
+                />
               </Ledger>
             </div>
           )}
@@ -164,8 +175,7 @@ export function UserAnchoringSection({
             />
           ) : (
             <div className="space-y-12">
-              <PageHeaderFigures
-                className="mt-0 sm:mt-0"
+              <FigureStrip
                 figures={[
                   {
                     id: 'anchors',
@@ -190,10 +200,15 @@ export function UserAnchoringSection({
                 ]}
               />
               <Ledger title={s('sections.actions')}>
-                <AnchorActionsTable list={rwlkAnchorActions} IsRwalk={true} />
+                <AnchorActionsTable
+                  list={rwlkAnchorActions}
+                  IsRwalk={true}
+                  headingLevel={4}
+                  pageSize={HISTORY_PAGE_SIZE}
+                />
               </Ledger>
               <Ledger title={s('sections.anchoredNftSelection')}>
-                <RwalkAnchorDistributionImprintsTable list={rwlkImprints} />
+                <RwalkAnchorDistributionImprintsTable list={rwlkImprints} headingLevel={4} />
               </Ledger>
             </div>
           )}

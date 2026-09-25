@@ -199,11 +199,12 @@
       "sections": {
         "actions": "Thao tác neo giữ / gỡ neo",
         "distributionsByToken": "Phân phối neo giữ theo token",
-        "distributionsByDeposit": "Phân phối neo giữ theo khoản nạp",
-        "retrievedDistributions": "Phân phối neo giữ đã nhận về",
-        "unretrievedDistributions": "Phân phối neo giữ chưa nhận về",
         "anchoredNftSelection": "Tinh tuyển NFT neo giữ"
-      }
+      },
+      "showDeposits": "Hiện các đợt nạp",
+      "hideDeposits": "Ẩn các đợt nạp",
+      "depositsHeader": "Đợt nạp",
+      "nothingRetrieved": "Chưa nhận về khoản nào: phân phối neo giữ của một NFT được nhận về khi gỡ neo."
     },
     "donatedAssets": {
       "nfts": {

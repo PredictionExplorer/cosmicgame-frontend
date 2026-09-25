@@ -199,11 +199,12 @@
       "sections": {
         "actions": "앵커링 / 해제 작업",
         "distributionsByToken": "토큰별 앵커링 지급",
-        "distributionsByDeposit": "적립별 앵커링 지급",
-        "retrievedDistributions": "회수한 앵커링 지급",
-        "unretrievedDistributions": "미회수 앵커링 지급",
         "anchoredNftSelection": "앵커링 NFT 별빛 선정"
-      }
+      },
+      "showDeposits": "적립 내역 보기",
+      "hideDeposits": "적립 내역 숨기기",
+      "depositsHeader": "적립 내역",
+      "nothingRetrieved": "아직 회수한 앵커링 지급이 없습니다. 앵커링 지급은 NFT의 앵커링을 해제할 때 회수됩니다."
     },
     "donatedAssets": {
       "nfts": {

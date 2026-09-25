@@ -199,11 +199,12 @@
       "sections": {
         "actions": "係留 / 解除の操作",
         "distributionsByToken": "トークン別の係留配分",
-        "distributionsByDeposit": "積立別の係留配分",
-        "retrievedDistributions": "受け取り済みの係留配分",
-        "unretrievedDistributions": "未受け取りの係留配分",
         "anchoredNftSelection": "係留NFT星選"
-      }
+      },
+      "showDeposits": "積立を表示",
+      "hideDeposits": "積立を隠す",
+      "depositsHeader": "積立",
+      "nothingRetrieved": "まだ受け取った係留配分はありません。NFTの係留配分は、係留の解除時に受け取ります。"
     },
     "donatedAssets": {
       "nfts": {

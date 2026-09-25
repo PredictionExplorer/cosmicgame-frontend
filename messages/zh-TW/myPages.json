@@ -199,11 +199,12 @@
       "sections": {
         "actions": "錨定與解錨操作",
         "distributionsByToken": "按代幣檢視錨定配發",
-        "distributionsByDeposit": "按存入檢視錨定配發",
-        "retrievedDistributions": "已取回錨定配發",
-        "unretrievedDistributions": "未取回錨定配發",
         "anchoredNftSelection": "錨定 NFT 星選"
-      }
+      },
+      "showDeposits": "顯示存入紀錄",
+      "hideDeposits": "隱藏存入紀錄",
+      "depositsHeader": "存入紀錄",
+      "nothingRetrieved": "尚未取回任何錨定配發：NFT 解錨時取回其錨定配發。"
     },
     "donatedAssets": {
       "nfts": {

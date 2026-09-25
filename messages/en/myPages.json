@@ -199,11 +199,12 @@
       "sections": {
         "actions": "Anchor and release actions",
         "distributionsByToken": "Anchor Distributions by NFT",
-        "distributionsByDeposit": "Anchor Distributions by deposit",
-        "retrievedDistributions": "Retrieved Anchor Distributions",
-        "unretrievedDistributions": "Anchor Distributions to retrieve",
         "anchoredNftSelection": "Anchored-NFT Stellar Selection"
-      }
+      },
+      "showDeposits": "Show deposits",
+      "hideDeposits": "Hide deposits",
+      "depositsHeader": "Deposits",
+      "nothingRetrieved": "Nothing retrieved yet: an NFT’s Anchor Distributions are retrieved when its anchor is released."
     },
     "donatedAssets": {
       "nfts": {
