@@ -647,7 +647,7 @@
     }
   },
   "embed": {
-    "title": "Endurance timeline · Cycle {cycle}",
+    "title": "Endurance & Chrono timeline · Cycle {cycle}",
     "final": "Final",
     "source": "Open in Cosmic Signature",
     "opensNewWindow": "(opens in a new window)"
