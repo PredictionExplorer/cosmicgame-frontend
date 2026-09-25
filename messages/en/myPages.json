@@ -86,7 +86,7 @@
       "spent": {
         "label": "Spent on gestures",
         "caption": "plus {amount}",
-        "info": "ETH this address paid for its ETH gestures. CST gestures are paid in CST, shown underneath. Gesture costs are not refunded."
+        "info": "ETH this address paid for its ETH gestures. CST gestures are paid in CST, shown underneath. Gesture Costs are not refunded."
       },
       "received": {
         "label": "Received",

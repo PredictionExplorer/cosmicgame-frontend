@@ -40,7 +40,7 @@ export const learnTextEn = {
     meta: {
       title: 'Learn Cosmic Signature | On-Chain Art, Performance Cycles, and Arbitrum',
       description:
-        'Learn how Cosmic Signature works: Performance Cycles, gestures, CST, three-body NFT art, Arbitrum contracts, anchoring, public goods, and risk clarifications.',
+        'Learn how Cosmic Signature works: Performance Cycles, gestures, CST, three-body NFT art, Arbitrum contracts, anchoring, Public Goods, and risk clarifications.',
     },
     h1: 'Learn Cosmic Signature',
     intro:
@@ -63,7 +63,7 @@ export const learnTextEn = {
       context: {
         title: 'Context',
         description:
-          'Public goods, where the art is collected and traded, and what the protocol is not.',
+          'Public Goods, where the art is collected and traded, and what the protocol is not.',
       },
     },
     whitePaper: {
@@ -146,7 +146,7 @@ export const learnTextEn = {
         'Learn how Cosmic Signature Performance Cycles use Calibration Windows, gestures, finalization, and allocation tracks on Arbitrum.',
       h1: 'How the Cosmic Signature Performance Cycle works',
       summary:
-        'A Cosmic Signature Performance Cycle is the protocol window where gestures accumulate, timing evolves, and the final Signature allocation is determined by on-chain rules.',
+        'A Cosmic Signature Performance Cycle is the protocol window where gestures accumulate, timing evolves, and the final Signature Allocation is determined by on-chain rules.',
       sections: [
         {
           heading: 'Cycle opening',
@@ -416,7 +416,7 @@ export const learnTextEn = {
       relatedLabels: ['Open anchoring tools', 'Explore the gallery'],
     },
     'protocol-guild-public-goods': {
-      cardTitle: 'Public goods and Protocol Guild',
+      cardTitle: 'Public Goods and Protocol Guild',
       cardDescription: 'How part of every Cycle Reserve reaches Ethereum’s core contributors.',
       title: 'Cosmic Signature and Ethereum Public Goods | Cosmic Signature',
       description:

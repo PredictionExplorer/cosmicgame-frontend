@@ -122,7 +122,7 @@
       "nameClearFailed": "An error occurred while clearing the token name. Please try again."
     },
     "marketingCst": {
-      "reserveUnavailable": "Outreach reserve wallet is not available.",
+      "reserveUnavailable": "Outreach Reserve wallet is not available.",
       "treasurerRequired": "Connect the Outreach Reserve treasurer wallet to send CST allocations.",
       "confirmed": "Outreach Reserve CST allocation confirmed.",
       "failed": "Unable to send the CST allocation. Please try again.",

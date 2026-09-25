@@ -52,7 +52,7 @@
       "live": {
         "badge": "Live on Arbitrum",
         "headline": "Shape the next Cosmic Signature",
-        "body": "Each gesture leaves a trace in the Performance Cycle, may imprint Participation CST, and helps direct protocol reserves to the public goods that sustain Ethereum.",
+        "body": "Each gesture leaves a trace in the Performance Cycle, may imprint Participation CST, and helps direct protocol reserves to the Public Goods that sustain Ethereum.",
         "cta": "Make a gesture"
       }
     },
@@ -66,7 +66,7 @@
         "body": "Participation CST carries a trace of the cycle you helped create."
       },
       "publicGoods": {
-        "title": "Allocations fund public goods",
+        "title": "Allocations fund Public Goods",
         "body": "Protocol reserves flow across allocation tracks, including Protocol Guild."
       }
     },
@@ -306,7 +306,7 @@
     "reward": {
       "economicsTitle": "CST gesture economics",
       "previewTitle": "Participation CST preview",
-      "economicsDescription": "Net CST is the Participation CST reward minus the current CST gesture cost.",
+      "economicsDescription": "Net CST is the Participation CST reward minus the current CST Gesture Cost.",
       "previewDescription": "Estimated dynamic CST you receive if this gesture lands. The amount depends on time since the previous gesture, and every gesture method has two protections: maximum cost and minimum CST reward.",
       "rewardLabel": "Reward",
       "costLabel": "Cost",
@@ -389,10 +389,10 @@
   },
   "calibration": {
     "defaultTitle": "Calibration Window",
-    "defaultSubtitle": "Gesture cost descends as this window progresses.",
+    "defaultSubtitle": "Gesture Cost descends as this window progresses.",
     "defaultEndedMessage": "Calibration Window closed.",
     "firstGestureTitle": "First Gesture Calibration Window",
-    "firstGestureSubtitle": "The first ETH gesture cost descends while this opening window progresses.",
+    "firstGestureSubtitle": "The first ETH Gesture Cost descends while this opening window progresses.",
     "cstTitle": "CST Calibration Window",
     "cstSubtitle": "CST cost descends through this dynamic window. ETH gestures shorten it by about {decreasePercent}%; CST gestures lengthen it by about {increasePercent}%.",
     "cstEndedMessage": "CST cost is at its floor (0 CST); network gas still applies.",
@@ -737,8 +737,8 @@
   "orientation": {
     "title": "How this cycle works",
     "costsNote": "ETH or CST spent on a gesture is not refunded when another participant takes your place. Transaction gas is always paid in ETH.",
-    "allocationsTitle": "Where the cycle reserve goes",
-    "allocationsDescription": "See every allocation, including Stellar Selection and public goods.",
+    "allocationsTitle": "Where the Cycle Reserve goes",
+    "allocationsDescription": "See every allocation, including Stellar Selection and Public Goods.",
     "storyTitle": "The art behind the cycle",
     "methods": {
       "eth": "Pay the current Gesture Cost in ETH.",

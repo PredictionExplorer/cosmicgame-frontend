@@ -185,7 +185,7 @@ describe('CstGestureCostChart', () => {
       refetch,
     });
     render(<CstGestureCostChart round={2} label="CST cost" />);
-    expect(screen.getByText('Failed to load CST gesture costs')).toBeInTheDocument();
+    expect(screen.getByText('Failed to load CST Gesture Costs')).toBeInTheDocument();
     await user.click(screen.getByRole('button', { name: /try again|retry/i }));
     expect(refetch).toHaveBeenCalled();
   });

@@ -13,7 +13,7 @@ const ALLOCATION_LIST_TOOLTIPS = [
     expected: /Active cycles and separate allocation retrieval records are excluded/,
   },
   {
-    label: 'Cycle reserve split',
+    label: 'Cycle Reserve split',
     expected: /ETH reserve is allocated across protocol tracks/,
   },
 ];

@@ -233,7 +233,7 @@
         "description": "Track automatic Cosmic Signature Public Goods forwards from protocol cycles to the Public Goods Vault and its configured beneficiary — currently Protocol Guild.",
         "source": "Cosmic Signature Public Goods API",
         "links": {
-          "learn": "Learn about public goods",
+          "learn": "Learn about Public Goods",
           "statistics": "View Public Goods statistics",
           "contracts": "Review the vault contract"
         },
@@ -256,7 +256,7 @@
         "source": "Cosmic Signature Public Goods API",
         "links": {
           "direct": "View direct ETH contributions",
-          "learn": "Learn about public goods",
+          "learn": "Learn about Public Goods",
           "risk": "Read risk disclosures"
         },
         "cards": {
@@ -273,10 +273,10 @@
       },
       "public-goods-retrievals": {
         "heading": "Public Goods retrievals",
-        "description": "Review retrievals from the Cosmic Signature Public Goods Vault, where cycle reserves forward support to the configured Public Goods beneficiary — currently Protocol Guild.",
+        "description": "Review retrievals from the Cosmic Signature Public Goods Vault, where Cycle Reserves forward support to the configured Public Goods beneficiary — currently Protocol Guild.",
         "source": "Cosmic Signature Public Goods API",
         "links": {
-          "learn": "Learn about public goods",
+          "learn": "Learn about Public Goods",
           "protocolGuild": "Visit Protocol Guild",
           "contracts": "Review public contract addresses"
         },

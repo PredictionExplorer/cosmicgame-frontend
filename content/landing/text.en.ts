@@ -14,7 +14,7 @@ export const landingTextEn = {
       'Arbitrum',
       'three-body problem',
       'generative art',
-      'public goods',
+      'Public Goods',
       'Protocol Guild',
       'CC0',
     ],

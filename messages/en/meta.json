@@ -98,7 +98,7 @@
     "title": "Gesture Information",
     "titleFor": "Gesture #{position} · Cycle #{cycle}",
     "titleForId": "Gesture record {id}",
-    "description": "View detailed gesture information including timestamp, participant address, gesture cost, and cycle context for the Cosmic Signature protocol."
+    "description": "View detailed gesture information including timestamp, participant address, Gesture Cost, and cycle context for the Cosmic Signature protocol."
   },
   "coordinationChanges": {
     "title": "Coordination Changes",
@@ -243,7 +243,7 @@
   },
   "learn": {
     "title": "Learn Cosmic Signature: on-chain art, Performance Cycles and Arbitrum",
-    "description": "Learn how Cosmic Signature works: Performance Cycles, gestures, CST, three-body NFT art, Arbitrum contracts, anchoring, public goods, and risk clarifications."
+    "description": "Learn how Cosmic Signature works: Performance Cycles, gestures, CST, three-body NFT art, Arbitrum contracts, anchoring, Public Goods, and risk clarifications."
   },
   "whitePaper": {
     "title": "White Paper: A Procedural On-Chain Art Protocol",
