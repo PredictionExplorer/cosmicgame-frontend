@@ -473,7 +473,9 @@
       "openingExcluded": "Gestures in the first hour after each cycle opens are excluded — opening activity is unusually concentrated and would otherwise skew this chart.",
       "openingNote": "Each cycle’s first hour is left out: its opening burst would dwarf every other bar.",
       "hour": "Hour",
-      "day": "Day"
+      "day": "Day",
+      "allGestures": "All gestures",
+      "allGesturesCaption": "Including each cycle’s first hour"
     },
     "spikes": {
       "count": "Spikes ({count})",

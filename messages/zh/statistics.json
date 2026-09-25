@@ -473,7 +473,9 @@
       "openingExcluded": "每个周期开启后的首小时不计入统计。该时段活动通常高度集中，纳入后会使图表失真。",
       "openingNote": "不含每个周期开启后的首小时，以免开局的集中活动掩盖其余时段。",
       "hour": "小时",
-      "day": "日期"
+      "day": "日期",
+      "allGestures": "全部落笔",
+      "allGesturesCaption": "含各周期的首个小时"
     },
     "spikes": {
       "count": "峰值（{count}）",

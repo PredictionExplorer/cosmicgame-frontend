@@ -473,7 +473,9 @@
       "openingExcluded": "Nét bút trong giờ đầu sau khi mỗi chu kỳ mở không được tính — hoạt động lúc mở tập trung bất thường và sẽ làm lệch biểu đồ này.",
       "openingNote": "Không tính giờ đầu của mỗi chu kỳ, vì đợt dồn dập lúc mở sẽ lấn át mọi cột khác.",
       "hour": "Giờ",
-      "day": "Ngày"
+      "day": "Ngày",
+      "allGestures": "Tất cả nét bút",
+      "allGesturesCaption": "Gồm cả giờ đầu tiên của mỗi chu kỳ"
     },
     "spikes": {
       "count": "Đợt tăng vọt ({count})",

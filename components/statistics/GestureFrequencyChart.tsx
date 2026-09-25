@@ -6,10 +6,11 @@ import { useLocale, useTranslations } from 'next-intl';
 
 import { formatUnixTsLabel } from '@/utils/format';
 // lexicon-allow-start: the hook and wire type mirror the backend route statistics/bidding/frequency
-import { useBidFrequency as useFrequencyQuery } from '@/hooks/useApiQuery';
+import { useBidFrequency as useFrequencyQuery, useDashboardInfo } from '@/hooks/useApiQuery';
 import type { BidFrequencyBucket as FrequencyBucket } from '@/services/api/types';
 // lexicon-allow-end
 import { useFormat } from '@/hooks/useFormat';
+import { toFiniteNumber } from '@/utils/finiteNumber';
 import { DataTable, type DataTableColumn } from '@/components/ui/data-table';
 import { EmptyState } from '@/components/ui/empty-state';
 import { ErrorState } from '@/components/ui/error-state';
@@ -99,7 +100,9 @@ type GestureFrequencyChartProps = {
  * week, as bars on one theme: round count ticks, calendar date ticks, the
  * total and the busiest day read out above, and the same buckets as a table.
  * Each cycle's first hour is left out (the backend's rule), which the note
- * under the plot says.
+ * under the plot says; when the daily view reaches the first gesture, the
+ * readout adds every gesture ever made, first hours included, so its total
+ * and the hub's never read as a contradiction.
  */
 export const GestureFrequencyChart: FC<GestureFrequencyChartProps> = ({
   enabled = true,
@@ -126,6 +129,15 @@ export const GestureFrequencyChart: FC<GestureFrequencyChartProps> = ({
     intervalSecs,
     enabled && bounds.settled,
   );
+  // Every gesture ever made, first hours included, so the chart's total (which leaves them
+  // out) reads beside the one the statistics hub shows, instead of contradicting it.
+  const dashboard = useDashboardInfo();
+  const allGestures = toFiniteNumber(
+    (dashboard.data?.MainStats as { TotalBids?: unknown } | undefined)?.TotalBids,
+  );
+  // Only the daily view reaches back to the first gesture; a week of hours is not comparable.
+  const coversAll = interval === 'day' && initTs <= bounds.firstTs;
+  const showAll = coversAll && !dashboard.isError;
 
   const points = useMemo(() => toChartPoints(data ?? []), [data]);
   // The range a reader is told is the one with gestures in it, not the query's padded end.
@@ -186,10 +198,19 @@ export const GestureFrequencyChart: FC<GestureFrequencyChartProps> = ({
   // The bounds come first: until they settle, the chart has not asked for anything yet.
   const loading = !bounds.settled || isLoading;
   const peakLabel = t(withTime ? 'charts.frequency.busiestHour' : 'charts.frequency.busiestDay');
+  const allItem: ReadoutItem | null = showAll
+    ? {
+        id: 'all',
+        label: t('charts.frequency.allGestures'),
+        value: loading || allGestures === null ? null : format.count(allGestures),
+        caption: loading || allGestures === null ? null : t('charts.frequency.allGesturesCaption'),
+      }
+    : null;
   const readout: ReadoutItem[] | undefined = loading
     ? [
         { id: 'total', label: t('charts.frequency.gestures'), value: null, caption: null },
         { id: 'peak', label: peakLabel, value: null, caption: null },
+        ...(allItem ? [allItem] : []),
       ]
     : peak
       ? [
@@ -205,6 +226,7 @@ export const GestureFrequencyChart: FC<GestureFrequencyChartProps> = ({
             value: format.count(peak.gestures),
             caption: formatUnixTsLabel(peak.bucketTs, withTime, locale),
           },
+          ...(allItem ? [allItem] : []),
         ]
       : undefined;
 

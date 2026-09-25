@@ -9,10 +9,12 @@ import { GestureFrequencyChart } from '../GestureFrequencyChart';
 
 const mockUseBidTimeBounds = jest.fn();
 const mockUseBidFrequency = jest.fn();
+const mockUseDashboardInfo = jest.fn();
 
 jest.mock('../../../hooks/useApiQuery', () => ({
   useBidTimeBounds: (...args: unknown[]) => mockUseBidTimeBounds(...args),
   useBidFrequency: (...args: unknown[]) => mockUseBidFrequency(...args),
+  useDashboardInfo: () => mockUseDashboardInfo(),
 }));
 jest.mock('recharts', () => require('@/test-utils/recharts').rechartsStub());
 
@@ -40,6 +42,7 @@ beforeEach(() => {
   jest.clearAllMocks();
   mockUseBidTimeBounds.mockReturnValue(ok({ MinTs: NOW_SEC - 30 * DAY, MaxTs: NOW_SEC }));
   mockUseBidFrequency.mockReturnValue(ok(buckets));
+  mockUseDashboardInfo.mockReturnValue(ok({ MainStats: { TotalBids: 3_184 } }));
 });
 
 describe('GestureFrequencyChart', () => {
@@ -50,6 +53,8 @@ describe('GestureFrequencyChart', () => {
     expect(readoutOf(figure)).toEqual([
       ['Gestures', '1,274'],
       ['Busiest day', '1,234'],
+      // Beside the hub's total: every gesture, first hours included, so the two never clash.
+      ['All gestures', '3,184'],
     ]);
     expect(figure.querySelector('figcaption')).toHaveTextContent('Aug 10, 2026');
     expect(screen.getByTestId('bar-chart')).toHaveAttribute('data-point-count', '2');
@@ -93,6 +98,16 @@ describe('GestureFrequencyChart', () => {
     const [from, , interval] = mockUseBidFrequency.mock.calls.at(-1)!;
     expect(interval).toBe(HOUR);
     expect(NOW_SEC - (from as number)).toBeLessThanOrEqual(7 * DAY);
+    // A week of hours is not comparable with every gesture ever made.
+    const figure = screen.getByRole('figure', { name: 'Frequency' });
+    expect(readoutOf(figure).map(([label]) => label)).not.toContain('All gestures');
+  });
+
+  it('leaves the whole count out when the dashboard cannot be read', () => {
+    mockUseDashboardInfo.mockReturnValue({ data: undefined, isLoading: false, isError: true });
+    render(<GestureFrequencyChart label="Frequency" />);
+    const figure = screen.getByRole('figure', { name: 'Frequency' });
+    expect(readoutOf(figure).map(([label]) => label)).toEqual(['Gestures', 'Busiest day']);
   });
 
   it('shows the same buckets as a table on request', async () => {

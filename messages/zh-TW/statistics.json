@@ -473,7 +473,9 @@
       "openingExcluded": "每個週期開啟後的首小時不計入統計。該時段活動通常高度集中，納入後會使圖表失真。",
       "openingNote": "不含每個週期開啟後的首小時，以免開局的集中活動掩蓋其餘時段。",
       "hour": "小時",
-      "day": "日期"
+      "day": "日期",
+      "allGestures": "全部落筆",
+      "allGesturesCaption": "含各週期的首個小時"
     },
     "spikes": {
       "count": "峰值（{count}）",
