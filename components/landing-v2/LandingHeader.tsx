@@ -15,11 +15,10 @@ import { Link, usePathname } from '@/i18n/navigation';
 import { publicPathname } from '@/lib/hostRouting';
 import { cn } from '@/lib/utils';
 import { LanguageSwitcher } from '@/components/layout/LanguageSwitcher';
-import { PalettePicker } from '@/components/layout/PalettePicker';
+import { NavSheet } from '@/components/layout/NavSheet';
 import { useSiteNavCopy } from '@/components/layout/useSiteNav';
 import { Wordmark } from '@/components/layout/Wordmark';
 import { ThemeSwitcher } from '@/components/theme/ThemeSwitcher';
-import { Sheet, SheetContent, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
 import { jumpToSection } from '@/lib/jumpToSection';
 
 import { OpenAppLink } from './OpenAppLink';
@@ -95,7 +94,8 @@ interface LandingHeaderProps {
  * glass bar outside `<main>` with the same wordmark lockup as the app, the
  * home sections (with the one in view marked), the reading pages, and
  * "Open the app", which joins the bar once the hero's own button has
- * scrolled away. Below 1024px the links move into a sheet.
+ * scrolled away. Below 1024px the links move into the sheet both hosts
+ * share (`NavSheet`).
  */
 export function LandingHeader({ sections }: LandingHeaderProps) {
   const t = useTranslations('nav');
@@ -211,8 +211,10 @@ export function LandingHeader({ sections }: LandingHeaderProps) {
               {openApp}
             </div>
           ) : null}
-          <Sheet open={menuOpen} onOpenChange={setMenuOpen}>
-            <SheetTrigger asChild>
+          <NavSheet
+            open={menuOpen}
+            onOpenChange={setMenuOpen}
+            trigger={
               <button
                 type="button"
                 aria-label={t('menuLabel')}
@@ -220,65 +222,45 @@ export function LandingHeader({ sections }: LandingHeaderProps) {
               >
                 <Menu aria-hidden className="size-5" />
               </button>
-            </SheetTrigger>
-            <SheetContent
-              side="right"
-              closePlacement="header"
-              aria-describedby={undefined}
-              onCloseAutoFocus={(event) => {
-                const section = pendingSection.current;
-                if (!section) return;
-                pendingSection.current = null;
-                event.preventDefault();
-                jumpToSection(section);
-              }}
-              className="flex w-[min(20rem,100vw)] flex-col gap-0 border-l border-rule bg-background p-0"
-            >
-              <SheetTitle className="sr-only">{t('drawerTitle')}</SheetTitle>
-              <div className="flex h-[var(--header-height)] items-center border-b border-rule-faint pl-4 pr-16">
-                <Wordmark size="md" />
-              </div>
-              <nav
-                aria-label={t('primaryLabel')}
-                className="min-h-0 flex-1 overflow-y-auto px-3 py-3"
-              >
-                <ul className="flex flex-col">
-                  {[...anchorLinks, ...pageLinks].map((link, index) => (
-                    <li
-                      key={link.key}
-                      className={cn(
-                        index === anchorLinks.length && 'mt-2 border-t border-rule-faint pt-2',
-                      )}
-                    >
-                      <Link
-                        href={link.href}
-                        aria-current={link.current}
-                        onClick={(event) => {
-                          if ('section' in link && link.section && !isModifiedClick(event)) {
-                            event.preventDefault();
-                            pendingSection.current = link.section;
-                          }
-                          setMenuOpen(false);
-                        }}
-                        className={cn(
-                          'flex min-h-11 items-center rounded-control px-2 text-sm no-underline transition-colors duration-150 hover:bg-muted',
-                          link.current ? 'text-primary' : 'text-foreground',
-                        )}
-                      >
-                        {link.label}
-                      </Link>
-                    </li>
-                  ))}
-                </ul>
-                <div className="mt-4 px-2">{openApp}</div>
-              </nav>
-              <div className="border-t border-rule-faint px-4 pb-[max(env(safe-area-inset-bottom),0.75rem)] pt-3">
-                <p className="type-eyebrow text-subtle">{t('drawer.preferences')}</p>
-                <PalettePicker className="mt-1 -ml-2.5" />
-                <LanguageSwitcher variant="drawer" className="mt-2" />
-              </div>
-            </SheetContent>
-          </Sheet>
+            }
+            onCloseAutoFocus={(event) => {
+              const section = pendingSection.current;
+              if (!section) return;
+              pendingSection.current = null;
+              event.preventDefault();
+              jumpToSection(section);
+            }}
+          >
+            <ul className="flex flex-col">
+              {[...anchorLinks, ...pageLinks].map((link, index) => (
+                <li
+                  key={link.key}
+                  className={cn(
+                    index === anchorLinks.length && 'mt-2 border-t border-rule-faint pt-2',
+                  )}
+                >
+                  <Link
+                    href={link.href}
+                    aria-current={link.current}
+                    onClick={(event) => {
+                      if ('section' in link && link.section && !isModifiedClick(event)) {
+                        event.preventDefault();
+                        pendingSection.current = link.section;
+                      }
+                      setMenuOpen(false);
+                    }}
+                    className={cn(
+                      'flex min-h-11 items-center rounded-control px-2 text-sm no-underline transition-colors duration-150 hover:bg-muted',
+                      link.current ? 'text-primary' : 'text-foreground',
+                    )}
+                  >
+                    {link.label}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+            <div className="mt-4 px-2">{openApp}</div>
+          </NavSheet>
         </div>
       </div>
     </header>

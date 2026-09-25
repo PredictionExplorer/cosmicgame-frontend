@@ -16,17 +16,14 @@ import {
   type SiteSectionId,
 } from '@/config/siteNav';
 import { OUTBOUND_ICONS, SITE_ROUTE_ICONS } from '@/config/siteNavIcons';
-import { Link, usePathname } from '@/i18n/navigation';
+import { usePathname } from '@/i18n/navigation';
 import { cn } from '@/lib/utils';
-import { Sheet, SheetContent, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
 
-import { LanguageSwitcher } from './LanguageSwitcher';
+import { NavSheet } from './NavSheet';
 import { HostDivider, NavRowContent } from './NavRow';
-import { PalettePicker } from './PalettePicker';
 import { SiteLink } from './SiteLink';
 import { routeCurrent } from './HeaderNavigation';
 import { useSiteNavCopy } from './useSiteNav';
-import { Wordmark } from './Wordmark';
 
 /**
  * Sections listed in the drawer, in order: the footer's own columns (the
@@ -184,14 +181,12 @@ interface SiteDrawerProps {
 }
 
 /**
- * The navigation drawer below 1024px. Every section of the taxonomy as a
- * disclosure (the everyday ones open, the rest collapsed unless the visitor
- * is inside them), a search entry at the top, and the palette and language
- * preferences pinned to the bottom so the phone header keeps its room for
- * the wordmark and the wallet. It opens from the right, under the thumb,
- * from a menu button at the header's end, the same side and anatomy as the
- * landing's menu. Choosing a language is an explicit pick in a menu, never
- * a change of page as a select is arrowed through.
+ * The navigation drawer below 1024px, in the sheet both hosts share
+ * (`NavSheet`: the wordmark row, the preferences at the foot): every section
+ * of the taxonomy as a disclosure (the everyday ones open, the rest
+ * collapsed unless the visitor is inside them) and a search entry at the
+ * top. Choosing a language is an explicit pick in a menu, never a change of
+ * page as a select is arrowed through.
  */
 export function SiteDrawer({
   open,
@@ -229,65 +224,34 @@ export function SiteDrawer({
     : DRAWER_SECTIONS;
 
   return (
-    <Sheet open={open} onOpenChange={onOpenChange}>
-      <SheetTrigger asChild>{trigger}</SheetTrigger>
-      <SheetContent
-        side="right"
-        closePlacement="header"
-        aria-describedby={undefined}
-        className="flex w-[min(22rem,100vw)] max-w-full flex-col gap-0 border-l border-rule bg-background p-0 sm:max-w-[22rem]"
+    <NavSheet open={open} onOpenChange={onOpenChange} trigger={trigger}>
+      <button
+        type="button"
+        onClick={() => {
+          close();
+          onOpenSearch();
+        }}
+        className="mb-2 flex min-h-11 w-full items-center gap-3 rounded-control border border-input bg-surface-sunken px-3 text-left text-sm text-muted-foreground transition-colors duration-150 hover:border-foreground/40 hover:text-foreground"
       >
-        <SheetTitle className="sr-only">{t('drawerTitle')}</SheetTitle>
-        <div className="flex h-[var(--header-height)] shrink-0 items-center border-b border-rule-faint pl-4 pr-16">
-          <Link
-            href="/"
-            onClick={close}
-            aria-label={t('brand.homeLabel')}
-            className="inline-flex min-h-11 items-center no-underline"
-          >
-            <Wordmark size="md" />
-          </Link>
-        </div>
+        <Search aria-hidden className="size-4 shrink-0 text-subtle" />
+        <span className="truncate">{t('search.triggerLabel')}</span>
+      </button>
 
-        <nav
-          aria-label={t('primaryLabel')}
-          className="min-h-0 flex-1 overflow-y-auto overscroll-contain px-3 pb-3 pt-3"
-        >
-          <button
-            type="button"
-            onClick={() => {
-              close();
-              onOpenSearch();
-            }}
-            className="mb-2 flex min-h-11 w-full items-center gap-3 rounded-control border border-input bg-surface-sunken px-3 text-left text-sm text-muted-foreground transition-colors duration-150 hover:border-foreground/40 hover:text-foreground"
-          >
-            <Search aria-hidden className="size-4 shrink-0 text-subtle" />
-            <span className="truncate">{t('search.triggerLabel')}</span>
-          </button>
-
-          {sections.map((section) => (
-            <DrawerSection
-              key={section}
-              section={section}
-              location={location}
-              onNavigate={close}
-              defaultOpen={
-                section === 'account' ||
-                OPEN_BY_DEFAULT.includes(section) ||
-                location.section === section
-              }
-              badges={badges}
-            />
-          ))}
-          <DrawerEcosystem />
-        </nav>
-
-        <div className="shrink-0 border-t border-rule-faint px-4 pb-[max(env(safe-area-inset-bottom),0.75rem)] pt-3">
-          <p className="type-eyebrow text-subtle">{t('drawer.preferences')}</p>
-          <PalettePicker className="mt-1 -ml-2.5" />
-          <LanguageSwitcher variant="drawer" className="mt-2" />
-        </div>
-      </SheetContent>
-    </Sheet>
+      {sections.map((section) => (
+        <DrawerSection
+          key={section}
+          section={section}
+          location={location}
+          onNavigate={close}
+          defaultOpen={
+            section === 'account' ||
+            OPEN_BY_DEFAULT.includes(section) ||
+            location.section === section
+          }
+          badges={badges}
+        />
+      ))}
+      <DrawerEcosystem />
+    </NavSheet>
   );
 }
