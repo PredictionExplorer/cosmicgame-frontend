@@ -171,6 +171,12 @@ export interface DataTableProps<T> {
    * 0.01 CST"), after the time zone when the table shows dates.
    */
   caption?: React.ReactNode;
+  /**
+   * States the reader's time zone under a table with dates (default). Pass
+   * `false` where the page already prints the zone beside a standalone date
+   * (a Signature's record), so a screen states it once.
+   */
+  timeZoneNote?: boolean;
 
   /** Stable key per row. Defaults to the index, which re-mounts rows on sort. */
   getRowKey?: (row: T, index: number) => React.Key;
@@ -400,6 +406,7 @@ export function DataTable<T>({
   notice,
   toolbar,
   caption,
+  timeZoneNote = true,
   getRowKey,
   getRowHref,
   getRowLabel,
@@ -541,7 +548,7 @@ export function DataTable<T>({
   const currentPage = currentIndex >= 0 && paginate ? Math.floor(currentIndex / pageSize) + 1 : 1;
 
   const linkColumnId = rowLinkColumn ?? visible[0]?.column.id;
-  const hasDatetime = visible.some((col) => col.kind === 'datetime');
+  const hasDatetime = timeZoneNote && visible.some((col) => col.kind === 'datetime');
   const cellPadding = density === 'compact' ? 'py-2.5' : 'py-3';
   const Heading = `h${headingLevel}` as const;
   // An empty or error state's title sits one level under the table's own

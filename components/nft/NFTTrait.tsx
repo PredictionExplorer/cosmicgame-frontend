@@ -329,13 +329,13 @@ const NFTTrait = ({ tokenId, initialMetadata, initialToken }: NFTTraitProps) => 
 
           {nameHistory.length > 0 && (
             <DetailSection title={t('sections.nameHistory')}>
-              <NameHistoryTable list={nameHistory} />
+              <NameHistoryTable list={nameHistory} timeZoneNote={false} />
             </DetailSection>
           )}
 
           {transferHistory.length > 0 && !transferHistory[0]?.TransferType && (
             <DetailSection title={t('sections.ownershipHistory')}>
-              <TransferHistoryTable list={transferHistory} />
+              <TransferHistoryTable list={transferHistory} timeZoneNote={false} />
             </DetailSection>
           )}
         </div>
