@@ -65,7 +65,8 @@ describe('chart ticks', () => {
 describe('chart labels', () => {
   it('labels a date tick in the locale’s short form', () => {
     expect(formatMonthDay(AUG_12, 'en')).toBe('Aug 12');
-    expect(formatMonthDay(AUG_12, 'vi')).toBe('12/8');
+    // Zero-padded DD/MM, as the readouts' full DD/MM/YYYY dates beside them (V431).
+    expect(formatMonthDay(AUG_12, 'vi')).toBe('12/08');
     expect(formatMonthDay(AUG_12, 'ja')).toMatch(/8月12日/);
   });
 
@@ -80,7 +81,8 @@ describe('chart labels', () => {
     expect(range).toMatch(/Aug 12/);
     expect(range).toMatch(/Sep 24/);
     expect(range.match(/2026/g)).toHaveLength(1);
-    expect(formatDateRange(AUG_12, AUG_12 + 43 * DAY, 'vi')).toBe('12/8 – 24/9/2026');
+    expect(formatDateRange(AUG_12, AUG_12 + 43 * DAY, 'vi')).toBe('12/08 – 24/09/2026');
+    expect(formatDateRange(AUG_12 - 300 * DAY, AUG_12, 'vi')).toBe('16/10/2025 – 12/08/2026');
   });
 });
 

@@ -5,7 +5,7 @@ import type { TimeStep } from './ticks';
 
 /**
  * Axis labels for dates, one short form per locale: the month and day on a
- * daily axis ("Aug 12", 8月12日, 8월 12일, 12 серп., 12/8), the hour on an
+ * daily axis ("Aug 12", 8月12日, 8월 12일, 12 серп., 12/08), the hour on an
  * hourly one ("14:00"), and the month, with its year where the year turns,
  * on a monthly one. Ticks never repeat "2026 … UTC": the figure's summary
  * states the range once, and every chart axis is UTC.
@@ -36,6 +36,10 @@ const intlMonthDay = (locale: string) => (date: Date) =>
     timeZone: 'UTC',
   }).format(date);
 
+/** A Vietnamese day and month, zero-padded: 12/08, as in 12/08/2026. */
+const viDayMonth = (date: Date) =>
+  `${String(date.getUTCDate()).padStart(2, '0')}/${String(date.getUTCMonth() + 1).padStart(2, '0')}`;
+
 const MONTH_DAY: LocaleRecord<(date: Date) => string> = {
   en: (date) => `${EN_MONTHS[date.getUTCMonth()]} ${date.getUTCDate()}`,
   zh: intlMonthDay('zh'),
@@ -44,8 +48,9 @@ const MONTH_DAY: LocaleRecord<(date: Date) => string> = {
   uk: intlMonthDay('uk'),
   ko: intlMonthDay('ko'),
   ja: intlMonthDay('ja'),
-  // Vietnamese writes numeric day/month dates (style-guide-vi §5).
-  vi: (date) => `${date.getUTCDate()}/${date.getUTCMonth() + 1}`,
+  // Vietnamese writes numeric DD/MM dates (style-guide-vi §5), zero-padded like the
+  // DD/MM/YYYY of a readout's full date beside them.
+  vi: (date) => viDayMonth(date),
 };
 
 /** The month ("Aug", 8月, трав.), or with its year ("Aug 2026", 2026年8月). */
@@ -57,7 +62,7 @@ function monthLabel(date: Date, locale: string, withYear: boolean): string {
   }).format(date);
 }
 
-/** A calendar date's short label: "Aug 12", 8月12日, 12/8. */
+/** A calendar date's short label: "Aug 12", 8月12日, 12/08. */
 export function formatMonthDay(ts: number, locale: string): string {
   return pickByLocale(MONTH_DAY, locale)(utcDate(ts));
 }
@@ -109,17 +114,15 @@ const DATE_RANGE: LocaleRecord<(from: Date, to: Date) => string> = {
   uk: intlRange('uk'),
   ko: intlRange('ko'),
   ja: intlRange('ja'),
-  vi: (from, to) => {
-    const day = (date: Date) => `${date.getUTCDate()}/${date.getUTCMonth() + 1}`;
-    return from.getUTCFullYear() === to.getUTCFullYear()
-      ? `${day(from)} – ${day(to)}/${to.getUTCFullYear()}`
-      : `${day(from)}/${from.getUTCFullYear()} – ${day(to)}/${to.getUTCFullYear()}`;
-  },
+  vi: (from, to) =>
+    from.getUTCFullYear() === to.getUTCFullYear()
+      ? `${viDayMonth(from)} – ${viDayMonth(to)}/${to.getUTCFullYear()}`
+      : `${viDayMonth(from)}/${from.getUTCFullYear()} – ${viDayMonth(to)}/${to.getUTCFullYear()}`,
 };
 
 /**
  * A date range in the locale's own form, the year written once when both
- * ends share it: "Aug 12 – Sep 24, 2026", 2026年8月12日至9月24日, 12/8 – 24/9/2026.
+ * ends share it: "Aug 12 – Sep 24, 2026", 2026年8月12日至9月24日, 12/08 – 24/09/2026.
  */
 export function formatDateRange(fromTs: number, toTs: number, locale: string): string {
   return pickByLocale(DATE_RANGE, locale)(utcDate(fromTs), utcDate(Math.max(fromTs, toTs)));
