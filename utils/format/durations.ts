@@ -65,8 +65,13 @@ export interface DurationOptions {
    * `compact` (default): "1d 2h 30m 45s" (zh "1天2小时30分45秒"), with inner
    * zero units kept so the reading stays positional ("1d 0h 0m 5s").
    * `clock`: a countdown, "6d 22:23:44" / "22:23:44" (ja "6日22:23:44").
+   * `fixed`: an elapsed or held time with a fixed shape, three units from the
+   * largest ("9d 01h 36m", "1h 52m 48s", "4h 01m 07s"; "52m 08s" and "7s"
+   * below an hour and a minute), the inner ones two digits wide. Every
+   * elapsed time on a page reads in this one grammar, and a right-aligned
+   * column of them lines up without dropping trailing zero units.
    */
-  readonly style?: 'compact' | 'clock';
+  readonly style?: 'compact' | 'clock' | 'fixed';
   /**
    * `compact` only: keep at most this many leading units ("1d 2h" for 2),
    * truncating the rest, for tight readouts.
@@ -103,6 +108,16 @@ export function formatDuration(
   ] as const;
   const first = ordered.findIndex(([value]) => value > 0);
   if (first === -1) return `0${units.seconds}`;
+
+  if (style === 'fixed') {
+    return ordered
+      .slice(first, first + 3)
+      .map(([value, unit], index) =>
+        index === 0 ? `${value}${unit}` : `${String(value).padStart(2, '0')}${unit}`,
+      )
+      .join(join);
+  }
+
   // Keep the units from the largest nonzero one to the smallest nonzero one,
   // inner zeros included; drop trailing zero units.
   let last = ordered.length - 1;

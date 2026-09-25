@@ -20,7 +20,9 @@
   "figures": {
     "cost": "一筆の費用",
     "participationCst": "参加CST",
-    "cycle": "サイクル"
+    "held": "保持時間",
+    "heldInfo": "この一筆が最新の一筆だった時間です。次の一筆、またはサイクルの確定まで数えます。",
+    "heldLive": "現在も最新の一筆"
   },
   "method": {
     "eth": "ETH",
@@ -41,6 +43,7 @@
   "rows": {
     "participant": "参加者",
     "finalizationTime": "この一筆の後の確定時刻",
+    "clockExtended": "{duration}延長",
     "transaction": "トランザクション",
     "copyHash": "トランザクションハッシュをコピー",
     "hashCopied": "トランザクションハッシュをコピーしました",
@@ -63,5 +66,11 @@
   },
   "randomWalk": {
     "heading": "Random Walk NFT"
+  },
+  "rail": {
+    "position": "{total}件中{position}番目の一筆",
+    "positionLive": "これまでの{total}件中{position}番目の一筆",
+    "liveNote": "このサイクルはまだ進行中です。シグネチャーはサイクルの確定時に刻印されます。",
+    "signature": "サイクル{cycle}のシグネチャー"
   }
 }

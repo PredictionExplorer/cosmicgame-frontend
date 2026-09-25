@@ -20,7 +20,9 @@
   "figures": {
     "cost": "落筆價格",
     "participationCst": "參與 CST",
-    "cycle": "週期"
+    "held": "保持時長",
+    "heldInfo": "這次落筆作為最新落筆保持的時長：直到下一次落筆，或直到週期收官。",
+    "heldLive": "仍是最新落筆"
   },
   "method": {
     "eth": "ETH",
@@ -41,6 +43,7 @@
   "rows": {
     "participant": "參與者",
     "finalizationTime": "此次落筆後的收官時間",
+    "clockExtended": "延後了 {duration}",
     "transaction": "交易",
     "copyHash": "複製交易哈希",
     "hashCopied": "交易哈希已複製",
@@ -63,5 +66,11 @@
   },
   "randomWalk": {
     "heading": "Random Walk NFT"
+  },
+  "rail": {
+    "position": "第 {position} 次落筆，共 {total} 次",
+    "positionLive": "第 {position} 次落筆，目前共 {total} 次",
+    "liveNote": "本週期仍在進行，它的簽名將在週期收官時銘刻。",
+    "signature": "第 {cycle} 個週期的簽名"
   }
 }

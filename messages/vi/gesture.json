@@ -20,7 +20,9 @@
   "figures": {
     "cost": "Chi phí nét bút",
     "participationCst": "CST tham gia",
-    "cycle": "Chu kỳ"
+    "held": "Thời gian giữ",
+    "heldInfo": "Khoảng thời gian nét bút này là nét bút gần nhất: đến nét bút tiếp theo, hoặc đến khi chu kỳ hoàn tất.",
+    "heldLive": "Vẫn là nét bút gần nhất"
   },
   "method": {
     "eth": "ETH",
@@ -41,6 +43,7 @@
   "rows": {
     "participant": "Người tham gia",
     "finalizationTime": "Thời điểm hoàn tất sau nét bút này",
+    "clockExtended": "Kéo dài thêm {duration}",
     "transaction": "Giao dịch",
     "copyHash": "Sao chép mã băm giao dịch",
     "hashCopied": "Đã sao chép mã băm giao dịch",
@@ -63,5 +66,11 @@
   },
   "randomWalk": {
     "heading": "Random Walk NFT"
+  },
+  "rail": {
+    "position": "Nét bút thứ {position} trên {total}",
+    "positionLive": "Nét bút thứ {position} trên {total} tính đến nay",
+    "liveNote": "Chu kỳ này vẫn đang diễn ra. Signature của chu kỳ được khắc khi chu kỳ hoàn tất.",
+    "signature": "Signature của chu kỳ {cycle}"
   }
 }

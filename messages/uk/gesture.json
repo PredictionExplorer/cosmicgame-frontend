@@ -20,7 +20,9 @@
   "figures": {
     "cost": "Вартість жесту",
     "participationCst": "CST участі",
-    "cycle": "Цикл"
+    "held": "Час утримання",
+    "heldInfo": "Скільки цей жест був Останнім жестом: до наступного жесту або до завершення циклу.",
+    "heldLive": "Досі Останній жест"
   },
   "method": {
     "eth": "ETH",
@@ -41,6 +43,7 @@
   "rows": {
     "participant": "Учасник",
     "finalizationTime": "Час завершення після цього жесту",
+    "clockExtended": "Продовжено на {duration}",
     "transaction": "Транзакція",
     "copyHash": "Копіювати хеш транзакції",
     "hashCopied": "Хеш транзакції скопійовано",
@@ -63,5 +66,11 @@
   },
   "randomWalk": {
     "heading": "Random Walk NFT"
+  },
+  "rail": {
+    "position": "Жест {position} з {total}",
+    "positionLive": "Жест {position} з {total}, цикл триває",
+    "liveNote": "Цикл ще триває. Його Сигнатуру буде закарбовано, коли цикл завершиться.",
+    "signature": "Сигнатура циклу {cycle}"
   }
 }
