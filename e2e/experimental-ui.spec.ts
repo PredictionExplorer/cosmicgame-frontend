@@ -277,9 +277,9 @@ test.describe('experimental UI', () => {
     });
 
     await expect(page.locator('html')).toHaveAttribute('lang', 'zh');
-    await expect(
-      page.getByRole('heading', { level: 1, name: 'Cosmic Signature 观测台' }),
-    ).toBeVisible({ timeout: 20_000 });
-    await expect(page.getByRole('link', { name: '返回当前界面' })).toHaveAttribute('href', '/zh');
+    await expect(page.getByRole('heading', { level: 1, name: '观测台艺术视图' })).toBeVisible({
+      timeout: 20_000,
+    });
+    await expect(page.getByRole('link', { name: '返回观测台' })).toHaveAttribute('href', '/zh');
   });
 });
