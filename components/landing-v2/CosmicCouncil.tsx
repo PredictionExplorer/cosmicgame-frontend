@@ -1,5 +1,7 @@
 import type { LandingContent } from '@/content/landing';
 
+import { Steps } from '@/components/ui/steps';
+
 import { SectionHeading } from './SectionHeading';
 import styles from './Landing.module.css';
 
@@ -17,19 +19,15 @@ export function CosmicCouncil({ council }: { council: LandingContent['council'] 
         headingId="landing-council-heading"
         description={council.body}
       />
-      <ol className={styles.rows}>
-        {council.columns.map((column, index) => (
-          <li key={column.title} className={styles.row}>
-            <span className="type-label pt-1 tabular-nums text-subtle">
-              {String(index + 1).padStart(2, '0')}
-            </span>
-            <div className="min-w-0">
-              <h3 className="type-title">{column.title}</h3>
-              <p className="type-body-sm mt-1.5 text-muted-foreground">{column.body}</p>
-            </div>
-          </li>
-        ))}
-      </ol>
+      <Steps
+        framed
+        className={styles.rows}
+        items={council.columns.map((column) => ({
+          id: column.title,
+          title: column.title,
+          body: <p>{column.body}</p>,
+        }))}
+      />
     </section>
   );
 }
