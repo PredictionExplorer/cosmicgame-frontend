@@ -31,6 +31,15 @@
   --duration-slow: 400ms;
   --duration-page: 560ms;
   --duration-settle: 900ms;
+  /* Tailwind's `duration-*` utility reads the --transition-duration-*
+   * namespace: these make `duration-base` and the rest the tokens above,
+   * where a bare name would otherwise emit nothing and fall back to 150ms. */
+  --transition-duration-instant: var(--duration-instant);
+  --transition-duration-fast: var(--duration-fast);
+  --transition-duration-base: var(--duration-base);
+  --transition-duration-slow: var(--duration-slow);
+  --transition-duration-page: var(--duration-page);
+  --transition-duration-settle: var(--duration-settle);
   --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
   --ease-gallery: cubic-bezier(0.2, 0, 0, 1);
   --ease-out-soft: cubic-bezier(0.25, 0.46, 0.45, 0.94);

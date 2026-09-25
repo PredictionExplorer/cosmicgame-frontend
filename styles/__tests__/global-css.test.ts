@@ -305,6 +305,19 @@ describe('overlay motion', () => {
   });
 });
 
+describe('motion utilities', () => {
+  it('surfaces every duration token as a `duration-*` utility', async () => {
+    // Regression: Tailwind reads `duration-*` from --transition-duration-*,
+    // so `duration-base` and its siblings emitted nothing and every one of
+    // them ran at the 150ms default.
+    for (const name of ['instant', 'fast', 'base', 'slow', 'page', 'settle']) {
+      expect(await declarationsFor(`duration-${name}`)).toContain(
+        `transition-duration: var(--duration-${name})`,
+      );
+    }
+  });
+});
+
 describe('Korean display punctuation', () => {
   it('falls back to the self-hosted cut where no Korean face is installed', () => {
     // Regression: the alias listed local() faces only, so Android and Linux

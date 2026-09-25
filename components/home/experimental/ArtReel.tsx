@@ -4,6 +4,7 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 
 import { getAssetsUrl } from '@/utils';
 
+import { motionTokens } from '@/lib/motion';
 import { cn } from '@/lib/utils';
 
 export interface ReelToken {
@@ -12,8 +13,11 @@ export interface ReelToken {
   id: number;
 }
 
-/** Fade between the clip and the still, in ms. Must match the Tailwind duration below. */
-export const REEL_FADE_MS = 600;
+/**
+ * Fade between the clip and the still, in ms: the `duration-page` token, the
+ * motion scale's ceiling, which the clip's class below uses too.
+ */
+export const REEL_FADE_MS = Math.round(motionTokens.duration.page * 1000);
 
 /**
  * How long a clip may sit without reaching `playing` before the reel gives
@@ -190,7 +194,7 @@ export function ArtReel({
         onPlaying={handlePlaying}
         onError={fail}
         className={cn(
-          'absolute inset-0 h-full w-full bg-art-ground object-contain transition-opacity duration-[600ms] ease-out motion-reduce:transition-none',
+          'absolute inset-0 h-full w-full bg-art-ground object-contain transition-opacity duration-page ease-gallery motion-reduce:transition-none',
           visible ? 'opacity-100' : 'opacity-0',
         )}
       />
