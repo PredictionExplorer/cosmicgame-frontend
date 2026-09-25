@@ -2,15 +2,17 @@
 
 import { useCallback, useEffect, useState } from 'react';
 import dynamic from 'next/dynamic';
-import { Menu, Search, Wallet } from 'lucide-react';
+import { ChevronDown, Menu, Search, Wallet } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 
 import { Link } from '@/i18n/navigation';
 import { cn } from '@/lib/utils';
 import { ThemeSwitcher } from '@/components/theme/ThemeSwitcher';
 import { ConnectWalletAction } from '@/components/wallet/ConnectWalletAction';
+import { WALLET_PILL_ADDRESS_CLASS, WALLET_PILL_CLASS } from '@/components/wallet/walletPill';
 import { useSystemMode } from '@/contexts/SystemModeContext';
 import { useActiveWeb3React } from '@/hooks/web3';
+import { formatAddress } from '@/utils/format/addresses';
 
 import { useCommandPaletteShortcut, useCommandShortcut } from './commandShortcut';
 import { HeaderNavigation } from './HeaderNavigation';
@@ -49,21 +51,28 @@ const CommandPalette = dynamic(() => loadCommandPalette().then((module) => modul
 });
 
 /**
+ * The wallet pill as it will arrive (its box, the short address, the menu
+ * chevron from 768px), quiet and inert until HeaderAccount's chunk lands.
+ */
+function WalletPillPlaceholder() {
+  const { account } = useActiveWeb3React();
+  return (
+    <span aria-hidden data-testid="wallet-pill-placeholder" className={WALLET_PILL_CLASS}>
+      <Wallet className="size-4 shrink-0 text-subtle" />
+      <span className={cn(WALLET_PILL_ADDRESS_CLASS, 'text-subtle')}>{formatAddress(account)}</span>
+      <ChevronDown className="hidden size-3.5 shrink-0 text-subtle md:inline" />
+    </span>
+  );
+}
+
+/**
  * The connected wallet (balances, the account menu, the network chip) loads
- * while a wallet is connected; until its chunk arrives the pill's outline
- * holds its place, so nothing in the header moves.
+ * while a wallet is connected; until its chunk arrives a placeholder of the
+ * pill's own size holds its place, so nothing in the header moves.
  */
 const HeaderAccount = dynamic(() => import('./HeaderAccount'), {
   ssr: false,
-  loading: () => (
-    <span
-      aria-hidden
-      data-testid="wallet-pill-placeholder"
-      className="inline-flex min-h-11 min-w-11 items-center justify-center rounded-pill border border-input bg-surface-sunken md:min-h-10"
-    >
-      <Wallet className="size-4 text-subtle" />
-    </span>
-  ),
+  loading: WalletPillPlaceholder,
 });
 
 /**

@@ -29,8 +29,10 @@ export default function HeaderAccount({
 
   return (
     <>
-      {/* From 1024px the wallet pill carries the wrong-network badge. */}
-      <div className="lg:hidden">
+      {/* From 1024px the wallet pill carries the wrong-network badge. On the
+          right network the chip renders nothing, and its empty box takes no
+          gap in the header row. */}
+      <div className="empty:hidden lg:hidden">
         <WrongNetworkChip />
       </div>
       <div className="min-w-0">

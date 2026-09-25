@@ -5,6 +5,7 @@ import userEvent from '@testing-library/user-event';
 import { flushDynamicImports } from '@/test-utils/dynamic';
 
 import Header from '@/components/layout/Header';
+import { WALLET_PILL_ADDRESS_CLASS, WALLET_PILL_CLASS } from '@/components/wallet/walletPill';
 import { OUTBOUND_LINKS } from '@/config/siteNav';
 import { LANDING_ORIGIN, localeHref } from '@/lib/hostRouting';
 
@@ -431,9 +432,14 @@ describe('Header drawer', () => {
     mockAccount = '0x1234567890abcdef1234567890abcdef12345678';
     render(<Header />);
     expect(screen.queryByTestId('connect-wallet-button')).toBeNull();
-    expect(screen.getByTestId('wallet-menu-trigger')).toHaveAccessibleName(
-      /wallet\.account\.menuLabel\(address=0x1234/,
+    const pill = screen.getByTestId('wallet-menu-trigger');
+    expect(pill).toHaveAccessibleName(/wallet\.account\.menuLabel\(address=0x1234/);
+    // The box and address its loading placeholder copies, so the header holds
+    // still (the menu pill's display is responsive: a sheet pill below 768px).
+    expect(pill).toHaveClass(
+      ...WALLET_PILL_CLASS.split(' ').filter((name) => name !== 'inline-flex'),
     );
+    expect(pill.querySelector('.type-mono')).toHaveClass(...WALLET_PILL_ADDRESS_CLASS.split(' '));
   });
 
   it('opens third-party links in a new tab from the ecosystem section', async () => {

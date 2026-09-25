@@ -31,6 +31,7 @@ import { NavRowContent } from '@/components/layout/NavRow';
 import { SiteLink } from '@/components/layout/SiteLink';
 import { useSiteNavCopy } from '@/components/layout/useSiteNav';
 import { WrongNetworkBadge } from '@/components/wallet/NetworkGuard';
+import { WALLET_PILL_ADDRESS_CLASS, WALLET_PILL_CLASS } from '@/components/wallet/walletPill';
 import {
   WalletAccountMenuItems,
   WalletAccountPanel,
@@ -434,15 +435,13 @@ const WalletPill = forwardRef<HTMLButtonElement, WalletPillProps>(function Walle
       aria-label={isWrongChain ? t('account.menuLabelWrongNetwork', { menu: name }) : name}
       {...rest}
       className={cn(
-        'relative inline-flex min-h-11 min-w-11 items-center justify-center gap-2 rounded-pill border border-input bg-surface-sunken px-3 text-sm text-foreground transition-colors duration-150 hover:border-foreground/40 hover:bg-muted data-[state=open]:border-primary/50 data-[state=open]:bg-muted md:min-h-10',
+        WALLET_PILL_CLASS,
+        'transition-colors duration-150 hover:border-foreground/40 hover:bg-muted data-[state=open]:border-primary/50 data-[state=open]:bg-muted',
         className,
       )}
     >
       <Wallet aria-hidden className="size-4 shrink-0 text-subtle" />
-      {/* The address shows wherever the header has room for it. */}
-      <span className="type-mono hidden text-foreground min-[400px]:inline lg:hidden xl:inline">
-        {short}
-      </span>
+      <span className={cn(WALLET_PILL_ADDRESS_CLASS, 'text-foreground')}>{short}</span>
       {hasUnclaimedRewards ? (
         <span
           aria-hidden
