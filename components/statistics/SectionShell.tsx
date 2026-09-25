@@ -109,6 +109,9 @@ export function SectionShell({
                 aria-expanded={open}
                 aria-controls={panelId}
                 onClick={toggle}
+                // The press area is the row (the ::after), not the words:
+                // declared, so the tap-target audit measures the row.
+                data-touch-target="extended"
                 className="text-left focus-ring-none after:absolute after:inset-0 after:content-['']"
               >
                 {title}

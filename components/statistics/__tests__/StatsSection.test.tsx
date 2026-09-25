@@ -45,6 +45,8 @@ describe('SectionShell', () => {
     expect(toggle.closest('h2')).toHaveClass('type-title');
     expect(toggle.closest('h2')).not.toHaveClass('type-section');
     expect(toggle).toHaveClass('after:absolute', 'after:inset-0');
+    // Declared, so the tap-target audit measures the row rather than the words.
+    expect(toggle).toHaveAttribute('data-touch-target', 'extended');
     expect(toggle.closest('.min-h-11')).not.toBeNull();
     expect(screen.getByText('One sentence.')).toBeInTheDocument();
     expect(screen.getByRole('link', { name: 'Act' })).toBeInTheDocument();
