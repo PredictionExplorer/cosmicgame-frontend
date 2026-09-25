@@ -6,7 +6,6 @@ import { useLocale, useTranslations } from 'next-intl';
 import { formatCount } from '@/utils/format';
 import { cn } from '@/lib/utils';
 import type { AttachedNFT as AttachedNFTRecord } from '@/services/api/types';
-import { SiteLink } from '@/components/layout/SiteLink';
 import { AddressChip } from '@/components/ui/address-chip';
 import { MEDIA_PLATE_CLASS } from '@/components/ui/art-frame';
 import { DateTime } from '@/components/ui/date-time';
@@ -14,6 +13,7 @@ import NFTImage from '@/components/nft/NFTImage';
 import { TitleWithArrow } from '@/components/nft/TitleWithArrow';
 import { TableLink } from '@/components/ui/data-table';
 
+import { AttachedNftProjectSite } from './AttachedNftProjectSite';
 import {
   getAttachedNftTokenId,
   nameCarriesTokenId,
@@ -66,7 +66,7 @@ function Caption({ facts, className }: { facts: readonly ReactNode[]; className?
  * collection. The plate and title link to the NFT on OpenSea, or to its
  * contract on the explorer (a new tab): addresses the protocol recorded, not
  * the NFT's own metadata. A project site the metadata names follows as a
- * secondary link that shows its host. `showRecord` adds the cycle, the date
+ * secondary link that shows its whole host. `showRecord` adds the cycle, the date
  * and the contributor, each with its own link.
  */
 const AttachedNFT = ({
@@ -170,21 +170,7 @@ const AttachedNFT = ({
           {label}
         </div>
       )}
-      {projectLink ? (
-        // Written by whoever deployed the contract: named by its host, so a
-        // reader sees where it goes before following it.
-        <p className="mt-1 flex min-w-0 items-center gap-x-1.5 type-caption text-subtle">
-          <span className="shrink-0">{t('attachedNftLinks.projectSite')}</span>
-          <SiteLink
-            kind="external"
-            href={projectLink.href}
-            rel="noopener noreferrer nofollow ugc"
-            className="link-quiet inline-flex min-h-6 min-w-0 items-center gap-1"
-          >
-            <span className="truncate">{projectLink.host}</span>
-          </SiteLink>
-        </p>
-      ) : null}
+      {projectLink ? <AttachedNftProjectSite link={projectLink} className="mt-1" /> : null}
       {showRecord ? (
         <div className="mt-1.5 space-y-1">
           <Caption

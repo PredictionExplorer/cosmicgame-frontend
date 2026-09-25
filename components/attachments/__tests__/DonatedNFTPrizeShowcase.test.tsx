@@ -337,8 +337,8 @@ describe('AttachedNFTAllocationShowcase', () => {
     expect(
       screen.getByRole('link', { name: 'currentCycle.showcase.nftCard.explorer' }),
     ).toHaveAttribute('href', expect.stringContaining(CONTRACT));
-    // The metadata's own site is a secondary action that names its host.
-    expect(screen.getByRole('link', { name: 'project.example' })).toHaveAttribute(
+    // The metadata's own site follows as a caption that names its host.
+    expect(screen.getByRole('link', { name: /^project\.example\b/ })).toHaveAttribute(
       'href',
       'https://project.example/nft/123',
     );
@@ -384,7 +384,7 @@ describe('AttachedNFTAllocationShowcase', () => {
 
     const openSea = buildOpenSeaAssetUrl(CONTRACT, 123, networkConfig.chainId);
     expect(screen.getByTestId('nft-allocation-media')).toHaveAttribute('href', openSea);
-    const project = screen.getByRole('link', { name: 'phish.example' });
+    const project = screen.getByRole('link', { name: /^phish\.example\b/ });
     expect(project).toHaveAttribute('href', 'https://phish.example/claim');
     expect(project).toHaveAttribute('rel', 'noopener noreferrer nofollow ugc');
     expect(
@@ -402,7 +402,23 @@ describe('AttachedNFTAllocationShowcase', () => {
 
     render(<AttachedNFTAllocationShowcase nfts={[createNft()]} cycleNumber={42} />);
 
-    expect(screen.queryByRole('link', { name: 'project.example' })).not.toBeInTheDocument();
+    expect(screen.queryByRole('link', { name: /project\.example/ })).not.toBeInTheDocument();
+  });
+
+  it('shows the whole host of a project site, wrapped, never cut or overflowing', () => {
+    const host = 'opensea.io-retrieve-your-allocation.example';
+    mockUseAttachedNftMetadata.mockReturnValue({
+      data: { name: 'Rexy', external_url: `https://${host}/claim` },
+      isError: false,
+    });
+
+    render(<AttachedNFTAllocationShowcase nfts={[createNft()]} cycleNumber={42} />);
+
+    const project = screen.getByRole('link', { name: new RegExp(host.replace(/\./g, '\\.')) });
+    // A caption link, not a no-wrap button whose label could run off a phone.
+    expect(project.className).not.toMatch(/whitespace-nowrap|\btruncate\b/);
+    const label = within(project).getByText(host);
+    expect(label.className).toContain('[overflow-wrap:anywhere]');
   });
 
   it('falls back to OpenSea as the primary action when project link is unavailable', () => {

@@ -18,6 +18,7 @@ import { buttonVariants } from '@/components/ui/button';
 import { ExplainedTerm } from '@/components/ui/explain-popover';
 import { Surface } from '@/components/ui/surface';
 
+import { AttachedNftProjectSite } from './AttachedNftProjectSite';
 import { attachedErc20Amount } from './attachedErc20Amount';
 import {
   getAttachedNftTokenId,
@@ -275,19 +276,16 @@ function AssetAction({
   href,
   label,
   primary = false,
-  untrusted = false,
 }: {
   href: string;
   label: string;
   primary?: boolean;
-  /** A link the NFT's own metadata supplied: not endorsed, and it passes no ranking. */
-  untrusted?: boolean;
 }) {
   return (
     <a
       href={href}
       target="_blank"
-      rel={untrusted ? 'noopener noreferrer nofollow ugc' : 'noopener noreferrer'}
+      rel="noopener noreferrer"
       className={cn(
         buttonVariants({ variant: primary ? 'outline' : 'ghost', size: 'sm' }),
         'gap-1.5',
@@ -323,7 +321,7 @@ function AttachedNFTAllocationCard({
     contractUnavailable: tStatistics('attachedNftLinks.contractUnavailable'),
   };
   // OpenSea or the explorer, from the recorded contract and token; the
-  // metadata's own site follows as a secondary action named by its host.
+  // metadata's own site follows as a caption that shows its whole host.
   const primaryLink = resolveAttachedNftLink({ nft, labels: linkLabels });
   const primaryLabel =
     primaryLink.kind === 'opensea'
@@ -444,10 +442,8 @@ function AttachedNFTAllocationCard({
           {explorerLink.href && primaryLink.href !== explorerLink.href ? (
             <AssetAction href={explorerLink.href} label={t('showcase.nftCard.explorer')} />
           ) : null}
-          {projectLink ? (
-            <AssetAction href={projectLink.href} label={projectLink.host} untrusted />
-          ) : null}
         </div>
+        {projectLink ? <AttachedNftProjectSite link={projectLink} className="mt-2" /> : null}
       </div>
     </AssetLayoutGrid>
   );

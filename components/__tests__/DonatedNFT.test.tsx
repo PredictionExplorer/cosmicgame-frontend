@@ -107,6 +107,30 @@ describe('AttachedNFT', () => {
     expect(screen.queryByText('RandomWalkNFT')).not.toBeInTheDocument();
   });
 
+  it('shows the whole host of a project site, never a trusted-looking start', () => {
+    // Whoever deploys the contract writes external_url, and a host is
+    // checked by its end: it wraps on a phone instead of being cut.
+    const host = 'opensea.io-retrieve-your-allocation.example';
+    mockUseAttachedNftMetadata.mockReturnValue({
+      data: { name: 'GBC #1', external_url: `https://${host}/claim` },
+      isError: false,
+    });
+
+    renderWithQuery(
+      <AttachedNFT
+        nft={{ TokenAddr: '0x3Aa5ebB10DC797CAC828524e59A333d0A371443c', NFTTokenId: 1 }}
+      />,
+    );
+
+    const project = screen.getByRole('link', { name: new RegExp(host.replace(/\./g, '\\.')) });
+    expect(project).toHaveAttribute('href', `https://${host}/claim`);
+    expect(project).toHaveAttribute('rel', 'noopener noreferrer nofollow ugc');
+    const label = screen.getByText(host);
+    expect(label.className).toContain('[overflow-wrap:anywhere]');
+    expect(label.className).not.toMatch(/\btruncate\b|text-ellipsis/);
+    expect(project.className).not.toMatch(/\btruncate\b|whitespace-nowrap/);
+  });
+
   it('has no accessibility violations', async () => {
     mockUseAttachedNftMetadata.mockReturnValue({
       data: { image: 'https://example.com/nft.png', external_url: 'https://example.com' },
