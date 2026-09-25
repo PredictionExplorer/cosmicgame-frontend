@@ -1,7 +1,7 @@
 import { COSMIC_OG_SIZE } from '@/lib/og/CosmicOgCard';
 import { ogImageMetadata } from '@/lib/og/cards';
 
-import { readingCardAlt, readingShareCard } from '../readingCard';
+import { readingShareCard } from '../readingCard';
 import { whitePaperReadingCard } from '../readingCardCopy';
 
 /** The white paper's card: its title and edition beside a Signature from the paper. */
@@ -14,7 +14,7 @@ interface ImageProps {
 
 export async function generateImageMetadata({ params }: ImageProps) {
   const { locale } = await params;
-  return ogImageMetadata(await readingCardAlt(locale, whitePaperReadingCard(locale)));
+  return ogImageMetadata(whitePaperReadingCard(locale).alt);
 }
 
 export default async function Image({ params }: ImageProps) {

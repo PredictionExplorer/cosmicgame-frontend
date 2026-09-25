@@ -5,7 +5,7 @@ import type { LandingEthTrack } from '@/content/landing';
 import { ALLOCATION_TRACK_COLORS, type AllocationTrackId } from '@/config/allocationTracks';
 import { cn } from '@/lib/utils';
 
-import styles from './Landing.module.css';
+import styles from './AllocationBar.module.css';
 
 /**
  * A track's fill for a bar segment or legend swatch: the colour every chart
@@ -15,6 +15,11 @@ import styles from './Landing.module.css';
  */
 export function trackFill(id: AllocationTrackId): string {
   return id === 'nextCycle' ? (styles.hatched ?? '') : ALLOCATION_TRACK_COLORS[id];
+}
+
+/** A track's colour key, for a legend row beside its name. */
+export function TrackSwatch({ id, className }: { id: AllocationTrackId; className?: string }) {
+  return <span aria-hidden="true" className={cn(styles.swatch, trackFill(id), className)} />;
 }
 
 interface AllocationBarProps {
@@ -32,7 +37,8 @@ interface AllocationBarProps {
  * segment wherever it fits and the compounding remainder hatched.
  * Decorative (`aria-hidden`): pair it with a legend, an AllocationKey or a
  * table that carries the figures. Server-safe, for any landing-host page
- * (the landing's Allocation Tracks, the white paper's §5.1 figure).
+ * (the landing's Allocation Tracks, the white paper's §5.1 figure, the Learn
+ * guides), with its own small stylesheet.
  */
 export function AllocationBar({ tracks, density = 'hero', className }: AllocationBarProps) {
   return (
@@ -63,17 +69,18 @@ interface AllocationKeyProps {
 }
 
 /**
- * The bar's key: each track's swatch and name in the bar's order. It names
- * the colours and leaves the figures to the bar and to the table or legend
- * that carries them, so a figure never repeats a table's numbers.
+ * The bar's key: each track's swatch, name and share in the bar's order, so
+ * a segment too narrow to hold its figure (the 4% Stellar Selection) is
+ * still read from the figure itself. The share is in tabular figures.
  */
 export function AllocationKey({ tracks, className }: AllocationKeyProps) {
   return (
     <ul className={cn(styles.key, className)}>
       {tracks.map((track) => (
         <li key={track.id} className={styles.keyItem}>
-          <span aria-hidden="true" className={cn(styles.swatch, trackFill(track.id))} />
+          <TrackSwatch id={track.id} />
           <span className="type-body-sm text-muted-foreground">{track.title}</span>
+          <span className="type-figure-sm text-foreground">{track.percent}</span>
         </li>
       ))}
     </ul>

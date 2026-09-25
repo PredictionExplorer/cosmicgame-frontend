@@ -24,11 +24,12 @@ import type { ReadingCard, ReadingCardCopy } from './readingCardCopy';
  *
  * The card faces are subsets cut from every string these cards draw
  * (./readingCardCopy.ts feeds `npm run og:fonts`), and
- * lib/og/__tests__/og-localization.test.ts fails when a subset misses one.
- * The coverage check below is only a runtime guard: should a title ever
+ * lib/og/__tests__/og-localization.test.ts fails when a subset misses one,
+ * so each card draws its own copy and its alt text (`ReadingCard.alt`, read
+ * without loading any font, as the page's metadata must) describes it. The
+ * coverage check below is only a last runtime guard: should a title ever
  * carry a character the faces lack, the card draws the brand line (still
- * beside the page's own Signature) rather than a missing glyph, and the alt
- * text follows what is drawn.
+ * beside the page's own Signature) rather than a missing glyph.
  */
 
 async function plateDataUri(publicPath: string): Promise<string | null> {
@@ -72,26 +73,15 @@ async function facesCover(locale: string, texts: readonly string[]): Promise<boo
 /** The brand card's copy has no eyebrow in some locales. */
 type DrawnCopy = Omit<ReadingCardCopy, 'eyebrow'> & { eyebrow?: string };
 
-/** The copy and alt text the card draws: the page's own, or the brand line's. */
-async function drawnCopy(
-  locale: string,
-  card: ReadingCard,
-): Promise<{ copy: DrawnCopy; alt: string }> {
+/** The copy the card draws: the page's own, or the brand line's should a glyph be missing. */
+async function drawnCopy(locale: string, card: ReadingCard): Promise<DrawnCopy> {
   const { copy } = card;
   const eyebrow = getOgTypography(locale).cjk ? copy.eyebrow : ogUppercase(copy.eyebrow, locale);
   if (await facesCover(locale, [copy.title, eyebrow, copy.subhead ?? '', copy.fact ?? ''])) {
-    return { copy, alt: card.alt };
+    return copy;
   }
   const brand = getOgCopy(locale, 'default');
-  return {
-    copy: { eyebrow: brand.eyebrow, title: brand.title, subhead: brand.subhead, fact: brand.fact },
-    alt: brand.alt,
-  };
-}
-
-/** The alt text of a reading card: it always describes the copy the card draws. */
-export async function readingCardAlt(locale: string, card: ReadingCard): Promise<string> {
-  return (await drawnCopy(locale, card)).alt;
+  return { eyebrow: brand.eyebrow, title: brand.title, subhead: brand.subhead, fact: brand.fact };
 }
 
 export async function readingShareCard(locale: string, card: ReadingCard): Promise<ImageResponse> {
@@ -103,7 +93,7 @@ export async function readingShareCard(locale: string, card: ReadingCard): Promi
         cycle: formatOgCycle(locale, plate.cycle),
       })
     : undefined;
-  const { copy } = await drawnCopy(locale, card);
+  const copy = await drawnCopy(locale, card);
 
   return createCosmicOgImage(locale, {
     eyebrow: copy.eyebrow,

@@ -14,7 +14,6 @@ import {
 } from '@/content/white-paper';
 import { getLandingContent } from '@/content/landing';
 
-import { AllocationBar, AllocationKey } from '@/components/landing-v2/AllocationBar';
 import { PageHeader } from '@/components/layout/PageHeader';
 import { buttonVariants } from '@/components/ui/button';
 import {
@@ -25,7 +24,9 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
+import { AllocationBar, AllocationKey } from '@/components/reading/AllocationBar';
 import { ReadingContents } from '@/components/reading/ContentsNav';
+import { MetaItems } from '@/components/reading/MetaItems';
 import type { ContentsEntry } from '@/components/reading/contents';
 import {
   BREAKOUT_CLASS,
@@ -442,21 +443,25 @@ export default async function WhitePaperPage({ params }: PageProps) {
         titleId={TITLE_ID}
         subtitle={content.hero.subtitle}
         meta={
-          <>
-            <span>
-              {content.hero.authorName}
-              {' · '}
-              <a href={`mailto:${content.hero.authorEmail}`} className="link-quiet">
-                {content.hero.authorEmail}
-              </a>
-            </span>
-            <span className="tabular-nums">
-              {content.hero.versionLabel} · {content.hero.dateLabel}
-            </span>
-            <span className="tabular-nums">
-              {fillTemplate(reading.readingTimeTemplate, { minutes })}
-            </span>
-          </>
+          <span className="inline-flex flex-wrap items-center gap-x-2.5 gap-y-1">
+            <MetaItems
+              items={[
+                <span key="author">{content.hero.authorName}</span>,
+                <a key="email" href={`mailto:${content.hero.authorEmail}`} className="link-quiet">
+                  {content.hero.authorEmail}
+                </a>,
+                <span key="version" className="tabular-nums">
+                  {content.hero.versionLabel}
+                </span>,
+                <span key="date" className="tabular-nums">
+                  {content.hero.dateLabel}
+                </span>,
+                <span key="time" className="tabular-nums">
+                  {fillTemplate(reading.readingTimeTemplate, { minutes })}
+                </span>,
+              ]}
+            />
+          </span>
         }
         actions={
           <a

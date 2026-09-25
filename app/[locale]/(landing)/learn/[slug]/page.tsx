@@ -1,26 +1,41 @@
+import type { ReactNode } from 'react';
 import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import { ArrowRight, FileText, type LucideIcon } from 'lucide-react';
 import { getTranslations, setRequestLocale } from 'next-intl/server';
 
-import { getLearnArticle, getLearnContent, getLearnSlugs } from '@/content/learn';
+import { getLandingContent } from '@/content/landing';
+import {
+  getLearnArticle,
+  getLearnContent,
+  getLearnSlugs,
+  type LearnFigure,
+  type LearnSection,
+} from '@/content/learn';
+import { LEGAL_LINKS } from '@/content/legal/links';
+import { protocolFacts } from '@/content/protocol-facts';
 import { WHITE_PAPER_PATH, getWhitePaperContent } from '@/content/white-paper';
 
-import { getSiteRoute, resolveRouteHref, type SiteRouteId } from '@/config/siteNav';
+import { getSiteRoute, type SiteRouteId } from '@/config/siteNav';
 import { notFoundMetadata } from '@/components/layout/notFoundMetadata';
 import { PageHeader } from '@/components/layout/PageHeader';
 import { SiteLink } from '@/components/layout/SiteLink';
+import { ContractLedger } from '@/components/learn/ContractLedger';
 import { GUIDE_ICONS } from '@/components/learn/GuideCard';
 import { GuideText } from '@/components/learn/GuideText';
-import { guideMinutes, landingLink } from '@/components/learn/guides';
+import { guideReadingTime, guideResourceTarget, landingLink } from '@/components/learn/guides';
 import { QuizPrompt } from '@/components/learn/QuizPrompt';
+import { AllocationBar, AllocationKey } from '@/components/reading/AllocationBar';
 import { ReadingContents } from '@/components/reading/ContentsNav';
-import { PROSE_CLASS, ReadingHeading } from '@/components/reading/prose';
+import { MetaItems } from '@/components/reading/MetaItems';
+import { NumberedFigure, PROSE_CLASS, ReadingHeading } from '@/components/reading/prose';
 import { ReadingMain } from '@/components/reading/ReadingMain';
 import { SignaturePlate } from '@/components/reading/SignaturePlate';
 import { getSignaturePlateCopy } from '@/components/reading/signaturePlateCopy';
-import { signaturePlate } from '@/components/reading/signaturePlates';
+import { SIGNATURE_PLATES, signaturePlate } from '@/components/reading/signaturePlates';
 import { fillTemplate } from '@/components/reading/template';
+import { CycleTimeline } from '@/components/white-paper/CycleTimeline';
+import { referenceTargets, withReferences } from '@/components/white-paper/crossReferences';
 import { Link } from '@/i18n/navigation';
 import { APP_ORIGIN, LANDING_ORIGIN, localeHref, localizeCrossHostHref } from '@/lib/hostRouting';
 import { cn } from '@/lib/utils';
@@ -35,8 +50,25 @@ interface PageProps {
 const TITLE_ID = 'guide-title';
 const ARTICLE_ID = 'guide-body';
 
-/** The app pages where a reader checks what a guide says. */
-const VERIFY_ROUTES: readonly SiteRouteId[] = ['faq', 'contracts', 'statistics', 'riskDisclosures'];
+/** The text measure inside the guide; figures break out to the white paper's 60rem. */
+const TEXT_COLUMN = 'max-w-[46rem]';
+
+/** The app pages every guide is read against: common questions, and the risks before taking part. */
+const VERIFY_ROUTES: readonly SiteRouteId[] = ['faq', 'riskDisclosures'];
+
+/**
+ * The core contracts the contracts guide lists, in the contracts page's
+ * order: each `contracts.entries` name with its verified address
+ * (content/protocol-facts.ts).
+ */
+const CORE_CONTRACTS = [
+  { entry: 'protocol', address: protocolFacts.contractAddresses.proxy },
+  { entry: 'implementation', address: protocolFacts.contractAddresses.implementation },
+  { entry: 'cst', address: protocolFacts.contractAddresses.cstToken },
+  { entry: 'nft', address: protocolFacts.contractAddresses.cosmicSignatureNft },
+  { entry: 'randomWalk', address: protocolFacts.contractAddresses.randomWalkNft },
+  { entry: 'council', address: protocolFacts.contractAddresses.cosmicCouncil },
+] as const;
 
 function sectionId(index: number): string {
   return `section-${index + 1}`;
@@ -70,10 +102,12 @@ export default async function LearnArticlePage({ params }: PageProps) {
   const article = getLearnArticle(slug, locale);
   if (!article) notFound();
   const { hub, articleUi, articles } = getLearnContent(locale);
+  const whitePaper = getWhitePaperContent(locale);
   const inLanguage = jsonLdInLanguage(locale);
-  const [common, nav, plateCopy] = await Promise.all([
+  const [common, nav, contracts, plateCopy] = await Promise.all([
     getTranslations({ locale, namespace: 'common' }),
     getTranslations({ locale, namespace: 'nav' }),
+    getTranslations({ locale, namespace: 'contracts' }),
     getSignaturePlateCopy(locale),
   ]);
 
@@ -89,17 +123,16 @@ export default async function LearnArticlePage({ params }: PageProps) {
         href: `/learn/${nextGuide.slug}`,
         icon: GUIDE_ICONS[nextGuide.slug],
       }
-    : (() => {
-        const whitePaper = getWhitePaperContent(locale);
-        return {
-          label: hub.whitePaper.eyebrow,
-          title: whitePaper.breadcrumbLabel,
-          description: whitePaper.hero.subtitle,
-          href: WHITE_PAPER_PATH,
-          icon: FileText,
-        };
-      })();
-  const minutes = guideMinutes(article, locale);
+    : {
+        label: hub.whitePaper.eyebrow,
+        title: whitePaper.breadcrumbLabel,
+        description: whitePaper.hero.subtitle,
+        href: WHITE_PAPER_PATH,
+        icon: FileText,
+      };
+  // The quiz closes a stage of the reading path, not every guide in it.
+  const endsStage = !nextGuide || nextGuide.group !== article.group;
+  const readingTime = guideReadingTime(article, locale, articleUi.readingTimeTemplate);
   const plate = signaturePlate(article.plate);
 
   const url = localeHref(LANDING_ORIGIN, `/learn/${article.slug}`, locale);
@@ -137,30 +170,113 @@ export default async function LearnArticlePage({ params }: PageProps) {
     : null;
 
   // One list of the pages to read or check this guide against: the guide's
-  // own related links, then the app's reference pages it does not already
-  // name, each destination once. The app's front door takes the shared
-  // "Open the app" name.
+  // own related links, then the questions and risks pages it does not
+  // already name, each destination once and each named after itself.
   const resources: { href: string; kind: ReturnType<typeof landingLink>['kind']; label: string }[] =
     [];
   const seen = new Set<string>();
-  const addResource = (target: ReturnType<typeof landingLink>, label: string) => {
-    const key = target.href.replace(/\/+$/, '');
+  const addResource = (href: string) => {
+    const target = guideResourceTarget(href);
+    if (!target) return;
+    const link = landingLink(href, locale);
+    const key = link.href.replace(/\/+$/, '');
     if (seen.has(key)) return;
     seen.add(key);
-    resources.push({ href: target.href, kind: target.kind, label });
+    const label =
+      target.kind === 'route'
+        ? nav(`routes.${target.id}.label`)
+        : target.kind === 'guide'
+          ? (articles.find((guide) => guide.slug === target.slug)?.cardTitle ?? '')
+          : // A venue goes by its own name; the footer's "Trade CST on Uniswap" is an action.
+            target.id === 'uniswap'
+            ? 'Uniswap'
+            : nav(`outbound.${target.id}.label`);
+    if (label) resources.push({ href: link.href, kind: link.kind, label });
   };
-  for (const link of article.related) {
-    addResource(
-      landingLink(link.href, locale),
-      link.href === APP_ORIGIN ? nav('cta.openApp') : link.label,
+  for (const href of article.related) addResource(href);
+  for (const routeId of VERIFY_ROUTES) addResource(`${APP_ORIGIN}${getSiteRoute(routeId).path}`);
+
+  // The figures, numbered in reading order and set in their sections.
+  const whitePaperTargets = referenceTargets(whitePaper);
+  const figureBody = (
+    figure: LearnFigure,
+  ): { title: string; caption: ReactNode; body: ReactNode } => {
+    // Every figure kind is handled; the compiler checks the switch is exhaustive.
+    switch (figure.kind) {
+      case 'cycleTimeline':
+        return {
+          title: whitePaper.figures.cycle.title,
+          caption: withReferences(
+            whitePaper.figures.cycle.caption,
+            locale,
+            whitePaperTargets,
+            WHITE_PAPER_PATH,
+          ),
+          body: <CycleTimeline steps={whitePaper.figures.cycle.steps} />,
+        };
+      case 'allocation': {
+        const tracks = getLandingContent(locale).tracks.eth;
+        return {
+          title: whitePaper.figures.allocation.title,
+          caption: whitePaper.figures.allocation.caption,
+          body: (
+            <>
+              <AllocationBar tracks={tracks} density="inline" />
+              <AllocationKey tracks={tracks} />
+            </>
+          ),
+        };
+      }
+      case 'seedPlates':
+        return {
+          title: whitePaper.figures.art.title,
+          caption: whitePaper.figures.art.caption,
+          body: (
+            <div className="grid gap-x-6 gap-y-8 sm:grid-cols-2">
+              {[SIGNATURE_PLATES[23], SIGNATURE_PLATES[24]].map((art) => (
+                <SignaturePlate
+                  key={art.tokenId}
+                  art={art}
+                  href={localizeCrossHostHref(`${APP_ORIGIN}/detail/${art.tokenId}`, locale)}
+                  sizes="(min-width: 1024px) 30rem, (min-width: 640px) 45vw, 100vw"
+                  copy={{ ...plateCopy(art), seedLabel: whitePaper.figures.art.seedLabel }}
+                />
+              ))}
+            </div>
+          ),
+        };
+      case 'contracts':
+        return {
+          title: articleUi.contractsFigure.title,
+          caption: articleUi.contractsFigure.caption,
+          body: (
+            <ContractLedger
+              rows={CORE_CONTRACTS.map(({ entry, address }) => ({
+                name: contracts(`entries.${entry}.name`),
+                address,
+                href: `${LEGAL_LINKS.explorer.href}/address/${address}`,
+              }))}
+            />
+          ),
+        };
+    }
+  };
+  const figuresBySection = new Map<number, ReactNode[]>();
+  article.figures.forEach((figure, figureIndex) => {
+    const { title, caption, body } = figureBody(figure);
+    const view = (
+      <NumberedFigure
+        key={`${figure.kind}-${figure.section}`}
+        titleId={`figure-${figureIndex + 1}-title`}
+        label={fillTemplate(whitePaper.reading.figureTemplate, { number: figureIndex + 1 })}
+        title={title}
+        caption={caption}
+      >
+        {body}
+      </NumberedFigure>
     );
-  }
-  for (const routeId of VERIFY_ROUTES) {
-    addResource(
-      resolveRouteHref(getSiteRoute(routeId), 'landing', locale),
-      nav(`routes.${routeId}.label`),
-    );
-  }
+    figuresBySection.set(figure.section, [...(figuresBySection.get(figure.section) ?? []), view]);
+  });
 
   const entries = article.sections.map((section, sectionIndex) => ({
     id: sectionId(sectionIndex),
@@ -199,22 +315,28 @@ export default async function LearnArticlePage({ params }: PageProps) {
           subtitle={article.summary}
           className="mb-0 border-b-0 sm:mb-0"
           meta={
-            <>
-              <span className="tabular-nums">
-                {fillTemplate(articleUi.guideTemplate, {
-                  number: index + 1,
-                  total: articles.length,
-                })}
-              </span>
-              <span className="tabular-nums">
-                {fillTemplate(articleUi.readingTimeTemplate, { minutes })}
-              </span>
-              <time dateTime={article.updated}>
-                {common('pageHeader.lastUpdated', {
-                  date: formatYyyymmddLabel(article.updated.replaceAll('-', ''), locale),
-                })}
-              </time>
-            </>
+            <span className="inline-flex flex-wrap items-center gap-x-2.5 gap-y-1">
+              <MetaItems
+                items={[
+                  <span key="guide" className="tabular-nums">
+                    {fillTemplate(articleUi.guideTemplate, {
+                      number: index + 1,
+                      total: articles.length,
+                    })}
+                  </span>,
+                  readingTime ? (
+                    <span key="time" className="tabular-nums">
+                      {readingTime}
+                    </span>
+                  ) : null,
+                  <time key="updated" dateTime={article.updated}>
+                    {common('pageHeader.lastUpdated', {
+                      date: formatYyyymmddLabel(article.updated.replaceAll('-', ''), locale),
+                    })}
+                  </time>,
+                ]}
+              />
+            </span>
           }
         />
         {plateView ? <div className="hidden pb-10 lg:block">{plateView('26rem')}</div> : null}
@@ -232,101 +354,57 @@ export default async function LearnArticlePage({ params }: PageProps) {
         </div>
 
         <div className="min-w-0">
-          <article id={ARTICLE_ID} aria-labelledby={TITLE_ID} className="min-w-0 max-w-[46rem]">
-            {article.sections.map((section, sectionIndex) => {
-              const id = sectionId(sectionIndex);
-              return (
-                <section
-                  key={section.heading}
-                  id={id}
-                  aria-labelledby={`${id}-heading`}
-                  className={cn(
-                    'scroll-mt-[var(--sticky-offset)]',
-                    sectionIndex === 0
-                      ? 'mt-12 lg:mt-14'
-                      : 'mt-12 border-t border-rule-faint pt-10 lg:mt-14 lg:pt-12',
-                  )}
-                >
-                  <ReadingHeading
-                    as="h2"
-                    sectionId={id}
-                    headingId={`${id}-heading`}
-                    anchorLabel={fillTemplate(articleUi.headingLinkTemplate, {
-                      title: section.heading,
-                    })}
-                  >
-                    {section.heading}
-                  </ReadingHeading>
-                  <div className="mt-5 space-y-5">
-                    {section.body.map((paragraph) => (
-                      <p key={paragraph} className={cn(PROSE_CLASS, '[overflow-wrap:anywhere]')}>
-                        <GuideText text={paragraph} locale={locale} />
-                      </p>
-                    ))}
-                  </div>
-                  {sectionIndex === 0 && plateView ? (
-                    <div className="mt-10 lg:hidden">{plateView('100vw')}</div>
-                  ) : null}
-                </section>
-              );
-            })}
+          <article id={ARTICLE_ID} aria-labelledby={TITLE_ID} className="min-w-0 max-w-[60rem]">
+            {article.sections.map((section, sectionIndex) => (
+              <GuideSection
+                key={section.heading}
+                section={section}
+                sectionIndex={sectionIndex}
+                locale={locale}
+                anchorLabel={fillTemplate(articleUi.headingLinkTemplate, {
+                  title: section.heading,
+                })}
+                figures={figuresBySection.get(sectionIndex)}
+                after={
+                  sectionIndex === 0 && plateView ? (
+                    <div className={cn('mt-10 lg:hidden', TEXT_COLUMN)}>{plateView('100vw')}</div>
+                  ) : null
+                }
+              />
+            ))}
           </article>
 
-          {/*
-           * The guide's own appendix comes right after the text, under one
-           * heading, with one list of the pages to check it against; the path
-           * onward (the next guide, then the quiz) closes the page.
-           */}
-          <aside
-            aria-labelledby="guide-appendix"
-            className="mt-16 max-w-[46rem] border-t border-rule pt-10 lg:mt-20"
+          {/* The pages to read or check the guide against, then the path onward. */}
+          <nav
+            aria-labelledby="guide-resources"
+            className={cn('mt-16 border-t border-rule pt-8 lg:mt-20', TEXT_COLUMN)}
           >
-            <h2 id="guide-appendix" className="sr-only">
-              {articleUi.appendixLabel}
+            <h2 id="guide-resources" className="type-label text-subtle">
+              {articleUi.relatedResourcesHeading}
             </h2>
-            <div className="space-y-7">
-              {articleUi.appendix.map((section) => (
-                <div key={section.heading}>
-                  <h3 className="type-title text-foreground">{section.heading}</h3>
-                  <div className="mt-2 space-y-2">
-                    {section.body.map((paragraph) => (
-                      <p key={paragraph} className="type-body-sm text-muted-foreground">
-                        <GuideText text={paragraph} locale={locale} />
-                      </p>
-                    ))}
-                  </div>
-                </div>
+            <ul className="mt-3 grid border-t border-rule-faint sm:grid-cols-2 sm:gap-x-8">
+              {resources.map((resource) => (
+                <li key={resource.href} className="border-b border-rule-faint">
+                  <SiteLink
+                    href={resource.href}
+                    kind={resource.kind}
+                    className="group flex min-h-11 items-center justify-between gap-3 py-2.5 type-body-sm text-foreground hover:text-primary"
+                    externalIconClassName="ml-auto"
+                  >
+                    <span className="min-w-0">{resource.label}</span>
+                    {resource.kind === 'external' ? null : (
+                      <ArrowRight
+                        aria-hidden
+                        className="size-3.5 shrink-0 text-subtle transition-colors group-hover:text-primary"
+                      />
+                    )}
+                  </SiteLink>
+                </li>
               ))}
-            </div>
+            </ul>
+          </nav>
 
-            <nav aria-labelledby="guide-resources" className="mt-10">
-              <p id="guide-resources" className="type-label text-subtle">
-                {articleUi.relatedResourcesHeading}
-              </p>
-              <ul className="mt-3 grid border-t border-rule-faint sm:grid-cols-2 sm:gap-x-8">
-                {resources.map((resource) => (
-                  <li key={resource.href} className="border-b border-rule-faint">
-                    <SiteLink
-                      href={resource.href}
-                      kind={resource.kind}
-                      className="group flex min-h-11 items-center justify-between gap-3 py-2.5 type-body-sm text-foreground hover:text-primary"
-                      externalIconClassName="ml-auto"
-                    >
-                      <span className="min-w-0">{resource.label}</span>
-                      {resource.kind === 'external' ? null : (
-                        <ArrowRight
-                          aria-hidden
-                          className="size-3.5 shrink-0 text-subtle transition-colors group-hover:text-primary"
-                        />
-                      )}
-                    </SiteLink>
-                  </li>
-                ))}
-              </ul>
-            </nav>
-          </aside>
-
-          <nav aria-label={next.label} className="mt-16 max-w-[46rem] lg:mt-20">
+          <nav aria-label={next.label} className={cn('mt-12 lg:mt-14', TEXT_COLUMN)}>
             <Link
               href={next.href}
               className="group flex items-start gap-5 rounded-surface border border-rule bg-surface p-5 transition-colors duration-fast hover:border-input hover:bg-surface-raised sm:p-7"
@@ -349,17 +427,98 @@ export default async function LearnArticlePage({ params }: PageProps) {
             </Link>
           </nav>
 
-          <QuizPrompt
-            className="mt-10 max-w-[46rem]"
-            headingId="guide-quiz"
-            heading={hub.quizCta.heading}
-            body={hub.quizCta.body}
-            linkLabel={hub.quizCta.linkLabel}
-            href={hub.quizCta.href}
-          />
+          {endsStage ? (
+            <QuizPrompt
+              className={cn('mt-10', TEXT_COLUMN)}
+              headingId="guide-quiz"
+              heading={hub.quizCta.heading}
+              body={hub.quizCta.body}
+              linkLabel={hub.quizCta.linkLabel}
+              href={hub.quizCta.href}
+            />
+          ) : null}
         </div>
       </div>
     </ReadingMain>
+  );
+}
+
+interface GuideSectionProps {
+  section: LearnSection;
+  sectionIndex: number;
+  locale: string;
+  anchorLabel: string;
+  /** Figures that illustrate the section, set after its first paragraph. */
+  figures?: readonly ReactNode[];
+  /** Content after the section (the guide's Signature on narrow screens). */
+  after?: ReactNode;
+}
+
+/** One section of a guide: its heading, paragraphs and steps, with its figures after the opening paragraph. */
+function GuideSection({
+  section,
+  sectionIndex,
+  locale,
+  anchorLabel,
+  figures,
+  after,
+}: GuideSectionProps) {
+  const id = sectionId(sectionIndex);
+  const [opening, ...rest] = section.body;
+  const paragraph = (text: string) => (
+    <p key={text} className={cn(PROSE_CLASS, '[overflow-wrap:anywhere]')}>
+      <GuideText text={text} locale={locale} />
+    </p>
+  );
+  return (
+    <section
+      id={id}
+      aria-labelledby={`${id}-heading`}
+      className={cn(
+        'scroll-mt-[var(--sticky-offset)]',
+        sectionIndex === 0
+          ? 'mt-12 lg:mt-14'
+          : 'mt-12 border-t border-rule-faint pt-10 lg:mt-14 lg:pt-12',
+      )}
+    >
+      <div className={TEXT_COLUMN}>
+        <ReadingHeading
+          as="h2"
+          sectionId={id}
+          headingId={`${id}-heading`}
+          anchorLabel={anchorLabel}
+        >
+          {section.heading}
+        </ReadingHeading>
+        <div className="mt-5 space-y-5">{opening ? paragraph(opening) : null}</div>
+      </div>
+      {figures?.length ? <div className="mt-10 space-y-10 mb-10">{figures}</div> : null}
+      {rest.length > 0 || section.steps?.length ? (
+        <div className={cn('mt-5 space-y-5', TEXT_COLUMN)}>
+          {rest.map(paragraph)}
+          {section.steps?.length ? <GuideSteps steps={section.steps} locale={locale} /> : null}
+        </div>
+      ) : null}
+      {after}
+    </section>
+  );
+}
+
+/** A procedure as numbered rows between hairlines, the numbers in tabular figures. */
+function GuideSteps({ steps, locale }: { steps: readonly string[]; locale: string }) {
+  return (
+    <ol className="divide-y divide-rule-faint border-y border-rule-faint">
+      {steps.map((step, stepIndex) => (
+        <li key={step} className="grid grid-cols-[2.25rem_minmax(0,1fr)] gap-x-3 py-4">
+          <span aria-hidden className="pt-0.5 type-label tabular-nums text-subtle">
+            {String(stepIndex + 1).padStart(2, '0')}
+          </span>
+          <p className="type-body-md text-muted-foreground [overflow-wrap:anywhere]">
+            <GuideText text={step} locale={locale} />
+          </p>
+        </li>
+      ))}
+    </ol>
   );
 }
 

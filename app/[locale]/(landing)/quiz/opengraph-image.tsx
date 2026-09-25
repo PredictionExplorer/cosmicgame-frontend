@@ -1,7 +1,7 @@
 import { COSMIC_OG_SIZE } from '@/lib/og/CosmicOgCard';
 import { ogImageMetadata } from '@/lib/og/cards';
 
-import { readingCardAlt, readingShareCard } from '../readingCard';
+import { readingShareCard } from '../readingCard';
 import { quizReadingCard } from '../readingCardCopy';
 
 /** The quiz's card, shared by its tiers: the question it asks beside a Signature. */
@@ -14,7 +14,7 @@ interface ImageProps {
 
 export async function generateImageMetadata({ params }: ImageProps) {
   const { locale } = await params;
-  return ogImageMetadata(await readingCardAlt(locale, quizReadingCard(locale)));
+  return ogImageMetadata(quizReadingCard(locale).alt);
 }
 
 export default async function Image({ params }: ImageProps) {

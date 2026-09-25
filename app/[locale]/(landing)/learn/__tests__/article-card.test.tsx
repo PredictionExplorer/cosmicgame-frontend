@@ -9,7 +9,7 @@ import { routing } from '@/i18n/routing';
 import { OG_TEXT_BOXES, planCosmicOgCard, type CosmicOgCardProps } from '@/lib/og/CosmicOgCard';
 import { getOgCopy } from '@/lib/og/copy';
 
-import { readingCardAlt, readingShareCard } from '../../readingCard';
+import { readingShareCard } from '../../readingCard';
 import {
   aboutReadingCard,
   learnArticleReadingCard,
@@ -64,7 +64,7 @@ describe('Learn guide share cards', () => {
         label: 'Signature #000014 · Cycle 0',
       },
     ]);
-    await expect(learnArticleCardAlt('en', 'how-gestures-work')).resolves.toBe(
+    expect(learnArticleCardAlt('en', 'how-gestures-work')).toBe(
       'How gestures work in Cosmic Signature',
     );
   });
@@ -81,9 +81,7 @@ describe('Learn guide share cards', () => {
   it('falls back to the brand card for an unknown guide', async () => {
     await learnArticleCard('en', 'no-such-guide');
     expect(lastCard().title).toBe(getOgCopy('en', 'default').title);
-    await expect(learnArticleCardAlt('en', 'no-such-guide')).resolves.toBe(
-      getOgCopy('en', 'default').alt,
-    );
+    expect(learnArticleCardAlt('en', 'no-such-guide')).toBe(getOgCopy('en', 'default').alt);
   });
 
   it('gives the white paper, the quiz and About cards of their own', async () => {
@@ -146,7 +144,8 @@ describe.each(routing.locales)('%s reading share cards', (locale) => {
     expect(props.title).toBe(card.copy.title);
     expect(props.subhead).toBe(card.copy.subhead);
     expect(props.fact).toBe(card.copy.fact);
-    await expect(readingCardAlt(locale, card)).resolves.toBe(card.alt);
+    // The alt text names what the card draws: its own title.
+    expect(card.alt.startsWith(props.title ?? '')).toBe(true);
 
     const plan = planCosmicOgCard(props);
     const box = OG_TEXT_BOXES[plan.layout];

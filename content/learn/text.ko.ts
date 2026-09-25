@@ -1,38 +1,7 @@
+import { AUDIT_FINDINGS_TOTAL, HACKEN_AUDIT } from '@/content/legal/audit';
 import { protocolFacts } from '@/content/protocol-facts';
 
 import type { LearnText } from './structure';
-import type { LearnSection } from './types';
-
-/** Shared appendix sections attached to the end of every Korean article. */
-const answerabilitySections: readonly LearnSection[] = [
-  {
-    heading: '핵심 개념',
-    body: [
-      'Cosmic Signature는 Arbitrum에서 운영되는 절차적 온체인 아트 프로토콜입니다. 퍼포먼스 사이클, 제스처, 결정론적 삼체 NFT 아트, CST, 앵커링, 공공재 배분이 서로 연결되어 있습니다.',
-      '프로토콜 소개와 학습 자료는 cosmicsignature.com에서, 앱과 실시간 데이터는 app.cosmicsignature.com에서 확인할 수 있습니다. 각 페이지의 관련 링크를 통해 설명과 실제 기록을 함께 살펴보세요.',
-    ],
-  },
-  {
-    heading: '이 주제를 확인하는 방법',
-    body: [
-      '실시간 프로토콜 데이터, 검증된 컨트랙트 주소, 소스 코드 자료, 통계는 공식 앱 페이지에서 확인합니다. 컨트랙트 페이지는 프로토콜 설명을 Arbitrum 주소와 연결하고, 통계 페이지는 데이터 출처와 업데이트 시각을 표시합니다.',
-      '비용이나 사이클 상태처럼 바뀌는 값은 앱에서 확인해 주세요. 작동 원리와 참여 조건은 학습 가이드, 자주 묻는 질문, 이용약관, 보안, 보안 감사, 위험 고지에서 자세히 설명합니다.',
-    ],
-  },
-  {
-    heading: '함께 읽을 자료',
-    body: [
-      '이 문서와 함께 자주 묻는 질문, 컨트랙트, 소스 코드, 통계, 위험 고지를 살펴보면 작동 원리부터 현재 운영 상태까지 파악할 수 있습니다. 모두 지갑 연결 없이 읽을 수 있습니다.',
-    ],
-  },
-  {
-    heading: '지갑 연결 없이 살펴보기',
-    body: [
-      '이 문서는 지갑을 연결하지 않아도 읽을 수 있습니다. 관련 링크에서 각 개념의 설명과 공개된 프로토콜 기록을 확인할 수 있습니다.',
-      '학습 자료로 기본 개념을 익힌 뒤, 앱에서 현재 사이클, 컨트랙트 주소, 통계를 살펴보세요. 참여 전에는 위험 고지도 확인해 주세요.',
-    ],
-  },
-];
 
 /** Korean learn copy, keyed by the skeleton in structure.ts. */
 export const learnTextKo = {
@@ -90,10 +59,12 @@ export const learnTextKo = {
       backToTopLabel: '맨 위로',
     },
     headingLinkTemplate: '이 절로 연결: {title}',
-    relatedResourcesHeading: '관련 Cosmic Signature 자료',
-    appendixLabel: '확인하고 더 읽기',
-    verifyLinksLabel: '앱에서 확인하기',
-    appendix: answerabilitySections,
+    relatedResourcesHeading: '관련 자료',
+    contractsFigure: {
+      title: 'Arbitrum One의 핵심 컨트랙트',
+      caption:
+        '각 주소는 Arbiscan에서 열립니다. 컨트랙트 페이지에는 금고와 지갑을 포함한 모든 공식 주소가 있습니다.',
+    },
   },
   articles: {
     'what-is-cosmic-signature': {
@@ -131,12 +102,11 @@ export const learnTextKo = {
         {
           heading: '공개 데이터를 읽는 방법',
           body: [
-            '앱 호스트는 현재 사이클, 통계, 배분 수령자, 컨트랙트 주소, 갤러리 기록, 기여 내역 같은 실시간 상태를 보여 줍니다. 공개 프로토콜 데이터는 개인 계정 상태에 좌우되지 않아야 하므로, 이 페이지는 지갑을 연결하기 전에도 쓸모 있게 만들어졌습니다.',
+            '앱은 현재 사이클, 통계, 배분 수령자, 컨트랙트 주소, 갤러리 기록, 기여 내역 같은 실시간 상태를 보여 줍니다. 공개 프로토콜 데이터는 개인 계정 상태에 좌우되지 않아야 하므로, 이 페이지는 지갑을 연결하기 전에도 쓸모 있게 만들어졌습니다.',
             '소개 사이트에서는 기본 개념과 용어를, 앱에서는 현재 상태와 기록을 확인할 수 있습니다. Cosmic Signature는 생물학의 COSMIC 데이터베이스와는 별개의 온체인 아트 프로토콜입니다.',
           ],
         },
       ],
-      relatedLabels: ['Cosmic Signature 앱 열기', '자주 묻는 질문 읽기', '프로토콜 통계 보기'],
     },
     'how-the-performance-cycle-works': {
       cardTitle: '퍼포먼스 사이클',
@@ -177,11 +147,6 @@ export const learnTextKo = {
             '사이클이 마감되면 프로토콜은 그 사이클을 실시간 상태가 아니라 역사로 다룹니다. 최종 시그니처, 수령자 기록, 배분 회수, 첨부된 NFT, 공공재 기여는 이후의 참여자가 살펴볼 수 있는 공개 아카이브의 일부가 됩니다.',
           ],
         },
-      ],
-      relatedLabels: [
-        '현재 퍼포먼스 사이클 보기',
-        '배분 내역 보기',
-        '프로토콜 자주 묻는 질문 읽기',
       ],
     },
     'how-gestures-work': {
@@ -224,11 +189,6 @@ export const learnTextKo = {
           ],
         },
       ],
-      relatedLabels: [
-        '앱에서 제스처 남기기 또는 살펴보기',
-        '퍼포먼스 사이클 알아보기',
-        '현재 사이클 데이터 보기',
-      ],
     },
     'three-body-nft-art': {
       cardTitle: '삼체 아트',
@@ -269,11 +229,6 @@ export const learnTextKo = {
           ],
         },
       ],
-      relatedLabels: [
-        'Cosmic Signature 갤러리 둘러보기',
-        '소스 코드 살펴보기',
-        '컨트랙트 및 검증 안내 읽기',
-      ],
     },
     'cosmic-signature-on-arbitrum': {
       cardTitle: 'Arbitrum 위의 프로토콜',
@@ -307,7 +262,6 @@ export const learnTextKo = {
           ],
         },
       ],
-      relatedLabels: ['검증된 컨트랙트 보기', '프로토콜 통계 보기'],
     },
     'contracts-security-verification': {
       cardTitle: '컨트랙트와 검증',
@@ -317,31 +271,34 @@ export const learnTextKo = {
         'Arbitrum 프로토콜인 Cosmic Signature의 스마트 컨트랙트, 소스 코드, 검증, 보안 맥락을 확인합니다.',
       h1: 'Cosmic Signature 컨트랙트, 보안, 검증',
       summary:
-        'Cosmic Signature는 참여자가 프로토콜 메커니즘을 살펴보고 온체인 동작을 검증할 수 있도록 컨트랙트와 소스 코드 정보를 공개합니다.',
+        'Cosmic Signature는 Arbitrum One의 몇몇 컨트랙트로 운영됩니다. 이 가이드는 핵심 컨트랙트를 소개하고, 직접 확인하는 방법과 독립 보안 감사가 다룬 범위를 설명합니다.',
       sections: [
         {
-          heading: '공개 컨트랙트 맥락',
+          heading: '프로토콜을 이루는 컨트랙트',
           body: [
-            '컨트랙트 페이지에는 공식 주소, 검증 링크, 배포 정보, 자금 흐름이 정리되어 있습니다.',
-            '지갑 연결 전에 공개된 설명과 자료를 읽고, 필요하면 블록 탐색기에서 컨트랙트와 트랜잭션을 확인할 수 있습니다.',
+            'Cosmic Signature는 체인 ID 42161인 Arbitrum One에서 운영됩니다. 제스처, 사이클, 배분은 모두 하나의 컨트랙트인 Cosmic Signature 프로토콜을 거칩니다. 이 컨트랙트는 업그레이드 가능한 프록시로 배포되어 주소는 그대로 유지되고, 로직은 프록시가 가리키는 구현 컨트랙트에 있습니다. CST, 두 NFT 컬렉션, 우주 평의회는 각각 고유한 주소를 가집니다.',
+            '[컨트랙트 페이지](contracts)는 금고와 지갑을 포함한 공식 주소의 유일한 목록입니다. Cosmic Signature를 표방하는 다른 주소는 모두 비공식 주소로 간주해 주세요.',
           ],
         },
         {
-          heading: '검증 자료',
-          body: [
-            '검증은 여러 공개 지면에 나뉘어 있습니다. [컨트랙트 페이지](contracts)는 배포 주소와 탐색기 링크를 나열하고, [소스 코드 페이지](code)는 결정론적 렌더링 자료를 설명하며, [보안 감사 페이지](audits)는 검토 현황을 밝히고, [보안 페이지](security)는 사용자가 공식 자료를 확인하는 방법을 안내합니다.',
-            '이 페이지는 함께 읽어야 합니다. 맥락 없는 컨트랙트 주소는 해석하기 어렵고, 링크 없는 보안 주장은 검증하기 어렵습니다. 그래서 Cosmic Signature는 주소, 소스 참조, 위험 문구, 보안 감사 현황을 내부 링크로 연결해 둡니다.',
+          heading: '컨트랙트를 직접 확인하기',
+          body: ['다음 단계에는 지갑이 필요하지 않습니다.'],
+          steps: [
+            '[컨트랙트 페이지](contracts)의 주소를 [Arbiscan](explorer)에서 열고, 네트워크가 테스트넷이 아닌 Arbitrum One인지 확인해 주세요.',
+            'Contract 탭에서 소스 코드가 검증되었는지 확인하고, [공개 컨트랙트 저장소](contractsRepository)와 비교하거나 [Sourcify](sourcify)에서 완전 일치를 확인해 주세요.',
+            '프로토콜 컨트랙트는 Read as Proxy를 열어, 그곳에 표시된 구현 컨트랙트가 컨트랙트 페이지의 구현 컨트랙트 주소와 같은지 확인해 주세요.',
+            '앱에서 제스처나 배분 같은 기록 하나를 골라, 탐색기에서 해당 컨트랙트의 트랜잭션 가운데 같은 트랜잭션을 찾아 보세요.',
           ],
         },
         {
-          heading: '먼저 확인할 것',
+          heading: '보안 감사가 다룬 범위',
           body: [
-            '공식 앱 호스트의 컨트랙트 페이지에서 시작해 Arbitrum 네트워크인지 확인합니다. 그다음 소스 코드 링크, 보안 개요, 보안 감사 페이지를 비교합니다. 보안 감사와 정형 검증은 보고서 공개 여부와 실제 검증 범위도 함께 확인해 주세요.',
-            '이런 보수적인 접근은 의도된 것입니다. 신뢰 페이지는 배포된 사실, 공개된 보고서, 정적 분석, 커뮤니티 검토, 향후 작업을 근거 없는 하나의 주장으로 뭉뚱그리지 않고 구분할 때 가장 쓸모가 있습니다.',
+            `Hacken은 2025년 말 운영 컨트랙트를 검토했습니다. 대상은 각 사이클을 운영하는 핵심 프로토콜, CST 토큰, 두 NFT 컬렉션, 앵커링 지갑, 지갑 및 시스템 관리 컨트랙트입니다. 2026년 1월에 공개된 [보고서](hackenReport)에는 발견 사항 ${AUDIT_FINDINGS_TOTAL}건이 실려 있으며 치명 또는 높음 심각도 항목은 없습니다. Hacken이 퍼즈 테스트한 불변 조건 ${HACKEN_AUDIT.invariants.tested}개 중 ${HACKEN_AUDIT.invariants.held}개가 유지되었습니다.`,
+            '컨트랙트 저장소에는 Certora Prover 명세, Solidity SMTChecker 구성, Slither 정적 분석, 테스트 모음도 있으며, [보안 감사 페이지](audits)에서 각각의 링크를 볼 수 있습니다. 이 검사들은 명시한 성질만 증명하거나 시험할 뿐, 그 이상을 뜻하지는 않습니다.',
+            '보안 감사의 범위는 스마트 컨트랙트였으며, 이 웹사이트, 앱의 데이터 서비스, 작품 렌더링 파이프라인은 포함되지 않았습니다. 다른 모든 검사와 마찬가지로 보안 감사는 위험을 줄일 뿐 없애지는 못합니다. 참여하기 전에 [위험 고지](riskDisclosures)를 읽어 주세요.',
           ],
         },
       ],
-      relatedLabels: ['컨트랙트 주소 열기', '소스 코드 자료 열기', '자주 묻는 질문 읽기'],
     },
     'cst-token-and-cosmic-council': {
       cardTitle: 'CST와 우주 평의회',
@@ -376,7 +333,6 @@ export const learnTextKo = {
           ],
         },
       ],
-      relatedLabels: ['제스처의 작동 원리 읽기', '앱 열기'],
     },
     'anchoring-nfts': {
       cardTitle: 'NFT 앵커링',
@@ -411,7 +367,6 @@ export const learnTextKo = {
           ],
         },
       ],
-      relatedLabels: ['앵커링 도구 열기', '갤러리 둘러보기'],
     },
     'protocol-guild-public-goods': {
       cardTitle: '공공재와 Protocol Guild',
@@ -445,7 +400,6 @@ export const learnTextKo = {
           ],
         },
       ],
-      relatedLabels: ['공공재 기여 기록 보기', '사이클의 작동 원리 알아보기'],
     },
     'collecting-and-trading-cosmic-signature': {
       cardTitle: '수집과 거래',
@@ -481,17 +435,10 @@ export const learnTextKo = {
         {
           heading: '거래 장소와 주소를 확인하는 방법',
           body: [
-            '거래 전에 앱 호스트의 컨트랙트 페이지에서 공식 컨트랙트 주소를 확인하고, 마켓플레이스나 거래소에서 보고 있는 컬렉션 또는 토큰 페어와 비교합니다. Cosmic Signature는 생태계 거래 장소인 Axiom Zero, Chaos Zero, Uniswap으로 가는 링크를 앱 헤더, 푸터, 사이트맵에 두어, 올바른 목적지로 가는 공식 경로가 항상 존재하도록 합니다.',
+            '거래 전에 앱의 컨트랙트 페이지에서 공식 컨트랙트 주소를 확인하고, 마켓플레이스나 거래소에서 보고 있는 컬렉션 또는 토큰 페어와 비교합니다. Cosmic Signature는 생태계 거래 장소인 Axiom Zero, Chaos Zero, Uniswap으로 가는 링크를 앱 헤더, 푸터, 사이트맵에 두어, 올바른 목적지로 가는 공식 경로가 항상 존재하도록 합니다.',
             '같은 주의는 CST 교환과 예측 포지션에도 적용됩니다. 토큰 주소가 공개된 CST 컨트랙트와 일치하는지 확인하고, Chaos Zero 포지션은 프로토콜이 기록한 공개 제스처 수로 결정되므로 시장의 모든 입력값을 Arbitrum에서 독립적으로 살펴볼 수 있다는 점을 기억해 주세요.',
           ],
         },
-      ],
-      relatedLabels: [
-        'Axiom Zero에서 Cosmic Signature 둘러보기',
-        'Chaos Zero에서 예측하기',
-        'Uniswap에서 ETH를 CST로 교환하기',
-        '컨트랙트 주소 확인',
-        'NFT 갤러리 둘러보기',
       ],
     },
     // lexicon-allow-start: explicit denial language for crawler and compliance clarity.
@@ -527,7 +474,6 @@ export const learnTextKo = {
           ],
         },
       ],
-      relatedLabels: ['이용약관 읽기', '자주 묻는 질문 읽기'],
     },
     // lexicon-allow-end
   },

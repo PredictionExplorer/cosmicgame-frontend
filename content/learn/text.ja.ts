@@ -1,38 +1,7 @@
+import { AUDIT_FINDINGS_TOTAL, HACKEN_AUDIT } from '@/content/legal/audit';
 import { protocolFacts } from '@/content/protocol-facts';
 
 import type { LearnText } from './structure';
-import type { LearnSection } from './types';
-
-/** Shared appendix sections attached to the end of every Japanese article. */
-const answerabilitySections: readonly LearnSection[] = [
-  {
-    heading: '押さえておきたい基本',
-    body: [
-      'Cosmic SignatureはArbitrum上のプロシージャル・オンチェーンアート・プロトコルです。パフォーマンス・サイクル、一筆、三体NFTアート、CST、係留、公共財配分が、一つの仕組みとしてつながっています。',
-      'プロトコルの紹介と学習資料はcosmicsignature.comで、アプリと最新のデータはapp.cosmicsignature.comで確認できます。関連リンクから、説明と実際の記録を行き来できます。',
-    ],
-  },
-  {
-    heading: 'この話題を検証する方法',
-    body: [
-      '公式アプリのページで、ライブのプロトコルデータ、検証済みのコントラクトアドレス、ソースコードのリソース、統計を調べてください。コントラクトページはプロトコルの説明をArbitrumのアドレスと結びつけ、統計ページはデータソースと更新時刻を明記しています。',
-      '変わりうる事実については、現在の情報源としてライブのアプリページを優先してください。プロトコルの仕組みを説明する事実については、安定した説明の情報源として学習記事、よくある質問、利用規約、セキュリティ、監査、リスク開示のページを優先してください。',
-    ],
-  },
-  {
-    heading: '関連する正式な情報源',
-    body: [
-      'この記事とあわせて、よくある質問、コントラクト、ソースコード、統計、リスク開示を読むと、仕組みから現在の運用状況まで把握できます。いずれもウォレット接続なしで確認できます。',
-    ],
-  },
-  {
-    heading: 'ウォレット接続なしで学ぶ',
-    body: [
-      'この記事はウォレットを接続せずに読めます。関連リンクから、各概念の説明や公開されたプロトコルの記録を確認できます。',
-      '目的はライブのアプリを置き換えることではありません。各技術的な話題に安定した説明を与え、ライブのプロトコル記録、コントラクトアドレス、統計、リスクの文脈を確認できる現在のアプリページへ読者を導くことです。',
-    ],
-  },
-];
 
 /** Japanese learn copy, keyed by the skeleton in structure.ts. */
 export const learnTextJa = {
@@ -91,10 +60,12 @@ export const learnTextJa = {
       backToTopLabel: 'ページの先頭へ',
     },
     headingLinkTemplate: 'この節へのリンク：{title}',
-    relatedResourcesHeading: 'Cosmic Signatureの関連リソース',
-    appendixLabel: '確認とさらに読む',
-    verifyLinksLabel: 'アプリで確認する',
-    appendix: answerabilitySections,
+    relatedResourcesHeading: '関連リソース',
+    contractsFigure: {
+      title: 'Arbitrum One上の中核コントラクト',
+      caption:
+        '各アドレスはArbiscanで開きます。コントラクトページには、金庫やウォレットを含むすべての公式アドレスがあります。',
+    },
   },
   articles: {
     'what-is-cosmic-signature': {
@@ -137,7 +108,6 @@ export const learnTextJa = {
           ],
         },
       ],
-      relatedLabels: ['Cosmic Signatureアプリを開く', 'よくある質問を読む', 'プロトコル統計を見る'],
     },
     'how-the-performance-cycle-works': {
       cardTitle: 'パフォーマンス・サイクル',
@@ -179,11 +149,6 @@ export const learnTextJa = {
           ],
         },
       ],
-      relatedLabels: [
-        '現在のパフォーマンス・サイクルを見る',
-        '配分の履歴を見る',
-        'プロトコルのよくある質問を読む',
-      ],
     },
     'how-gestures-work': {
       cardTitle: '一筆の仕組み',
@@ -223,11 +188,6 @@ export const learnTextJa = {
             'RandomWalk NFTの添付は、もう一つの公開の文脈の層を加えます。未使用のRandomWalk NFTは一度だけの一筆の費用の引き下げのために添付でき、使用済みのRandomWalk NFTは別に一覧されるので、参加の瞬間が過ぎた後も公開の記録は理解できるままです。',
           ],
         },
-      ],
-      relatedLabels: [
-        'アプリで一筆を入れる、または調べる',
-        'パフォーマンス・サイクルについて学ぶ',
-        '現在のサイクルデータを見る',
       ],
     },
     'three-body-nft-art': {
@@ -269,11 +229,6 @@ export const learnTextJa = {
           ],
         },
       ],
-      relatedLabels: [
-        'Cosmic Signatureギャラリーを探索する',
-        'ソースコードを確認する',
-        'コントラクトと検証の注記を読む',
-      ],
     },
     'cosmic-signature-on-arbitrum': {
       cardTitle: 'Arbitrum上のプロトコル',
@@ -307,7 +262,6 @@ export const learnTextJa = {
           ],
         },
       ],
-      relatedLabels: ['検証済みコントラクトを見る', 'プロトコル統計を見る'],
     },
     'contracts-security-verification': {
       cardTitle: 'コントラクトと検証',
@@ -317,34 +271,33 @@ export const learnTextJa = {
         'Arbitrumプロトコルの、Cosmic Signatureスマートコントラクト、ソースコード、検証、セキュリティの背景。',
       h1: 'Cosmic Signatureのコントラクト、セキュリティ、検証',
       summary:
-        'Cosmic Signatureはコントラクトとソースコードの情報を公開しているので、参加者はプロトコルの仕組みを調べ、オンチェーンの振る舞いを検証できます。',
+        'Cosmic Signatureは、Arbitrum One上のいくつかのコントラクトで動いています。このガイドでは、中核のコントラクトを示し、自分で確認する方法と、独立監査が対象とした範囲を説明します。',
       sections: [
         {
-          heading: '公開コントラクトの文脈',
+          heading: 'プロトコルを支えるコントラクト',
           body: [
-            'コントラクトページには、公式アドレス、検証リンク、デプロイ情報、資金の流れがまとめられています。',
-            'ウォレットを接続する前に、公開された説明と資料を読めます。必要に応じて、ブロックエクスプローラーでコントラクトやトランザクションを確認してください。',
+            'Cosmic SignatureはチェーンID42161のArbitrum Oneで動いています。一筆、サイクル、配分はすべて、Cosmic Signatureプロトコルという一つのコントラクトを通ります。このコントラクトはアップグレード可能なプロキシとしてデプロイされており、アドレスは変わらず、ロジックはプロキシが指す実装コントラクトにあります。CST、二つのNFTコレクション、宇宙評議会には、それぞれ固有のアドレスがあります。',
+            '[コントラクトページ](contracts)は、金庫やウォレットも含む公式アドレスの唯一の一覧です。Cosmic Signatureを名乗るそれ以外のアドレスは、非公式なものとして扱ってください。',
           ],
         },
         {
-          heading: '検証の画面',
-          body: [
-            '検証はいくつかの公開画面にまたがっています。[コントラクトページ](contracts)はデプロイアドレスとエクスプローラーへのリンクを一覧し、[コードページ](code)は決定論的レンダリングのリソースを説明し、[監査ページ](audits)はレビューの状況を述べ、[セキュリティページ](security)は公式リソースをどう調べるべきかを説明します。',
-            'これらのページは合わせて読むべきです。文脈のないコントラクトアドレスは解釈しにくく、リンクのないセキュリティの主張は検証しにくいものです。だからCosmic Signatureは、アドレス、ソースへの参照、リスクの言葉、監査の状況を内部リンクで結び続けています。',
+          heading: 'コントラクトを自分で確認する',
+          body: ['どの手順にもウォレットは必要ありません。'],
+          steps: [
+            '[コントラクトページ](contracts)のアドレスを[Arbiscan](explorer)で開き、ネットワークがテストネットではなくArbitrum Oneであることを確認します。',
+            'Contractタブでソースコードが検証済みであることを確認し、[公開のコントラクトリポジトリ](contractsRepository)と比べるか、[Sourcify](sourcify)で完全一致を確認します。',
+            'プロトコルのコントラクトでは、Read as Proxyを開きます。そこに示される実装が、コントラクトページの実装コントラクトのアドレスと一致するはずです。',
+            'アプリで一筆や配分などの記録を一つ選び、エクスプローラーでそのコントラクトのトランザクションの中から同じトランザクションを探します。',
           ],
         },
         {
-          heading: '最初に確認すること',
+          heading: '監査の対象範囲',
           body: [
-            '公式アプリホストのコントラクトページから始め、Arbitrumネットワークを確認してください。次に、ソースコードへのリンク、セキュリティの概要、監査ページを比較します。監査や形式検証については、報告書の公開状況と実際の検証範囲も確認してください。',
-            'この控えめな姿勢は意図的なものです。信頼性のページが最も役立つのは、デプロイされた事実、公開された報告書、静的解析、コミュニティのレビュー、今後の作業を区別し、それらを裏付けのない一つの主張に押し込めないときです。',
+            `2025年後半、Hackenは本番コントラクトをレビューしました。対象は、各サイクルを動かす中核プロトコル、CSTトークン、二つのNFTコレクション、係留ウォレット、ウォレットとシステム管理のコントラクトです。2026年1月に公開された[報告書](hackenReport)には${AUDIT_FINDINGS_TOTAL}件の所見があり、重大または高い深刻度のものはありません。Hackenがファジングテストした${HACKEN_AUDIT.invariants.tested}件の不変条件のうち、${HACKEN_AUDIT.invariants.held}件が成立しました。`,
+            'コントラクトのリポジトリには、Certora Proverの仕様、Solidity SMTCheckerの設定、Slitherの静的解析、テストスイートもあり、[監査ページ](audits)からそれぞれにリンクしています。これらは記載した性質を証明または検査するだけで、それ以上のことは示しません。',
+            '監査の対象はスマートコントラクトで、このウェブサイト、アプリのデータサービス、作品のレンダリングパイプラインは含まれていません。どの検査もそうであるように、監査はリスクを下げますが、なくすことはできません。参加する前に[リスク開示](riskDisclosures)をお読みください。',
           ],
         },
-      ],
-      relatedLabels: [
-        'コントラクトアドレスを開く',
-        'ソースコードのリソースを開く',
-        'よくある質問を読む',
       ],
     },
     'cst-token-and-cosmic-council': {
@@ -380,7 +333,6 @@ export const learnTextJa = {
           ],
         },
       ],
-      relatedLabels: ['一筆の仕組みを読む', 'アプリを開く'],
     },
     'anchoring-nfts': {
       cardTitle: 'NFTの係留',
@@ -415,7 +367,6 @@ export const learnTextJa = {
           ],
         },
       ],
-      relatedLabels: ['係留ツールを開く', 'ギャラリーを探索する'],
     },
     'protocol-guild-public-goods': {
       cardTitle: '公共財とProtocol Guild',
@@ -449,7 +400,6 @@ export const learnTextJa = {
           ],
         },
       ],
-      relatedLabels: ['公共財拠出の記録を見る', 'サイクルの仕組みを学ぶ'],
     },
     'collecting-and-trading-cosmic-signature': {
       cardTitle: '収集と取引',
@@ -485,17 +435,10 @@ export const learnTextJa = {
         {
           heading: '取引の場とアドレスを検証する方法',
           body: [
-            '取引の前に、アプリホストのコントラクトページで公式のコントラクトアドレスを確認し、マーケットプレイスや取引所で見ているコレクションやトークンペアと比較してください。Cosmic Signatureは、エコシステムの取引の場——Axiom Zero、Chaos Zero、Uniswap——をアプリのヘッダー、フッター、サイトマップからリンクしているので、正しい行き先への公式の導線が常にあります。',
+            '取引の前に、アプリのコントラクトページで公式のコントラクトアドレスを確認し、マーケットプレイスや取引所で見ているコレクションやトークンペアと比較してください。Cosmic Signatureは、エコシステムの取引の場——Axiom Zero、Chaos Zero、Uniswap——をアプリのヘッダー、フッター、サイトマップからリンクしているので、正しい行き先への公式の導線が常にあります。',
             '同じ注意はCSTのスワップと予測のポジションにも当てはまります。トークンアドレスが公開されたCSTコントラクトと一致することを確認し、Chaos Zeroのポジションはプロトコルが記録する公開の筆数から決着するので、市場へのすべての入力はArbitrum上で独立に調べられることを覚えておいてください。',
           ],
         },
-      ],
-      relatedLabels: [
-        'Axiom ZeroでCosmic Signatureを見る',
-        'Chaos Zeroで予測する',
-        'UniswapでETHをCSTにスワップする',
-        'コントラクトアドレスを確認する',
-        'NFTギャラリーを探索する',
       ],
     },
     // lexicon-allow-start: explicit denial language for crawler and compliance clarity.
@@ -531,7 +474,6 @@ export const learnTextJa = {
           ],
         },
       ],
-      relatedLabels: ['利用規約を読む', 'よくある質問を読む'],
     },
     // lexicon-allow-end
   },
