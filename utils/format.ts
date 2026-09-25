@@ -60,6 +60,7 @@ export {
 export {
   calculateTimeDiff,
   formatDuration,
+  formatDurationParts,
   formatDurationTick,
   formatHoursTick,
   formatSeconds,

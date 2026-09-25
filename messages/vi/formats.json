@@ -7,10 +7,10 @@
     "seconds": "GIÂY"
   },
   "durationCompact": {
-    "days": "ng",
-    "hours": "g",
-    "minutes": "ph",
-    "seconds": "s"
+    "days": " ngày",
+    "hours": " giờ",
+    "minutes": " phút",
+    "seconds": " giây"
   },
   "address": {
     "zero": "Địa chỉ 0",

@@ -153,10 +153,13 @@ export function CycleStatus({
             })}
             className="mt-2"
           >
-            {/* A clock whose last poll failed may have been extended: it dims until data returns. */}
+            {/* A clock whose last poll failed may have been extended: it dims until data returns.
+                A column too narrow for a long day unit ("5 ngày 06:54:03") puts
+                the clock on a second line rather than overflowing. */}
             <Duration
               seconds={remainingSeconds}
               variant="clock"
+              wrap
               className={cn(
                 'block type-figure-xl',
                 clockStale ? 'text-muted-foreground' : 'text-foreground',
