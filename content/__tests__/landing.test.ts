@@ -183,6 +183,31 @@ describe('landing content contract accuracy', () => {
     },
   );
 
+  it.each(routing.locales)(
+    '%s: states council rules, selection counts and the public-goods share as fact digits (V047)',
+    (locale) => {
+      const { council, tracks, faq } = getLandingContent(locale);
+      const proposal = council.columns.find((column) => column.id === 'proposal')!.body;
+      for (const figure of [
+        protocolFacts.councilProposalThresholdCst,
+        protocolFacts.councilVotingDelayDays,
+        protocolFacts.councilVotingPeriodWeeks,
+      ]) {
+        expect(proposal).toContain(String(figure));
+      }
+      const quorum = council.columns.find((column) => column.id === 'quorum')!.body;
+      expect(quorum).toContain(`${protocolFacts.councilQuorumPercent}%`);
+      const ethSelection = tracks.eth.find((track) => track.id === 'stellar')!;
+      expect(ethSelection.body).toContain(String(protocolFacts.ethStellarSelectionRecipients));
+      const answers = faq.items.map((item) => item.answer).join(' ');
+      expect(answers).toContain(`${protocolFacts.publicGoodsPercentage}%`);
+      // No spelled-out figure the numeric-claims guard cannot read.
+      expect(`${proposal} ${answers}`).not.toMatch(
+        /Сім відсотків|два дні|два тижні|Bảy phần trăm|hai ngày|hai tuần/,
+      );
+    },
+  );
+
   it('picks every plural form Ukrainian needs for a recipient count', () => {
     const phrase = (count: number) => pluralPhrase(landingTextUk.tracks.recipients, count, 'uk');
     expect([1, 3, 10, 1.5].map(phrase)).toEqual([

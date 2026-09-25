@@ -135,7 +135,7 @@ export const landingTextKo = {
       },
       'eth-stellar-selection': {
         title: 'ETH 별빛 선정',
-        body: '무작위로 선정된 참여자 3명이 나누어 받습니다. 선정 빈도는 남긴 제스처 수에 따라 늘어납니다.',
+        body: `무작위로 선정된 참여자 ${protocolFacts.ethStellarSelectionRecipients}명이 나누어 받습니다. 선정 빈도는 남긴 제스처 수에 따라 늘어납니다.`,
       },
       'participant-nft-stellar-selection': {
         title: '참여자 대상 NFT 별빛 선정',
@@ -197,7 +197,7 @@ export const landingTextKo = {
     columns: {
       proposal: {
         title: '조율 제안',
-        body: '위임된 가중치가 100 CST 이상인 주소는 누구나 제안을 제출할 수 있습니다. 조율 지연은 2일, 조율 기간은 2주입니다.',
+        body: `위임된 가중치가 ${protocolFacts.councilProposalThresholdCst} CST 이상인 주소는 누구나 제안을 제출할 수 있습니다. 조율 지연은 ${protocolFacts.councilVotingDelayDays}일, 조율 기간은 ${protocolFacts.councilVotingPeriodWeeks}주입니다.`,
       },
       weight: {
         title: '조율 가중치',
@@ -205,7 +205,7 @@ export const landingTextKo = {
       },
       quorum: {
         title: '조율 정족수',
-        body: '찬성이 반대를 넘고, 찬성과 기권 가중치의 합이 CST 총 공급량의 3%에 이르면 제안이 통과됩니다. 반대 가중치는 정족수에 포함되지 않습니다.',
+        body: `찬성이 반대를 넘고, 찬성과 기권 가중치의 합이 CST 총 공급량의 ${protocolFacts.councilQuorumPercent}%에 이르면 제안이 통과됩니다. 반대 가중치는 정족수에 포함되지 않습니다.`,
       },
     },
   },
@@ -238,8 +238,7 @@ export const landingTextKo = {
     items: [
       {
         question: '참여자로서 실제로 무엇을 하나요?',
-        answer:
-          '제스처를 남깁니다. 각 제스처는 ETH 또는 CST 트랜잭션으로, 사이클 마감 시각을 연장하고, 별빛 선정 자격을 기록하고, 동적 참여 CST를 각인할 수 있으며, 사이클의 시그니처를 빚어냅니다. Cosmic Signature NFT를 앵커링하면 앵커링 지급의 몫을 받을 수 있습니다. 100 CST 이상을 보유하면 우주 평의회를 통해 조율 제안을 제출할 수 있습니다.',
+        answer: `제스처를 남깁니다. 각 제스처는 ETH 또는 CST 트랜잭션으로, 사이클 마감 시각을 연장하고, 별빛 선정 자격을 기록하고, 동적 참여 CST를 각인할 수 있으며, 사이클의 시그니처를 빚어냅니다. Cosmic Signature NFT를 앵커링하면 앵커링 지급의 몫을 받을 수 있습니다. ${protocolFacts.councilProposalThresholdCst} CST 이상을 보유하면 우주 평의회를 통해 조율 제안을 제출할 수 있습니다.`,
       },
       {
         question: '작품은 어떤 기술로 만들어지나요?',
@@ -254,8 +253,7 @@ export const landingTextKo = {
       // lexicon-allow-start: explicit denial of charitable-tax-treatment framing.
       {
         question: '공공재란 정확히 무엇인가요?',
-        answer:
-          '각 사이클 ETH 준비금의 7%가 공공재 주소, 현재는 Protocol Guild로 전달됩니다. Protocol Guild는 170명이 넘는 이더리움 핵심 기여자를 위한 공동 자금 지원 메커니즘입니다. 이는 공공재 주소로 ETH를 전달하는 것으로, 미국 세법상의 자선 기부가 아니며, Cosmic Signature는 그 세무상 취급에 관해 어떤 진술도 하지 않습니다.',
+        answer: `각 사이클 ETH 준비금의 ${protocolFacts.publicGoodsPercentage}%가 공공재 주소, 현재는 Protocol Guild로 전달됩니다. Protocol Guild는 170명이 넘는 이더리움 핵심 기여자를 위한 공동 자금 지원 메커니즘입니다. 이는 공공재 주소로 ETH를 전달하는 것으로, 미국 세법상의 자선 기부가 아니며, Cosmic Signature는 그 세무상 취급에 관해 어떤 진술도 하지 않습니다.`,
       },
       // lexicon-allow-end
       // lexicon-allow-start: explicit denial of lottery, casino, gambling, house, dealer, and bet categories.

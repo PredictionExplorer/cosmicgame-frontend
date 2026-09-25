@@ -137,7 +137,7 @@ export const landingTextJa = {
       },
       'eth-stellar-selection': {
         title: 'ETH星選',
-        body: '無作為に選ばれた3人の参加者で分け合います。選ばれる頻度は入れた一筆の数に応じて高まります。',
+        body: `無作為に選ばれた${protocolFacts.ethStellarSelectionRecipients}人の参加者で分け合います。選ばれる頻度は入れた一筆の数に応じて高まります。`,
       },
       'participant-nft-stellar-selection': {
         title: 'NFT星選——参加者',
@@ -199,7 +199,7 @@ export const landingTextJa = {
     columns: {
       proposal: {
         title: '調整提案',
-        body: '委任されたウェイトが100 CST以上あるアドレスは誰でも提案を提出できます。調整の遅延は2日、調整の実施期間は2週間です。',
+        body: `委任されたウェイトが${protocolFacts.councilProposalThresholdCst} CST以上あるアドレスは誰でも提案を提出できます。調整の遅延は${protocolFacts.councilVotingDelayDays}日、調整の実施期間は${protocolFacts.councilVotingPeriodWeeks}週間です。`,
       },
       weight: {
         title: '調整ウェイト',
@@ -207,7 +207,7 @@ export const landingTextJa = {
       },
       quorum: {
         title: '調整定足数',
-        body: '支持が反対を上回り、支持と棄権のウェイトの合計がCST総供給量の3%に達すれば提案は成立します。反対のウェイトは定足数に数えられません。',
+        body: `支持が反対を上回り、支持と棄権のウェイトの合計がCST総供給量の${protocolFacts.councilQuorumPercent}%に達すれば提案は成立します。反対のウェイトは定足数に数えられません。`,
       },
     },
   },
@@ -240,8 +240,7 @@ export const landingTextJa = {
     items: [
       {
         question: '参加者として、実際には何をするのですか？',
-        answer:
-          '一筆を入れます。各一筆はETHまたはCSTのトランザクションで、サイクル確定時刻を延ばし、星選の対象を記録し、動的な参加CSTを刻印することがあり、サイクルのシグネチャーを形づくります。Cosmic Signature NFTを係留すると、係留配分の対象にもなります。100 CST以上を保有していれば、宇宙評議会を通じて調整提案を提出することもできます。',
+        answer: `一筆を入れます。各一筆はETHまたはCSTのトランザクションで、サイクル確定時刻を延ばし、星選の対象を記録し、動的な参加CSTを刻印することがあり、サイクルのシグネチャーを形づくります。Cosmic Signature NFTを係留すると、係留配分の対象にもなります。${protocolFacts.councilProposalThresholdCst} CST以上を保有していれば、宇宙評議会を通じて調整提案を提出することもできます。`,
       },
       {
         question: '作品はどのような技術で作られていますか？',
@@ -256,8 +255,7 @@ export const landingTextJa = {
       // lexicon-allow-start: explicit denial of charitable-tax-treatment framing.
       {
         question: '公共財とは、正確には何ですか？',
-        answer:
-          '各サイクルのETH準備金の7%が、公共財のアドレス——現在はProtocol Guild——へ送られます。Protocol Guildは170人以上のEthereumコア貢献者の共同資金支援メカニズムです。これは公共財のアドレスへのETHの送付であり、米国の税法上の慈善寄付ではなく、Cosmic Signatureはその税務上の扱いについて何も表明しません。',
+        answer: `各サイクルのETH準備金の${protocolFacts.publicGoodsPercentage}%が、公共財のアドレス——現在はProtocol Guild——へ送られます。Protocol Guildは170人以上のEthereumコア貢献者の共同資金支援メカニズムです。これは公共財のアドレスへのETHの送付であり、米国の税法上の慈善寄付ではなく、Cosmic Signatureはその税務上の扱いについて何も表明しません。`,
       },
       // lexicon-allow-end
       // lexicon-allow-start: explicit denial of lottery, casino, gambling, house, dealer, and bet categories.

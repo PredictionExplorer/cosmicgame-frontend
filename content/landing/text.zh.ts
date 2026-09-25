@@ -138,7 +138,7 @@ export const landingTextZh = {
       },
       'eth-stellar-selection': {
         title: 'ETH 星选',
-        body: '由程序化随机选出的 3 位参与者均分；入选频次随落笔次数增加。',
+        body: `由程序化随机选出的 ${protocolFacts.ethStellarSelectionRecipients} 位参与者均分；入选频次随落笔次数增加。`,
       },
       'participant-nft-stellar-selection': {
         title: '参与者 NFT 星选',
@@ -200,7 +200,7 @@ export const landingTextZh = {
     columns: {
       proposal: {
         title: '协调提案',
-        body: '获委托权重不少于 100 CST 的地址均可提交提案。协调延迟为 2 天，协调期为 2 周。',
+        body: `获委托权重不少于 ${protocolFacts.councilProposalThresholdCst} CST 的地址均可提交提案。协调延迟为 ${protocolFacts.councilVotingDelayDays} 天，协调期为 ${protocolFacts.councilVotingPeriodWeeks} 周。`,
       },
       weight: {
         title: '协调权重',
@@ -208,7 +208,7 @@ export const landingTextZh = {
       },
       quorum: {
         title: '协调法定权重',
-        body: '支持权重高于反对权重，且支持与弃权权重之和达到 CST 总供应量的 3%，提案即获通过。反对权重不计入法定权重。',
+        body: `支持权重高于反对权重，且支持与弃权权重之和达到 CST 总供应量的 ${protocolFacts.councilQuorumPercent}%，提案即获通过。反对权重不计入法定权重。`,
       },
     },
   },
@@ -241,8 +241,7 @@ export const landingTextZh = {
     items: [
       {
         question: '参与者实际要做什么？',
-        answer:
-          '你可以落笔。每一笔都是使用 ETH 或 CST 发起的链上交易，会延长收官倒计时、计入一次星选资格，还可能铭刻参与 CST，并共同塑造这一周期的签名。你还可以将 Cosmic Signature NFT 锚定至协议，使其按比例参与锚定派发；持有至少 100 CST 时，也可以通过宇宙议会提交协调提案。',
+        answer: `你可以落笔。每一笔都是使用 ETH 或 CST 发起的链上交易，会延长收官倒计时、计入一次星选资格，还可能铭刻参与 CST，并共同塑造这一周期的签名。你还可以将 Cosmic Signature NFT 锚定至协议，使其按比例参与锚定派发；持有至少 ${protocolFacts.councilProposalThresholdCst} CST 时，也可以通过宇宙议会提交协调提案。`,
       },
       {
         question: '这件艺术作品在技术上是什么？',
@@ -257,8 +256,7 @@ export const landingTextZh = {
       // lexicon-allow-start: 明确否认慈善捐赠及相关税务定性。
       {
         question: '公共物品具体指什么？',
-        answer:
-          '每个周期会将 ETH 储备的 7% 转拨至公共物品地址，目前为 Protocol Guild。Protocol Guild 是为 170 多位以太坊核心贡献者提供资助的集体机制。这是向公共物品地址转拨 ETH，并非美国税法意义上的慈善捐赠；Cosmic Signature 不对其税务处理作任何陈述。',
+        answer: `每个周期会将 ETH 储备的 ${protocolFacts.publicGoodsPercentage}% 转拨至公共物品地址，目前为 Protocol Guild。Protocol Guild 是为 170 多位以太坊核心贡献者提供资助的集体机制。这是向公共物品地址转拨 ETH，并非美国税法意义上的慈善捐赠；Cosmic Signature 不对其税务处理作任何陈述。`,
       },
       // lexicon-allow-end
       // lexicon-allow-start: 明确否认彩票、赌场、赌博、庄家、荷官及赌注类别。

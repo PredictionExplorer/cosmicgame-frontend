@@ -137,7 +137,7 @@ export const landingTextVi = {
       },
       'eth-stellar-selection': {
         title: 'ETH Tinh tuyển',
-        body: 'Chia cho ba người tham gia được chọn ngẫu nhiên. Tần suất được chọn tăng theo số nét bút đã đặt.',
+        body: `Chia cho ${protocolFacts.ethStellarSelectionRecipients} người tham gia được chọn ngẫu nhiên. Tần suất được chọn tăng theo số nét bút đã đặt.`,
       },
       'participant-nft-stellar-selection': {
         title: 'NFT Tinh tuyển — Người tham gia',
@@ -199,7 +199,7 @@ export const landingTextVi = {
     columns: {
       proposal: {
         title: 'Đề xuất điều phối',
-        body: 'Bất kỳ địa chỉ nào có ít nhất 100 CST trọng số được ủy quyền đều có thể gửi đề xuất. Độ trễ điều phối hai ngày, giai đoạn điều phối hai tuần.',
+        body: `Bất kỳ địa chỉ nào có ít nhất ${protocolFacts.councilProposalThresholdCst} CST trọng số được ủy quyền đều có thể gửi đề xuất. Độ trễ điều phối ${protocolFacts.councilVotingDelayDays} ngày, giai đoạn điều phối ${protocolFacts.councilVotingPeriodWeeks} tuần.`,
       },
       weight: {
         title: 'Trọng số điều phối',
@@ -207,7 +207,7 @@ export const landingTextVi = {
       },
       quorum: {
         title: 'Túc số điều phối',
-        body: 'Đề xuất được thông qua khi trọng số tán thành lớn hơn phản đối và tổng trọng số tán thành cùng bỏ trống đạt ít nhất 3% tổng cung CST. Trọng số phản đối không được tính vào túc số.',
+        body: `Đề xuất được thông qua khi trọng số tán thành lớn hơn phản đối và tổng trọng số tán thành cùng bỏ trống đạt ít nhất ${protocolFacts.councilQuorumPercent}% tổng cung CST. Trọng số phản đối không được tính vào túc số.`,
       },
     },
   },
@@ -240,8 +240,7 @@ export const landingTextVi = {
     items: [
       {
         question: 'Là người tham gia, tôi thực sự làm gì?',
-        answer:
-          'Bạn đặt nét bút. Mỗi nét bút là một giao dịch ETH hoặc CST kéo dài thời điểm hoàn tất chu kỳ, ghi nhận một lượt Tinh tuyển, có thể khắc CST tham gia động, và định hình Signature của chu kỳ. Bạn có thể neo giữ Cosmic Signature NFT để nhận một phần phân phối neo giữ. Bạn có thể gửi đề xuất điều phối qua Hội đồng Vũ trụ nếu nắm giữ ít nhất 100 CST.',
+        answer: `Bạn đặt nét bút. Mỗi nét bút là một giao dịch ETH hoặc CST kéo dài thời điểm hoàn tất chu kỳ, ghi nhận một lượt Tinh tuyển, có thể khắc CST tham gia động, và định hình Signature của chu kỳ. Bạn có thể neo giữ Cosmic Signature NFT để nhận một phần phân phối neo giữ. Bạn có thể gửi đề xuất điều phối qua Hội đồng Vũ trụ nếu nắm giữ ít nhất ${protocolFacts.councilProposalThresholdCst} CST.`,
       },
       {
         question: 'Về mặt kỹ thuật, tác phẩm là gì?',
@@ -256,8 +255,7 @@ export const landingTextVi = {
       // lexicon-allow-start: explicit denial of charitable-tax-treatment framing.
       {
         question: 'Hàng hóa công chính xác là gì?',
-        answer:
-          'Bảy phần trăm dự trữ ETH của mỗi chu kỳ được chuyển đến một địa chỉ hàng hóa công, hiện là Protocol Guild. Protocol Guild là cơ chế tài trợ tập thể cho hơn 170 người đóng góp cốt lõi cho Ethereum. Đây là việc chuyển tiếp ETH đến một địa chỉ hàng hóa công; đây không phải là khoản đóng góp từ thiện theo nghĩa thuế của Hoa Kỳ, và Cosmic Signature không đưa ra cam kết nào về cách xử lý thuế của nó.',
+        answer: `${protocolFacts.publicGoodsPercentage}% dự trữ ETH của mỗi chu kỳ được chuyển đến một địa chỉ hàng hóa công, hiện là Protocol Guild. Protocol Guild là cơ chế tài trợ tập thể cho hơn 170 người đóng góp cốt lõi cho Ethereum. Đây là việc chuyển tiếp ETH đến một địa chỉ hàng hóa công; đây không phải là khoản đóng góp từ thiện theo nghĩa thuế của Hoa Kỳ, và Cosmic Signature không đưa ra cam kết nào về cách xử lý thuế của nó.`,
       },
       // lexicon-allow-end
       // lexicon-allow-start: explicit denial of lottery, casino, gambling, house, dealer, and bet categories.

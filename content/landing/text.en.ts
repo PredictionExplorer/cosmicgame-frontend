@@ -205,7 +205,7 @@ export const landingTextEn = {
       },
       quorum: {
         title: 'Coordination Quorum',
-        body: 'A proposal passes if Support exceeds Opposition and Support plus Abstain weight reaches 3% of total CST supply. Opposition weight does not count toward the quorum.',
+        body: `A proposal passes if Support exceeds Opposition and Support plus Abstain weight reaches ${protocolFacts.councilQuorumPercent}% of total CST supply. Opposition weight does not count toward the quorum.`,
       },
     },
   },
@@ -238,8 +238,7 @@ export const landingTextEn = {
     items: [
       {
         question: 'What do I actually do as a participant?',
-        answer:
-          'You make gestures. Each gesture is an ETH or CST transaction that extends the Cycle Finalization Time, records a Stellar Selection entry, may imprint dynamic Participation CST, and shapes the cycle’s Signature. You may anchor Cosmic Signature NFTs to receive a share of Anchor Distributions. You may submit Coordination Proposals through the Cosmic Council if you hold at least 100 CST.',
+        answer: `You make gestures. Each gesture is an ETH or CST transaction that extends the Cycle Finalization Time, records a Stellar Selection entry, may imprint dynamic Participation CST, and shapes the cycle’s Signature. You may anchor Cosmic Signature NFTs to receive a share of Anchor Distributions. You may submit Coordination Proposals through the Cosmic Council if you hold at least ${protocolFacts.councilProposalThresholdCst} CST.`,
       },
       {
         question: 'What is the art, technically?',
