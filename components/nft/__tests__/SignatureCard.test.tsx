@@ -81,13 +81,15 @@ describe('SignatureCard', () => {
     expect(link()).toHaveAccessibleName(/Anchored$/);
   });
 
-  // F252: the glyph alone meant nothing to a sighted newcomer.
-  it('names the anchored state in a word tag from `sm`, the glyph alone on a phone', () => {
+  // V381: one anchored treatment on every wall label, never a text tag; V252's
+  // fallback: the glyph is titled, so a pointer can read what it means.
+  it('marks the anchored state with the one titled anchor at every width, never a tag', () => {
     render(<SignatureCard tokenId={3} seed="a3" entry={entry} anchored sizes="400px" />);
-    const tag = screen.getByTestId('card-tag');
-    expect(tag).toHaveTextContent('Anchored');
-    expect(tag.firstElementChild).toHaveClass('max-sm:hidden');
-    expect(screen.getByTestId('anchored-mark')).toHaveClass('sm:hidden');
+    expect(screen.queryByTestId('card-tag')).not.toBeInTheDocument();
+    const mark = screen.getByTestId('anchored-mark');
+    expect(mark).not.toHaveClass('sm:hidden');
+    expect(mark.parentElement).toHaveAttribute('title', 'Anchored');
+    expect(mark.parentElement).not.toHaveClass('sm:hidden');
   });
 
   it('carries facts with links of their own after the card link, never inside it', () => {

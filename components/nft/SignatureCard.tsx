@@ -103,10 +103,11 @@ export function signatureCardSources(
  * (the number alone below `sm`, so a phone's two-across titles keep to one
  * line); the caption carries the number (for a named token), then structure
  * and palette from `sm` (a phone's label keeps to the name and number). An
- * anchored Signature says so in a word tag from `sm` and with the anchor alone
- * on a phone. The whole card is one link to the detail page, named by the
- * plate's alt text (composed from the traits); the visible label repeats part
- * of it, so it is hidden from assistive technology rather than read twice.
+ * anchored Signature carries the one quiet anchor every wall label uses,
+ * titled for a pointer and named for screen readers, never a text tag. The
+ * whole card is one link to the detail page, named by the plate's alt text
+ * (composed from the traits); the visible label repeats part of it, so it is
+ * hidden from assistive technology rather than read twice.
  */
 export function SignatureCard({
   tokenId,
@@ -145,15 +146,10 @@ export function SignatureCard({
       : tTraits('card.traitsPending');
   const anchoredState = tTraits('card.anchoredState');
   const selectable = Boolean(select && !select.unavailable);
-  // In select mode a reason not to choose it outranks the anchored tag it
-  // usually is ("Anchored"); otherwise an anchored card shows the word from `sm`.
+  // In select mode, why a Signature cannot be chosen ("Anchored", "Owner
+  // changed") is a tag. The anchored state itself is the quiet anchor below.
   const tag = select?.unavailable ? (
     <ArtTag tone={select.unavailableTone}>{select.unavailable}</ArtTag>
-  ) : anchored ? (
-    <ArtTag className="max-sm:hidden">
-      <AnchoringIcon aria-hidden className="size-3 shrink-0" />
-      {anchoredState}
-    </ArtTag>
   ) : null;
 
   const content = (
@@ -222,23 +218,23 @@ export function SignatureCard({
           ) : null}
         </div>
         {/*
-         * The status slot: the anchor on a phone, and (to a mouse, on hover
-         * or focus) the quick-view button in its place, so the label never
-         * gains a gap for a control that is not showing.
+         * The status slot: the anchor, and (to a mouse, on hover or focus)
+         * the quick-view button in its place, so the label never gains a gap
+         * for a control that is not showing.
          */}
         {!select && (anchored || onQuickView) ? (
           <span
             aria-hidden
+            title={anchored ? anchoredState : undefined}
             className={cn(
               '-mt-1 flex size-8 shrink-0 items-center justify-center transition-opacity duration-[var(--duration-fast)]',
               !anchored && 'pointer-coarse:hidden',
-              anchored && !onQuickView && 'sm:hidden',
               onQuickView &&
                 'pointer-fine:group-hover:opacity-0 pointer-fine:group-focus-within:opacity-0',
             )}
           >
             {anchored ? (
-              <AnchoringIcon className="size-4 text-subtle sm:hidden" data-testid="anchored-mark" />
+              <AnchoringIcon className="size-4 text-subtle" data-testid="anchored-mark" />
             ) : null}
           </span>
         ) : null}
