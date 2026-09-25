@@ -49,7 +49,11 @@ describe('token page metadata', () => {
 
   // The API answers 400 "record not found" for a token it does not hold.
   it('answers a token that does not exist with not found', async () => {
-    respondWithToken(null, 400);
+    global.fetch = jest.fn(async () => ({
+      status: 400,
+      ok: false,
+      json: async () => ({ error: 'record not found' }),
+    })) as unknown as typeof fetch;
     await expect(generateMetadata(props('999999999'))).rejects.toThrow();
   });
 

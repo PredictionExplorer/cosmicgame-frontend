@@ -82,6 +82,17 @@ describe('token route layout', () => {
   it('leaves the page to load the record itself when the read fails', async () => {
     respond(502);
     await expect(render('26')).resolves.toBe('page');
+    // Other API errors share the 400 status: only "record not found" is a 404.
+    respond(400, { error: 'database timeout' });
+    await expect(render('28')).resolves.toBe('page');
+    global.fetch = jest.fn(async () => ({
+      status: 400,
+      ok: false,
+      json: async () => {
+        throw new SyntaxError('Unexpected token <');
+      },
+    })) as unknown as typeof fetch;
+    await expect(render('29')).resolves.toBe('page');
     global.fetch = jest.fn(async () => {
       throw new Error('offline');
     }) as unknown as typeof fetch;
