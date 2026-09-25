@@ -19,13 +19,15 @@ const DESKTOP_VIEWPORTS = [
 
 async function expectDecisionDashboardInViewport(page: Page) {
   const viewport = page.viewportSize()!;
+  const panel = page.locator('[data-testid="gesture-panel"][data-variant="card"]');
+  // The page exists for one action: the clock, the Calibration Window that
+  // prices CST, the methods and the form's own action share the first
+  // viewport at every desktop size, from 1280×720 up.
   const critical = [
     ['clock', page.getByTestId('cycle-clock')],
-    ['Last Gesture', page.getByTestId('latest-participant-intel')],
-    ['Endurance Champion', page.getByTestId('control-desk-endurance')],
-    ['Chrono Warrior', page.getByTestId('chrono-role-summary')],
-    ['active challenge', page.getByTestId('chrono-active-challenge')],
     ['Calibration Window', page.getByTestId('control-desk-calibration')],
+    ['gesture methods', panel.getByTestId('panel-method-tabs')],
+    ['commit action', panel.getByTestId('connect-to-gesture').getByRole('button')],
   ] as const;
 
   // Visibility alone does not mean that a participant can see the content
@@ -40,10 +42,68 @@ async function expectDecisionDashboardInViewport(page: Page) {
     expect(box!.x, `${name} left`).toBeGreaterThanOrEqual(0);
     expect(box!.x + box!.width, `${name} right`).toBeLessThanOrEqual(viewport.width);
   }
+  // The standings are decision inputs: always open, never behind a disclosure.
+  for (const testId of [
+    'latest-participant-intel',
+    'control-desk-endurance',
+    'chrono-role-summary',
+    'chrono-active-challenge',
+  ]) {
+    await expect(page.getByTestId(testId)).toBeVisible();
+    expect(
+      await page.getByTestId(testId).evaluate((element) => element.closest('details') === null),
+    ).toBe(true);
+  }
   expect(
     await page.evaluate(() => document.documentElement.scrollWidth),
     'the page must not overflow horizontally',
   ).toBeLessThanOrEqual(viewport.width);
+}
+
+/**
+ * The desk reads in DOM order, column by column: within each column of the
+ * two-column desk, keyboard focus never moves up (WCAG 1.3.2, 2.4.3).
+ */
+async function expectDeskFocusOrderReadsDown(page: Page) {
+  const stops = await page.getByTestId('control-desk-grid').evaluate((grid) => {
+    const selector =
+      'a[href], button:not([disabled]), input, textarea, select, [tabindex]:not([tabindex="-1"])';
+    const form = grid
+      .querySelector('[data-testid="control-desk-gesture"]')!
+      .getBoundingClientRect();
+    return Array.from(grid.querySelectorAll<HTMLElement>(selector))
+      .filter((element) => {
+        const style = getComputedStyle(element);
+        const rect = element.getBoundingClientRect();
+        return (
+          style.visibility !== 'hidden' &&
+          style.display !== 'none' &&
+          !element.closest('[hidden], [inert], [aria-hidden="true"]') &&
+          rect.width > 0 &&
+          rect.height > 0
+        );
+      })
+      .map((element) => {
+        const rect = element.getBoundingClientRect();
+        return {
+          name: (element.getAttribute('aria-label') ?? element.textContent ?? '')
+            .trim()
+            .slice(0, 40),
+          column: rect.left >= form.left - 1 ? 'right' : 'left',
+          top: rect.top + window.scrollY,
+        };
+      });
+  });
+  expect(stops.length).toBeGreaterThan(5);
+  for (const column of ['left', 'right'] as const) {
+    const inColumn = stops.filter((stop) => stop.column === column);
+    for (let index = 1; index < inColumn.length; index += 1) {
+      expect(
+        inColumn[index]!.top,
+        `${column} column: "${inColumn[index]!.name}" after "${inColumn[index - 1]!.name}"`,
+      ).toBeGreaterThanOrEqual(inColumn[index - 1]!.top - 2);
+    }
+  }
 }
 
 /** Opens the optional message editor, which recedes behind one control until wanted. */
@@ -89,10 +149,10 @@ async function expectCommentFormReachable(page: Page) {
 }
 
 /**
- * Row 1 is the cycle column (the clock over the Calibration Window) beside
- * the standings. Row 2 is the form (8 of 12 columns) with, beside it on the
- * wall, the newest Signature over the wallet's standing. The three methods
- * sit side by side.
+ * Row 1 is the Cycle column (the clock over the Calibration Window, 5 of 12)
+ * beside the gesture form (7 of 12), so the form's action is in the first
+ * viewport. Row 2 is the Standings Ledger beside the newest Signature. The
+ * three methods sit side by side.
  */
 async function expectEfficientDesktopLayout(page: Page) {
   const grid = page.getByTestId('control-desk-grid');
@@ -102,26 +162,16 @@ async function expectEfficientDesktopLayout(page: Page) {
   const form = page.getByTestId('control-desk-gesture');
   const methods = page.getByTestId('panel-method-tabs');
   const art = page.getByTestId('control-desk-art');
-  const standing = page.getByTestId('control-desk-standing');
-  const [
-    gridBox,
-    clockBox,
-    calibrationBox,
-    standingsBox,
-    formBox,
-    methodsBox,
-    artBox,
-    standingBox,
-  ] = await Promise.all([
-    grid.boundingBox(),
-    clock.boundingBox(),
-    calibration.boundingBox(),
-    standings.boundingBox(),
-    form.boundingBox(),
-    methods.boundingBox(),
-    art.boundingBox(),
-    standing.boundingBox(),
-  ]);
+  const [gridBox, clockBox, calibrationBox, standingsBox, formBox, methodsBox, artBox] =
+    await Promise.all([
+      grid.boundingBox(),
+      clock.boundingBox(),
+      calibration.boundingBox(),
+      standings.boundingBox(),
+      form.boundingBox(),
+      methods.boundingBox(),
+      art.boundingBox(),
+    ]);
   for (const box of [
     gridBox,
     clockBox,
@@ -130,35 +180,34 @@ async function expectEfficientDesktopLayout(page: Page) {
     formBox,
     methodsBox,
     artBox,
-    standingBox,
   ]) {
     expect(box).not.toBeNull();
   }
 
-  // The cycle column and the standings share the first row, and the
-  // Calibration Window continues the cycle column under the clock.
-  expect(Math.abs(clockBox!.y - standingsBox!.y)).toBeLessThanOrEqual(1);
-  expect(clockBox!.x + clockBox!.width).toBeLessThanOrEqual(standingsBox!.x);
+  // The Cycle column and the form share the first row; the Calibration
+  // Window continues the Cycle column under the clock.
+  expect(Math.abs(clockBox!.y - formBox!.y)).toBeLessThanOrEqual(1);
+  expect(Math.abs(clockBox!.x - gridBox!.x)).toBeLessThanOrEqual(1);
+  expect(clockBox!.x + clockBox!.width).toBeLessThanOrEqual(formBox!.x);
   expect(Math.abs(calibrationBox!.x - clockBox!.x)).toBeLessThanOrEqual(1);
   expect(calibrationBox!.y).toBeGreaterThanOrEqual(clockBox!.y + clockBox!.height - 1);
+  expect(Math.abs(formBox!.x + formBox!.width - (gridBox!.x + gridBox!.width))).toBeLessThanOrEqual(
+    1,
+  );
+  expect(formBox!.width).toBeGreaterThan(gridBox!.width * 0.5);
 
-  // The form starts row 2 at the desk's edge and takes most of it.
-  expect(Math.abs(formBox!.x - gridBox!.x)).toBeLessThanOrEqual(1);
-  expect(formBox!.width).toBeGreaterThan(gridBox!.width * 0.6);
+  // Row 2 starts under both: the standings at the desk's edge, the art beside them.
   const gap = await grid.evaluate((element) => Number.parseFloat(getComputedStyle(element).rowGap));
   const rowBottom = Math.max(
     calibrationBox!.y + calibrationBox!.height,
-    standingsBox!.y + standingsBox!.height,
+    formBox!.y + formBox!.height,
   );
-  const formGap = formBox!.y - rowBottom;
-  expect(formGap).toBeGreaterThanOrEqual(0);
-  expect(formGap).toBeLessThanOrEqual(gap + 2);
-
-  // Beside it, the art starts the same row and the standing follows under it.
-  expect(formBox!.x + formBox!.width).toBeLessThanOrEqual(artBox!.x);
-  expect(Math.abs(artBox!.y - formBox!.y)).toBeLessThanOrEqual(1);
-  expect(standingBox!.x).toBeCloseTo(artBox!.x, 0);
-  expect(standingBox!.y).toBeGreaterThanOrEqual(artBox!.y + artBox!.height - 1);
+  const rowGap = standingsBox!.y - rowBottom;
+  expect(rowGap).toBeGreaterThanOrEqual(-1);
+  expect(rowGap).toBeLessThanOrEqual(gap + 2);
+  expect(Math.abs(standingsBox!.x - gridBox!.x)).toBeLessThanOrEqual(1);
+  expect(standingsBox!.x + standingsBox!.width).toBeLessThanOrEqual(artBox!.x);
+  expect(Math.abs(artBox!.y - standingsBox!.y)).toBeLessThanOrEqual(1);
   expect(methodsBox!.width).toBeGreaterThanOrEqual(formBox!.width * 0.8);
 
   // Every method on one line, each with its price.
@@ -362,6 +411,7 @@ test.describe('home gesture chat', () => {
 
       await expectDecisionDashboardInViewport(page);
       await expectEfficientDesktopLayout(page);
+      await expectDeskFocusOrderReadsDown(page);
       await expect(page.getByTestId('standings-disclosure')).toHaveCount(0);
       await expect(page.getByTestId('allocation-ledger')).toBeHidden();
       await expect(page.getByTestId('control-desk-calibration').getByRole('region')).toHaveCount(1);
@@ -459,12 +509,19 @@ test.describe('home gesture chat', () => {
     });
   }
 
-  test('keeps an inline form on phones and offers the same controls in the quick-action sheet', async ({
+  test('keeps an inline form on phones, with the dock offering the form’s own connect action', async ({
     page,
   }, testInfo) => {
     test.skip(testInfo.project.name === 'Desktop Chrome', 'mobile action-path guard');
     await page.setViewportSize({ width: 320, height: 800 });
     await page.goto('/', { waitUntil: 'domcontentloaded' });
+
+    // From the first paint on a phone, before anything is measured, the dock
+    // offers the one action: here, without a wallet, "Connect wallet".
+    const dock = page.locator('[data-action-dock]');
+    await expect(dock).not.toHaveAttribute('aria-hidden', 'true');
+    await expect(page.getByTestId('dock-connect')).toBeVisible();
+    await expect(page.getByTestId('dock-open-sheet')).toHaveCount(0);
 
     const inlinePanel = page.locator('[data-testid="gesture-panel"][data-variant="card"]');
     await expect(inlinePanel).toBeVisible();
@@ -485,30 +542,23 @@ test.describe('home gesture chat', () => {
     // Aside, the dock slides away and leaves the accessibility tree and the
     // tab order (aria-hidden and inert); Playwright counts a faded element
     // as visible, so the attributes are the contract.
-    const dock = page.locator('[data-action-dock]');
-    const dockAction = page.getByTestId('dock-open-sheet');
     await expect(dock).toHaveAttribute('aria-hidden', 'true');
     await page.getByTestId('home-feed-layout').scrollIntoViewIfNeeded();
     await expect(dock).not.toHaveAttribute('aria-hidden', 'true');
-    await expect(dockAction).toBeVisible();
-    await dockAction.click();
 
-    const sheetPanel = page.locator('[data-testid="gesture-panel"][data-variant="sheet"]:visible');
-    await expect(sheetPanel).toHaveCount(1);
-    await expect(sheetPanel.getByTestId('panel-method-eth-cost')).toBeVisible();
-    const sheetMessage = sheetPanel.getByRole('textbox', {
-      name: new RegExp(`^${home.form.advanced.messageLabel}`),
-    });
-    await expect(sheetMessage).toBeVisible();
-    await expect(sheetMessage).toBeEditable();
-    await expect(sheetMessage).toHaveValue(draft);
-    const revisedDraft = `${draft} Finished in the quick-action sheet.`;
-    await sheetMessage.fill(revisedDraft);
-    await expect(sheetPanel.getByTestId('connect-to-gesture')).toBeVisible();
+    // Its connect action opens the wallet list directly, never a sheet that
+    // only asks for a wallet; the draft waits in the form.
+    const dockConnect = page.getByTestId('dock-connect');
+    await expect(dockConnect).toBeVisible();
+    await dockConnect.click();
+    const wallets = page.getByRole('dialog', { name: /connect a wallet/i }).first();
+    await expect(wallets).toBeVisible({ timeout: 10_000 });
     await page.keyboard.press('Escape');
-    await expect(sheetPanel).toHaveCount(0);
-    await expect(inlinePanel).toBeVisible();
-    await expect(inlineMessage).toHaveValue(revisedDraft);
+    await expect(wallets).toBeHidden();
+    await expect(page.locator('[data-testid="gesture-panel"][data-variant="sheet"]')).toHaveCount(
+      0,
+    );
+    await expect(inlineMessage).toHaveValue(draft);
     await page.evaluate(() => document.fonts.ready);
     const screenshotPath = testInfo.outputPath('home-dashboard-mobile-320.png');
     await page.screenshot({ path: screenshotPath, fullPage: true, animations: 'disabled' });
@@ -542,63 +592,35 @@ test.describe('home gesture chat', () => {
     await expect(page.getByTestId('control-desk-calibration')).toBeVisible();
   });
 
-  test('keeps long chat history readable: scrolling in its frame on desktop, in the page on phones', async ({
+  test('keeps long chat history readable in the page at every width, never in a scroll box', async ({
     page,
-  }, testInfo) => {
+  }) => {
     await page.unroute('**/api/cosmicgame/**');
     await mockHomeGestureChatApi(page, makeLongGestureFeed());
     await page.goto('/', { waitUntil: 'domcontentloaded' });
 
     const chat = page.locator('[data-testid="gesture-message-chat"]:visible').first();
-    const scroll = chat.getByTestId('gesture-message-chat-scroll');
-    const heading = chat.getByRole('heading', { name: 'Gesture Chat' });
+    const feed = chat.getByTestId('gesture-message-chat-scroll');
     await expect(chat.getByText('Cycle #7 · 12 messages')).toBeVisible();
     await chat.scrollIntoViewIfNeeded();
     const oldest = chat.getByText(/Scrollable message 12:/);
 
-    if (testInfo.project.name !== 'Desktop Chrome') {
-      // Phones: the newest messages, then "Show more"; no scroll box in the page.
-      const metrics = await scroll.evaluate((element) => ({
-        clientHeight: element.clientHeight,
-        scrollHeight: element.scrollHeight,
-        overflowY: window.getComputedStyle(element).overflowY,
-      }));
-      expect(metrics.overflowY).toBe('visible');
-      expect(metrics.scrollHeight).toBeLessThanOrEqual(metrics.clientHeight + 1);
-      await expect(oldest).toBeHidden();
-      await chat.getByRole('button', { name: 'Show more', exact: true }).click();
-      await expect(oldest).toBeVisible();
-      return;
-    }
-
-    const viewport = page.viewportSize()!;
-    const chatBox = await chat.boundingBox();
-    const metrics = await scroll.evaluate((element) => ({
+    // The newest messages, then "Show more": the wheel always moves the
+    // page, never a box inside it.
+    const metrics = await feed.evaluate((element) => ({
       clientHeight: element.clientHeight,
       scrollHeight: element.scrollHeight,
       overflowY: window.getComputedStyle(element).overflowY,
     }));
-    expect(chatBox).not.toBeNull();
-    expect(metrics.overflowY).toBe('auto');
-    expect(metrics.scrollHeight).toBeGreaterThan(metrics.clientHeight + 20);
-    expect(chatBox!.height).toBeLessThanOrEqual(viewport.height * 0.9);
-
-    await expect(oldest).not.toBeInViewport();
-    // Focusing may bring the region fully into view; from then on the page stays.
-    await scroll.focus();
-    const headingBox = await heading.boundingBox();
+    expect(metrics.overflowY).toBe('visible');
+    expect(metrics.scrollHeight).toBeLessThanOrEqual(metrics.clientHeight + 1);
+    await expect(oldest).toBeHidden();
     const pageScroll = await page.evaluate(() => window.scrollY);
-    await page.keyboard.press('PageDown');
-    await expect.poll(() => scroll.evaluate((element) => element.scrollTop)).toBeGreaterThan(0);
-    expect(await page.evaluate(() => window.scrollY)).toBe(pageScroll);
-    await scroll.evaluate((element) => {
-      element.scrollTop = element.scrollHeight;
-    });
-    expect(await scroll.evaluate((element) => element.scrollTop)).toBeGreaterThan(0);
-    await expect(oldest).toBeInViewport();
-    await expect(heading).toBeInViewport();
-    expect((await heading.boundingBox())!.y).toBeCloseTo(headingBox!.y, 0);
-    expect(await page.evaluate(() => window.scrollY)).toBe(pageScroll);
+    await feed.hover();
+    await page.mouse.wheel(0, 400);
+    await expect.poll(() => page.evaluate(() => window.scrollY)).toBeGreaterThan(pageScroll);
+    await chat.getByRole('button', { name: 'Show more', exact: true }).click();
+    await expect(oldest).toBeVisible();
   });
 
   test('positions the chat appropriately for the current viewport', async ({ page }, testInfo) => {
@@ -645,19 +667,17 @@ test.describe('home gesture chat', () => {
       expect(artworkBox!.y + artworkBox!.height).toBeLessThanOrEqual(box!.y + 2);
       expect(box!.y + box!.height).toBeLessThanOrEqual(guideBox!.y + 2);
 
-      // Who and when share a line; how the Gesture was made follows the body.
-      const metaBox = await chat.getByTestId('gesture-message-meta').first().boundingBox();
-      const methodBox = await chat.getByTestId('gesture-method-badge').first().boundingBox();
-      expect(metaBox).not.toBeNull();
-      expect(methodBox).not.toBeNull();
-      expect(methodBox!.y).toBeGreaterThanOrEqual(metaBox!.y + metaBox!.height - 1);
+      // Who, how the Gesture was made and when share one line over the message.
+      const meta = chat.getByTestId('gesture-message-meta').first();
+      await expect(meta.getByTestId('gesture-method-badge')).toBeVisible();
       return;
     }
 
-    // Desktop: the form and the art share row 2; the chat and the guide share row 3.
-    expect(clockBox!.y + clockBox!.height).toBeLessThanOrEqual(panelBox!.y + 2);
+    // Desktop: the form beside the Cycle column; the standings and the art
+    // below; then the chat and the guide.
+    expect(clockBox!.x + clockBox!.width).toBeLessThanOrEqual(panelBox!.x + 2);
     await expectEfficientDesktopLayout(page);
-    expect(artworkBox!.y).toBeLessThan(panelBox!.y + panelBox!.height);
+    expect(artworkBox!.y).toBeGreaterThanOrEqual(panelBox!.y + panelBox!.height);
     expect(box!.x + box!.width).toBeLessThanOrEqual(guideBox!.x + 2);
     expect(Math.abs(box!.y - guideBox!.y)).toBeLessThanOrEqual(1);
     expect(box!.x).toBeLessThan(viewport!.width / 2);

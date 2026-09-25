@@ -75,14 +75,17 @@ for (const viewport of [
         expect(firstRow.length).toBeGreaterThanOrEqual(3);
 
         if (messageCount > 1) {
-          const scroll = page.getByTestId('gesture-message-chat-scroll');
-          const dimensions = await scroll.evaluate((element) => ({
+          // A long history stays part of the page: the newest messages, then
+          // "Show more", never a scroll box that catches the wheel.
+          const feed = page.getByTestId('gesture-message-chat-scroll');
+          const dimensions = await feed.evaluate((element) => ({
             content: element.scrollHeight,
             panel: element.clientHeight,
             overflow: getComputedStyle(element).overflowY,
           }));
-          expect(dimensions.content).toBeGreaterThan(dimensions.panel);
-          expect(dimensions.overflow).toBe('auto');
+          expect(dimensions.content).toBeLessThanOrEqual(dimensions.panel + 1);
+          expect(dimensions.overflow).toBe('visible');
+          await expect(chat.getByRole('button', { name: 'Show more', exact: true })).toBeVisible();
         }
       }
 

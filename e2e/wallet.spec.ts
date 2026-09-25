@@ -284,7 +284,8 @@ test.describe('Wallet connection state (disconnected)', () => {
     ).toBeDisabled();
 
     // Message, advanced options and the action share the form's main column;
-    // from 1024px the wallet's standing sits beside the form, outside it.
+    // from 1024px the wallet's standing sits in the Cycle column beside the
+    // form, outside it.
     const messageBox = (await panel.getByTestId('gesture-panel-message').boundingBox())!;
     // The sheet pins its action row as a full-bleed footer; its button keeps to
     // the form's column.
@@ -298,7 +299,7 @@ test.describe('Wallet connection state (disconnected)', () => {
     expect(actionBox.width).toBeCloseTo(messageBox.width, 0);
     if (!isMobile) {
       const standingBox = (await page.getByTestId('control-desk-standing').boundingBox())!;
-      expect(messageBox.x + messageBox.width).toBeLessThanOrEqual(standingBox.x);
+      expect(standingBox.x + standingBox.width).toBeLessThanOrEqual(messageBox.x);
     }
 
     await advancedTrigger.click();
@@ -413,19 +414,17 @@ test.describe('Wallet connection state (disconnected)', () => {
       'the gesture panel is legitimately hidden while no cycle is active',
     );
 
-    // Phones host the one gesture panel in a bottom sheet behind the dock;
-    // desktop renders it inline in the stage.
+    // Without a wallet the dock offers the form's own connect action on
+    // phones (it steps aside while the form's action is on screen, so it is
+    // reached from further down the page), and the form says the same inline.
     const isMobile = await page.evaluate(() => window.innerWidth < 1024);
-    // The dock steps aside while the in-page gesture form is on screen, so it is
-    // reached from further down the page, as a reader scrolling past the form would.
-    if (isMobile) await openSheetFromDock(page);
-    const panel = page
-      .locator(
-        isMobile
-          ? '[data-testid="gesture-panel"][data-variant="sheet"]:visible'
-          : '[data-testid="gesture-panel"]:visible',
-      )
-      .first();
+    if (isMobile) {
+      await page.getByTestId('home-feed-layout').scrollIntoViewIfNeeded();
+      await expect(page.getByTestId('dock-connect')).toBeVisible();
+      await expect(page.getByTestId('dock-open-sheet')).toHaveCount(0);
+    }
+    const panel = page.locator('[data-testid="gesture-panel"][data-variant="card"]').first();
+    await panel.scrollIntoViewIfNeeded();
     await expect(panel).toBeVisible({ timeout: 15000 });
 
     const prompt = panel.getByTestId('connect-to-gesture');
