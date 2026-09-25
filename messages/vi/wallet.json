@@ -25,6 +25,7 @@
     "heading": "Tài khoản",
     "menuLabel": "Menu tài khoản {address}",
     "menuLabelWithAlert": "Menu tài khoản {address}, có phân bổ đang chờ nhận về",
+    "menuLabelWrongNetwork": "{menu}, sai mạng",
     "retrieveReady": "Sẵn sàng nhận về",
     "retrieveAmount": "{amount} sẵn sàng nhận về",
     "addCstToMetaMask": "Thêm CST vào MetaMask",

@@ -120,4 +120,9 @@ export const rootViewport: Viewport = {
   initialScale: 1,
   viewportFit: 'cover',
   themeColor: THEME_CHROME[DEFAULT_SITE_THEME],
+  // Every palette is dark. Declared in the head, the browser paints its dark
+  // canvas before the stylesheet arrives, so no document ever flashes white:
+  // not a slow first paint, and not the bare shell Next.js streams when a
+  // route segment calls notFound() before the 404 renders on the client.
+  colorScheme: 'dark',
 };

@@ -2,14 +2,12 @@
   "publicData": {
     "common": {
       "none": "아직 없음",
-      "source": "데이터 출처: {source}",
       "relatedPagesAria": "{heading} 관련 페이지"
     },
     "routes": {
       "allocation": {
         "heading": "배분 수령자",
         "description": "마감된 퍼포먼스 사이클에 걸친 Cosmic Signature의 공개 배분 내역을 둘러볼 수 있습니다. 시그니처 배분, 별빛 선정, 앵커링 지급, 공공재 흐름이 포함됩니다.",
-        "source": "Cosmic Signature 공개 사이클 API",
         "links": {
           "statistics": "프로토콜 통계 보기",
           "learn": "사이클 마감 과정 알아보기",
@@ -35,7 +33,6 @@
       "anchoring": {
         "heading": "앵커링 지급",
         "description": "블록체인에 기록된 모든 NFT 앵커링, ETH 앵커링 지급, 별빛 선정 각인을 한곳에서 확인할 수 있습니다.",
-        "source": "Cosmic Signature 공개 앵커링 API",
         "links": {
           "statistics": "앵커링 통계 보기",
           "learn": "앵커링 알아보기",
@@ -59,11 +56,9 @@
       "marketing": {
         "heading": "홍보 배분",
         "description": "Cosmic Signature를 널리 알리는 기여자에게 홍보 준비금에서 보낸 CST입니다. 배분마다 해당 트랜잭션이 함께 표시됩니다.",
-        "source": "Cosmic Signature 홍보 API",
         "links": {
-          "faq": "자주 묻는 질문 읽기",
-          "statistics": "프로토콜 통계 보기",
-          "siteMap": "공개 페이지 둘러보기"
+          "faq": "홍보 준비금의 작동 원리",
+          "statistics": "프로토콜 통계 보기"
         },
         "cards": {
           "records": {
@@ -80,7 +75,6 @@
       "imprint": {
         "heading": "Random Walk NFT 각인",
         "description": "Cosmic Signature 참여를 위해 Random Walk NFT를 각인합니다. 사용하지 않은 Random Walk NFT는 ETH 제스처 하나에 첨부해 제스처 비용을 50% 낮출 수 있습니다.",
-        "source": "Random Walk NFT 컨트랙트 및 Cosmic Signature 공개 API",
         "links": {
           "cycle": "진행 중인 퍼포먼스 사이클 열기",
           "learn": "제스처 알아보기",
@@ -101,7 +95,6 @@
       "eth-contribution": {
         "heading": "직접 ETH 기여",
         "description": "사이클 준비금에 직접 보낸 ETH를 기여자의 메모, 해당 사이클과 함께 보여 줍니다.",
-        "source": "Cosmic Signature 기여 API",
         "links": {
           "reserve": "사이클 준비금 배분 방식",
           "protocol": "공공재 몫이 전달되는 곳",
@@ -122,7 +115,6 @@
       "attached-nfts": {
         "heading": "첨부된 NFT 기여",
         "description": "Cosmic Signature 제스처에 첨부된 NFT를 둘러볼 수 있습니다. 첨부된 ERC-721 토큰은 사이클이 마감될 때 시그니처 배분을 받는 참여자에게 전달됩니다.",
-        "source": "Cosmic Signature 공개 첨부 NFT API",
         "links": {
           "gallery": "Cosmic Signature 갤러리 둘러보기",
           "cycle": "현재 퍼포먼스 사이클 보기",
@@ -143,7 +135,6 @@
       "allocation-finalized": {
         "heading": "마감된 배분",
         "description": "마감된 각 사이클의 배분 내역입니다. 시그니처 배분부터 모든 별빛 선정 및 앵커링 지급 기록까지 확인할 수 있습니다.",
-        "source": "Cosmic Signature 공개 배분 회수 API",
         "links": {
           "myAllocations": "내 배분 회수",
           "statistics": "종합 통계 보기",
@@ -166,7 +157,6 @@
       "named-nfts": {
         "heading": "이름 붙인 Cosmic Signature NFT",
         "description": "소유자가 직접 이름을 붙인 Cosmic Signature NFT를 둘러볼 수 있습니다. 작품을 감상하고 온체인에 기록된 이력을 살펴보세요.",
-        "source": "Cosmic Signature 공개 토큰 API",
         "links": {
           "gallery": "전체 갤러리 둘러보기",
           "learn": "작품 알아보기",
@@ -178,16 +168,12 @@
           },
           "owners": {
             "label": "현재 소유자"
-          },
-          "imprinted": {
-            "label": "각인된 NFT"
           }
         }
       },
       "used-rwlk-nfts": {
         "heading": "사용된 Random Walk NFT",
         "description": "일회성 제스처 비용 할인을 위해 이미 ETH 제스처에 첨부된 Random Walk NFT를 확인할 수 있습니다.",
-        "source": "Cosmic Signature 공개 Random Walk 사용 기록 API",
         "links": {
           "imprint": "Random Walk NFT 각인",
           "learn": "제스처 알아보기",
@@ -208,7 +194,6 @@
       "coordination-changes": {
         "heading": "조율 변경 내역",
         "description": "컨트랙트 소유자가 프로토콜 매개변수에 적용한 변경 사항과 각 트랜잭션입니다. 소유권을 포기하기 전까지 소유자는 계속 변경할 수 있습니다.",
-        "source": "Cosmic Signature 시스템 이벤트 API",
         "links": {
           "security": "보안 개요 읽기",
           "audits": "보안 감사와 검증 확인",
@@ -232,10 +217,8 @@
       "public-goods-contributions-cg": {
         "heading": "프로토콜 공공재 기여",
         "description": "마감된 사이클마다 사이클 준비금의 7%가 공공재 금고로 들어가 공공재 수령처 앞으로 보관됩니다. 현재 수령처는 이더리움 핵심 기여자를 지원하는 Protocol Guild입니다.",
-        "source": "Cosmic Signature 공공재 API",
         "links": {
           "learn": "공공재 알아보기",
-          "statistics": "공공재 통계 보기",
           "contracts": "금고 컨트랙트 확인"
         },
         "cards": {
@@ -246,15 +229,14 @@
             "label": "사이클별 비율",
             "tooltip": "마감된 각 사이클 준비금 중 프로토콜이 공공재 금고로 전달하는 비율입니다."
           },
-          "latest": {
-            "label": "최근"
+          "totalEth": {
+            "label": "기여된 ETH"
           }
         }
       },
       "public-goods-contributions-voluntary": {
         "heading": "자발적 공공재 기여",
         "description": "누구나 공공재 금고에 직접 보낸 ETH로, 지정된 수령처(현재 Protocol Guild)에 전달됩니다.",
-        "source": "Cosmic Signature 공공재 API",
         "links": {
           "direct": "직접 ETH 기여 보기",
           "learn": "공공재 알아보기",
@@ -275,11 +257,10 @@
       "public-goods-retrievals": {
         "heading": "공공재 회수",
         "description": "공공재 금고에서 공공재 수령처(현재 Protocol Guild)로 보낸 모든 전달 내역입니다. 누구나 전달을 실행할 수 있으며, ETH는 항상 수령처로만 갑니다.",
-        "source": "Cosmic Signature 공공재 API",
         "links": {
           "learn": "공공재 알아보기",
           "protocolGuild": "Protocol Guild 방문",
-          "contracts": "공개 컨트랙트 주소 확인"
+          "contracts": "금고 컨트랙트 확인"
         },
         "cards": {
           "records": {

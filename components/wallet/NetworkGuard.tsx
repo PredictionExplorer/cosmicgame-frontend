@@ -100,26 +100,29 @@ export function WrongNetworkChip({ className }: { className?: string }) {
 
 /**
  * The wrong-network state as a badge on the wallet pill, where the header has
- * no room for `WrongNetworkChip`: phones under 360px and the desktop bar (xl
- * and up), where the navigation fills the row. The pill opens the account
- * panel or menu, which explains the state and offers the switch. Place it
- * inside a `relative` trigger; pass visibility classes for the widths where
- * the chip is shown instead.
+ * no room for `WrongNetworkChip`: phones under 360px and the desktop bar
+ * (1024px and up), where the navigation fills the row. The pill opens the
+ * account panel or menu, which explains the state and offers the switch.
+ * Place it inside a `relative` trigger; pass visibility classes for the widths
+ * where the chip is shown instead.
+ *
+ * The badge is drawn only: a button's `aria-label` replaces its content, so
+ * the trigger says the state in its own name (the wallet pill's
+ * `account.menuLabelWrongNetwork`).
  */
 export function WrongNetworkBadge({ className }: { className?: string }) {
-  const t = useTranslations('wallet');
   const { isWrongChain } = useWalletNetwork();
   if (!isWrongChain) return null;
   return (
     <span
+      aria-hidden
       data-testid="wrong-network-badge"
       className={cn(
         'absolute right-0 -top-0.5 inline-flex size-4 items-center justify-center rounded-full border border-background bg-background',
         className,
       )}
     >
-      <AlertTriangle className={cn('size-3.5', 'text-attention')} aria-hidden />
-      <span className="sr-only">{t('network.wrong')}</span>
+      <AlertTriangle className="size-3.5 text-attention" />
     </span>
   );
 }

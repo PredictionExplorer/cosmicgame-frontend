@@ -15,5 +15,9 @@
     "account": "Your statistics, allocations, NFTs and anchors. Connect a wallet to see them.",
     "ecosystem": "Independent services built around Cosmic Signature. They open in a new tab.",
     "community": "Where the community talks, and where the Public Goods Allocation goes."
+  },
+  "guides": {
+    "title": "Guides",
+    "description": "Articles on the protocol, the art and taking part, from Learn on {host}."
   }
 }

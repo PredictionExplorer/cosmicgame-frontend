@@ -1,18 +1,13 @@
-import { createContext, useContext, useMemo, type ReactNode } from 'react';
+import { useMemo, type ReactNode } from 'react';
 
 import { useActiveWeb3React } from '@/hooks/web3';
 import { useAnchoredCSTokensByUser, useAnchoredRWLKTokensByUser } from '@/hooks/useApiQuery';
 import type { AnchoredTokenInfo } from '@/services/api/types';
 
-interface AnchoredTokenContextValue {
-  cstokens: AnchoredTokenInfo[];
-  rwlktokens: AnchoredTokenInfo[];
-  fetchData: () => Promise<void>;
-  error: string | null;
-  isLoading: boolean;
-}
+import { AnchoredTokenContext, useAnchoredToken } from './accountDataContexts';
 
-const AnchoredTokenContext = createContext<AnchoredTokenContextValue | undefined>(undefined);
+export { useAnchoredToken };
+export type { AnchoredTokenContextValue } from './accountDataContexts';
 
 /**
  * The lists while a read has no data (disconnected, loading or failed): one
@@ -62,12 +57,4 @@ export const AnchoredTokenProvider = ({ children }: AnchoredTokenProviderProps) 
       {children}
     </AnchoredTokenContext.Provider>
   );
-};
-
-export const useAnchoredToken = (): AnchoredTokenContextValue => {
-  const context = useContext(AnchoredTokenContext);
-  if (!context) {
-    throw new Error('useAnchoredToken must be used within a AnchoredTokenProvider');
-  }
-  return context;
 };

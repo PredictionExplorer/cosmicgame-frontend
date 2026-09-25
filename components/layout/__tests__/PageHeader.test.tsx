@@ -1,6 +1,11 @@
 import '@testing-library/jest-dom';
 
-import { PageHeader } from '@/components/layout/PageHeader';
+import {
+  PageHeader,
+  PageHeaderFacts,
+  PageHeaderFigures,
+  PageHeaderTabs,
+} from '@/components/layout/PageHeader';
 import { PAGE_SECTIONS } from '@/components/layout/pageSections';
 
 import { render, screen, within, checkA11y } from '@/test-utils';
@@ -416,7 +421,9 @@ describe('PageHeader', () => {
     );
   });
 
-  it('keeps related pages off phones and draws them on the control radius', () => {
+  it('keeps related pages on phones, as quiet links rather than bordered chips', () => {
+    // Phones once dropped the header's only route to sibling pages; the links
+    // now wrap there, every one in view, and the visible label steps aside.
     render(
       <PageHeader
         title="Allocation"
@@ -424,10 +431,42 @@ describe('PageHeader', () => {
         relatedLabel="Related"
       />,
     );
-    expect(screen.getByRole('navigation', { name: 'Related' })).toHaveClass('max-sm:hidden');
-    const chip = screen.getByRole('link', { name: 'Statistics' });
-    expect(chip).toHaveClass('rounded-control', 'pointer-coarse:min-h-11');
-    expect(chip).not.toHaveClass('rounded-pill');
+    const related = screen.getByRole('navigation', { name: 'Related' });
+    expect(related).not.toHaveClass('max-sm:hidden');
+    expect(related.closest('.max-sm\\:hidden')).toBeNull();
+    // The visible label repeats the nav's own name, so it is not read twice,
+    // and gives its room to the links on phones.
+    const label = within(related).getByText('common.pageHeader.relatedPages');
+    expect(label).toHaveAttribute('aria-hidden', 'true');
+    expect(label).toHaveClass('max-sm:hidden');
+    expect(within(related).getByRole('list')).toHaveClass('flex-wrap');
+    const link = screen.getByRole('link', { name: 'Statistics' });
+    expect(link).toHaveClass('link-quiet', 'pointer-coarse:min-h-11', 'sm:whitespace-nowrap');
+    expect(link).not.toHaveClass('border');
+  });
+
+  it('keeps the lede at its own size on phones, never under the body text', () => {
+    render(<PageHeader title="Security" variant="reading" subtitle="The thesis." />);
+    const lede = screen.getByText('The thesis.');
+    expect(lede).toHaveClass('type-lede');
+    expect(lede.className).not.toMatch(/max-sm:text-/);
+  });
+
+  it('gives a date figure its own phone row beside another wide figure', () => {
+    render(
+      <PageHeaderFigures
+        figures={[
+          { id: 'records', label: 'Retrievals', value: '2' },
+          { id: 'total', label: 'ETH retrieved', value: '4.8 ETH' },
+          { id: 'latest', label: 'Latest', value: 'Aug 11, 2026, 19:34', size: 'md', date: true },
+          { id: 'beneficiary', label: 'Beneficiary', value: 'Protocol Guild', size: 'md' },
+        ]}
+      />,
+    );
+    const latest = document.querySelector('[data-figure="latest"]');
+    const beneficiary = document.querySelector('[data-figure="beneficiary"]');
+    expect(latest).toHaveClass('max-sm:col-span-2');
+    expect(beneficiary).toHaveClass('max-sm:col-span-2');
   });
 
   it('never clamps the lede of a reading page', () => {
@@ -436,6 +475,52 @@ describe('PageHeader', () => {
     rerender(<PageHeader title="Risk" variant="reading" subtitle="The disclosure." />);
     expect(screen.getByText('The disclosure.')).not.toHaveAttribute('data-lede-fit');
     expect(screen.queryByRole('button', { name: 'common.pageHeader.readMore' })).toBeNull();
+  });
+
+  it('opens the header with the sibling tabs, above the title, so switching never moves them', () => {
+    render(
+      <PageHeader
+        section="records"
+        title="Voluntary contributions"
+        subtitle="A lede that is longer on one tab than on another."
+        figures={[{ id: 'records', label: 'Contributions', value: '0' }]}
+        tabs={
+          <PageHeaderTabs
+            label="Public Goods"
+            items={[
+              { href: '/protocol', label: 'Protocol' },
+              { href: '/voluntary', label: 'Voluntary', current: true },
+            ]}
+          />
+        }
+      />,
+    );
+    const tabs = screen.getByRole('navigation', { name: 'Public Goods' });
+    const heading = screen.getByRole('heading', { level: 1 });
+    // Before the H1 in document order, on a rule of its own.
+    expect(tabs.compareDocumentPosition(heading) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+    expect(tabs.parentElement).toHaveClass('border-b', 'border-rule');
+    expect(within(tabs).getByRole('link', { name: 'Voluntary' })).toHaveAttribute(
+      'aria-current',
+      'page',
+    );
+    // The header keeps its own foot and bottom rule.
+    expect(screen.getByRole('banner')).toHaveClass('pb-6', 'border-b');
+  });
+
+  it('sets a facts line under the lede, before the related pages', () => {
+    render(
+      <PageHeader
+        section="collection"
+        title="Named NFTs"
+        subtitle="Signatures their owners have named."
+        facts={<PageHeaderFacts facts={[{ id: 'named', label: 'Named NFTs', value: '3' }]} />}
+        related={[{ href: '/gallery', label: 'Gallery' }]}
+      />,
+    );
+    const facts = screen.getByTestId('page-header-facts');
+    const related = screen.getByRole('navigation', { name: 'common.pageHeader.relatedPages' });
+    expect(facts.compareDocumentPosition(related) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
   });
 
   it('gives the H1 an id for aria-labelledby', () => {

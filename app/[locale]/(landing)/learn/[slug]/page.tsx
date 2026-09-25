@@ -46,6 +46,12 @@ export function generateStaticParams() {
   return getLearnSlugs().map((slug) => ({ slug }));
 }
 
+// Every guide is prerendered. proxy.ts answers any other slug before routing
+// (lib/paramRoutes.ts) with app/global-not-found.tsx, the landing chrome
+// rendered on the server; this is the backstop, which Next.js reaches only
+// by logging an internal NoFallbackError.
+export const dynamicParams = false;
+
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const { locale, slug } = await params;
   setRequestLocale(locale);

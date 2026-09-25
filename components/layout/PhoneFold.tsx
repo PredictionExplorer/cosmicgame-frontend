@@ -6,15 +6,9 @@ import { ChevronDown } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 interface PhoneFoldProps {
-  /** The group's heading, always rendered (visible, or sr-only via `headingClassName`). */
+  /** The group's heading, an h2, always rendered (visible, or sr-only via `headingClassName`). */
   heading: ReactNode;
   headingClassName?: string;
-  /** A stable id for the heading, when a surrounding landmark is labelled by it. */
-  headingId?: string;
-  /** Heading level; the footer uses h2. */
-  headingLevel?: 'h2' | 'h3';
-  /** Always visible between the heading and the folded content. */
-  lead?: ReactNode;
   children: ReactNode;
   className?: string;
   panelClassName?: string;
@@ -36,23 +30,19 @@ interface PhoneFoldProps {
 export function PhoneFold({
   heading,
   headingClassName,
-  headingId: givenHeadingId,
-  headingLevel: Heading = 'h2',
-  lead,
   children,
   className,
   panelClassName,
   toggleClassName,
 }: PhoneFoldProps) {
   const [open, setOpen] = useState(false);
-  const generatedHeadingId = useId();
-  const headingId = givenHeadingId ?? generatedHeadingId;
+  const headingId = useId();
   const panelId = useId();
   return (
     <div className={cn('relative min-w-0', className)}>
-      <Heading id={headingId} className={headingClassName}>
+      <h2 id={headingId} className={headingClassName}>
         {heading}
-      </Heading>
+      </h2>
       <button
         type="button"
         aria-expanded={open}
@@ -72,7 +62,6 @@ export function PhoneFold({
           )}
         />
       </button>
-      {lead}
       <div
         id={panelId}
         className={cn(

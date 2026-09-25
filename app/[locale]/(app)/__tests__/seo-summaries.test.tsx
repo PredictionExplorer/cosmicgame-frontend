@@ -493,7 +493,7 @@ describe('server-rendered page headers', () => {
     ['named-nfts' as const, 'Named Cosmic Signature NFTs', 'collection', '/gallery'],
     ['used-rwlk-nfts' as const, 'Used Random Walk NFTs', 'collection', '/gallery'],
   ])(
-    'renders %s as one header: H1, section eyebrow, snapshot and source',
+    'renders %s as one header: H1, section eyebrow and snapshot',
     async (route, heading, section, hub) => {
       render(await PublicDataRouteSeoSummary({ route }));
 
@@ -505,9 +505,13 @@ describe('server-rendered page headers', () => {
         hub,
       );
       expect(screen.getByText(COMMON.snapshot)).toBeInTheDocument();
-      // The stamp and its source are one item of the meta line, so they flow as one line.
-      const source = screen.getByText(/^· Source: /);
-      expect(source).toContainElement(screen.getByText(COMMON.snapshot));
+      // The meta line dates the figures; it names no API ("Source: … APIs").
+      expect(screen.queryByText(/Source: /)).not.toBeInTheDocument();
+      // A collection page's facts sit on one quiet line: its headline is the art.
+      if (section === 'collection') {
+        expect(screen.getByTestId('page-header-facts')).toBeInTheDocument();
+        expect(document.querySelector('dl[data-layout]')).toBeNull();
+      }
       // The eyebrow names the section, never the H1 with "· Arbitrum".
       expect(screen.queryByText(/· Arbitrum/)).not.toBeInTheDocument();
     },
@@ -618,10 +622,6 @@ describe('server-rendered page headers', () => {
       // ("Random Walk NFTs imprinted"): label-and-value rows, never a label
       // broken over three lines.
       expect(document.querySelector('dl')).toHaveAttribute('data-layout', 'rows');
-      // The source names where the figures come from: the chain and the API.
-      expect(
-        screen.getByText(new RegExp(seoMessages.publicData.routes.imprint.source)),
-      ).toBeInTheDocument();
     });
 
     it('shows the imprinted count as unavailable when the chain read fails, never as zero', async () => {
@@ -743,17 +743,11 @@ describe('server-rendered page headers', () => {
     });
 
     it('shows "None yet" for the latest record of an empty but successful read', async () => {
-      const cg = render(
-        await PublicDataRouteSeoSummary({ route: 'public-goods-contributions-cg' }),
-      );
-      expect(figureValue('latest')).toHaveTextContent('None yet');
-      expect(figureValue('latest')).not.toHaveTextContent(COMMON.unavailable);
-      cg.unmount();
-
       const retrievals = render(
         await PublicDataRouteSeoSummary({ route: 'public-goods-retrievals' }),
       );
       expect(figureValue('latest')).toHaveTextContent('None yet');
+      expect(figureValue('latest')).not.toHaveTextContent(COMMON.unavailable);
       expect(figureValue('beneficiary')).toHaveTextContent('None yet');
       retrievals.unmount();
 
@@ -769,16 +763,38 @@ describe('server-rendered page headers', () => {
       expect(figureValue('beneficiary')).not.toHaveTextContent('None yet');
     });
 
-    it('lets the empty voluntary ledger lead instead of three zeros', async () => {
+    it('keeps the figure row on the empty voluntary ledger, so the tab row stays put', async () => {
+      // The three Public Goods tabs share one header shape; an empty ledger
+      // once dropped its figures and moved the tab row up by about 120px.
       render(await PublicDataRouteSeoSummary({ route: 'public-goods-contributions-voluntary' }));
-      expect(document.querySelector('[data-figure]')).toBeNull();
+      expect(figureValue('records')).toHaveTextContent(/^0$/);
+      expect(figureValue('totalEth')).toHaveTextContent(/^0\sETH$/);
+      expect(figureValue('contributors')).toHaveTextContent(/^0$/);
       expect(screen.getByText(COMMON.snapshot)).toBeInTheDocument();
     });
 
-    it('leaves the protocol ETH total to the vault flow below the header', async () => {
+    it('leads every Public Goods tab with its ETH, not a count or a date', async () => {
+      mockPublicGoodsDeposits.mockResolvedValue([
+        { AmountEth: 1.5, TimeStamp: 1_786_100_000 },
+        { AmountEth: 0.25, TimeStamp: 1_786_200_000 },
+      ] as Rows<typeof get_charity_cg_deposits>);
+      for (const route of [
+        'public-goods-contributions-cg',
+        'public-goods-contributions-voluntary',
+        'public-goods-retrievals',
+      ] as const) {
+        const view = render(await PublicDataRouteSeoSummary({ route }));
+        const figures = [...document.querySelectorAll('[data-figure]')].map((figure) =>
+          figure.getAttribute('data-figure'),
+        );
+        expect(figures[0]).toBe('totalEth');
+        view.unmount();
+      }
       render(await PublicDataRouteSeoSummary({ route: 'public-goods-contributions-cg' }));
-      expect(document.querySelector('[data-figure="totalEth"]')).toBeNull();
-      expect(figureValue('share')).toBeInTheDocument();
+      expect(figureValue('totalEth')).toHaveTextContent(/^1\.75\d*\sETH$/);
+      expect(figureValue('records')).toHaveTextContent(/^2$/);
+      // The ledger below dates each forward; the header keeps to the flow.
+      expect(document.querySelector('[data-figure="latest"]')).toBeNull();
     });
 
     it('links Public Goods pages where their tabs do not go', async () => {
@@ -791,13 +807,25 @@ describe('server-rendered page headers', () => {
       expect(hrefs).not.toContain('/public-goods-contributions-voluntary');
       const guild = within(related).getByRole('link', { name: /Protocol Guild/ });
       expect(guild).toHaveAttribute('target', '_blank');
+      // The vault link lands on the vault's own section, not the top of /contracts.
+      expect(hrefs).toContain('/contracts#public-goods-heading');
+    });
+
+    it('leads outreach readers to the Outreach Reserve answer, not a generic page', async () => {
+      render(await PublicDataRouteSeoSummary({ route: 'marketing' }));
+      const related = screen.getByRole('navigation', { name: /related pages/ });
+      const hrefs = within(related)
+        .getAllByRole('link')
+        .map((link) => link.getAttribute('href'));
+      expect(hrefs).toContain('/faq#what-are-marketing-rewards');
+      expect(hrefs).not.toContain('/site-map');
     });
 
     it('dates the latest record with its year, as the ledger below does', async () => {
-      mockPublicGoodsDeposits.mockResolvedValue([
+      mockPublicGoodsRetrievals.mockResolvedValue([
         { AmountEth: 1, TimeStamp: 1_786_100_000 },
-      ] as Rows<typeof get_charity_cg_deposits>);
-      render(await PublicDataRouteSeoSummary({ route: 'public-goods-contributions-cg' }));
+      ] as Rows<typeof get_charity_withdrawals>);
+      render(await PublicDataRouteSeoSummary({ route: 'public-goods-retrievals' }));
       expect(figureValue('latest')).toHaveTextContent(/2026/);
     });
 
@@ -841,7 +869,8 @@ describe('server-rendered page headers', () => {
 
       expect(figureValue('named')).toHaveTextContent('2');
       expect(document.querySelector('[data-figure="owners"]')).toBeNull();
-      expect(figureValue('imprinted')).toHaveTextContent('240');
+      // Only facts about named NFTs: the collection's size is the gallery's.
+      expect(document.querySelector('[data-figure="imprinted"]')).toBeNull();
     });
 
     it('counts the owners the names endpoint does return', async () => {
@@ -949,7 +978,6 @@ describe('server-rendered page headers', () => {
       'href',
       '/statistics',
     );
-    expect(screen.getByText(/^· 数据来源：/)).toBeInTheDocument();
     expect(screen.queryByText(/initial HTML for search engines/i)).not.toBeInTheDocument();
   });
 

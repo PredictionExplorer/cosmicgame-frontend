@@ -5,8 +5,8 @@ import {
   useEffect,
   useId,
   useMemo,
+  useRef,
   useState,
-  useSyncExternalStore,
   type KeyboardEvent,
   type ReactNode,
 } from 'react';
@@ -41,8 +41,12 @@ import { formatAddress } from '@/utils/format';
 import { formatId } from '@/utils/format/ids';
 import { getExplorerUrl } from '@/utils/urls';
 
-import { OPEN_SITE_SEARCH_EVENT } from './siteSearchEvents';
+import { paletteReturnTarget } from './commandShortcut';
 import { useSiteNavCopy } from './useSiteNav';
+
+// The keyboard contract lives in the small module the header loads on every
+// page; re-exported for callers that import it from here.
+export { useCommandPaletteShortcut, useCommandShortcut } from './commandShortcut';
 
 interface PaletteOption {
   readonly key: string;
@@ -69,51 +73,8 @@ const JUMP_ICONS: Record<JumpTarget['kind'], LucideIcon> = {
   gesture: PenLine,
 };
 
-const subscribeToNothing = () => () => {};
-
 /** How long typing must pause before the result count is announced. */
 const ANNOUNCE_DELAY_MS = 500;
-
-function platformShortcut(): string {
-  const platform =
-    (navigator as Navigator & { userAgentData?: { platform?: string } }).userAgentData?.platform ??
-    navigator.platform;
-  return /mac|iphone|ipad/i.test(platform) ? '⌘K' : 'Ctrl K';
-}
-
-/**
- * The platform's shortcut, once the client knows it: null on the server and
- * during hydration, so no one ever sees the wrong glyph.
- */
-export function useCommandShortcutLabel(): string | null {
-  return useSyncExternalStore(subscribeToNothing, platformShortcut, () => null);
-}
-
-/**
- * Opens the palette on ⌘K / Ctrl+K anywhere, and when another surface calls
- * `requestSiteSearch()`. There is deliberately no single-character shortcut
- * ("/"): one that cannot be turned off fires from speech input and stray
- * keys (WCAG 2.1.4), and the modifier chord is always available.
- */
-export function useCommandPaletteShortcut(open: () => void) {
-  useEffect(() => {
-    window.addEventListener(OPEN_SITE_SEARCH_EVENT, open);
-    return () => window.removeEventListener(OPEN_SITE_SEARCH_EVENT, open);
-  }, [open]);
-
-  useEffect(() => {
-    const onKeyDown = (event: globalThis.KeyboardEvent) => {
-      if (event.defaultPrevented) return;
-      const commandK = (event.metaKey || event.ctrlKey) && event.key.toLowerCase() === 'k';
-      if (commandK) {
-        event.preventDefault();
-        open();
-      }
-    };
-    window.addEventListener('keydown', onKeyDown);
-    return () => window.removeEventListener('keydown', onKeyDown);
-  }, [open]);
-}
 
 function Kbd({ children }: { children: ReactNode }) {
   return (
@@ -299,7 +260,7 @@ function PaletteBody({ onClose }: { onClose: () => void }) {
         <Search aria-hidden className="size-4 shrink-0 text-subtle" />
         <input
           role="combobox"
-          aria-expanded
+          aria-expanded={groups.length > 0}
           aria-controls={listId}
           aria-autocomplete="list"
           aria-activedescendant={activeId}
@@ -318,13 +279,13 @@ function PaletteBody({ onClose }: { onClose: () => void }) {
           placeholder={roomy ? t('search.placeholder') : t('search.placeholderShort')}
           className="focus-ring-none h-14 min-w-0 flex-1 bg-transparent text-base text-foreground outline-none placeholder:text-subtle"
         />
-        {/* A visible way out on every device: a close button on phones, the Esc key cap from 640px. */}
-        <DialogPrimitive.Close
-          aria-label={t('search.keys.close')}
-          className="-mr-2 inline-flex size-11 shrink-0 items-center justify-center rounded-control text-subtle transition-colors duration-150 hover:bg-muted hover:text-foreground sm:mr-0 sm:size-auto sm:bg-transparent sm:hover:bg-transparent"
-        >
+        {/* A visible way out on every device: a close button on phones, the Esc key cap
+            from 640px. The name is "Close" plus the key cap where it shows, so it
+            always contains the visible label (WCAG 2.5.3). */}
+        <DialogPrimitive.Close className="-mr-2 inline-flex size-11 shrink-0 items-center justify-center rounded-control text-subtle transition-colors duration-150 hover:bg-muted hover:text-foreground sm:mr-0 sm:size-auto sm:bg-transparent sm:hover:bg-transparent">
           <X aria-hidden className="size-5 sm:hidden" />
-          <span aria-hidden className="hidden sm:inline-flex">
+          <span className="sr-only">{t('search.keys.close')}</span>
+          <span className="hidden sm:inline-flex">
             <Kbd>Esc</Kbd>
           </span>
         </DialogPrimitive.Close>
@@ -372,17 +333,22 @@ function PaletteBody({ onClose }: { onClose: () => void }) {
                     }}
                     onClick={() => choose(option)}
                     className={cn(
+                      // The site's highlighted row (components/ui/item-highlight): a 12%
+                      // primary fill and a 2px primary bar, 6.5:1 or more in every
+                      // palette. Focus stays in the field (aria-activedescendant), so
+                      // this row is the list's keyboard focus indicator; in forced
+                      // colours it is outlined in the system highlight.
                       'flex min-h-12 cursor-pointer items-center gap-3 rounded-control px-3 py-2',
-                      selected ? 'bg-muted' : 'bg-transparent',
+                      selected
+                        ? 'bg-primary/12 text-foreground shadow-[inset_2px_0_0_0_hsl(var(--primary))] forced-colors:outline forced-colors:outline-2 forced-colors:-outline-offset-2 forced-colors:outline-[Highlight]'
+                        : 'bg-transparent',
                     )}
                   >
                     <span
                       aria-hidden
                       className={cn(
-                        'flex size-8 shrink-0 items-center justify-center rounded-control border',
-                        selected
-                          ? 'border-primary/40 bg-primary/10 text-primary'
-                          : 'border-rule-faint bg-surface-sunken text-subtle',
+                        'flex size-8 shrink-0 items-center justify-center rounded-control',
+                        selected ? 'text-primary' : 'text-subtle',
                       )}
                     >
                       <Icon className="size-4" />
@@ -442,6 +408,11 @@ interface CommandPaletteProps {
 export function CommandPalette({ open, onOpenChange }: CommandPaletteProps) {
   const t = useTranslations('nav');
   const close = useCallback(() => onOpenChange(false), [onOpenChange]);
+  // The palette has no Radix trigger (it opens from a shortcut, the header,
+  // the drawer, a menu row or the 404), so Radix cannot give focus back on
+  // its own: it would fall to <body>, and a keyboard or screen-reader user
+  // would start again from the top of the page (WCAG 2.4.3).
+  const openerRef = useRef<HTMLElement | null>(null);
   return (
     <DialogPrimitive.Root open={open} onOpenChange={onOpenChange}>
       <DialogPrimitive.Portal>
@@ -451,7 +422,16 @@ export function CommandPalette({ open, onOpenChange }: CommandPaletteProps) {
           className="fixed left-1/2 top-[max(0.75rem,env(safe-area-inset-top),12vh)] z-50 flex max-h-[min(34rem,calc(100dvh-2rem))] w-[min(40rem,calc(100vw-1.5rem))] -translate-x-1/2 flex-col overflow-hidden rounded-surface border border-rule bg-popover text-popover-foreground shadow-float duration-150 data-[state=open]:animate-in data-[state=open]:fade-in-0 data-[state=open]:zoom-in-[0.98] data-[state=closed]:animate-out data-[state=closed]:fade-out-0"
           onOpenAutoFocus={(event) => {
             event.preventDefault();
+            // Focus has not moved yet: this is the element that opened the palette.
+            const opener = document.activeElement;
+            openerRef.current =
+              opener instanceof HTMLElement && opener !== document.body ? opener : null;
             (event.currentTarget as HTMLElement).querySelector('input')?.focus();
+          }}
+          onCloseAutoFocus={(event) => {
+            event.preventDefault();
+            paletteReturnTarget(openerRef.current)?.focus();
+            openerRef.current = null;
           }}
         >
           <DialogPrimitive.Title className="sr-only">{t('search.title')}</DialogPrimitive.Title>

@@ -4,59 +4,16 @@ import { useEffect } from 'react';
 import { useQueryClient, type QueryClient } from '@tanstack/react-query';
 
 import { useContractAddresses } from '@/contexts/ContractAddressesContext';
+import { startCosmicEventPolling, type CosmicChainEvent } from '@/lib/chainEvents';
 import {
-  startCosmicEventPolling,
-  type CosmicChainEvent,
-  type WatchedCosmicEventName,
-} from '@/lib/chainEvents';
+  EVENT_QUERY_ROUTES,
+  EVENT_WINDOW_EVENTS,
+  LIVE_GAME_QUERY_KEYS,
+} from '@/lib/liveGameQueryKeys';
 
-export const LIVE_GAME_QUERY_KEYS: readonly (readonly unknown[])[] = [
-  ['dashboardInfo'],
-  ['currentSpecialWinners'],
-  ['specialAllocationChainSnapshot'],
-  ['allocationTime'],
-  ['timeUntilPrize'],
-  ['currentTime'],
-  ['gestureList'],
-  ['bidListByRound'],
-  ['homeGestureFeed'],
-  ['donationsNFTByRound'],
-  ['donationsERC20ByRound'],
-  ['bidEthPrice'],
-  ['ctPrice'],
-];
-
-/** Queries showing ETH donation data (list pages, per-round tabs, totals). */
-const ETH_DONATION_QUERY_KEYS: readonly (readonly unknown[])[] = [
-  ['dashboardInfo'],
-  ['donationsCGSimpleList'],
-  ['donationsCGSimpleByRound'],
-  ['donationsCGWithInfoList'],
-  ['donationsCGWithInfoByRound'],
-  ['donationsWithInfoById'],
-  ['donationsEthByUser'],
-  ['donationsBoth'],
-  ['donationsBothByRound'],
-];
-
-/**
- * Which query caches each watched CosmicGame event refreshes. Keys are
- * matched as prefixes, so e.g. `['roundInfo']` covers every per-round entry.
- */
-export const EVENT_QUERY_ROUTES: Record<WatchedCosmicEventName, readonly (readonly unknown[])[]> = {
-  BidPlaced: LIVE_GAME_QUERY_KEYS,
-  FirstBidPlacedInRound: [...LIVE_GAME_QUERY_KEYS, ['roundList'], ['roundInfo']],
-  MainPrizeClaimed: [...LIVE_GAME_QUERY_KEYS, ['claimHistory'], ['roundList'], ['roundInfo']],
-  EthDonated: ETH_DONATION_QUERY_KEYS,
-  EthDonatedWithInfo: ETH_DONATION_QUERY_KEYS,
-};
-
-/** DOM events broadcast so non-query consumers can react immediately. */
-export const EVENT_WINDOW_EVENTS: Partial<Record<WatchedCosmicEventName, string>> = {
-  BidPlaced: 'cosmic:gesture-placed',
-  FirstBidPlacedInRound: 'cosmic:gesture-placed',
-  MainPrizeClaimed: 'cosmic:cycle-finalized',
-};
+// The key tables live in a module the app shell can read without the event
+// polling (lib/liveGameQueryKeys); re-exported here for existing callers.
+export { EVENT_QUERY_ROUTES, EVENT_WINDOW_EVENTS, LIVE_GAME_QUERY_KEYS };
 
 /**
  * The backend ETL indexes a new block shortly after the node sees it, so the
@@ -84,7 +41,9 @@ export function invalidateLiveGameQueries(
 }
 
 /**
- * Site-wide event-driven refresh: polls both RPC nodes for the watched
+ * Event-driven refresh for every page that shows live data (the app shell
+ * mounts it once such a query is observed, see LiveGameDataRefreshGate):
+ * polls both RPC nodes for the watched
  * CosmicGame events (see lib/chainEvents) and, when one lands on-chain,
  * broadcasts the matching window event and invalidates the affected query
  * caches — once immediately and once after `ETL_ECHO_DELAY_MS`, so viewers

@@ -25,6 +25,7 @@
     "heading": "アカウント",
     "menuLabel": "{address}のアカウントメニュー",
     "menuLabelWithAlert": "{address}のアカウントメニュー。受け取れる配分があります",
+    "menuLabelWrongNetwork": "{menu}。別のネットワーク",
     "retrieveReady": "受け取り可能",
     "retrieveAmount": "受け取り可能：{amount}",
     "addCstToMetaMask": "CSTをMetaMaskに追加",

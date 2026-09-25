@@ -15,5 +15,9 @@
     "account": "你的統計、分配、NFT 與錨定。連接錢包後即可查看。",
     "ecosystem": "圍繞 Cosmic Signature 建立的獨立服務，將在新分頁中打開。",
     "community": "社區交流的地方，以及公共物品分配的去向。"
+  },
+  "guides": {
+    "title": "指南",
+    "description": "{host} 上的學習文章：協議、藝術與參與方式。"
   }
 }

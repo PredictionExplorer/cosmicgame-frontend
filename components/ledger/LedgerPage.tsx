@@ -8,7 +8,7 @@ export interface LedgerPageProps {
    * The page's one header: a `PageHeader`, or the server-rendered
    * `PublicDataRouteSeoSummary` that renders into one. Sibling ledgers (the
    * Public Goods trio, an address's CST and NFT transfers) sit in its `tabs`
-   * slot as `PageHeaderTabs`, on the header's bottom rule.
+   * slot as `PageHeaderTabs`, at the top of the header.
    */
   header: ReactNode;
   /**

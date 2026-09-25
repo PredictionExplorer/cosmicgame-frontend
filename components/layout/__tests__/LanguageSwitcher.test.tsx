@@ -38,7 +38,7 @@ describe('LanguageSwitcher', () => {
 
   it('labels the trigger with the current language in its own name and language', () => {
     mockLocale = 'ja';
-    render(<LanguageSwitcher />);
+    render(<LanguageSwitcher variant="drawer" />);
     const trigger = screen.getByRole('button', TRIGGER);
     expect(trigger).toHaveTextContent(LOCALE_LABELS.ja);
     // The visible name is part of the accessible name (WCAG 2.5.3).
@@ -51,7 +51,7 @@ describe('LanguageSwitcher', () => {
 
   it('lists one radio option per routing locale, each tagged with its own lang attribute', async () => {
     const user = userEvent.setup();
-    render(<LanguageSwitcher />);
+    render(<LanguageSwitcher variant="drawer" />);
 
     await user.click(screen.getByRole('button', TRIGGER));
     const menu = await screen.findByRole('menu');
@@ -70,7 +70,7 @@ describe('LanguageSwitcher', () => {
 
   it('names the menu with the same label as the trigger', async () => {
     const user = userEvent.setup();
-    render(<LanguageSwitcher />);
+    render(<LanguageSwitcher variant="drawer" />);
 
     await user.click(screen.getByRole('button', TRIGGER));
     const menu = await screen.findByRole('menu');
@@ -89,7 +89,7 @@ describe('LanguageSwitcher', () => {
 
   it('replaces the current route (with query and hash) under the chosen locale', async () => {
     const user = userEvent.setup();
-    render(<LanguageSwitcher />);
+    render(<LanguageSwitcher variant="drawer" />);
 
     await user.click(screen.getByRole('button', TRIGGER));
     await user.click(await screen.findByRole('menuitemradio', { name: LOCALE_LABELS.uk }));
@@ -100,7 +100,7 @@ describe('LanguageSwitcher', () => {
   it('is a no-op when the current locale is chosen again', async () => {
     mockLocale = 'uk';
     const user = userEvent.setup();
-    render(<LanguageSwitcher />);
+    render(<LanguageSwitcher variant="drawer" />);
 
     expect(screen.getByRole('button', TRIGGER)).toHaveTextContent(LOCALE_LABELS.uk);
     await user.click(screen.getByRole('button', TRIGGER));
@@ -148,28 +148,13 @@ describe('LanguageSwitcher', () => {
       );
     });
 
+    it('writes Ukrainian in Cyrillic, never "UK" (the United Kingdom beside a globe)', () => {
+      expect(LOCALE_SHORT_LABELS.uk).toBe('УКР');
+    });
+
     it('gives the two Traditional Chinese editions different short names', () => {
       expect(LOCALE_SHORT_LABELS['zh-TW']).not.toBe(LOCALE_SHORT_LABELS['zh-HK']);
       expect(new Set(Object.values(LOCALE_SHORT_LABELS)).size).toBe(routing.locales.length);
-    });
-  });
-
-  describe('compact variant', () => {
-    it('keeps the accessible label but drops the visible language name', async () => {
-      mockLocale = 'ko';
-      const user = userEvent.setup();
-      render(<LanguageSwitcher variant="compact" />);
-
-      const trigger = screen.getByRole('button', TRIGGER);
-      expect(trigger).not.toHaveTextContent(LOCALE_LABELS.ko);
-
-      await user.click(trigger);
-      const menu = await screen.findByRole('menu');
-      expect(within(menu).getAllByRole('menuitemradio')).toHaveLength(routing.locales.length);
-      expect(within(menu).getByRole('menuitemradio', { name: LOCALE_LABELS.ko })).toHaveAttribute(
-        'aria-checked',
-        'true',
-      );
     });
   });
 

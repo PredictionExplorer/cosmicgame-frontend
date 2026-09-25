@@ -25,6 +25,7 @@
     "heading": "Account",
     "menuLabel": "Account menu for {address}",
     "menuLabelWithAlert": "Account menu for {address}, allocations ready to retrieve",
+    "menuLabelWrongNetwork": "{menu}, wrong network",
     "retrieveReady": "Ready to retrieve",
     "retrieveAmount": "{amount} ready to retrieve",
     "addCstToMetaMask": "Add CST to MetaMask",

@@ -2,20 +2,21 @@
 
 import {
   createContext,
+  useCallback,
   useContext,
   useEffect,
   useMemo,
+  useState,
   type ReactNode,
 } from 'react';
+import dynamic from 'next/dynamic';
 
 import {
   emptyContractAddresses,
-  publishDashboardContractAddresses,
   getCachedDashboardContractAddresses,
   type AppContractAddresses,
 } from '@/config/networks';
 import type { ContractAddresses } from '@/services/api/types';
-import { useDashboardInfo } from '@/hooks/useApiQuery';
 
 function pickAddr(v: string | undefined): string {
   if (v && v.length >= 10) return v;
@@ -40,31 +41,50 @@ export function mergeContractAddresses(api?: ContractAddresses): AppContractAddr
   };
 }
 
-const ContractAddressesCtx = createContext<AppContractAddresses | null>(null);
+interface ContractAddressesState {
+  readonly addresses: AppContractAddresses;
+  /** Starts reading the addresses: a consumer mounted. */
+  readonly request: () => void;
+}
+
+const ContractAddressesCtx = createContext<ContractAddressesState | null>(null);
+
+/** The dashboard read, loaded the first time a component asks for an address. */
+const ContractAddressesLoader = dynamic(() => import('./ContractAddressesLoader'), {
+  ssr: false,
+});
 
 /**
- * Supplies dashboard-backed contract addresses app-wide. Wrapped inside
- * `QueryClientProvider` so `useDashboardInfo` can run.
+ * Supplies the dashboard-backed contract addresses app-wide, read on demand:
+ * the dashboard request (and the API client it needs) starts only once a
+ * component calls `useContractAddresses`, so a page that never touches a
+ * contract (the legal pages, the FAQ) makes no dashboard request and ships no
+ * API client. Wrapped inside `QueryClientProvider` for the loader's query.
  */
 export function ContractAddressesProvider({ children }: { children: ReactNode }) {
-  const { data } = useDashboardInfo();
-  const value = useMemo(
-    () => mergeContractAddresses(data?.ContractAddrs),
-    [data?.ContractAddrs],
+  const [requested, setRequested] = useState(false);
+  const [addresses, setAddresses] = useState(getCachedDashboardContractAddresses);
+  const request = useCallback(() => setRequested(true), []);
+  const value = useMemo(() => ({ addresses, request }), [addresses, request]);
+
+  return (
+    <ContractAddressesCtx.Provider value={value}>
+      {requested ? <ContractAddressesLoader onAddresses={setAddresses} /> : null}
+      {children}
+    </ContractAddressesCtx.Provider>
   );
-
-  useEffect(() => {
-    publishDashboardContractAddresses(value);
-  }, [value]);
-
-  return <ContractAddressesCtx.Provider value={value}>{children}</ContractAddressesCtx.Provider>;
 }
 
 /**
- * Single source for on-chain addresses: prefers provider context when mounted;
- * otherwise the last merged snapshot from {@link publishDashboardContractAddresses}.
+ * Single source for on-chain addresses: the provider's, read on first use;
+ * outside the provider (isolated tests), the last merged snapshot from
+ * {@link publishDashboardContractAddresses}.
  */
 export function useContractAddresses(): AppContractAddresses {
   const ctx = useContext(ContractAddressesCtx);
-  return ctx ?? getCachedDashboardContractAddresses();
+  const request = ctx?.request;
+  useEffect(() => {
+    request?.();
+  }, [request]);
+  return ctx?.addresses ?? getCachedDashboardContractAddresses();
 }

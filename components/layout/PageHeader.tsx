@@ -49,9 +49,14 @@ export interface PageHeaderFigure {
    * row on phones instead of stacking as three label-and-value rows.
    */
   compact?: boolean;
+  /**
+   * A date and time (use with `size: 'md'`). On phones it takes the row's
+   * full width rather than share it, so the time never wraps under the date.
+   */
+  date?: boolean;
 }
 
-/** A related page, rendered as a quiet chip under the header. */
+/** A related page, one link in the header's "Related pages" line. */
 export interface PageHeaderLink {
   href: string;
   label: string;
@@ -112,14 +117,21 @@ export interface PageHeaderProps {
   /** The summary figures, as one compact row (a two-column grid on phones). */
   figures?: readonly PageHeaderFigure[];
   /**
+   * The page's facts as one quiet line (`PageHeaderFacts`) in place of the
+   * figure row, where the page's headline is its art: under the lede, before
+   * the related pages.
+   */
+  facts?: ReactNode;
+  /**
    * The meta line under the figures: `SnapshotStamp` (when server data was
    * read), `LiveStatus` (polling pages), `ReviewedStamp` (legal pages), a source.
    */
   meta?: ReactNode;
   /**
-   * Related pages, as chips at the foot of the header from 640px. Phones
-   * leave them out, so the header stays inside its share of the first screen;
-   * the drawer and the footer reach the same pages.
+   * Related pages: one quiet line of links at the foot of the header,
+   * labelled "Related pages". The links wrap, so every onward path shows at
+   * every width; on phones the visible label gives its room to the links
+   * (the nav keeps its name for screen readers).
    */
   related?: readonly PageHeaderLink[];
   /** Accessible name of the related-pages nav. Defaults to "Related pages". */
@@ -129,8 +141,11 @@ export interface PageHeaderProps {
   /** Extra header content, rendered after the related pages (an address chip, a network badge). */
   children?: ReactNode;
   /**
-   * Sub-navigation between sibling pages (`PageHeaderTabs`), set on the
-   * header's bottom rule, e.g. the Trust Center pages.
+   * Sub-navigation between sibling pages (`PageHeaderTabs`), e.g. the Trust
+   * Center pages or the three Public Goods ledgers. It opens the header,
+   * under the eyebrow that names the group, on a rule of its own: switching
+   * pages replaces the title, lede and figures below it, so the row itself
+   * never moves, and on phones it is in the first screen.
    */
   tabs?: ReactNode;
   /** `id` of the H1, for an `aria-labelledby` elsewhere on the page. */
@@ -200,6 +215,7 @@ export function PageHeader({
   breadcrumbs,
   eyebrow,
   figures,
+  facts,
   meta,
   related,
   relatedLabel,
@@ -243,8 +259,7 @@ export function PageHeader({
   return (
     <header
       className={cn(
-        'relative mb-8 border-b border-rule print:relative print:z-[2] print:text-foreground sm:mb-10',
-        tabs ? 'pb-0' : 'pb-6 sm:pb-10',
+        'relative mb-8 border-b border-rule pb-6 print:relative print:z-[2] print:text-foreground sm:mb-10 sm:pb-10',
         centered && 'text-center',
         className,
       )}
@@ -264,6 +279,11 @@ export function PageHeader({
           )}
         >
           {eyebrowContent}
+        </div>
+      ) : null}
+      {tabs ? (
+        <div data-slot="page-header-tabs" className="mb-6 border-b border-rule sm:mb-8">
+          {tabs}
         </div>
       ) : null}
 
@@ -296,8 +316,10 @@ export function PageHeader({
               lessLabel={t('pageHeader.readLess')}
               clamp={clampLede}
               className={cn(
-                // 16px on phones keeps the header inside the first screen.
-                'mt-3 type-lede text-muted-foreground max-sm:text-base print:!text-foreground/85 sm:mt-4',
+                // The lede keeps its 18px on phones: it is the page's most readable
+                // paragraph, never smaller than the 17px prose under it. A long one
+                // is clamped on data pages instead (HeaderLede).
+                'mt-3 type-lede text-muted-foreground print:!text-foreground/85 sm:mt-4',
                 centered && 'mx-auto',
               )}
             >
@@ -313,6 +335,7 @@ export function PageHeader({
       {figures && figures.length > 0 ? (
         <PageHeaderFigures figures={figures} placement="header" />
       ) : null}
+      {facts}
 
       {meta ? (
         <div
@@ -328,26 +351,37 @@ export function PageHeader({
       {related && related.length > 0 ? (
         <nav
           aria-label={relatedLabel ?? t('pageHeader.relatedPages')}
-          className={cn('max-sm:hidden', meta ? 'mt-4' : 'mt-6')}
+          className={cn(
+            'flex items-baseline gap-x-4',
+            meta ? 'mt-3 sm:mt-4' : 'mt-4 sm:mt-6',
+            centered && 'justify-center',
+          )}
         >
-          <ul className={cn('flex flex-wrap gap-2', centered && 'justify-center')}>
+          {/* Seen, not heard: the nav's own name already says it. On phones
+              the links need the room more than the label does. */}
+          <span aria-hidden className="type-label shrink-0 text-subtle max-sm:hidden">
+            {t('pageHeader.relatedPages')}
+          </span>
+          <ul
+            className={cn('flex min-w-0 flex-wrap gap-x-5 gap-y-1', centered && 'justify-center')}
+          >
             {related.map((link) => {
               // Third-party pages open in a new tab and carry its arrow; the
               // other Cosmic Signature host stays in this tab, like a page here.
               const kind = classifyHref(link.href, 'app');
               const Icon = kind === 'external' ? ArrowUpRight : ArrowRight;
               return (
-                <li key={link.href}>
+                <li key={link.href} className="max-w-full">
                   <SiteLink
                     href={link.href}
                     kind={kind}
                     externalIcon={false}
-                    className="group inline-flex min-h-8 items-center gap-1.5 rounded-control border border-rule px-3 type-label text-muted-foreground no-underline transition-colors duration-fast hover:border-input hover:text-foreground pointer-coarse:min-h-11"
+                    className="link-quiet group inline-flex min-h-8 items-center gap-1 type-label text-muted-foreground transition-colors duration-fast hover:text-foreground sm:whitespace-nowrap pointer-coarse:min-h-11"
                   >
                     {link.label}
                     <Icon
                       aria-hidden
-                      className="size-3.5 shrink-0 text-subtle transition-colors duration-fast group-hover:text-foreground"
+                      className="size-3.5 shrink-0 text-subtle transition-colors duration-fast group-hover:text-foreground rtl:-scale-x-100"
                     />
                   </SiteLink>
                 </li>
@@ -358,8 +392,6 @@ export function PageHeader({
       ) : null}
 
       {children}
-
-      {tabs ? <div className="mt-6 sm:mt-8">{tabs}</div> : null}
     </header>
   );
 }
@@ -372,9 +404,9 @@ export interface PageHeaderTab {
 }
 
 /**
- * Underline tabs between sibling pages, for `PageHeader`'s `tabs` slot: they
- * sit on the header's bottom rule, the current page marked with a 2px primary
- * rule and `aria-current="page"`. A row wider than the screen scrolls on a
+ * Underline tabs between sibling pages, for `PageHeader`'s `tabs` slot: a row
+ * on its own rule at the top of the header, the current page marked with a
+ * 2px primary rule and `aria-current="page"`. A row wider than the screen scrolls on a
  * ScrollRail, fading only at an edge with more to see and keeping the current
  * page in view. Links, not ARIA tabs: each one is its own page.
  */
@@ -493,9 +525,11 @@ export function PageHeaderFigures({
   const unavailable = t('status.unavailable');
   const layout = figurePhoneLayout(figures);
   const rows = layout === 'rows';
-  // Two full-width figures (a date and an address) share the last phone row
-  // rather than taking one row each; a single one keeps the full width.
-  const pairWideFigures = figures.filter((figure) => figure.size === 'md').length === 2;
+  // Two full-width figures (an address and a name) share the last phone row
+  // rather than taking one row each; a single one, or a date beside another,
+  // keeps the full width.
+  const wideFigures = figures.filter((figure) => figure.size === 'md');
+  const pairWideFigures = wideFigures.length === 2 && !wideFigures.some((figure) => figure.date);
   return (
     <dl
       data-layout={layout}
@@ -572,5 +606,55 @@ export function PageHeaderFigures({
         </div>
       ))}
     </dl>
+  );
+}
+
+/** One fact of a `PageHeaderFacts` line. */
+export interface PageHeaderFact {
+  /** Stable id, rendered as `data-figure` (tests, analytics). */
+  id: string;
+  label: string;
+  /** The formatted value; `null` when the read failed (the Unavailable dash). */
+  value: ReactNode | null;
+}
+
+/**
+ * A page's facts as one quiet wall-label line under the lede ("Named NFTs 3 ·
+ * Current owners 2") instead of a row of large figures: on the collection
+ * pages the art is the headline, and a figure row pushed it down. Pass it as
+ * the header's `facts` (or its children, on a header with no related pages),
+ * with the snapshot stamp beside it.
+ */
+export function PageHeaderFacts({
+  facts,
+  meta,
+  className,
+}: {
+  facts: readonly PageHeaderFact[];
+  /** The snapshot stamp or another short note, on the same line. */
+  meta?: ReactNode;
+  className?: string;
+}) {
+  const t = useTranslations('common');
+  const unavailable = t('status.unavailable');
+  return (
+    <div
+      className={cn(
+        'mt-3 flex flex-wrap items-center gap-x-5 gap-y-1 type-caption text-subtle sm:mt-4',
+        className,
+      )}
+    >
+      <dl className="flex flex-wrap items-baseline gap-x-5 gap-y-1" data-testid="page-header-facts">
+        {facts.map((fact) => (
+          <div key={fact.id} data-figure={fact.id} className="flex items-baseline gap-1.5">
+            <dt className="type-label text-subtle">{fact.label}</dt>
+            <dd className="type-label font-medium tabular-nums text-foreground">
+              {fact.value === null ? <UnknownValue label={unavailable} /> : fact.value}
+            </dd>
+          </div>
+        ))}
+      </dl>
+      {meta}
+    </div>
   );
 }

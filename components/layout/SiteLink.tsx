@@ -60,7 +60,15 @@ export const SiteLink = forwardRef<HTMLAnchorElement, SiteLinkProps>(function Si
 
   if (kind === 'external') {
     return (
-      <a ref={ref} href={href} target="_blank" rel="noopener noreferrer" {...rest}>
+      <a
+        ref={ref}
+        href={href}
+        target="_blank"
+        rel="noopener noreferrer"
+        onPointerEnter={onPointerEnter}
+        onFocus={onFocus}
+        {...rest}
+      >
         {children}
         {externalIcon ? (
           <ArrowUpRight
@@ -75,7 +83,7 @@ export const SiteLink = forwardRef<HTMLAnchorElement, SiteLinkProps>(function Si
 
   if (kind === 'crossHost') {
     return (
-      <a ref={ref} href={href} {...rest}>
+      <a ref={ref} href={href} onPointerEnter={onPointerEnter} onFocus={onFocus} {...rest}>
         {children}
       </a>
     );

@@ -1,5 +1,9 @@
-// Server component on purpose: the recovery links render from the server,
-// without client state.
+// The app's 404 for a route segment that calls notFound() once it has read
+// its data (a token the API has no record of). A segment's notFound()
+// arrives as Next.js's bare error shell, which the client fills with this
+// page once the bundle runs, so everything that can be answered before
+// routing is: app/global-not-found.tsx renders unknown URLs, and ids a page
+// would turn away (/detail/abc, lib/paramRoutes.ts), on the server.
 import { NotFoundView } from '@/components/layout/NotFoundView';
 import { PageShell } from '@/components/ui/page-shell';
 

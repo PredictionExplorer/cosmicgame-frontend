@@ -32,7 +32,6 @@
 import { useEffect, type ReactNode } from 'react';
 import { CookiesProvider } from 'react-cookie';
 import { Toaster } from 'sonner';
-import { MotionConfig } from 'framer-motion';
 
 import { NOTIFICATION_AUTO_HIDE_MS } from '@/config/constants';
 import ErrorBoundary from '@/components/layout/ErrorBoundary';
@@ -61,30 +60,28 @@ export function LandingShell({
 
   return (
     <ErrorBoundary>
-      <MotionConfig reducedMotion="user">
-        <CookiesProvider>
-          <TooltipProvider delayDuration={200} skipDelayDuration={300}>
-            <SkipLink />
-            <div className="site-shell flex min-h-screen flex-col">
-              <LandingHeader sections={sections} />
-              <div className="min-w-0 flex-1">
-                <ErrorBoundary>{children}</ErrorBoundary>
-              </div>
-              {footer}
+      <CookiesProvider>
+        <TooltipProvider delayDuration={200} skipDelayDuration={300}>
+          <SkipLink />
+          <div className="site-shell flex min-h-screen flex-col">
+            <LandingHeader sections={sections} />
+            <div className="min-w-0 flex-1">
+              <ErrorBoundary>{children}</ErrorBoundary>
             </div>
-            <Toaster
-              position="top-right"
-              theme="dark"
-              richColors
-              closeButton
-              toastOptions={{
-                duration: NOTIFICATION_AUTO_HIDE_MS,
-                className: 'border border-rule bg-popover shadow-float',
-              }}
-            />
-          </TooltipProvider>
-        </CookiesProvider>
-      </MotionConfig>
+            {footer}
+          </div>
+          <Toaster
+            position="top-right"
+            theme="dark"
+            richColors
+            closeButton
+            toastOptions={{
+              duration: NOTIFICATION_AUTO_HIDE_MS,
+              className: 'border border-rule bg-popover shadow-float',
+            }}
+          />
+        </TooltipProvider>
+      </CookiesProvider>
     </ErrorBoundary>
   );
 }

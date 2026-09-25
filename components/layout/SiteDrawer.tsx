@@ -5,6 +5,7 @@ import { ChevronDown, Search } from 'lucide-react';
 import { useLocale, useTranslations } from 'next-intl';
 
 import {
+  FOOTER_SECTIONS,
   outboundLinks,
   resolveRouteHref,
   routesInSection,
@@ -27,15 +28,11 @@ import { routeCurrent } from './HeaderNavigation';
 import { useSiteNavCopy } from './useSiteNav';
 import { Wordmark } from './Wordmark';
 
-/** Sections listed in the drawer, in order; the account section leads when connected. */
-const DRAWER_SECTIONS: readonly SiteSectionId[] = [
-  'participate',
-  'collection',
-  'explore',
-  'records',
-  'learn',
-  'trust',
-];
+/**
+ * Sections listed in the drawer, in order: the footer's own columns (the
+ * account section leads them when a wallet is connected).
+ */
+const DRAWER_SECTIONS: readonly SiteSectionId[] = FOOTER_SECTIONS;
 
 /** Where the header's own navigation takes over (Tailwind `lg`). */
 const DESKTOP_QUERY = '(min-width: 1024px)';

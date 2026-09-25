@@ -25,6 +25,7 @@
     "heading": "계정",
     "menuLabel": "{address} 계정 메뉴",
     "menuLabelWithAlert": "{address} 계정 메뉴. 회수할 배분이 있습니다",
+    "menuLabelWrongNetwork": "{menu}. 다른 네트워크",
     "retrieveReady": "회수 가능",
     "retrieveAmount": "회수 가능: {amount}",
     "addCstToMetaMask": "MetaMask에 CST 추가",

@@ -1,7 +1,7 @@
 import { readdirSync } from 'node:fs';
 import { join, relative } from 'node:path';
 
-import { ZH_ROUTE_INVENTORY } from '../../e2e/zh-route-inventory';
+import { GLOBAL_NOT_FOUND_FILE, ZH_ROUTE_INVENTORY } from '../../e2e/zh-route-inventory';
 
 const LOCALE_APP_ROOT = join(process.cwd(), 'app', '[locale]');
 
@@ -14,6 +14,7 @@ function collectPageFiles(directory: string): string[] {
 }
 
 function publicPathForPageFile(pageFile: string): string {
+  if (pageFile === GLOBAL_NOT_FOUND_FILE) return '/[...notFound]';
   const withoutGroup = pageFile.replace(/^\((?:app|embed|landing)\)\//, '');
   const withoutPage = withoutGroup.replace(/\/?page\.tsx$/, '');
   if (withoutPage === '' || withoutPage === 'landing-site') return '/';
@@ -21,8 +22,13 @@ function publicPathForPageFile(pageFile: string): string {
 }
 
 describe('canonical localized route inventory', () => {
-  it('accounts for every app/[locale] page exactly once', () => {
-    const actual = collectPageFiles(LOCALE_APP_ROOT).sort();
+  it('accounts for every app/[locale] page and the global 404 exactly once', () => {
+    const globalNotFound = relative(
+      LOCALE_APP_ROOT,
+      join(process.cwd(), 'app', 'global-not-found.tsx'),
+    );
+    expect(globalNotFound).toBe(GLOBAL_NOT_FOUND_FILE);
+    const actual = [...collectPageFiles(LOCALE_APP_ROOT), globalNotFound].sort();
     const inventoried = ZH_ROUTE_INVENTORY.map((route) => route.pageFile).sort();
 
     expect(actual).toHaveLength(66);

@@ -1,15 +1,4 @@
-import {
-  createContext,
-  useContext,
-  useState,
-  useCallback,
-  useMemo,
-  useRef,
-  useEffect,
-  type Dispatch,
-  type SetStateAction,
-  type ReactNode,
-} from 'react';
+import { useState, useCallback, useMemo, useRef, useEffect, type ReactNode } from 'react';
 
 import { useActiveWeb3React } from '@/hooks/web3';
 import api from '@/services/api';
@@ -17,47 +6,15 @@ import type { CSTAnchorDistribution } from '@/services/api/types';
 import { useNotifyRedBox, useCSTAnchorDistributionsToRetrieveByUser } from '@/hooks/useApiQuery';
 import { reportError } from '@/utils/errors';
 
+import { ApiDataContext, initialApiData, useApiData, type ApiData } from './accountDataContexts';
 import { useAnchoredToken } from './AnchoredTokenContext';
 
-interface ApiData {
-  ETHRaffleToClaim: number;
-  ETHRaffleToClaimWei: number;
-  NumDonatedNFTToClaim: number;
-  UnretrievedAnchorDistribution: number;
-  releasableActionIds: (number | string)[];
-  claimableActionIds?: { DepositId: number; StakeActionId: number }[];
-}
-
-const initialApiData: ApiData = {
-  ETHRaffleToClaim: 0,
-  ETHRaffleToClaimWei: 0,
-  NumDonatedNFTToClaim: 0,
-  UnretrievedAnchorDistribution: 0,
-  releasableActionIds: [],
-};
+export { useApiData };
+export type { ApiData, ApiDataContextValue } from './accountDataContexts';
 
 interface ApiDataProviderProps {
   children: ReactNode;
 }
-
-interface ApiDataContextValue {
-  apiData: ApiData;
-  setApiData: Dispatch<SetStateAction<ApiData>>;
-  fetchData: () => Promise<void>;
-  unclaimedRewards: CSTAnchorDistribution[];
-  error: string | null;
-  isLoading: boolean;
-}
-
-const ApiDataContext = createContext<ApiDataContextValue | undefined>(undefined);
-
-export const useApiData = (): ApiDataContextValue => {
-  const context = useContext(ApiDataContext);
-  if (!context) {
-    throw new Error('useApiData must be used within an ApiDataProvider');
-  }
-  return context;
-};
 
 export const ApiDataProvider = ({ children }: ApiDataProviderProps) => {
   const [apiData, setApiData] = useState<ApiData>(initialApiData);

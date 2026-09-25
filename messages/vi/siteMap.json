@@ -15,5 +15,9 @@
     "account": "Thống kê, phân bổ, NFT và neo giữ của bạn. Kết nối ví để xem.",
     "ecosystem": "Các dịch vụ độc lập xây dựng quanh Cosmic Signature. Mở trong thẻ mới.",
     "community": "Nơi cộng đồng trò chuyện, và nơi phân bổ Hàng hóa công được chuyển đến."
+  },
+  "guides": {
+    "title": "Hướng dẫn",
+    "description": "Các bài viết trong mục Tìm hiểu trên {host}: giao thức, tác phẩm và cách tham gia."
   }
 }

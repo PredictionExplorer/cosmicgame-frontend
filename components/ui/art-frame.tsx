@@ -15,6 +15,11 @@ import { ImageOff } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { mediaFailoverUrl, mediaPathKey } from '@/utils/urls';
 
+import { OrbitMark } from './orbit-mark';
+
+// The hairline orbit mark lives in a server-safe module; re-exported here.
+export { OrbitMark, type OrbitMarkProps } from './orbit-mark';
+
 /*
  * The art plate. Every Signature hangs on its own pure-black plate at the
  * native 3456:2234 ratio with object-fit: contain. Nothing overlays, crops,
@@ -305,52 +310,6 @@ export function ArtImage({
       className={className}
       style={style}
     />
-  );
-}
-
-export interface OrbitMarkProps {
-  className?: string;
-}
-
-/**
- * The orbit mark as a hairline: three orbits and their bodies. It stands in
- * for artwork that has not arrived and never resembles a real Signature.
- */
-export function OrbitMark({ className }: OrbitMarkProps) {
-  return (
-    <svg
-      viewBox="0 0 120 120"
-      aria-hidden="true"
-      focusable="false"
-      className={cn('text-foreground/15', className)}
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="1"
-      data-testid="orbit-mark"
-    >
-      <ellipse cx="60" cy="60" rx="54" ry="19" vectorEffect="non-scaling-stroke" />
-      <ellipse
-        cx="60"
-        cy="60"
-        rx="54"
-        ry="19"
-        transform="rotate(60 60 60)"
-        vectorEffect="non-scaling-stroke"
-      />
-      <ellipse
-        cx="60"
-        cy="60"
-        rx="54"
-        ry="19"
-        transform="rotate(120 60 60)"
-        vectorEffect="non-scaling-stroke"
-      />
-      <g fill="currentColor" stroke="none">
-        <circle cx="114" cy="60" r="2.2" />
-        <circle cx="33" cy="106.8" r="2.2" />
-        <circle cx="42.2" cy="23.6" r="2.2" />
-      </g>
-    </svg>
   );
 }
 

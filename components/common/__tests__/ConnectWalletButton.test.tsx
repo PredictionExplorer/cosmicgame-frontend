@@ -4,7 +4,7 @@ import { CHAOS_ZERO_PREDICTIONS_URL } from '@/config/predictions';
 import { COSMIC_SIGNATURE_MARKETPLACE_URL } from '@/config/marketplace';
 import { CST_UNISWAP_SWAP_URL } from '@/config/uniswap';
 
-import { fireEvent, render, screen, waitFor, within } from '@/test-utils';
+import { checkA11y, fireEvent, render, screen, waitFor, within } from '@/test-utils';
 
 import ConnectWalletButton from '../ConnectWalletButton';
 
@@ -46,15 +46,23 @@ jest.mock('../../../contexts/WalletUiContext', () => {
 });
 
 const mockDisconnectAsync = jest.fn().mockResolvedValue(undefined);
+/** The wallet's chain: the app chain (Arbitrum Sepolia in tests) unless a test moves it. */
+let mockWalletChainId = 421614;
 jest.mock('wagmi', () => ({
   ...jest.requireActual('../../../__mocks__/wagmi'),
+  useConnection: () => ({
+    address: mockAccount ?? undefined,
+    isConnected: mockAccount !== null,
+    chainId: mockWalletChainId,
+    status: mockAccount ? 'connected' : 'disconnected',
+    connector: undefined,
+  }),
   useDisconnect: () => ({ mutateAsync: mockDisconnectAsync, isPending: false }),
 }));
 
 function renderWalletButton(props: Partial<React.ComponentProps<typeof ConnectWalletButton>> = {}) {
   return render(
     <ConnectWalletButton
-      presentation="menu"
       loading={false}
       balance={{ ETH: 1, CosmicToken: 25, CosmicSignature: 2, RWLK: 3 }}
       stakedTokenCount={{ cst: 4, rwalk: 5 }}
@@ -73,58 +81,61 @@ describe('ConnectWalletButton', () => {
   beforeEach(() => {
     mockAccount = ACCOUNT;
     mockConnectPending = false;
+    mockWalletChainId = 421614;
     jest.clearAllMocks();
   });
 
-  describe('disconnected', () => {
-    beforeEach(() => {
-      mockAccount = null;
-    });
-
-    it('renders the deferred connect trigger', () => {
-      renderWalletButton();
-      expect(screen.getByTestId('connect-wallet-button')).toHaveTextContent(
-        'wallet.connect.button',
-      );
-    });
-
-    it('shows a busy spinner while the wallet list downloads', () => {
-      mockConnectPending = true;
-      renderWalletButton();
-      const trigger = screen.getByTestId('connect-wallet-button');
-      expect(trigger).toHaveAttribute('aria-busy', 'true');
-      expect(trigger).toHaveTextContent('wallet.connect.opening');
-    });
-
-    it('opens the lazy wallet modal on click and warms its chunk on hover', () => {
-      renderWalletButton();
-      const trigger = screen.getByTestId('connect-wallet-button');
-      fireEvent.pointerEnter(trigger);
-      expect(mockWarmConnectModal).toHaveBeenCalledTimes(1);
-      expect(mockRequestConnectModal).not.toHaveBeenCalled();
-      fireEvent.click(trigger);
-      expect(mockRequestConnectModal).toHaveBeenCalledTimes(1);
-    });
-
-    it('shortens its label where the header is tightest', () => {
-      renderWalletButton({ compactInHeader: true });
-      const trigger = screen.getByTestId('connect-wallet-button');
-      expect(within(trigger).getByText('wallet.connect.buttonShort')).toHaveClass('sm:hidden');
-      expect(within(trigger).getByText('wallet.connect.button')).toHaveClass('hidden', 'sm:inline');
-    });
-
-    it('applies liquid glass only when explicitly requested', () => {
-      renderWalletButton({ liquid: true });
-      expect(screen.getByTestId('connect-wallet-button')).toHaveClass('liquid-glass-cta');
-    });
+  it('renders nothing without a wallet: the header shows its own connect button', () => {
+    mockAccount = null;
+    const { container } = renderWalletButton();
+    expect(container).toBeEmptyDOMElement();
   });
 
   describe('connected, desktop menu', () => {
-    it('names the trigger after the account', () => {
+    it('names the trigger after the account and shows its short address', () => {
       renderWalletButton();
-      expect(screen.getByTestId('wallet-menu-trigger')).toHaveAccessibleName(
-        /wallet\.account\.menuLabel\(address=0xabcd/i,
-      );
+      const trigger = screen.getByTestId('wallet-menu-trigger');
+      expect(trigger).toHaveAccessibleName(/wallet\.account\.menuLabel\(address=0xabcd/i);
+      expect(within(trigger).getByText(/0xAbCd…⁠abcd/i)).toBeInTheDocument();
+    });
+
+    it('says in its name that the wallet is on another network, where only the badge shows it', () => {
+      mockWalletChainId = 1;
+      renderWalletButton();
+      for (const testId of ['wallet-menu-trigger', 'wallet-account-trigger']) {
+        const trigger = screen.getByTestId(testId);
+        expect(trigger).toHaveAccessibleName(
+          /^wallet\.account\.menuLabelWrongNetwork\(menu=wallet\.account\.menuLabel\(address=0xabcd/i,
+        );
+        // The badge is drawn only; the name carries the state.
+        expect(within(trigger).getByTestId('wrong-network-badge')).toHaveAttribute(
+          'aria-hidden',
+          'true',
+        );
+      }
+    });
+
+    it('lists balances and anchored NFTs as figures, units in the labels', async () => {
+      renderWalletButton({
+        balance: { ETH: 2.5, CosmicToken: 50, CosmicSignature: 5, RWLK: 3 },
+        stakedTokenCount: { cst: 7, rwalk: 2 },
+      });
+      const { menu } = await openMenu();
+      expect(within(menu).getByText('wallet.labels.balancesHeading')).toBeInTheDocument();
+      const figure = (label: string) =>
+        within(menu).getByText(label).closest('div')?.querySelector('dd')?.textContent;
+      expect(figure('wallet.balances.eth')).toMatch(/^2\.5/);
+      expect(figure('wallet.balances.cosmicNfts')).toBe('5');
+      expect(figure('wallet.balances.anchoredCst')).toBe('7');
+      expect(figure('wallet.balances.anchoredRwlk')).toBe('2');
+    });
+
+    it('shows a loading mark instead of figures while balances load', async () => {
+      renderWalletButton({ loading: true });
+      const { menu } = await openMenu();
+      expect(
+        within(menu).getByText('wallet.balances.eth').closest('div')?.querySelector('dd'),
+      ).toHaveTextContent('…');
     });
 
     it('groups the account pages under one heading, in taxonomy order', async () => {
@@ -203,7 +214,7 @@ describe('ConnectWalletButton', () => {
 
   describe('connected, phone sheet', () => {
     it('opens the account sheet with the wallet actions and the account pages', async () => {
-      renderWalletButton({ presentation: 'sheet' });
+      renderWalletButton();
       const trigger = screen.getByTestId('wallet-account-trigger');
       expect(trigger).toHaveAccessibleName(/0xabcd/i);
       fireEvent.click(trigger);
@@ -218,7 +229,7 @@ describe('ConnectWalletButton', () => {
     });
 
     it('shows the account title once, not again over the pages', async () => {
-      renderWalletButton({ presentation: 'sheet' });
+      renderWalletButton();
       fireEvent.click(screen.getByTestId('wallet-account-trigger'));
       const sheet = await screen.findByRole('dialog');
       expect(within(sheet).getAllByText('wallet.account.heading')).toHaveLength(1);
@@ -227,7 +238,7 @@ describe('ConnectWalletButton', () => {
     });
 
     it('closes the sheet when an account page is picked', async () => {
-      renderWalletButton({ presentation: 'sheet' });
+      renderWalletButton();
       fireEvent.click(screen.getByTestId('wallet-account-trigger'));
       const sheet = await screen.findByRole('dialog');
 
@@ -250,14 +261,13 @@ describe('ConnectWalletButton', () => {
       let pathname = '/';
       navigation.usePathname = () => pathname;
       try {
-        const { rerender } = renderWalletButton({ presentation: 'sheet' });
+        const { rerender } = renderWalletButton();
         fireEvent.click(screen.getByTestId('wallet-account-trigger'));
         expect(await screen.findByRole('dialog')).toBeInTheDocument();
 
         pathname = '/my-anchors';
         rerender(
           <ConnectWalletButton
-            presentation="sheet"
             loading={false}
             balance={{ ETH: 1, CosmicToken: 25, CosmicSignature: 2, RWLK: 3 }}
             stakedTokenCount={{ cst: 4, rwalk: 5 }}
@@ -285,9 +295,14 @@ describe('ConnectWalletButton', () => {
     expect(within(rwlk).getByText('3')).toBeInTheDocument();
   });
 
-  it('renders both triggers, chosen by CSS, in the responsive header mode', () => {
-    renderWalletButton({ presentation: 'responsive' });
+  it('renders both triggers and lets CSS choose: the sheet on phones, the menu from 768px', () => {
+    renderWalletButton();
     expect(screen.getByTestId('wallet-account-trigger')).toHaveClass('md:hidden');
     expect(screen.getByTestId('wallet-menu-trigger')).toHaveClass('hidden', 'md:inline-flex');
+  });
+
+  it('has no accessibility violations', async () => {
+    const { container } = renderWalletButton();
+    await checkA11y(container);
   });
 });

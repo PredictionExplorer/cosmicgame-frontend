@@ -2,7 +2,10 @@ import '@testing-library/jest-dom';
 
 import userEvent from '@testing-library/user-event';
 
+import { flushDynamicImports } from '@/test-utils/dynamic';
+
 import Header from '@/components/layout/Header';
+import { WALLET_PILL_ADDRESS_CLASS, WALLET_PILL_CLASS } from '@/components/wallet/walletPill';
 import { OUTBOUND_LINKS } from '@/config/siteNav';
 import { LANDING_ORIGIN, localeHref } from '@/lib/hostRouting';
 
@@ -11,6 +14,8 @@ import { render, screen, checkA11y, within, waitFor } from '@/test-utils';
 jest.mock('@rainbow-me/rainbowkit');
 jest.mock('wagmi');
 jest.mock('viem');
+// The palette and the connected wallet are code-split; render them synchronously.
+jest.mock('next/dynamic', () => require('@/test-utils/dynamic').syncDynamic);
 
 let mockAccount: string | null = null;
 let mockClaims = { ETHRaffleToClaim: 0, NumDonatedNFTToClaim: 0 };
@@ -66,6 +71,8 @@ jest.mock('../../services/api', () => ({
   __esModule: true,
   default: { get_user_balance: jest.fn(), get_user_info: jest.fn() },
 }));
+
+beforeAll(() => flushDynamicImports());
 
 beforeEach(() => {
   jest.clearAllMocks();
@@ -153,21 +160,14 @@ describe('Header', () => {
     ).toHaveAttribute('aria-current', 'page');
   });
 
-  it('centres the experimental glass pill behind full-height items', () => {
-    mockPathname.mockReturnValue('/experimental-ui');
+  it.each(['/', '/experimental-ui'])('draws the same navigation on %s', (path) => {
+    // The retired liquid-glass variant once padded the list on one route only,
+    // so the items moved sideways between pages.
+    mockPathname.mockReturnValue(path);
     render(<Header />);
-    const nav = primaryNav();
-    const pill = within(nav).getByTestId('header-nav-pill');
-    expect(pill).toHaveClass('liquid-glass-control', 'top-1/2', '-translate-y-1/2');
-    // The items keep the header's height, so the current mark sits on its rule.
-    const list = within(nav).getByRole('list');
-    expect(list).toHaveClass('h-full');
-    expect(list).not.toHaveClass('liquid-glass-control');
-  });
-
-  it('draws no glass pill on the ordinary routes', () => {
-    render(<Header />);
-    expect(within(primaryNav()).queryByTestId('header-nav-pill')).toBeNull();
+    const list = within(primaryNav()).getByRole('list');
+    expect(list).toHaveClass('relative flex h-full items-stretch gap-0.5', { exact: true });
+    expect(document.querySelector('[class*="liquid-glass"]')).toBeNull();
   });
 
   it('reserves the shortcut key cap before the client knows the platform', () => {
@@ -188,7 +188,8 @@ describe('Header', () => {
     const button = kbd.closest('button')!;
     expect(button).toHaveAccessibleName('nav.search.triggerLabel');
     expect(button).toHaveTextContent('nav.search.trigger');
-    expect(button).toHaveAttribute('aria-keyshortcuts', 'Meta+K Control+K');
+    // The platform's own chord only: Ctrl+K here (the test runs off Apple platforms).
+    expect(button).toHaveAttribute('aria-keyshortcuts', 'Control+K');
   });
 
   it.each([
@@ -269,10 +270,13 @@ describe('Header', () => {
   it('opens the command palette from the search button and with Ctrl+K', async () => {
     const user = userEvent.setup();
     render(<Header />);
-    await user.click(screen.getByRole('button', { name: 'nav.search.triggerLabel' }));
+    const trigger = screen.getByRole('button', { name: 'nav.search.triggerLabel' });
+    await user.click(trigger);
     expect(await screen.findByRole('combobox')).toHaveFocus();
     await user.keyboard('{Escape}');
     await waitFor(() => expect(screen.queryByRole('combobox')).not.toBeInTheDocument());
+    // Focus comes back to the button that opened the palette (WCAG 2.4.3).
+    expect(trigger).toHaveFocus();
 
     await user.keyboard('{Control>}k{/Control}');
     expect(await screen.findByRole('combobox')).toBeInTheDocument();
@@ -404,12 +408,38 @@ describe('Header drawer', () => {
     mockAccount = '0x1234567890abcdef1234567890abcdef12345678';
     mockClaims = { ETHRaffleToClaim: 0.5, NumDonatedNFTToClaim: 0 };
     render(<Header />);
-    const trigger = screen.getByRole('button', { name: 'nav.menuLabelWithAlert' });
+    const trigger = await screen.findByRole('button', { name: 'nav.menuLabelWithAlert' });
     expect(trigger).toBeInTheDocument();
     const { drawer } = await openDrawer();
     expect(
       within(drawer).getByRole('link', { name: /nav\.routes\.myAllocations\.label/ }),
     ).toHaveTextContent('wallet.account.retrieveReady');
+  });
+
+  it('offers the connect button without a wallet, shortened where the header is tightest', () => {
+    render(<Header />);
+    const connect = screen.getByTestId('connect-wallet-button');
+    expect(within(connect).getByText('wallet.connect.buttonShort')).toHaveClass(
+      'sm:hidden',
+      'lg:inline',
+      'xl:hidden',
+    );
+    expect(within(connect).getByText('wallet.connect.button')).toHaveClass('hidden', 'sm:inline');
+    expect(screen.queryByTestId('wallet-menu-trigger')).toBeNull();
+  });
+
+  it('swaps the connect button for the wallet pill once a wallet is connected', () => {
+    mockAccount = '0x1234567890abcdef1234567890abcdef12345678';
+    render(<Header />);
+    expect(screen.queryByTestId('connect-wallet-button')).toBeNull();
+    const pill = screen.getByTestId('wallet-menu-trigger');
+    expect(pill).toHaveAccessibleName(/wallet\.account\.menuLabel\(address=0x1234/);
+    // The box and address its loading placeholder copies, so the header holds
+    // still (the menu pill's display is responsive: a sheet pill below 768px).
+    expect(pill).toHaveClass(
+      ...WALLET_PILL_CLASS.split(' ').filter((name) => name !== 'inline-flex'),
+    );
+    expect(pill.querySelector('.type-mono')).toHaveClass(...WALLET_PILL_ADDRESS_CLASS.split(' '));
   });
 
   it('opens third-party links in a new tab from the ecosystem section', async () => {

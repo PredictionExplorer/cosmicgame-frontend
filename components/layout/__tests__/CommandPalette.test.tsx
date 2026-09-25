@@ -2,9 +2,10 @@ import '@testing-library/jest-dom';
 import { useState } from 'react';
 import userEvent from '@testing-library/user-event';
 
-import { checkA11y, render, screen, waitFor, within } from '@/test-utils';
+import { checkA11y, fireEvent, render, screen, waitFor, within } from '@/test-utils';
 
 import { CommandPalette, useCommandPaletteShortcut } from '../CommandPalette';
+import { isPaletteChord } from '../commandShortcut';
 import { requestSiteSearch } from '../siteSearchEvents';
 
 const mockPush = jest.fn();
@@ -136,14 +137,80 @@ describe('CommandPalette', () => {
     expect(document.getElementById(after!)).toHaveTextContent(/nav\.routes\.faq\.label/);
   });
 
-  it('offers a visible close control', async () => {
+  it('offers a visible close control whose name holds its visible key cap', async () => {
     const { user } = await openPalette();
-    await user.click(screen.getByRole('button', { name: 'nav.search.keys.close' }));
+    // "Close" for screen readers, plus the "Esc" key cap it shows from 640px (WCAG 2.5.3).
+    const close = screen.getByRole('button', { name: /^nav\.search\.keys\.close/ });
+    expect(close).toHaveAccessibleName('nav.search.keys.close Esc');
+    await user.click(close);
     await waitFor(() => expect(screen.queryByRole('combobox')).toBeNull());
+  });
+
+  it('reports a collapsed list when nothing matches', async () => {
+    const { user, input } = await openPalette();
+    expect(input).toHaveAttribute('aria-expanded', 'true');
+    await user.type(input, 'zzzz');
+    expect(input).toHaveAttribute('aria-expanded', 'false');
+  });
+
+  it('marks the active option with the shared highlight: a primary fill and a leading bar', async () => {
+    await openPalette();
+    const active = screen.getByRole('option', { selected: true });
+    expect(active).toHaveClass('bg-primary/12', 'shadow-[inset_2px_0_0_0_hsl(var(--primary))]');
+  });
+
+  it('gives focus back to the element that had it before Ctrl+K', async () => {
+    const user = userEvent.setup();
+    render(<Harness />);
+    const field = screen.getByRole('textbox', { name: 'elsewhere' });
+    await user.click(field);
+    await user.keyboard('{Control>}k{/Control}');
+    expect(await screen.findByRole('combobox')).toHaveFocus();
+    await user.keyboard('{Escape}');
+    await waitFor(() => expect(screen.queryByRole('combobox')).toBeNull());
+    expect(field).toHaveFocus();
+  });
+
+  it('opens on Ctrl+K from the physical K key on a Cyrillic layout', async () => {
+    render(<Harness />);
+    fireEvent.keyDown(window, { key: 'л', code: 'KeyK', ctrlKey: true });
+    expect(await screen.findByRole('combobox')).toBeInTheDocument();
   });
 
   it('has no accessibility violations', async () => {
     await openPalette();
     await checkA11y(screen.getByRole('dialog'));
+  });
+});
+
+describe('isPaletteChord', () => {
+  const key = (init: KeyboardEventInit) => new KeyboardEvent('keydown', init);
+
+  it('is Ctrl+K off Apple platforms and Cmd+K on them', () => {
+    expect(isPaletteChord(key({ key: 'k', code: 'KeyK', ctrlKey: true }), false)).toBe(true);
+    expect(isPaletteChord(key({ key: 'k', code: 'KeyK', metaKey: true }), false)).toBe(false);
+    expect(isPaletteChord(key({ key: 'k', code: 'KeyK', metaKey: true }), true)).toBe(true);
+    // Ctrl+K in a Mac text field deletes to the end of the line; it stays the field's.
+    expect(isPaletteChord(key({ key: 'k', code: 'KeyK', ctrlKey: true }), true)).toBe(false);
+  });
+
+  it('reads the letter a Latin layout types, and the physical key otherwise', () => {
+    expect(isPaletteChord(key({ key: 'K', code: 'KeyK', ctrlKey: true }), false)).toBe(true);
+    expect(isPaletteChord(key({ key: 'л', code: 'KeyK', ctrlKey: true }), false)).toBe(true);
+    // Dvorak: the key labelled K sits where QWERTY has V, and types "k".
+    expect(isPaletteChord(key({ key: 'k', code: 'KeyV', ctrlKey: true }), false)).toBe(true);
+    expect(isPaletteChord(key({ key: 't', code: 'KeyK', ctrlKey: true }), false)).toBe(false);
+  });
+
+  it('ignores extra modifiers and input-method composition', () => {
+    expect(
+      isPaletteChord(key({ key: 'k', code: 'KeyK', ctrlKey: true, shiftKey: true }), false),
+    ).toBe(false);
+    expect(
+      isPaletteChord(key({ key: 'k', code: 'KeyK', ctrlKey: true, altKey: true }), false),
+    ).toBe(false);
+    expect(
+      isPaletteChord(key({ key: 'k', code: 'KeyK', ctrlKey: true, isComposing: true }), false),
+    ).toBe(false);
   });
 });

@@ -19,11 +19,7 @@ export function SiteSearchButton({ className }: { className?: string }) {
     <button
       type="button"
       onClick={requestSiteSearch}
-      className={cn(
-        buttonVariants({ variant: 'outline', size: 'lg' }),
-        'px-5 normal-case',
-        className,
-      )}
+      className={cn(buttonVariants({ variant: 'outline', size: 'lg' }), 'px-5', className)}
     >
       <Search aria-hidden />
       {t('search.triggerLabel')}

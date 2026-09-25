@@ -1,10 +1,17 @@
 /**
  * Canonical Sprint 8 inventory for every page under app/[locale].
  *
- * `pageFile` is checked against the filesystem by a Jest guard. `publicPath`
+ * `pageFile` is checked against the filesystem by a Jest guard (the 404 is
+ * app/global-not-found.tsx, outside app/[locale]). `publicPath`
  * documents the real route shape, while `fixturePath` supplies deterministic
  * values for every dynamic segment.
  */
+
+/**
+ * The 404 for every URL no route matches, relative to app/[locale] like the
+ * page files: app/global-not-found.tsx renders the whole document.
+ */
+export const GLOBAL_NOT_FOUND_FILE = '../global-not-found.tsx';
 
 export type ZhRouteHost = 'app' | 'landing';
 export type ZhRouteCluster =
@@ -49,7 +56,8 @@ export const ZH_ROUTE_INVENTORY: readonly ZhRouteInventoryEntry[] = [
   // Sprint 1 — global chrome and utility routes.
   {
     id: 'app-not-found',
-    pageFile: '(app)/[...notFound]/page.tsx',
+    // Any URL no route matches: the whole-document 404 at the app root.
+    pageFile: GLOBAL_NOT_FOUND_FILE,
     publicPath: '/[...notFound]',
     fixturePath: '/quality-assurance-route-not-found',
     host: 'app',

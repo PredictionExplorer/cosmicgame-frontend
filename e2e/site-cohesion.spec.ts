@@ -13,6 +13,7 @@ import {
   type LocaleRouteEntry,
 } from './locale-route-inventory';
 import { mockMobileAuditApi } from './mobile-audit-fixtures';
+import { GLOBAL_NOT_FOUND_FILE } from './zh-route-inventory';
 import {
   LANDING_HEADERS,
   collectOverflowViolations,
@@ -82,9 +83,12 @@ test.afterEach(async ({ page, isMobile }, testInfo) => {
 });
 
 test('the cohesion audit covers every page source', () => {
-  const pageSources = readdirSync(join(__dirname, '../app/[locale]'), { recursive: true })
-    .filter((path): path is string => typeof path === 'string' && path.endsWith('/page.tsx'))
-    .sort();
+  const pageSources = [
+    ...readdirSync(join(__dirname, '../app/[locale]'), { recursive: true }).filter(
+      (path): path is string => typeof path === 'string' && path.endsWith('/page.tsx'),
+    ),
+    GLOBAL_NOT_FOUND_FILE,
+  ].sort();
   expect([...new Set(routes.map((route) => route.pageFile))].sort()).toEqual(pageSources);
 });
 

@@ -186,7 +186,9 @@ describe('network guard', () => {
     const { rerender } = render(<WrongNetworkBadge className="min-[360px]:hidden" />);
     const badge = screen.getByTestId('wrong-network-badge');
     expect(badge).toHaveClass('min-[360px]:hidden');
-    expect(badge).toHaveTextContent('wallet.network.wrong');
+    // Drawn only: the pill's own name says the wallet is on another network.
+    expect(badge).toHaveAttribute('aria-hidden', 'true');
+    expect(badge).toHaveTextContent('');
 
     mockWalletChainId = 421614;
     rerender(<WrongNetworkBadge className="min-[360px]:hidden" />);
