@@ -70,8 +70,15 @@ test.describe('with script', () => {
     await page.waitForTimeout(500);
 
     const state = await page.evaluate(() => {
+      // The first face that sets the element's words. The site's subset
+      // companions ("CS Display Figures" for a heading's digits, the CJK
+      // punctuation cuts) lead the stacks but load only for the characters
+      // they cover, so a heading without a digit never loads them.
       const firstFamily = (element: Element) =>
-        getComputedStyle(element).fontFamily.split(',')[0]!.trim().replace(/['"]/g, '');
+        getComputedStyle(element)
+          .fontFamily.split(',')
+          .map((family) => family.trim().replace(/['"]/g, ''))
+          .find((family) => !family.startsWith('CS '))!;
       const loaded = (family: string) =>
         [...document.fonts].some(
           (face) => face.family.replace(/['"]/g, '') === family && face.status === 'loaded',
