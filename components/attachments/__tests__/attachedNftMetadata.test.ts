@@ -5,7 +5,9 @@ import {
   IPFS_GATEWAYS,
   MAX_METADATA_BYTES,
   ResponseTooLargeError,
+  cleanDisplayText,
   fetchAttachedNftMetadata,
+  normalizeAttachedNftMetadata,
   readCappedBytes,
   type MetadataFetcher,
 } from '../attachedNftMetadata';
@@ -132,5 +134,46 @@ describe('readCappedBytes', () => {
   it('stops an undeclared body once it passes the cap', async () => {
     const response = new Response(new Uint8Array(9));
     await expect(readCappedBytes(response, 8)).rejects.toBeInstanceOf(ResponseTooLargeError);
+  });
+});
+
+describe('cleanDisplayText', () => {
+  it('keeps one visible line', () => {
+    expect(cleanDisplayText('  Blueberry \n  Club ', 64)).toBe('Blueberry Club');
+    expect(cleanDisplayText('\u0000​', 64)).toBeUndefined();
+    expect(cleanDisplayText(42, 64)).toBeUndefined();
+  });
+
+  it('drops direction overrides and isolates, which reorder what a reader sees', () => {
+    expect(cleanDisplayText('Rexy ‮gnp.exe', 64)).toBe('Rexy gnp.exe');
+    expect(cleanDisplayText('⁧Club⁩ ‏#1', 64)).toBe('Club #1');
+  });
+
+  it('keeps the joiner that emoji sequences need', () => {
+    expect(cleanDisplayText('Crew \u{1F469}‍\u{1F680}', 64)).toBe('Crew \u{1F469}‍\u{1F680}');
+  });
+
+  it('cuts long text with an ellipsis', () => {
+    expect(cleanDisplayText('x'.repeat(80), 64)).toBe(`${'x'.repeat(63)}…`);
+  });
+});
+
+describe('normalizeAttachedNftMetadata', () => {
+  it('cleans every text field a page shows', () => {
+    expect(
+      normalizeAttachedNftMetadata({
+        name: 'Rexy‮ #1',
+        description: 'Line one\n\nline two',
+        collection_name: 'Blue⁦berry',
+        artist: '‎Artist',
+        platform: 'x'.repeat(100),
+      }),
+    ).toMatchObject({
+      name: 'Rexy #1',
+      description: 'Line one line two',
+      collection_name: 'Blueberry',
+      artist: 'Artist',
+      platform: `${'x'.repeat(63)}…`,
+    });
   });
 });

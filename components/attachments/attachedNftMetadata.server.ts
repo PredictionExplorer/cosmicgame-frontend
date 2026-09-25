@@ -19,8 +19,10 @@ import type { AttachedNFT } from '@/services/api/types';
 
 import {
   IPFS_GATEWAYS,
+  MAX_LABEL_LENGTH,
   attachedNftImagePath,
   attachedNftRef,
+  cleanDisplayText,
   fetchAttachedNftMetadata,
   readCappedBytes,
   type AttachedNftMetadata,
@@ -82,8 +84,6 @@ const DNS_LOOKUP_TIMEOUT_MS = 3_000;
 const CONTRACT_NAME_REVALIDATE_SECONDS = 7 * 24 * 60 * 60;
 /** One `name()` read over RPC. */
 const CONTRACT_NAME_TIMEOUT_MS = 4_000;
-/** Longer contract names are cut, with an ellipsis. */
-const MAX_CONTRACT_NAME_LENGTH = 64;
 
 /**
  * Raster formats the image route serves. SVG is refused on purpose: an SVG
@@ -300,20 +300,12 @@ export function withSameOriginImage(
 }
 
 /**
- * A name a contract supplies, made safe to show in a caption: one line, no
- * control or bidirectional formatting characters, at most 64 characters.
+ * A name a contract supplies, made safe to show in a caption the way the
+ * metadata's own collection name is: one line, no control or bidirectional
+ * formatting characters, at most 64 characters.
  */
 export function displayContractName(value: unknown): string | undefined {
-  if (typeof value !== 'string') return undefined;
-  const clean = value
-    .replace(/[\p{Cc}\p{Cf}]/gu, '')
-    .replace(/\s+/g, ' ')
-    .trim();
-  if (!clean) return undefined;
-  const chars = Array.from(clean);
-  return chars.length > MAX_CONTRACT_NAME_LENGTH
-    ? `${chars.slice(0, MAX_CONTRACT_NAME_LENGTH - 1).join('')}…`
-    : clean;
+  return cleanDisplayText(value, MAX_LABEL_LENGTH);
 }
 
 /** Whether a failed `name()` read is the contract's answer (it has none), not a network fault. */
