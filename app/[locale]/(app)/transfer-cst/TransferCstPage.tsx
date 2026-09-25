@@ -1,13 +1,15 @@
 'use client';
 
-import { ArrowRight } from 'lucide-react';
+import { ArrowRight, ArrowUpRight } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import { getAddress } from 'viem';
 
 import { Link } from '@/i18n/navigation';
+import { CST_UNISWAP_SWAP_URL } from '@/config/uniswap';
 import { REQUIRED_CHAIN_NAME } from '@/lib/chainGuard';
 import { LedgerPage } from '@/components/ledger/LedgerPage';
 import { PageHeader } from '@/components/layout/PageHeader';
+import { SiteLink } from '@/components/layout/SiteLink';
 import { UniswapTradeButton } from '@/components/common/UniswapTradeButton';
 import { CstTransferForm } from '@/components/tokens/CstTransferForm';
 import { AddressChip } from '@/components/ui/address-chip';
@@ -16,11 +18,15 @@ import { useActiveWeb3React } from '@/hooks/web3';
 
 const TITLE_ID = 'transfer-cst-title';
 
-/** The side column: the wallet the CST leaves, its history, and what to check first. */
+/**
+ * What comes before the form: the wallet the CST leaves, its history, and
+ * what to check before sending. It reads first at every width, so the checks
+ * are never below the commit button.
+ */
 function TransferGuide({ source }: { source: string }) {
   const t = useTranslations('myPages.transferCst.guide');
   return (
-    <div className="flex flex-col gap-8">
+    <div className="grid gap-8 sm:grid-cols-2 sm:gap-10">
       <div className="flex flex-col gap-2">
         <h2 className="type-label text-subtle">{t('from')}</h2>
         <AddressChip address={source} className="max-w-full self-start" />
@@ -47,11 +53,15 @@ function TransferGuide({ source }: { source: string }) {
 /**
  * Transfer CST: the connected wallet's CST sent to another address, with the
  * recipient checked, the amount capped by the balance and a review before the
- * wallet opens. Without a wallet the page says what connecting unlocks.
+ * wallet opens, in one reading column: where it leaves from and what to check
+ * first, then the form. Without a wallet the page says what connecting
+ * unlocks, with the one Connect action first and the way to trade CST as a
+ * quiet link under it.
  */
 export default function TransferCstPage() {
   const t = useTranslations('myPages');
   const tWallet = useTranslations('wallet');
+  const tNav = useTranslations('nav');
   const { account, active } = useActiveWeb3React();
   const source = active && account ? getAddress(account) : null;
 
@@ -61,7 +71,8 @@ export default function TransferCstPage() {
       title={t('transferCst.page.title')}
       titleId={TITLE_ID}
       subtitle={t('transferCst.page.subtitle', { network: REQUIRED_CHAIN_NAME })}
-      actions={<UniswapTradeButton variant="secondary" />}
+      // Disconnected, the page's one action is Connect; trading sits under it.
+      actions={source ? <UniswapTradeButton variant="secondary" /> : undefined}
     />
   );
 
@@ -71,13 +82,24 @@ export default function TransferCstPage() {
         <WalletRequiredState
           title={tWallet('required.transferCst.title')}
           description={tWallet('required.transferCst.description')}
-        />
+        >
+          <SiteLink
+            href={CST_UNISWAP_SWAP_URL}
+            kind="external"
+            externalIcon={false}
+            className="link-quiet mt-4 inline-flex min-h-6 items-center gap-1 type-body-sm text-muted-foreground hover:text-foreground"
+          >
+            {tNav('ecosystem.uniswap.defaultLabel')}
+            <ArrowUpRight aria-hidden className="size-3.5 text-subtle" />
+          </SiteLink>
+        </WalletRequiredState>
       </LedgerPage>
     );
   }
 
   return (
-    <LedgerPage header={header} aside={<TransferGuide source={source} />}>
+    <LedgerPage header={header} width="narrow">
+      <TransferGuide source={source} />
       <section aria-labelledby={TITLE_ID} className="rounded-surface bg-surface p-5 sm:p-8">
         <CstTransferForm source={source} />
       </section>
