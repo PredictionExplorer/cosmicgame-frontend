@@ -112,9 +112,9 @@
     "description": "Khắc một Random Walk NFT trên Cosmic Signature. Mỗi Random Walk NFT chưa sử dụng có thể đính kèm vào một nét bút ETH để giảm 50% chi phí nét bút ETH."
   },
   "systemEvent": {
-    "title": "Cấu hình trước chu kỳ {cycle}",
+    "title": "Thay đổi điều phối trước chu kỳ {cycle}",
     "description": "Các tham số giao thức mà chủ sở hữu hợp đồng đã thay đổi trước khi chu kỳ {cycle} mở, kèm giá trị mới và giao dịch của từng thay đổi.",
-    "titleInitial": "Cấu hình ban đầu",
+    "titleInitial": "Thay đổi điều phối trước chu kỳ đầu tiên",
     "descriptionInitial": "Các tham số giao thức mà chủ sở hữu hợp đồng đã đặt trước khi chu kỳ đầu tiên mở, kèm giá trị và giao dịch của từng tham số."
   },
   "currentCycleFull": {

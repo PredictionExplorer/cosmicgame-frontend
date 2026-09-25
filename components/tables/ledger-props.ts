@@ -17,6 +17,8 @@ export interface LedgerStateProps {
   headingLevel?: 2 | 3 | 4;
   /** A line under the title: what the table lists. */
   description?: ReactNode;
+  /** The empty state's title, when the table's own does not fit the page. */
+  emptyTitle?: string;
   /** Explains what the empty table will list, under its empty title. */
   emptyDescription?: string;
   /** A next step from the empty state (a link, an address to send to). */

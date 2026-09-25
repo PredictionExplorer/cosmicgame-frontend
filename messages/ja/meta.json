@@ -112,9 +112,9 @@
     "description": "Cosmic SignatureでRandom Walk NFTを刻印する。未使用のRandom Walk NFTはそれぞれ1回のETH一筆に添付でき、ETH一筆の費用が50%割引されます。"
   },
   "systemEvent": {
-    "title": "サイクル{cycle}より前の設定",
+    "title": "サイクル{cycle}より前の調整の変更",
     "description": "サイクル{cycle}の開始前にコントラクト所有者が変更したプロトコルのパラメーターです。それぞれの新しい値とトランザクションを示します。",
-    "titleInitial": "初期設定",
+    "titleInitial": "最初のサイクルより前の調整の変更",
     "descriptionInitial": "最初のサイクルの開始前にコントラクト所有者が設定したプロトコルのパラメーターです。それぞれの値とトランザクションを示します。"
   },
   "currentCycleFull": {

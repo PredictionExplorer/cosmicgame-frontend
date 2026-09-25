@@ -6,8 +6,8 @@
     "loadError": "조율 변경 내역을 불러오지 못했습니다."
   },
   "systemEvent": {
-    "title": "사이클 {cycle} 이전 구성",
-    "titleInitial": "초기 구성",
+    "title": "사이클 {cycle} 이전 조율 변경 내역",
+    "titleInitial": "첫 사이클 이전 조율 변경 내역",
     "lede": "사이클 {cycle} 시작 전에 컨트랙트 소유자가 변경한 프로토콜 매개변수와 각각의 새 값, 트랜잭션입니다.",
     "ledeInitial": "첫 사이클 시작 전에 컨트랙트 소유자가 설정한 프로토콜 매개변수와 각각의 값, 트랜잭션입니다.",
     "figures": {
@@ -18,10 +18,12 @@
     },
     "allChanges": "전체 조율 변경 내역",
     "loadError": "구성 변경 내역을 불러오지 못했습니다.",
-    "emptyDescription": "사이클 {cycle} 시작 전에 컨트랙트 소유자가 변경한 설정이 없습니다.",
+    "emptyDescription": "사이클 {cycle} 시작 전에 컨트랙트 소유자가 변경한 설정이 없습니다.",
     "invalidTitle": "존재하지 않는 구성 기간입니다",
     "invalidDescription": "링크의 사이클 또는 이벤트 범위가 올바르지 않습니다.",
-    "emptyDescriptionInitial": "첫 사이클 시작 전에 컨트랙트 소유자가 변경한 설정이 없습니다."
+    "emptyDescriptionInitial": "첫 사이클 시작 전에 컨트랙트 소유자가 변경한 설정이 없습니다.",
+    "tableTitle": "변경 내역",
+    "emptyTitle": "이 기간에는 변경 내역이 없습니다"
   },
   "events": {
     "undefined": "정의되지 않음",

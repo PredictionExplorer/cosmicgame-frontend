@@ -252,9 +252,9 @@ test.describe('zh Sprint 5 — statistics, tables, and formatting', () => {
       [`/zh/user/stellar-selection-nft/${ADDRESS}`, '星选 · NFT', '星选 NFT · Cosmic Signature'],
       [
         `/zh/system-event/${CYCLE}/100/200`,
-        `第 ${CYCLE} 个周期前的配置`,
+        `第 ${CYCLE} 个周期前的协调变更`,
         // The tab names the window by its cycle, as the H1 does.
-        `第 ${CYCLE} 个周期前的配置 · Cosmic Signature`,
+        `第 ${CYCLE} 个周期前的协调变更 · Cosmic Signature`,
       ],
     ];
 
@@ -294,7 +294,7 @@ test.describe('zh Sprint 5 — statistics, tables, and formatting', () => {
     await openZhRoute(
       page,
       `/zh/system-event/${CYCLE}/100/200`,
-      `第 ${CYCLE} 个周期前的配置 · Cosmic Signature`,
+      `第 ${CYCLE} 个周期前的协调变更 · Cosmic Signature`,
     );
     // The event's name explains itself in place (no ⓘ per row): the name is the trigger.
     const eventTooltipTrigger = page

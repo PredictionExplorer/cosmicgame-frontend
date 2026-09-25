@@ -140,9 +140,9 @@
     "description": "查看此参与者通过星选获配的全部 Cosmic Signature NFT。"
   },
   "systemEvent": {
-    "title": "第 {cycle} 个周期前的配置",
+    "title": "第 {cycle} 个周期前的协调变更",
     "description": "第 {cycle} 个周期开启前，合约所有者变更的协议参数，每项均附新值与交易。",
-    "titleInitial": "初始配置",
+    "titleInitial": "首个周期前的协调变更",
     "descriptionInitial": "首个周期开启前，合约所有者设定的协议参数，每项均附取值与交易。"
   },
   "faq": {

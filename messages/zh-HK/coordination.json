@@ -6,8 +6,8 @@
     "loadError": "未能載入協調變更。"
   },
   "systemEvent": {
-    "title": "第 {cycle} 個週期前的設定",
-    "titleInitial": "初始設定",
+    "title": "第 {cycle} 個週期前的協調變更",
+    "titleInitial": "首個週期前的協調變更",
     "lede": "第 {cycle} 個週期開啟前，合約所有者變更的協議參數，每項均附新值及交易。",
     "ledeInitial": "首個週期開啟前，合約所有者設定的協議參數，每項均附數值及交易。",
     "figures": {
@@ -21,7 +21,9 @@
     "emptyDescription": "第 {cycle} 個週期開啟前，合約所有者沒有變更任何設定。",
     "invalidTitle": "此設定期間不存在",
     "invalidDescription": "連結中的週期或事件範圍無效。",
-    "emptyDescriptionInitial": "首個週期開啟前，合約所有者沒有變更任何設定。"
+    "emptyDescriptionInitial": "首個週期開啟前，合約所有者沒有變更任何設定。",
+    "tableTitle": "變更",
+    "emptyTitle": "此期間沒有變更"
   },
   "events": {
     "undefined": "未定義",
