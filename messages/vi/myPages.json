@@ -43,7 +43,7 @@
       "label": "Tra cứu một địa chỉ bất kỳ",
       "hint": "Các phân bổ đều công khai: xem một địa chỉ bất kỳ đã nhận những gì.",
       "submit": "Tra cứu",
-      "invalid": "Hãy nhập địa chỉ đầy đủ: 0x và 40 chữ cái, chữ số theo sau."
+      "invalid": "Hãy nhập địa chỉ đầy đủ: bắt đầu bằng 0x, theo sau là 40 ký tự thập lục phân (0–9, a–f)."
     }
   },
   "anchors": {

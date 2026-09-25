@@ -43,7 +43,7 @@
       "label": "Look up any address",
       "hint": "Allocations are public: see what any address has received.",
       "submit": "Look up",
-      "invalid": "Enter a full address: 0x followed by 40 letters and digits."
+      "invalid": "Enter a full address: 0x followed by 40 hexadecimal characters (0–9, a–f)."
     }
   },
   "anchors": {
