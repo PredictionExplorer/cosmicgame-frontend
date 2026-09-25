@@ -36,12 +36,18 @@ export function GallerySearchInput({ value, onCommit, className }: GallerySearch
 
   const timer = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
   useEffect(() => () => clearTimeout(timer.current), []);
+  // The debounced commit fires after later renders: it calls the latest
+  // onCommit, never the one from the keystroke that scheduled it.
+  const onCommitRef = useRef(onCommit);
+  useEffect(() => {
+    onCommitRef.current = onCommit;
+  }, [onCommit]);
 
   const commit = (next: string) => {
     clearTimeout(timer.current);
     const trimmed = next.trim();
     setSent(trimmed);
-    onCommit(trimmed);
+    onCommitRef.current(trimmed);
   };
 
   const onValueChange = (next: string) => {

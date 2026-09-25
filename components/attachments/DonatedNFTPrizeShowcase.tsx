@@ -1,7 +1,6 @@
 'use client';
 
 import type { ReactNode } from 'react';
-import { formatUnits } from 'viem';
 import { ArrowUpRight, ImageOff } from 'lucide-react';
 import { useLocale, useTranslations } from 'next-intl';
 
@@ -13,16 +12,19 @@ import { cn } from '@/lib/utils';
 import type { AttachedNFT, DonatedERC20Token } from '@/services/api/types';
 import NFTImage from '@/components/nft/NFTImage';
 import { AddressChip } from '@/components/ui/address-chip';
+import { MEDIA_PLATE_CLASS } from '@/components/ui/art-frame';
 import { Badge } from '@/components/ui/badge';
 import { buttonVariants } from '@/components/ui/button';
 import { ExplainedTerm } from '@/components/ui/explain-popover';
 import { Surface } from '@/components/ui/surface';
 
+import { AttachedNftProjectSite } from './AttachedNftProjectSite';
+import { attachedErc20Amount } from './attachedErc20Amount';
 import {
-  buildOpenSeaAssetUrl,
   getAttachedNftTokenId,
   resolveAttachedNftExplorerLink,
   resolveAttachedNftLink,
+  resolveAttachedNftProjectLink,
 } from './attachedNftLinks';
 import { useAttachedNftMetadata } from './useAttachedNftMetadata';
 import { useAttachedErc20Metadata } from './useAttachedErc20Metadata';
@@ -216,35 +218,6 @@ function formatAttachedAmount(amount: number, locale: string): string {
   return formatNumber(amount, locale, { maximumFractionDigits: amountDigits(amount) });
 }
 
-function getAttachedErc20Amount(
-  token: DonatedERC20Token,
-  decimals: number,
-  locale: string,
-): string | null {
-  if (typeof token.AmountDonatedEth === 'number' && Number.isFinite(token.AmountDonatedEth)) {
-    return formatAttachedAmount(token.AmountDonatedEth, locale);
-  }
-  if (typeof token.AmountEth === 'number' && Number.isFinite(token.AmountEth)) {
-    return formatAttachedAmount(token.AmountEth, locale);
-  }
-
-  const rawAmount =
-    typeof token.Amount === 'string'
-      ? token.Amount
-      : typeof token.DonateClaimDiffEth === 'string'
-        ? token.DonateClaimDiffEth
-        : '';
-  if (/^\d+$/.test(rawAmount)) {
-    try {
-      const amount = Number(formatUnits(BigInt(rawAmount), decimals));
-      return Number.isFinite(amount) ? formatAttachedAmount(amount, locale) : null;
-    } catch {
-      return null;
-    }
-  }
-  return null;
-}
-
 function SummaryFact({
   label,
   value,
@@ -342,21 +315,20 @@ function AttachedNFTAllocationCard({
   });
   const tokenId = getAttachedNftTokenId(nft);
   const linkLabels = {
-    viewNft: tStatistics('attachedNftLinks.viewNft'),
     viewOpenSea: tStatistics('attachedNftLinks.viewOpenSea'),
     viewContract: tStatistics('attachedNftLinks.viewContract'),
     detailsUnavailable: tStatistics('attachedNftLinks.detailsUnavailable'),
     contractUnavailable: tStatistics('attachedNftLinks.contractUnavailable'),
   };
-  const primaryLink = resolveAttachedNftLink({ nft, metadata, labels: linkLabels });
+  // OpenSea or the explorer, from the recorded contract and token; the
+  // metadata's own site follows as a caption that shows its whole host.
+  const primaryLink = resolveAttachedNftLink({ nft, labels: linkLabels });
   const primaryLabel =
-    primaryLink.kind === 'project'
-      ? t('showcase.nftCard.links.project')
-      : primaryLink.kind === 'opensea'
-        ? t('showcase.nftCard.links.opensea')
-        : t('showcase.nftCard.links.explorer');
+    primaryLink.kind === 'opensea'
+      ? t('showcase.nftCard.links.opensea')
+      : t('showcase.nftCard.links.explorer');
   const explorerLink = resolveAttachedNftExplorerLink(nft, linkLabels);
-  const openSeaUrl = buildOpenSeaAssetUrl(nft.TokenAddr, tokenId);
+  const projectLink = resolveAttachedNftProjectLink(metadata);
   const { data: estimate } = useNFTCollectionEstimate({
     tokenAddr: nft.TokenAddr,
     tokenId,
@@ -373,11 +345,9 @@ function AttachedNFTAllocationCard({
   const imageAlt = metadata?.name
     ? t('showcase.nftCard.imageAlt', { name: metadata.name })
     : t('showcase.nftCard.imageAltFallback');
-  const frameClassName = cn(
-    ASSET_FRAME_CLASS,
-    'group/media bg-art-ground shadow-[var(--art-edge)] transition-shadow duration-[var(--duration-fast)]',
-    primaryLink.href && 'hover:shadow-[var(--art-edge-active)]',
-  );
+  // The shared media plate draws its print edge above the image, so a
+  // letterboxed picture never interrupts it.
+  const frameClassName = cn(MEDIA_PLATE_CLASS, ASSET_FRAME_CLASS, 'group/media');
   const image = (
     <NFTImage
       src={metadata?.image}
@@ -469,13 +439,11 @@ function AttachedNFTAllocationCard({
           {primaryLink.href ? (
             <AssetAction href={primaryLink.href} label={primaryLabel} primary />
           ) : null}
-          {openSeaUrl && primaryLink.href !== openSeaUrl ? (
-            <AssetAction href={openSeaUrl} label={t('showcase.nftCard.openSea')} />
-          ) : null}
-          {explorerLink.href ? (
+          {explorerLink.href && primaryLink.href !== explorerLink.href ? (
             <AssetAction href={explorerLink.href} label={t('showcase.nftCard.explorer')} />
           ) : null}
         </div>
+        {projectLink ? <AttachedNftProjectSite link={projectLink} className="mt-2" /> : null}
       </div>
     </AssetLayoutGrid>
   );
@@ -492,9 +460,11 @@ function AttachedERC20AllocationCard({
   const locale = useLocale();
   const { data: metadata } = useAttachedErc20Metadata(token.TokenAddr);
   const symbol = metadata?.symbol || t('showcase.erc20Card.symbolFallback');
+  const attached = attachedErc20Amount(token, metadata?.decimals ?? 18);
   const amount =
-    getAttachedErc20Amount(token, metadata?.decimals ?? 18, locale) ??
-    t('showcase.erc20Card.unknownAmount');
+    attached === null
+      ? t('showcase.erc20Card.unknownAmount')
+      : formatAttachedAmount(attached, locale);
   const tokenName = metadata?.name || t('showcase.erc20Card.nameFallback');
   const explorerHref = token.TokenAddr ? getExplorerUrl('token', token.TokenAddr) : '';
   const logoSource = metadata?.logoSource ?? t('showcase.erc20Card.logoSourceFallback');

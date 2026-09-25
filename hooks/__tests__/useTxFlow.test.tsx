@@ -131,7 +131,8 @@ describe('useTxFlow — lifecycle', () => {
     expect(result).toMatchObject({ status: 'confirmed', hash: '0xhash' });
     expect(mockWriteContract).toHaveBeenCalledWith(
       mockConfig,
-      expect.objectContaining({ functionName: 'doIt', chainId: APP_CHAIN }),
+      // Pinned to the account the flow started with.
+      expect.objectContaining({ functionName: 'doIt', chainId: APP_CHAIN, account: '0xUser' }),
     );
 
     const [firstLoading, secondLoading] = mockToast.loading.mock.calls;

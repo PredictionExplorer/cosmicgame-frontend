@@ -18,6 +18,11 @@ export interface WalletRequiredStateProps {
   description?: string;
   /** Public view of the same kind of data, for visitors who only want to look. */
   publicLink?: { href: string; label: string };
+  /**
+   * A figure in place of the wallet icon tile: what will fill the page once
+   * connected (My NFTs shows the newest plates).
+   */
+  visual?: ReactNode;
   /** Heading level for the title; the page H1 sits above, so h2 by default. */
   headingLevel?: 'h2' | 'h3';
   /** Extra content under the actions (a Uniswap link on the CST pages…). */
@@ -62,6 +67,7 @@ export function WalletRequiredState({
   title,
   description,
   publicLink,
+  visual,
   headingLevel = 'h2',
   children,
   className,
@@ -80,6 +86,7 @@ export function WalletRequiredState({
         variant="page"
         headingLevel={headingLevel === 'h3' ? 3 : 2}
         icon={<Wallet />}
+        visual={visual}
         title={title}
         description={description}
         className="py-14 sm:py-16"

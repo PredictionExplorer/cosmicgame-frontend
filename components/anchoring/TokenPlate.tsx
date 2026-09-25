@@ -4,7 +4,7 @@ import { useTranslations } from 'next-intl';
 
 import { cn } from '@/lib/utils';
 import { formatId } from '@/utils/format';
-import { getRWLKImageUrl } from '@/utils/urls';
+import { randomWalkImageUrl } from '@/utils/urls';
 import { useCSTInfo } from '@/hooks/useApiQuery';
 import { ArtFrame, PendingPlate, type ArtSource } from '@/components/ui/art-frame';
 import { signatureMedia, signatureSources } from '@/components/nft/signatureMedia';
@@ -17,8 +17,7 @@ import type { AnchorCollection } from './anchorLinks';
  * Signature's own ratio, so a Random Walk NFT sits on the same black plate.
  */
 export function randomWalkSources(tokenId: number): readonly ArtSource[] {
-  const stem = String(tokenId).padStart(6, '0');
-  return [getRWLKImageUrl(stem), getRWLKImageUrl(stem, 'black.png')];
+  return [randomWalkImageUrl(tokenId), randomWalkImageUrl(tokenId, 'black.png')];
 }
 
 export interface TokenPlateProps {

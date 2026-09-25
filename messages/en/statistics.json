@@ -637,7 +637,11 @@
     "loadErrorMessage": "The named NFT records could not be read. Try again.",
     "emptyTitle": "No named NFTs",
     "emptyDescription": "No Cosmic Signature NFTs have been named yet.",
-    "galleryLink": "See them in the gallery"
+    "galleryLink": "See them in the gallery",
+    "card": {
+      "namedOn": "Named",
+      "namedBy": "Named by"
+    }
   },
   "attachedNfts": {
     "title": "Attached NFT contributions",
@@ -654,13 +658,14 @@
   "usedRwlkNfts": {
     "title": "Used Random Walk NFTs",
     "subtitle": "Random Walk NFTs attached to ETH gestures for the one-time 50% Gesture Cost reduction",
-    "artAlt": "RandomWalk NFT {id}",
-    "loadErrorTitle": "Used RandomWalk NFTs could not be loaded",
-    "loadError": "The used RandomWalk NFTs could not be read. Try again.",
-    "emptyTitle": "No RandomWalk NFTs used yet",
-    "emptyDescription": "A RandomWalk NFT appears here once an ETH gesture uses it for its one-time Gesture Cost reduction.",
+    "artAlt": "Random Walk NFT #{id}",
+    "loadErrorTitle": "Used Random Walk NFTs could not be loaded",
+    "loadError": "The used Random Walk NFTs could not be read. Try again.",
+    "emptyTitle": "No Random Walk NFTs used yet",
+    "emptyDescription": "A Random Walk NFT appears here once an ETH gesture uses it for its one-time Gesture Cost reduction.",
     "card": {
       "cycle": "Cycle {cycle}",
+      "title": "Random Walk #{id}",
       "usedBy": "Used by"
     }
   },
@@ -762,7 +767,7 @@
     "attached": "Attached"
   },
   "attachedNftLinks": {
-    "viewNft": "View NFT",
+    "projectSite": "Project site",
     "viewOpenSea": "View on OpenSea",
     "viewContract": "View contract",
     "detailsUnavailable": "NFT details unavailable",

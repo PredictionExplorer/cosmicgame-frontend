@@ -77,7 +77,7 @@ describe('GlobalAnchoredTokensTable', () => {
     expect(screen.getByTestId('art-frame')).toBeInTheDocument();
     expect(screen.getByRole('link', { name: /#001826/ })).toHaveAttribute(
       'href',
-      'https://randomwalknft.com/detail/1826',
+      'https://www.randomwalknft.com/detail/1826',
     );
     expect(
       screen.getAllByRole('link', {

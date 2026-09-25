@@ -53,6 +53,10 @@ describe('next.config', () => {
     expect(patterns).toHaveLength(4);
   });
 
+  it('keeps optimized renditions of the seed-named art for a month', () => {
+    expect((config as NextConfig).images?.minimumCacheTTL).toBe(2_678_400);
+  });
+
   it('enables turbopack', () => {
     expect(config).toHaveProperty('turbopack');
   });
@@ -175,6 +179,13 @@ describe('next.config', () => {
       const keys = withoutDsn[0]?.headers.map((header) => header.key);
       expect(keys).toContain('Content-Security-Policy');
       expect(keys).not.toContain('Content-Security-Policy-Report-Only');
+    });
+
+    it('lets browsers keep static images for a day and revalidate in the background', () => {
+      const images = headers.find((rule) => rule.source === '/images/:path*');
+      expect(images?.headers).toEqual([
+        { key: 'Cache-Control', value: 'public, max-age=86400, stale-while-revalidate=604800' },
+      ]);
     });
   });
 

@@ -21,5 +21,7 @@ export interface LedgerStateProps {
   emptyDescription?: string;
   /** A next step from the empty state (a link, an address to send to). */
   emptyAction?: ReactNode;
+  /** `false` where the page already states the time zone beside a standalone date. */
+  timeZoneNote?: boolean;
   className?: string;
 }

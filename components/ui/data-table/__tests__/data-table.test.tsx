@@ -978,6 +978,21 @@ describe('DataTable framing', () => {
     expect(pager).toHaveTextContent(/formats\.dateTime\.timeZone.*·.*Muted amounts are dust\./);
   });
 
+  it('leaves the time zone to the page when told it is stated there', () => {
+    render(
+      <DataTable
+        ariaLabel="Holders"
+        data={rows}
+        columns={[
+          { id: 'when', kind: 'datetime', header: 'Date', value: () => 1_700_000_000 },
+          ...columns,
+        ]}
+        timeZoneNote={false}
+      />,
+    );
+    expect(document.body).not.toHaveTextContent(/formats\.dateTime\.timeZone/);
+  });
+
   it('underlines a quiet ledger’s links only on hover and focus', () => {
     render(<DataTable ariaLabel="Holders" data={rows} columns={columns} links="quiet" />);
     expect(screen.getByRole('table')).toHaveAttribute('data-links', 'quiet');

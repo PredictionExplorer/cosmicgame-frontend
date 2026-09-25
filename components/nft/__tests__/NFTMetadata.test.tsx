@@ -168,11 +168,21 @@ describe('NFTSeed', () => {
       clipboard: { writeText: jest.fn().mockResolvedValue(undefined) },
     });
     render(<NFTSeed seed="deadbeef" />);
-    fireEvent.click(screen.getByTestId('copy-seed-button'));
+    fireEvent.click(screen.getByRole('button', { name: 'detail.metadata.copySeed' }));
     expect(navigator.clipboard.writeText).toHaveBeenCalledWith('deadbeef');
     await waitFor(() =>
-      expect(screen.getByTestId('copy-seed-button')).toHaveAccessibleName('common.actions.copied'),
+      expect(screen.getByRole('button', { name: 'common.actions.copied' })).toBeInTheDocument(),
     );
+  });
+
+  it('never confirms a copy the browser refused', async () => {
+    Object.assign(navigator, {
+      clipboard: { writeText: jest.fn().mockRejectedValue(new Error('denied')) },
+    });
+    render(<NFTSeed seed="deadbeef" />);
+    fireEvent.click(screen.getByRole('button', { name: 'detail.metadata.copySeed' }));
+    await waitFor(() => expect(navigator.clipboard.writeText).toHaveBeenCalled());
+    expect(screen.queryByRole('button', { name: 'common.actions.copied' })).toBeNull();
   });
 
   it('renders nothing without a seed', () => {

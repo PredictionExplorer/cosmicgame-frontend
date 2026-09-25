@@ -12,16 +12,10 @@ import { DashboardQuerySeed, QuerySeed, seedsDisabled } from '../../QuerySeed';
 import { readDashboard } from '../../publicDataReads';
 
 import GesturePage from './GesturePage';
+import { parseGestureId } from './gestureId';
 
 interface PageProps {
   params: Promise<{ locale: string; id: string }>;
-}
-
-/** The route's event-log id, or null when it is not a whole number ("12abc" is not 12). */
-function parseGestureId(id: string): number | null {
-  if (!/^\d+$/.test(id)) return null;
-  const value = Number(id);
-  return Number.isSafeInteger(value) ? value : null;
 }
 
 /**
@@ -90,6 +84,9 @@ export default async function Page({ params }: PageProps) {
               queryKey: ['gestureInfo', gestureId],
               data: gesture?.data ?? null,
               at: gesture?.at ?? 0,
+              // A record the API does not hold is seeded as absent, so the
+              // server HTML opens on the not-found state, not a skeleton.
+              absent: gesture?.data === null,
             },
           ]}
         >

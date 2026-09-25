@@ -1,6 +1,10 @@
 {
-  "invalid": {
-    "title": "トークンIDが無効です"
+  "notFound": {
+    "title": "このシグネチャーはまだ刻印されていません",
+    "titleInvalid": "このリンクに対応するシグネチャーはありません",
+    "description": "シグネチャーには刻印された順に番号が付きます。",
+    "newest": "最新は#{id}です。",
+    "newestLink": "最新のシグネチャーを見る"
   },
   "jsonLd": {
     "productDescription": "Cosmic Signatureから生まれたジェネラティブNFT。三体問題の物理シミュレーションが、一点ごとに異なる軌跡を描きます。"
@@ -19,7 +23,8 @@
     "trigger": "共有",
     "copyVideoLink": "動画リンクをコピー",
     "copyImageLink": "画像リンクをコピー",
-    "copyPageLink": "ページリンクをコピー"
+    "copyPageLink": "ページリンクをコピー",
+    "copyFailed": "リンクをコピーできませんでした。"
   },
   "navigation": {
     "label": "前後のシグネチャー"

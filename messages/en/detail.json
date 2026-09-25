@@ -1,6 +1,10 @@
 {
-  "invalid": {
-    "title": "Invalid token ID"
+  "notFound": {
+    "title": "This Signature hasn't been imprinted yet",
+    "titleInvalid": "This link doesn't lead to a Signature",
+    "description": "Signatures are numbered in the order they're imprinted.",
+    "newest": "The newest is #{id}.",
+    "newestLink": "See the newest Signature"
   },
   "jsonLd": {
     "productDescription": "Unique generative NFT from the Cosmic Signature procedural on-chain art protocol, rendered from three-body problem physics."
@@ -19,7 +23,8 @@
     "trigger": "Share",
     "copyVideoLink": "Copy Video Link",
     "copyImageLink": "Copy Image Link",
-    "copyPageLink": "Copy Page Link"
+    "copyPageLink": "Copy Page Link",
+    "copyFailed": "The link could not be copied."
   },
   "navigation": {
     "label": "Previous and next Signatures"

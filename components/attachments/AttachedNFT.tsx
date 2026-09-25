@@ -1,22 +1,26 @@
 'use client';
 
 import { Fragment, type ReactNode } from 'react';
-import { ArrowUpRight } from 'lucide-react';
 import { useLocale, useTranslations } from 'next-intl';
 
-import { formatAddress, formatCount } from '@/utils/format';
+import { formatCount } from '@/utils/format';
 import { cn } from '@/lib/utils';
 import type { AttachedNFT as AttachedNFTRecord } from '@/services/api/types';
 import { AddressChip } from '@/components/ui/address-chip';
+import { MEDIA_PLATE_CLASS } from '@/components/ui/art-frame';
 import { DateTime } from '@/components/ui/date-time';
 import NFTImage from '@/components/nft/NFTImage';
+import { TitleWithArrow } from '@/components/nft/TitleWithArrow';
 import { TableLink } from '@/components/ui/data-table';
 
+import { AttachedNftProjectSite } from './AttachedNftProjectSite';
 import {
   getAttachedNftTokenId,
   nameCarriesTokenId,
   resolveAttachedNftLink,
+  resolveAttachedNftProjectLink,
 } from './attachedNftLinks';
+import { useAttachedNftCollectionLabel } from './useAttachedNftCollectionLabel';
 import { useAttachedNftMetadata } from './useAttachedNftMetadata';
 
 type NFT = Partial<
@@ -57,29 +61,12 @@ function Caption({ facts, className }: { facts: readonly ReactNode[]; className?
 }
 
 /**
- * The title with the external-link arrow bound to its last word, so a
- * wrapped title keeps the arrow at the end of its text, never alone at the
- * far edge of the card.
- */
-function TitleWithArrow({ text, arrow }: { text: string; arrow: boolean }) {
-  if (!arrow) return <>{text}</>;
-  const cut = text.lastIndexOf(' ') + 1;
-  return (
-    <>
-      {text.slice(0, cut)}
-      <span className="whitespace-nowrap">
-        {text.slice(cut)}
-        <ArrowUpRight aria-hidden className="ms-1 inline size-3.5 align-[-0.125em] text-subtle" />
-      </span>
-    </>
-  );
-}
-
-/**
  * An NFT attached to a gesture, shown as a work on a black plate: the image
  * whole (object-contain) on a square ground, then its name or number and its
- * collection. The plate and title link to the NFT on its project's site,
- * OpenSea or the explorer (a new tab); `showRecord` adds the cycle, the date
+ * collection. The plate and title link to the NFT on OpenSea, or to its
+ * contract on the explorer (a new tab): addresses the protocol recorded, not
+ * the NFT's own metadata. A project site the metadata names follows as a
+ * secondary link that shows its whole host. `showRecord` adds the cycle, the date
  * and the contributor, each with its own link.
  */
 const AttachedNFT = ({
@@ -96,21 +83,30 @@ const AttachedNFT = ({
   });
   const link = resolveAttachedNftLink({
     nft,
-    metadata,
     labels: {
-      viewNft: t('attachedNftLinks.viewNft'),
       viewOpenSea: t('attachedNftLinks.viewOpenSea'),
       viewContract: t('attachedNftLinks.viewContract'),
       detailsUnavailable: t('attachedNftLinks.detailsUnavailable'),
       contractUnavailable: t('attachedNftLinks.contractUnavailable'),
     },
   });
+  const projectLink = resolveAttachedNftProjectLink(metadata);
+  const collectionLabel = useAttachedNftCollectionLabel(nft.TokenAddr, metadata);
   const tokenId = getAttachedNftTokenId(nft);
   const name = typeof metadata?.name === 'string' ? metadata.name.trim() : '';
   const number = tokenId ? `#${tokenId}` : t('attachedNftCard.unknownToken');
-  const collection =
-    (typeof metadata?.collection_name === 'string' && metadata.collection_name.trim()) ||
-    (nft.TokenAddr ? formatAddress(nft.TokenAddr) : null);
+  // The collection's name, else its contract in the one address style (the
+  // chip is text here: the whole label is already the link).
+  const collection = nft.TokenAddr ? (
+    <AddressChip
+      address={nft.TokenAddr}
+      variant="plain"
+      href={false}
+      showCopy={false}
+      label={collectionLabel}
+      className="min-w-0 max-w-full align-bottom"
+    />
+  ) : null;
   const accessibleName = name
     ? t('attachedNftCard.viewNamed', { name })
     : tokenId
@@ -118,7 +114,14 @@ const AttachedNFT = ({
       : link.label;
 
   const plate = (
-    <div className="relative aspect-square overflow-hidden rounded-edge bg-art-ground shadow-[var(--art-edge)] transition-shadow duration-[var(--duration-fast)] group-hover:shadow-[var(--art-edge-active)]">
+    // The shared media plate draws its print edge above the image, so a
+    // letterboxed picture never interrupts it.
+    <div
+      className={cn(
+        MEDIA_PLATE_CLASS,
+        'aspect-square group-hover:after:shadow-[var(--art-edge-active)]',
+      )}
+    >
       <NFTImage
         src={metadata?.image}
         fallbackSrc={metadata?.imageFallback}
@@ -167,6 +170,7 @@ const AttachedNFT = ({
           {label}
         </div>
       )}
+      {projectLink ? <AttachedNftProjectSite link={projectLink} className="mt-1" /> : null}
       {showRecord ? (
         <div className="mt-1.5 space-y-1">
           <Caption

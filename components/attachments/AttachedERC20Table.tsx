@@ -18,6 +18,7 @@ import {
 import { DateTime } from '@/components/ui/date-time';
 import { UnknownValue } from '@/components/ui/unknown-value';
 
+import { attachedErc20Amount } from './attachedErc20Amount';
 import { useAttachedErc20Metadata } from './useAttachedErc20Metadata';
 
 export type { DonatedERC20Token };
@@ -28,25 +29,6 @@ interface DonatedERC20TableProps {
   handleClaim: ((roundNum: number, tokenAddr: string, amount: string) => void) | null;
   /** Table heading level when the table stands under a section heading. */
   headingLevel?: 2 | 3 | 4;
-}
-
-/**
- * The amount that was attached. The Recipient's read (`by_user`) reports what
- * is still held (`AmountDonated`, 0 once retrieved) beside what was retrieved,
- * so the attached amount is their sum; the cycle's read (`by_round`) reports
- * the attached amount itself (`AmountEth`). `null` when neither is known.
- */
-export function attachedErc20Amount(
-  row: Pick<DonatedERC20Token, 'AmountDonated' | 'AmountDonatedEth' | 'AmountClaimedEth'> & {
-    AmountEth?: unknown;
-  },
-): number | null {
-  const held = toFiniteNumber(row.AmountDonatedEth);
-  const reportsHolding = row.AmountDonated !== undefined && row.AmountDonated !== null;
-  if (reportsHolding) {
-    return held === null ? null : held + (toFiniteNumber(row.AmountClaimedEth) ?? 0);
-  }
-  return toFiniteNumber(row.AmountEth) ?? held;
 }
 
 /** Up to four decimals: ERC-20 amounts are arbitrary tokens, not ETH or CST. */

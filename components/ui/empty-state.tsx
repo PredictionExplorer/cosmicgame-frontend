@@ -48,6 +48,11 @@ const TITLE_CLASS: Record<StateVariant, string> = {
 
 interface EmptyStateProps {
   icon?: ReactNode;
+  /**
+   * A figure of its own in place of the icon tile (art on its plates), for a
+   * page state that can show what will fill it. Centred variants only.
+   */
+  visual?: ReactNode;
   title: string;
   description?: ReactNode;
   action?: ReactNode;
@@ -68,6 +73,7 @@ interface EmptyStateProps {
  */
 export function EmptyState({
   icon,
+  visual,
   title,
   description,
   action,
@@ -97,9 +103,13 @@ export function EmptyState({
   // that size the root (min-height, full height) size the state itself.
   return (
     <div className={cn(stateLayoutVariants({ variant }), className)}>
-      <div aria-hidden className={stateIconVariants({ variant })}>
-        {icon ?? <Inbox />}
-      </div>
+      {visual && !isInline ? (
+        visual
+      ) : (
+        <div aria-hidden className={stateIconVariants({ variant })}>
+          {icon ?? <Inbox />}
+        </div>
+      )}
       {isInline ? <div className="min-w-0">{text}</div> : text}
     </div>
   );

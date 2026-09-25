@@ -1,12 +1,12 @@
 import { checkA11y, fireEvent, render, screen, within } from '@/test-utils';
 
 import NamedNFTsPage from '../NamedNFTsPage';
+import type { NamedSignature } from '../namedWall';
 
-const mockUseNamedNFTs = jest.fn();
-const mockUseCSTList = jest.fn();
-jest.mock('@/hooks/useApiQuery', () => ({
-  useNamedNFTs: () => mockUseNamedNFTs(),
-  useCSTList: () => mockUseCSTList(),
+const mockUseQuery = jest.fn();
+jest.mock('@tanstack/react-query', () => ({
+  ...jest.requireActual('@tanstack/react-query'),
+  useQuery: (...args: unknown[]) => mockUseQuery(...args),
 }));
 
 const mockUseCollectionTraits = jest.fn();
@@ -22,19 +22,35 @@ jest.mock('next/image', () => ({
   },
 }));
 
-const named = [
-  { MintTimeStamp: 1000, TokenId: 1, TokenName: 'Alpha' },
-  { MintTimeStamp: 2000, TokenId: 2, TokenName: 'Beta' },
+const NAMER = '0x232351e4217F8cB46BcA6c94e873C382ae2B99AE';
+
+function row(overrides: Partial<NamedSignature>): NamedSignature {
+  return {
+    tokenId: 1,
+    name: 'Alpha',
+    seed: 'a1',
+    anchored: false,
+    imprintedAt: 1000,
+    namedAt: 1786935062,
+    namedBy: NAMER,
+    namedTx: '0x196087f0ceb1ded3f6f15ae3f0215cce400c8c5ee38dcbcb8579e553b86d3696',
+    ...overrides,
+  };
+}
+
+// Most recently named first, as readNamedWall orders them.
+const wall = [
+  row({ tokenId: 25, name: 'Twisted Mind', anchored: true }),
+  row({ tokenId: 1, name: 'NUMBA 1', namedAt: 1781506802, namedTx: null, namedBy: null }),
 ];
-const collection = [
-  { TokenId: 1, Seed: 'a1', Staked: true },
-  { TokenId: 2, Seed: 'a2', Staked: false },
-];
+
+function query(state: Record<string, unknown>) {
+  mockUseQuery.mockReturnValue({ isLoading: false, isError: false, refetch: jest.fn(), ...state });
+}
 
 beforeEach(() => {
   jest.clearAllMocks();
-  mockUseNamedNFTs.mockReturnValue({ data: named, isLoading: false });
-  mockUseCSTList.mockReturnValue({ data: collection, isLoading: false });
+  query({ data: wall });
   mockUseCollectionTraits.mockReturnValue({ traits: null, isLoading: false, isError: true });
 });
 
@@ -46,16 +62,37 @@ describe('NamedNFTsPage', () => {
     ).toBeInTheDocument();
   });
 
-  it('hangs every named Signature as art, titled by its name', () => {
+  it('hangs every named Signature as art, titled by its name, in the order named', () => {
     render(<NamedNFTsPage />);
-    const wall = screen.getByRole('list', { name: 'Named Cosmic Signature NFTs' });
-    const cards = within(wall).getAllByTestId('signature-card');
+    const list = screen.getByRole('list', { name: 'Named Cosmic Signature NFTs' });
+    const cards = within(list).getAllByTestId('signature-card');
     expect(cards).toHaveLength(2);
-    expect(within(cards[0]!).getByText('Alpha')).toBeInTheDocument();
-    expect(within(cards[0]!).getByRole('link')).toHaveAttribute('href', '/detail/1');
-    // The anchored state comes from the collection list.
+    expect(within(cards[0]!).getByText('Twisted Mind')).toBeInTheDocument();
+    expect(within(cards[0]!).getAllByRole('link')[0]).toHaveAttribute('href', '/detail/25');
     expect(within(cards[0]!).getByTestId('anchored-mark')).toBeInTheDocument();
     expect(within(cards[1]!).queryByTestId('anchored-mark')).not.toBeInTheDocument();
+  });
+
+  it('says who named each Signature and when, with the proof', () => {
+    render(<NamedNFTsPage />);
+    const [first, second] = screen.getAllByTestId('signature-card');
+    expect(within(first!).getByText('Named')).toBeInTheDocument();
+    expect(within(first!).getByText('Named by')).toBeInTheDocument();
+    const proof = within(first!)
+      .getAllByRole('link')
+      .find((link) => link.getAttribute('href')?.includes('/tx/0x196087f0'));
+    expect(proof).toBeDefined();
+    expect(within(first!).getByRole('link', { name: /0x2323/ })).toHaveAttribute(
+      'href',
+      `/user/${NAMER}`,
+    );
+    // No proof or namer read: the date alone.
+    expect(within(second!).queryByText('Named by')).not.toBeInTheDocument();
+  });
+
+  it('never nests a link inside the card link', () => {
+    const { container } = render(<NamedNFTsPage />);
+    expect(container.querySelectorAll('a a')).toHaveLength(0);
   });
 
   it('links to the gallery filtered to named Signatures', () => {
@@ -66,8 +103,8 @@ describe('NamedNFTsPage', () => {
     );
   });
 
-  it('waits for a seed source rather than flashing unavailable plates', () => {
-    mockUseCSTList.mockReturnValue({ data: undefined, isLoading: true });
+  it('waits for the trait index when a record gave no seed, rather than flash unavailable plates', () => {
+    query({ data: [row({ seed: null })] });
     mockUseCollectionTraits.mockReturnValue({ traits: null, isLoading: true, isError: false });
     render(<NamedNFTsPage />);
     expect(screen.getByTestId('signature-grid-skeleton')).toBeInTheDocument();
@@ -75,7 +112,7 @@ describe('NamedNFTsPage', () => {
   });
 
   it('says so when no Signature has a name yet', () => {
-    mockUseNamedNFTs.mockReturnValue({ data: [], isLoading: false });
+    query({ data: [] });
     render(<NamedNFTsPage />);
     expect(screen.getByRole('heading', { level: 2, name: 'No named NFTs' })).toBeInTheDocument();
     expect(screen.getByText('No Cosmic Signature NFTs have been named yet.')).toBeInTheDocument();
@@ -83,7 +120,7 @@ describe('NamedNFTsPage', () => {
 
   it('offers a retry instead of an empty wall when the list cannot be read', () => {
     const refetch = jest.fn();
-    mockUseNamedNFTs.mockReturnValue({ data: undefined, isLoading: false, isError: true, refetch });
+    query({ data: undefined, isError: true, refetch });
     render(<NamedNFTsPage />);
     expect(screen.queryByRole('heading', { name: 'No named NFTs' })).toBeNull();
     expect(
@@ -93,8 +130,16 @@ describe('NamedNFTsPage', () => {
     expect(refetch).toHaveBeenCalled();
   });
 
+  // A failed background refetch keeps the data it had (TanStack sets isError).
+  it('keeps the wall when a refetch fails after a load', () => {
+    query({ data: wall, isError: true });
+    render(<NamedNFTsPage />);
+    expect(screen.getAllByTestId('signature-card')).toHaveLength(2);
+    expect(screen.queryByRole('heading', { name: 'Named NFTs could not be loaded' })).toBeNull();
+  });
+
   it('never says nothing is named under a header that counted named NFTs', () => {
-    mockUseNamedNFTs.mockReturnValue({ data: [], isLoading: false, refetch: jest.fn() });
+    query({ data: [] });
     render(<NamedNFTsPage snapshotCount={3} />);
     expect(screen.queryByRole('heading', { name: 'No named NFTs' })).toBeNull();
     expect(

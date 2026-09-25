@@ -128,9 +128,13 @@ test.describe('Gesture detail page', () => {
     expect(reads).toBe(1);
   });
 
-  test('an id that is not a whole number is invalid, never a nearby gesture', async ({ page }) => {
-    await page.goto('/gesture/12abc', { waitUntil: 'networkidle' });
-    await expect(page.getByRole('heading', { level: 1 })).toHaveText('Invalid gesture ID');
-    await expect(page).toHaveTitle(/^Invalid gesture ID · /);
+  // The route layout turns a malformed id away before the loading boundary
+  // streams, so it is a real 404 rather than a 200 "Invalid" page.
+  test('an id that is not a whole number is a real 404, never a nearby gesture', async ({
+    page,
+  }) => {
+    const response = await page.goto('/gesture/12abc', { waitUntil: 'networkidle' });
+    expect(response?.status()).toBe(404);
+    await expect(page.getByRole('heading', { level: 1 })).toHaveText('Page not found');
   });
 });

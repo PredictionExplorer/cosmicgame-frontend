@@ -1,6 +1,10 @@
 {
-  "invalid": {
-    "title": "Mã token không hợp lệ"
+  "notFound": {
+    "title": "Signature này chưa được khắc",
+    "titleInvalid": "Liên kết này không dẫn tới Signature nào",
+    "description": "Các Signature được đánh số theo thứ tự khắc.",
+    "newest": "Signature mới nhất là #{id}.",
+    "newestLink": "Xem Signature mới nhất"
   },
   "jsonLd": {
     "productDescription": "Cosmic Signature NFT là tác phẩm tạo sinh độc nhất trên chuỗi, được tạo từ mô phỏng bài toán ba vật thể."
@@ -19,7 +23,8 @@
     "trigger": "Chia sẻ",
     "copyVideoLink": "Sao chép liên kết video",
     "copyImageLink": "Sao chép liên kết hình ảnh",
-    "copyPageLink": "Sao chép liên kết trang"
+    "copyPageLink": "Sao chép liên kết trang",
+    "copyFailed": "Không sao chép được liên kết."
   },
   "navigation": {
     "label": "Signature trước và sau"

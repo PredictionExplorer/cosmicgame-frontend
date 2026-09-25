@@ -94,8 +94,10 @@ const PaginationRWLKGrid: FC<PaginationRWLKGridProps> = ({
         <span className="sr-only">{t('rwlkGrid.loading')}</span>
         <div aria-hidden className={gridClass(compact)}>
           {Array.from({ length: itemsPerPage }, (_, index) => (
-            <div key={index} className="overflow-hidden rounded-lg border border-border">
-              <Skeleton className="w-full rounded-none pt-[64%]" />
+            // The card's shape: the plate, then its number under it.
+            <div key={index}>
+              <Skeleton className="aspect-art w-full rounded-edge" />
+              <Skeleton shine={false} className="mt-2 h-4 w-16" />
             </div>
           ))}
         </div>
@@ -157,7 +159,7 @@ const PaginationRWLKGrid: FC<PaginationRWLKGridProps> = ({
                   aria-pressed={selected}
                   aria-label={t('rwlkGrid.tokenAria', { id: formatId(tokenId) })}
                   onClick={() => handleCardClick(tokenId)}
-                  className="block w-full cursor-pointer rounded-lg text-left"
+                  className="block w-full cursor-pointer rounded-edge text-left"
                   data-testid="rwlk-option"
                 >
                   {card}

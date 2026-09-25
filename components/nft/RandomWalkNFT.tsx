@@ -1,78 +1,63 @@
 import { Check } from 'lucide-react';
 
-import { formatId } from '@/utils';
-
+import { formatId } from '@/utils/format/ids';
 import { cn } from '@/lib/utils';
 import { useRWLKNFT } from '@/hooks/useRWLKNFT';
-import { SkeletonArtPlate } from '@/components/ui/skeleton';
+import { MEDIA_PLATE_CLASS } from '@/components/ui/art-frame';
+import { Skeleton } from '@/components/ui/skeleton';
 
 import NFTImage from './NFTImage';
 
 interface RandomWalkNFTProps {
   tokenId: number | string;
   selected?: boolean;
-  /** Inside a picker the card is plain content; otherwise it links to randomwalknft.com. */
-  selectable?: boolean;
   /**
-   * The image and the number chip are decorative because a parent control
-   * (the picker's toggle button) already names the token.
+   * The image and the number are decorative because a parent control (the
+   * picker's toggle button) already names the token.
    */
   decorative?: boolean;
 }
 
-/** A RandomWalk NFT thumbnail with its number, used by the gesture picker and gesture pages. */
-const RandomWalkNFT = ({
-  tokenId,
-  selected = false,
-  selectable = true,
-  decorative = false,
-}: RandomWalkNFTProps) => {
+/**
+ * A Random Walk NFT as the gesture picker offers it: the render whole on its
+ * black plate, with nothing drawn over it, and a label row under the plate
+ * with the token number and, once chosen, a check. A chosen card also draws
+ * the plate's print edge in the accent, so the choice never rests on colour
+ * alone.
+ */
+const RandomWalkNFT = ({ tokenId, selected = false, decorative = false }: RandomWalkNFTProps) => {
   const nft = useRWLKNFT(tokenId);
-  const idLabel = formatId(tokenId);
-
-  const content = (
-    <div className="relative">
-      {!nft ? (
-        <SkeletonArtPlate />
-      ) : (
-        <NFTImage src={nft.black_image_thumb} alt={decorative ? '' : undefined} density="compact" />
-      )}
-      <span
-        className={cn(
-          'pointer-events-none absolute bottom-2 right-2 z-[1] rounded-control px-2 py-0.5',
-          'bg-art-ground/80 type-caption font-mono font-medium tabular-nums text-foreground',
-          'ring-1 ring-rule',
-        )}
-        aria-hidden={decorative || undefined}
-      >
-        {idLabel}
-      </span>
-      {selected ? (
-        <span
-          aria-hidden
-          className="absolute right-2 top-2 z-[1] flex size-6 items-center justify-center rounded-full bg-primary text-primary-foreground"
-        >
-          <Check className="size-3.5" strokeWidth={3} />
-        </span>
-      ) : null}
-    </div>
-  );
 
   return (
-    <div
-      className={cn(
-        'relative overflow-hidden rounded-lg border transition-colors duration-[var(--duration-fast)]',
-        selected ? 'border-primary ring-1 ring-primary' : 'border-border',
-      )}
-      data-selected={selected || undefined}
-    >
-      {selectable ? (
-        content
-      ) : (
-        <a href={`https://www.randomwalknft.com/detail/${tokenId}`} className="block">
-          {content}
-        </a>
-      )}
+    <div className="min-w-0" data-selected={selected || undefined}>
+      <div
+        className={cn(
+          MEDIA_PLATE_CLASS,
+          'aspect-art',
+          selected &&
+            'after:shadow-[inset_0_0_0_2px_var(--color-primary)] hover:after:shadow-[inset_0_0_0_2px_var(--color-primary)]',
+        )}
+      >
+        {nft ? (
+          <NFTImage
+            src={nft.black_image_thumb}
+            alt={decorative ? '' : undefined}
+            density="compact"
+            className="h-full w-full bg-transparent object-contain"
+          />
+        ) : (
+          <Skeleton className="size-full rounded-none" />
+        )}
+      </div>
+      <p
+        aria-hidden={decorative || undefined}
+        className="mt-2 flex min-h-5 items-center justify-between gap-2"
+      >
+        <span className="type-mono text-foreground">{formatId(tokenId)}</span>
+        {selected ? (
+          <Check aria-hidden className="size-4 shrink-0 text-primary" strokeWidth={2.5} />
+        ) : null}
+      </p>
     </div>
   );
 };

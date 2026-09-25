@@ -225,13 +225,13 @@
   "tokens": {
     "page": {
       "title": "自分のNFT",
-      "subtitle": "接続中のウォレットにあるCosmic Signature NFT",
+      "subtitle": "接続するウォレットにあるCosmic Signature NFT",
+      "newestCaption": "最新のシグネチャーです。お持ちのシグネチャーもここに展示されます。",
       "anchorLink": "NFTを係留する",
       "loadErrorTitle": "トークンを読み込めませんでした",
       "loadErrorMessage": "Cosmic Signature NFTを読み込めませんでした。",
       "ownedTitle": "所有しているCosmic Signature NFT",
       "transferTitle": "NFTを移転",
-      "transferSubtitle": "任意：選択したCosmic Signature NFTを別のウォレットへ送ります。",
       "figures": {
         "owned": "このウォレット内",
         "anchored": "係留中"
@@ -259,16 +259,10 @@
     }
   },
   "nftTransfer": {
-    "empty": "このウォレットにCosmic Signature NFTはありません。",
     "pickerTitle": "移転するNFTを選ぶ",
     "pickerSummary": "移転できる{total}点のうち{selected}点を選択中。",
-    "selectAll": "移転できるものをすべて選択",
-    "selectPage": "このページを選択",
-    "clear": "選択を解除",
-    "listAria": "Cosmic Signature NFT",
+    "selectAll": "すべて選択",
     "selectAria": "NFT {id}を選択",
-    "cycle": "サイクル{cycle}",
-    "cycleUnavailable": "サイクルのデータを利用できません",
     "statusLabels": {
       "anchored": "係留中——移転する前に解除してください",
       "ownerChanged": "所有者が変わりました——移転する前に再読み込みしてください"

@@ -161,6 +161,16 @@ const nextConfig: NextConfig = {
     ];
   },
   images: {
+    // A Signature's files are named by its seed, so their pixels never
+    // change: keep the optimizer's 1200 and 1920px renditions of the art (the
+    // detail page's LCP image among them) for a month instead of re-encoding
+    // them from the 3456px original every 4 hours, the default. The same
+    // month applies to the other optimized inputs: static files in public/,
+    // which take a new name when their content changes, and attached NFTs'
+    // art through /api/attached-nft/<contract>/<id>/image, which rarely
+    // changes (a collection that swaps a token's image shows the old one
+    // here for up to a month).
+    minimumCacheTTL: 2_678_400,
     remotePatterns: [
       // Rotated API origins (the media servers actually used by the app).
       ...apiOriginRemotePatterns(),
@@ -218,6 +228,18 @@ const nextConfig: NextConfig = {
             process.env.NEXT_PUBLIC_RPC_URL,
           ].flatMap((value) => value?.split(',') ?? []),
         }),
+      },
+      {
+        // Static images in public/ (brand marks, landing and learn figures):
+        // a day in the browser, then served from cache while it revalidates.
+        // Their names carry no hash, so this stays short of immutable.
+        source: '/images/:path*',
+        headers: [
+          {
+            key: 'Cache-Control',
+            value: 'public, max-age=86400, stale-while-revalidate=604800',
+          },
+        ],
       },
     ];
   },

@@ -43,6 +43,14 @@ describe('GestureCosts', () => {
     }
   });
 
+  // Regions, not cards: the rows sit on the page ground under a hairline.
+  it('lays the costs on the page ground, not in a card', () => {
+    render(<GestureCosts costs={costs} />);
+    const list = screen.getAllByRole('term')[0]!.closest('dl')!;
+    expect(list.parentElement).toHaveClass('border-t', 'border-rule-faint');
+    expect(screen.getByTestId('gesture-costs').querySelector('.bg-surface')).toBeNull();
+  });
+
   it('has no accessibility violations', async () => {
     const { container } = render(<GestureCosts costs={costs} />);
     await checkA11y(container);

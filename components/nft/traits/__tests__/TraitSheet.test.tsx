@@ -3,7 +3,7 @@ import { buildFacets, normalizeTraitEntry, parseCosmicSignatureMetadata } from '
 
 import { render, screen, checkA11y, fireEvent, within } from '@/test-utils';
 
-import { TraitSheet } from '../TraitSheet';
+import { TraitLedgerRow, TraitSheet } from '../TraitSheet';
 
 const entry1 = normalizeTraitEntry(parseCosmicSignatureMetadata(TOKEN_1_METADATA_V2)!)!;
 const entry7 = normalizeTraitEntry(parseCosmicSignatureMetadata(TOKEN_7_METADATA_V2)!)!;
@@ -42,6 +42,38 @@ describe('TraitSheet', () => {
     render(<TraitSheet entry={entry1} facets={facets} total={2} />);
     expect(screen.getByTestId('trait-row-palette')).toHaveTextContent('2/2');
     expect(screen.getByTestId('trait-row-structure')).toHaveTextContent('1/2');
+  });
+
+  // V246: one hairline ledger, like the provenance ledger above it, with no
+  // stretched orphan tile and the share fixed at the end of the first line.
+  it('lays the traits out as ledger rows with the share in its own column', () => {
+    render(
+      <TraitSheet entry={entry1} facets={facets} total={2} groups={['composition']} hideHeadings />,
+    );
+    const row = screen.getByTestId('trait-row-structure');
+    expect(row).toHaveClass('border-b', 'border-rule-faint');
+    expect(row.className).not.toMatch(/col-span-2|bg-surface-sunken/);
+    const share = within(row).getByText('1/2');
+    expect(share).toHaveClass('type-figure-sm');
+    expect(share.parentElement).toHaveClass('grid-cols-[minmax(0,1fr)_auto]');
+  });
+
+  it('adds a page’s own facts to the end of the last ledger', () => {
+    render(
+      <TraitSheet
+        entry={entry1}
+        groups={['composition']}
+        hideHeadings
+        extraRows={
+          <TraitLedgerRow label="Halation" testId="extra-row">
+            0.15
+          </TraitLedgerRow>
+        }
+      />,
+    );
+    const ledgers = screen.getAllByRole('definition').map((dd) => dd.closest('dl'));
+    expect(new Set(ledgers).size).toBe(1);
+    expect(screen.getByTestId('extra-row')).toHaveTextContent('Halation0.15');
   });
 
   it('makes categorical values selectable when a handler is provided', () => {

@@ -7,6 +7,7 @@ import { useTranslations } from 'next-intl';
 import type { FAQCategory as FAQCategoryType, FAQItem } from '@/content/faq/types';
 import { protocolFacts } from '@/content/protocol-facts';
 
+import { useCopyFeedback } from '@/hooks/useCopyFeedback';
 import { cn } from '@/lib/utils';
 import {
   Accordion,
@@ -83,7 +84,11 @@ export const FAQCategorySection = forwardRef<HTMLElement, FAQCategoryProps>(
   ) {
     const t = useTranslations('faq');
     const tGlossary = useTranslations('glossary');
-    const [copiedId, setCopiedId] = useState<string | null>(null);
+    // The shared copy action: an execCommand fallback, no unhandled
+    // rejection, and a check only for a write that happened.
+    const { copied, copy } = useCopyFeedback();
+    const [copiedItemId, setCopiedItemId] = useState<string | null>(null);
+    const copiedId = copied ? copiedItemId : null;
     const query = searchQuery.trim();
     const searching = query.length > 0;
     // The answers a reader closed during a search, kept for that query only:
@@ -114,14 +119,15 @@ export const FAQCategorySection = forwardRef<HTMLElement, FAQCategoryProps>(
       );
     }, [category.items, query, searching]);
 
-    const copyLink = useCallback((item: FAQItem) => {
-      const anchor = item.hashAnchor || item.id;
-      const url = `${window.location.origin}${window.location.pathname}#${anchor}`;
-      void navigator.clipboard.writeText(url).then(() => {
-        setCopiedId(item.id);
-        window.setTimeout(() => setCopiedId(null), 2000);
-      });
-    }, []);
+    const copyLink = useCallback(
+      (item: FAQItem) => {
+        const anchor = item.hashAnchor || item.id;
+        const url = `${window.location.origin}${window.location.pathname}#${anchor}`;
+        setCopiedItemId(item.id);
+        void copy(url);
+      },
+      [copy],
+    );
 
     if (filteredItems.length === 0) return null;
 

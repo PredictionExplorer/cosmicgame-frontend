@@ -699,6 +699,22 @@ test.describe('raw HTML SEO', () => {
     expectNotFoundHead(await response.text(), '/detail/not-a-token');
   });
 
+  // One URL per Signature: a zero-padded number is not a second indexable page.
+  test('zero-padded token detail routes move to the canonical number', async ({ request }) => {
+    const response = await request.get('/zh/detail/0001', {
+      headers: hostHeaders(APP_HOST),
+      maxRedirects: 0,
+    });
+    expect(response.status()).toBe(308);
+    expect(new URL(response.headers().location ?? '', 'http://x').pathname).toBe('/zh/detail/1');
+  });
+
+  test('malformed gesture routes return a real 404', async ({ request }) => {
+    const response = await request.get('/gesture/12abc', { headers: hostHeaders(APP_HOST) });
+    expect(response.status()).toBe(404);
+    expectNotFoundHead(await response.text(), '/gesture/12abc');
+  });
+
   test('unknown top-level routes return a real 404 with branded content', async ({ request }) => {
     const response = await request.get('/this-route-does-not-exist', {
       headers: hostHeaders(APP_HOST),

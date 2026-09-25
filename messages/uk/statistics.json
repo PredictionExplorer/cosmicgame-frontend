@@ -637,7 +637,11 @@
     "loadErrorMessage": "Не вдалося прочитати записи іменованих NFT. Спробуйте ще раз.",
     "emptyTitle": "Іменованих NFT немає",
     "emptyDescription": "Жодному Cosmic Signature NFT ще не дали ім’я.",
-    "galleryLink": "Переглянути їх у галереї"
+    "galleryLink": "Переглянути їх у галереї",
+    "card": {
+      "namedOn": "Іменовано",
+      "namedBy": "Хто дав ім’я"
+    }
   },
   "attachedNfts": {
     "title": "Долучені NFT від спільноти",
@@ -654,13 +658,14 @@
   "usedRwlkNfts": {
     "title": "Використані Random Walk NFT",
     "subtitle": "Random Walk NFT, долучені до ETH-жестів для одноразового зменшення вартості жесту на 50%",
-    "artAlt": "RandomWalk NFT {id}",
-    "loadErrorTitle": "Не вдалося завантажити використані RandomWalk NFT",
-    "loadError": "Не вдалося прочитати використані RandomWalk NFT. Спробуйте ще раз.",
-    "emptyTitle": "Використаних RandomWalk NFT ще немає",
-    "emptyDescription": "RandomWalk NFT з’являється тут, щойно ETH-жест використає його для одноразового зменшення вартості жесту.",
+    "artAlt": "Random Walk NFT #{id}",
+    "loadErrorTitle": "Не вдалося завантажити використані Random Walk NFT",
+    "loadError": "Не вдалося прочитати використані Random Walk NFT. Спробуйте ще раз.",
+    "emptyTitle": "Використаних Random Walk NFT ще немає",
+    "emptyDescription": "Random Walk NFT з’являється тут, щойно ETH-жест використає його для одноразового зменшення вартості жесту.",
     "card": {
       "cycle": "Цикл {cycle}",
+      "title": "Random Walk #{id}",
       "usedBy": "Учасник"
     }
   },
@@ -762,7 +767,7 @@
     "attached": "Долучено"
   },
   "attachedNftLinks": {
-    "viewNft": "Переглянути NFT",
+    "projectSite": "Сайт проєкту",
     "viewOpenSea": "Переглянути на OpenSea",
     "viewContract": "Переглянути контракт",
     "detailsUnavailable": "Подробиці NFT недоступні",

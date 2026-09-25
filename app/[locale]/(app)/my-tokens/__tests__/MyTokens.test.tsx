@@ -16,7 +16,7 @@ jest.mock('@/hooks/useNftTraits', () => ({
   useCollectionTraits: () => mockUseCollectionTraits(),
 }));
 
-let mockAccount: string | null = '0xUser';
+let mockAccount: string | null = '0x1111111111111111111111111111111111111111';
 let mockActive = true;
 jest.mock('@/hooks/web3', () => ({
   useActiveWeb3React: () => ({ account: mockAccount, active: mockActive }),
@@ -30,28 +30,30 @@ jest.mock('next/image', () => ({
   },
 }));
 
-jest.mock('@/components/nft/CosmicSignatureNftTransferForm', () => ({
-  CosmicSignatureNftTransferForm: ({
+// The sheet's form talks to the wallet; its own suite covers it.
+jest.mock('@/components/nft/NftSendSheet', () => ({
+  NftSendSheet: ({
+    open,
+    items,
     sourceAddress,
-    tokens,
     historyHref,
-    description,
   }: {
+    open: boolean;
+    items: { tokenId: number }[];
     sourceAddress: string;
-    tokens: unknown[];
     historyHref: string;
-    description?: string;
-  }) => (
-    <div
-      data-testid="nft-transfer-form"
-      data-source={sourceAddress}
-      data-count={tokens.length}
-      data-history={historyHref}
-    >
-      {description}
-    </div>
-  ),
+  }) =>
+    open ? (
+      <div
+        data-testid="nft-send-sheet"
+        data-source={sourceAddress}
+        data-ids={items.map((item) => item.tokenId).join(',')}
+        data-history={historyHref}
+      />
+    ) : null,
 }));
+
+const ACCOUNT = '0x1111111111111111111111111111111111111111';
 
 const tokens = [
   { TokenId: 1, TokenName: 'Alpha', Seed: 'a1', Staked: true },
@@ -62,9 +64,14 @@ function tokensState(overrides = {}) {
   return { data: tokens, isLoading: false, isError: false, refetch: jest.fn(), ...overrides };
 }
 
+const card = (id: number) =>
+  screen
+    .getAllByTestId('signature-card')
+    .find((element) => element.getAttribute('data-token-id') === String(id))!;
+
 beforeEach(() => {
   jest.clearAllMocks();
-  mockAccount = '0xUser';
+  mockAccount = ACCOUNT;
   mockActive = true;
   mockUseCSTTokensByUser.mockReturnValue(tokensState());
   mockUseCollectionTraits.mockReturnValue({ traits: null, isLoading: false, isError: true });
@@ -83,14 +90,35 @@ describe('MyTokens', () => {
       screen.getByRole('link', { name: /wallet\.required\.nfts\.publicLink/ }),
     ).toHaveAttribute('href', '/gallery');
     expect(mockUseCSTTokensByUser).toHaveBeenCalledWith(undefined);
+    // The subtitle never speaks of a wallet that is not there.
+    expect(screen.getByText('myPages.tokens.page.subtitle')).toBeInTheDocument();
+    expect(screen.queryByTestId('newest-plates')).not.toBeInTheDocument();
+  });
+
+  it('hangs the newest plates instead of a wallet icon while disconnected (V254)', () => {
+    mockAccount = null;
+    mockActive = false;
+    mockUseCSTTokensByUser.mockReturnValue(tokensState({ data: undefined }));
+    render(
+      <MyTokens
+        newest={[
+          { tokenId: 48, seed: 'aa' },
+          { tokenId: 47, seed: 'bb' },
+          { tokenId: 46, seed: 'cc' },
+        ]}
+      />,
+    );
+    const plates = screen.getByTestId('newest-plates');
+    expect(within(plates).getAllByRole('listitem', { hidden: true })).toHaveLength(3);
+    expect(plates).toHaveTextContent('myPages.tokens.page.newestCaption');
   });
 
   it('hangs the wallet as a collection, newest first, with its figures', () => {
     render(<MyTokens />);
-    expect(mockUseCSTTokensByUser).toHaveBeenCalledWith('0xUser');
+    expect(mockUseCSTTokensByUser).toHaveBeenCalledWith(ACCOUNT);
     const wall = screen.getByRole('list', { name: 'myPages.tokens.page.ownedTitle' });
     const cards = within(wall).getAllByTestId('signature-card');
-    expect(cards.map((card) => card.getAttribute('data-token-id'))).toEqual(['7', '1']);
+    expect(cards.map((element) => element.getAttribute('data-token-id'))).toEqual(['7', '1']);
     expect(within(cards[1]!).getByText('Alpha')).toBeInTheDocument();
     expect(within(cards[1]!).getByTestId('anchored-mark')).toBeInTheDocument();
     const figures = screen.getAllByRole('definition');
@@ -114,6 +142,16 @@ describe('MyTokens', () => {
     expect(refetch).toHaveBeenCalled();
   });
 
+  // V068: TanStack keeps the data when a refetch (after a send, on Retry)
+  // fails; the wall, its figures and the send mode stay up.
+  it('keeps the wall when a refetch fails after a load', () => {
+    mockUseCSTTokensByUser.mockReturnValue(tokensState({ isError: true }));
+    render(<MyTokens />);
+    expect(screen.queryByText('myPages.tokens.page.loadErrorMessage')).not.toBeInTheDocument();
+    expect(screen.getAllByTestId('signature-card')).toHaveLength(2);
+    expect(screen.getByTestId('nft-send-mode')).toBeInTheDocument();
+  });
+
   it('points an empty wallet to the gallery', () => {
     mockUseCSTTokensByUser.mockReturnValue(tokensState({ data: [] }));
     render(<MyTokens />);
@@ -123,15 +161,14 @@ describe('MyTokens', () => {
     expect(
       screen.getByRole('link', { name: /wallet\.required\.nfts\.publicLink/ }),
     ).toHaveAttribute('href', '/gallery');
-    expect(screen.queryByText('myPages.tokens.page.transferTitle')).not.toBeInTheDocument();
+    expect(screen.queryByTestId('nft-send-mode')).not.toBeInTheDocument();
   });
 
-  it('links to the Cosmic Signature marketplace from the page header', () => {
+  it('links to the marketplace from the page header with its one label', () => {
     render(<MyTokens />);
-    expect(screen.getByRole('link', { name: /nav\.ecosystem\.axiomZero\.label/ })).toHaveAttribute(
-      'href',
-      COSMIC_SIGNATURE_MARKETPLACE_URL,
-    );
+    const link = screen.getByRole('link', { name: /^nav\.ecosystem\.axiomZero\.label/ });
+    expect(link).toHaveAttribute('href', COSMIC_SIGNATURE_MARKETPLACE_URL);
+    expect(link).toHaveTextContent('nav.ecosystem.axiomZero.label');
   });
 
   it('offers to anchor while a Signature here has never been anchored', () => {
@@ -157,23 +194,75 @@ describe('MyTokens', () => {
     ).not.toBeInTheDocument();
   });
 
-  it('offers NFT transfers as a secondary collapsed option', async () => {
-    const user = userEvent.setup();
-    render(<MyTokens />);
-    expect(screen.queryByTestId('nft-transfer-form')).not.toBeInTheDocument();
+  // V249: sending is a mode of the one wall, not a second grid of the same art.
+  describe('send mode', () => {
+    it('puts a checkbox in each wall label and says why a piece cannot go', async () => {
+      const user = userEvent.setup();
+      render(<MyTokens />);
+      expect(screen.queryByRole('checkbox')).not.toBeInTheDocument();
 
-    await user.click(screen.getByText('myPages.tokens.page.transferTitle'));
+      const toggle = screen.getByTestId('nft-send-mode');
+      expect(toggle).toHaveAttribute('aria-pressed', 'false');
+      await user.click(toggle);
+      expect(toggle).toHaveAttribute('aria-pressed', 'true');
 
-    const form = screen.getByTestId('nft-transfer-form');
-    expect(form).toHaveAttribute('data-source', '0xUser');
-    expect(form).toHaveAttribute('data-count', '2');
-    expect(form).toHaveAttribute('data-history', '/cosmic-signature-transfer/0xUser');
-    // The disclosure's own heading and subtitle introduce the form: no second description.
-    expect(form).toBeEmptyDOMElement();
+      // Still one wall of plates.
+      expect(screen.getAllByTestId('signature-card')).toHaveLength(2);
+      expect(within(card(7)).getByRole('checkbox')).toBeEnabled();
+      expect(within(card(1)).getByRole('checkbox')).toBeDisabled();
+      expect(card(1)).toHaveTextContent('myPages.nftTransfer.statusLabels.anchored');
+      // Nothing dims the art: only the disabled checkbox itself fades.
+      const dimmed = Array.from(card(1).querySelectorAll('[class*="opacity-50"]'));
+      expect(dimmed.filter((element) => element.tagName !== 'INPUT')).toEqual([]);
+      expect(screen.getByTestId('nft-send-bar')).toHaveTextContent(
+        'myPages.nftTransfer.pickerSummary(selected=0,total=1)',
+      );
+    });
+
+    it('opens the send sheet with the chosen Signatures', async () => {
+      const user = userEvent.setup();
+      render(<MyTokens />);
+      await user.click(screen.getByTestId('nft-send-mode'));
+      const bar = screen.getByTestId('nft-send-bar');
+      const send = within(bar).getByRole('button', { name: /myPages\.nftTransfer\.send/ });
+      expect(send).toBeDisabled();
+
+      await user.click(within(card(7)).getByRole('checkbox'));
+      expect(bar).toHaveTextContent('myPages.nftTransfer.pickerSummary(selected=1,total=1)');
+      expect(send).toHaveTextContent('myPages.nftTransfer.sendCount(count=1)');
+      await user.click(send);
+
+      const sheet = screen.getByTestId('nft-send-sheet');
+      expect(sheet).toHaveAttribute('data-ids', '7');
+      expect(sheet).toHaveAttribute('data-source', ACCOUNT);
+      expect(sheet).toHaveAttribute('data-history', `/cosmic-signature-transfer/${ACCOUNT}`);
+    });
+
+    it('chooses every piece that can go, and leaves the mode on Cancel', async () => {
+      const user = userEvent.setup();
+      render(<MyTokens />);
+      await user.click(screen.getByTestId('nft-send-mode'));
+      const bar = screen.getByTestId('nft-send-bar');
+      await user.click(within(bar).getByRole('button', { name: 'myPages.nftTransfer.selectAll' }));
+      expect(within(card(7)).getByRole('checkbox')).toBeChecked();
+      expect(within(card(1)).getByRole('checkbox')).not.toBeChecked();
+
+      await user.click(within(bar).getAllByRole('button', { name: 'common.actions.cancel' })[0]!);
+      expect(screen.queryByTestId('nft-send-bar')).not.toBeInTheDocument();
+      expect(screen.queryByRole('checkbox')).not.toBeInTheDocument();
+      expect(screen.getByTestId('nft-send-mode')).toHaveAttribute('aria-pressed', 'false');
+    });
   });
 
   it('has no accessibility violations', async () => {
     const { container } = render(<MyTokens />);
+    await checkA11y(container);
+  });
+
+  it('has no accessibility violations in send mode', async () => {
+    const user = userEvent.setup();
+    const { container } = render(<MyTokens />);
+    await user.click(screen.getByTestId('nft-send-mode'));
     await checkA11y(container);
   });
 });

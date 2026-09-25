@@ -1,23 +1,22 @@
 /**
- * The one grid every trait tile sits on, in the TraitSheet and in the facts
- * the detail page's trait panel adds under it, so the column edges line up:
- * two columns on a phone, four on a wide screen, where the four composition
- * traits fill one row.
+ * The trait ledger: the spec-sheet pattern the detail page's provenance
+ * ledger uses (a label, its value, faint hairlines between rows), so the
+ * traits read as one record with it rather than as boxed tiles. Two columns
+ * from `lg`; the rows of both columns carry their own hairline, so a column
+ * that ends early leaves no orphaned box.
  */
-export const TRAIT_GRID_CLASS = 'grid grid-cols-2 gap-2 sm:gap-3 lg:grid-cols-4';
+export const TRAIT_LEDGER_CLASS = 'grid border-t border-rule-faint lg:grid-cols-2 lg:gap-x-12';
 
-/**
- * For a grid of one-column facts: the last one fills the rest of its row
- * instead of leaving an empty cell (the third of three spans two columns).
- */
-export const TRAIT_GRID_FILL_ROW_CLASS =
-  'max-lg:[&>*:last-child:nth-child(odd)]:col-span-2 lg:[&>*:last-child:nth-child(4n+3)]:col-span-2';
+/** The ledger of the gallery quick view's narrow column: one column. */
+export const TRAIT_LEDGER_DENSE_CLASS = 'grid border-t border-rule-faint';
 
-/** The dense grid of the gallery quick view's narrow column. */
-export const TRAIT_GRID_DENSE_CLASS = 'grid grid-cols-2 gap-2 sm:grid-cols-3';
+/** One label / value row of the trait ledger. */
+export const TRAIT_ROW_CLASS =
+  'grid min-w-0 grid-cols-[minmax(0,8.5rem)_minmax(0,1fr)] items-baseline gap-x-4 border-b border-rule-faint py-3';
 
-/** A trait tile: a sunken well with a label over its value (no border: one bordered level per region). */
-export const TRAIT_TILE_CLASS = 'min-w-0 rounded-control bg-surface-sunken px-3 py-3 sm:px-4';
+/** A row of the dense ledger. */
+export const TRAIT_ROW_DENSE_CLASS =
+  'grid min-w-0 grid-cols-[minmax(0,7rem)_minmax(0,1fr)] items-baseline gap-x-3 border-b border-rule-faint py-2.5';
 
-/** A trait tile in the dense grid. */
-export const TRAIT_TILE_DENSE_CLASS = 'min-w-0 rounded-control bg-surface-sunken px-3 py-2.5';
+/** A row whose value needs the width (the masses, a braid word, file hashes): both columns. */
+export const TRAIT_ROW_WIDE_CLASS = 'lg:col-span-2';

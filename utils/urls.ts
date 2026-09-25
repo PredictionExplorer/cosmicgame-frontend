@@ -130,6 +130,19 @@ export const getRWLKImageUrl = (fileName: string, variant: string = 'black_thumb
   return `${nftCdnOrigin()}/images/randomwalk/${fileName}_${variant}`;
 };
 
+/**
+ * A Random Walk NFT's render on the media server, by token id: the files are
+ * named by the zero-padded id ("004079_black_thumb.jpg").
+ */
+export const randomWalkImageUrl = (
+  tokenId: number | string,
+  variant: string = 'black_thumb.jpg',
+): string => getRWLKImageUrl(String(tokenId).padStart(6, '0'), variant);
+
+/** A Random Walk NFT's page on the project's own site. */
+export const randomWalkTokenUrl = (tokenId: number | string): string =>
+  `https://www.randomwalknft.com/detail/${tokenId}`;
+
 /** Decodes the original URL (handles legacy proxied format for backwards compatibility). */
 export const getOriginUrl = (url: string): string => {
   if (url.startsWith('/api/proxy?url=')) {

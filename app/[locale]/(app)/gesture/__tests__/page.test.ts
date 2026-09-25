@@ -4,6 +4,7 @@ import { documentTitleOf } from '@/test-utils/metadata';
 
 import { ApiReadError } from '@/services/api/readError';
 
+import GestureLayout from '../[id]/layout';
 import Page, { generateMetadata } from '../[id]/page';
 
 const mockGestureRead = jest.fn();
@@ -30,6 +31,24 @@ interface GesturePageProps {
   gestureId?: number;
   serverLiveCycle?: number | null;
   children?: ReactNode;
+}
+
+/** The seeds the route hands the client's query cache. */
+function renderedSeeds(tree: ReactNode): Array<{ absent?: boolean; data: unknown }> | undefined {
+  if (!isValidElement(tree)) return undefined;
+  const { props: elementProps } = tree as ReactElement<{
+    seeds?: Array<{ absent?: boolean; data: unknown }>;
+    children?: ReactNode;
+  }>;
+  if (Array.isArray(elementProps.seeds)) return elementProps.seeds;
+  const children = Array.isArray(elementProps.children)
+    ? elementProps.children
+    : [elementProps.children];
+  for (const child of children) {
+    const found = renderedSeeds(child as ReactNode);
+    if (found !== undefined) return found;
+  }
+  return undefined;
 }
 
 /** The props the route hands the client page. */
@@ -113,5 +132,36 @@ describe('gesture/[id] page', () => {
     mockGestureRead.mockResolvedValue({ BidPosition: 1135, RoundNum: 2 });
     const tree = await Page(props('29434'));
     expect(renderedPageProps(tree)?.serverLiveCycle).toBeNull();
+  });
+});
+
+describe('gesture/[id] layout', () => {
+  // Before the loading boundary streams, so the response is a real 404.
+  it.each(['abc', '12abc', '-3', '1.5'])('answers %s with not found', async (id) => {
+    await expect(
+      GestureLayout({ children: 'page', params: Promise.resolve({ id }) }),
+    ).rejects.toThrow();
+  });
+
+  it('renders the page for a whole-number id', async () => {
+    await expect(
+      GestureLayout({ children: 'page', params: Promise.resolve({ id: '29434' }) }),
+    ).resolves.toBe('page');
+  });
+});
+
+describe('gesture/[id] seed', () => {
+  beforeEach(() => mockGestureRead.mockReset());
+
+  it('seeds a record the API does not hold as absent, so the HTML says so', async () => {
+    mockGestureRead.mockRejectedValue(new ApiReadError('Network response was not OK', 400));
+    const seeds = renderedSeeds(await Page(props('40000')));
+    expect(seeds?.[0]).toMatchObject({ data: null, absent: true });
+  });
+
+  it('seeds nothing absent when the read failed', async () => {
+    mockGestureRead.mockRejectedValue(new Error('offline'));
+    const seeds = renderedSeeds(await Page(props('40001')));
+    expect(seeds?.[0]?.absent).toBe(false);
   });
 });

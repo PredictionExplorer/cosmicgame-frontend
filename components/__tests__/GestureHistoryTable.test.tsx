@@ -217,7 +217,11 @@ describe('GestureHistoryTable', () => {
     );
 
     const walk = screen.getByText('tables.gestureHistory.randomWalkToken(id=#987654)');
-    expect(walk.closest('a')).toHaveAttribute('href', 'https://randomwalknft.com/detail/987654');
+    // The one Random Walk host every link uses (utils/urls randomWalkTokenUrl).
+    expect(walk.closest('a')).toHaveAttribute(
+      'href',
+      'https://www.randomwalknft.com/detail/987654',
+    );
     expect(document.querySelector('td img')).toBeNull();
   });
 

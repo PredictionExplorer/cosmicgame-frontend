@@ -81,6 +81,91 @@ describe('SignatureCard', () => {
     expect(link()).toHaveAccessibleName(/Anchored$/);
   });
 
+  // F252: the glyph alone meant nothing to a sighted newcomer.
+  it('names the anchored state in a word tag from `sm`, the glyph alone on a phone', () => {
+    render(<SignatureCard tokenId={3} seed="a3" entry={entry} anchored sizes="400px" />);
+    const tag = screen.getByTestId('card-tag');
+    expect(tag).toHaveTextContent('Anchored');
+    expect(tag.firstElementChild).toHaveClass('max-sm:hidden');
+    expect(screen.getByTestId('anchored-mark')).toHaveClass('sm:hidden');
+  });
+
+  it('carries facts with links of their own after the card link, never inside it', () => {
+    render(
+      <SignatureCard
+        tokenId={3}
+        seed="a3"
+        entry={entry}
+        sizes="400px"
+        after={<a href="https://example.com/tx">proof</a>}
+      />,
+    );
+    const cardLink = screen
+      .getAllByRole('link')
+      .find((a) => a.getAttribute('href') === '/detail/3');
+    expect(cardLink).not.toContainElement(screen.getByText('proof'));
+  });
+
+  describe('in select mode', () => {
+    it('is a checkbox’s label instead of a link, with the box in the label row', () => {
+      const onCheckedChange = jest.fn();
+      render(
+        <SignatureCard
+          tokenId={3}
+          seed="a3"
+          entry={entry}
+          sizes="400px"
+          select={{ checked: false, onCheckedChange, label: 'Select #000003' }}
+        />,
+      );
+      expect(screen.queryByRole('link')).not.toBeInTheDocument();
+      fireEvent.click(screen.getByTestId('art-frame'));
+      expect(onCheckedChange).toHaveBeenCalledWith(true);
+      expect(screen.getByRole('checkbox', { name: 'Select #000003' })).toBeInTheDocument();
+    });
+
+    it('marks a chosen card on its plate edge, never over or dimming the art', () => {
+      render(
+        <SignatureCard
+          tokenId={3}
+          seed="a3"
+          entry={entry}
+          sizes="400px"
+          select={{ checked: true, onCheckedChange: jest.fn(), label: 'Select #000003' }}
+        />,
+      );
+      const plate = screen.getByTestId('art-frame');
+      // Through the plate's own edge variables: a competing after:shadow
+      // class lost to the plate's edge in the stylesheet (regression).
+      expect(plate.className).toContain('[--art-edge:inset_0_0_0_2px_var(--color-primary)]');
+      expect(plate.className).toContain('[--art-edge-active:inset_0_0_0_2px_var(--color-primary)]');
+      expect(plate.className).not.toContain('after:shadow-[inset');
+      expect(plate.className).not.toMatch(/opacity-/);
+      expect(screen.getByTestId('signature-card')).toHaveAttribute('data-selected', 'true');
+    });
+
+    it('says why a Signature cannot be chosen, in words, and keeps its art whole', () => {
+      render(
+        <SignatureCard
+          tokenId={3}
+          seed="a3"
+          entry={entry}
+          anchored
+          sizes="400px"
+          select={{
+            checked: false,
+            onCheckedChange: jest.fn(),
+            label: 'Select #000003',
+            unavailable: 'Owner changed',
+          }}
+        />,
+      );
+      expect(screen.getByRole('checkbox', { name: 'Select #000003' })).toBeDisabled();
+      expect(screen.getByTestId('card-tag')).toHaveTextContent('Owner changed');
+      expect(screen.getByTestId('art-frame').className).not.toMatch(/opacity-/);
+    });
+  });
+
   it('shows a skeleton caption while the traits load, and says when they are not published', () => {
     const { rerender } = render(<SignatureCard tokenId={3} seed="a3" sizes="400px" />);
     expect(screen.getByTestId('trait-skeleton')).toBeInTheDocument();

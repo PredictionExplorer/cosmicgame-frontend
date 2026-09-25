@@ -1,6 +1,10 @@
 {
-  "invalid": {
-    "title": "代币 ID 无效"
+  "notFound": {
+    "title": "这枚签名尚未铭刻",
+    "titleInvalid": "这个链接没有对应的签名",
+    "description": "签名按铭刻的先后顺序编号。",
+    "newest": "最新的一枚是 #{id}。",
+    "newestLink": "查看最新的签名"
   },
   "jsonLd": {
     "productDescription": "Cosmic Signature 的生成艺术 NFT，以三体物理模拟生成独一无二的图像。"
@@ -19,7 +23,8 @@
     "trigger": "分享",
     "copyVideoLink": "复制视频链接",
     "copyImageLink": "复制图片链接",
-    "copyPageLink": "复制页面链接"
+    "copyPageLink": "复制页面链接",
+    "copyFailed": "无法复制链接。"
   },
   "navigation": {
     "label": "上一枚与下一枚签名"

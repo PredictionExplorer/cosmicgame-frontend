@@ -3,7 +3,7 @@ import userEvent from '@testing-library/user-event';
 import type { FAQCategory } from '@/content/faq/types';
 import { protocolFacts } from '@/content/protocol-facts';
 
-import { render, screen, checkA11y, waitFor } from '@/test-utils';
+import { render, screen, checkA11y, fireEvent, waitFor } from '@/test-utils';
 
 import { FAQCategorySection } from '../components/FAQCategory';
 import {
@@ -287,6 +287,26 @@ describe('FAQCategorySection', () => {
     expect(
       body('long')!.querySelectorAll('p.type-prose')[1]!.querySelector('mark'),
     ).toHaveTextContent('floor');
+  });
+
+  // V079: the shared copy action confirms only a copy that happened.
+  it('confirms a copied link, and not a refused one', async () => {
+    const writeText = jest.fn();
+    Object.defineProperty(navigator, 'clipboard', { value: { writeText }, configurable: true });
+    renderFAQCategory({ expandedItems: ['q1'] });
+    const button = () => screen.getAllByRole('button', { name: 'Copy link to this question' })[0]!;
+
+    writeText.mockRejectedValueOnce(new Error('denied'));
+    const execCommand = jest.fn().mockReturnValue(false);
+    Object.assign(document, { execCommand });
+    fireEvent.click(button());
+    await waitFor(() => expect(execCommand).toHaveBeenCalledWith('copy'));
+    expect(button()).toHaveTextContent('Copy link');
+
+    writeText.mockResolvedValueOnce(undefined);
+    fireEvent.click(button());
+    await waitFor(() => expect(button()).toHaveTextContent('Copied'));
+    expect(writeText).toHaveBeenLastCalledWith(expect.stringMatching(/#/));
   });
 
   it('keeps legacy ids for deep links', () => {

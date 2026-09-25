@@ -1,6 +1,10 @@
 {
-  "invalid": {
-    "title": "유효하지 않은 토큰 ID"
+  "notFound": {
+    "title": "이 시그니처는 아직 각인되지 않았습니다",
+    "titleInvalid": "이 링크에 해당하는 시그니처가 없습니다",
+    "description": "시그니처에는 각인된 순서대로 번호가 매겨집니다.",
+    "newest": "가장 최근 시그니처는 #{id}입니다.",
+    "newestLink": "최신 시그니처 보기"
   },
   "jsonLd": {
     "productDescription": "절차적 온체인 아트 프로토콜 Cosmic Signature가 삼체 문제 물리로 렌더링한 고유한 제너러티브 NFT입니다."
@@ -19,7 +23,8 @@
     "trigger": "공유",
     "copyVideoLink": "영상 링크 복사",
     "copyImageLink": "이미지 링크 복사",
-    "copyPageLink": "페이지 링크 복사"
+    "copyPageLink": "페이지 링크 복사",
+    "copyFailed": "링크를 복사하지 못했습니다."
   },
   "navigation": {
     "label": "이전 및 다음 시그니처"

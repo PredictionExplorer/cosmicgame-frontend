@@ -47,7 +47,7 @@ describe('AnchorActionsTable', () => {
   it('links a Random Walk token to its own site in a new tab', () => {
     render(<AnchorActionsTable list={[action({ TokenId: 1826 })]} IsRwalk />);
     const link = screen.getByRole('link', { name: /#001826/ });
-    expect(link).toHaveAttribute('href', 'https://randomwalknft.com/detail/1826');
+    expect(link).toHaveAttribute('href', 'https://www.randomwalknft.com/detail/1826');
     expect(link).toHaveAttribute('target', '_blank');
   });
 

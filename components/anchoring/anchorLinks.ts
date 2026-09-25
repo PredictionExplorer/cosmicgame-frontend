@@ -1,3 +1,5 @@
+import { randomWalkTokenUrl } from '@/utils/urls';
+
 /**
  * Where anchoring records live. Pure and server-safe, so server pages,
  * client tables and tests build the same links.
@@ -13,9 +15,7 @@ export function collectionFromRouteFlag(isRwalk: number | boolean): AnchorCollec
 
 /** An NFT's own page: the gallery detail, or its page on randomwalknft.com. */
 export function anchorTokenHref(collection: AnchorCollection, tokenId: number): string {
-  return collection === 'randomWalk'
-    ? `https://randomwalknft.com/detail/${tokenId}`
-    : `/detail/${tokenId}`;
+  return collection === 'randomWalk' ? randomWalkTokenUrl(tokenId) : `/detail/${tokenId}`;
 }
 
 /** The record of one anchor action (the anchor and, once released, its release). */

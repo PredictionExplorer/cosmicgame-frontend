@@ -1,6 +1,7 @@
 import { isAddress } from 'viem';
 
-import { normalizeHttpUrl } from './attachedNftLinks';
+import { normalizeHttpUrl, normalizeHttpsUrl } from './attachedNftLinks';
+import { MAX_LABEL_LENGTH, cleanDisplayText } from './displayText';
 
 /*
  * Display metadata of an NFT attached to a gesture: parsing, the IPFS gateway
@@ -10,17 +11,24 @@ import { normalizeHttpUrl } from './attachedNftLinks';
  * share one implementation.
  */
 
+/**
+ * What a page shows of an attached NFT. Only these fields are kept from the
+ * token's metadata document: whoever deployed the contract writes that
+ * document, so nothing else in it is passed on, cached or served.
+ */
 export interface AttachedNftMetadata {
   name?: string;
   description?: string;
   image?: string;
   /** The same image from another source, for the <NFTImage> fallback chain. */
   imageFallback?: string;
+  /** The project site the document names: https only, never a card's primary link. */
   external_url?: string;
   collection_name?: string;
+  /** The contract's own ERC-721 `name()`, read by the server when the document names no collection. */
+  contract_name?: string;
   artist?: string;
   platform?: string;
-  [key: string]: unknown;
 }
 
 /** The contract and token an attached-NFT record points at. */
@@ -44,6 +52,89 @@ export const IPFS_GATEWAYS = [
 
 /** Per-request timeout of one metadata read. */
 export const METADATA_FETCH_TIMEOUT_MS = 10_000;
+
+/**
+ * The largest metadata document read. A token URI is untrusted input, and a
+ * real document (name, description, image, attributes) is a few kilobytes.
+ */
+export const MAX_METADATA_BYTES = 256 * 1024;
+
+/** A response body larger than the reader's cap. */
+export class ResponseTooLargeError extends Error {
+  constructor(maxBytes: number) {
+    super(`Response body exceeds ${maxBytes} bytes`);
+    this.name = 'ResponseTooLargeError';
+  }
+}
+
+/** Refuses a response whose declared length is already over the cap, before reading it. */
+function assertDeclaredLength(response: Response, maxBytes: number): void {
+  const declared = Number(response.headers?.get('content-length') ?? Number.NaN);
+  if (Number.isFinite(declared) && declared > maxBytes) {
+    void response.body?.cancel().catch(() => {});
+    throw new ResponseTooLargeError(maxBytes);
+  }
+}
+
+/** A stream read to its end, abandoned as soon as it passes `maxBytes`. */
+async function readCappedStream(
+  body: ReadableStream<Uint8Array>,
+  maxBytes: number,
+): Promise<Uint8Array<ArrayBuffer>> {
+  const reader = body.getReader();
+  const chunks: Uint8Array[] = [];
+  let received = 0;
+  for (;;) {
+    const { done, value } = await reader.read();
+    if (done) break;
+    received += value.byteLength;
+    if (received > maxBytes) {
+      void reader.cancel().catch(() => {});
+      throw new ResponseTooLargeError(maxBytes);
+    }
+    chunks.push(value);
+  }
+  const bytes = new Uint8Array(received);
+  let offset = 0;
+  for (const chunk of chunks) {
+    bytes.set(chunk, offset);
+    offset += chunk.byteLength;
+  }
+  return bytes;
+}
+
+/**
+ * The body of `response` as bytes, read chunk by chunk and abandoned as soon
+ * as it passes `maxBytes`, whether or not the server declared a length.
+ * Abandoning the body does not end the request: whoever made it aborts it.
+ */
+export async function readCappedBytes(
+  response: Response,
+  maxBytes: number,
+): Promise<Uint8Array<ArrayBuffer>> {
+  assertDeclaredLength(response, maxBytes);
+  if (!response.body) {
+    // Only environments without body streams take this path.
+    const bytes = new Uint8Array(await response.arrayBuffer());
+    if (bytes.byteLength > maxBytes) throw new ResponseTooLargeError(maxBytes);
+    return bytes;
+  }
+  return readCappedStream(response.body, maxBytes);
+}
+
+/** The body of `response` as text, under the same cap as `readCappedBytes`. */
+export async function readCappedText(response: Response, maxBytes: number): Promise<string> {
+  assertDeclaredLength(response, maxBytes);
+  if (!response.body) {
+    // Only environments without body streams take this path.
+    const text = await response.text();
+    if (new TextEncoder().encode(text).byteLength > maxBytes) {
+      throw new ResponseTooLargeError(maxBytes);
+    }
+    return text;
+  }
+  return new TextDecoder().decode(await readCappedStream(response.body, maxBytes));
+}
 
 function isRecord(value: unknown): value is Record<string, unknown> {
   return !!value && typeof value === 'object' && !Array.isArray(value);
@@ -97,9 +188,10 @@ export function normalizeMetadataAssetUrl(
   return undefined;
 }
 
-function optionalString(value: unknown): string | undefined {
-  return typeof value === 'string' && value.trim() ? value.trim() : undefined;
-}
+/** The longest name kept from a metadata document. */
+const MAX_NAME_LENGTH = 120;
+/** The longest description kept: pages show at most a few lines of it. */
+const MAX_DESCRIPTION_LENGTH = 1_000;
 
 export function normalizeAttachedNftMetadata(
   raw: unknown,
@@ -114,15 +206,14 @@ export function normalizeAttachedNftMetadata(
   const imagePath = ipfsPath(raw.image);
 
   return {
-    ...raw,
-    name: optionalString(raw.name),
-    description: optionalString(raw.description),
+    name: cleanDisplayText(raw.name, MAX_NAME_LENGTH),
+    description: cleanDisplayText(raw.description, MAX_DESCRIPTION_LENGTH),
     image: normalizeMetadataAssetUrl(raw.image, metadataUri),
     imageFallback: imagePath && fallbackGateway ? `${fallbackGateway}${imagePath}` : undefined,
-    external_url: normalizeHttpUrl(raw.external_url) ?? undefined,
-    collection_name: optionalString(raw.collection_name ?? raw.collectionName),
-    artist: optionalString(raw.artist),
-    platform: optionalString(raw.platform),
+    external_url: normalizeHttpsUrl(raw.external_url) ?? undefined,
+    collection_name: cleanDisplayText(raw.collection_name ?? raw.collectionName, MAX_LABEL_LENGTH),
+    artist: cleanDisplayText(raw.artist, MAX_LABEL_LENGTH),
+    platform: cleanDisplayText(raw.platform, MAX_LABEL_LENGTH),
   };
 }
 
@@ -134,32 +225,36 @@ export function metadataUrlCandidates(uri: string): string[] {
   return httpUrl ? [httpUrl] : [];
 }
 
-/** Extra `fetch` options for a metadata read (the server passes its cache policy). */
-export type MetadataFetchInit = Omit<RequestInit, 'signal' | 'headers'> & {
-  next?: { revalidate?: number | false };
-};
-
 /** A `fetch` stand-in: the server passes one that checks every redirect hop. */
 export type MetadataFetcher = (url: string, init: RequestInit) => Promise<Response>;
 
+/**
+ * One candidate's document. The request ends with this call, whatever the
+ * outcome: the deadline covers the whole body, and every exit aborts the
+ * request, because giving up on a body does not stop a fetcher that keeps
+ * its own copy (Next's data cache tees every body it caches) from reading
+ * the rest of an oversized or endless document. `stop` aborts it early,
+ * when another candidate has already answered.
+ */
 async function fetchMetadataFromUrl(
   url: string,
-  init: MetadataFetchInit | undefined,
   timeoutMs: number,
   fetcher: MetadataFetcher,
+  stop?: AbortSignal,
 ): Promise<AttachedNftMetadata> {
   const controller = new AbortController();
-  const timer = setTimeout(() => controller.abort(), timeoutMs);
+  const abort = () => controller.abort();
+  const timer = setTimeout(abort, timeoutMs);
+  stop?.addEventListener('abort', abort, { once: true });
   try {
     const response = await fetcher(url, {
-      ...init,
       headers: { Accept: 'application/json' },
       signal: controller.signal,
     });
     if (!response.ok) {
       throw new Error(`Failed to fetch NFT metadata (${response.status})`);
     }
-    const data: unknown = await response.json();
+    const data: unknown = JSON.parse(await readCappedText(response, MAX_METADATA_BYTES));
     const normalized = normalizeAttachedNftMetadata(data, url);
     if (!normalized) {
       throw new Error('Failed to fetch NFT metadata (unusable payload)');
@@ -167,12 +262,12 @@ async function fetchMetadataFromUrl(
     return normalized;
   } finally {
     clearTimeout(timer);
+    stop?.removeEventListener('abort', abort);
+    abort();
   }
 }
 
 export interface FetchAttachedNftMetadataOptions {
-  /** `fetch` options for every candidate (the server's data-cache policy). */
-  init?: MetadataFetchInit;
   /** Skips candidates that fail this check (the server's public-host guard). */
   allowUrl?: (url: string) => boolean;
   /** Reads each candidate (default: the global `fetch`). */
@@ -181,14 +276,14 @@ export interface FetchAttachedNftMetadataOptions {
 }
 
 /**
- * Reads a metadata URI: an `ipfs://` URI races every gateway and the first
- * usable document wins; an http(s) URI is read as is. Resolves to null for a
- * scheme it cannot read and rejects when every candidate failed.
+ * Reads a metadata URI: an `ipfs://` URI races every gateway, the first
+ * usable document wins and the other requests are aborted; an http(s) URI
+ * is read as is. Resolves to null for a scheme it cannot read and rejects
+ * when every candidate failed.
  */
 export async function fetchAttachedNftMetadata(
   uri: string,
   {
-    init,
     allowUrl,
     fetcher = (url, requestInit) => fetch(url, requestInit),
     timeoutMs = METADATA_FETCH_TIMEOUT_MS,
@@ -196,16 +291,20 @@ export async function fetchAttachedNftMetadata(
 ): Promise<AttachedNftMetadata | null> {
   const candidates = metadataUrlCandidates(uri).filter((url) => !allowUrl || allowUrl(url));
   if (candidates.length === 0) return null;
-  const read = (url: string) => fetchMetadataFromUrl(url, init, timeoutMs, fetcher);
-  if (candidates.length === 1) return read(candidates[0]!);
+  if (candidates.length === 1) return fetchMetadataFromUrl(candidates[0]!, timeoutMs, fetcher);
 
+  const race = new AbortController();
   try {
-    return await Promise.any(candidates.map(read));
+    return await Promise.any(
+      candidates.map((url) => fetchMetadataFromUrl(url, timeoutMs, fetcher, race.signal)),
+    );
   } catch (error) {
     if (error instanceof AggregateError && error.errors.length > 0) {
       throw error.errors[0];
     }
     throw error;
+  } finally {
+    race.abort();
   }
 }
 

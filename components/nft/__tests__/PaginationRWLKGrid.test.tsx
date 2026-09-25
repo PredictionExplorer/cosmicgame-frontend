@@ -31,7 +31,8 @@ describe('PaginationRWLKGrid', () => {
     expect(status).toHaveTextContent('home.rwlkGrid.loading');
     // The grid's own shape waits in skeleton cards, not a spinner and a caption.
     expect(within(status).getByText('home.rwlkGrid.loading')).toHaveClass('sr-only');
-    expect(status.querySelectorAll('[data-slot="skeleton"]')).toHaveLength(6);
+    // One plate-shaped skeleton per card (its number line waits under it).
+    expect(status.querySelectorAll('[data-slot="skeleton"].aspect-art')).toHaveLength(6);
     expect(screen.queryByRole('searchbox')).not.toBeInTheDocument();
     expect(screen.queryByText('home.rwlkGrid.empty')).not.toBeInTheDocument();
   });

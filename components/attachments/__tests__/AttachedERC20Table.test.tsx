@@ -1,6 +1,7 @@
 import { checkA11y, fireEvent, render, screen, within } from '@/test-utils';
 
-import DonatedERC20Table, { attachedErc20Amount } from '../AttachedERC20Table';
+import DonatedERC20Table from '../AttachedERC20Table';
+import { attachedErc20Amount } from '../attachedErc20Amount';
 
 const mockMetadata = jest.fn();
 jest.mock('../useAttachedErc20Metadata', () => ({
@@ -53,6 +54,13 @@ describe('attachedErc20Amount', () => {
   it('reads the attached amount itself from a cycle read', () => {
     expect(
       attachedErc20Amount({ AmountEth: 2000, AmountDonatedEth: 2000, AmountClaimedEth: 0 }),
+    ).toBe(2000);
+  });
+
+  it('falls back to base units when a read carries no display figures', () => {
+    expect(attachedErc20Amount({ Amount: '2500000' }, 6)).toBe(2.5);
+    expect(
+      attachedErc20Amount({ AmountDonated: '0', AmountClaimed: '2000000000000000000000' }),
     ).toBe(2000);
   });
 

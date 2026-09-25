@@ -637,7 +637,11 @@
     "loadErrorMessage": "無法讀取已命名 NFT 的紀錄，請重試。",
     "emptyTitle": "暫無已命名 NFT",
     "emptyDescription": "尚未有持有者為 Cosmic Signature NFT 命名。",
-    "galleryLink": "在畫廊中查看"
+    "galleryLink": "在畫廊中查看",
+    "card": {
+      "namedOn": "命名於",
+      "namedBy": "命名者"
+    }
   },
   "attachedNfts": {
     "title": "已附加 NFT 貢獻",
@@ -654,13 +658,14 @@
   "usedRwlkNfts": {
     "title": "已使用的 Random Walk NFT",
     "subtitle": "隨 ETH 落筆附加、用於一次性降低 50% 落筆價格的 Random Walk NFT",
-    "artAlt": "Random Walk NFT {id}",
+    "artAlt": "Random Walk NFT #{id}",
     "loadErrorTitle": "無法載入已使用的 Random Walk NFT",
     "loadError": "無法讀取已使用的 Random Walk NFT，請重試。",
     "emptyTitle": "尚無已使用的 Random Walk NFT",
     "emptyDescription": "ETH 落筆使用 Random Walk NFT 獲得一次性落筆價格減免後，該 NFT 會顯示在這裡。",
     "card": {
       "cycle": "第 {cycle} 個週期",
+      "title": "Random Walk #{id}",
       "usedBy": "參與者"
     }
   },
@@ -762,7 +767,7 @@
     "attached": "已附加"
   },
   "attachedNftLinks": {
-    "viewNft": "檢視 NFT",
+    "projectSite": "專案網站",
     "viewOpenSea": "在 OpenSea 上檢視",
     "viewContract": "檢視合約",
     "detailsUnavailable": "NFT 詳情暫不可用",

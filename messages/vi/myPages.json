@@ -225,13 +225,13 @@
   "tokens": {
     "page": {
       "title": "NFT của tôi",
-      "subtitle": "Các Cosmic Signature NFT trong ví đang kết nối",
+      "subtitle": "Các Cosmic Signature NFT trong ví bạn kết nối",
+      "newestCaption": "Những Signature mới nhất. Signature của bạn cũng sẽ được treo ở đây.",
       "anchorLink": "Neo giữ NFT",
       "loadErrorTitle": "Không tải được token",
       "loadErrorMessage": "Không tải được Cosmic Signature NFT.",
       "ownedTitle": "Cosmic Signature NFT tôi sở hữu",
       "transferTitle": "Chuyển giao NFT",
-      "transferSubtitle": "Tùy chọn: gửi các Cosmic Signature NFT đã chọn đến một ví khác.",
       "figures": {
         "owned": "Trong ví này",
         "anchored": "Đang neo giữ"
@@ -259,16 +259,10 @@
     }
   },
   "nftTransfer": {
-    "empty": "Bạn không có Cosmic Signature NFT nào trong ví này.",
     "pickerTitle": "Chọn NFT để chuyển giao",
     "pickerSummary": "Đã chọn {selected} trong {total} NFT có thể chuyển giao.",
-    "selectAll": "Chọn tất cả NFT có thể chuyển giao",
-    "selectPage": "Chọn trang hiện tại",
-    "clear": "Bỏ chọn",
-    "listAria": "Cosmic Signature NFT",
+    "selectAll": "Chọn tất cả",
     "selectAria": "Chọn NFT {id}",
-    "cycle": "Chu kỳ {cycle}",
-    "cycleUnavailable": "Không có dữ liệu chu kỳ",
     "statusLabels": {
       "anchored": "Đang neo giữ - gỡ neo trước khi chuyển giao",
       "ownerChanged": "Chủ sở hữu đã thay đổi - tải lại trước khi chuyển giao"

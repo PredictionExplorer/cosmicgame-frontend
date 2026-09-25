@@ -153,7 +153,7 @@
       },
       "named-nfts": {
         "heading": "名前付きCosmic Signature NFT",
-        "description": "所有者が名前を付けたCosmic Signature NFTを紹介します。作品を見つけ、オンチェーンに記録された来歴をたどれます。",
+        "description": "所有者はオンチェーンでシグネチャーに名前を付けられます。名前の付いたシグネチャーを、名前が付いた日の新しい順に並べています。",
         "links": {
           "gallery": "ギャラリー全体を探索する",
           "learn": "アートについて学ぶ",
@@ -279,12 +279,17 @@
   },
   "gallerySummary": {
     "heading": "Cosmic Signatureギャラリー",
-    "description": "オンチェーンのシードと三体問題の物理計算から生まれたCosmic Signature NFTを紹介します。",
+    "description": "すべてのシグネチャーは、オンチェーンのシードから三体物理で描かれます。",
     "cards": {
       "imprinted": "刻印済みNFT",
       "anchored": "係留中のNFT",
       "named": "名前付きNFT",
       "cycles": "確定したサイクル"
+    },
+    "cardsShort": {
+      "imprinted": "刻印済み",
+      "anchored": "係留中",
+      "named": "名前付き"
     },
     "relatedAria": "ギャラリーの関連ページ",
     "links": {

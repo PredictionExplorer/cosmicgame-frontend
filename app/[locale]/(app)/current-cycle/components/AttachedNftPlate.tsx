@@ -31,9 +31,7 @@ export function AttachedNftPlate({ nft }: { nft: AttachedNFT }) {
   const name = metadata.data?.name ?? null;
   const link = resolveAttachedNftLink({
     nft,
-    metadata: metadata.data,
     labels: {
-      viewNft: tStatistics('attachedNftLinks.viewNft'),
       viewOpenSea: tStatistics('attachedNftLinks.viewOpenSea'),
       viewContract: tStatistics('attachedNftLinks.viewContract'),
       detailsUnavailable: tStatistics('attachedNftLinks.detailsUnavailable'),
