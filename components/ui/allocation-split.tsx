@@ -80,14 +80,16 @@ export function AllocationSplitBar({
       </div>
 
       {/* Columns stop at 20rem, so a share sits near its label on a wide screen. */}
-      <dl className="mt-6 grid gap-x-10 sm:grid-cols-[repeat(2,minmax(0,20rem))]">
+      <dl className="mt-6 grid grid-cols-[minmax(0,1fr)] gap-x-10 sm:grid-cols-[repeat(2,minmax(0,20rem))]">
         {segments.map((segment) => {
           const percent = percentText(segment);
           return (
             <div
               key={segment.id}
               data-track={segment.id}
-              className="flex min-h-11 items-center gap-3 border-b border-rule-faint py-2.5"
+              // A long track name (uk "Накопичувальний резерв" at 320px) keeps its
+              // words whole: the figures wrap under it, at the end edge.
+              className="flex min-h-11 flex-wrap items-center gap-x-3 gap-y-1 border-b border-rule-faint py-2.5"
             >
               {/* The swatch belongs to the term: a dl's div holds only dt and dd. */}
               <dt className="flex min-w-0 flex-1 items-center gap-3 type-body-sm text-muted-foreground">
@@ -107,7 +109,7 @@ export function AllocationSplitBar({
                   )}
                 </span>
               </dt>
-              <dd className="flex shrink-0 items-baseline gap-3 type-figure-sm text-foreground">
+              <dd className="ms-auto flex shrink-0 items-baseline gap-3 type-figure-sm text-foreground">
                 {showAmounts ? (
                   segment.amount === null || segment.amount === undefined ? (
                     <UnknownValue label={unavailableLabel} />

@@ -114,7 +114,9 @@ test.describe('Landing page @ cosmicsignature.com', () => {
     await expect(timer.getByText('128 Gestures')).toBeVisible();
     // One freshness stamp replaces the three "same clock as the app" lines.
     await expect(timer.getByText(/^Updated /)).toBeVisible();
-    await expect(timer.getByTestId('countdown-value')).toHaveCount(4);
+    // The one Cycle clock: HH:MM:SS with about two hours left (DD:HH:MM:SS
+    // only while days remain), as on the app home and /current-cycle.
+    await expect(timer.getByTestId('countdown-value')).toHaveCount(3);
 
     const liveCycleLink = timer.getByRole('link', { name: /open the current cycle/i });
     await expect(liveCycleLink).toHaveAttribute('href', CURRENT_CYCLE_PATTERN);
@@ -123,12 +125,12 @@ test.describe('Landing page @ cosmicsignature.com', () => {
   test('keeps counting from the last reading when a poll fails', async ({ page }) => {
     await page.goto('/', { waitUntil: 'domcontentloaded' });
     const timer = page.getByLabel('Live Performance Cycle countdown');
-    await expect(timer.getByTestId('countdown-value')).toHaveCount(4, { timeout: 10_000 });
+    await expect(timer.getByTestId('countdown-value')).toHaveCount(3, { timeout: 10_000 });
 
     await page.route('**/api/cosmicgame/**', (route) => route.abort());
     await expect(timer.getByRole('status')).toHaveText('Reconnecting…', { timeout: 20_000 });
     await expect(timer.getByRole('heading', { name: /Cycle #42 finalizes in/i })).toBeVisible();
-    await expect(timer.getByTestId('countdown-value')).toHaveCount(4);
+    await expect(timer.getByTestId('countdown-value')).toHaveCount(3);
     await expect(timer.getByText(/unavailable/i)).toHaveCount(0);
   });
 
