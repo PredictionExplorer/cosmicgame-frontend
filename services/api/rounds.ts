@@ -1,7 +1,5 @@
 // lexicon-allow-start: backend HTTP URL paths mirror the Go server routes and are a sealed contract
 
-import { weiToEthNumber } from '@/utils/format';
-
 import {
   apiGet,
   getAPIUrl,
@@ -41,8 +39,11 @@ import type {
 
 /**
  * Maps the live Go `/statistics/dashboard` JSON onto the app schema: `PrizeAmountEth` →
- * `CurPrizeAmountEth`, `BidPriceEth` → `CurBidPriceEth` (the ETH Gesture Cost), and
- * `TokenReward` (a wei string of CST, never an ETH cost) → `ParticipationCstReward` in CST.
+ * `CurPrizeAmountEth` and `BidPriceEth` → `CurBidPriceEth` (the ETH Gesture Cost).
+ *
+ * The wire's `TokenReward` (a wei string of CST) passes through untouched: the gesture form
+ * reads the participation CST from the contract, so nothing here converts it, and it never
+ * lands in an ETH-named field.
  */
 export function normalizeDashboardWire(raw: Record<string, unknown>): Record<string, unknown> {
   const data = { ...raw };
@@ -53,27 +54,8 @@ export function normalizeDashboardWire(raw: Record<string, unknown>): Record<str
   if (data.CurBidPriceEth === undefined && typeof data.BidPriceEth === 'number') {
     data.CurBidPriceEth = data.BidPriceEth;
   }
-  if (data.ParticipationCstReward === undefined) {
-    const reward = tokenRewardWeiStringToCst(data.TokenReward);
-    if (reward !== undefined) data.ParticipationCstReward = reward;
-  }
 
   return data;
-}
-
-/** Converts the wire `TokenReward` (a wei-denominated CST string); `undefined` when it is absent or a sentinel. */
-function tokenRewardWeiStringToCst(tokenReward: unknown): number | undefined {
-  if (typeof tokenReward !== 'string' || tokenReward === '' || tokenReward === 'error') {
-    return undefined;
-  }
-  // Keep the value in wei through `formatUnits`: `Number(wei) / 1e18` rounds
-  // the integer to a double first and loses precision past 2^53.
-  try {
-    return weiToEthNumber(BigInt(tokenReward));
-  } catch {
-    const n = Number(tokenReward);
-    return Number.isFinite(n) ? n / 1e18 : undefined;
-  }
 }
 
 /**
