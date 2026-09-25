@@ -48,7 +48,12 @@ export function NftMarketplaceButton({
 }: NftMarketplaceButtonProps) {
   const t = useTranslations('nav');
   const text = label ?? t(LABEL_KEYS[variant]);
-  const resolvedAriaLabel = ariaLabel ?? t('ecosystem.axiomZero.ariaLabel');
+  // The short labels ("Axiom Zero") take the fuller name; a label that
+  // already names the place ("NFTs on Axiom Zero") is the name itself, so
+  // what a voice user reads is what they say (WCAG 2.5.3).
+  const namesItself = LABEL_KEYS[variant] === 'ecosystem.axiomZero.defaultLabel';
+  const resolvedAriaLabel =
+    ariaLabel ?? (namesItself ? undefined : t('ecosystem.axiomZero.ariaLabel'));
 
   if (variant === 'menu') {
     return (
@@ -89,6 +94,7 @@ export function NftMarketplaceButton({
         {text}
         {/* The site's mark for a link that leaves it (it opens a new tab). */}
         <ArrowUpRight className="size-4 text-subtle" aria-hidden />
+        {resolvedAriaLabel ? null : <span className="sr-only"> {t('link.newTab')}</span>}
       </a>
     </Button>
   );

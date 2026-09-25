@@ -8,7 +8,7 @@ describe('NftMarketplaceButton', () => {
   it('links to the Axiom Zero marketplace with safe external attributes', () => {
     render(<NftMarketplaceButton />);
 
-    const link = screen.getByRole('link', { name: 'nav.ecosystem.axiomZero.ariaLabel' });
+    const link = screen.getByRole('link', { name: /^nav\.ecosystem\.axiomZero\.defaultLabel/ });
     expect(link).toHaveAttribute('href', COSMIC_SIGNATURE_MARKETPLACE_URL);
     expect(link).toHaveAttribute('target', '_blank');
     expect(link).toHaveAttribute('rel', 'noopener noreferrer');
@@ -18,11 +18,20 @@ describe('NftMarketplaceButton', () => {
     expect(url.pathname).toBe('/cosmic-signature');
   });
 
-  it('names Axiom Zero in the default label', () => {
+  it('is named by its visible label, and says it opens a new tab (WCAG 2.5.3)', () => {
     render(<NftMarketplaceButton />);
 
+    const link = screen.getByRole('link', {
+      name: 'nav.ecosystem.axiomZero.defaultLabel nav.link.newTab',
+    });
+    expect(link).not.toHaveAttribute('aria-label');
+  });
+
+  it('uses the page-header label in the Signature action row', () => {
+    render(<NftMarketplaceButton variant="action" />);
+
     expect(
-      screen.getByRole('link', { name: 'nav.ecosystem.axiomZero.ariaLabel' }),
+      screen.getByRole('link', { name: /^nav\.ecosystem\.axiomZero\.defaultLabel/ }),
     ).toHaveTextContent('nav.ecosystem.axiomZero.defaultLabel');
   });
 

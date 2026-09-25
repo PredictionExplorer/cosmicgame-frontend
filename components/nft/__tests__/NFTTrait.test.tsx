@@ -232,10 +232,9 @@ describe('NFTTrait', () => {
     withNameHistory();
     render(<NFTTrait tokenId={5} />);
 
-    expect(screen.getByRole('link', { name: 'nav.ecosystem.axiomZero.ariaLabel' })).toHaveAttribute(
-      'href',
-      COSMIC_SIGNATURE_MARKETPLACE_URL,
-    );
+    expect(
+      screen.getByRole('link', { name: /^nav\.ecosystem\.axiomZero\.defaultLabel/ }),
+    ).toHaveAttribute('href', COSMIC_SIGNATURE_MARKETPLACE_URL);
   });
 
   it('renders breadcrumbs through the PageHeader API', () => {

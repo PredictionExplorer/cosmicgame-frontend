@@ -166,7 +166,7 @@ describe('MyTokens', () => {
 
   it('links to the marketplace from the page header with its one label', () => {
     render(<MyTokens />);
-    const link = screen.getByRole('link', { name: 'nav.ecosystem.axiomZero.ariaLabel' });
+    const link = screen.getByRole('link', { name: /^nav\.ecosystem\.axiomZero\.defaultLabel/ });
     expect(link).toHaveAttribute('href', COSMIC_SIGNATURE_MARKETPLACE_URL);
     expect(link).toHaveTextContent('nav.ecosystem.axiomZero.defaultLabel');
   });
