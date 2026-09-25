@@ -94,6 +94,27 @@ describe('one ledger for a whole history', () => {
     expect(within(row).queryByRole('button')).not.toBeInTheDocument();
   });
 
+  it('reads a retrieved row from the Recipient read as held plus retrieved, never 0', () => {
+    // The live `donations/erc20/by_user` row for a retrieved 2,000 ARB attachment:
+    // nothing is held any more and the whole amount sits in the retrieved fields.
+    const retrieved = {
+      RoundNum: 0,
+      TokenAddr: '0x912CE59144191C1204E64559FE8253a0e49E6548',
+      AmountDonated: '0',
+      AmountDonatedEth: 0,
+      AmountClaimed: '2000000000000000000000',
+      AmountClaimedEth: 2000,
+      DonateClaimDiff: '-2000000000000000000000',
+      DonateClaimDiffEth: -2000,
+      Claimed: true,
+    };
+    renderWithQuery(<AttachedTokenRetrievalTable rows={[retrieved]} ariaLabel="Attached tokens" />);
+    const row = screen.getAllByRole('row')[1]!;
+    expect(row).toHaveTextContent('2,000 ARB');
+    expect(row).not.toHaveTextContent(/(^|[^\d,])0\sARB/);
+    expect(row).toHaveTextContent('tables.recipientHistory.retrieved');
+  });
+
   it('shows an unreadable amount as unknown, never blank', () => {
     renderWithQuery(
       <AttachedTokenRetrievalTable

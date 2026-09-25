@@ -3,18 +3,21 @@ import { formatUnits } from 'viem';
 import { toFiniteNumber } from '@/utils/finiteNumber';
 import type { DonatedERC20Token } from '@/services/api/types';
 
-/** The amount fields an attached ERC-20 row may carry (reads differ in which). */
+/** A base-unit amount as the reads deliver it (a decimal string, or a number or bigint). */
+type BaseUnitField = string | number | bigint | null;
+
+/**
+ * The amount fields an attached ERC-20 row may carry (reads differ in which).
+ * Base-unit fields are wider than `DonatedERC20Token`'s so the retrieval
+ * ledgers, whose rows also feed the retrieve call, read through here too.
+ */
 export type AttachedErc20AmountRow = Partial<
-  Pick<
-    DonatedERC20Token,
-    | 'Amount'
-    | 'AmountDonated'
-    | 'AmountDonatedEth'
-    | 'AmountClaimed'
-    | 'AmountClaimedEth'
-    | 'AmountEth'
-  >
->;
+  Pick<DonatedERC20Token, 'AmountDonatedEth' | 'AmountClaimedEth' | 'AmountEth'>
+> & {
+  Amount?: BaseUnitField;
+  AmountDonated?: BaseUnitField;
+  AmountClaimed?: BaseUnitField;
+};
 
 /** A whole number of base units, or null. */
 function baseUnits(value: unknown): bigint | null {

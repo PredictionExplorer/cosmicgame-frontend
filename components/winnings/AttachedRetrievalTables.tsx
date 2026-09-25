@@ -4,6 +4,7 @@ import { useMemo, type ReactNode } from 'react';
 import { useTranslations } from 'next-intl';
 
 import NFTImage from '@/components/nft/NFTImage';
+import { attachedErc20Amount } from '@/components/attachments/attachedErc20Amount';
 import { useAttachedErc20Metadata } from '@/components/attachments/useAttachedErc20Metadata';
 import { useAttachedNftMetadata } from '@/components/attachments/useAttachedNftMetadata';
 import { PendingPlate } from '@/components/ui/art-frame';
@@ -47,7 +48,10 @@ export interface AttachedTokenRetrievalRow extends DonatedErc20ClaimAmountSource
   TxHash?: string;
   /** What is left to retrieve, in whole tokens (the indexer's `DonateClaimDiffEth`). */
   DonateClaimDiffEth?: string | number;
+  /** Still held for the Recipient, in whole tokens (0 once retrieved). */
   AmountDonatedEth?: number;
+  /** Already retrieved, in base units and in whole tokens. */
+  AmountClaimed?: string;
   AmountClaimedEth?: number;
   /** Already retrieved: the row shows so instead of an action. */
   Claimed?: boolean;
@@ -114,16 +118,21 @@ function AttachedTokenIdentity({ address }: { address: string }) {
   );
 }
 
-/** What the row is worth: what is left to retrieve, or, once retrieved, what was attached. */
-function tokenAmount(row: AttachedTokenRetrievalRow): number | null {
-  return toFiniteNumber(row.Claimed ? row.AmountDonatedEth : row.DonateClaimDiffEth);
+/**
+ * What the row is worth: what is left to retrieve, or, once retrieved, what
+ * was attached. A retrieved row reads through `attachedErc20Amount`, which adds
+ * what is still held (0 by then) to what was retrieved, so this ledger and the
+ * cycle's showcase give the same figure for the same attachment.
+ */
+function tokenAmount(row: AttachedTokenRetrievalRow, decimals?: number): number | null {
+  return row.Claimed ? attachedErc20Amount(row, decimals) : toFiniteNumber(row.DonateClaimDiffEth);
 }
 
 function TokenAmount({ row }: { row: AttachedTokenRetrievalRow }) {
   const format = useFormat();
   const tCommon = useTranslations('common');
   const { data: metadata } = useAttachedErc20Metadata(row.TokenAddr);
-  const amount = tokenAmount(row);
+  const amount = tokenAmount(row, metadata?.decimals);
   if (amount === null) return <UnknownValue label={tCommon('status.unavailable')} />;
   return (
     <span className="whitespace-nowrap tabular-nums">
