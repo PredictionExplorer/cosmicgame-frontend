@@ -83,9 +83,9 @@ describe('Tabs', () => {
 
 describe('ScrollRail', () => {
   it('scrolls the current item into view without moving the page', () => {
-    const scrollBy = jest.fn();
-    const original = HTMLElement.prototype.scrollBy;
-    HTMLElement.prototype.scrollBy = scrollBy;
+    const scrollTo = jest.fn();
+    const original = HTMLElement.prototype.scrollTo;
+    HTMLElement.prototype.scrollTo = scrollTo;
     jest.useFakeTimers();
     try {
       render(
@@ -104,14 +104,16 @@ describe('ScrollRail', () => {
       act(() => {
         jest.runOnlyPendingTimers();
       });
-      expect(scrollBy).toHaveBeenCalledWith(
+      expect(scrollTo).toHaveBeenCalledWith(
         expect.objectContaining({ behavior: 'instant', left: expect.any(Number) }),
       );
-      const [{ left }] = scrollBy.mock.calls[0] as [{ left: number }];
-      expect(left).toBeGreaterThan(140);
+      const [{ left }] = scrollTo.mock.calls[0] as [{ left: number }];
+      // B comes to rest whole, one rest inset from the start: the gap to A,
+      // no wider than the fade (40px).
+      expect(left).toBe(180 - 40);
     } finally {
       jest.useRealTimers();
-      HTMLElement.prototype.scrollBy = original;
+      HTMLElement.prototype.scrollTo = original;
     }
   });
 });

@@ -1,4 +1,4 @@
-import { ScrollRail } from '@/components/ui/scroll-rail';
+import { restScroll, ScrollRail, type RailSpan } from '@/components/ui/scroll-rail';
 
 import { render, screen, waitFor } from '@/test-utils';
 
@@ -93,28 +93,30 @@ describe('ScrollRail', () => {
     function layout(track: HTMLElement, boxes: Box[], trackBox: Box) {
       const row = track.firstElementChild as HTMLElement;
       Array.from(row.children).forEach((item, index) => {
-        (item as HTMLElement).getBoundingClientRect = () => boxes[index] as DOMRect;
+        (item as HTMLElement).getBoundingClientRect = () =>
+          ({ ...boxes[index], width: boxes[index]!.right - boxes[index]!.left }) as DOMRect;
       });
       track.getBoundingClientRect = () => trackBox as DOMRect;
-      const scrollBy = jest.fn();
-      Object.assign(track, { scrollBy });
-      return scrollBy;
+      const scrollTo = jest.fn();
+      Object.assign(track, { scrollTo });
+      return scrollTo;
     }
 
-    it('scrolls a cut item fully out rather than leave a fragment at the start', async () => {
-      // A 300px rail, 16px font: the fade is 40px. The active tab (the third)
-      // ends at 380; revealing it alone would stop with the first tab cut.
+    it('rests the row on whole items, making room after it when the row ends first', async () => {
+      // A 300px rail, 16px font: the end fade is 40px. The active tab (the
+      // third) ends at 380 and the row can scroll 80px; the tabs abut.
+      const restore = mockOverflow(80);
       const { container } = render(
         <ScrollRail>
-          <div>
-            <span>Source code</span>
-            <span>Risk Disclosures</span>
-            <span data-state="active">Terms</span>
-          </div>
+          <ul style={{ borderBottom: '1px solid' }}>
+            <li>Source code</li>
+            <li>Risk Disclosures</li>
+            <li data-state="active">Terms</li>
+          </ul>
         </ScrollRail>,
       );
       const track = container.querySelector('[class*="overflow-x-auto"]') as HTMLElement;
-      const scrollBy = layout(
+      const scrollTo = layout(
         track,
         [
           { left: 0, right: 110 },
@@ -126,12 +128,104 @@ describe('ScrollRail', () => {
       // A change of the current item runs the reveal.
       track.querySelector('[data-state]')!.setAttribute('data-state', 'inactive');
       track.querySelector('[data-state]')!.setAttribute('data-state', 'active');
-      await waitFor(() => expect(scrollBy).toHaveBeenCalled());
-      // Scrolling just 380 - 300 + 40 = 120 would leave the tab under the
-      // start edge (at 120 + 40 = 160, "Risk Disclosures", 110-280) cut in
-      // two; the row moves on to that tab's end, beside the fade.
-      const { left } = scrollBy.mock.calls.at(-1)![0] as { left: number };
-      expect(left).toBe(280 - 0 - 40);
+      await waitFor(() => expect(scrollTo).toHaveBeenCalled());
+      // Scrolling just far enough (120) would leave "Risk Disclosures" cut in
+      // two at the start, and the row's own end (80) would show 30px of
+      // "Source code": the row moves on to "Risk Disclosures", whole at the
+      // start, with 30px of room after it.
+      expect(scrollTo).toHaveBeenLastCalledWith({ left: 110, behavior: 'smooth' });
+      expect(track.style.getPropertyValue('--rail-end-room')).toBe('30px');
+      // An underline row's hairline runs on under the room.
+      expect(track).toHaveAttribute('data-end-rule');
+      restore();
+    });
+
+    it('snaps items to the row gap from the start edge', async () => {
+      const restore = mockOverflow(100);
+      const { container } = render(
+        <ScrollRail>
+          <ul>
+            <li>Overview</li>
+            <li data-state="active">Tokens</li>
+          </ul>
+        </ScrollRail>,
+      );
+      const track = container.querySelector('[class*="overflow-x-auto"]') as HTMLElement;
+      layout(
+        track,
+        [
+          { left: 0, right: 64 },
+          { left: 88, right: 136 },
+        ],
+        { left: 0, right: 300 },
+      );
+      track.querySelector('[data-state]')!.setAttribute('data-state', 'inactive');
+      track.querySelector('[data-state]')!.setAttribute('data-state', 'active');
+      await waitFor(() => expect(track.style.scrollPaddingInline).toBe('24px 2.5rem'));
+      restore();
+    });
+  });
+
+  describe('restScroll', () => {
+    // Tabs 24px apart on a 358px phone rail, 16px font (a 40px end fade).
+    const track: RailSpan = { left: 0, right: 358 };
+    const at = (...spans: [number, number][]): RailSpan[] =>
+      spans.map(([left, right]) => ({ left, right }));
+    const trust = at(
+      [0, 56], // Security
+      [80, 124], // Audits
+      [148, 213], // Contracts
+      [237, 322], // Source code
+      [346, 456], // Risk Disclosures
+      [480, 594], // Terms of Service
+      [618, 711], // Privacy Policy
+    );
+    const rest = (items: RailSpan[], index: number, reach: number, atEnd = false) =>
+      restScroll({ track, items, index, inset: 24, fade: 40, reach, atEnd });
+
+    it('leaves a row alone while its current item shows whole and clear of the fade', () => {
+      expect(rest(trust, 1, 353)).toBeNull();
+    });
+
+    it('moves on to the next item start so no fragment stays at the start (regression)', () => {
+      // Terms of Service: the least scroll (276) cut "Source code" to "de"
+      // under the start fade; "Risk Disclosures" now starts one gap in.
+      expect(rest(trust, 5, 353)).toBe(346 - 24);
+    });
+
+    it('rests on the row end when the item it cuts there stays mostly in view', () => {
+      // Privacy Policy at the end: "Risk Disclosures" loses 7 of its 110px.
+      expect(rest(trust, 6, 353)).toBe(353);
+    });
+
+    it('makes room after the row when its end would leave a fragment', () => {
+      // Statistics at 390px, Activity current: the row's end (147) keeps 25px
+      // of "Participation"; resting "Tokens" one gap in needs 172.
+      const statistics = at([0, 64], [88, 172], [196, 244], [268, 338], [362, 412], [436, 505]);
+      expect(rest(statistics, 4, 147)).toBe(196 - 24);
+    });
+
+    it('brings an item hidden to the start in with the one before it, whole', () => {
+      const scrolled = trust.map(({ left, right }) => ({ left: left - 400, right: right - 400 }));
+      expect(rest(scrolled, 3, 0, true)).toBe(148 - 400 - 24);
+    });
+
+    it('moves a row the browser left on a fragment to rest on whole items', () => {
+      // Clicking the last tab lets the browser scroll it in to the row's end,
+      // leaving 35px of "Stellar Selection": the row moves on to the next
+      // tab, whole at the rest inset, with room after the row.
+      const tabs = at([-123, 35], [59, 183], [207, 358]);
+      expect(rest(tabs, 2, 0, true)).toBe(59 - 24);
+    });
+
+    it('leaves a row whose start cuts an item that stays mostly in view', () => {
+      const tabs = at([-7, 103], [127, 241], [265, 358]);
+      expect(rest(tabs, 2, 0, true)).toBeNull();
+    });
+
+    it('draws no end fade to clear at the row end', () => {
+      const scrolled = trust.map(({ left, right }) => ({ left: left - 353, right: right - 353 }));
+      expect(rest(scrolled, 6, 0, true)).toBeNull();
     });
   });
 });
