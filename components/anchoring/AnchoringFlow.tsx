@@ -41,7 +41,11 @@ interface FlowNodeProps {
  * A lane from `sm`: figures and steps in one row of columns, with three
  * shared rows (label, value, caption) that each figure joins as a subgrid.
  * Every value then sits on the same line however many lines a label takes
- * in a long locale, and the steps align to the values. It stacks on phones.
+ * in a long locale, and the steps align to the values. Each figure is
+ * centred in its column, so an operator sits balanced between its operands
+ * whatever their lengths ("1.9376 ETH ÷ 33 = 0.0587 ETH" reads as one
+ * equation, not three left-aligned values with uneven gaps). It stacks,
+ * start-aligned, on phones.
  */
 const LANE_CLASS = cn(
   'mt-4 flex flex-col gap-3',
@@ -49,10 +53,17 @@ const LANE_CLASS = cn(
   'sm:grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)_auto_minmax(0,1fr)]',
 );
 
+/**
+ * A lane title's colour dot, centred on the title's first line (half its
+ * line height, less half the dot), so a title that wraps keeps the dot
+ * beside its first line instead of floating between the two.
+ */
+const TITLE_DOT_CLASS = 'mt-[calc(0.5lh-3px)] size-1.5 shrink-0 rounded-full';
+
 /** One figure of a lane: its label, the live value and an optional caption. */
 function FlowNode({ label, definition, value, caption, loading = false }: FlowNodeProps) {
   return (
-    <li className="min-w-0 sm:row-span-3 sm:grid sm:grid-rows-subgrid">
+    <li className="min-w-0 sm:row-span-3 sm:grid sm:grid-rows-subgrid sm:text-center">
       <p className="type-label text-subtle hyphens-auto sm:self-end">
         {definition ? (
           <ExplainedTerm definition={definition} announce="moreInformation">
@@ -63,7 +74,7 @@ function FlowNode({ label, definition, value, caption, loading = false }: FlowNo
         )}
       </p>
       <div className="mt-1.5 type-figure-md text-foreground sm:mt-0">
-        {loading ? <Skeleton className="h-6 w-24" /> : value}
+        {loading ? <Skeleton className="h-6 w-24 sm:mx-auto" /> : value}
       </div>
       {caption && !loading ? (
         <p className="mt-1 type-caption text-subtle sm:row-start-3 sm:mt-0">{caption}</p>
@@ -75,21 +86,23 @@ function FlowNode({ label, definition, value, caption, loading = false }: FlowNo
 /**
  * The step between two figures, centred on the value row from `sm`: the
  * operator ("÷", "=") where the lane is arithmetic, an arrow where it is a
- * sequence. On phones, where the lane stacks, a down arrow leads, followed
- * by the operator. The step is read out through `spoken`; the glyphs are
- * decoration.
+ * sequence (down on phones, where the lane stacks; across from `sm`). One
+ * glyph a step, never an arrow beside an operator. The step is read out
+ * through `spoken`; the glyphs are decoration.
  */
 function FlowStep({ symbol, spoken }: { symbol?: string; spoken: string }) {
   return (
-    <li className="flex shrink-0 items-center gap-2 ps-1 text-subtle sm:row-start-2 sm:w-8 sm:justify-center sm:self-center sm:ps-0 lg:w-10">
+    <li className="flex shrink-0 items-center ps-1 text-subtle sm:row-start-2 sm:w-8 sm:justify-center sm:self-center sm:ps-0 lg:w-10">
       <span className="sr-only">{spoken}</span>
-      <ArrowDown aria-hidden className="size-4 sm:hidden" />
       {symbol ? (
-        <span aria-hidden className="type-label font-medium text-muted-foreground sm:type-title">
+        <span aria-hidden className="type-title font-medium text-muted-foreground">
           {symbol}
         </span>
       ) : (
-        <ArrowRight aria-hidden className="size-4 max-sm:hidden" />
+        <>
+          <ArrowDown aria-hidden className="size-4 sm:hidden" />
+          <ArrowRight aria-hidden className="size-4 max-sm:hidden" />
+        </>
       )}
     </li>
   );
@@ -127,8 +140,8 @@ export function AnchoringFlow({
       </figcaption>
 
       <div className="p-5 sm:p-6">
-        <h3 className="flex items-center gap-2 type-title text-foreground">
-          <span aria-hidden className="size-1.5 rounded-full bg-track-anchoring" />
+        <h3 className="flex items-start gap-2 type-title text-foreground">
+          <span aria-hidden className={cn(TITLE_DOT_CLASS, 'bg-track-anchoring')} />
           {t('flow.cosmicSignature.title')}
         </h3>
         <ol className={LANE_CLASS}>
@@ -172,8 +185,8 @@ export function AnchoringFlow({
       </div>
 
       <div className="border-t border-rule-faint p-5 sm:p-6">
-        <h3 className="flex items-center gap-2 type-title text-foreground">
-          <span aria-hidden className="size-1.5 rounded-full bg-track-stellar-nft" />
+        <h3 className="flex items-start gap-2 type-title text-foreground">
+          <span aria-hidden className={cn(TITLE_DOT_CLASS, 'bg-track-stellar-nft')} />
           {t('flow.randomWalk.title')}
         </h3>
         <ol className={LANE_CLASS}>
