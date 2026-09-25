@@ -50,6 +50,29 @@ const makeAxios400 = (): AxiosError => {
   return err;
 };
 
+/** The API's answer for a record it does not hold. */
+const makeAxios400RecordNotFound = (): AxiosError =>
+  new AxiosError('Bad Request', 'ERR_BAD_REQUEST', undefined, undefined, {
+    status: 400,
+    statusText: 'Bad Request',
+    headers: {},
+    config: {} as never,
+    data: { error: 'record not found', status: 0 },
+  });
+
+/** Another of the API's 400s: a parameter it could not parse. */
+const makeAxios400ParseError = (): AxiosError =>
+  new AxiosError('Bad Request', 'ERR_BAD_REQUEST', undefined, undefined, {
+    status: 400,
+    statusText: 'Bad Request',
+    headers: {},
+    config: {} as never,
+    data: {
+      error: 'Can\'t parse integer parameter: strconv.ParseInt: parsing "abc": invalid syntax',
+      status: 0,
+    },
+  });
+
 const makeAxios403 = (): AxiosError => {
   const err = new AxiosError('Forbidden', 'ERR_BAD_REQUEST', undefined, undefined, {
     status: 403,
@@ -248,7 +271,9 @@ describe('apiCallRequired', () => {
   });
 
   it.each([
-    ['400', makeAxios400, 400, true],
+    ['a 400 "record not found"', makeAxios400RecordNotFound, 400, true],
+    ['a 400 that says something else', makeAxios400ParseError, 400, false],
+    ['a 400 with no body', makeAxios400, 400, false],
     ['404', makeAxios404, 404, true],
     ['500', makeAxios500, 500, false],
     ['a network failure', makeAxiosNoResponse, undefined, false],

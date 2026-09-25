@@ -173,8 +173,9 @@ export function useRoundList() {
 const READ_RETRIES = 2;
 
 /**
- * A finalized cycle's record. The API answers 400 for a cycle it holds no
- * record of (the live cycle, one that has not started, one not indexed yet):
+ * A finalized cycle's record. The API answers 400 `record not found` for a
+ * cycle it holds no record of (the live cycle, one that has not started, one
+ * not indexed yet):
  * that answer is final, so it is not retried, and pages read it with
  * `isRecordNotFound(error)` to show "no record" instead of an error.
  */

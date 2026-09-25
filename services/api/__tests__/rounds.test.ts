@@ -45,6 +45,13 @@ const make400 = () =>
     isAxiosError: true,
   });
 
+/** The API's answer for a record it does not hold. */
+const make400RecordNotFound = () =>
+  Object.assign(new Error('Bad Request'), {
+    response: { status: 400, data: { error: 'record not found', status: 0 } },
+    isAxiosError: true,
+  });
+
 const make403 = () =>
   Object.assign(new Error('Forbidden'), {
     response: { status: 403 },
@@ -344,12 +351,18 @@ describe('rounds API', () => {
       );
     });
 
-    it('propagates a 400 instead of resolving to null, as a missing record', async () => {
-      mockedAxios.get.mockRejectedValue(make400());
+    it('propagates a 400 "record not found" instead of resolving to null, as a missing record', async () => {
+      mockedAxios.get.mockRejectedValue(make400RecordNotFound());
       const rejection = await get_round_info(1).catch((error: unknown) => error);
       expect((rejection as Error).message).toBe('Network response was not OK');
       // The live cycle answers 400 "record not found": pages show "no record", not an error.
       expect(isRecordNotFound(rejection)).toBe(true);
+    });
+
+    it('reads any other 400 as a failed read, not a missing record', async () => {
+      mockedAxios.get.mockRejectedValue(make400());
+      const rejection = await get_round_info(1).catch((error: unknown) => error);
+      expect(isRecordNotFound(rejection)).toBe(false);
     });
 
     it('throws on network error', async () => {

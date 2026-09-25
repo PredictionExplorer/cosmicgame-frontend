@@ -52,7 +52,10 @@ describe('readFinalizedCycleSeeds', () => {
   });
 
   it.each([
-    ['answers 400 for a cycle it holds no record of', new ApiReadError('record not found', 400)],
+    [
+      'answers 400 for a cycle it holds no record of',
+      new ApiReadError('Network response was not OK', 400, { error: 'record not found' }),
+    ],
     ['answers with an empty record', null],
   ])(
     'seeds no record, with the cycle list that says why, when the API %s',

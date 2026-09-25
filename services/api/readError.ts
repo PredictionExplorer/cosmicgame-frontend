@@ -6,16 +6,36 @@
  */
 
 /**
+ * Whether an API answer's body says it holds no such record: the Cosmic API
+ * answers `400 {"error":"record not found"}` for one. Its other errors share
+ * the 400 (`Can't parse integer parameter`, a database failure), so the
+ * status alone cannot say a record is missing.
+ */
+export function saysRecordNotFound(body: unknown): boolean {
+  const message = (body as { error?: unknown } | null | undefined)?.error;
+  return typeof message === 'string' && /\brecord not found\b/i.test(message);
+}
+
+/** Whether an answer means "no such record": a 404, or a 400 that says so. */
+function answersRecordNotFound(status: unknown, body: unknown): boolean {
+  return status === 404 || (status === 400 && saysRecordNotFound(body));
+}
+
+/**
  * A failed read. The message stays generic (the transport detail is already on
- * the Sentry report); `status` is the HTTP status when the server answered, so
- * a page can tell "this record does not exist" from "the read failed".
+ * the Sentry report); `status` is the HTTP status when the server answered,
+ * and `recordNotFound` whether the answer said it holds no such record, so a
+ * page can tell "this record does not exist" from "the read failed".
  */
 export class ApiReadError extends Error {
   readonly status: number | undefined;
+  readonly recordNotFound: boolean;
 
-  constructor(message: string, status?: number) {
+  /** `body` is the answer's body, when the server sent one. */
+  constructor(message: string, status?: number, body?: unknown) {
     super(message);
     this.status = status;
+    this.recordNotFound = answersRecordNotFound(status, body);
   }
 }
 
@@ -32,14 +52,17 @@ export function apiErrorStatus(error: unknown): number | undefined {
 }
 
 /**
- * True when the server answered that it has no such record. The Cosmic API
- * answers `400 {"error":"record not found"}` for a record it does not hold
- * (`rounds/info/{n}` for the live cycle, a cycle that has not started, or one
- * finalized moments ago and not indexed yet), and some routes answer 404.
- * Retrying cannot change the answer, and a page shows "no record" rather than
- * an error with a retry.
+ * True when the server answered that it has no such record: a 404, or the
+ * Cosmic API's `400 {"error":"record not found"}` (`rounds/info/{n}` for the
+ * live cycle, a cycle that has not started, or one finalized moments ago and
+ * not indexed yet). Retrying cannot change the answer, and a page shows "no
+ * record" rather than an error with a retry. A 400 that says anything else is
+ * a failed read.
  */
 export function isRecordNotFound(error: unknown): boolean {
-  const status = apiErrorStatus(error);
-  return status === 400 || status === 404;
+  if (error instanceof ApiReadError) return error.recordNotFound;
+  // An axios error that did not pass through a read policy.
+  const response = (error as { response?: { status?: unknown; data?: unknown } } | null | undefined)
+    ?.response;
+  return answersRecordNotFound(response?.status, response?.data);
 }

@@ -56,7 +56,9 @@ describe('readCycleRecord', () => {
   });
 
   it('keeps a cycle with no record yet a minute, seeded as absent beside the list', async () => {
-    mockRoundInfo.mockRejectedValue(new ApiReadError('record not found', 400));
+    mockRoundInfo.mockRejectedValue(
+      new ApiReadError('Network response was not OK', 400, { error: 'record not found' }),
+    );
     const read = await readCycleRecord(3);
     expect(read.cacheWindow).toBe('pending');
     expect(read.seeds).toEqual([

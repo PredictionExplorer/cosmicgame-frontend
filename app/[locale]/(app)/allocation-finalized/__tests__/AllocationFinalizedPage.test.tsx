@@ -91,13 +91,16 @@ function roundInfo(data: unknown, isLoading = false) {
   mockUseRoundInfo.mockReturnValue({ data, isLoading, refetch: mockRefetch });
 }
 
-/** A failed read: `status` 400 is the API's "record not found" for a cycle it does not hold. */
+/**
+ * A failed read whose body is the API's "record not found": with `status`
+ * 400 it is the answer for a cycle the API does not hold.
+ */
 function roundInfoFails(status?: number) {
   mockUseRoundInfo.mockReturnValue({
     data: undefined,
     isLoading: false,
     isError: true,
-    error: new ApiReadError('Network response was not OK', status),
+    error: new ApiReadError('Network response was not OK', status, { error: 'record not found' }),
     refetch: mockRefetch,
   });
 }

@@ -1,19 +1,19 @@
 import { cache } from 'react';
 
 import { SERVER_READ_TIMEOUT_MS, getAPIUrl } from '@/services/api/client';
+import { saysRecordNotFound } from '@/services/api/readError';
 import type { CSTTokenInfo } from '@/services/api/types';
 
 import { seedsDisabled } from '../../QuerySeed';
 
 /**
  * Whether a 400 is the API saying it holds no such record
- * (`{"error":"record not found"}`). Its other errors share the status, and
- * one of those must not turn an existing token into a 404.
+ * (`saysRecordNotFound`). Its other errors share the status, and one of
+ * those must not turn an existing token into a missing one.
  */
-async function saysRecordNotFound(response: Response): Promise<boolean> {
+async function answersRecordNotFound(response: Response): Promise<boolean> {
   try {
-    const body = (await response.json()) as { error?: unknown } | null;
-    return typeof body?.error === 'string' && /\brecord not found\b/i.test(body.error);
+    return saysRecordNotFound(await response.json());
   } catch {
     return false;
   }
@@ -42,7 +42,8 @@ export const loadTokenInfo = cache(
         signal: AbortSignal.timeout(SERVER_READ_TIMEOUT_MS),
       });
       if (response.status === 404) return null;
-      if (response.status === 400) return (await saysRecordNotFound(response)) ? null : undefined;
+      if (response.status === 400)
+        return (await answersRecordNotFound(response)) ? null : undefined;
       if (!response.ok) return undefined;
       const data = (await response.json()) as { TokenInfo?: CSTTokenInfo | null };
       return data.TokenInfo ?? null;

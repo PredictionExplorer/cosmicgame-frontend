@@ -117,6 +117,9 @@ jest.mock('../../services/api', () => ({
 
 const mockUseQuery = useQuery as jest.Mock;
 
+/** The API's answer body for a record it does not hold. */
+const NOT_HELD = { error: 'record not found', status: 0 };
+
 beforeEach(() => {
   jest.clearAllMocks();
 });
@@ -271,14 +274,16 @@ describe('useApiQuery hooks', () => {
       expect(mockUseQuery.mock.calls[0][0].enabled).toBe(true);
     });
 
-    it('never retries the answer for a cycle with no record (HTTP 400), and retries failures twice', () => {
+    it('never retries the answer for a cycle with no record (HTTP 400 "record not found"), and retries failures twice', () => {
       renderHook(() => useRoundInfo(2));
       const retry = mockUseQuery.mock.calls[0][0].retry as (
         count: number,
         error: unknown,
       ) => boolean;
 
-      expect(retry(0, new ApiReadError('Network response was not OK', 400))).toBe(false);
+      expect(retry(0, new ApiReadError('Network response was not OK', 400, NOT_HELD))).toBe(false);
+      // Another 400 (a parameter the API could not parse) is a failed read.
+      expect(retry(0, new ApiReadError('Network response was not OK', 400))).toBe(true);
       expect(retry(0, new ApiReadError('Network response was not OK', 502))).toBe(true);
       expect(retry(0, new Error('Network Error'))).toBe(true);
       expect(retry(1, new ApiReadError('Network response was not OK', 502))).toBe(true);
@@ -383,12 +388,13 @@ describe('useApiQuery hooks', () => {
       expect(getOptions().enabled).toBe(true);
     });
 
-    it('never retries the answer for a record the API does not hold (HTTP 400), and retries failures twice (D321)', () => {
+    it('never retries the answer for a record the API does not hold (HTTP 400 "record not found"), and retries failures twice (D321)', () => {
       renderHook(() => useGestureInfo(40000));
       const retry = getOptions().retry as (count: number, error: unknown) => boolean;
 
-      expect(retry(0, new ApiReadError('Network response was not OK', 400))).toBe(false);
+      expect(retry(0, new ApiReadError('Network response was not OK', 400, NOT_HELD))).toBe(false);
       expect(retry(0, new ApiReadError('Network response was not OK', 404))).toBe(false);
+      expect(retry(0, new ApiReadError('Network response was not OK', 400))).toBe(true);
       expect(retry(0, new ApiReadError('Network response was not OK', 502))).toBe(true);
       expect(retry(0, new Error('Network Error'))).toBe(true);
       expect(retry(1, new ApiReadError('Network response was not OK', 502))).toBe(true);

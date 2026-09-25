@@ -91,7 +91,9 @@ describe('gesture/[id] metadata (D080)', () => {
   });
 
   it('names the record by its id when the API holds no such record (HTTP 400)', async () => {
-    mockGestureRead.mockRejectedValue(new ApiReadError('Network response was not OK', 400));
+    mockGestureRead.mockRejectedValue(
+      new ApiReadError('Network response was not OK', 400, { error: 'record not found' }),
+    );
     const metadata = await generateMetadata(props('40000'));
     expect(documentTitleOf(metadata)).toBe('Gesture record 40000 · Cosmic Signature');
   });
@@ -159,7 +161,9 @@ describe('gesture/[id] seed', () => {
   beforeEach(() => mockGestureRead.mockReset());
 
   it('seeds a record the API does not hold as absent, so the HTML says so', async () => {
-    mockGestureRead.mockRejectedValue(new ApiReadError('Network response was not OK', 400));
+    mockGestureRead.mockRejectedValue(
+      new ApiReadError('Network response was not OK', 400, { error: 'record not found' }),
+    );
     const seeds = renderedSeeds(await Page(props('40000')));
     expect(seeds?.[0]).toMatchObject({ data: null, absent: true });
   });
@@ -199,7 +203,10 @@ describe('gesture/[id] cache window', () => {
   });
 
   it.each([
-    ['a record the API does not hold yet', new ApiReadError('Network response was not OK', 400)],
+    [
+      'a record the API does not hold yet',
+      new ApiReadError('Network response was not OK', 400, { error: 'record not found' }),
+    ],
     ['a read that failed', new Error('offline')],
   ])('keeps %s a minute', async (_case, error) => {
     mockGestureRead.mockRejectedValue(error);

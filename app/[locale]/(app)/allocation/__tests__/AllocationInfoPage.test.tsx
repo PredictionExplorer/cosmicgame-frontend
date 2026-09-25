@@ -176,7 +176,7 @@ describe('AllocationInfoPage', () => {
         data: undefined,
         isLoading: false,
         isError: true,
-        error: new ApiReadError('Network response was not OK', 400),
+        error: new ApiReadError('Network response was not OK', 400, { error: 'record not found' }),
         refetch,
       });
       return refetch;

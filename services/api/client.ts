@@ -40,9 +40,9 @@
  *                       routes where an empty result is a truthful answer.
  *
  * A read that rejects does so with an `ApiReadError` (./readError) carrying the
- * HTTP status, so a page can tell a record the server does not hold
- * (`isRecordNotFound`: `rounds/info/{n}` answers 400 for the live cycle) from a
- * read that failed.
+ * HTTP status and the answer's body, so a page can tell a record the server
+ * does not hold (`isRecordNotFound`: `rounds/info/{n}` answers 400 "record
+ * not found" for the live cycle) from a read that failed.
  */
 import axios, {
   isAxiosError,
@@ -535,6 +535,7 @@ function toReadError(err: unknown): Error {
   return new ApiReadError(
     'Network response was not OK',
     isAxiosError(err) ? err.response?.status : undefined,
+    isAxiosError(err) ? err.response?.data : undefined,
   );
 }
 
