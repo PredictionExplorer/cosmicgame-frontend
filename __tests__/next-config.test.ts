@@ -126,8 +126,17 @@ describe('next.config', () => {
   describe('security headers', () => {
     let headers: Awaited<ReturnType<NonNullable<NextConfig['headers']>>>;
 
+    const DSN = 'https://abc123@o42.ingest.sentry.io/4507';
+    const savedDsn = process.env.NEXT_PUBLIC_SENTRY_DSN;
+
     beforeAll(async () => {
+      process.env.NEXT_PUBLIC_SENTRY_DSN = DSN;
       headers = await (config as NextConfig).headers!();
+    });
+
+    afterAll(() => {
+      if (savedDsn === undefined) delete process.env.NEXT_PUBLIC_SENTRY_DSN;
+      else process.env.NEXT_PUBLIC_SENTRY_DSN = savedDsn;
     });
 
     it('applies headers to all routes', () => {
@@ -154,6 +163,18 @@ describe('next.config', () => {
       expect(reportOnly).toMatch(/^default-src 'self'; script-src 'self' 'unsafe-inline' /);
       // jest.setup.ts points the API at a plain-http origin, which is named.
       expect(reportOnly).toContain("connect-src 'self' https: wss: http://test-api.example");
+      expect(reportOnly).toContain(
+        'report-uri https://o42.ingest.sentry.io/api/4507/security/?sentry_key=abc123',
+      );
+    });
+
+    it('sends no report-only policy when there is nowhere to report', async () => {
+      delete process.env.NEXT_PUBLIC_SENTRY_DSN;
+      const withoutDsn = await (config as NextConfig).headers!();
+      process.env.NEXT_PUBLIC_SENTRY_DSN = DSN;
+      const keys = withoutDsn[0]?.headers.map((header) => header.key);
+      expect(keys).toContain('Content-Security-Policy');
+      expect(keys).not.toContain('Content-Security-Policy-Report-Only');
     });
   });
 
