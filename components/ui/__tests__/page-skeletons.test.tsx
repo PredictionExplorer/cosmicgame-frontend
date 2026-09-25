@@ -45,9 +45,10 @@ describe('record page skeletons', () => {
 
 describe('dynamic record routes', () => {
   const APP = join(__dirname, '..', '..', '..', 'app', '[locale]', '(app)');
+  // Not user/[address]: it is cached (on-demand ISR), its page shell is its own loading state,
+  // and a translated loading boundary would read the request headers (isrLoadingBoundaries).
   it.each([
     'detail/[id]',
-    'user/[address]',
     'gesture/[id]',
     'allocation/[id]',
     'eth-contribution/detail/[id]',
