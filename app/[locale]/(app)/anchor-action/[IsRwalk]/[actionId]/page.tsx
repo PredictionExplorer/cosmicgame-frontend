@@ -2,6 +2,7 @@ import type { Metadata, ResolvingMetadata } from 'next';
 import { notFound } from 'next/navigation';
 import { getTranslations, setRequestLocale } from 'next-intl/server';
 
+import { parseAnchorActionParams } from '@/utils/routeParams';
 import { capCacheWindow } from '@/lib/cacheWindow';
 import { createPageMetadata } from '@/utils/seo';
 import { PageMessages } from '@/components/i18n/PageMessages';
@@ -10,7 +11,6 @@ import { QuerySeed } from '../../../QuerySeed';
 
 import AnchorActionDetailPage from './AnchorActionDetailPage';
 import { readAnchorActionSeeds } from './anchorActionReads';
-import { parseAnchorActionParams } from './params';
 
 interface PageProps {
   params: Promise<{ locale: string; IsRwalk: string; actionId: string }>;

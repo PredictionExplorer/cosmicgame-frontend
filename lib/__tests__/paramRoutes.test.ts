@@ -3,6 +3,9 @@ import { generateStaticParams as quizParams } from '@/app/[locale]/(landing)/qui
 
 import { isRejectedParamPath } from '@/lib/paramRoutes';
 
+// The real address checks (the shared viem mock is lenient).
+jest.mock('viem', () => jest.requireActual('viem'));
+
 describe('isRejectedParamPath', () => {
   it.each([
     '/detail/abc',
@@ -19,6 +22,17 @@ describe('isRejectedParamPath', () => {
     '/allocation/1e3',
     '/embed/endurance/abc',
     '/embed/endurance/-2',
+    '/anchor-action/2/5',
+    '/anchor-action/0/05',
+    '/anchor-action/yes/5',
+    '/distributions-by-token/0x12/45',
+    '/distributions-by-token/0x7406B34d25A9B7841CAC133E3173919e0af6Bc6c/045',
+    '/distributions-by-token/0x7406B34d25A9B7841CAC133E3173919e0af6Bc6c%3Fx%3D1/45',
+    '/system-event/2/350/200',
+    '/system-event/2/0200/350',
+    '/system-event/-1/200/350',
+    '/system-event/2/-2/350',
+    '/system-event/abc/200/350',
     '/learn/no-such-guide',
     '/quiz/expert',
     '/quiz/',
@@ -36,9 +50,18 @@ describe('isRejectedParamPath', () => {
     '/allocation/0',
     '/allocation/12',
     '/embed/endurance/3',
+    '/anchor-action/0/23',
+    '/anchor-action/1/0',
+    '/distributions-by-token/0x7406B34d25A9B7841CAC133E3173919e0af6Bc6c/45',
+    '/distributions-by-token/0x7406b34d25a9b7841cac133e3173919e0af6bc6c/0',
+    '/system-event/2/200/350',
+    // The first setup's window starts at the list's "from the beginning".
+    '/system-event/0/-1/99',
     '/quiz/basic',
     // Pages under an id and neighbouring routes are their routes' business.
     '/detail/abc/opengraph-image',
+    '/anchor-action/0',
+    '/system-event/2/200',
     '/allocation-finalized',
     '/allocation',
     '/learn',
@@ -57,6 +80,21 @@ describe('isRejectedParamPath', () => {
     }
     for (const { tier } of quizParams()) {
       expect(isRejectedParamPath(`/quiz/${tier}`)).toBe(false);
+    }
+  });
+
+  // The proxy turns away exactly the segments the routes turn away: a record route's own
+  // parser decides, and the proxy's check never refuses a page the route would serve.
+  it('agrees with the token distributions route on every address and token id', () => {
+    const { parseTokenDistributionParams } = jest.requireActual<
+      typeof import('@/app/[locale]/(app)/distributions-by-token/[address]/[tokenId]/params')
+    >('@/app/[locale]/(app)/distributions-by-token/[address]/[tokenId]/params');
+    const holder = '0x7406B34d25A9B7841CAC133E3173919e0af6Bc6c';
+    for (const address of [holder, holder.toLowerCase(), holder.toUpperCase(), '0x12', 'abc']) {
+      for (const tokenId of ['45', '0', '045', '4.5', '-1']) {
+        const served = parseTokenDistributionParams(address, tokenId) !== null;
+        expect(isRejectedParamPath(`/distributions-by-token/${address}/${tokenId}`)).toBe(!served);
+      }
     }
   });
 });

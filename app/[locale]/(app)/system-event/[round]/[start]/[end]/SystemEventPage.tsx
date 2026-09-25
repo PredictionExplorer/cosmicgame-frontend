@@ -22,7 +22,10 @@ import {
   type SystemEventWindow,
 } from './systemEventWindow';
 
-type SystemEventPageProps = SystemEventWindow;
+interface SystemEventPageProps extends SystemEventWindow {
+  /** The mode change list holds no window for the cycle: the page says the window does not exist. */
+  missing?: boolean;
+}
 
 const NO_EVENTS: AdminEventRow[] = [];
 
@@ -47,10 +50,10 @@ function changeSpan(rows: readonly AdminEventRow[]): { first: number; latest: nu
  * a failed read).
  */
 const SystemEventPage = (props: SystemEventPageProps) => {
-  const { round, start, end } = props;
+  const { round, start, end, missing = false } = props;
   const t = useTranslations('coordination');
   const locale = useLocale();
-  const valid = isValidWindow(props);
+  const valid = !missing && isValidWindow(props);
   const range = valid ? windowRange(props) : { start: -1, end: -1 };
   const { data, isLoading, error, refetch } = useSystemEvents(range.start, range.end);
   // Every change before the window: what each parameter was before it changed here.

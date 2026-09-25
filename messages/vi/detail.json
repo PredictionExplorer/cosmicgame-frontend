@@ -1,7 +1,6 @@
 {
   "notFound": {
     "title": "Signature này chưa được khắc",
-    "titleInvalid": "Liên kết này không dẫn tới Signature nào",
     "description": "Các Signature được đánh số theo thứ tự khắc.",
     "newest": "Signature mới nhất là #{id}.",
     "newestLink": "Xem Signature mới nhất"

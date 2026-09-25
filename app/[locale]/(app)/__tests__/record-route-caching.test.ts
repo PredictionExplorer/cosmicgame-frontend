@@ -29,14 +29,6 @@ const RECORD_ROUTES = [
   'user/stellar-selection-nft/[address]',
 ];
 
-/**
- * Record routes still rendered on every request: each answers a record that
- * does not exist with its segment's `notFound()`, whose boundary reads the
- * request locale, which a cached render cannot.
- */
-const RENDERED_PER_REQUEST = ['detail/[id]', 'eth-contribution/detail/[id]'];
-const CACHED_RECORD_ROUTES = RECORD_ROUTES.filter((route) => !RENDERED_PER_REQUEST.includes(route));
-
 /** Every page.tsx under `dir`. */
 function pages(dir: string): string[] {
   return readdirSync(dir).flatMap((entry) => {
@@ -126,7 +118,7 @@ describe('record routes', () => {
     expect(parameterPages.sort()).toEqual([...RECORD_ROUTES].sort());
   });
 
-  it.each(CACHED_RECORD_ROUTES)('%s is rendered on demand for the cache', (route) => {
+  it.each(RECORD_ROUTES)('%s is rendered on demand for the cache', (route) => {
     const source = readFileSync(path.join(APP_GROUP, route, 'page.tsx'), 'utf8');
     expect(isOnDemandIsr(source)).toBe(true);
   });
@@ -147,9 +139,9 @@ describe('on-demand ISR routes', () => {
   // follows the boundary's imports.
   const routes = pages(APP_DIR).filter((page) => isOnDemandIsr(readFileSync(page, 'utf8')));
 
-  it('finds the cached record routes among them', () => {
+  it('finds the record routes among them', () => {
     expect(routes.map((page) => path.relative(APP_GROUP, path.dirname(page)))).toEqual(
-      expect.arrayContaining(CACHED_RECORD_ROUTES),
+      expect.arrayContaining(RECORD_ROUTES),
     );
   });
 

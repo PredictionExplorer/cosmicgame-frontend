@@ -47,14 +47,18 @@ describe('token page metadata', () => {
     expect(String(metadata.alternates?.canonical)).toMatch(/\/detail\/7$/);
   });
 
-  // The API answers 400 "record not found" for a token it does not hold.
-  it('answers a token that does not exist with not found', async () => {
+  // The API answers 400 "record not found" for a token it does not hold: the
+  // page renders the Signature's not-found state, headed like every 404.
+  it('titles a token that does not exist as a missing page, kept out of the index', async () => {
     global.fetch = jest.fn(async () => ({
       status: 400,
       ok: false,
       json: async () => ({ error: 'record not found' }),
     })) as unknown as typeof fetch;
-    await expect(generateMetadata(props('999999999'))).rejects.toThrow();
+    const metadata = await generateMetadata(props('999999999'));
+    expect(documentTitleOf(metadata)).toBe('errors.notFound.title · Cosmic Signature');
+    expect(metadata.robots).toEqual({ index: false, follow: true });
+    expect(metadata.alternates?.canonical).toBeUndefined();
   });
 
   // The co-located opengraph-image.tsx is the share image; the page never

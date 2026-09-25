@@ -226,6 +226,22 @@ describe('SystemEventPage', () => {
     expect(screen.queryByTestId('events-table')).not.toBeInTheDocument();
   });
 
+  // The mode change list holds no window for the cycle: the server renders the page in the
+  // state that says so, where a segment's notFound() would reach the browser blank.
+  it('says a window the mode list does not hold does not exist, reading nothing', () => {
+    mockEvents({ data: rows });
+    render(<SystemEventPage round={99} start={100} end={200} missing />);
+    expect(mockUseSystemEvents).toHaveBeenCalledWith(-1, -1);
+    expect(
+      screen.getByRole('heading', { level: 1, name: 'This configuration window does not exist' }),
+    ).toBeInTheDocument();
+    expect(screen.getByRole('link', { name: 'All coordination changes' })).toHaveAttribute(
+      'href',
+      '/coordination-changes',
+    );
+    expect(screen.queryByTestId('events-table')).not.toBeInTheDocument();
+  });
+
   it('has no accessibility violations', async () => {
     mockEvents({ data: rows });
     const { container } = render(<SystemEventPage round={1} start={100} end={200} />);

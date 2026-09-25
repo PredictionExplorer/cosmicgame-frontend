@@ -1,7 +1,6 @@
 {
   "notFound": {
     "title": "这枚签名尚未铭刻",
-    "titleInvalid": "这个链接没有对应的签名",
     "description": "签名按铭刻的先后顺序编号。",
     "newest": "最新的一枚是 #{id}。",
     "newestLink": "查看最新的签名"

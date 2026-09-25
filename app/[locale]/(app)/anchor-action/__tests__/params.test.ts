@@ -1,4 +1,4 @@
-import { parseAnchorActionParams } from '../[IsRwalk]/[actionId]/params';
+import { parseAnchorActionParams } from '@/utils/routeParams';
 
 describe('parseAnchorActionParams', () => {
   it('reads the collection flag and a canonical action id', () => {

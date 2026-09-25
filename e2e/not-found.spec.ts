@@ -6,8 +6,9 @@ import { expect, test } from '@playwright/test';
  * complete without script. It once arrived as an empty error shell with no
  * stylesheet, a white page until the app bundle hydrated, and nothing at all
  * for readers without script, crawlers and link unfurlers. An id page with
- * an id it turns away (/detail/abc) gets the same 404 from proxy.ts, since
- * the page's own notFound() would arrive as that empty shell.
+ * an id it turns away (/detail/abc, /anchor-action/2/5) gets the same 404
+ * from proxy.ts, since the page's own notFound() would arrive as that empty
+ * shell.
  */
 const LANDING_HEADERS = { 'X-Forwarded-Host': 'cosmicsignature.com' };
 
@@ -19,6 +20,7 @@ for (const { host, path, lang, headers } of [
   { host: 'app', path: '/zh/detail/abc', lang: 'zh', headers: {} },
   { host: 'app', path: '/allocation/01', lang: 'en', headers: {} },
   { host: 'app', path: '/gesture/12abc', lang: 'en', headers: {} },
+  { host: 'app', path: '/uk/anchor-action/2/5', lang: 'uk', headers: {} },
   {
     host: 'landing',
     path: '/quality-assurance-route-not-found',

@@ -1,7 +1,6 @@
 {
   "notFound": {
     "title": "這枚簽名尚未銘刻",
-    "titleInvalid": "這個連結沒有對應的簽名",
     "description": "簽名按銘刻的先後次序編號。",
     "newest": "最新的一枚是 #{id}。",
     "newestLink": "查看最新的簽名"

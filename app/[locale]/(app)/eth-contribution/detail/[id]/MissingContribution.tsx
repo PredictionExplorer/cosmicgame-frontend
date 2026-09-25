@@ -1,26 +1,23 @@
 'use client';
 
 import { ArrowRight, SearchX } from 'lucide-react';
-import { useParams } from 'next/navigation';
 import { useTranslations } from 'next-intl';
 
 import { Link } from '@/i18n/navigation';
 import { EmptyState } from '@/components/ui/empty-state';
 
 /**
- * The not-found state of a contribution record: which number was asked for
- * (from the URL, as a 404 page gets no props), which records have a page,
- * and the way back to the full list.
+ * The not-found state of a contribution record: which number was asked for,
+ * which records have a page, and the way back to the full list.
  */
-export function MissingContribution() {
+export function MissingContribution({ id }: { id: number }) {
   const t = useTranslations('ethContribution.detail');
-  const { id } = useParams<{ id?: string }>();
   return (
     <EmptyState
       variant="page"
       headingLevel={2}
       icon={<SearchX aria-hidden />}
-      title={t('notFoundTitle', { id: id ?? '' })}
+      title={t('notFoundTitle', { id: String(id) })}
       description={t('notFoundDescription')}
       action={
         <Link

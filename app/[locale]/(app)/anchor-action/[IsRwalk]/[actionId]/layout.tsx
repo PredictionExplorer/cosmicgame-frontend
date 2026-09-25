@@ -1,7 +1,7 @@
 import type { ReactNode } from 'react';
 import { notFound } from 'next/navigation';
 
-import { parseAnchorActionParams } from './params';
+import { parseAnchorActionParams } from '@/utils/routeParams';
 
 interface LayoutProps {
   children: ReactNode;

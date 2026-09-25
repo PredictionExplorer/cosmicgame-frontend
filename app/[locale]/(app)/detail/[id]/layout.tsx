@@ -4,27 +4,22 @@ import { notFound } from 'next/navigation';
 import { permanentRedirect } from '@/i18n/navigation';
 import { parseTokenId } from '@/utils/routeParams';
 
-import { loadTokenInfo } from './tokenInfo';
-
 interface TokenLayoutProps {
   children: ReactNode;
   params: Promise<{ locale: string; id: string }>;
 }
 
 /**
- * Decides whether the page exists before its loading boundary streams: a
- * `notFound()` inside that boundary arrives after the 200 status is sent, so
- * a malformed id or a token not imprinted yet would answer 200 with a
- * made-up record. Here each gets a real 404 (the Signature not-found state
- * in `detail/not-found.tsx`), and `/detail/025` moves to `/detail/25`, the
- * one URL a Signature has. The record read is the page's own (cached per
- * request and in the data cache), so the page does not read it again.
+ * Gives a Signature one URL before the page renders: `/detail/025` moves to
+ * `/detail/25`. A malformed id is a 404; proxy.ts answers those first, with
+ * the server-rendered global 404 (lib/paramRoutes.ts mirrors this test). A
+ * number not imprinted yet is the page's own business: it renders the
+ * Signature's not-found state on the server (`SignatureNotFound`).
  */
 export default async function TokenLayout({ children, params }: TokenLayoutProps) {
   const { locale, id } = await params;
   const tokenId = parseTokenId(id);
   if (tokenId === null) notFound();
   if (String(tokenId) !== id) permanentRedirect({ href: `/detail/${tokenId}`, locale });
-  if ((await loadTokenInfo(tokenId)) === null) notFound();
   return children;
 }

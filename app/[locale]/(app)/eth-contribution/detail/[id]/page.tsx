@@ -1,12 +1,13 @@
 import type { Metadata, ResolvingMetadata } from 'next';
-import { notFound } from 'next/navigation';
 import { getTranslations, setRequestLocale } from 'next-intl/server';
 
+import { capCacheWindow } from '@/lib/cacheWindow';
 import { createPageMetadata } from '@/utils/seo';
 import { PageMessages } from '@/components/i18n/PageMessages';
 
 import { QuerySeed } from '../../../QuerySeed';
 
+import { ContributionNotFound } from './ContributionNotFound';
 import EthDonationDetailPage from './EthDonationDetailPage';
 import { contributionSeeds, readContribution } from './contributionRecord';
 
@@ -34,9 +35,17 @@ export async function generateMetadata(
   );
 }
 
-// Dynamic-param pages render on demand; revalidate keeps live protocol data
-// fresh instead of freezing the first render forever (see route-group refactor).
-export const revalidate = 300;
+/**
+ * No record renders at build time: each renders on its first visit and is
+ * then served from the cache. A contribution never changes once indexed, so
+ * its render keeps a day (`CACHE_WINDOW.final`); a record not indexed yet, or
+ * a render whose read failed, keeps a minute.
+ */
+export function generateStaticParams() {
+  return [];
+}
+
+export const revalidate = 86400;
 
 export default async function Page({
   params,
@@ -46,10 +55,15 @@ export default async function Page({
   const { locale, id } = await params;
   setRequestLocale(locale);
   const recordId = Number(id);
-  // The record's server read: a found record is in the HTML, a missing one is a
-  // 404 (the segment's not-found state), and a failed read leaves both to the client.
+  // The record's server read: a found record is in the HTML, and a failed read leaves the
+  // record to the client. A missing record is the record's not-found state, rendered here on
+  // the server and kept a minute, since the record may be indexed a moment from now.
   const read = await readContribution(recordId);
-  if (read.status === 'missing') notFound();
+  if (read.status === 'missing') {
+    await capCacheWindow('pending');
+    return <ContributionNotFound locale={locale} id={recordId} />;
+  }
+  if (read.status === 'unknown') await capCacheWindow('pending');
   return (
     <PageMessages namespaces={['ethContribution', 'tables']}>
       <QuerySeed seeds={contributionSeeds(recordId, read)}>

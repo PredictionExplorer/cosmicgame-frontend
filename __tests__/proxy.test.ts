@@ -58,6 +58,8 @@ describe('proxy: a page asked for a parameter it does not serve', () => {
     ['/zh/detail/abc', 'zh'],
     ['/zh-TW/allocation/01', 'zh-TW'],
     ['/embed/endurance/abc', 'en'],
+    ['/ko/anchor-action/2/5', 'ko'],
+    ['/system-event/2/350/200', 'en'],
   ])('answers %s with the global 404 in %s', (path, locale) => {
     const response = run(path);
     expect(rewriteOf(response)).toBe(`/${locale}/_not-found`);

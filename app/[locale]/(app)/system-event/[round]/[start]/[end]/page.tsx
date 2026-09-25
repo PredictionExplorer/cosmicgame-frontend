@@ -5,18 +5,41 @@ import { capCacheWindow } from '@/lib/cacheWindow';
 import { createPageMetadata } from '@/utils/seo';
 import { PageMessages } from '@/components/i18n/PageMessages';
 
-import { readSystemModes } from '../../../../publicDataReads';
-import { QuerySeed, seedsDisabled } from '../../../../QuerySeed';
+import { QuerySeed } from '../../../../QuerySeed';
 
 import SystemEventPage from './SystemEventPage';
+import { checkSystemEventWindow } from './systemEventLink';
 import { readSystemEventsSeed } from './systemEventsSeed';
+import { isValidWindow } from './systemEventWindow';
+
+/** The window a link names, from its three segments. */
+function linkedWindow({ round, start, end }: { round: string; start: string; end: string }) {
+  return { round: Number(round), start: Number(start), end: Number(end) };
+}
 
 export async function generateMetadata(
   { params }: { params: Promise<{ locale: string; round: string; start: string; end: string }> },
   parent: ResolvingMetadata,
 ): Promise<Metadata> {
   const { locale, round, start, end } = await params;
-  const t = await getTranslations({ locale, namespace: 'meta' });
+  const window = linkedWindow({ round, start, end });
+  const [t, tCoordination, check] = await Promise.all([
+    getTranslations({ locale, namespace: 'meta' }),
+    getTranslations({ locale, namespace: 'coordination' }),
+    checkSystemEventWindow(window.round, window.start, window.end),
+  ]);
+  const path = `/system-event/${round}/${start}/${end}`;
+  // A window that does not exist says so in its tab, as its H1 does.
+  if (check.status === 'missing' || !isValidWindow(window)) {
+    return createPageMetadata(
+      parent,
+      tCoordination('systemEvent.invalidTitle'),
+      tCoordination('systemEvent.invalidDescription'),
+      undefined,
+      path,
+      { index: false, locale },
+    );
+  }
   // The tab names the window by its cycle, as the H1 does.
   const initial = round === '0';
   return createPageMetadata(
@@ -24,7 +47,7 @@ export async function generateMetadata(
     initial ? t('systemEvent.titleInitial') : t('systemEvent.title', { cycle: round }),
     initial ? t('systemEvent.descriptionInitial') : t('systemEvent.description', { cycle: round }),
     undefined,
-    `/system-event/${round}/${start}/${end}`,
+    path,
     { index: false, locale },
   );
 }
@@ -32,8 +55,8 @@ export async function generateMetadata(
 /**
  * No window renders at build time: each renders on its first visit and is
  * then served from the cache. A window closes when its cycle opens, so its
- * changes are final and its render keeps a day (`CACHE_WINDOW.final`); one
- * whose reads failed keeps a minute.
+ * changes are final and its render keeps a day (`CACHE_WINDOW.final`); a
+ * cycle with no window yet, or a render whose reads failed, keeps a minute.
  */
 export function generateStaticParams() {
   return [];
@@ -48,14 +71,21 @@ export default async function Page({
 }) {
   const { locale, round, start, end } = await params;
   setRequestLocale(locale);
-  const window = { round: Number(round), start: Number(start), end: Number(end) };
+  const window = linkedWindow({ round, start, end });
+  const check = await checkSystemEventWindow(window.round, window.start, window.end);
+  // A cycle with no window: the window's not-found state, rendered here on the server (a
+  // segment's notFound() reaches the browser as the bare error shell) and kept a minute.
+  if (check.status === 'missing') {
+    await capCacheWindow('pending');
+    return (
+      <PageMessages namespaces={['coordination', 'statistics', 'tables']}>
+        <SystemEventPage {...window} missing />
+      </PageMessages>
+    );
+  }
   // The window's first read, so its changes are in the HTML (no layout shift).
-  const [seeds, modes] = await Promise.all([
-    readSystemEventsSeed(window),
-    seedsDisabled() ? null : readSystemModes(),
-  ]);
-  // The layout checked the window against the mode list, unless the list could not be read.
-  await capCacheWindow(seeds.length > 0 && modes?.data ? 'final' : 'pending');
+  const seeds = await readSystemEventsSeed(window);
+  await capCacheWindow(seeds.length > 0 && check.status === 'canonical' ? 'final' : 'pending');
   return (
     <PageMessages namespaces={['coordination', 'statistics', 'tables']}>
       <QuerySeed seeds={seeds}>

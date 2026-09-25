@@ -1,6 +1,7 @@
 import { cache } from 'react';
 
 import type { CacheWindow } from '@/lib/cacheWindow';
+import type { AnchorActionParams } from '@/utils/routeParams';
 import {
   get_staking_cst_actions_info,
   get_staking_rwalk_actions_info,
@@ -10,7 +11,6 @@ import { get_cst_info } from '@/services/api/tokens';
 import { seedsDisabled, type QuerySeedEntry } from '../../../QuerySeed';
 
 import { isReleased } from './anchorRelease';
-import type { AnchorActionParams } from './params';
 
 /** The client hook's query key for one action's record, by collection. */
 export function anchorActionQueryKey({ isRwalk, actionId }: AnchorActionParams) {

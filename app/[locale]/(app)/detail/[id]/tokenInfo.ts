@@ -20,17 +20,17 @@ async function saysRecordNotFound(response: Response): Promise<boolean> {
 }
 
 /**
- * A Signature's record, read once per request: the route layout decides
- * with it whether the token exists, and the page's metadata, JSON-LD and
- * first paint render it. `fetch` (not axios) so the read lands in the Next.js
- * Data Cache, and React `cache()` so the three share one request.
+ * A Signature's record, read once per render: the page decides with it
+ * whether the token exists, and its metadata, JSON-LD and first paint render
+ * it. `fetch` (not axios) so the read lands in the Next.js Data Cache, and
+ * React `cache()` so the page and its metadata share one request.
  *
  * Resolves `null` when the API says it holds no such token (a 404, or a 400
- * whose body says "record not found"), so the route answers a real 404;
- * `undefined` when the read failed for any other reason, took longer than
- * `SERVER_READ_TIMEOUT_MS`, or was skipped, and the page then loads the
- * record itself. Under the e2e harness the browser mocks the API, so the
- * server reads nothing and never turns a fixture token away.
+ * whose body says "record not found"), and the page renders the Signature's
+ * not-found state; `undefined` when the read failed for any other reason,
+ * took longer than `SERVER_READ_TIMEOUT_MS`, or was skipped, and the page
+ * then loads the record itself. Under the e2e harness the browser mocks the
+ * API, so the server reads nothing and never turns a fixture token away.
  */
 export const loadTokenInfo = cache(
   async (tokenId: number): Promise<CSTTokenInfo | null | undefined> => {
