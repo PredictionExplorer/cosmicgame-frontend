@@ -77,7 +77,17 @@
       "participant": "参与者",
       "loadErrorTitle": "无法加载此地址的统计",
       "loadErrorMessage": "统计服务暂未响应，请稍后重试。",
-      "sectionLoadErrorTitle": "此部分未能加载"
+      "sectionLoadErrorTitle": "此部分未能加载",
+      "nav": {
+        "label": "个人资料目录",
+        "overview": "概览",
+        "nfts": "NFT",
+        "gestures": "落笔",
+        "allocations": "获配记录",
+        "anchoring": "锚定",
+        "outreach": "推广分配",
+        "attached": "已附加资产"
+      }
     },
     "figures": {
       "gestures": {

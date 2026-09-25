@@ -21,6 +21,8 @@ export interface CountByKind {
 }
 
 export interface ProfileOverviewProps {
+  /** The section's anchor id, for the profile's contents. */
+  id?: string;
   address: string;
   userInfo: UserProfileInfo;
   gestures: GestureSummary;
@@ -50,6 +52,7 @@ export interface ProfileOverviewProps {
  * there is something in it.
  */
 export function ProfileOverview({
+  id,
   address,
   userInfo,
   gestures,
@@ -67,7 +70,7 @@ export function ProfileOverview({
     (userInfo.SumRaffleEthWinnings ?? 0) + (userInfo.SumRaffleEthWithdrawal ?? 0);
 
   return (
-    <SectionShell title={o('title')}>
+    <SectionShell id={id} title={o('title')}>
       <div className="grid gap-x-10 gap-y-10 sm:grid-cols-2 xl:grid-cols-4">
         <StatisticsGroup title={o('gestures.title')}>
           <StatisticsItem

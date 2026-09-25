@@ -77,7 +77,17 @@
       "participant": "참여자",
       "loadErrorTitle": "이 주소의 통계를 불러오지 못했습니다",
       "loadErrorMessage": "통계 서비스가 응답하지 않았습니다. 잠시 후 다시 시도해 주세요.",
-      "sectionLoadErrorTitle": "이 섹션을 불러오지 못했습니다"
+      "sectionLoadErrorTitle": "이 섹션을 불러오지 못했습니다",
+      "nav": {
+        "label": "프로필 목차",
+        "overview": "개요",
+        "nfts": "NFT",
+        "gestures": "제스처",
+        "allocations": "받은 배분",
+        "anchoring": "앵커링",
+        "outreach": "홍보 배분",
+        "attached": "첨부 자산"
+      }
     },
     "figures": {
       "gestures": {

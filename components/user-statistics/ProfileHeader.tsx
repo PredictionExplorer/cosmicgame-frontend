@@ -83,6 +83,8 @@ export interface ProfileHeaderProps {
   /** Wallet balances; `null` when the read failed. */
   balance: { eth: number; cst: number } | null;
   loading: boolean;
+  /** Classes on the page header (the section rail below takes over its bottom rule). */
+  className?: string;
 }
 
 /**
@@ -100,6 +102,7 @@ export function ProfileHeader({
   allocations,
   balance,
   loading,
+  className,
 }: ProfileHeaderProps) {
   const t = useTranslations('myPages');
   const tWallet = useTranslations('wallet');
@@ -246,6 +249,7 @@ export function ProfileHeader({
         )
       }
       figures={figures}
+      className={className}
     >
       {identity}
     </PageHeader>

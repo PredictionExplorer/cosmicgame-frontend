@@ -77,7 +77,17 @@
       "participant": "参加者",
       "loadErrorTitle": "このアドレスの統計を読み込めませんでした",
       "loadErrorMessage": "統計サービスから応答がありませんでした。しばらくしてからもう一度お試しください。",
-      "sectionLoadErrorTitle": "このセクションを読み込めませんでした"
+      "sectionLoadErrorTitle": "このセクションを読み込めませんでした",
+      "nav": {
+        "label": "プロフィールの目次",
+        "overview": "概要",
+        "nfts": "NFT",
+        "gestures": "一筆",
+        "allocations": "受け取った配分",
+        "anchoring": "係留",
+        "outreach": "広報配分",
+        "attached": "添付されたアセット"
+      }
     },
     "figures": {
       "gestures": {

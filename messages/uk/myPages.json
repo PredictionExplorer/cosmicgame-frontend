@@ -77,7 +77,17 @@
       "participant": "Учасник",
       "loadErrorTitle": "Не вдалося завантажити статистику цієї адреси",
       "loadErrorMessage": "Сервіс статистики не відповідає. Спробуйте ще раз за хвилину.",
-      "sectionLoadErrorTitle": "Розділ не завантажився"
+      "sectionLoadErrorTitle": "Розділ не завантажився",
+      "nav": {
+        "label": "Зміст профілю",
+        "overview": "Огляд",
+        "nfts": "NFT",
+        "gestures": "Жести",
+        "allocations": "Розподіли",
+        "anchoring": "Закріплення",
+        "outreach": "Просування",
+        "attached": "Долучені активи"
+      }
     },
     "figures": {
       "gestures": {

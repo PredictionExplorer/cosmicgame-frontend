@@ -1,6 +1,6 @@
 'use client';
 
-import type { HTMLAttributes, ReactNode } from 'react';
+import { createContext, useContext, type HTMLAttributes, type ReactNode } from 'react';
 import { useLocale, useTranslations } from 'next-intl';
 
 import {
@@ -159,6 +159,22 @@ export function DateTime({
       )}
     </time>
   );
+}
+
+const TimeZoneStatedContext = createContext(false);
+
+/**
+ * Marks a region whose page states the time zone once for all of it (in a
+ * sticky bar, say): the tables inside leave out their own "Time zone" note,
+ * which would otherwise repeat under every ledger of a long page.
+ */
+export function TimeZoneStated({ children }: { children: ReactNode }) {
+  return <TimeZoneStatedContext.Provider value>{children}</TimeZoneStatedContext.Provider>;
+}
+
+/** Whether an enclosing `<TimeZoneStated>` already states the time zone. */
+export function useTimeZoneStated(): boolean {
+  return useContext(TimeZoneStatedContext);
 }
 
 /**

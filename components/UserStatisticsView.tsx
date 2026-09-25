@@ -30,6 +30,7 @@ import { toFiniteNumber } from '@/utils/finiteNumber';
 import { PageHeader } from '@/components/layout/PageHeader';
 import { useParticipantTrail } from '@/components/layout/participantTrail';
 import { PageShell } from '@/components/ui/page-shell';
+import { TimeZoneStated } from '@/components/ui/date-time';
 import { EmptyState } from '@/components/ui/empty-state';
 import { ErrorState } from '@/components/ui/error-state';
 import { SkeletonTable } from '@/components/ui/skeleton';
@@ -59,6 +60,12 @@ import {
   type AnchorDistributionRow,
 } from './user-statistics/UserAnchoringSection';
 import { DonatedAssetsSection } from './user-statistics/DonatedAssetsSection';
+import {
+  PROFILE_HEADER_WITH_NAV_CLASS,
+  ProfileSectionNav,
+  ProfileSectionNavPlaceholder,
+  type ProfileSectionLink,
+} from './user-statistics/ProfileSectionNav';
 
 const SHELL_CLASS = SITE_EDGE_SHELL_CLASS;
 
@@ -66,6 +73,23 @@ interface UserStatisticsViewProps {
   address: string | null | undefined;
   isOwnProfile: boolean;
 }
+
+/** Anchor ids of the profile's sections, for its contents rail and for links into them. */
+const SECTION_ID = {
+  overview: 'profile-overview',
+  nfts: 'profile-nfts',
+  gestures: 'profile-gestures',
+  allocations: 'profile-allocations',
+  anchoring: 'profile-anchoring',
+  outreach: 'profile-outreach',
+  attached: 'profile-attached',
+} as const;
+
+type ProfileSectionKey = keyof typeof SECTION_ID;
+
+/** A read that answered without failing: only then can its emptiness hide a section. */
+const answered = (query: { isLoading: boolean; isError: boolean }) =>
+  !query.isLoading && !query.isError;
 
 /** Reads again every query of a section that failed; the ones that answered stay as they are. */
 function refetchFailed(queries: readonly { isError: boolean; refetch: () => Promise<unknown> }[]) {
@@ -308,6 +332,44 @@ const UserStatisticsView = ({ address, isOwnProfile }: UserStatisticsViewProps) 
   ].some((query) => query.isError);
   const allEmpty = !anyLoading && !hasActivity && !anyFailed;
 
+  // A section with nothing in it drops out, with its link in the contents, once its reads have
+  // answered: while they load it holds its place, and a failed read keeps it to say so.
+  const hasOverview = Boolean(userInfo && gestureSummary);
+  const shown: Record<ProfileSectionKey, boolean> = {
+    overview: hasOverview,
+    nfts: !(answered(cstTokensQuery) && answered(userInfoQuery) && heldOrAnchored === 0),
+    gestures: !(answered(userInfoQuery) && gestureHistory.length === 0),
+    allocations: !(answered(claimsQuery) && claimHistory.length === 0),
+    anchoring: !(
+      anchoringQueries.every(answered) &&
+      answered(userInfoQuery) &&
+      cstAnchorActions.length === 0 &&
+      cstAnchorDistributions.length === 0 &&
+      rwlkAnchorActions.length === 0 &&
+      anchorActions.randomWalk === 0
+    ),
+    outreach: marketingRewards.length > 0,
+    attached: !(
+      [...attachedNftQueries, erc20Query].every(answered) &&
+      unclaimedDonatedNFTsList.length === 0 &&
+      claimedDonatedNFTsList.length === 0 &&
+      donatedERC20List.length === 0
+    ),
+  };
+  const navLabels: Record<ProfileSectionKey, string> = {
+    overview: t('statistics.page.nav.overview'),
+    nfts: t('statistics.page.nav.nfts'),
+    gestures: t('statistics.page.nav.gestures'),
+    allocations: t('statistics.page.nav.allocations'),
+    anchoring: t('statistics.page.nav.anchoring'),
+    outreach: t('statistics.page.nav.outreach'),
+    attached: t('statistics.page.nav.attached'),
+  };
+  const sectionLinks: ProfileSectionLink[] = (Object.keys(SECTION_ID) as ProfileSectionKey[])
+    .filter((key) => shown[key])
+    .map((key) => ({ id: SECTION_ID[key], label: navLabels[key] }));
+  const showNav = !userInfoQuery.isLoading && !allEmpty;
+
   return (
     <PageShell variant="data" className={SHELL_CLASS}>
       <ProfileHeader
@@ -317,7 +379,13 @@ const UserStatisticsView = ({ address, isOwnProfile }: UserStatisticsViewProps) 
         allocations={allocationSummary}
         balance={balance}
         loading={headerLoading}
+        className={PROFILE_HEADER_WITH_NAV_CLASS}
       />
+      {showNav ? (
+        <ProfileSectionNav label={t('statistics.page.nav.label')} sections={sectionLinks} />
+      ) : (
+        <ProfileSectionNavPlaceholder />
+      )}
 
       {userInfoQuery.isLoading ? (
         // A screen tall, as the sections that replace it are: the footer stays below the
@@ -333,124 +401,154 @@ const UserStatisticsView = ({ address, isOwnProfile }: UserStatisticsViewProps) 
           description={t('statistics.page.emptyDescription')}
         />
       ) : (
-        <div className="space-y-10 sm:space-y-12">
-          {isOwnProfile ? <QuickActions address={address} /> : null}
+        // The contents rail states the time zone once; the ledgers leave out their own note.
+        <TimeZoneStated>
+          <div className="space-y-10 sm:space-y-12">
+            {isOwnProfile ? <QuickActions address={address} /> : null}
 
-          {selectionShare && currentCycle !== null ? (
-            <SelectionShare
-              share={selectionShare}
-              cycle={currentCycle}
-              ethSelections={toFiniteNumber(dashboardData?.NumRaffleEthWinnersBidding)}
-              nftSelections={toFiniteNumber(dashboardData?.NumRaffleNFTWinnersBidding)}
-            />
-          ) : null}
-
-          {/* The figures come from the profile record; an address without one skips them. */}
-          {userInfo && gestureSummary ? (
-            <ProfileOverview
-              address={address}
-              userInfo={userInfo}
-              gestures={gestureSummary}
-              latestGestureTs={latestGestureTs}
-              heldOrAnchored={heldOrAnchored}
-              anchoredNow={anchoredNow}
-              anchorActions={anchorActions}
-              anchorDistributionsEth={totalAnchorDistributionEth}
-            />
-          ) : null}
-
-          <SectionShell title={t('statistics.page.sections.artworks')}>
-            <ProfileArtworks
-              tokens={cstListRaw ?? []}
-              anchored={anchoredPlates}
-              loading={loadingCST}
-              error={cstTokensQuery.isError}
-              onRetry={() => void cstTokensQuery.refetch()}
-            />
-          </SectionShell>
-
-          <SectionShell title={t('statistics.page.sections.gestureHistory')}>
-            {userInfoQuery.isError ? (
-              <ErrorState
-                headingLevel={3}
-                title={t('statistics.page.loadErrorTitle')}
-                message={t('statistics.page.loadErrorMessage')}
-                onRetry={() => userInfoQuery.refetch()}
+            {selectionShare && currentCycle !== null ? (
+              <SelectionShare
+                share={selectionShare}
+                cycle={currentCycle}
+                ethSelections={toFiniteNumber(dashboardData?.NumRaffleEthWinnersBidding)}
+                nftSelections={toFiniteNumber(dashboardData?.NumRaffleNFTWinnersBidding)}
               />
-            ) : (
-              // An empty list says "No gestures yet" inside the section.
-              <GestureHistoryTable
-                gestureHistory={gestureHistory}
-                showParticipant={false}
-                showHold={false}
-              />
-            )}
-          </SectionShell>
+            ) : null}
 
-          <SectionShell title={t('statistics.page.sections.recipientHistory')}>
-            <RecipientHistoryTable
-              winningHistory={claimHistory}
-              showClaimedStatus
-              showWinnerAddr={false}
-              loading={claimsQuery.isLoading}
-              error={claimsQuery.isError ? t('statistics.page.loadErrorMessage') : undefined}
-              onRetry={() => claimsQuery.refetch()}
-            />
-          </SectionShell>
-
-          <SectionShell title={t('statistics.page.sections.anchoring')} busy={anchoringLoading}>
-            {anchoringLoading ? (
-              <SkeletonTable rows={4} columns={4} />
-            ) : anchoringFailed ? (
-              <ErrorState
-                headingLevel={3}
-                variant="inline"
-                title={t('statistics.page.sectionLoadErrorTitle')}
-                message={t('statistics.page.loadErrorMessage')}
-                onRetry={() => refetchFailed(anchoringQueries)}
-              />
-            ) : (
-              <UserAnchoringSection
+            {/* The figures come from the profile record; an address without one skips them. */}
+            {userInfo && gestureSummary ? (
+              <ProfileOverview
+                id={SECTION_ID.overview}
                 address={address}
                 userInfo={userInfo}
-                canRelease={canClaim}
-                cstAnchorActions={cstAnchorActions}
-                rwlkAnchorActions={rwlkAnchorActions}
-                cstAnchorDistributions={cstAnchorDistributions}
-                cstAnchorDistributionsByDeposit={cstStakingRewardsByDepositRaw ?? []}
-                seeds={signatureSeeds}
-                rwlkImprints={rwlkImprints}
+                gestures={gestureSummary}
+                latestGestureTs={latestGestureTs}
+                heldOrAnchored={heldOrAnchored}
+                anchoredNow={anchoredNow}
+                anchorActions={anchorActions}
+                anchorDistributionsEth={totalAnchorDistributionEth}
               />
-            )}
-          </SectionShell>
+            ) : null}
 
-          {marketingRewards.length > 0 ? (
-            <SectionShell title={t('statistics.page.sections.outreachAllocations')}>
-              <MarketingRewardsTable list={marketingRewards} />
-            </SectionShell>
-          ) : null}
+            {shown.nfts ? (
+              <SectionShell id={SECTION_ID.nfts} title={t('statistics.page.sections.artworks')}>
+                <ProfileArtworks
+                  tokens={cstListRaw ?? []}
+                  anchored={anchoredPlates}
+                  loading={loadingCST}
+                  error={cstTokensQuery.isError}
+                  onRetry={() => void cstTokensQuery.refetch()}
+                />
+              </SectionShell>
+            ) : null}
 
-          <SectionShell title={t('statistics.page.sections.claimableAssets')}>
-            <DonatedAssetsSection
-              unclaimedNFTs={unclaimedDonatedNFTsList}
-              claimedNFTs={claimedDonatedNFTsList}
-              donatedERC20={donatedERC20List}
-              loadingNFTs={loadingUnclaimedNFTs || loadingClaimedNFTs}
-              loadingERC20={loadingERC20}
-              nftsError={attachedNftQueries.some((query) => query.isError)}
-              onRetryNFTs={() => refetchFailed(attachedNftQueries)}
-              erc20Error={erc20Query.isError}
-              onRetryERC20={() => void erc20Query.refetch()}
-              canClaim={canClaim}
-              isClaiming={isClaiming.donatedNFT}
-              claimingDonatedNFTs={claimingDonatedNFTs}
-              onClaimNFT={claimDonatedNFT}
-              onClaimAllNFTs={handleAllDonatedNFTsClaim}
-              onClaimERC20={claimDonatedERC20}
-              onClaimAllERC20={handleAllDonatedERC20Claim}
-            />
-          </SectionShell>
-        </div>
+            {shown.gestures ? (
+              <SectionShell
+                id={SECTION_ID.gestures}
+                title={t('statistics.page.sections.gestureHistory')}
+              >
+                {userInfoQuery.isError ? (
+                  <ErrorState
+                    headingLevel={3}
+                    title={t('statistics.page.loadErrorTitle')}
+                    message={t('statistics.page.loadErrorMessage')}
+                    onRetry={() => userInfoQuery.refetch()}
+                  />
+                ) : (
+                  // An empty list says "No gestures yet" inside the section.
+                  <GestureHistoryTable
+                    gestureHistory={gestureHistory}
+                    showParticipant={false}
+                    showHold={false}
+                  />
+                )}
+              </SectionShell>
+            ) : null}
+
+            {shown.allocations ? (
+              <SectionShell
+                id={SECTION_ID.allocations}
+                title={t('statistics.page.sections.recipientHistory')}
+              >
+                <RecipientHistoryTable
+                  winningHistory={claimHistory}
+                  showClaimedStatus
+                  showWinnerAddr={false}
+                  loading={claimsQuery.isLoading}
+                  error={claimsQuery.isError ? t('statistics.page.loadErrorMessage') : undefined}
+                  onRetry={() => claimsQuery.refetch()}
+                />
+              </SectionShell>
+            ) : null}
+
+            {shown.anchoring ? (
+              <SectionShell
+                id={SECTION_ID.anchoring}
+                title={t('statistics.page.sections.anchoring')}
+                busy={anchoringLoading}
+              >
+                {anchoringLoading ? (
+                  <SkeletonTable rows={4} columns={4} />
+                ) : anchoringFailed ? (
+                  <ErrorState
+                    headingLevel={3}
+                    variant="inline"
+                    title={t('statistics.page.sectionLoadErrorTitle')}
+                    message={t('statistics.page.loadErrorMessage')}
+                    onRetry={() => refetchFailed(anchoringQueries)}
+                  />
+                ) : (
+                  <UserAnchoringSection
+                    address={address}
+                    userInfo={userInfo}
+                    canRelease={canClaim}
+                    cstAnchorActions={cstAnchorActions}
+                    rwlkAnchorActions={rwlkAnchorActions}
+                    cstAnchorDistributions={cstAnchorDistributions}
+                    cstAnchorDistributionsByDeposit={cstStakingRewardsByDepositRaw ?? []}
+                    seeds={signatureSeeds}
+                    rwlkImprints={rwlkImprints}
+                  />
+                )}
+              </SectionShell>
+            ) : null}
+
+            {shown.outreach ? (
+              <SectionShell
+                id={SECTION_ID.outreach}
+                title={t('statistics.page.sections.outreachAllocations')}
+              >
+                <MarketingRewardsTable list={marketingRewards} />
+              </SectionShell>
+            ) : null}
+
+            {shown.attached ? (
+              <SectionShell
+                id={SECTION_ID.attached}
+                title={t('statistics.page.sections.claimableAssets')}
+              >
+                <DonatedAssetsSection
+                  unclaimedNFTs={unclaimedDonatedNFTsList}
+                  claimedNFTs={claimedDonatedNFTsList}
+                  donatedERC20={donatedERC20List}
+                  loadingNFTs={loadingUnclaimedNFTs || loadingClaimedNFTs}
+                  loadingERC20={loadingERC20}
+                  nftsError={attachedNftQueries.some((query) => query.isError)}
+                  onRetryNFTs={() => refetchFailed(attachedNftQueries)}
+                  erc20Error={erc20Query.isError}
+                  onRetryERC20={() => void erc20Query.refetch()}
+                  canClaim={canClaim}
+                  isClaiming={isClaiming.donatedNFT}
+                  claimingDonatedNFTs={claimingDonatedNFTs}
+                  onClaimNFT={claimDonatedNFT}
+                  onClaimAllNFTs={handleAllDonatedNFTsClaim}
+                  onClaimERC20={claimDonatedERC20}
+                  onClaimAllERC20={handleAllDonatedERC20Claim}
+                />
+              </SectionShell>
+            ) : null}
+          </div>
+        </TimeZoneStated>
       )}
     </PageShell>
   );
