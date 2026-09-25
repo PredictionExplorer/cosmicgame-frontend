@@ -473,6 +473,7 @@
       "viewing": "Viewing spike #{index}: {start} → {end}",
       "gestures": "Gestures: {count}",
       "inSpike": "Gestures in the spike",
+      "peak": "Spike peak",
       "loadErrorTitle": "Failed to load gesture spikes",
       "loadErrorMessage": "Could not fetch spike detection data.",
       "empty": "No gesture spikes detected in indexed history.",

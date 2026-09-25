@@ -473,6 +473,7 @@
       "viewing": "급증 #{index} 보기: {start} → {end}",
       "gestures": "제스처: {count}",
       "inSpike": "급증 구간 제스처",
+      "peak": "급증 구간 최고치",
       "loadErrorTitle": "제스처 급증을 불러오지 못했습니다",
       "loadErrorMessage": "급증 감지 데이터를 불러오지 못했습니다.",
       "empty": "인덱싱된 내역에서 감지된 제스처 급증이 없습니다.",

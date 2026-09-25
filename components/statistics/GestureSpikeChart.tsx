@@ -84,7 +84,9 @@ type GestureSpikeChartProps = {
  * Hours when gestures came much faster than around them. Opens on the
  * recent spike, or the latest one, never on an empty frame; each spike is
  * picked by its date, and the hours around it are drawn with the spike
- * shaded. The spike's busiest hour and its total read out above.
+ * shaded. The shaded spike's peak reads out above (named as the spike's, since
+ * a neighbouring spike in the same window can be taller), with its total when
+ * it spans more than its peak hour, so one number never shows under two labels.
  */
 export const GestureSpikeChart: FC<GestureSpikeChartProps> = ({ enabled = true, label }) => {
   const t = useTranslations('statistics');
@@ -165,22 +167,26 @@ export const GestureSpikeChart: FC<GestureSpikeChartProps> = ({ enabled = true, 
   const loading = !bounds.settled || isLoading || (spike !== undefined && hours.isLoading);
   const readout: ReadoutItem[] | undefined = loading
     ? [
-        { id: 'peak', label: t('charts.frequency.busiestHour'), value: null, caption: null },
+        { id: 'peak', label: t('charts.spikes.peak'), value: null, caption: null },
         { id: 'total', label: t('charts.spikes.inSpike'), value: null },
       ]
     : spike
       ? [
           {
             id: 'peak',
-            label: t('charts.frequency.busiestHour'),
+            label: t('charts.spikes.peak'),
             value: format.count(spike.PeakNumBids),
             caption: formatUnixTsLabel(spike.PeakTs, true, locale),
           },
-          {
-            id: 'total',
-            label: t('charts.spikes.inSpike'),
-            value: format.count(spike.TotalBids),
-          },
+          ...(spike.TotalBids !== spike.PeakNumBids
+            ? [
+                {
+                  id: 'total',
+                  label: t('charts.spikes.inSpike'),
+                  value: format.count(spike.TotalBids),
+                },
+              ]
+            : []),
         ]
       : undefined;
 

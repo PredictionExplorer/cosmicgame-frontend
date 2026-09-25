@@ -90,17 +90,39 @@ describe('GestureSpikeChart', () => {
     ).toBeInTheDocument();
   });
 
-  it('reads out the spike’s busiest hour and its total', () => {
+  const readoutOf = (name: string) =>
+    [...screen.getByRole('figure', { name }).querySelectorAll('figcaption dl > div')].map(
+      (item) => [item.querySelector('dt')?.textContent, item.querySelector('dd')?.textContent],
+    );
+
+  it('reads out the spike’s peak and its total', () => {
     render(<GestureSpikeChart label="Gesture spikes" />);
-    const figure = screen.getByRole('figure', { name: 'Gesture spikes' });
-    const figures = [...figure.querySelectorAll('figcaption dl > div')].map((item) => [
-      item.querySelector('dt')?.textContent,
-      item.querySelector('dd')?.textContent,
-    ]);
-    expect(figures).toEqual([
-      ['Busiest hour', '12'],
+    expect(readoutOf('Gesture spikes')).toEqual([
+      ['Spike peak', '12'],
       ['Gestures in the spike', '17'],
     ]);
+  });
+
+  it('names the peak as the spike’s and never repeats it as the total of a one-hour spike', () => {
+    // Regression: a one-hour spike of 34 read "Busiest hour 34 · Gestures in the
+    // spike 34" above a window whose neighbouring spike drew a taller 35 bar.
+    const oneHour: BidSpike = {
+      ...spike(0, AUG_12 + 9 * HOUR, 34),
+      StartTs: AUG_12 + 9 * HOUR,
+      EndTs: AUG_12 + 9 * HOUR,
+      TotalBids: 34,
+      BucketCount: 1,
+    };
+    mockUseBiddingActivity.mockReturnValue(ok({ Spikes: [oneHour], RecentSpikeIndex: 0 }));
+    mockUseBidFrequency.mockReturnValue(
+      ok([
+        { BucketTs: AUG_12 + 3 * HOUR, NumBids: 35 },
+        { BucketTs: AUG_12 + 9 * HOUR, NumBids: 34 },
+      ]),
+    );
+    render(<GestureSpikeChart label="Gesture spikes" />);
+    expect(readoutOf('Gesture spikes')).toEqual([['Spike peak', '34']]);
+    expect(screen.queryByText('Busiest hour')).not.toBeInTheDocument();
   });
 
   it('names each spike by its date, and every one by its hour when two share a day', () => {

@@ -473,6 +473,7 @@
       "viewing": "正在查看第 {index} 个峰值：{start} → {end}",
       "gestures": "落笔次数：{count}",
       "inSpike": "峰值区间落笔数",
+      "peak": "峰值区间单小时最高",
       "loadErrorTitle": "未能加载落笔峰值",
       "loadErrorMessage": "未能获取峰值检测数据。",
       "empty": "索引历史中未检测到落笔峰值。",

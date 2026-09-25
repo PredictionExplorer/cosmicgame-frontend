@@ -473,6 +473,7 @@
       "viewing": "急増 #{index}を表示中：{start} → {end}",
       "gestures": "筆数：{count}",
       "inSpike": "急増中の一筆",
+      "peak": "急増のピーク",
       "loadErrorTitle": "一筆の急増を読み込めませんでした",
       "loadErrorMessage": "急増検出データを取得できませんでした。",
       "empty": "インデックス済みの履歴に一筆の急増は検出されていません。",

@@ -473,6 +473,7 @@
       "viewing": "Đang xem đợt tăng vọt #{index}: {start} → {end}",
       "gestures": "Nét bút: {count}",
       "inSpike": "Nét bút trong đợt",
+      "peak": "Đỉnh của đợt",
       "loadErrorTitle": "Không tải được các đợt tăng vọt nét bút",
       "loadErrorMessage": "Không lấy được dữ liệu phát hiện đợt tăng vọt.",
       "empty": "Không phát hiện đợt tăng vọt nét bút nào trong lịch sử đã lập chỉ mục.",
