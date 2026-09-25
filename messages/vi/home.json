@@ -253,9 +253,9 @@
   },
   "form": {
     "title": "Đặt nét bút",
-    "subtitle": "Chọn cách thanh toán để tham gia chu kỳ hiện tại.",
+    "subtitle": "Chọn cách đặt nét bút để tham gia chu kỳ hiện tại.",
     "loadingAria": "Đang tải biểu mẫu nét bút",
-    "methodLabel": "Cách thanh toán",
+    "methodLabel": "Cách đặt nét bút",
     "method": {
       "eth": {
         "label": "ETH",
@@ -280,7 +280,7 @@
     "reward": {
       "previewTitle": "Xem trước CST tham gia",
       "economicsDescription": "CST ròng là CST tham gia nhận được trừ đi chi phí nét bút CST hiện tại.",
-      "previewDescription": "Lượng CST tham gia ước tính nếu nét bút được ghi nhận, thay đổi theo thời gian kể từ nét bút trước. Với mọi cách thanh toán, bạn có thể đặt giới hạn chi phí tối đa và lượng CST tham gia tối thiểu.",
+      "previewDescription": "Lượng CST tham gia ước tính nếu nét bút được ghi nhận, thay đổi theo thời gian kể từ nét bút trước. Với mọi cách đặt nét bút, bạn có thể đặt giới hạn chi phí tối đa và lượng CST tham gia tối thiểu.",
       "rewardLabel": "Nhận",
       "costLabel": "Chi phí",
       "netLabel": "CST ròng",
@@ -546,7 +546,7 @@
     },
     "console": {
       "title": "Đặt nét bút",
-      "methodLabel": "Cách thanh toán",
+      "methodLabel": "Cách đặt nét bút",
       "reward": "Xem trước CST tham gia",
       "minAccepted": "Mức chấp nhận tối thiểu",
       "messageHint": "Lời nhắn được ghi trên chuỗi cùng nét bút",

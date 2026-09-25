@@ -58,6 +58,7 @@ plural forms are regular for ICU (`one {# жест} few {# жести} many {# �
 | a gesture / this gesture           | жест / цей жест           |
 | ETH gesture / CST gesture          | ETH-жест / CST-жест       |
 | Gesture Cost                       | вартість жесту            |
+| Gesture method (not «оплати»)      | спосіб жесту              |
 | Final Gesture                      | завершальний жест         |
 | Last Gesture (the role)            | Останній жест             |
 | Your cycle standing (personal)     | Ваша позиція в циклі      |
