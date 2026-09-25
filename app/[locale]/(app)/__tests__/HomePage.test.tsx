@@ -1456,6 +1456,30 @@ describe('HomePage', () => {
     await user.click(screen.getByTestId('clock-finalize'));
 
     expect(mockAllocationFinalize.onFinalize).toHaveBeenCalledTimes(1);
+    // During rollover the backend refuses the current recipients read: it is
+    // cleared, never refetched into an error.
+    await waitFor(() =>
+      expect(mockSetQueryData).toHaveBeenCalledWith(['currentSpecialWinners'], null),
+    );
+    expect(mockCancelQueries).toHaveBeenCalledWith({ queryKey: ['currentSpecialWinners'] });
+  });
+
+  it('points the Last Gesture holder to Finalize whatever case the wallet reports its address in', () => {
+    const checksummed = '0xAbCdEf0123456789aBcDeF0123456789AbCdEf01';
+    // The wallet reports lowercase; the API returns the checksummed form.
+    mockAccount = checksummed.toLowerCase();
+    mockAllocationFinalize.allocationTime = Date.now() - 60 * 60_000;
+    mockAllocationFinalize.timeoutFinalize = 0;
+    mockUseDashboardInfo.mockReturnValue({
+      data: makeDashboardData({ LastBidderAddr: checksummed }),
+      isLoading: false,
+    });
+
+    render(<HomePage />);
+
+    // Never nudged to pay for another Gesture instead of finalizing.
+    expect(screen.getByTestId('gesture-finalize-pointer')).toBeInTheDocument();
+    expect(document.getElementById('gesture-submit')).toBeNull();
   });
 
   it('holds the clock in the confirming phase until the zero-cross is verified on-chain', () => {
