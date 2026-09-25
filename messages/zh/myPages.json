@@ -235,6 +235,13 @@
         "emptyTitle": "暂无已附加代币",
         "emptyDescription": "尚无已附加 ERC-20 代币分配给此地址。"
       }
+    },
+    "viewAddress": {
+      "label": "查看任意地址",
+      "hint": "参与者统计是公开的：无需连接钱包即可查看任何地址。",
+      "placeholder": "0x…",
+      "submit": "查看",
+      "invalid": "请输入完整地址：0x 加 40 位字母和数字。"
     }
   },
   "tokens": {

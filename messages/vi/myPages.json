@@ -235,6 +235,13 @@
         "emptyTitle": "Không có token đính kèm",
         "emptyDescription": "Chưa có token ERC20 đính kèm nào được phân bổ cho địa chỉ này."
       }
+    },
+    "viewAddress": {
+      "label": "Xem một địa chỉ bất kỳ",
+      "hint": "Thống kê của người tham gia là công khai: bạn có thể xem bất kỳ địa chỉ nào mà không cần kết nối ví.",
+      "placeholder": "0x…",
+      "submit": "Xem",
+      "invalid": "Hãy nhập địa chỉ đầy đủ: 0x và 40 chữ cái, chữ số theo sau."
     }
   },
   "tokens": {

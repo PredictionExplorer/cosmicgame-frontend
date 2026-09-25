@@ -235,6 +235,13 @@
         "emptyTitle": "No attached tokens",
         "emptyDescription": "No attached ERC-20 tokens have been allocated to this address yet."
       }
+    },
+    "viewAddress": {
+      "label": "View any address",
+      "hint": "Participant statistics are public: see any address without connecting a wallet.",
+      "placeholder": "0x…",
+      "submit": "View",
+      "invalid": "Enter a full address: 0x followed by 40 letters and digits."
     }
   },
   "tokens": {
