@@ -165,7 +165,7 @@
       },
       "named-nfts": {
         "heading": "Named Cosmic Signature NFTs",
-        "description": "Browse Cosmic Signature NFTs that owners have given custom names, connecting token identity, gallery discovery, and on-chain collection history.",
+        "description": "Owners can give their Signature a name on-chain. These are the ones that carry a name, most recently named first.",
         "source": "Cosmic Signature public token APIs",
         "links": {
           "gallery": "Explore the full gallery",

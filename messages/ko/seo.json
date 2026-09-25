@@ -165,7 +165,7 @@
       },
       "named-nfts": {
         "heading": "이름 붙인 Cosmic Signature NFT",
-        "description": "소유자가 직접 이름을 붙인 Cosmic Signature NFT를 둘러볼 수 있습니다. 작품을 감상하고 온체인에 기록된 이력을 살펴보세요.",
+        "description": "소유자는 온체인에서 시그니처에 이름을 붙일 수 있습니다. 이름이 있는 시그니처를 최근에 이름이 붙은 순서로 보여 줍니다.",
         "source": "Cosmic Signature 공개 토큰 API",
         "links": {
           "gallery": "전체 갤러리 둘러보기",

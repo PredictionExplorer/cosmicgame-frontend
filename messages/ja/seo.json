@@ -165,7 +165,7 @@
       },
       "named-nfts": {
         "heading": "名前付きCosmic Signature NFT",
-        "description": "所有者が名前を付けたCosmic Signature NFTを紹介します。作品を見つけ、オンチェーンに記録された来歴をたどれます。",
+        "description": "所有者はオンチェーンでシグネチャーに名前を付けられます。名前の付いたシグネチャーを、名前が付いた日の新しい順に並べています。",
         "source": "Cosmic Signature公開トークンAPI",
         "links": {
           "gallery": "ギャラリー全体を探索する",

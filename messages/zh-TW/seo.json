@@ -165,7 +165,7 @@
       },
       "named-nfts": {
         "heading": "已命名 Cosmic Signature NFT",
-        "description": "瀏覽由持有者自定義名稱的 Cosmic Signature NFT，串聯代幣身份、畫廊發現與鏈上系列歷史。",
+        "description": "持有者可以在鏈上為自己的簽名作品命名。這裡展示已命名的作品，最近命名的排在最前。",
         "source": "Cosmic Signature 公開代幣 API",
         "links": {
           "gallery": "瀏覽完整畫廊",

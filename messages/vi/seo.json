@@ -165,7 +165,7 @@
       },
       "named-nfts": {
         "heading": "Cosmic Signature NFT đã đặt tên",
-        "description": "Khám phá Cosmic Signature NFT đã được chủ sở hữu đặt tên. Xem tác phẩm, thông tin token và lịch sử sở hữu trên chuỗi.",
+        "description": "Chủ sở hữu có thể đặt tên cho Signature của mình trên chuỗi. Đây là những Signature đã có tên, xếp từ lần đặt tên gần nhất.",
         "source": "Các API token công khai của Cosmic Signature",
         "links": {
           "gallery": "Khám phá toàn bộ phòng trưng bày",
