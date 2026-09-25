@@ -20,8 +20,10 @@ import { useSiteNavCopy } from '@/components/layout/useSiteNav';
 import { Wordmark } from '@/components/layout/Wordmark';
 import { ThemeSwitcher } from '@/components/theme/ThemeSwitcher';
 import { Sheet, SheetContent, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
+import { jumpToSection } from '@/lib/jumpToSection';
 
 import { OpenAppLink } from './OpenAppLink';
+import { followSectionLink, isModifiedClick } from './SectionLink';
 import { useCollapseWhenCrowded } from './useCollapseWhenCrowded';
 
 export type LandingSectionLabels = Readonly<Record<LandingSectionAnchor, string>>;
@@ -116,8 +118,13 @@ export function LandingHeader({ sections }: LandingHeaderProps) {
         href: onHome ? `#${id}` : `/#${id}`,
         label: sections[id],
         current: inView === id ? ('location' as const) : undefined,
+        // On the home page the link moves focus with the view (V415).
+        section: onHome ? id : undefined,
       }))
     : [];
+  // A home section chosen in the sheet: reached once the sheet has closed,
+  // so focus lands on its heading instead of returning to the menu button.
+  const pendingSection = useRef<string | null>(null);
   const locatedId = location.route?.id;
   const headerId = locatedId ? (HEADER_PARENT[locatedId] ?? locatedId) : undefined;
   const pageLinks = LANDING_HEADER_LINKS.map(({ id, short }) => {
@@ -172,6 +179,9 @@ export function LandingHeader({ sections }: LandingHeaderProps) {
                 <Link
                   href={link.href}
                   aria-current={link.current}
+                  onClick={(event) => {
+                    if ('section' in link && link.section) followSectionLink(event, link.section);
+                  }}
                   className={cn(
                     'relative inline-flex h-9 items-center whitespace-nowrap rounded-control px-3 text-sm no-underline transition-colors duration-150',
                     link.current
@@ -215,6 +225,13 @@ export function LandingHeader({ sections }: LandingHeaderProps) {
               side="right"
               closePlacement="header"
               aria-describedby={undefined}
+              onCloseAutoFocus={(event) => {
+                const section = pendingSection.current;
+                if (!section) return;
+                pendingSection.current = null;
+                event.preventDefault();
+                jumpToSection(section);
+              }}
               className="flex w-[min(20rem,100vw)] flex-col gap-0 border-l border-rule bg-background p-0"
             >
               <SheetTitle className="sr-only">{t('drawerTitle')}</SheetTitle>
@@ -236,7 +253,13 @@ export function LandingHeader({ sections }: LandingHeaderProps) {
                       <Link
                         href={link.href}
                         aria-current={link.current}
-                        onClick={() => setMenuOpen(false)}
+                        onClick={(event) => {
+                          if ('section' in link && link.section && !isModifiedClick(event)) {
+                            event.preventDefault();
+                            pendingSection.current = link.section;
+                          }
+                          setMenuOpen(false);
+                        }}
                         className={cn(
                           'flex min-h-11 items-center rounded-control px-2 text-sm no-underline transition-colors duration-150 hover:bg-muted',
                           link.current ? 'text-primary' : 'text-foreground',

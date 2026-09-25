@@ -54,7 +54,7 @@ describe('landing sections', () => {
     // Verifiability blank until an IntersectionObserver fired.
     const sections = [
       <TheArt key="art" art={content.art} />,
-      <TheCycle key="cycle" cycle={content.cycle} />,
+      <TheCycle key="cycle" cycle={content.cycle} tracks={content.tracks.eth} />,
       <AllocationTracks key="tracks" tracks={content.tracks} />,
       <PublicGoods key="pg" publicGoods={content.publicGoods} />,
       <Anchoring key="anchoring" anchoring={content.anchoring} showcase={content.art.showcase} />,

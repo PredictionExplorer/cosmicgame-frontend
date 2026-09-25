@@ -102,17 +102,6 @@ html:is(:lang(zh), :lang(ja)) .headline {
   text-spacing-trim: trim-both;
 }
 
-/*
- * The hero plate only: its edges dissolve into the art's own black, so the
- * Signature floats on the atmosphere instead of sitting in a box. Grids keep
- * their hard print edges.
- */
-.bleedPlate {
-  box-shadow:
-    var(--art-edge),
-    0 0 2.5rem 0.5rem hsl(var(--art-ground) / 0.45);
-}
-
 .heroArt {
   grid-area: art;
   min-width: 0;
@@ -163,6 +152,24 @@ html:is(:lang(zh), :lang(ja)) .headline {
   .heroArt {
     margin-top: 0;
     align-self: center;
+  }
+}
+
+/*
+ * Wide screens: the exhibit grows. From 100rem the hero and its clock reach
+ * into the right gutter (up to 20rem past the container, never into the
+ * page's own gutter) and the art column takes all of it, while the copy
+ * keeps the header's edge and the width it has at 80rem. PLATE_SIZES
+ * (HeroArtShowcase) follows this width.
+ */
+@media (width >= 100rem) {
+  .heroGrid,
+  .clockBand {
+    margin-inline-end: calc(-1 * min(50vw - 40rem - var(--gutter), 20rem));
+  }
+
+  .heroGrid {
+    grid-template-columns: minmax(0, 31.25rem) minmax(0, 1fr);
   }
 }
 
@@ -242,6 +249,39 @@ html:is(:lang(zh), :lang(ja)) .headline {
 
 .animationVisible {
   opacity: 1;
+}
+
+/* The plate and, while the animation runs, its progress hairline below it. */
+.animationStage {
+  position: relative;
+}
+
+/*
+ * Set in the gap above the wall label, so it appears and goes without moving
+ * anything: the sparse opening frames of the animation read as progress.
+ */
+.animationProgress {
+  position: absolute;
+  inset-inline: 0;
+  top: calc(100% + 0.375rem);
+  height: 1px;
+  overflow: hidden;
+  background: var(--rule-faint);
+}
+
+.animationProgress::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: hsl(var(--muted-foreground));
+  transform: scaleX(var(--progress, 0));
+  transform-origin: left center;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .animationProgress::after {
+    transition: transform var(--duration-base) linear;
+  }
 }
 
 /* ── The Art ──────────────────────────────────────────────────────────── */
@@ -337,6 +377,7 @@ html:is(:lang(zh), :lang(ja)) .headline {
   grid-template-columns: minmax(0, 1fr);
   grid-template-areas:
     'intro'
+    'diagram'
     'steps'
     'actions';
 }
@@ -345,32 +386,146 @@ html:is(:lang(zh), :lang(ja)) .headline {
   grid-area: intro;
 }
 
+/* The steps caption the drawing: on phones as numbered rows under it. */
 .steps {
   grid-area: steps;
   min-width: 0;
-  margin-top: clamp(2rem, 1.5rem + 2vw, 3rem);
+  margin-top: clamp(1.5rem, 1rem + 1.5vw, 2.25rem);
+  border-bottom: 1px solid var(--rule-faint);
+}
+
+.step {
+  display: grid;
+  grid-template-columns: 2.5rem minmax(0, 1fr);
+  align-content: start;
+  column-gap: 1rem;
+  padding-block: 1.25rem;
+  border-top: 1px solid var(--rule-faint);
 }
 
 .cycleActions {
   grid-area: actions;
 }
 
+/*
+ * The cycle drawn (./CycleDiagram.tsx): hairlines in the rule colour, the
+ * gestures and the latest extension in the accent, the fan in the tracks'
+ * own colours. Strokes keep their width however wide the drawing is.
+ */
+.cycleDiagram {
+  grid-area: diagram;
+  display: block;
+  width: 100%;
+  height: auto;
+  margin-top: clamp(2rem, 1.5rem + 2.5vw, 3.5rem);
+  overflow: visible;
+}
+
+.cycleDiagram :is(line, path, rect, circle) {
+  vector-effect: non-scaling-stroke;
+}
+
+.cycleAxis,
+.cycleTick,
+.cycleArc {
+  fill: none;
+  stroke: hsl(var(--rule));
+  stroke-width: 1;
+}
+
+.cycleArcLatest {
+  fill: none;
+  stroke: hsl(var(--primary));
+  stroke-width: 1.5;
+}
+
+.cycleGesture {
+  stroke: hsl(var(--primary));
+  stroke-width: 2;
+  stroke-linecap: round;
+}
+
+.cycleFinal {
+  fill: hsl(var(--background));
+  stroke: hsl(var(--foreground));
+  stroke-width: 2;
+}
+
+.cycleFan {
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.25;
+}
+
+.cycleSegment {
+  fill: currentColor;
+}
+
+.cycleSegmentHatched {
+  fill: url(#cycle-diagram-hatch);
+  stroke: currentColor;
+  stroke-width: 1;
+}
+
+.cycleHatch {
+  stroke: hsl(var(--track-compounding));
+  stroke-width: 1.5;
+}
+
+.track-signature {
+  color: hsl(var(--track-signature));
+}
+
+.track-chrono {
+  color: hsl(var(--track-chrono));
+}
+
+.track-stellar {
+  color: hsl(var(--track-stellar-eth));
+}
+
+.track-anchor {
+  color: hsl(var(--track-anchoring));
+}
+
+.track-publicGoods {
+  color: hsl(var(--track-public-goods));
+}
+
+.track-nextCycle {
+  color: hsl(var(--track-compounding));
+}
+
+/* From 40rem the three steps caption the drawing's three zones, one column each. */
+@media (width >= 40rem) {
+  .steps {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    column-gap: clamp(1.5rem, 3vw, 3rem);
+    border-bottom: 0;
+  }
+
+  .step {
+    grid-template-columns: minmax(0, 1fr);
+    row-gap: 0.5rem;
+    padding-block: 1.25rem 0;
+    border-top: 1px solid hsl(var(--rule));
+  }
+}
+
 @media (width >= 64rem) {
   .cycleLayout {
-    grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
-    grid-template-rows: auto 1fr;
+    grid-template-columns: minmax(0, 1fr) auto;
     grid-template-areas:
-      'intro steps'
-      'actions steps';
+      'intro actions'
+      'diagram diagram'
+      'steps steps';
     column-gap: clamp(3rem, 6vw, 6rem);
   }
 
-  .steps {
-    margin-top: 0;
-  }
-
   .cycleActions {
-    align-self: start;
+    align-self: end;
+    margin-top: 0;
   }
 }
 
@@ -405,66 +560,21 @@ html:is(:lang(zh), :lang(ja)) .headline {
   margin-top: clamp(2.5rem, 2rem + 1.5vw, 3.5rem);
 }
 
+/*
+ * Narrow phones: a section's commit button and its quiet link stack like the
+ * hero's, the button at full width (The Cycle, the closing band).
+ */
+@media (width < 30rem) {
+  .sectionActions {
+    flex-direction: column;
+    align-items: stretch;
+  }
+}
+
 /* ── Allocation Tracks ────────────────────────────────────────────────── */
 
 .split {
   margin-top: clamp(2.5rem, 2rem + 2vw, 4rem);
-}
-
-/*
- * One bar drawn to scale against 100%: each segment grows by its share, so
- * the six ETH tracks always fill the width together. A two-pixel gap
- * separates them; the end segments carry the bar's rounding.
- */
-.bar {
-  display: flex;
-  gap: 2px;
-  height: clamp(2.75rem, 2.25rem + 1.5vw, 3.5rem);
-}
-
-.segment {
-  container-type: inline-size;
-  display: flex;
-  align-items: flex-end;
-  min-width: 0.375rem;
-  flex: var(--share) 1 0;
-  padding: 0.5rem;
-  border-radius: var(--radius-edge);
-}
-
-.segmentLabel {
-  color: hsl(var(--background));
-  white-space: nowrap;
-}
-
-/* Inside reading text (the white paper's figure): the same bar, a quieter height. */
-.barInline {
-  height: 2.25rem;
-}
-
-.barInline .segment {
-  padding: 0.375rem;
-}
-
-/* The bar's key: swatch and name per track, wrapping in rows. */
-.key {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.625rem 1.5rem;
-  margin-top: 1rem;
-}
-
-.keyItem {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.5rem;
-}
-
-/* A share too narrow for its figure shows the colour alone; the legend reads it. */
-@container (width < 2.5rem) {
-  .segmentLabel {
-    display: none;
-  }
 }
 
 .legend {
@@ -481,13 +591,6 @@ html:is(:lang(zh), :lang(ja)) .headline {
   column-gap: 0.875rem;
   padding-block: 1rem;
   border-top: 1px solid var(--rule-faint);
-}
-
-.swatch {
-  width: 0.75rem;
-  height: 0.75rem;
-  align-self: center;
-  border-radius: var(--radius-edge);
 }
 
 .legendBody {
@@ -665,14 +768,6 @@ html:is(:lang(zh), :lang(ja)) .headline {
   margin-top: 2rem;
 }
 
-.row {
-  display: grid;
-  grid-template-columns: 2.25rem minmax(0, 1fr);
-  column-gap: 0.75rem;
-  padding-block: 1.125rem;
-  border-top: 1px solid var(--rule-faint);
-}
-
 .evidence {
   margin-top: 1.5rem;
   padding-top: 1.25rem;
@@ -684,6 +779,14 @@ html:is(:lang(zh), :lang(ja)) .headline {
   flex-wrap: wrap;
   column-gap: 1.5rem;
   margin-top: 0.5rem;
+}
+
+/* Phones: two by two, so a fourth link is never left alone on its line. */
+@media (width < 40rem) {
+  .evidenceLinks {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
 }
 
 /* ── FAQ ──────────────────────────────────────────────────────────────── */

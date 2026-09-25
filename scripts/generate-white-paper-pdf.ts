@@ -17,9 +17,11 @@
  * default, has no Cyrillic glyphs). Japanese and Korean embed regular and bold
  * Noto Sans JP/KR subsets from the pinned Google Fonts source used by the OG font builder;
  * this avoids system CID fonts that some PDF readers cannot resolve.
- * Rerun after any change to a content
- * module, and bump WHITE_PAPER_VERSION in content/white-paper/types.ts for
- * substantive revisions so older copies stay citable.
+ * Rerun after any change to a content module (each run records the digest
+ * of its source in content/white-paper/pdf-manifest.json, and a test fails
+ * while a PDF lags its content), and bump WHITE_PAPER_VERSION in
+ * content/white-paper/types.ts for substantive revisions so older copies
+ * stay citable. The markdown itself is built in white-paper-pdf-core.ts.
  */
 
 import { execFileSync } from 'node:child_process';
@@ -50,15 +52,21 @@ import {
 import {
   WHITE_PAPER_DATE_DISPLAY,
   whitePaperPdfPath,
-  type WhitePaperBlock,
   type WhitePaperContent,
-  type WhitePaperSection,
 } from '../content/white-paper/types';
 import { isAppLocale, type AppLocale, type LocaleRecord } from '../i18n/locale';
 import { routing } from '../i18n/routing';
 
 import { GOOGLE_FONTS_COMMIT, type FontSource } from './build-og-fonts-core';
 import { uncoveredCharacters } from './font-cmap';
+import {
+  WHITE_PAPER_PDF_MANIFEST_PATH,
+  paperSourceSha256,
+  paperTitleMetadata,
+  renderPaperBody,
+  type WhitePaperPdfManifest,
+  type WhitePaperPdfManifestEntry,
+} from './white-paper-pdf-core';
 
 const ROOT = resolve(process.cwd());
 
@@ -231,10 +239,13 @@ async function prepareCjkFonts(build: LocaleBuild, tempDir: string): Promise<Loc
   const printableAscii = Array.from({ length: 95 }, (_, index) =>
     String.fromCharCode(index + 32),
   ).join('');
+  // A formula's notation and its legend symbols are typeset as math
+  // (white-paper-pdf-core.ts), in the math font, never in this face.
+  const copy = JSON.stringify(build.content, (key: string, value: unknown) =>
+    key === 'notation' || key === 'symbol' ? undefined : value,
+  );
   const text = Array.from(
-    new Set(
-      `${JSON.stringify(build.content)}${build.dateDisplay}${build.tocTitle}${printableAscii}`,
-    ),
+    new Set(`${copy}${build.dateDisplay}${build.tocTitle}${printableAscii}`),
   ).join('');
   for (const [style, weight] of [
     ['regular', 400],
@@ -261,137 +272,10 @@ async function prepareCjkFonts(build: LocaleBuild, tempDir: string): Promise<Loc
   };
 }
 
-/**
- * The papers' prose intentionally contains no markdown syntax, so escaping
- * every special character is safe. Formulas and addresses are emitted as
- * code spans and skip this path.
- */
-function escapeMarkdown(text: string): string {
-  return (
-    text
-      .replace(/[\\`*_{}[\]<>#+!|~^$]/g, (match) => `\\${match}`)
-      // U+2212 (minus sign) is not guaranteed a glyph in Latin Modern.
-      .replace(/\u2212/g, '-')
-  );
-}
-
-const ADDRESS_PATTERN = /^0x[0-9a-fA-F]{40}$/;
-
-function renderCell(cell: string): string {
-  if (ADDRESS_PATTERN.test(cell)) return `\`${cell}\``;
-  return escapeMarkdown(cell);
-}
-
-/** CJK codepoints render two columns wide; padding must match display width. */
-function displayWidth(text: string): number {
-  let width = 0;
-  for (const char of text) {
-    const code = char.codePointAt(0) ?? 0;
-    width += code > 0x2e7f ? 2 : 1;
-  }
-  return width;
-}
-
-/**
- * Emits a pipe table. Cell padding makes the source columns proportional to
- * their content, which pandoc turns into sensible relative column widths in
- * the PDF (long prose columns wrap instead of overflowing the page).
- */
-function renderTable(block: Extract<WhitePaperBlock, { kind: 'table' }>): string {
-  const { columns, rows, footnote } = block.table;
-  const rendered = [columns.map(escapeMarkdown), ...rows.map((row) => row.map(renderCell))];
-  const widths = columns.map((_, columnIndex) =>
-    Math.max(...rendered.map((row) => displayWidth(row[columnIndex] ?? ''))),
-  );
-  const pad = (cell: string, columnIndex: number): string =>
-    cell + ' '.repeat(Math.max(0, (widths[columnIndex] ?? 0) - displayWidth(cell)));
-
-  const lines: string[] = [];
-  lines.push(`| ${rendered[0]!.map(pad).join(' | ')} |`);
-  lines.push(`|${widths.map((width) => '-'.repeat(width + 2)).join('|')}|`);
-  for (const row of rendered.slice(1)) {
-    lines.push(`| ${row.map(pad).join(' | ')} |`);
-  }
-  let table = lines.join('\n');
-  if (footnote) {
-    table += `\n\n\\noindent {\\small \\emph{${latexEscape(footnote)}}}`;
-  }
-  return table;
-}
-
-/** Escapes prose for the few spots emitted as raw LaTeX (table footnotes). */
-function latexEscape(text: string): string {
-  return text
-    .replace(/[\\{}]/g, (match) => `\\${match === '\\' ? 'textbackslash ' : match}`)
-    .replace(/[%$#_&]/g, (match) => `\\${match}`)
-    .replace(/~/g, '\\textasciitilde ')
-    .replace(/\^/g, '\\textasciicircum ')
-    .replace(/\u2212/g, '-');
-}
-
-/** Wraps long single-line formulas at operator boundaries for the code block. */
-function wrapFormula(formula: string): string {
-  if (formula.length <= 76) return formula;
-  return formula.replace(/ \/ /g, '\n    / ');
-}
-
-/** Explicit raw blocks let pandoc still parse Markdown inside a LaTeX container. */
-function rawLatex(value: string): string {
-  return `\`\`\`{=latex}\n${value}\n\`\`\``;
-}
-
-function renderBlock(block: WhitePaperBlock): string {
-  switch (block.kind) {
-    case 'paragraph':
-      return escapeMarkdown(block.text);
-    case 'list':
-      return block.items.map((item) => `- ${escapeMarkdown(item)}`).join('\n');
-    case 'formula': {
-      const code = `\`\`\`\n${wrapFormula(block.formula)}\n\`\`\``;
-      const contents = block.caption
-        ? `${code}\n\n\\noindent {\\small \\emph{${latexEscape(block.caption)}}}`
-        : code;
-      // A formula without its explanation on the same page is hard to read.
-      // These compact blocks fit comfortably on a page at the existing size.
-      return [
-        rawLatex('\\noindent\\begin{minipage}{\\linewidth}'),
-        contents,
-        rawLatex('\\end{minipage}'),
-      ].join('\n\n');
-    }
-    case 'note':
-      return `> ${escapeMarkdown(block.text)}`;
-    case 'table':
-      return renderTable(block);
-  }
-}
-
-function renderSection(section: WhitePaperSection): string {
-  const parts: string[] = [];
-  const title = /^\d+$/.test(section.number)
-    ? `${section.number}. ${section.heading}`
-    : section.heading;
-  // longtable may start on the next page even when a heading itself fits.
-  // Reserve room for the heading, table header, and initial rows together.
-  if (section.blocks[0]?.kind === 'table') parts.push('\\needspace{8\\baselineskip}');
-  parts.push(`# ${escapeMarkdown(title)}`);
-  for (const block of section.blocks) parts.push(renderBlock(block));
-  for (const subsection of section.subsections ?? []) {
-    if (subsection.blocks[0]?.kind === 'table') parts.push('\\needspace{8\\baselineskip}');
-    parts.push(`## ${subsection.number} ${escapeMarkdown(subsection.heading)}`);
-    for (const block of subsection.blocks) parts.push(renderBlock(block));
-  }
-  return parts.join('\n\n');
-}
-
 function buildMarkdown(build: LocaleBuild): string {
-  const { content } = build;
   const metadata = {
-    title: content.hero.title,
-    subtitle: content.hero.subtitle,
-    author: `${content.hero.authorName} \\hspace{0.4em} \\texttt{\\small ${content.hero.authorEmail}}`,
-    date: `${content.hero.versionLabel} \\textperiodcentered\\ ${build.dateDisplay}`,
-    abstract: content.abstract.paragraphs.join('\n\n'),
+    ...paperTitleMetadata(build.content),
+    date: `${build.content.hero.versionLabel} \\textperiodcentered\\ ${build.dateDisplay}`,
     'toc-title': build.tocTitle,
     fontsize: '11pt',
     papersize: 'letter',
@@ -405,32 +289,25 @@ function buildMarkdown(build: LocaleBuild): string {
     ...(build.lang ? { lang: build.lang } : {}),
   };
 
-  const body: string[] = [];
-  for (const section of content.sections) {
-    body.push(renderSection(section));
-  }
-
-  // References and the closing citation form one short block. A page break
-  // before the block is preferable to a final page containing only a license.
-  body.push(rawLatex('\\noindent\\begin{minipage}{\\linewidth}'));
-  body.push(`# ${escapeMarkdown(content.references.heading)}`);
-  body.push(
-    content.references.items
-      .map(
-        (reference, index) =>
-          `${index + 1}. ${escapeMarkdown(reference.label)}. <${reference.href}>`,
-      )
-      .join('\n'),
-  );
-
-  body.push('\\vspace{1.5em}\\noindent\\hrulefill\n');
-  body.push(
-    `\\noindent {\\small ${latexEscape(content.citation)}\\par\\smallskip\\noindent ${latexEscape(content.licenseNote)}}`,
-  );
-  body.push(rawLatex('\\end{minipage}'));
-
   const frontMatter = `---\n${JSON.stringify(metadata, null, 2)}\n---`;
-  return `${frontMatter}\n\n${body.join('\n\n')}\n`;
+  return `${frontMatter}\n\n${renderPaperBody(build.content)}\n`;
+}
+
+/** Records what a locale's committed PDF was built from (WHITE_PAPER_PDF_MANIFEST_PATH). */
+function recordInManifest(locale: AppLocale, content: WhitePaperContent): void {
+  const manifestPath = join(ROOT, WHITE_PAPER_PDF_MANIFEST_PATH);
+  const previous: Partial<WhitePaperPdfManifest> = existsSync(manifestPath)
+    ? (JSON.parse(readFileSync(manifestPath, 'utf8')) as Partial<WhitePaperPdfManifest>)
+    : {};
+  const next: Partial<Record<AppLocale, WhitePaperPdfManifestEntry>> = {};
+  for (const entryLocale of routing.locales) {
+    const entry =
+      entryLocale === locale
+        ? { pdf: whitePaperPdfPath(locale), sourceSha256: paperSourceSha256(content) }
+        : previous[entryLocale];
+    if (entry) next[entryLocale] = entry;
+  }
+  writeFileSync(manifestPath, `${JSON.stringify(next, null, 2)}\n`, 'utf8');
 }
 
 async function generate(locale: AppLocale): Promise<void> {
@@ -463,6 +340,7 @@ async function generate(locale: AppLocale): Promise<void> {
     rmSync(tempDir, { recursive: true, force: true });
   }
 
+  recordInManifest(locale, BUILDS[locale].content);
   const sizeKb = Math.round(statSync(outputPath).size / 1024);
   /* eslint-disable-next-line no-console -- CLI status output; this script
      runs via `npm run white-paper:pdf` and never ships to the browser. */

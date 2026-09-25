@@ -88,7 +88,7 @@ export const getThumbUrl = (seed: string | number, variant: ThumbVariant): strin
 };
 
 /** Seed as lower-case hex without a `0x` prefix, however the caller spelled it. */
-const bareSeed = (seed: string | number): string =>
+export const bareSeed = (seed: string | number): string =>
   String(seed).trim().toLowerCase().replace(/^0x/, '');
 
 /**

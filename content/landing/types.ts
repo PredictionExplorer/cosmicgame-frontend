@@ -22,7 +22,6 @@ export interface LandingHeroArtContent {
 
 export interface LandingHeroContent {
   readonly eyebrow: string;
-  readonly headline: string;
   readonly headlineLead: string;
   readonly headlineAccent: string;
   /** The loop in one breath: what a visitor does and what happens at zero. */
@@ -140,6 +139,8 @@ export interface LandingPublicGoodsContent {
 }
 
 export interface LandingCouncilColumn {
+  /** `proposal`, `weight` or `quorum` (content/landing/structure.ts). */
+  readonly id: string;
   readonly title: string;
   readonly body: string;
 }
@@ -152,6 +153,8 @@ export interface LandingCouncilContent {
 }
 
 export interface LandingVerifiabilityPillar {
+  /** `cc0`, `verification` or `reproducible` (content/landing/structure.ts): it picks the icon. */
+  readonly id: string;
   readonly title: string;
   readonly body: string;
 }

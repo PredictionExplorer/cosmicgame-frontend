@@ -24,10 +24,10 @@ function renderStatus() {
       startLabel={hub.startLabel}
       resumeLabel={hub.resumeLabel}
       rankNames={{
-        observer: ui.summary.ranks.observer.name,
-        participant: ui.summary.ranks.participant.name,
-        enduranceChampion: ui.summary.ranks.enduranceChampion.name,
-        chronoWarrior: ui.summary.ranks.chronoWarrior.name,
+        reader: ui.summary.ranks.reader.name,
+        student: ui.summary.ranks.student.name,
+        scholar: ui.summary.ranks.scholar.name,
+        cartographer: ui.summary.ranks.cartographer.name,
       }}
     />,
   );
@@ -51,9 +51,7 @@ describe('<QuizTierStatus />', () => {
       JSON.stringify({ correct: 20, total: 25 }),
     );
     renderStatus();
-    expect(screen.getByTestId('quiz-tier-status')).toHaveTextContent(
-      'Best 20 of 25 · Endurance Champion',
-    );
+    expect(screen.getByTestId('quiz-tier-status')).toHaveTextContent('Best 20 of 25 · Scholar');
   });
 
   it('offers Resume for a run in progress', () => {

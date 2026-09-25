@@ -38,7 +38,10 @@ export default async function QuizHubPage({ params }: PageProps) {
   setRequestLocale(locale);
   const { hub, ui, tiers } = getQuizContent(locale);
   const learn = getLearnContent(locale);
-  const firstGuide = learn.articles[0];
+  // The reading path's first stage, which the "Start here" copy describes.
+  const startGuides = learn.articles
+    .map((article, index) => ({ article, number: index + 1 }))
+    .filter(({ article }) => article.group === 'start');
   const t = await getTranslations({ locale, namespace: 'meta' });
   const inLanguage = jsonLdInLanguage(locale);
   const rankNames = Object.fromEntries(
@@ -68,8 +71,8 @@ export default async function QuizHubPage({ params }: PageProps) {
 
       <PageHeader
         variant="reading"
+        host="landing"
         breadcrumbs={[{ label: learn.hub.breadcrumbs.learnLabel, href: '/learn' }]}
-        eyebrow={hub.eyebrow}
         title={hub.h1}
         subtitle={hub.intro}
       />
@@ -138,28 +141,33 @@ export default async function QuizHubPage({ params }: PageProps) {
         <p className="mt-3 max-w-[var(--measure-lede)] type-body-md text-muted-foreground">
           {learn.hub.groups.start.description}
         </p>
-        <ul className="mt-6 flex flex-wrap gap-x-8 gap-y-2">
-          {firstGuide ? (
-            <li>
+        {/* Every guide the description promises, in reading order, then the full reference. */}
+        <ol className="mt-6 grid max-w-[46rem] border-t border-rule-faint sm:grid-cols-2 sm:gap-x-8">
+          {startGuides.map(({ article, number }) => (
+            <li key={article.slug} className="border-b border-rule-faint">
               <Link
-                href={`/learn/${firstGuide.slug}`}
-                className="link-quiet inline-flex min-h-11 items-center gap-1.5 type-body-md text-foreground"
+                href={`/learn/${article.slug}`}
+                className="group flex min-h-12 items-center gap-3 py-2.5 type-body-md text-foreground hover:text-primary"
               >
-                {firstGuide.cardTitle}
-                <ArrowRight aria-hidden className="size-4 text-subtle" />
+                <span aria-hidden className="w-6 shrink-0 type-label tabular-nums text-subtle">
+                  {String(number).padStart(2, '0')}
+                </span>
+                <span className="min-w-0 flex-1">{article.cardTitle}</span>
+                <ArrowRight
+                  aria-hidden
+                  className="size-4 shrink-0 text-subtle transition-colors group-hover:text-primary"
+                />
               </Link>
             </li>
-          ) : null}
-          <li>
-            <Link
-              href={WHITE_PAPER_PATH}
-              className="link-quiet inline-flex min-h-11 items-center gap-1.5 type-body-md text-foreground"
-            >
-              {learn.hub.whitePaper.readLabel}
-              <ArrowRight aria-hidden className="size-4 text-subtle" />
-            </Link>
-          </li>
-        </ul>
+          ))}
+        </ol>
+        <Link
+          href={WHITE_PAPER_PATH}
+          className="link-quiet mt-5 inline-flex min-h-11 items-center gap-1.5 type-body-md text-foreground"
+        >
+          {learn.hub.whitePaper.readLabel}
+          <ArrowRight aria-hidden className="size-4 text-subtle" />
+        </Link>
       </section>
     </ReadingMain>
   );

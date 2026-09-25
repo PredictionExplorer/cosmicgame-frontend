@@ -3,11 +3,27 @@ import type { LearnSlug } from './structure';
 export interface LearnSection {
   readonly heading: string;
   readonly body: readonly string[];
+  /**
+   * A procedure the reader follows, set as numbered steps after the
+   * paragraphs. Steps may carry `[label](key)` link tokens like the body.
+   */
+  readonly steps?: readonly string[];
 }
 
-export interface LearnRelatedLink {
-  readonly label: string;
-  readonly href: string;
+/**
+ * The figures a guide can carry, each drawn from parts the white paper
+ * already uses, so a guide shows what it describes:
+ * - `cycleTimeline`: the stages of a Performance Cycle.
+ * - `allocation`: the ETH split of a Cycle Reserve, as a bar and its key.
+ * - `seedPlates`: two Signatures, each captioned with the seed it renders from.
+ * - `contracts`: the core contract addresses on Arbitrum One, each linked to the explorer.
+ */
+export type LearnFigureKind = 'cycleTimeline' | 'allocation' | 'seedPlates' | 'contracts';
+
+export interface LearnFigure {
+  readonly kind: LearnFigureKind;
+  /** The section it illustrates (from 0): it follows that section's first paragraph. */
+  readonly section: number;
 }
 
 /** The three stages of the reading path, in order. */
@@ -32,7 +48,13 @@ export interface LearnArticle {
   /** The token id of the Signature that opens the guide (components/reading/signaturePlates). */
   readonly plate: number;
   readonly sections: readonly LearnSection[];
-  readonly related: readonly LearnRelatedLink[];
+  /** The figures set inside the guide's sections, in reading order. */
+  readonly figures: readonly LearnFigure[];
+  /**
+   * Link targets of the guide's related resources: app pages, other guides
+   * and outside venues. The page names each one after its destination.
+   */
+  readonly related: readonly string[];
 }
 
 export interface LearnGroupCopy {
@@ -84,17 +106,13 @@ export interface LearnArticleUi {
   };
   /** `{title}` placeholder: the accessible name of a heading's anchor link. */
   readonly headingLinkTemplate: string;
+  /** Heading of the list of pages to read or check a guide against. */
   readonly relatedResourcesHeading: string;
-  /** Accessible name of the closing aside that holds the reference notes. */
-  readonly appendixLabel: string;
-  /** Heading of the links to the app pages where a reader checks the guide. */
-  readonly verifyLinksLabel: string;
-  /**
-   * Reference notes shared by every guide (how to verify, further reading):
-   * kept for readers and answer engines, rendered as a quiet aside after the
-   * guide rather than as more of its sections.
-   */
-  readonly appendix: readonly LearnSection[];
+  /** The contracts guide's address figure. */
+  readonly contractsFigure: {
+    readonly title: string;
+    readonly caption: string;
+  };
 }
 
 export interface LearnContent {

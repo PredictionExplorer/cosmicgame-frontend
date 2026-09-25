@@ -1,3 +1,5 @@
+import { bareSeed } from '@/utils/urls';
+
 /**
  * Real Signatures bundled with the reading pages, so their art paints without
  * waiting for the collection API or the media server. Token ids, cycles and
@@ -13,10 +15,22 @@ export interface SignaturePlateArt {
   seed: string;
   /** The bundled preview, served through the image optimizer. */
   src: string;
+  /** Imprint transaction time in Unix seconds, where a wall label dates the plate. */
+  imprintedAt?: number;
 }
 
-function plate(tokenId: number, cycle: number, seed: string, folder = 'learn'): SignaturePlateArt {
-  return { tokenId, cycle, seed, src: `/images/${folder}/signature-${tokenId}.webp` };
+function plate(tokenId: number, cycle: number, seed: string): SignaturePlateArt {
+  return { tokenId, cycle, seed, src: `/images/learn/signature-${tokenId}.webp` };
+}
+
+/** The two Signatures the landing features (public/images/landing/README.md), dated. */
+function landingPlate(
+  tokenId: number,
+  cycle: number,
+  seed: string,
+  imprintedAt: number,
+): SignaturePlateArt & { imprintedAt: number } {
+  return { tokenId, cycle, seed, imprintedAt, src: `/images/landing/signature-${tokenId}.webp` };
 }
 
 export const SIGNATURE_PLATES = {
@@ -28,8 +42,19 @@ export const SIGNATURE_PLATES = {
   13: plate(13, 0, '8b834c15a096e3e2ba8ecaea21627117e104bb37f844f69648c0fdf9406d3457'),
   14: plate(14, 0, '18952be1a43822726d7920df20bc2e1a2be06c1f907a0dc80e7469e50be3ce4b'),
   22: plate(22, 0, '003108837490f9fd840a44e70590173c7f95340872f60eaa13482b4ecb8fb0a8'),
-  23: plate(23, 0, '17d61f1c00e5d16c399a8e341e9feaea32b275e5426a4375394e74cc855affcc', 'landing'),
-  24: plate(24, 1, '5084a87375896c7103ba17b57264f20de35d9e6eb545314680ad5e074dfc33ad', 'landing'),
+  // Imprint times from cst/info/<id>, 2026-09-24.
+  23: landingPlate(
+    23,
+    0,
+    '17d61f1c00e5d16c399a8e341e9feaea32b275e5426a4375394e74cc855affcc',
+    1_781_506_802,
+  ),
+  24: landingPlate(
+    24,
+    1,
+    '5084a87375896c7103ba17b57264f20de35d9e6eb545314680ad5e074dfc33ad',
+    1_786_491_506,
+  ),
   25: plate(25, 1, '6b273359fbc21c34f58a546c86a88b21c2bd307797e3c4959c5eccc8e326e4fd'),
   33: plate(33, 1, 'fecd05a4e7f537281200ed720a095da2d5d4db14867a37d2627ebdaa2d2ad1e6'),
   39: plate(39, 1, '56d7e21a3dd131a46f7541b0d4fc85faf7996a325f090d5f18d53d099cade7b8'),
@@ -47,8 +72,13 @@ export function signaturePlate(tokenId: number): SignaturePlateArt | undefined {
   return PLATES_BY_ID.get(tokenId);
 }
 
-/** The seed as printed on a wall label: its first and last characters. */
+/**
+ * The seed as printed on a wall label, on every surface (the landing, the
+ * reading pages): its first six and last four characters, like a short
+ * address. A `0x` prefix is dropped; a short value prints whole.
+ */
 export function shortSeed(seed: string): string {
+  const bare = bareSeed(seed);
   // The word joiner after the ellipsis keeps the two halves on one line.
-  return `${seed.slice(0, 6)}…\u2060${seed.slice(-4)}`;
+  return bare.length > 12 ? `${bare.slice(0, 6)}…\u2060${bare.slice(-4)}` : bare;
 }

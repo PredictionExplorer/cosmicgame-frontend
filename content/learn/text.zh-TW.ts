@@ -1,19 +1,9 @@
+import { AUDIT_FINDINGS_TOTAL, HACKEN_AUDIT } from '@/content/legal/audit';
 import { protocolFacts } from '@/content/protocol-facts';
 
 import type { LearnText } from './structure';
-import type { LearnSection } from './types';
 
 /** 附加在每篇中文文章末尾的共享附錄章節。 */
-const answerabilitySections: readonly LearnSection[] = [
-  {
-    heading: '查閱最新資訊',
-    body: [
-      '即時週期數據、已驗證合約地址、原始碼和統計均可在官方應用程式中查閱。',
-      '會隨時間變化的資訊，請以應用程式中的即時資料為準；協議機制則以學習指南、常見問題、服務條款、安全、審計和風險揭露頁面為準。',
-    ],
-  },
-];
-
 /** 中文「學習」欄目文案，以 structure.ts 中的骨架為鍵。 */
 export const learnTextZhTw = {
   hub: {
@@ -67,10 +57,11 @@ export const learnTextZhTw = {
       backToTopLabel: '回到頂端',
     },
     headingLinkTemplate: '本節連結：{title}',
-    relatedResourcesHeading: 'Cosmic Signature 相關資源',
-    appendixLabel: '查證與延伸閱讀',
-    verifyLinksLabel: '在應用程式中查證',
-    appendix: answerabilitySections,
+    relatedResourcesHeading: '相關資源',
+    contractsFigure: {
+      title: 'Arbitrum One 上的核心合約',
+      caption: '每個地址都可在 Arbiscan 上開啟。合約頁面列出全部官方地址，包括各金庫與錢包。',
+    },
   },
   articles: {
     'what-is-cosmic-signature': {
@@ -112,7 +103,6 @@ export const learnTextZhTw = {
           ],
         },
       ],
-      relatedLabels: ['開啟 Cosmic Signature 應用程式', '閱讀常見問題', '檢視協議統計'],
     },
     'how-the-performance-cycle-works': {
       cardTitle: '演繹週期',
@@ -153,7 +143,6 @@ export const learnTextZhTw = {
           ],
         },
       ],
-      relatedLabels: ['檢視目前演繹週期', '檢視分配紀錄', '閱讀協議常見問題'],
     },
     'how-gestures-work': {
       cardTitle: '落筆如何運作',
@@ -194,7 +183,6 @@ export const learnTextZhTw = {
           ],
         },
       ],
-      relatedLabels: ['在應用程式中落筆或檢視落筆紀錄', '了解演繹週期', '檢視目前週期數據'],
     },
     'three-body-nft-art': {
       cardTitle: '三體藝術',
@@ -235,7 +223,6 @@ export const learnTextZhTw = {
           ],
         },
       ],
-      relatedLabels: ['瀏覽 Cosmic Signature 畫廊', '檢視原始碼', '閱讀合約與驗證說明'],
     },
     'cosmic-signature-on-arbitrum': {
       cardTitle: '運作於 Arbitrum',
@@ -269,7 +256,6 @@ export const learnTextZhTw = {
           ],
         },
       ],
-      relatedLabels: ['檢視已驗證合約', '檢視協議統計'],
     },
     'contracts-security-verification': {
       cardTitle: '合約與驗證',
@@ -278,31 +264,35 @@ export const learnTextZhTw = {
       description:
         '查閱 Cosmic Signature 智慧合約、原始碼、驗證資訊，以及這套 Arbitrum 協議的安全背景。',
       h1: 'Cosmic Signature 合約、安全與驗證',
-      summary: 'Cosmic Signature 公開合約與原始碼資訊，便於參與者審視協議機制並驗證鏈上行為。',
+      summary:
+        'Cosmic Signature 運作在 Arbitrum One 上的一組合約之上。本指南列出核心合約，介紹自行核驗的方法，並說明獨立審計的涵蓋範圍。',
       sections: [
         {
-          heading: '公開的合約資訊',
+          heading: '協議背後的合約',
           body: [
-            '合約頁面是查詢地址、驗證連結、部署詳情和協議資金流向的官方入口。',
-            '關鍵資訊會以清晰文字列出，無需連接錢包或開啟區塊瀏覽器也能查閱。',
+            'Cosmic Signature 運作在 Arbitrum One 上，鏈 ID 為 42161。落筆、週期與分配都經由同一個合約：Cosmic Signature 協議。它以可升級代理合約的形式部署，地址保持不變，邏輯則位於代理所指向的實現合約中。CST、兩個 NFT 系列和宇宙議會各有自己的地址。',
+            '[合約頁面](contracts)是官方地址的唯一清單，各金庫與錢包也列在其中。任何以 Cosmic Signature 名義出現、卻不在此清單上的地址，都應視為非官方地址。',
           ],
         },
         {
-          heading: '可供驗證的公開入口',
-          body: [
-            '驗證資訊分佈在多個公開入口。[合約頁面](contracts)列出部署地址與區塊瀏覽器連結，[原始碼頁面](code)介紹確定性渲染資源，[審計頁面](audits)說明審閱狀態，[安全頁面](security)則解釋如何查驗官方資源。',
-            '驗證時應結合這些頁面：合約地址需與部署說明一同檢視，安全聲明也應有報告或連結作為依據。站內連結會串聯合約地址、原始碼、風險說明和審計狀態。',
+          heading: '自行核驗合約',
+          body: ['以下步驟都無需連接錢包。'],
+          steps: [
+            '從[合約頁面](contracts)在 [Arbiscan](explorer) 上開啟地址，確認網路是 Arbitrum One，而不是測試網。',
+            '在 Contract 分頁確認原始碼已驗證，再與[公開的合約儲存庫](contractsRepository)比對，或在 [Sourcify](sourcify) 上核對完全相符。',
+            '對於協議合約，開啟 Read as Proxy：其中列出的實現合約，應與合約頁面上的實現合約地址一致。',
+            '在應用程式中選一筆紀錄，例如一次落筆或一筆分配，再在區塊瀏覽器上該合約的交易中找到同一筆交易。',
           ],
         },
         {
-          heading: '應先核對什麼',
+          heading: '審計涵蓋的範圍',
           body: [
-            '先在官方應用程式主站開啟合約頁面，確認網路為 Arbitrum；再逐一對照原始碼連結、安全概覽與審計頁面。如尚未發布審計或形式化驗證報告，頁面會明確標註目前狀態。',
-            '已部署事實、已發布報告、靜態分析、社群審閱和後續工作各有不同，不能混為一談。',
+            `2025年末，Hacken 審查了生產合約：驅動每個週期的核心協議、CST 代幣、兩個 NFT 系列、錨定錢包，以及錢包與系統管理合約。[審計報告](hackenReport)於2026年1月發布，共列出 ${AUDIT_FINDINGS_TOTAL} 項發現，其中沒有嚴重或高危級別問題；在 Hacken 模糊測試的 ${HACKEN_AUDIT.invariants.tested} 項不變量中，${HACKEN_AUDIT.invariants.held} 項保持成立。`,
+            '合約儲存庫還包含 Certora Prover 規格、Solidity SMTChecker 設定、Slither 靜態分析和自動化測試套件，[審計頁面](audits)逐一附有連結。這些檢查只證明或測試它們所聲明的屬性，僅此而已。',
+            '審計的範圍是智慧合約：本網站、應用程式背後的資料服務和藝術渲染流程都不在其中。與所有檢查一樣，審計只能降低風險，無法消除風險；參與之前，請閱讀[風險揭露](riskDisclosures)。',
           ],
         },
       ],
-      relatedLabels: ['檢視合約地址', '開啟原始碼資源', '閱讀常見問題'],
     },
     'cst-token-and-cosmic-council': {
       cardTitle: 'CST 與宇宙議會',
@@ -336,7 +326,6 @@ export const learnTextZhTw = {
           ],
         },
       ],
-      relatedLabels: ['了解落筆如何運作', '開啟應用程式'],
     },
     'anchoring-nfts': {
       cardTitle: '錨定 NFT',
@@ -371,7 +360,6 @@ export const learnTextZhTw = {
           ],
         },
       ],
-      relatedLabels: ['開啟錨定工具', '瀏覽畫廊'],
     },
     'protocol-guild-public-goods': {
       cardTitle: '公共財與 Protocol Guild',
@@ -405,7 +393,6 @@ export const learnTextZhTw = {
           ],
         },
       ],
-      relatedLabels: ['檢視公共財資助紀錄', '了解週期如何運作'],
     },
     'collecting-and-trading-cosmic-signature': {
       cardTitle: '收藏與交易',
@@ -441,17 +428,10 @@ export const learnTextZhTw = {
         {
           heading: '如何驗證交易場所與地址',
           body: [
-            '交易前，先在應用程式主站的合約頁面確認官方地址，再與市場中的系列地址或兌換平台上的代幣地址逐一比對。應用程式頁首、頁尾與網站導覽均提供 Axiom Zero、Chaos Zero 和 Uniswap 的官方連結，因此始終可以循著官方導覽抵達正確地址。',
+            '交易前，先在應用程式的合約頁面確認官方地址，再與市場中的系列地址或兌換平台上的代幣地址逐一比對。應用程式頁首、頁尾與網站導覽均提供 Axiom Zero、Chaos Zero 和 Uniswap 的官方連結，因此始終可以循著官方導覽抵達正確地址。',
             '兌換 CST 與持有預測憑證時也應同樣謹慎：核對代幣地址是否與已公佈的 CST 合約一致。Chaos Zero 會根據協議紀錄的公開落筆次數判定預測結果，因此市場的每項輸入都可在 Arbitrum 上獨立查驗。',
           ],
         },
-      ],
-      relatedLabels: [
-        '在 Axiom Zero 瀏覽 Cosmic Signature',
-        '在 Chaos Zero 研判週期結果',
-        '在 Uniswap 用 ETH 兌換 CST',
-        '驗證合約地址',
-        '瀏覽 NFT 畫廊',
       ],
     },
     // lexicon-allow-start: 保留明確的否認措辭。
@@ -485,7 +465,6 @@ export const learnTextZhTw = {
           ],
         },
       ],
-      relatedLabels: ['閱讀服務條款', '閱讀常見問題'],
     },
     // lexicon-allow-end
   },

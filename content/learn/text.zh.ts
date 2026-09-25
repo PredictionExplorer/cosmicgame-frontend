@@ -1,19 +1,9 @@
+import { AUDIT_FINDINGS_TOTAL, HACKEN_AUDIT } from '@/content/legal/audit';
 import { protocolFacts } from '@/content/protocol-facts';
 
 import type { LearnText } from './structure';
-import type { LearnSection } from './types';
 
 /** 附加在每篇中文文章末尾的共享附录章节。 */
-const answerabilitySections: readonly LearnSection[] = [
-  {
-    heading: '查阅最新信息',
-    body: [
-      '实时周期数据、已验证合约地址、源代码和统计均可在官方应用中查阅。',
-      '会随时间变化的信息，请以应用中的实时数据为准；协议机制则以学习指南、常见问题、服务条款、安全、审计和风险披露页面为准。',
-    ],
-  },
-];
-
 /** 中文“学习”栏目文案，以 structure.ts 中的骨架为键。 */
 export const learnTextZh = {
   hub: {
@@ -67,10 +57,11 @@ export const learnTextZh = {
       backToTopLabel: '回到顶部',
     },
     headingLinkTemplate: '本节链接：{title}',
-    relatedResourcesHeading: 'Cosmic Signature 相关资源',
-    appendixLabel: '查证与延伸阅读',
-    verifyLinksLabel: '在应用中查证',
-    appendix: answerabilitySections,
+    relatedResourcesHeading: '相关资源',
+    contractsFigure: {
+      title: 'Arbitrum One 上的核心合约',
+      caption: '每个地址都可在 Arbiscan 上打开。合约页面列出全部官方地址，包括各金库与钱包。',
+    },
   },
   articles: {
     'what-is-cosmic-signature': {
@@ -112,7 +103,6 @@ export const learnTextZh = {
           ],
         },
       ],
-      relatedLabels: ['打开 Cosmic Signature 应用', '阅读常见问题', '查看协议统计'],
     },
     'how-the-performance-cycle-works': {
       cardTitle: '演绎周期',
@@ -153,7 +143,6 @@ export const learnTextZh = {
           ],
         },
       ],
-      relatedLabels: ['查看当前演绎周期', '查看分配记录', '阅读协议常见问题'],
     },
     'how-gestures-work': {
       cardTitle: '落笔如何运作',
@@ -194,7 +183,6 @@ export const learnTextZh = {
           ],
         },
       ],
-      relatedLabels: ['在应用中落笔或查看落笔记录', '了解演绎周期', '查看当前周期数据'],
     },
     'three-body-nft-art': {
       cardTitle: '三体艺术',
@@ -235,7 +223,6 @@ export const learnTextZh = {
           ],
         },
       ],
-      relatedLabels: ['浏览 Cosmic Signature 画廊', '查看源代码', '阅读合约与验证说明'],
     },
     'cosmic-signature-on-arbitrum': {
       cardTitle: '运行于 Arbitrum',
@@ -269,7 +256,6 @@ export const learnTextZh = {
           ],
         },
       ],
-      relatedLabels: ['查看已验证合约', '查看协议统计'],
     },
     'contracts-security-verification': {
       cardTitle: '合约与验证',
@@ -278,31 +264,35 @@ export const learnTextZh = {
       description:
         '查阅 Cosmic Signature 智能合约、源代码、验证信息，以及这套 Arbitrum 协议的安全背景。',
       h1: 'Cosmic Signature 合约、安全与验证',
-      summary: 'Cosmic Signature 公开合约与源代码信息，便于参与者审视协议机制并验证链上行为。',
+      summary:
+        'Cosmic Signature 运行在 Arbitrum One 上的一组合约之上。本指南列出核心合约，介绍自行核验的方法，并说明独立审计的覆盖范围。',
       sections: [
         {
-          heading: '公开的合约信息',
+          heading: '协议背后的合约',
           body: [
-            '合约页面是查询地址、验证链接、部署详情和协议资金流向的官方入口。',
-            '关键信息会以清晰文字列出，无需连接钱包或打开区块浏览器也能查阅。',
+            'Cosmic Signature 运行在 Arbitrum One 上，链 ID 为 42161。落笔、周期与分配都经由同一个合约：Cosmic Signature 协议。它以可升级代理合约的形式部署，地址保持不变，逻辑则位于代理所指向的实现合约中。CST、两个 NFT 系列和宇宙议会各有自己的地址。',
+            '[合约页面](contracts)是官方地址的唯一清单，各金库与钱包也列在其中。任何以 Cosmic Signature 名义出现、却不在此清单上的地址，都应视为非官方地址。',
           ],
         },
         {
-          heading: '可供验证的公开入口',
-          body: [
-            '验证信息分布在多个公开入口。[合约页面](contracts)列出部署地址与区块浏览器链接，[源代码页面](code)介绍确定性渲染资源，[审计页面](audits)说明审阅状态，[安全页面](security)则解释如何查验官方资源。',
-            '核验时应结合这些页面：合约地址需与部署说明一同查看，安全声明也应有报告或链接作为依据。站内链接会串联合约地址、源代码、风险说明和审计状态。',
+          heading: '自行核验合约',
+          body: ['以下步骤都无需连接钱包。'],
+          steps: [
+            '从[合约页面](contracts)在 [Arbiscan](explorer) 上打开地址，确认网络是 Arbitrum One，而不是测试网。',
+            '在 Contract 标签页确认源代码已验证，再与[公开的合约仓库](contractsRepository)比对，或在 [Sourcify](sourcify) 上核对完全匹配。',
+            '对于协议合约，打开 Read as Proxy：其中列出的实现合约，应与合约页面上的实现合约地址一致。',
+            '在应用中选一条记录，例如一次落笔或一笔分配，再在区块浏览器上该合约的交易中找到同一笔交易。',
           ],
         },
         {
-          heading: '应先核对什么',
+          heading: '审计覆盖的范围',
           body: [
-            '先在官方应用主站打开合约页面，确认网络为 Arbitrum；再逐一对照源代码链接、安全概览与审计页面。如尚未发布审计或形式化验证报告，页面会明确标注当前状态。',
-            '已部署事实、已发布报告、静态分析、社区审阅和后续工作各有不同，不能混为一谈。',
+            `2025年末，Hacken 审查了生产合约：驱动每个周期的核心协议、CST 代币、两个 NFT 系列、锚定钱包，以及钱包与系统管理合约。[审计报告](hackenReport)于2026年1月发布，共列出 ${AUDIT_FINDINGS_TOTAL} 项发现，其中没有严重或高危级别问题；在 Hacken 模糊测试的 ${HACKEN_AUDIT.invariants.tested} 项不变量中，${HACKEN_AUDIT.invariants.held} 项保持成立。`,
+            '合约仓库还包含 Certora Prover 规范、Solidity SMTChecker 配置、Slither 静态分析和自动化测试套件，[审计页面](audits)逐一附有链接。这些检查只证明或测试它们所声明的属性，仅此而已。',
+            '审计的范围是智能合约：本网站、应用背后的数据服务和艺术渲染流程都不在其中。与所有检查一样，审计只能降低风险，无法消除风险；参与之前，请阅读[风险披露](riskDisclosures)。',
           ],
         },
       ],
-      relatedLabels: ['查看合约地址', '打开源代码资源', '阅读常见问题'],
     },
     'cst-token-and-cosmic-council': {
       cardTitle: 'CST 与宇宙议会',
@@ -336,7 +326,6 @@ export const learnTextZh = {
           ],
         },
       ],
-      relatedLabels: ['了解落笔如何运作', '打开应用'],
     },
     'anchoring-nfts': {
       cardTitle: '锚定 NFT',
@@ -371,7 +360,6 @@ export const learnTextZh = {
           ],
         },
       ],
-      relatedLabels: ['打开锚定工具', '浏览画廊'],
     },
     'protocol-guild-public-goods': {
       cardTitle: '公共物品与 Protocol Guild',
@@ -405,7 +393,6 @@ export const learnTextZh = {
           ],
         },
       ],
-      relatedLabels: ['查看公共物品资助记录', '了解周期如何运作'],
     },
     'collecting-and-trading-cosmic-signature': {
       cardTitle: '收藏与交易',
@@ -441,17 +428,10 @@ export const learnTextZh = {
         {
           heading: '如何核验交易场所与地址',
           body: [
-            '交易前，先在应用主站的合约页面确认官方地址，再与市场中的系列地址或兑换平台上的代币地址逐一比对。应用页眉、页脚与网站地图均提供 Axiom Zero、Chaos Zero 和 Uniswap 的官方链接，因此始终可以循着官方导航抵达正确地址。',
+            '交易前，先在应用的合约页面确认官方地址，再与市场中的系列地址或兑换平台上的代币地址逐一比对。应用页眉、页脚与网站地图均提供 Axiom Zero、Chaos Zero 和 Uniswap 的官方链接，因此始终可以循着官方导航抵达正确地址。',
             '兑换 CST 与持有预测凭证时也应同样谨慎：核对代币地址是否与已公布的 CST 合约一致。Chaos Zero 会根据协议记录的公开落笔次数判定预测结果，因此市场的每项输入都可在 Arbitrum 上独立查验。',
           ],
         },
-      ],
-      relatedLabels: [
-        '在 Axiom Zero 浏览 Cosmic Signature',
-        '在 Chaos Zero 研判周期结果',
-        '在 Uniswap 用 ETH 兑换 CST',
-        '核验合约地址',
-        '浏览 NFT 画廊',
       ],
     },
     // lexicon-allow-start: 保留明确的否认措辞。
@@ -485,7 +465,6 @@ export const learnTextZh = {
           ],
         },
       ],
-      relatedLabels: ['阅读服务条款', '阅读常见问题'],
     },
     // lexicon-allow-end
   },

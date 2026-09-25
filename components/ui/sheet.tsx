@@ -67,14 +67,19 @@ interface SheetContentProps
    * `corner` (default): the dialog's close control in the top corner.
    * `header`: for a drawer that opens with a header-height row (the site
    * menus): the close control sits where the menu button that opened it was,
-   * a 44px target centred on the row, with the menu button's 20px glyph.
+   * a 44px target centred on the row at the page gutter, with the menu
+   * button's 20px glyph.
    */
   closePlacement?: 'corner' | 'header';
 }
 
-/** On a drawer's header row: centred on the row, 8px from the edge, like the menu button. */
+/**
+ * On a drawer's header row, where the menu button was: centred on the row,
+ * its edge half a rem inside the page gutter (the button's own `-mr-2` in a
+ * `site-container`), so it tracks the gutter from a 320px phone to a tablet.
+ */
 const HEADER_CLOSE_CLASS =
-  'right-2 top-[calc((var(--header-height)-2.75rem)/2)] size-11 min-h-11 min-w-11 sm:m-0 sm:size-11';
+  'right-[calc(var(--gutter)-0.5rem)] top-[calc((var(--header-height)-2.75rem)/2)] size-11 min-h-11 min-w-11 sm:m-0 sm:size-11';
 
 const SheetContent = React.forwardRef<
   React.ComponentRef<typeof SheetPrimitive.Content>,

@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useRef, useState, useSyncExternalStore } from 'react';
+import { useEffect, useId, useRef, useState, useSyncExternalStore } from 'react';
 import { ArrowRight } from 'lucide-react';
 import { useLocale, useTranslations } from 'next-intl';
 
@@ -20,6 +20,7 @@ import { LiveStatusView } from '@/components/ui/live-status-view';
 import {
   getLandingCycleTimerSnapshot,
   mergeLandingCyclePoll,
+  type ClockShard,
   type LandingCyclePoll,
   type LandingCycleReading,
   type LandingCycleTimerSnapshot,
@@ -28,6 +29,7 @@ import {
 // pulled axios + the full schema module (~90 KB gzip) into the marketing
 // host's bundle for three display-only reads.
 import {
+  LANDING_FETCH_TIMEOUT_MS,
   fetchLandingCurrentTimeSec,
   fetchLandingDashboardSnapshot,
   fetchLandingFinalizationTimeSec,
@@ -38,13 +40,17 @@ import styles from './EventHorizonCountdown.module.css';
 /** The base cadence; it quickens near the deadline (lib/pollingCadence). */
 export const POLL_INTERVAL_MS = 12_000;
 
-/** One poll of the three reads; each helper answers null on failure and never throws. */
-async function pollLandingCycle(): Promise<LandingCyclePoll> {
+/**
+ * One poll of the three reads; each helper answers null on failure (a
+ * timeout included) and never throws, so a hung read never holds the loop
+ * past the next poll's time.
+ */
+async function pollLandingCycle(timeoutMs: number): Promise<LandingCyclePoll> {
   const sampledAtMs = Date.now();
   const [targetServerTimeSec, currentServerTimeSec, dashboard] = await Promise.all([
-    fetchLandingFinalizationTimeSec(),
-    fetchLandingCurrentTimeSec(),
-    fetchLandingDashboardSnapshot(),
+    fetchLandingFinalizationTimeSec(timeoutMs),
+    fetchLandingCurrentTimeSec(timeoutMs),
+    fetchLandingDashboardSnapshot(timeoutMs),
   ]);
   return { targetServerTimeSec, currentServerTimeSec, dashboard, sampledAtMs };
 }
@@ -65,7 +71,9 @@ function readOnline(): boolean {
 /**
  * Polls the three clock reads and keeps the last good value of each
  * (`mergeLandingCyclePoll`), so one failed request never blanks the clock;
- * ticks once a second; and follows the browser's online state.
+ * ticks once a second; and follows the browser's online state. Polling
+ * stops while the tab is hidden and resumes with a fresh read when it is
+ * shown again, as the app's queries do.
  */
 function useLandingCycleReading() {
   const [reading, setReading] = useState<LandingCycleReading | null>(null);
@@ -76,9 +84,10 @@ function useLandingCycleReading() {
   useEffect(() => {
     let cancelled = false;
     let pollId: number | undefined;
+    let inFlight = false;
 
     const refresh = async () => {
-      const poll = await pollLandingCycle();
+      const poll = await pollLandingCycle(Math.min(LANDING_FETCH_TIMEOUT_MS, nextDelayMs()));
       if (cancelled) return;
       const next = mergeLandingCyclePoll(readingRef.current, poll);
       readingRef.current = next;
@@ -102,15 +111,32 @@ function useLandingCycleReading() {
     };
 
     const loop = async () => {
+      pollId = undefined;
+      inFlight = true;
       await refresh();
-      if (!cancelled) pollId = window.setTimeout(loop, nextDelayMs());
+      inFlight = false;
+      if (!cancelled && document.visibilityState !== 'hidden') {
+        pollId = window.setTimeout(loop, nextDelayMs());
+      }
     };
 
+    // A hidden tab reads nothing; showing it again reads at once.
+    const onVisibilityChange = () => {
+      if (document.visibilityState === 'hidden') {
+        if (pollId !== undefined) window.clearTimeout(pollId);
+        pollId = undefined;
+      } else if (!inFlight && pollId === undefined) {
+        void loop();
+      }
+    };
+
+    document.addEventListener('visibilitychange', onVisibilityChange);
     void loop();
     const tickId = window.setInterval(() => setNowMs(Date.now()), 1000);
 
     return () => {
       cancelled = true;
+      document.removeEventListener('visibilitychange', onVisibilityChange);
       if (pollId !== undefined) window.clearTimeout(pollId);
       window.clearInterval(tickId);
     };
@@ -153,6 +179,18 @@ function phaseCopyKey(phase: LandingCycleTimerSnapshot['phase']): PhaseCopyKey {
   }
 }
 
+/**
+ * The units a listener hears: the non-zero ones, to the minute, so the spoken
+ * duration changes once a minute rather than every second ("2 hours,
+ * 1 minute"). Under a minute it counts the seconds.
+ */
+export function spokenShards(shards: readonly ClockShard[]): readonly ClockShard[] {
+  const nonZero = shards.filter((shard) => shard.value > 0);
+  const toTheMinute = nonZero.filter((shard) => shard.unit !== 'seconds');
+  if (toTheMinute.length > 0) return toTheMinute;
+  return nonZero.length > 0 ? nonZero : shards.slice(-1);
+}
+
 /** Phases whose readout is a sentence instead of figures. */
 const STATEMENT_PHASES: ReadonlySet<PhaseCopyKey> = new Set([
   'waitingFirstGesture',
@@ -180,6 +218,7 @@ export function EventHorizonCountdown() {
   const timerT = useTranslations('landing.timer');
   const navT = useTranslations('nav');
   const hydrated = useHydrated();
+  const titleId = useId();
   const { reading, nowMs, online } = useLandingCycleReading();
 
   const snapshot = getLandingCycleTimerSnapshot({
@@ -213,20 +252,18 @@ export function EventHorizonCountdown() {
     copyKey === 'ready' || copyKey === 'confirming' ? timerT(`phases.${copyKey}.state`) : null;
 
   // The one Cycle clock (countdownGroups): the app's groups, padding and
-  // fixed captions, so the same number never changes shape between hosts;
-  // the timer's name spells the value out.
+  // fixed captions, so the same number never changes shape between hosts.
+  // The figures are hidden from assistive technology; the timer is named by
+  // the heading and reads as text, the duration spelled out to the minute.
   const parts = Object.fromEntries(
     snapshot.shards.map((shard) => [shard.unit, shard.value]),
   ) as unknown as CountdownParts;
   const groups = countdownGroups(parts, locale);
-  const timerLabel = showCountdown
-    ? timerT('countdownAria', {
-        label: title,
-        duration: snapshot.shards
-          .map((shard) => timerT(`duration.${shard.unit}`, { count: shard.value }))
-          .join(timerT('durationSeparator')),
-      })
-    : title;
+  const spokenDuration = showCountdown
+    ? spokenShards(snapshot.shards)
+        .map((shard) => timerT(`duration.${shard.unit}`, { count: shard.value }))
+        .join(timerT('durationSeparator'))
+    : null;
 
   const app = resolveRouteHref(getSiteRoute('observatory'), 'landing', locale);
   const currentCycle = resolveRouteHref(getSiteRoute('currentCycle'), 'landing', locale);
@@ -245,7 +282,12 @@ export function EventHorizonCountdown() {
           <p className="type-eyebrow text-subtle">
             {hydrated && !unavailable ? timerT('liveClock') : timerT('cycleClock')}
           </p>
-          <h2 className={cn('type-heading-1', styles.title, loading && styles.pending)}>{title}</h2>
+          <h2
+            id={titleId}
+            className={cn('type-heading-1', styles.title, loading && styles.pending)}
+          >
+            {title}
+          </h2>
           {gestureCount !== null && gestureCount > 0 ? (
             <p className={cn('type-body-sm text-muted-foreground', styles.fact)}>
               {timerT('gestureCount', { count: gestureCount })}
@@ -254,7 +296,8 @@ export function EventHorizonCountdown() {
         </div>
 
         <div className={styles.readout}>
-          <div role="timer" aria-live="off" aria-label={timerLabel} className={styles.timer}>
+          <div role="timer" aria-live="off" aria-labelledby={titleId} className={styles.timer}>
+            {spokenDuration ? <span className="sr-only">{spokenDuration}</span> : null}
             {showCountdown || loading ? (
               <CountdownFigures
                 groups={groups}

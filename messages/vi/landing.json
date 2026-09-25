@@ -54,7 +54,6 @@
     },
     "currentCycle": "Mở chu kỳ hiện tại",
     "noscript": "Đồng hồ trực tiếp cần JavaScript. Ứng dụng luôn hiển thị chu kỳ hiện tại.",
-    "countdownAria": "{label}: {duration}",
     "durationSeparator": ", "
   },
   "artwork": {
@@ -64,6 +63,8 @@
     "resumeRotation": "Tiếp tục chuyển tác phẩm",
     "playAnimation": "Phát hoạt ảnh",
     "pauseAnimation": "Tạm dừng hoạt ảnh",
+    "resumeAnimation": "Tiếp tục hoạt ảnh",
+    "replayAnimation": "Phát lại",
     "unavailable": "Tác phẩm không khả dụng"
   }
 }

@@ -26,4 +26,10 @@ describe('bundled Signature plates', () => {
   it('prints a short seed that never breaks across lines', () => {
     expect(shortSeed(SIGNATURE_PLATES[23].seed)).toBe('17d61f…⁠ffcc');
   });
+
+  it('prints one short form on every surface, whatever the seed looks like', () => {
+    // The landing's Art plate and the white paper's figure caption #24 alike.
+    expect(shortSeed(`0x${SIGNATURE_PLATES[24].seed.toUpperCase()}`)).toBe('5084a8…⁠33ad');
+    expect(shortSeed('abc')).toBe('abc');
+  });
 });

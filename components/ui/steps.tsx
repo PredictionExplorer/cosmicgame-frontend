@@ -9,6 +9,13 @@ export interface StepsItem {
   title: ReactNode;
   /** The explanation under the title: text, or a short list of its own. */
   body?: ReactNode;
+  /**
+   * `list` only: a glyph in the index column instead of the number, for a
+   * set of peers that is not a sequence (with `ordered={false}`), such as
+   * the landing's Verifiability pillars beside the Council's rules.
+   * Decorative, like the number.
+   */
+  marker?: ReactNode;
 }
 
 export interface StepsProps {
@@ -34,6 +41,12 @@ export interface StepsProps {
    * sit flush with what surrounds them.
    */
   framed?: boolean;
+  /**
+   * `list` only: `false` sets peers that are not a sequence as an unordered
+   * list in the same rows, each item bringing its own `marker`, so a set of
+   * claims beside a numbered list shares its gutter, padding and title tier.
+   */
+  ordered?: boolean;
   className?: string;
 }
 
@@ -41,7 +54,9 @@ export interface StepsProps {
  * Steps — every numbered sequence on both hosts, one treatment per layout:
  * the index in Inter tabular figures in the subtle tier (never mono, which
  * is for identifiers, and never a display-size figure), the title at
- * `type-heading-3`, the body at `type-body-sm` in the muted tier. Server-safe.
+ * `type-heading-3`, the body at `type-body-sm` in the muted tier. A set of
+ * peers beside a sequence takes the same rows with a glyph for the index
+ * (`ordered={false}` and a `marker` per item). Server-safe.
  */
 export function Steps({
   items,
@@ -49,6 +64,7 @@ export function Steps({
   titleAs: Title = 'h3',
   stepLabel,
   framed = false,
+  ordered = true,
   className,
 }: StepsProps) {
   if (layout === 'timeline') {
@@ -84,8 +100,9 @@ export function Steps({
     );
   }
 
+  const List = ordered ? 'ol' : 'ul';
   return (
-    <ol
+    <List
       className={cn(
         'min-w-0 divide-y divide-rule-faint',
         framed && 'border-y border-rule-faint',
@@ -105,7 +122,7 @@ export function Steps({
             data-slot="step-index"
             className="pt-1 type-label tabular-nums text-subtle"
           >
-            {String(index + 1).padStart(2, '0')}
+            {item.marker ?? String(index + 1).padStart(2, '0')}
           </span>
           <div className="min-w-0">
             {stepLabel ? <span className="sr-only">{stepLabel(index + 1)}</span> : null}
@@ -116,6 +133,6 @@ export function Steps({
           </div>
         </li>
       ))}
-    </ol>
+    </List>
   );
 }

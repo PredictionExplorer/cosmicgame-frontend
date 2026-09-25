@@ -1,8 +1,8 @@
 import type { LandingContent } from '@/content/landing';
 
 import { cn } from '@/lib/utils';
+import { AllocationBar, TrackSwatch } from '@/components/reading/AllocationBar';
 
-import { AllocationBar, trackFill } from './AllocationBar';
 import { LandingSection, SectionHeading } from './SectionHeading';
 import styles from './Landing.module.css';
 
@@ -32,7 +32,7 @@ export function AllocationTracks({ tracks }: { tracks: LandingContent['tracks'] 
         <ul className={styles.legend} aria-labelledby="landing-tracks-eth">
           {tracks.eth.map((track) => (
             <li key={track.id} className={styles.legendItem}>
-              <span aria-hidden="true" className={cn(styles.swatch, trackFill(track.id))} />
+              <TrackSwatch id={track.id} />
               <h4 className="type-title">{track.title}</h4>
               <span className="type-figure-md text-right">{track.percent}</span>
               <p className={cn('type-body-sm text-muted-foreground', styles.legendBody)}>

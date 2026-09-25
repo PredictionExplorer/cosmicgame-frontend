@@ -28,17 +28,14 @@ describe('learnArticles', () => {
       expect(article.summary).toMatch(/[\u3400-\u9fff]/);
       expect(article.sections.length).toBeGreaterThanOrEqual(3);
       // Chinese has no whitespace-delimited words and is materially denser
-      // than English, so use a CJK-aware character floor instead. The page
-      // renders the shared reference notes after every guide.
+      // than English, so use a CJK-aware character floor instead.
       expect(
-        [...article.sections, ...learnContentZh.articleUi.appendix]
-          .flatMap((section) => section.body)
-          .join('').length,
-      ).toBeGreaterThan(400);
+        article.sections.flatMap((section) => [...section.body, ...(section.steps ?? [])]).join('')
+          .length,
+      ).toBeGreaterThan(250);
       const english = getLearnArticle(article.slug);
-      expect(article.related.map((link) => link.href)).toEqual(
-        english?.related.map((link) => link.href),
-      );
+      expect(article.related).toEqual(english?.related);
+      expect(article.figures).toEqual(english?.figures);
     }
   });
 
@@ -129,19 +126,30 @@ describe('learn reading path', () => {
       expect(article.cardDescription).not.toBe(article.description);
       expect(signaturePlate(article.plate)).toBeDefined();
     }
-    expect(articleUi.appendix.length).toBeGreaterThan(0);
+    expect(articleUi.relatedResourcesHeading.trim()).not.toBe('');
     expect(articleUi.guideTemplate).toContain('{number}');
     expect(articleUi.readingTimeTemplate).toContain('{minutes}');
   });
 
-  it.each(routing.locales)('%s: keeps the shared reference notes out of the guides', (locale) => {
-    const { articles, articleUi } = getLearnContent(locale);
-    const appendixHeadings = new Set(articleUi.appendix.map((section) => section.heading));
-    for (const article of articles) {
-      expect(article.sections.filter((section) => appendixHeadings.has(section.heading))).toEqual(
-        [],
-      );
+  it.each(routing.locales)('%s: sets every figure in a section the guide has (V178)', (locale) => {
+    for (const article of getLearnContent(locale).articles) {
+      for (const figure of article.figures) {
+        expect([article.slug, article.sections[figure.section]]).toEqual([
+          article.slug,
+          expect.objectContaining({ heading: expect.any(String) }),
+        ]);
+      }
     }
+  });
+
+  it('illustrates the guides that describe a mechanism', () => {
+    const kinds = (slug: string) => getLearnArticle(slug)!.figures.map((figure) => figure.kind);
+    expect(kinds('how-the-performance-cycle-works')).toEqual(['cycleTimeline', 'allocation']);
+    expect(kinds('how-gestures-work')).toEqual(['cycleTimeline']);
+    expect(kinds('three-body-nft-art')).toEqual(['seedPlates']);
+    expect(kinds('contracts-security-verification')).toEqual(['contracts']);
+    expect(kinds('anchoring-nfts')).toEqual(['allocation']);
+    expect(kinds('protocol-guild-public-goods')).toEqual(['allocation']);
   });
 
   it('gives every guide its own opening Signature', () => {
@@ -183,7 +191,7 @@ describe('learn article contract accuracy', () => {
 
   it('trading article links the ecosystem destinations from the shared config', () => {
     const article = getLearnArticle('collecting-and-trading-cosmic-signature');
-    const hrefs = article!.related.map((link) => link.href);
+    const hrefs = article!.related;
     expect(hrefs).toContain('https://www.axiomzero.market/cosmic-signature');
     expect(hrefs).toContain('https://chaoszero.com');
     expect(hrefs.some((href) => href.startsWith('https://app.uniswap.org/'))).toBe(true);
@@ -206,30 +214,49 @@ describe('inline links in guide prose', () => {
   });
 
   function paragraphsOf(locale: string) {
-    const { articles, articleUi } = getLearnContent(locale);
-    return [
-      ...articles.flatMap((article) =>
-        article.sections.flatMap((section, sectionIndex) =>
-          section.body.map((text, index) => ({
-            key: `${article.slug} ${sectionIndex}.${index}`,
-            text,
-          })),
-        ),
+    const { articles } = getLearnContent(locale);
+    return articles.flatMap((article) =>
+      article.sections.flatMap((section, sectionIndex) =>
+        [...section.body, ...(section.steps ?? [])].map((text, index) => ({
+          key: `${article.slug} ${sectionIndex}.${index}`,
+          text,
+        })),
       ),
-      ...articleUi.appendix.flatMap((section, sectionIndex) =>
-        section.body.map((text, index) => ({ key: `appendix ${sectionIndex}.${index}`, text })),
-      ),
-    ];
+    );
   }
 
-  it('links the verification pages from the contracts guide', () => {
+  it('shows how to verify a contract, step by step, in the contracts guide (V177)', () => {
     const guide = getLearnArticle('contracts-security-verification')!;
-    expect(guide.sections.flatMap((section) => section.body).flatMap(learnLinkKeys)).toEqual([
+    const text = guide.sections
+      .flatMap((section) => [...section.body, ...(section.steps ?? [])])
+      .join(' ');
+    expect(guide.sections.flatMap((section) => section.steps ?? [])).toHaveLength(4);
+    expect(text).toContain('42161');
+    expect(text).toMatch(/Read as Proxy/);
+    expect(text).toMatch(/Hacken/);
+    // It explains the protocol, not how the site's pages should be written.
+    expect(text).not.toMatch(/should say so|Trust pages are|app-host|internal links/i);
+    expect(
+      guide.sections
+        .flatMap((section) => [...section.body, ...(section.steps ?? [])])
+        .flatMap(learnLinkKeys),
+    ).toEqual([
       'contracts',
-      'code',
+      'contracts',
+      'explorer',
+      'contractsRepository',
+      'sourcify',
+      'hackenReport',
       'audits',
-      'security',
+      'riskDisclosures',
     ]);
+  });
+
+  it.each(routing.locales)('%s: never calls the app its host', (locale) => {
+    const text = JSON.stringify(getLearnContent(locale).articles);
+    expect(text).not.toMatch(
+      /app-host|app host|应用主站|應用程式主站|앱 호스트|アプリホスト|máy chủ ứng dụng/i,
+    );
   });
 
   it.each(routing.locales)(

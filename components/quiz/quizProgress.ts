@@ -306,15 +306,15 @@ export type QuizRankKey = keyof QuizRunnerUi['summary']['ranks'];
 
 /** The mastery ranks, highest first, each with its minimum share of correct answers. */
 export const RANK_BANDS = [
-  { threshold: 0.95, rank: 'chronoWarrior' },
-  { threshold: 0.75, rank: 'enduranceChampion' },
-  { threshold: 0.5, rank: 'participant' },
-  { threshold: 0, rank: 'observer' },
+  { threshold: 0.95, rank: 'cartographer' },
+  { threshold: 0.75, rank: 'scholar' },
+  { threshold: 0.5, rank: 'student' },
+  { threshold: 0, rank: 'reader' },
 ] as const satisfies ReadonlyArray<{ threshold: number; rank: QuizRankKey }>;
 
 export function rankFor(correct: number, total: number): QuizRankKey {
   const ratio = total === 0 ? 0 : correct / total;
-  return RANK_BANDS.find((band) => ratio >= band.threshold)?.rank ?? 'observer';
+  return RANK_BANDS.find((band) => ratio >= band.threshold)?.rank ?? 'reader';
 }
 
 /** The share of correct answers from which the runner suggests the next tier. */

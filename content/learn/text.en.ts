@@ -1,38 +1,7 @@
+import { AUDIT_FINDINGS_TOTAL, HACKEN_AUDIT } from '@/content/legal/audit';
 import { protocolFacts } from '@/content/protocol-facts';
 
 import type { LearnText } from './structure';
-import type { LearnSection } from './types';
-
-/** Shared appendix sections attached to the end of every English article. */
-const answerabilitySections: readonly LearnSection[] = [
-  {
-    heading: 'The protocol at a glance',
-    body: [
-      'Cosmic Signature is a procedural on-chain art protocol on Arbitrum. Its Performance Cycles connect gestures, deterministic three-body NFT art, CST, anchoring, and Public Goods Allocations.',
-      'Visit cosmicsignature.com for guides and explanations, and app.cosmicsignature.com for the active cycle, artwork, and protocol records.',
-    ],
-  },
-  {
-    heading: 'How to verify this topic',
-    body: [
-      'Use the official app pages to inspect live protocol data, verified contract addresses, source-code resources, and statistics. The contracts page connects protocol explanations to Arbitrum addresses, while the statistics page labels its data source and update time.',
-      'When a fact can change, prefer the live app page as the current source. When a fact explains how the protocol works, prefer the learn article, FAQ, terms, security, audits, or risk-disclosures pages as the stable explanatory source.',
-    ],
-  },
-  {
-    heading: 'Further reading',
-    body: [
-      'The FAQ explains common questions. The contracts and source-code pages let you inspect the implementation, while statistics show protocol activity. Read the risk disclosures before taking part.',
-    ],
-  },
-  {
-    heading: 'Explore before connecting a wallet',
-    body: [
-      'You can read the guides, browse the gallery, and inspect public protocol records without connecting a wallet.',
-      'Use this guide to understand the rules, then check the app for current costs, timing, and protocol records before deciding whether to participate.',
-    ],
-  },
-];
 
 /** English learn copy, keyed by the skeleton in structure.ts. */
 export const learnTextEn = {
@@ -90,10 +59,12 @@ export const learnTextEn = {
       backToTopLabel: 'Back to top',
     },
     headingLinkTemplate: 'Link to this section: {title}',
-    relatedResourcesHeading: 'Related Cosmic Signature resources',
-    appendixLabel: 'Checking this guide',
-    verifyLinksLabel: 'Check it on the app',
-    appendix: answerabilitySections,
+    relatedResourcesHeading: 'Related resources',
+    contractsFigure: {
+      title: 'The core contracts on Arbitrum One',
+      caption:
+        'Each address opens on Arbiscan. The contracts page lists every official address, the vaults and wallets included.',
+    },
   },
   articles: {
     'what-is-cosmic-signature': {
@@ -131,12 +102,11 @@ export const learnTextEn = {
         {
           heading: 'How to read the public data',
           body: [
-            'The app host exposes live state such as the current cycle, statistics, allocation recipients, contract addresses, gallery records, and contribution histories. These pages are designed to be useful even before a wallet connects, because public protocol data should not depend on a private account state.',
+            'The app shows live state such as the current cycle, statistics, allocation recipients, contract addresses, gallery records, and contribution histories. These pages are designed to be useful even before a wallet connects, because public protocol data should not depend on a private account state.',
             'The main website explains the protocol and its terminology. The app shows current costs, timing, and activity, so you can move from understanding a rule to checking how it applies to a live cycle.',
           ],
         },
       ],
-      relatedLabels: ['Open the Cosmic Signature app', 'Read the FAQ', 'View protocol statistics'],
     },
     'how-the-performance-cycle-works': {
       cardTitle: 'The Performance Cycle',
@@ -176,11 +146,6 @@ export const learnTextEn = {
             'When a cycle finalizes, the protocol stops treating it as live state and starts treating it as history. The final Signature, recipient records, allocation retrievals, attached NFTs, and public-goods contributions become part of the public archive that future participants can inspect.',
           ],
         },
-      ],
-      relatedLabels: [
-        'See the current Performance Cycle',
-        'View allocation history',
-        'Read protocol FAQ answers',
       ],
     },
     'how-gestures-work': {
@@ -223,11 +188,6 @@ export const learnTextEn = {
           ],
         },
       ],
-      relatedLabels: [
-        'Make or inspect gestures in the app',
-        'Learn about Performance Cycles',
-        'View current cycle data',
-      ],
     },
     'three-body-nft-art': {
       cardTitle: 'Three-body art',
@@ -269,11 +229,6 @@ export const learnTextEn = {
           ],
         },
       ],
-      relatedLabels: [
-        'Explore the Cosmic Signature gallery',
-        'Review source code',
-        'Read contract and verification notes',
-      ],
     },
     'cosmic-signature-on-arbitrum': {
       cardTitle: 'Built on Arbitrum',
@@ -307,7 +262,6 @@ export const learnTextEn = {
           ],
         },
       ],
-      relatedLabels: ['View verified contracts', 'View protocol statistics'],
     },
     'contracts-security-verification': {
       cardTitle: 'Contracts and verification',
@@ -318,31 +272,34 @@ export const learnTextEn = {
         'Find the Cosmic Signature smart contract, source code, verification, and security context for the Arbitrum protocol.',
       h1: 'Cosmic Signature contracts, security, and verification',
       summary:
-        'Cosmic Signature publishes contract and source-code information so participants can inspect the protocol mechanics and verify on-chain behavior.',
+        'Cosmic Signature runs on a small set of contracts on Arbitrum One. This guide names the core ones, shows how to check any of them yourself, and says what an independent audit has covered.',
       sections: [
         {
-          heading: 'Public contract context',
+          heading: 'The contracts behind the protocol',
           body: [
-            'Start with the contracts page for deployment addresses, verification links, and the role of each contract in the protocol.',
-            'You can review these resources before connecting a wallet. Follow the explorer links to compare the deployed contracts with their published source code.',
+            'Cosmic Signature runs on Arbitrum One, chain ID 42161. Gestures, cycles and allocations all go through one contract, the Cosmic Signature Protocol, deployed as an upgradeable proxy: its address stays the same while its logic lives in the implementation contract the proxy points to. CST, both NFT collections and the Cosmic Council each have an address of their own.',
+            'The [contracts page](contracts) is the one list of official addresses, the vaults and wallets included. Treat any other address that presents itself as Cosmic Signature as unofficial.',
           ],
         },
         {
-          heading: 'Verification surfaces',
-          body: [
-            'Verification is spread across several public surfaces. The [contracts page](contracts) lists deployment addresses and explorer links, the [code page](code) describes the deterministic rendering resources, the [audits page](audits) states review status, and the [security page](security) explains how users should inspect official resources.',
-            'These pages should be read together. A contract address without context is hard to interpret; a security claim without links is hard to verify. Cosmic Signature therefore keeps addresses, source references, risk language, and audit status connected through internal links.',
+          heading: 'Check a contract yourself',
+          body: ['None of these steps needs a wallet.'],
+          steps: [
+            'Open the address from the [contracts page](contracts) on [Arbiscan](explorer), and confirm the network is Arbitrum One, not a test network.',
+            'On the Contract tab, confirm the source code is verified. Compare it with the [public contracts repository](contractsRepository), or check the exact match on [Sourcify](sourcify).',
+            'For the protocol contract, open Read as Proxy: the implementation it names should be the implementation address on the contracts page.',
+            'Pick a record in the app, such as a gesture or an allocation, and find the same transaction among the contract’s transactions on the explorer.',
           ],
         },
         {
-          heading: 'What to check first',
+          heading: 'What has been audited',
           body: [
-            'Start with the official app-host contracts page and confirm the Arbitrum network. Then compare source-code links, the security overview, and the audits page. If an audit or formal verification report has not been published, the page should say so plainly instead of implying unavailable proof.',
-            'This conservative approach is intentional. Trust pages are most useful when they distinguish deployed facts, published reports, static analysis, community review, and future work rather than collapsing them into a single unsupported claim.',
+            `In late 2025, Hacken reviewed the production contracts: the core protocol that runs each cycle, the CST token, both NFT collections, the anchoring wallets, and the wallet and system management contracts. [The report](hackenReport), published in January 2026, lists ${AUDIT_FINDINGS_TOTAL} findings, none of them critical or high, and ${HACKEN_AUDIT.invariants.held} of the ${HACKEN_AUDIT.invariants.tested} invariants Hacken fuzz-tested held.`,
+            'The contracts repository also carries Certora Prover specifications, a Solidity SMTChecker configuration, Slither static analysis and a test suite, each linked from the [audits page](audits). They prove or test the properties they state, and no more.',
+            'The audit’s scope was the smart contracts: this website, the data service behind the app and the art pipeline were not part of it. Like every check, it lowers risk without removing it; read the [risk disclosures](riskDisclosures) before taking part.',
           ],
         },
       ],
-      relatedLabels: ['Open contract addresses', 'Open source code resources', 'Read the FAQ'],
     },
     'cst-token-and-cosmic-council': {
       cardTitle: 'CST and the Cosmic Council',
@@ -377,7 +334,6 @@ export const learnTextEn = {
           ],
         },
       ],
-      relatedLabels: ['Read how gestures work', 'Open the app'],
     },
     'anchoring-nfts': {
       cardTitle: 'Anchoring NFTs',
@@ -413,7 +369,6 @@ export const learnTextEn = {
           ],
         },
       ],
-      relatedLabels: ['Open anchoring tools', 'Explore the gallery'],
     },
     'protocol-guild-public-goods': {
       cardTitle: 'Public Goods and Protocol Guild',
@@ -447,7 +402,6 @@ export const learnTextEn = {
           ],
         },
       ],
-      relatedLabels: ['View public-goods contribution records', 'Learn how cycles work'],
     },
     'collecting-and-trading-cosmic-signature': {
       cardTitle: 'Collecting and trading',
@@ -483,17 +437,10 @@ export const learnTextEn = {
         {
           heading: 'How to verify venues and addresses',
           body: [
-            'Before trading, confirm the official contract addresses on the app-host contracts page and compare them with the collection or token pair you are viewing on a marketplace or exchange. Cosmic Signature links its ecosystem venues \u2014 Axiom Zero, Chaos Zero, and Uniswap \u2014 from the app header, footer, and site map so there is always an official navigation path to the correct destination.',
+            'Before trading, confirm the official contract addresses on the contracts page in the app and compare them with the collection or token pair you are viewing on a marketplace or exchange. Cosmic Signature links its ecosystem venues \u2014 Axiom Zero, Chaos Zero, and Uniswap \u2014 from the app header, footer, and site map so there is always an official navigation path to the correct destination.',
             'The same caution applies to CST swaps and prediction positions: check that the token address matches the published CST contract, and remember that Chaos Zero positions resolve from public gesture counts recorded by the protocol, so every input to the market can be independently inspected on Arbitrum.',
           ],
         },
-      ],
-      relatedLabels: [
-        'Browse Cosmic Signature on Axiom Zero',
-        'Make predictions on Chaos Zero',
-        'Swap ETH for CST on Uniswap',
-        'Verify contract addresses',
-        'Explore the NFT gallery',
       ],
     },
     // lexicon-allow-start: explicit denial language for crawler and compliance clarity.
@@ -529,7 +476,6 @@ export const learnTextEn = {
           ],
         },
       ],
-      relatedLabels: ['Read the Terms of Service', 'Read the FAQ'],
     },
     // lexicon-allow-end
   },

@@ -3,12 +3,21 @@
  */
 import type { ReactElement } from 'react';
 
-import { getLearnContent, getLearnSlugs } from '@/content/learn';
+import { getLearnSlugs } from '@/content/learn';
 
 import { routing } from '@/i18n/routing';
-import type { CosmicOgCardProps } from '@/lib/og/CosmicOgCard';
+import { OG_TEXT_BOXES, planCosmicOgCard, type CosmicOgCardProps } from '@/lib/og/CosmicOgCard';
 import { getOgCopy } from '@/lib/og/copy';
 
+import { readingShareCard } from '../../readingCard';
+import {
+  aboutReadingCard,
+  learnArticleReadingCard,
+  quizReadingCard,
+  readingCards,
+  whitePaperReadingCard,
+  type ReadingCard,
+} from '../../readingCardCopy';
 import { learnArticleCard, learnArticleCardAlt } from '../articleCard';
 
 /** next/og cannot rasterize under jest: capture the card element instead. */
@@ -29,6 +38,13 @@ jest.mock('@/lib/og/art', () => ({
 }));
 
 const lastCard = () => mockCards[mockCards.length - 1]!.props;
+
+type ImageRoute = {
+  default: (props: { params: Promise<{ locale: string }> }) => Promise<unknown>;
+  generateImageMetadata: (props: {
+    params: Promise<{ locale: string }>;
+  }) => Promise<Array<{ alt: string }>>;
+};
 
 describe('Learn guide share cards', () => {
   beforeEach(() => {
@@ -62,27 +78,14 @@ describe('Learn guide share cards', () => {
     expect(plates.size).toBe(getLearnSlugs().length);
   });
 
-  it.each(routing.locales)(
-    '%s: draws the guide title, or the brand line where the card faces lack a glyph',
-    async (locale) => {
-      const slug = 'what-is-cosmic-signature';
-      await learnArticleCard(locale, slug);
-      const card = lastCard();
-      const article = getLearnContent(locale).articles.find((entry) => entry.slug === slug)!;
-      expect([article.h1, getOgCopy(locale, 'default').title]).toContain(card.title);
-      expect(card.art).toHaveLength(1);
-    },
-  );
-
   it('falls back to the brand card for an unknown guide', async () => {
     await learnArticleCard('en', 'no-such-guide');
     expect(lastCard().title).toBe(getOgCopy('en', 'default').title);
+    expect(learnArticleCardAlt('en', 'no-such-guide')).toBe(getOgCopy('en', 'default').alt);
   });
 
   it('gives the white paper, the quiz and About cards of their own', async () => {
-    const whitePaper = require('../../white-paper/opengraph-image') as {
-      default: (props: { params: Promise<{ locale: string }> }) => Promise<unknown>;
-    };
+    const whitePaper = require('../../white-paper/opengraph-image') as ImageRoute;
     await whitePaper.default({ params: Promise.resolve({ locale: 'en' }) });
     expect(lastCard()).toEqual(
       expect.objectContaining({
@@ -93,18 +96,64 @@ describe('Learn guide share cards', () => {
       }),
     );
 
-    const quiz = require('../../quiz/opengraph-image') as typeof whitePaper;
+    const quiz = require('../../quiz/opengraph-image') as ImageRoute;
     await quiz.default({ params: Promise.resolve({ locale: 'en' }) });
-    expect(lastCard().title).toBe('How well do you know Cosmic Signature?');
+    expect(lastCard().title).toBe(quizReadingCard('en').copy.title);
 
-    const about = require('../../about/opengraph-image') as typeof whitePaper;
+    const about = require('../../about/opengraph-image') as ImageRoute;
     await about.default({ params: Promise.resolve({ locale: 'en' }) });
     expect(lastCard()).toEqual(
       expect.objectContaining({
-        eyebrow: 'ABOUT THE PROTOCOL',
-        title: 'About Cosmic Signature',
+        title: aboutReadingCard('en').copy.title,
         art: [expect.objectContaining({ label: 'Signature #000002 · Cycle 0' })],
       }),
     );
+  });
+
+  it.each([
+    ['about', aboutReadingCard],
+    ['quiz', quizReadingCard],
+    ['white-paper', whitePaperReadingCard],
+  ] as const)('%s: the image metadata alt is the copy the card draws', async (path, cardOf) => {
+    const image = require(`../../${path}/opengraph-image`) as ImageRoute;
+    for (const locale of routing.locales) {
+      const [metadata] = await image.generateImageMetadata({ params: Promise.resolve({ locale }) });
+      expect(metadata?.alt).toBe(cardOf(locale).alt);
+    }
+  });
+});
+
+/**
+ * V136 regression guard: the card faces are subsets, cut from the reading
+ * cards' own copy (./readingCardCopy.ts), so every locale's cards draw their
+ * page's title, never the brand fallback, and fit their boxes whole.
+ */
+describe.each(routing.locales)('%s reading share cards', (locale) => {
+  const cards = readingCards(locale).map((card) => [card.copy.title, card] as const);
+
+  it('publishes a card for About, the quiz, the white paper and every guide', () => {
+    expect(cards).toHaveLength(3 + getLearnSlugs().length);
+    for (const slug of getLearnSlugs()) {
+      expect(learnArticleReadingCard(locale, slug)).not.toBeNull();
+    }
+  });
+
+  it.each(cards)('draws its own copy and fits: %s', async (_title, card: ReadingCard) => {
+    await readingShareCard(locale, card);
+    const props = lastCard();
+    expect(props.title).toBe(card.copy.title);
+    expect(props.subhead).toBe(card.copy.subhead);
+    expect(props.fact).toBe(card.copy.fact);
+    // The alt text names what the card draws: its own title.
+    expect(card.alt.startsWith(props.title ?? '')).toBe(true);
+
+    const plan = planCosmicOgCard(props);
+    const box = OG_TEXT_BOXES[plan.layout];
+    expect(plan.stack.title).toEqual(expect.objectContaining({ truncated: false, split: 'none' }));
+    expect(plan.stack.eyebrow?.lines).toHaveLength(1);
+    if (plan.stack.subhead) {
+      expect(plan.stack.subhead).toEqual(expect.objectContaining({ truncated: false }));
+    }
+    expect(plan.stack.height).toBeLessThanOrEqual(box.height);
   });
 });

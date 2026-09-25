@@ -36,7 +36,7 @@ export default async function LandingPage({ params }: PageProps) {
     <main id="main" tabIndex={-1} className={styles.page}>
       <Hero hero={content.hero} />
       <TheArt art={content.art} />
-      <TheCycle cycle={content.cycle} />
+      <TheCycle cycle={content.cycle} tracks={content.tracks.eth} />
       <AllocationTracks tracks={content.tracks} />
       <PublicGoods publicGoods={content.publicGoods} />
       <Anchoring anchoring={content.anchoring} showcase={content.art.showcase} />

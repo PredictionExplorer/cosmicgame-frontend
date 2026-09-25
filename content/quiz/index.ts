@@ -32,6 +32,7 @@ function buildQuizContent(text: QuizText): QuizContent {
       return {
         id: tier.id,
         title: tierText.title,
+        heading: tierText.heading,
         tagline: tierText.tagline,
         description: tierText.description,
         questions: tier.questions.map((question): QuizQuestion => {

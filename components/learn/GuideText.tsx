@@ -25,6 +25,8 @@ export function GuideText({ text, locale }: GuideTextProps) {
         href={target.href}
         kind={target.kind}
         className="link"
+        // The new-tab arrow rides the last word: an SVG is a block box by default.
+        externalIconClassName="ms-0.5 inline size-3 align-[-0.05em]"
       >
         {part.label}
       </SiteLink>

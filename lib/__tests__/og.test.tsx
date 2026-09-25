@@ -4,6 +4,7 @@ import { join, relative } from 'node:path';
 import { isValidElement, type ReactElement, type ReactNode } from 'react';
 
 import { uncoveredBy } from '@/scripts/og-font-coverage';
+import { getAboutContent } from '@/content/about';
 
 import { getLocaleConfig } from '@/i18n/localeConfig';
 import { routing } from '@/i18n/routing';
@@ -356,9 +357,12 @@ describe('opengraph-image routes', () => {
     // A bundled plate, not the newest Signature: nothing to regenerate.
     expect(route.revalidate).toBeUndefined();
     await route.default(params({ locale: 'en' }));
+    // The page's own statement, under its short name (the wordmark names the protocol).
+    const about = getAboutContent('en');
     expect(lastCard().element.props).toEqual(
       expect.objectContaining({
-        title: 'About Cosmic Signature',
+        eyebrow: about.breadcrumbLabel.toUpperCase(),
+        title: about.heading,
         domain: 'cosmicsignature.com',
         art: [expect.objectContaining({ label: 'Signature #000002 · Cycle 0' })],
       }),

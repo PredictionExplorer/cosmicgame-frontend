@@ -35,7 +35,6 @@ function buildLearnContent(text: LearnText): LearnContent {
         cardDescription: string;
         summary: string;
         sections: readonly LearnSection[];
-        relatedLabels: readonly string[];
       }
     >
   >;
@@ -71,10 +70,8 @@ function buildLearnContent(text: LearnText): LearnContent {
         group: article.group,
         plate: article.plate,
         sections: articleText.sections,
-        related: article.related.map((href, index) => ({
-          label: articleText.relatedLabels[index]!,
-          href,
-        })),
+        figures: 'figures' in article ? article.figures : [],
+        related: article.related,
       };
     }),
   };
@@ -117,9 +114,10 @@ export type {
   LearnArticle,
   LearnArticleUi,
   LearnContent,
+  LearnFigure,
+  LearnFigureKind,
   LearnGroupCopy,
   LearnGroupId,
   LearnHubContent,
-  LearnRelatedLink,
   LearnSection,
 } from './types';

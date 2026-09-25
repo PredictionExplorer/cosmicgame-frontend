@@ -6,7 +6,8 @@ import { mediumQuestionsTextVi } from './text.medium.vi';
 /** Vietnamese quiz copy, keyed by the skeleton in structure.ts. */
 export const quizTextVi = {
   hub: {
-    eyebrow: 'Trắc nghiệm kiến thức',
+    // The short form (as in the breadcrumb): the share card sets it on one line.
+    eyebrow: 'Trắc nghiệm',
     h1: 'Bạn hiểu Cosmic Signature đến đâu?',
     intro:
       'Một trăm câu hỏi ở ba cấp độ, dựa trên sách trắng: chu kỳ, nét bút, phân bổ, quy trình tạo tác phẩm và các trường hợp đặc biệt. Mỗi đáp án có lời giải thích cùng liên kết đến phần tương ứng để bạn tìm hiểu thêm.',
@@ -62,20 +63,20 @@ export const quizTextVi = {
       rankLabel: 'Mức độ hiểu biết',
       rankTemplate: 'Mức độ hiểu biết: {rank}',
       ranks: {
-        observer: {
-          name: 'Người quan sát',
+        reader: {
+          name: 'Người đọc',
           line: 'Bạn đã bắt đầu tìm hiểu giao thức. Các phần gợi ý bên dưới sẽ giúp củng cố kiến thức cơ bản.',
         },
-        participant: {
-          name: 'Người tham gia',
+        student: {
+          name: 'Học viên',
           line: 'Bạn đã nắm được các cơ chế chính. Hãy xem thêm những trường hợp đặc biệt để hiểu sâu hơn.',
         },
-        enduranceChampion: {
-          name: 'Quán quân Bền bỉ',
+        scholar: {
+          name: 'Học giả',
           line: 'Bạn hiểu rõ phần lớn cơ chế. Xem lại một vài chủ đề bên dưới để củng cố kiến thức.',
         },
-        chronoWarrior: {
-          name: 'Chiến binh Thời gian',
+        cartographer: {
+          name: 'Người vẽ bản đồ',
           line: 'Bạn đã nắm vững giao thức. Các phần tham chiếu giúp bạn tiếp tục tìm hiểu những chi tiết chuyên sâu.',
         },
       },
@@ -90,6 +91,7 @@ export const quizTextVi = {
   tiers: {
     basic: {
       title: 'Cơ bản',
+      heading: 'Cơ bản: những điều nền tảng',
       tagline: 'Những kiến thức nền tảng: chu kỳ, nét bút, phân bổ và nghệ thuật.',
       description:
         'Hai mươi lăm câu hỏi về những điều căn bản \u2014 nét bút là gì, chu kỳ kết thúc ra sao, ETH đi về đâu, và điều gì khiến tác phẩm mang tính tất định. Nếu bạn mới đến đây, hãy bắt đầu từ đây.',
@@ -97,6 +99,7 @@ export const quizTextVi = {
     },
     medium: {
       title: 'Trung cấp',
+      heading: 'Trung cấp: cơ chế vận hành',
       tagline: 'Cơ chế vận hành: cửa sổ hiệu chỉnh, các luồng bền bỉ, quy tắc Hội đồng.',
       description:
         'Hai mươi lăm câu hỏi về cơ chế vận hành \u2014 đường chi phí, vòng phản hồi CST, Quán quân Bền bỉ so với Chiến binh Thời gian, toán học của Tinh tuyển và các tham số của Hội đồng. Dành cho người đã theo dõi một hai chu kỳ.',
@@ -104,6 +107,7 @@ export const quizTextVi = {
     },
     hard: {
       title: 'Nâng cao',
+      heading: 'Nâng cao: các trường hợp biên',
       tagline:
         'Trường hợp đặc biệt và phân tích: ví có hành vi bất thường, lịch sử nâng cấp, quy trình nghệ thuật.',
       description:

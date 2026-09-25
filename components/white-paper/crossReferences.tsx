@@ -3,6 +3,7 @@ import type { ReactNode } from 'react';
 import type { WhitePaperContent } from '@/content/white-paper';
 
 import { pickByLocale, type LocaleRecord } from '@/i18n/locale';
+import { Link } from '@/i18n/navigation';
 
 /**
  * The paper's cross-references ("Section 5.2", "第 5.2 节", "5.2절",
@@ -82,21 +83,45 @@ export function splitReferences(
   return parts;
 }
 
-/** Renders text with its cross-references as in-page links. */
+/**
+ * A reference as a link's text: each number kept on the line of the word
+ * before it and the measure word after it ("Section 11.3", "第 5.2 节",
+ * "Sections 3 through 5"), so the link never breaks between them and never
+ * reads as two links. Scripts that set no spaces (第3.1節) may break between
+ * any two characters, so the link itself also never wraps (REFERENCE_CLASS).
+ */
+export function referenceText(text: string): string {
+  return text.replace(/\s(?=\d)|(?<=\d)\s/gu, '\u00a0');
+}
+
+/** A reference link is one unbreakable phrase, in every script. */
+const REFERENCE_CLASS = 'link whitespace-nowrap';
+
+/**
+ * Renders text with its cross-references as links: to the sections of this
+ * page, or, with `paperPath` (the white paper's own path), to the paper's
+ * sections from another page.
+ */
 export function withReferences(
   text: string,
   locale: string,
   targets: ReadonlyMap<string, string>,
+  paperPath?: string,
 ): ReactNode {
   const parts = splitReferences(text, locale, targets);
   if (parts.length === 1 && typeof parts[0] === 'string') return text;
-  return parts.map((part, index) =>
-    typeof part === 'string' ? (
-      part
+  return parts.map((part, index) => {
+    if (typeof part === 'string') return part;
+    const key = `${index}-${part.id}`;
+    const label = referenceText(part.text);
+    return paperPath ? (
+      <Link key={key} href={`${paperPath}#${part.id}`} className={REFERENCE_CLASS}>
+        {label}
+      </Link>
     ) : (
-      <a key={`${index}-${part.id}`} href={`#${part.id}`} className="link">
-        {part.text}
+      <a key={key} href={`#${part.id}`} className={REFERENCE_CLASS}>
+        {label}
       </a>
-    ),
-  );
+    );
+  });
 }

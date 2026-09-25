@@ -5,6 +5,7 @@ import { getWhitePaperContent, type WhitePaperBlock } from '@/content/white-pape
 import { routing } from '@/i18n/routing';
 import {
   referenceTargets,
+  referenceText,
   splitReferences,
   withReferences,
 } from '@/components/white-paper/crossReferences';
@@ -65,9 +66,38 @@ describe('white paper cross-references', () => {
 
   it('renders references as in-page links', () => {
     render(<p>{withReferences('Section 7.1 has the formula.', 'en', targets)}</p>);
-    expect(screen.getByRole('link', { name: 'Section 7.1' })).toHaveAttribute(
+    expect(screen.getByRole('link', { name: 'Section\u00a07.1' })).toHaveAttribute(
       'href',
       '#imprint-rules',
+    );
+  });
+
+  it('keeps each number on the line of its word, so a link never breaks in two (V193)', () => {
+    expect(referenceText('Section 11.3')).toBe('Section\u00a011.3');
+    // A short range stays whole.
+    expect(referenceText('Sections 3 through 5')).toBe('Sections\u00a03\u00a0through\u00a05');
+    expect(referenceText('第 5.2 节')).toBe('第\u00a05.2\u00a0节');
+    expect(referenceText('第3節')).toBe('第3節');
+  });
+
+  it('never wraps a reference link, even in a script that sets no spaces (V193)', () => {
+    render(
+      <p>
+        {withReferences(
+          '正確なルールは第3.1節にあります。',
+          'ja',
+          referenceTargets(getWhitePaperContent('ja')),
+        )}
+      </p>,
+    );
+    expect(screen.getByRole('link', { name: '第3.1節' })).toHaveClass('whitespace-nowrap');
+  });
+
+  it('links the paper from another page by its path', () => {
+    render(<p>{withReferences('Section 7.1 has the formula.', 'en', targets, '/white-paper')}</p>);
+    expect(screen.getByRole('link', { name: 'Section\u00a07.1' })).toHaveAttribute(
+      'href',
+      '/white-paper#imprint-rules',
     );
   });
 

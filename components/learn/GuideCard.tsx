@@ -38,16 +38,26 @@ export interface GuideCardProps {
   number: number;
   title: string;
   description: string;
-  /** "4 min read", or `null` for a guide too short for the figure to help. */
+  /**
+   * "4 min read", or `null` below the shared threshold
+   * (components/learn/guides `MIN_READING_MINUTES_SHOWN`): the card then has
+   * no foot at all rather than an empty one.
+   */
   readingTime: string | null;
   /** The card title's heading level in the page outline. */
   titleAs?: 'h3' | 'p';
   className?: string;
 }
 
+const ARROW_CLASS =
+  'size-4 shrink-0 text-subtle transition-[color,transform] duration-fast group-hover:text-primary motion-safe:group-hover:translate-x-0.5';
+
 /**
- * A guide on the Learn hub's reading path: its number, glyph, short title,
- * one-line description and reading time, the whole card one link.
+ * A guide on the Learn hub's reading path, the whole entry one link. On
+ * phones it is a row between hairlines — number, title, one line, arrow —
+ * so eleven guides read as a list, not five screens of boxes; from `sm` it
+ * is a card with the guide's glyph, and its reading time when that says
+ * something.
  */
 export function GuideCard({
   slug,
@@ -63,28 +73,35 @@ export function GuideCard({
     <Link
       href={`/learn/${slug}`}
       className={cn(
-        'group flex h-full flex-col rounded-surface border border-rule bg-surface p-5 transition-colors duration-fast hover:border-input hover:bg-surface-raised sm:p-6',
+        'group grid h-full grid-cols-[2rem_minmax(0,1fr)_auto] items-start gap-x-3 border-b border-rule-faint py-4 transition-colors duration-fast',
+        'sm:flex sm:flex-col sm:rounded-surface sm:border sm:border-rule sm:bg-surface sm:p-6 sm:hover:border-input sm:hover:bg-surface-raised',
         className,
       )}
     >
-      <span className="flex items-center justify-between gap-4">
-        <span aria-hidden className="type-label tabular-nums text-subtle">
+      <span className="flex items-center justify-between gap-4 pt-1 sm:w-full sm:pt-0">
+        <span aria-hidden className="flex items-center gap-3 type-label tabular-nums text-subtle">
           {String(number).padStart(2, '0')}
+          <Icon
+            aria-hidden
+            className="size-4 transition-colors duration-fast group-hover:text-primary max-sm:hidden"
+          />
         </span>
-        <Icon
-          aria-hidden
-          className="size-4 text-subtle transition-colors duration-fast group-hover:text-primary"
-        />
+        <ArrowRight aria-hidden className={cn(ARROW_CLASS, 'max-sm:hidden')} />
       </span>
-      <Title className="mt-5 type-heading-3 text-foreground">{title}</Title>
-      <span className="mt-2 flex-1 type-body-sm text-muted-foreground">{description}</span>
-      <span className="mt-5 flex items-center justify-between gap-4 border-t border-rule-faint pt-4 type-caption tabular-nums text-subtle">
-        <span>{readingTime}</span>
-        <ArrowRight
-          aria-hidden
-          className="size-4 text-subtle transition-[color,transform] duration-fast group-hover:text-primary motion-safe:group-hover:translate-x-0.5"
-        />
+      <span className="min-w-0 sm:mt-5 sm:flex sm:flex-1 sm:flex-col">
+        <Title className="type-title text-foreground group-hover:text-primary sm:type-heading-3 sm:group-hover:text-foreground">
+          {title}
+        </Title>
+        <span className="mt-1 block type-body-sm text-muted-foreground sm:mt-2 sm:flex-1">
+          {description}
+        </span>
+        {readingTime ? (
+          <span className="mt-4 block type-caption tabular-nums text-subtle max-sm:hidden">
+            {readingTime}
+          </span>
+        ) : null}
       </span>
+      <ArrowRight aria-hidden className={cn(ARROW_CLASS, 'mt-1 sm:hidden')} />
     </Link>
   );
 }

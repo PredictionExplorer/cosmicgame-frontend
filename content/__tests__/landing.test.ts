@@ -1,7 +1,14 @@
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 
-import { getLandingContent, landingContentEn, landingContentZh } from '@/content/landing';
+import {
+  getLandingContent,
+  landingContentEn,
+  landingContentZh,
+  pluralPhrase,
+} from '@/content/landing';
+import { landingTextUk } from '@/content/landing/text.uk';
+import { protocolFacts } from '@/content/protocol-facts';
 
 import { CST_GECKOTERMINAL_POOL_URL } from '@/config/geckoterminal';
 import { outboundLinks } from '@/config/siteNav';
@@ -43,8 +50,15 @@ describe('landing content shape', () => {
     });
   });
 
-  it('hero declares the primary CTA as the app subdomain', () => {
-    expect(landingContent.hero.primaryCta.href).toBe('https://app.cosmicsignature.com');
+  it('makes the gesture the hero’s one commit action, with The Cycle’s label and target (V170)', () => {
+    for (const locale of routing.locales) {
+      const { hero, cycle, closing } = getLandingContent(locale);
+      expect(hero.primaryCta).toEqual(cycle.gestureCta);
+      expect(closing.gestureCta).toEqual(cycle.gestureCta);
+    }
+    expect(landingContent.hero.primaryCta.href).toBe(
+      'https://app.cosmicsignature.com/#make-gesture',
+    );
   });
 
   it('keeps the hero eyebrow separator with the word before it, in every locale', () => {
@@ -152,7 +166,67 @@ describe('landing content contract accuracy', () => {
 
   it('describes the reserve split without claiming it reaches everyone who took part', () => {
     expect(landingContent.meta.description).not.toMatch(/everyone who shaped/i);
-    expect(landingContent.meta.description).toMatch(/more than ten tracks/);
+    expect(landingContent.meta.description).toMatch(/allocated across its tracks/);
+  });
+
+  it.each(routing.locales)(
+    '%s: claims no count of tracks the Allocation Tracks section does not show (V169)',
+    (locale) => {
+      const { meta, tracks, faq } = getLandingContent(locale);
+      const text = [meta.description, tracks.heading, ...faq.items.map((item) => item.answer)].join(
+        ' ',
+      );
+      expect(text).not.toMatch(/more than ten|十余|十餘|понад десят|열 개가 넘|10を超|hơn mười/i);
+    },
+  );
+
+  it.each(routing.locales)(
+    '%s: counts each CST and NFT track’s recipients from protocol facts, in the locale’s plural (V047)',
+    (locale) => {
+      const { fixed } = getLandingContent(locale).tracks;
+      const counts = fixed.map((track) => track.amount.match(/\d+/)?.[0]);
+      expect(counts).toEqual([
+        String(protocolFacts.nftStellarSelectionRecipients),
+        String(protocolFacts.anchoredRwlkNftSelectionRecipients),
+        '1',
+        '1',
+      ]);
+    },
+  );
+
+  it.each(routing.locales)(
+    '%s: states council rules, selection counts and the public-goods share as fact digits (V047)',
+    (locale) => {
+      const { council, tracks, faq } = getLandingContent(locale);
+      const proposal = council.columns.find((column) => column.id === 'proposal')!.body;
+      for (const figure of [
+        protocolFacts.councilProposalThresholdCst,
+        protocolFacts.councilVotingDelayDays,
+        protocolFacts.councilVotingPeriodWeeks,
+      ]) {
+        expect(proposal).toContain(String(figure));
+      }
+      const quorum = council.columns.find((column) => column.id === 'quorum')!.body;
+      expect(quorum).toContain(`${protocolFacts.councilQuorumPercent}%`);
+      const ethSelection = tracks.eth.find((track) => track.id === 'stellar')!;
+      expect(ethSelection.body).toContain(String(protocolFacts.ethStellarSelectionRecipients));
+      const answers = faq.items.map((item) => item.answer).join(' ');
+      expect(answers).toContain(`${protocolFacts.publicGoodsPercentage}%`);
+      // No spelled-out figure the numeric-claims guard cannot read.
+      expect(`${proposal} ${answers}`).not.toMatch(
+        /Сім відсотків|два дні|два тижні|Bảy phần trăm|hai ngày|hai tuần/,
+      );
+    },
+  );
+
+  it('picks every plural form Ukrainian needs for a recipient count', () => {
+    const phrase = (count: number) => pluralPhrase(landingTextUk.tracks.recipients, count, 'uk');
+    expect([1, 3, 10, 1.5].map(phrase)).toEqual([
+      '1\u00a0отримувач',
+      '3\u00a0отримувачі',
+      '10\u00a0отримувачів',
+      '2\u00a0отримувача',
+    ]);
   });
 
   it('says what the name is not (the COSMIC database) in the footer of both hosts', () => {

@@ -63,7 +63,7 @@ export const whitePaperTextEn = {
       ],
     },
     'protocol-overview': {
-      heading: 'Protocol Overview',
+      heading: 'Protocol overview',
       blocks: [
         {
           kind: 'paragraph',
@@ -142,7 +142,7 @@ export const whitePaperTextEn = {
           ],
         },
         countdown: {
-          heading: 'The Countdown',
+          heading: 'The countdown',
           blocks: [
             {
               kind: 'paragraph',
@@ -183,7 +183,7 @@ export const whitePaperTextEn = {
       ],
       subsections: {
         'eth-gestures': {
-          heading: 'ETH Gestures',
+          heading: 'ETH gestures',
           blocks: [
             {
               kind: 'paragraph',
@@ -192,7 +192,7 @@ export const whitePaperTextEn = {
           ],
         },
         'random-walk-attachment': {
-          heading: 'Random Walk NFT Attachment',
+          heading: 'Random Walk NFT attachment',
           blocks: [
             {
               kind: 'paragraph',
@@ -201,7 +201,7 @@ export const whitePaperTextEn = {
           ],
         },
         'cst-gestures': {
-          heading: 'CST Gestures',
+          heading: 'CST gestures',
           blocks: [
             {
               kind: 'paragraph',
@@ -222,7 +222,7 @@ export const whitePaperTextEn = {
           ],
         },
         'messages-and-attachments': {
-          heading: 'Messages and Attached Assets',
+          heading: 'Messages and attached assets',
           blocks: [
             {
               kind: 'paragraph',
@@ -233,7 +233,7 @@ export const whitePaperTextEn = {
       },
     },
     'allocation-tracks': {
-      heading: 'The Cycle Reserve and Allocation Tracks',
+      heading: 'The Cycle Reserve and allocation tracks',
       blocks: [
         {
           kind: 'paragraph',
@@ -242,7 +242,7 @@ export const whitePaperTextEn = {
       ],
       subsections: {
         'distribution-at-finalization': {
-          heading: 'Distribution at Finalization',
+          heading: 'Distribution at finalization',
           blocks: [
             {
               kind: 'table',
@@ -368,7 +368,7 @@ export const whitePaperTextEn = {
           ],
         },
         'delivery-and-timeouts': {
-          heading: 'Delivery, Escrow, and Timeouts',
+          heading: 'Delivery, escrow, and timeouts',
           blocks: [
             {
               kind: 'paragraph',
@@ -383,7 +383,7 @@ export const whitePaperTextEn = {
       },
     },
     'the-art': {
-      heading: 'The Art: Deterministic Three-Body Signatures',
+      heading: 'The art: Deterministic three-body Signatures',
       blocks: [
         {
           kind: 'paragraph',
@@ -396,7 +396,7 @@ export const whitePaperTextEn = {
       ],
       subsections: {
         'art-pipeline': {
-          heading: 'The Pipeline',
+          heading: 'The pipeline',
           blocks: [
             {
               kind: 'list',
@@ -417,7 +417,7 @@ export const whitePaperTextEn = {
           ],
         },
         'reproducibility-and-license': {
-          heading: 'Reproducibility and License',
+          heading: 'Reproducibility and license',
           blocks: [
             {
               kind: 'paragraph',
@@ -432,7 +432,7 @@ export const whitePaperTextEn = {
       },
     },
     cst: {
-      heading: 'The CST Token',
+      heading: 'The CST token',
       blocks: [
         {
           kind: 'paragraph',
@@ -441,7 +441,7 @@ export const whitePaperTextEn = {
       ],
       subsections: {
         'imprint-rules': {
-          heading: 'Imprint Rules',
+          heading: 'Imprint rules',
           blocks: [
             {
               kind: 'paragraph',
@@ -486,7 +486,7 @@ export const whitePaperTextEn = {
           ],
         },
         'supply-dynamics': {
-          heading: 'Burning and Supply Dynamics',
+          heading: 'Burning and supply dynamics',
           blocks: [
             {
               kind: 'paragraph',
@@ -563,11 +563,11 @@ export const whitePaperTextEn = {
       ],
     },
     security: {
-      heading: 'Security, Randomness, and Verifiability',
+      heading: 'Security, randomness, and verifiability',
       blocks: [],
       subsections: {
         'independent-review': {
-          heading: 'Independent Review',
+          heading: 'Independent review',
           blocks: [
             {
               kind: 'paragraph',
@@ -584,7 +584,7 @@ export const whitePaperTextEn = {
           ],
         },
         'defensive-design': {
-          heading: 'Defensive Design',
+          heading: 'Defensive design',
           blocks: [
             {
               kind: 'list',
@@ -611,7 +611,7 @@ export const whitePaperTextEn = {
           ],
         },
         'open-verification': {
-          heading: 'Open Verification',
+          heading: 'Open verification',
           blocks: [
             {
               kind: 'paragraph',
@@ -622,7 +622,7 @@ export const whitePaperTextEn = {
       },
     },
     'upgrade-history': {
-      heading: 'Deployment History and the Road Ahead',
+      heading: 'Deployment history and the road ahead',
       blocks: [
         {
           kind: 'paragraph',
@@ -640,7 +640,7 @@ export const whitePaperTextEn = {
           ],
         },
         v2: {
-          heading: 'The V2 Upgrade, Live Today',
+          heading: 'The V2 upgrade, live today',
           blocks: [
             {
               kind: 'paragraph',
@@ -659,7 +659,7 @@ export const whitePaperTextEn = {
           ],
         },
         v3: {
-          heading: 'The Planned V3 Upgrade',
+          heading: 'The planned V3 upgrade',
           blocks: [
             {
               kind: 'paragraph',
@@ -684,7 +684,7 @@ export const whitePaperTextEn = {
       },
     },
     decentralization: {
-      heading: 'The Path to Full Decentralization',
+      heading: 'The path to full decentralization',
       blocks: [
         {
           kind: 'paragraph',
@@ -709,11 +709,11 @@ export const whitePaperTextEn = {
       ],
     },
     clarifications: {
-      heading: 'Clarifications and Risk Factors',
+      heading: 'Clarifications and risk factors',
       blocks: [],
       subsections: {
         'what-it-is-not': {
-          heading: 'What Cosmic Signature Is Not',
+          heading: 'What Cosmic Signature is not',
           blocks: [
             // lexicon-allow-start: denial copy must name the concepts it denies, matching FAQ practice.
             {
@@ -728,7 +728,7 @@ export const whitePaperTextEn = {
           ],
         },
         'risk-factors': {
-          heading: 'Risk Factors',
+          heading: 'Risk factors',
           blocks: [
             {
               kind: 'list',
@@ -755,7 +755,7 @@ export const whitePaperTextEn = {
       ],
     },
     'appendix-a': {
-      heading: 'Appendix A: Verified Contract Addresses',
+      heading: 'Appendix A: Verified contract addresses',
       blocks: [
         {
           kind: 'table',
@@ -787,7 +787,7 @@ export const whitePaperTextEn = {
       ],
     },
     'appendix-b': {
-      heading: 'Appendix B: Parameters at a Glance',
+      heading: 'Appendix B: Parameters at a glance',
       blocks: [
         {
           kind: 'table',

@@ -63,9 +63,22 @@ describe('<LandingFAQ />', () => {
 
   it('links to the full FAQ in the app, in the same tab', () => {
     render(<LandingFAQ faq={faq} />);
-    const link = screen.getByRole('link', { name: faq.moreLabel });
-    expect(link).toHaveAttribute('href', 'https://app.cosmicsignature.com/faq');
-    expect(link).not.toHaveAttribute('target');
+    for (const link of screen.getAllByRole('link', { name: faq.moreLabel })) {
+      expect(link).toHaveAttribute('href', 'https://app.cosmicsignature.com/faq');
+      expect(link).not.toHaveAttribute('target');
+    }
+  });
+
+  it('puts the way to more answers after the questions below 64rem (V174)', () => {
+    const { container } = render(<LandingFAQ faq={faq} />);
+    const [beside, after] = screen.getAllByRole('link', { name: faq.moreLabel });
+    // One beside the sticky intro from lg, one after the list on narrower screens.
+    expect(beside).toHaveClass('max-lg:hidden');
+    expect(after).toHaveClass('lg:hidden');
+    const lastQuestion = container.querySelectorAll('details')[faq.items.length - 1]!;
+    expect(
+      lastQuestion.compareDocumentPosition(after!) & Node.DOCUMENT_POSITION_FOLLOWING,
+    ).toBeTruthy();
   });
 
   it('question text uses cosmic vocabulary (not banned terms, except denial copy)', () => {

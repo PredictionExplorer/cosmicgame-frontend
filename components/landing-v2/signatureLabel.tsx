@@ -1,12 +1,39 @@
 import type { ReactNode } from 'react';
 import { useLocale } from 'next-intl';
 
+import { pickByLocale, type LocaleRecord } from '@/i18n/locale';
 import { getLocaleConfig } from '@/i18n/localeConfig';
 import { useSignatureLabel as useWallLabel } from '@/components/ui/signature-label';
 
 import type { ShowcaseArtwork } from './showcase-art';
 
 type LabelledArtwork = Pick<ShowcaseArtwork, 'TokenId' | 'TokenName' | 'RoundNum' | 'ImprintedAt'>;
+
+/**
+ * The month style of a wall label's date. CLDR's short month is a clipped
+ * abbreviation in Ukrainian (черв. 2026 р.) and Vietnamese (thg 6 2026), so
+ * those labels spell the month as their style guides write it (червень 2026 р.,
+ * tháng 6 năm 2026); the CJK forms are the same either way.
+ */
+export const WALL_LABEL_MONTH: LocaleRecord<'short' | 'long'> = {
+  en: 'short',
+  zh: 'long',
+  'zh-TW': 'long',
+  'zh-HK': 'long',
+  uk: 'long',
+  ko: 'long',
+  ja: 'long',
+  vi: 'long',
+};
+
+/** "Jun 2026", "червень 2026 р.", "tháng 6 năm 2026": the month a Signature was imprinted. */
+export function wallLabelMonthFormat(locale: string): Intl.DateTimeFormat {
+  return new Intl.DateTimeFormat(getLocaleConfig(locale).intlLocale, {
+    month: pickByLocale(WALL_LABEL_MONTH, locale),
+    year: 'numeric',
+    timeZone: 'UTC',
+  });
+}
 
 /**
  * The landing's plates read their wall label from the one rule every art
@@ -17,11 +44,7 @@ type LabelledArtwork = Pick<ShowcaseArtwork, 'TokenId' | 'TokenName' | 'RoundNum
 export function useSignatureLabel() {
   const locale = useLocale();
   const label = useWallLabel();
-  const month = new Intl.DateTimeFormat(getLocaleConfig(locale).intlLocale, {
-    month: 'short',
-    year: 'numeric',
-    timeZone: 'UTC',
-  });
+  const month = wallLabelMonthFormat(locale);
   const facts = (art: LabelledArtwork) => ({ tokenId: art.TokenId, name: art.TokenName });
 
   return {

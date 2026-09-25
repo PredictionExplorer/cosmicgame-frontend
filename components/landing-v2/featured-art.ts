@@ -1,25 +1,27 @@
+import { SIGNATURE_PLATES, type SignaturePlateArt } from '@/components/reading/signaturePlates';
+
 /**
- * Real Signatures verified against the public token API. Bundled previews
- * keep first paint independent of API/media availability; provenance and
+ * The two Signatures the landing features, derived from the reading pages'
+ * bundled plates (components/reading/signaturePlates.ts), the one record of
+ * their verified seed, cycle, imprint time and preview. Bundled previews keep
+ * first paint independent of API/media availability; provenance and
  * reproduction instructions live in public/images/landing/README.md.
  * `RoundNum` is the cycle each was imprinted in and `ImprintedAt` its imprint
- * transaction time in Unix seconds (cst/info/<id>, 2026-09-24).
+ * transaction time in Unix seconds.
  */
+function featured(plate: SignaturePlateArt & { imprintedAt: number }) {
+  return {
+    TokenId: plate.tokenId,
+    Seed: plate.seed,
+    RoundNum: plate.cycle,
+    ImprintedAt: plate.imprintedAt,
+    imageSrc: plate.src,
+  } as const;
+}
+
 export const FEATURED_LANDING_ART = [
-  {
-    TokenId: 23,
-    Seed: '17d61f1c00e5d16c399a8e341e9feaea32b275e5426a4375394e74cc855affcc',
-    RoundNum: 0,
-    ImprintedAt: 1_781_506_802,
-    imageSrc: '/images/landing/signature-23.webp',
-  },
-  {
-    TokenId: 24,
-    Seed: '5084a87375896c7103ba17b57264f20de35d9e6eb545314680ad5e074dfc33ad',
-    RoundNum: 1,
-    ImprintedAt: 1_786_491_506,
-    imageSrc: '/images/landing/signature-24.webp',
-  },
+  featured(SIGNATURE_PLATES[23]),
+  featured(SIGNATURE_PLATES[24]),
 ] as const;
 
 export type FeaturedLandingArt = (typeof FEATURED_LANDING_ART)[number];

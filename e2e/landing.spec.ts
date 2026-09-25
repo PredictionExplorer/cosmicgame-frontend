@@ -1,5 +1,6 @@
 import { expect, test, type Page } from '@playwright/test';
 
+import { getAboutContent } from '../content/about';
 import { getLandingContent } from '../content/landing';
 
 import { LOCALE_CHROME, LOCALE_SEO, TRANSLATED_LOCALES, routing } from './locale-fixtures';
@@ -180,7 +181,7 @@ test.describe('Landing page @ cosmicsignature.com', () => {
     const sectionTitles = [
       getLandingContent('en').art.heading,
       'A Performance Cycle',
-      'More than ten ways the protocol distributes',
+      getLandingContent('en').tracks.heading,
       'Anchor Cosmic Signature',
       'Every cycle funds Ethereum',
       'Protocol Coordination',
@@ -260,7 +261,7 @@ test.describe('Landing page @ cosmicsignature.com', () => {
       });
 
       for (const route of [
-        { path: '/zh/about', heading: '关于 Cosmic Signature' },
+        { path: '/zh/about', heading: getAboutContent('zh').heading },
         { path: '/zh/learn', heading: '了解 Cosmic Signature' },
         {
           path: '/zh/learn/what-is-cosmic-signature',
@@ -374,9 +375,12 @@ test.describe('Landing page @ cosmicsignature.com', () => {
     }
   });
 
-  test('requests the animation only once The Art nears the screen', async ({ page }) => {
-    // Regression: the 3 MB mp4 downloaded on every desktop load, before the
-    // visitor scrolled anywhere near The Art.
+  test('keeps the finished Signature on The Art until the visitor asks to play it', async ({
+    page,
+  }) => {
+    // Regression: the 3 MB mp4 downloaded on every desktop load, and then
+    // autoplayed its nearly empty opening frames over the finished still
+    // (V165). The still is the resting state; the animation plays on request.
     await page.setViewportSize({ width: 1440, height: 900 });
     const videoRequests: string[] = [];
     await page.route('**/*.mp4', (route) => {
@@ -385,9 +389,12 @@ test.describe('Landing page @ cosmicsignature.com', () => {
     });
     await page.goto('/', { waitUntil: 'load' });
     await page.waitForLoadState('networkidle');
-    expect(videoRequests).toEqual([]);
-
     await page.locator('#art figure').scrollIntoViewIfNeeded();
+    await page.waitForTimeout(500);
+    expect(videoRequests).toEqual([]);
+    await expect(page.locator('#art video')).toHaveCount(0);
+
+    await page.locator('#art').getByRole('button', { name: 'Play the animation' }).click();
     await expect.poll(() => videoRequests.length).toBeGreaterThan(0);
   });
 
@@ -514,10 +521,10 @@ test.describe('Landing page @ cosmicsignature.com', () => {
     await page.setViewportSize({ width: 390, height: 844 });
     await page.goto('/', { waitUntil: 'domcontentloaded' });
     const plate = page.getByTestId('hero-art-link');
+    // The hero's one commit action is The Cycle's gesture (V170).
     const primary = page
-      .locator('main')
-      .getByRole('link', { name: /open the app/i })
-      .first();
+      .locator('[aria-labelledby="landing-headline"]')
+      .getByRole('link', { name: getLandingContent('en').hero.primaryCta.label });
     await expect(plate).toBeInViewport({ ratio: 1 });
     await expect(primary).toBeInViewport();
     // Drawn above the action, but read (and focused) after it.
@@ -529,7 +536,7 @@ test.describe('Landing page @ cosmicsignature.com', () => {
   test('reaches the primary action by keyboard before the exhibit controls', async ({ page }) => {
     await page.goto('/', { waitUntil: 'domcontentloaded' });
     const hero = page.locator('[aria-labelledby="landing-headline"]');
-    const primary = hero.getByRole('link', { name: /open the app/i });
+    const primary = hero.getByRole('link', { name: getLandingContent('en').hero.primaryCta.label });
     const firstControl = hero.getByRole('button').first();
     const order = await primary.evaluate(
       (node, other) => node.compareDocumentPosition(other as Node),

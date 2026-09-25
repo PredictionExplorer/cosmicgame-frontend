@@ -27,6 +27,25 @@ describe('Steps', () => {
     expect(screen.getByRole('list')).toHaveClass('border-y', 'border-rule-faint');
   });
 
+  it('sets peers beside a sequence in the same rows, a glyph in place of the number', () => {
+    const { container } = render(
+      <Steps
+        ordered={false}
+        framed
+        items={items.map((item) => ({ ...item, marker: <svg data-testid={`glyph-${item.id}`} /> }))}
+      />,
+    );
+    const list = screen.getByRole('list');
+    expect(list.tagName).toBe('UL');
+    expect(list).toHaveClass('border-y', 'border-rule-faint');
+    const indexes = container.querySelectorAll('[data-slot="step-index"]');
+    expect(Array.from(indexes, (node) => node.textContent)).toEqual(['', '']);
+    expect(within(indexes[0] as HTMLElement).getByTestId('glyph-a')).toBeInTheDocument();
+    expect(screen.getByRole('heading', { level: 3, name: 'Simulation' })).toHaveClass(
+      'type-heading-3',
+    );
+  });
+
   it('draws a sequence in time as circled steps on a rail, each named for screen readers', () => {
     render(<Steps items={items} layout="timeline" stepLabel={(n) => `Step ${n}`} />);
     const [first] = screen.getAllByRole('listitem');

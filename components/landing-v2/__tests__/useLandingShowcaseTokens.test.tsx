@@ -1,12 +1,14 @@
 import { render, renderHook, screen, waitFor } from '@testing-library/react';
 
 import {
+  SHOWCASE_TTL_MS,
   imprintedCount,
   resetLandingShowcaseCache,
   useLandingShowcaseTokens,
 } from '@/components/landing-v2/useLandingShowcaseTokens';
-import { showcaseArtworks, showcaseSources, shortSeed } from '@/components/landing-v2/showcase-art';
+import { showcaseArtworks, showcaseSources } from '@/components/landing-v2/showcase-art';
 import { FEATURED_LANDING_ART } from '@/components/landing-v2/featured-art';
+import { SIGNATURE_PLATES } from '@/components/reading/signaturePlates';
 
 function respond(body: unknown, ok = true) {
   (global.fetch as jest.Mock).mockResolvedValue({ ok, json: async () => body });
@@ -55,6 +57,40 @@ describe('useLandingShowcaseTokens', () => {
     expect(result.current.tokens.map((token) => token.TokenId)).toEqual([3]);
   });
 
+  it('asks again on the next mount after a failure, never keeping it for the session (V044)', async () => {
+    (global.fetch as jest.Mock).mockRejectedValueOnce(new Error('down'));
+    const first = renderHook(() => useLandingShowcaseTokens());
+    await waitFor(() => expect(first.result.current.status).toBe('failed'));
+    first.unmount();
+
+    respond({ CosmicSignatureTokenList: [{ TokenId: 3, Seed: 'cc' }] });
+    const second = renderHook(() => useLandingShowcaseTokens());
+    await waitFor(() => expect(second.result.current.status).toBe('ready'));
+    expect(global.fetch).toHaveBeenCalledTimes(2);
+    // Each read is bounded by a timeout signal where the browser has one.
+    const init = (global.fetch as jest.Mock).mock.calls[1]?.[1] as RequestInit | undefined;
+    expect(init).toEqual(expect.objectContaining({ signal: expect.anything() }));
+  });
+
+  it('reuses a good answer for a while, then reads the collection again', async () => {
+    const now = jest.spyOn(Date, 'now').mockReturnValue(1_000_000);
+    try {
+      respond({ CosmicSignatureTokenList: [{ TokenId: 3, Seed: 'cc' }] });
+      const first = renderHook(() => useLandingShowcaseTokens());
+      await waitFor(() => expect(first.result.current.status).toBe('ready'));
+      first.unmount();
+      renderHook(() => useLandingShowcaseTokens()).unmount();
+      expect(global.fetch).toHaveBeenCalledTimes(1);
+
+      now.mockReturnValue(1_000_000 + SHOWCASE_TTL_MS + 1);
+      const later = renderHook(() => useLandingShowcaseTokens());
+      await waitFor(() => expect(global.fetch).toHaveBeenCalledTimes(2));
+      await waitFor(() => expect(later.result.current.status).toBe('ready'));
+    } finally {
+      now.mockRestore();
+    }
+  });
+
   it.each([
     ['an error status', () => respond({}, false)],
     ['a network failure', () => (global.fetch as jest.Mock).mockRejectedValue(new Error('down'))],
@@ -98,7 +134,8 @@ describe('showcase art helpers', () => {
     expect(artworks.map((art) => art.TokenId)).toEqual([23, 24, 50]);
     // The featured piece takes the collection's live name and anchoring state.
     expect(artworks[0]).toMatchObject({ TokenName: 'Named', Staked: true });
-    expect(artworks[2]!.Seed).toBe('ABC');
+    // One seed normalisation everywhere (utils/urls bareSeed): no prefix, lower case.
+    expect(artworks[2]!.Seed).toBe('abc');
   });
 
   it('serves a featured piece from its bundled preview and others through the published files', () => {
@@ -114,8 +151,14 @@ describe('showcase art helpers', () => {
     expect(source).toEqual(expect.stringContaining('/cosmicsignature/0xabc.png'));
   });
 
-  it('shortens a seed for a caption', () => {
-    expect(shortSeed(`0x${FEATURED_LANDING_ART[1].Seed}`)).toBe('5084a873…4dfc33ad');
-    expect(shortSeed('abc')).toBe('abc');
+  it('takes the featured Signatures from the bundled plates, the one record of them', () => {
+    expect(FEATURED_LANDING_ART.map((art) => art.TokenId)).toEqual([23, 24]);
+    expect(FEATURED_LANDING_ART[1]).toEqual({
+      TokenId: 24,
+      Seed: SIGNATURE_PLATES[24].seed,
+      RoundNum: 1,
+      ImprintedAt: 1_786_491_506,
+      imageSrc: '/images/landing/signature-24.webp',
+    });
   });
 });

@@ -23,7 +23,7 @@ export function CosmicCouncil({ council }: { council: LandingContent['council'] 
         framed
         className={styles.rows}
         items={council.columns.map((column) => ({
-          id: column.title,
+          id: column.id,
           title: column.title,
           body: <p>{column.body}</p>,
         }))}

@@ -1,5 +1,6 @@
 import { expect, test } from '@playwright/test';
 
+import { getAboutContent } from '../content/about';
 import { getLandingContent } from '../content/landing';
 
 import { LOCALE_CHROME, LOCALE_SEO, TRANSLATED_LOCALES } from './locale-fixtures';
@@ -28,7 +29,12 @@ const publicPages: PublicPage[] = [
     h1: getLandingContent('en').hero.headlineLead,
     jsonLd: ['Organization', 'WebSite', 'CreativeWork'],
   },
-  { path: '/about', host: LANDING_HOST, h1: 'About Cosmic Signature', jsonLd: ['AboutPage'] },
+  {
+    path: '/about',
+    host: LANDING_HOST,
+    h1: getAboutContent('en').heading,
+    jsonLd: ['AboutPage'],
+  },
   { path: '/learn', host: LANDING_HOST, h1: 'Learn Cosmic Signature', jsonLd: ['BreadcrumbList'] },
   {
     path: '/learn/collecting-and-trading-cosmic-signature',
@@ -45,7 +51,7 @@ const publicPages: PublicPage[] = [
   {
     path: '/zh/about',
     host: LANDING_HOST,
-    h1: '关于 Cosmic Signature',
+    h1: getAboutContent('zh').heading,
     jsonLd: ['AboutPage'],
   },
   {
@@ -69,7 +75,7 @@ const publicPages: PublicPage[] = [
   {
     path: '/uk/about',
     host: LANDING_HOST,
-    h1: 'Про Cosmic Signature',
+    h1: getAboutContent('uk').heading,
     jsonLd: ['AboutPage'],
   },
   {

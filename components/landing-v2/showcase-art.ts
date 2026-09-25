@@ -1,4 +1,4 @@
-import { getAssetsUrl, getThumbUrl, getWebImageUrl } from '@/utils/urls';
+import { bareSeed, getAssetsUrl, getThumbUrl, getWebImageUrl } from '@/utils/urls';
 import { ART_WIDTH, type ArtSource } from '@/components/ui/art-frame';
 
 import { FEATURED_LANDING_ART } from './featured-art';
@@ -27,10 +27,6 @@ export interface ShowcaseArtwork {
   ImprintedAt?: number;
   /** The bundled preview, for the two featured Signatures. */
   imageSrc?: string;
-}
-
-function bareSeed(seed: string | number): string {
-  return String(seed).trim().replace(/^0x/i, '');
 }
 
 /** The featured Signatures first, then the collection, newest first, without repeats. */
@@ -72,10 +68,4 @@ export function showcaseSources(artwork: ShowcaseArtwork): readonly ArtSource[] 
 /** The 30-second animation of the simulation, 3456 × 2234 H.264. */
 export function showcaseAnimation(artwork: ShowcaseArtwork): string {
   return getAssetsUrl(`cosmicsignature/0x${bareSeed(artwork.Seed)}.mp4`);
-}
-
-/** A seed shortened for a caption: `5084a873…4dfc33ad`. */
-export function shortSeed(seed: string): string {
-  const bare = bareSeed(seed);
-  return bare.length > 20 ? `${bare.slice(0, 8)}…${bare.slice(-8)}` : bare;
 }

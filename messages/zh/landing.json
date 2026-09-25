@@ -54,7 +54,6 @@
     },
     "currentCycle": "查看当前周期",
     "noscript": "实时时钟需要启用 JavaScript。应用中始终显示当前周期。",
-    "countdownAria": "{label}：{duration}",
     "durationSeparator": "，"
   },
   "artwork": {
@@ -64,6 +63,8 @@
     "resumeRotation": "继续作品轮换",
     "playAnimation": "播放动画",
     "pauseAnimation": "暂停动画",
+    "resumeAnimation": "继续播放动画",
+    "replayAnimation": "重新播放",
     "unavailable": "作品暂不可用"
   }
 }

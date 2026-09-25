@@ -115,7 +115,7 @@ describe('<TheArt />', () => {
     expect(caption.textContent?.match(/#000024/g)).toHaveLength(1);
     expect(caption).toHaveTextContent('common.signature.cycle(n=1)');
     expect(caption).toHaveTextContent('Aug 2026');
-    expect(caption).toHaveTextContent('Seed5084a873…4dfc33ad');
+    expect(caption).toHaveTextContent('Seed5084a8…⁠33ad');
   });
 
   it('never waits on the collection for its artwork', () => {
@@ -175,11 +175,22 @@ describe('<TheArt />', () => {
     expect(value.querySelector('[aria-label]')).toBeNull();
   });
 
-  it('keeps the still under reduced motion and plays the animation only on request', () => {
-    installMatchMedia({ reducedMotion: true, wide: true });
+  it('keeps the finished still at rest and never requests the animation by itself', () => {
+    // V165: the animation opens on a nearly empty black frame, so it never
+    // replaces the still unasked, on any screen, with motion allowed or not.
+    installMatchMedia({ reducedMotion: false, wide: true });
     const { container } = render(<TheArt art={art} />);
     scrollPlate(true);
     expect(container.querySelector('video')).toBeNull();
+    expect(container.querySelector('[src$=".mp4"]')).toBeNull();
+    expect(play).not.toHaveBeenCalled();
+    expect(screen.getByRole('button', { name: 'landing.artwork.playAnimation' })).toBeVisible();
+  });
+
+  it('plays the animation once on request, with its progress, then returns to the still', () => {
+    installMatchMedia({ reducedMotion: true, wide: false });
+    const { container } = render(<TheArt art={art} />);
+    scrollPlate(true);
 
     fireEvent.click(screen.getByRole('button', { name: 'landing.artwork.playAnimation' }));
     const video = container.querySelector('video')!;
@@ -189,56 +200,75 @@ describe('<TheArt />', () => {
     );
     expect(video.muted).toBe(true);
     expect(video).toHaveAttribute('playsinline');
+    expect(video).not.toHaveAttribute('loop');
     expect(video).toHaveAttribute('aria-hidden', 'true');
-    expect(play).toHaveBeenCalled();
+    expect(play).toHaveBeenCalledTimes(1);
+    // Until the first frame plays, the still shows and the control is busy.
+    expect(video).not.toHaveClass('animationVisible');
+    expect(screen.getByRole('button', { name: 'landing.artwork.pauseAnimation' })).toHaveAttribute(
+      'aria-busy',
+      'true',
+    );
 
-    fireEvent.click(screen.getByRole('button', { name: 'landing.artwork.pauseAnimation' }));
-    expect(container.querySelector('video')).toBeNull();
+    fireEvent.playing(video);
+    expect(video).toHaveClass('animationVisible');
+    Object.defineProperty(video, 'currentTime', { configurable: true, writable: true, value: 8.4 });
+    fireEvent.timeUpdate(video);
+    expect(container.querySelector('figcaption')).toHaveTextContent('0:08 / 0:30');
+    expect(container.querySelector('.animationProgress')).toHaveStyle({ '--progress': '0.28' });
+
+    fireEvent.ended(video);
+    expect(video).not.toHaveClass('animationVisible');
+    expect(container.querySelector('.animationProgress')).toBeNull();
+    fireEvent.click(screen.getByRole('button', { name: 'landing.artwork.replayAnimation' }));
+    expect(play).toHaveBeenCalledTimes(2);
   });
 
-  it('requests the animation only once the plate nears the screen', () => {
-    // Regression: the 3 MB video mounted with preload="auto" on page load, so
-    // every desktop visit downloaded it before the visitor scrolled.
+  it('holds the frame on pause and resumes where it stopped', () => {
     installMatchMedia({ reducedMotion: false, wide: true });
     const { container } = render(<TheArt art={art} />);
-    expect(container.querySelector('video')).toBeNull();
-    expect(container.querySelector('[src$=".mp4"]')).toBeNull();
-    expect(play).not.toHaveBeenCalled();
-
     scrollPlate(true);
-    expect(container.querySelector('video')).not.toBeNull();
-    expect(play).toHaveBeenCalledTimes(1);
+    fireEvent.click(screen.getByRole('button', { name: 'landing.artwork.playAnimation' }));
+    const video = container.querySelector('video')!;
+    fireEvent.playing(video);
 
-    // Scrolled past, it pauses but stays loaded for the way back.
-    scrollPlate(false);
-    expect(container.querySelector('video')).not.toBeNull();
+    fireEvent.click(screen.getByRole('button', { name: 'landing.artwork.pauseAnimation' }));
     expect(pause).toHaveBeenCalled();
+    expect(video).toHaveClass('animationVisible');
+    fireEvent.click(screen.getByRole('button', { name: 'landing.artwork.resumeAnimation' }));
+    expect(play).toHaveBeenCalledTimes(2);
   });
 
-  it('starts the animation by itself only on wide screens with motion allowed', () => {
-    installMatchMedia({ reducedMotion: false, wide: false });
+  it('pauses while the plate is off screen and picks up again on the way back', () => {
+    installMatchMedia({ reducedMotion: false, wide: true });
     const { container } = render(<TheArt art={art} />);
     scrollPlate(true);
-    expect(container.querySelector('video')).toBeNull();
-    expect(play).not.toHaveBeenCalled();
+    fireEvent.click(screen.getByRole('button', { name: 'landing.artwork.playAnimation' }));
+    fireEvent.playing(container.querySelector('video')!);
+
+    scrollPlate(false);
+    expect(pause).toHaveBeenCalled();
+    scrollPlate(true);
+    expect(play).toHaveBeenCalledTimes(2);
   });
 
   it('falls back to the still when the animation cannot load', () => {
     installMatchMedia({ reducedMotion: false, wide: true });
     const { container } = render(<TheArt art={art} />);
     scrollPlate(true);
+    fireEvent.click(screen.getByRole('button', { name: 'landing.artwork.playAnimation' }));
     fireEvent.error(container.querySelector('video')!);
     expect(container.querySelector('video')).toBeNull();
-    expect(screen.queryByRole('button', { name: /animation/ })).not.toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: /animation/i })).not.toBeInTheDocument();
     expect(screen.getByTestId('art-frame')).toBeInTheDocument();
   });
 
   it('offers the play control only where JavaScript runs', () => {
     render(<TheArt art={art} />);
     // Landing.module.css hides this class under @media (scripting: none).
-    expect(screen.getByRole('button', { name: 'landing.artwork.playAnimation' })).toHaveClass(
-      'scriptedControl',
-    );
+    expect(
+      screen.getByRole('button', { name: 'landing.artwork.playAnimation' }).parentElement,
+    ).toHaveClass('scriptedControl');
   });
 
   it('has an id="art" anchor and names the section by its heading', () => {

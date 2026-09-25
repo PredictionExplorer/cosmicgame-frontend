@@ -6,11 +6,12 @@ import {
   fetchLandingFinalizationTimeSec,
   type LandingDashboardSnapshot,
 } from '../landing-cycle-data';
-import { EventHorizonCountdown, POLL_INTERVAL_MS } from '../EventHorizonCountdown';
+import { EventHorizonCountdown, POLL_INTERVAL_MS, spokenShards } from '../EventHorizonCountdown';
 
 // The countdown reads through the zod-free landing-cycle-data module (NOT
 // the services/api barrel — that would drag axios+zod into the landing).
 jest.mock('../landing-cycle-data', () => ({
+  LANDING_FETCH_TIMEOUT_MS: 8_000,
   fetchLandingFinalizationTimeSec: jest.fn(),
   fetchLandingCurrentTimeSec: jest.fn(),
   fetchLandingDashboardSnapshot: jest.fn(),
@@ -79,15 +80,22 @@ describe('<EventHorizonCountdown />', () => {
     expect(screen.queryByRole('link', { name: /GeckoTerminal/i })).not.toBeInTheDocument();
   });
 
-  it('keeps the visible clock and its accessible duration in sync without announcing every tick', async () => {
+  it('reads the clock as text to the minute, named by its heading, without announcing ticks (V416)', async () => {
     jest.useFakeTimers({ doNotFake: ['Date'] });
     render(<EventHorizonCountdown />);
 
     await waitFor(() => expect(clockValues()).toEqual(['02', '01', '05']));
     const timer = screen.getByRole('timer');
     expect(timer).toHaveAttribute('aria-live', 'off');
+    expect(timer).not.toHaveAttribute('aria-label');
     expect(screen.getByTestId('countdown-units')).toHaveAttribute('aria-hidden', 'true');
-    expect(timer).toHaveAccessibleName(/landing\.timer\.duration\.seconds\(count=5\)/);
+    // The name is the heading, which does not change as the digits tick.
+    expect(timer).toHaveAccessibleName(
+      screen.getByRole('heading', { name: /landing\.timer\.phases\.approach\.title/ }).textContent!,
+    );
+    const spoken =
+      'landing.timer.duration.hours(count=2)landing.timer.durationSeparatorlanding.timer.duration.minutes(count=1)';
+    expect(timer).toHaveTextContent(spoken);
 
     jest.mocked(Date.now).mockReturnValue(nowMs + 1_000);
     act(() => {
@@ -95,7 +103,37 @@ describe('<EventHorizonCountdown />', () => {
     });
 
     expect(clockValues()).toEqual(['02', '01', '04']);
-    expect(timer).toHaveAccessibleName(/landing\.timer\.duration\.seconds\(count=4\)/);
+    expect(timer).toHaveTextContent(spoken);
+  });
+
+  it('stops polling while the tab is hidden and reads at once when it is shown (V045)', async () => {
+    jest.useFakeTimers({ doNotFake: ['Date'] });
+    mockFetchDashboard.mockClear();
+    let visibility: DocumentVisibilityState = 'visible';
+    const visibilitySpy = jest
+      .spyOn(document, 'visibilityState', 'get')
+      .mockImplementation(() => visibility);
+    try {
+      render(<EventHorizonCountdown />);
+      await waitFor(() => expect(mockFetchDashboard).toHaveBeenCalledTimes(1));
+      // Every read carries a timeout, so a hung request never holds the loop.
+      expect(mockFetchDashboard).toHaveBeenLastCalledWith(8_000);
+
+      visibility = 'hidden';
+      await act(async () => {
+        document.dispatchEvent(new Event('visibilitychange'));
+        jest.advanceTimersByTime(POLL_INTERVAL_MS * 5);
+      });
+      expect(mockFetchDashboard).toHaveBeenCalledTimes(1);
+
+      visibility = 'visible';
+      await act(async () => {
+        document.dispatchEvent(new Event('visibilitychange'));
+      });
+      await waitFor(() => expect(mockFetchDashboard).toHaveBeenCalledTimes(2));
+    } finally {
+      visibilitySpy.mockRestore();
+    }
   });
 
   it('never discards its last good reading when a poll fails', async () => {
@@ -217,5 +255,25 @@ describe('<EventHorizonCountdown />', () => {
   it('calls itself live only once the page runs', async () => {
     render(<EventHorizonCountdown />);
     await waitFor(() => expect(screen.getByText('landing.timer.liveClock')).toBeInTheDocument());
+  });
+});
+
+describe('spokenShards', () => {
+  const shards = (days: number, hours: number, minutes: number, seconds: number) => [
+    { unit: 'days' as const, value: days },
+    { unit: 'hours' as const, value: hours },
+    { unit: 'minutes' as const, value: minutes },
+    { unit: 'seconds' as const, value: seconds },
+  ];
+  const units = (list: readonly { unit: string; value: number }[]) =>
+    list.map(({ unit, value }) => `${value} ${unit}`);
+
+  it('speaks the non-zero units to the minute', () => {
+    expect(units(spokenShards(shards(4, 0, 12, 33)))).toEqual(['4 days', '12 minutes']);
+  });
+
+  it('counts the seconds only in the final minute', () => {
+    expect(units(spokenShards(shards(0, 0, 0, 42)))).toEqual(['42 seconds']);
+    expect(units(spokenShards(shards(0, 0, 0, 0)))).toEqual(['0 seconds']);
   });
 });

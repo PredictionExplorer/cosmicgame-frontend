@@ -54,7 +54,6 @@
     },
     "currentCycle": "現在のサイクルを開く",
     "noscript": "ライブの時計にはJavaScriptが必要です。アプリでは現在のサイクルをいつでも確認できます。",
-    "countdownAria": "{label}：{duration}",
     "durationSeparator": " "
   },
   "artwork": {
@@ -64,6 +63,8 @@
     "resumeRotation": "作品の切り替えを再開",
     "playAnimation": "アニメーションを再生",
     "pauseAnimation": "アニメーションを一時停止",
+    "resumeAnimation": "アニメーションを再開",
+    "replayAnimation": "もう一度再生",
     "unavailable": "アートワークを利用できません"
   }
 }

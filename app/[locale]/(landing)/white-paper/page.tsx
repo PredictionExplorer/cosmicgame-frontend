@@ -14,7 +14,6 @@ import {
 } from '@/content/white-paper';
 import { getLandingContent } from '@/content/landing';
 
-import { AllocationBar, AllocationKey } from '@/components/landing-v2/AllocationBar';
 import { PageHeader } from '@/components/layout/PageHeader';
 import { buttonVariants } from '@/components/ui/button';
 import {
@@ -25,7 +24,9 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
+import { AllocationBar, AllocationKey } from '@/components/reading/AllocationBar';
 import { ReadingContents } from '@/components/reading/ContentsNav';
+import { MetaItems } from '@/components/reading/MetaItems';
 import type { ContentsEntry } from '@/components/reading/contents';
 import {
   BREAKOUT_CLASS,
@@ -33,6 +34,8 @@ import {
   FormulaFigure,
   NumberedFigure,
   PROSE_CLASS,
+  READING_TABLE_CLASS,
+  READING_TEXT_EDGE_CLASS,
   ReadingHeading,
   RunInList,
 } from '@/components/reading/prose';
@@ -186,6 +189,7 @@ function BlockView({ block, context }: { block: WhitePaperBlock; context: BlockC
            */}
           <Table
             labelledBy={context.headingId}
+            className={READING_TABLE_CLASS}
             containerClassName={columns.length <= 2 ? 'max-w-[var(--measure-prose)]' : undefined}
           >
             <TableHeader>
@@ -203,7 +207,13 @@ function BlockView({ block, context }: { block: WhitePaperBlock; context: BlockC
                   {row.map((cell, cellIndex) => (
                     <TableCell
                       key={`${cellIndex}-${cell}`}
-                      label={cellIndex === 0 ? undefined : columns[cellIndex]}
+                      // On a phone each row is a record titled by its first
+                      // cell. A term and its description need no label; a
+                      // wider table labels each value with its column.
+                      phone={cellIndex === 0 ? 'title' : undefined}
+                      label={
+                        cellIndex === 0 || columns.length <= 2 ? undefined : columns[cellIndex]
+                      }
                       stack={cellIndex === 0 || !numeric[cellIndex]}
                       align={numeric[cellIndex] ? 'end' : 'start'}
                       numeric={numeric[cellIndex]}
@@ -435,26 +445,31 @@ export default async function WhitePaperPage({ params }: PageProps) {
 
       <PageHeader
         variant="reading"
+        host="landing"
         eyebrow={content.hero.eyebrow}
         title={content.hero.title}
         titleId={TITLE_ID}
         subtitle={content.hero.subtitle}
         meta={
-          <>
-            <span>
-              {content.hero.authorName}
-              {' · '}
-              <a href={`mailto:${content.hero.authorEmail}`} className="link-quiet">
-                {content.hero.authorEmail}
-              </a>
-            </span>
-            <span className="tabular-nums">
-              {content.hero.versionLabel} · {content.hero.dateLabel}
-            </span>
-            <span className="tabular-nums">
-              {fillTemplate(reading.readingTimeTemplate, { minutes })}
-            </span>
-          </>
+          <span className="inline-flex flex-wrap items-center gap-x-2.5 gap-y-1">
+            <MetaItems
+              items={[
+                <span key="author">{content.hero.authorName}</span>,
+                <a key="email" href={`mailto:${content.hero.authorEmail}`} className="link-quiet">
+                  {content.hero.authorEmail}
+                </a>,
+                <span key="version" className="tabular-nums">
+                  {content.hero.versionLabel}
+                </span>,
+                <span key="date" className="tabular-nums">
+                  {content.hero.dateLabel}
+                </span>,
+                <span key="time" className="tabular-nums">
+                  {fillTemplate(reading.readingTimeTemplate, { minutes })}
+                </span>,
+              ]}
+            />
+          </span>
         }
         actions={
           <a
@@ -468,7 +483,7 @@ export default async function WhitePaperPage({ params }: PageProps) {
         }
       />
 
-      <div className="reading-grid">
+      <div className={cn(READING_TEXT_EDGE_CLASS, 'reading-grid')}>
         <div className="lg:row-span-4">
           <ReadingContents
             entries={entries}

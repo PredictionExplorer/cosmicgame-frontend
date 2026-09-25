@@ -9,7 +9,7 @@ import type { LandingText } from './structure';
 export const landingTextZh = {
   meta: {
     title: 'Cosmic Signature · Arbitrum 上的程序化链上艺术协议',
-    description: `Cosmic Signature 是运行于 Arbitrum 的程序化链上艺术协议。参与者在每个演绎周期中落笔；周期收官后，新的签名作品随之铭刻，周期储备按十余条轨道分配，其中 ${protocolFacts.publicGoodsPercentage}% 转拨给以太坊核心贡献者。`,
+    description: `Cosmic Signature 是运行于 Arbitrum 的程序化链上艺术协议。参与者在每个演绎周期中落笔；周期收官后，新的签名作品随之铭刻，周期储备按规则分配至各条轨道，其中 ${protocolFacts.publicGoodsPercentage}% 转拨给以太坊核心贡献者。`,
     keywords: [
       'Cosmic Signature',
       '程序化艺术协议',
@@ -25,11 +25,9 @@ export const landingTextZh = {
 
   hero: {
     eyebrow: '程序化链上艺术协议 · Arbitrum',
-    headline: '每一次落笔， 都在塑造艺术。',
     headlineLead: '每一次落笔，',
     headlineAccent: '都在塑造\u200B艺术。',
-    subhead: `使用 ETH 或 CST 落笔，延长周期的收官倒计时。倒计时归零后，完成收官即可铭刻新的签名作品并分配周期储备，其中 ${protocolFacts.publicGoodsPercentage}% 转拨给以太坊核心贡献者。`,
-    primaryCtaLabel: '打开应用',
+    subhead: `每一次落笔以 ETH 或 CST 完成，都会延长周期的收官倒计时。倒计时归零即可收官：为获配者铭刻新的签名作品，并将周期储备分配到各条轨道，其中 ${protocolFacts.publicGoodsPercentage}% 转拨给以太坊核心贡献者。`,
     secondaryCtaLabel: '了解周期如何运作',
     art: {
       viewAriaLabel: '在应用中查看 Cosmic Signature {tokenLabel}',
@@ -109,12 +107,13 @@ export const landingTextZh = {
 
   tracks: {
     eyebrow: '分配轨道',
-    heading: '十余条轨道，让周期储备\u200B循轨而行。',
+    heading: '每一份周期储备，都按规则分配。',
     description:
       '周期收官后，协议会沿各条分配轨道发放 ETH 与 CST 储备，以表彰坚守、时机、投入与参与。约一半 ETH 储备会滚入下一周期。',
     ethLabel: '每个周期储备中的 ETH',
     fixedLabel: '每个周期的 CST 与 NFT',
     fixedEach: `每位获配者获配 ${protocolFacts.specialAllocationCst.toLocaleString('zh-CN')} CST 与 1 枚 Cosmic Signature NFT。`,
+    recipients: { other: '{count}\u00a0位获配者' },
     items: {
       'signature-allocation': {
         title: '签名分配',
@@ -139,25 +138,21 @@ export const landingTextZh = {
       },
       'eth-stellar-selection': {
         title: 'ETH 星选',
-        body: '由程序化随机选出的 3 位参与者均分；入选频次随落笔次数增加。',
+        body: `由程序化随机选出的 ${protocolFacts.ethStellarSelectionRecipients} 位参与者均分；入选频次随落笔次数增加。`,
       },
       'participant-nft-stellar-selection': {
-        amount: '10 位获配者',
         title: '参与者 NFT 星选',
         body: '从本周期的参与者中程序化随机选出。',
       },
       'anchored-nft-stellar-selection': {
-        amount: '10 位获配者',
         title: '锚定 NFT 星选',
         body: '从 Random Walk NFT 锚定者中程序化随机选出。',
       },
       'endurance-champion': {
-        amount: '1 位获配者',
         title: '坚守冠军分配',
         body: '连续坚守时间最长的参与者。',
       },
       'final-cst-gesture': {
-        amount: '1 位获配者',
         title: 'CST 收官之笔分配',
         body: '本周期最后一次使用 CST 落笔的参与者。',
       },
@@ -202,40 +197,40 @@ export const landingTextZh = {
     eyebrow: '宇宙议会',
     heading: '协议协调，尽在链上。',
     body: 'CST 持有者在链上协调协议事务：委托权重、提交协调提案，并表示支持或反对。',
-    columns: [
-      {
+    columns: {
+      proposal: {
         title: '协调提案',
-        body: '获委托权重不少于 100 CST 的地址均可提交提案。协调延迟为 2 天，协调期为 2 周。',
+        body: `获委托权重不少于 ${protocolFacts.councilProposalThresholdCst} CST 的地址均可提交提案。协调延迟为 ${protocolFacts.councilVotingDelayDays} 天，协调期为 ${protocolFacts.councilVotingPeriodWeeks} 周。`,
       },
-      {
+      weight: {
         title: '协调权重',
         body: '委托完成后，每单位 CST 对应一单位协调权重。支持、反对或弃权均通过密码学签名提交；CST 不代表股份，也不是股权工具。',
       },
-      {
+      quorum: {
         title: '协调法定权重',
-        body: '支持权重高于反对权重，且支持与弃权权重之和达到 CST 总供应量的 3%，提案即获通过。反对权重不计入法定权重。',
+        body: `支持权重高于反对权重，且支持与弃权权重之和达到 CST 总供应量的 ${protocolFacts.councilQuorumPercent}%，提案即获通过。反对权重不计入法定权重。`,
       },
-    ],
+    },
   },
 
   verifiability: {
     eyebrow: '可验证性',
     heading: '开放、已验证、可复现。',
     body: '任何人都能从种子重新生成签名作品，并对照应用中公开的合约、源代码与审计状态自行核验。',
-    pillars: [
-      {
+    pillars: {
+      cc0: {
         title: 'CC0 1.0',
         body: 'Cosmic Signature 各代码仓库中的项目自有材料（合约、着色器与渲染管线）采用 CC0 1.0，不保留任何权利；第三方依赖、字体与素材仍适用各自的许可证。',
       },
-      {
+      verification: {
         title: '验证状态',
         body: '应用提供公开合约地址、源代码资源、验证说明及审计与报告状态，任何人都能查看已发布内容。',
       },
-      {
+      reproducible: {
         title: '可复现艺术',
         body: '持续集成会校验生成画面的 SHA-256 哈希。同一种子，得到完全相同的输出。',
       },
-    ],
+    },
     evidenceLabel: '亲自查证',
   },
 
@@ -246,8 +241,7 @@ export const landingTextZh = {
     items: [
       {
         question: '参与者实际要做什么？',
-        answer:
-          '你可以落笔。每一笔都是使用 ETH 或 CST 发起的链上交易，会延长收官倒计时、计入一次星选资格，还可能铭刻参与 CST，并共同塑造这一周期的签名。你还可以将 Cosmic Signature NFT 锚定至协议，使其按比例参与锚定派发；持有至少 100 CST 时，也可以通过宇宙议会提交协调提案。',
+        answer: `你可以落笔。每一笔都是使用 ETH 或 CST 发起的链上交易，会延长收官倒计时、计入一次星选资格，还可能铭刻参与 CST，并共同塑造这一周期的签名。你还可以将 Cosmic Signature NFT 锚定至协议，使其按比例参与锚定派发；持有至少 ${protocolFacts.councilProposalThresholdCst} CST 时，也可以通过宇宙议会提交协调提案。`,
       },
       {
         question: '这件艺术作品在技术上是什么？',
@@ -262,15 +256,14 @@ export const landingTextZh = {
       // lexicon-allow-start: 明确否认慈善捐赠及相关税务定性。
       {
         question: '公共物品具体指什么？',
-        answer:
-          '每个周期会将 ETH 储备的 7% 转拨至公共物品地址，目前为 Protocol Guild。Protocol Guild 是为 170 多位以太坊核心贡献者提供资助的集体机制。这是向公共物品地址转拨 ETH，并非美国税法意义上的慈善捐赠；Cosmic Signature 不对其税务处理作任何陈述。',
+        answer: `每个周期会将 ETH 储备的 ${protocolFacts.publicGoodsPercentage}% 转拨至公共物品地址，目前为 Protocol Guild。Protocol Guild 是为 170 多位以太坊核心贡献者提供资助的集体机制。这是向公共物品地址转拨 ETH，并非美国税法意义上的慈善捐赠；Cosmic Signature 不对其税务处理作任何陈述。`,
       },
       // lexicon-allow-end
       // lexicon-allow-start: 明确否认彩票、赌场、赌博、庄家、荷官及赌注类别。
       {
         question: '这是彩票、赌场或赌博产品吗？',
         answer:
-          '不是。Cosmic Signature 是程序化链上艺术协议。参与者在演绎周期中落笔；周期收官后，协议将储备分配至十余条轨道。这里没有庄家，没有荷官，也没有赌注。分配所表彰的是坚守、时机与参与。唯一带有随机性的分配轨道——星选——是协议层面的程序化分配。',
+          '不是。Cosmic Signature 是程序化链上艺术协议。参与者在演绎周期中落笔；周期收官后，协议将储备按规则分配至各条分配轨道。这里没有庄家，没有荷官，也没有赌注。分配所表彰的是坚守、时机与参与。唯一带有随机性的分配轨道——星选——是协议层面的程序化分配。',
       },
       // lexicon-allow-end
       // lexicon-allow-start: 明确否认投资、利润、股息及投资合同定性。

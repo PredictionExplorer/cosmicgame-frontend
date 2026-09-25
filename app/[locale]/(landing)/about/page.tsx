@@ -1,41 +1,28 @@
 import type { Metadata } from 'next';
-import {
-  AppWindow,
-  ArrowRight,
-  AtSign,
-  CircleHelp,
-  Code2,
-  FileCode2,
-  GitBranch,
-  Lock,
-  Mail,
-  MessagesSquare,
-  Scale,
-  type LucideIcon,
-} from 'lucide-react';
+import { AppWindow, ArrowRight, Code2, FileCode2, Mail, type LucideIcon } from 'lucide-react';
 import { getTranslations, setRequestLocale } from 'next-intl/server';
 
 import {
+  ABOUT_MILESTONE_IDS,
   ABOUT_PLATE_TOKEN_ID,
-  ABOUT_RESOURCE_GROUPS,
+  ABOUT_RESOURCE_IDS,
   getAboutContent,
   type AboutResourceId,
 } from '@/content/about';
 import { getLearnContent } from '@/content/learn';
 import { protocolFacts } from '@/content/protocol-facts';
-import { WHITE_PAPER_PATH, getWhitePaperContent } from '@/content/white-paper';
+import { WHITE_PAPER_PATH } from '@/content/white-paper';
 
+import { PageHeader } from '@/components/layout/PageHeader';
 import { SiteLink } from '@/components/layout/SiteLink';
 import { landingLink } from '@/components/learn/guides';
-import { Callout, PROSE_CLASS, splitRunIn, termLabel } from '@/components/reading/prose';
+import { Callout, PROSE_CLASS } from '@/components/reading/prose';
 import { ReadingMain } from '@/components/reading/ReadingMain';
 import { SignaturePlate } from '@/components/reading/SignaturePlate';
 import { getSignaturePlateCopy } from '@/components/reading/signaturePlateCopy';
 import { SIGNATURE_PLATES } from '@/components/reading/signaturePlates';
 import { fillTemplate } from '@/components/reading/template';
-import { Badge } from '@/components/ui/badge';
 import { SectionHeader } from '@/components/ui/section-header';
-import { PageHeader } from '@/components/layout/PageHeader';
 import { Link } from '@/i18n/navigation';
 import { APP_ORIGIN, LANDING_ORIGIN, localeHref, localizeCrossHostHref } from '@/lib/hostRouting';
 import { formatPercent } from '@/utils/format/numbers';
@@ -48,22 +35,13 @@ interface PageProps {
 
 const ABOUT_PLATE = SIGNATURE_PLATES[ABOUT_PLATE_TOKEN_ID];
 
-/** The resources this page lists: the protocol's own, then the support address. */
-const ABOUT_PAGE_RESOURCES: readonly AboutResourceId[] = [
-  ...ABOUT_RESOURCE_GROUPS.protocol,
-  'support',
-];
+/** The white paper's introduction, where the design's own account continues. */
+const WHITE_PAPER_INTRODUCTION = `${WHITE_PAPER_PATH}#introduction`;
 
 const RESOURCE_ICONS: Readonly<Record<AboutResourceId, LucideIcon>> = {
   app: AppWindow,
   contracts: FileCode2,
   code: Code2,
-  x: AtSign,
-  discord: MessagesSquare,
-  github: GitBranch,
-  faq: CircleHelp,
-  terms: Scale,
-  privacy: Lock,
   support: Mail,
 };
 
@@ -77,16 +55,6 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
     canonicalHost: 'landing',
     locale,
   });
-}
-
-/** The white paper's three design properties ("Determinism. The artwork…"), split into term and text. */
-function principlesOf(locale: string) {
-  const introduction = getWhitePaperContent(locale).sections.find(
-    (section) => section.id === 'introduction',
-  );
-  const list = introduction?.blocks.find((block) => block.kind === 'list');
-  if (list?.kind !== 'list') return [];
-  return list.items.map(splitRunIn).filter((item) => item.term !== null);
 }
 
 export default async function AboutPage({ params }: PageProps) {
@@ -108,9 +76,18 @@ export default async function AboutPage({ params }: PageProps) {
       '@id': `${LANDING_ORIGIN}/#organization`,
     },
   };
-  const principles = principlesOf(locale);
   const readWhitePaperLabel = getLearnContent(locale).hub.whitePaper.readLabel;
   const linksById = new Map(content.officialResources.links.map((link) => [link.id, link]));
+  const facts = [
+    { label: content.facts.licenseLabel, value: content.facts.license },
+    { label: content.facts.networkLabel, value: content.facts.network },
+    {
+      label: content.facts.publicGoodsLabel,
+      value: fillTemplate(content.facts.publicGoodsTemplate, {
+        percent: formatPercent(protocolFacts.publicGoodsPercentage, locale),
+      }),
+    },
+  ];
 
   return (
     <ReadingMain>
@@ -127,85 +104,78 @@ export default async function AboutPage({ params }: PageProps) {
         ]}
       />
 
-      {/* The reading header every long page uses, top-aligned beside its Signature. */}
-      <div className="grid items-start gap-10 border-b border-rule pb-12 lg:grid-cols-[minmax(0,1fr)_minmax(0,36rem)] lg:gap-16 lg:pb-16">
+      {/*
+       * The one page header, like every reading page: the page's name as the
+       * eyebrow, a statement as the H1, the lede and the facts, with the
+       * Signature that introduces the protocol beside it from lg.
+       */}
+      <div className="border-b border-rule lg:grid lg:grid-cols-[minmax(0,1fr)_minmax(0,30rem)] lg:items-end lg:gap-12 xl:gap-16">
         <PageHeader
           variant="reading"
+          host="landing"
           eyebrow={content.eyebrow}
           title={content.heading}
           subtitle={content.body.lede}
-          className="mb-0 border-b-0 pb-0 sm:mb-0 sm:pb-0"
+          className="mb-0 border-b-0 sm:mb-0"
         >
-          <ul className="mt-6 flex flex-wrap gap-2">
-            {[
-              content.facts.license,
-              content.facts.network,
-              fillTemplate(content.facts.publicGoodsTemplate, {
-                percent: formatPercent(protocolFacts.publicGoodsPercentage, locale),
-              }),
-            ].map((fact) => (
-              <li key={fact}>
-                <Badge tone="neutral">{fact}</Badge>
-              </li>
+          <dl className="mt-8 grid grid-cols-2 gap-x-8 gap-y-5 border-t border-rule-faint pt-5 sm:flex sm:flex-wrap sm:gap-x-10">
+            {facts.map((fact) => (
+              <div key={fact.label} className="min-w-0 last:max-sm:col-span-2">
+                <dt className="type-label text-subtle">{fact.label}</dt>
+                <dd className="mt-1 type-body-md text-foreground">{fact.value}</dd>
+              </div>
             ))}
-          </ul>
+          </dl>
         </PageHeader>
-        <SignaturePlate
-          art={ABOUT_PLATE}
-          priority
-          href={localizeCrossHostHref(`${APP_ORIGIN}/detail/${ABOUT_PLATE.tokenId}`, locale)}
-          sizes="(min-width: 1024px) 36rem, 100vw"
-          copy={plateCopy(ABOUT_PLATE)}
-        />
+        <div className="pb-10 max-lg:mt-2">
+          <SignaturePlate
+            art={ABOUT_PLATE}
+            priority
+            href={localizeCrossHostHref(`${APP_ORIGIN}/detail/${ABOUT_PLATE.tokenId}`, locale)}
+            sizes="(min-width: 1024px) 30rem, 100vw"
+            copy={plateCopy(ABOUT_PLATE)}
+          />
+        </div>
       </div>
 
-      {/* The body opens the Principles it introduces, instead of standing alone
-          at half the row's width between the header and the section. */}
-      {principles.length > 0 ? (
-        <section aria-labelledby="about-principles" className="mt-12 lg:mt-16">
-          <SectionHeader
-            headingId="about-principles"
-            title={content.principlesHeading}
-            description={
-              <span className="block space-y-3">
-                {content.body.paragraphs.map((paragraph) => (
-                  <span key={paragraph} className="block">
-                    {paragraph}
-                  </span>
-                ))}
-              </span>
-            }
-          />
-          <ol className="mt-8 grid gap-8 md:grid-cols-3 md:gap-10">
-            {principles.map((principle, index) => (
-              <li key={principle.term} className="border-t border-rule pt-5">
-                <p aria-hidden className="type-label tabular-nums text-subtle">
-                  {String(index + 1).padStart(2, '0')}
-                </p>
-                <h3 className="mt-3 type-heading-3 text-foreground">
-                  {termLabel(principle.term ?? '')}
-                </h3>
-                <p className="mt-2 type-body-md text-muted-foreground">{principle.text}</p>
-              </li>
-            ))}
-          </ol>
-          <Link
-            href={WHITE_PAPER_PATH}
-            className="link-quiet mt-8 inline-flex min-h-6 items-center gap-1.5 type-label text-primary"
-          >
-            {readWhitePaperLabel}
-            <ArrowRight aria-hidden className="size-3.5" />
-          </Link>
-        </section>
-      ) : (
-        <div className="mt-12 space-y-5 lg:mt-16">
-          {content.body.paragraphs.map((paragraph) => (
+      <section aria-labelledby="about-origin" className="mt-12 lg:mt-16">
+        <SectionHeader headingId="about-origin" title={content.origin.heading} />
+        <div className="mt-5 space-y-5">
+          {content.origin.paragraphs.map((paragraph) => (
             <p key={paragraph} className={PROSE_CLASS}>
               {paragraph}
             </p>
           ))}
         </div>
-      )}
+        <Link
+          href={WHITE_PAPER_INTRODUCTION}
+          className="link-quiet mt-6 inline-flex min-h-6 items-center gap-1.5 type-label text-primary"
+        >
+          {readWhitePaperLabel}
+          <ArrowRight aria-hidden className="size-3.5" />
+        </Link>
+      </section>
+
+      <section aria-labelledby="about-milestones" className="mt-16 lg:mt-20">
+        <SectionHeader headingId="about-milestones" title={content.milestones.heading} />
+        <ol className="mt-6 max-w-[60rem] divide-y divide-rule-faint border-y border-rule-faint">
+          {ABOUT_MILESTONE_IDS.map((id) => {
+            const milestone = content.milestones.items[id];
+            return (
+              <li
+                key={id}
+                className="grid gap-x-8 gap-y-1.5 py-5 sm:grid-cols-[minmax(0,11rem)_minmax(0,1fr)]"
+              >
+                <p className="flex items-baseline gap-3">
+                  <span className="type-title text-foreground">{milestone.label}</span>
+                  <span className="type-label text-subtle">{milestone.status}</span>
+                </p>
+                <p className="type-body-md text-muted-foreground">{milestone.text}</p>
+              </li>
+            );
+          })}
+        </ol>
+      </section>
 
       <Callout label={content.clarificationsHeading} className="mt-16 lg:mt-20">
         {/* The COSMIC disambiguation sits in the footer of every landing page, just below. */}
@@ -217,7 +187,7 @@ export default async function AboutPage({ params }: PageProps) {
         {/* The protocol's own resources and a way to write in; community and
             legal links live in the footer right below. */}
         <ul className="mt-6 grid border-t border-rule-faint sm:grid-cols-2 sm:gap-x-10">
-          {ABOUT_PAGE_RESOURCES.map((id) => {
+          {ABOUT_RESOURCE_IDS.map((id) => {
             const link = linksById.get(id);
             if (!link) return null;
             const Icon = RESOURCE_ICONS[id];

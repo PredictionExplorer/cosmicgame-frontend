@@ -77,7 +77,9 @@ test.describe('Landing responsive regressions', () => {
 
       const timer = page.getByRole('timer');
       await expect(timer).toHaveAttribute('aria-live', 'off');
-      await expect(timer).toHaveAccessibleName(/Cycle 42\b.*4 days/i);
+      // Named by its heading; the duration reads as text, to the minute.
+      await expect(timer).toHaveAccessibleName(/Cycle 42\b/i);
+      await expect(timer).toContainText(/4 days/i);
 
       const cards = page.getByTestId('countdown-units').locator('[data-countdown-unit]');
       await expect(cards).toHaveCount(4);
@@ -153,7 +155,7 @@ test.describe('Landing responsive regressions', () => {
     await mockLandingApi(page, 123);
     await openLanding(page);
 
-    await expect(page.getByRole('timer')).toHaveAccessibleName(/Cycle 42\b.*123 days/i);
+    await expect(page.getByRole('timer')).toContainText(/123 days/i);
     const days = page.locator('[data-countdown-unit="days"]').getByTestId('countdown-value');
     await expect(days).toHaveText('123');
     const geometry = await days.evaluate((element) => {

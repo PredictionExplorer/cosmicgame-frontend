@@ -12,6 +12,7 @@ import { PhrasedText } from '@/components/ui/phrased-text';
 
 import { EventHorizonCountdown } from './EventHorizonCountdown';
 import { HeroArtShowcase } from './HeroArtShowcase';
+import { SectionLink } from './SectionLink';
 import styles from './Landing.module.css';
 
 /**
@@ -58,15 +59,14 @@ export function Hero({ hero }: { hero: LandingContent['hero'] }) {
               {hero.primaryCta.label}
               <ArrowRight aria-hidden />
             </SiteLink>
-            {/* A link that reads as one: it scrolls to the cycle below. */}
-            <SiteLink
-              href={hero.secondaryCta.href}
-              kind="internal"
+            {/* A link that reads as one: it takes the view and focus to the cycle below. */}
+            <SectionLink
+              section={hero.secondaryCta.href.replace(/^#/, '')}
               className="link-quiet type-body-md inline-flex min-h-11 items-center gap-1.5 font-medium text-foreground"
             >
               {hero.secondaryCta.label}
               <ArrowDown aria-hidden className="size-4 text-subtle" />
-            </SiteLink>
+            </SectionLink>
           </div>
           <div className={styles.heroArt}>
             <HeroArtShowcase art={hero.art} />

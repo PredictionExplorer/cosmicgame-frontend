@@ -54,7 +54,6 @@
     },
     "currentCycle": "查看目前週期",
     "noscript": "即時時鐘需要啟用 JavaScript。應用程式會一直顯示目前週期。",
-    "countdownAria": "{label}：{duration}",
     "durationSeparator": "，"
   },
   "artwork": {
@@ -64,6 +63,8 @@
     "resumeRotation": "繼續作品輪換",
     "playAnimation": "播放動畫",
     "pauseAnimation": "暫停動畫",
+    "resumeAnimation": "繼續播放動畫",
+    "replayAnimation": "重新播放",
     "unavailable": "作品暫不可用"
   }
 }

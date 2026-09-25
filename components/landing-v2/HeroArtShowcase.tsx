@@ -30,8 +30,13 @@ import styles from './Landing.module.css';
 /** How long each Signature holds the plate while the rotation runs. */
 export const ROTATION_INTERVAL_MS = 8_000;
 
-/** The plate's rendered width: seven of twelve columns from 64rem, the full column below. */
-const PLATE_SIZES = '(min-width: 80rem) 46rem, (min-width: 64rem) 56vw, 100vw';
+/**
+ * The plate's rendered width: from 100rem the art column reaches into the
+ * right gutter (Landing.module.css .heroGrid), seven of twelve columns from
+ * 64rem, the full column below.
+ */
+const PLATE_SIZES =
+  '(min-width: 130rem) 63.75rem, (min-width: 100rem) calc(46vw + 3.75rem), (min-width: 80rem) 46rem, (min-width: 64rem) 56vw, 100vw';
 
 /** Loads an artwork's first source the way the plate will, so the swap never flashes. */
 function preloadArtwork(artwork: ShowcaseArtwork): Promise<boolean> {
@@ -202,7 +207,7 @@ export function HeroArtShowcase({ art }: { art: LandingHeroArtContent }) {
         kind={classifyHref(detailHref, 'landing')}
         aria-label={art.viewAriaLabel.replace('{tokenLabel}', tokenLabel)}
         data-testid="hero-art-link"
-        className={cn(ART_PLATE_CLASS, 'block w-full', styles.bleedPlate)}
+        className={cn(ART_PLATE_CLASS, 'block w-full')}
       >
         {previousArtwork ? (
           <PlateLayer

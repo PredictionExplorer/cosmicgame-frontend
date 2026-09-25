@@ -6,7 +6,7 @@ import type { LandingText } from './structure';
 export const landingTextEn = {
   meta: {
     title: 'Cosmic Signature: Procedural On-Chain Art Protocol on Arbitrum',
-    description: `Cosmic Signature is a procedural on-chain art protocol on Arbitrum. Participants make gestures in each Performance Cycle; when it finalizes, new Signatures are imprinted and the Cycle Reserve is allocated across more than ten tracks, ${protocolFacts.publicGoodsPercentage}% of it to Ethereum’s core contributors.`,
+    description: `Cosmic Signature is a procedural on-chain art protocol on Arbitrum. Participants make gestures in each Performance Cycle; when it finalizes, new Signatures are imprinted and the Cycle Reserve is allocated across its tracks, ${protocolFacts.publicGoodsPercentage}% of it to Ethereum’s core contributors.`,
     keywords: [
       'Cosmic Signature',
       'procedural art protocol',
@@ -22,11 +22,9 @@ export const landingTextEn = {
 
   hero: {
     eyebrow: 'Procedural on-chain art protocol · Arbitrum',
-    headline: 'Art, shaped by every gesture.',
     headlineLead: 'Art, shaped by',
     headlineAccent: 'every gesture.',
-    subhead: `Make a gesture with ETH or CST to extend the cycle’s clock. When it runs out, finalizing the cycle imprints new Signatures and allocates the Cycle Reserve, ${protocolFacts.publicGoodsPercentage}% of it to Ethereum’s core contributors.`,
-    primaryCtaLabel: 'Open the app',
+    subhead: `Each gesture, made with ETH or CST, extends the cycle’s clock. When it runs out, the cycle is finalized: new Signatures are imprinted for its recipients, and the Cycle Reserve is allocated across its tracks, ${protocolFacts.publicGoodsPercentage}% of it to Ethereum’s core contributors.`,
     secondaryCtaLabel: 'How a cycle works',
     art: {
       viewAriaLabel: 'View Cosmic Signature {tokenLabel} in the app',
@@ -106,16 +104,17 @@ export const landingTextEn = {
 
   tracks: {
     eyebrow: 'Allocation Tracks',
-    heading: 'More than ten ways the protocol distributes the Cycle Reserve.',
+    heading: 'Every Cycle Reserve, allocated by rule.',
     description:
       'When a cycle finalizes, the protocol distributes its ETH and CST reserves across allocation tracks that recognize endurance, timing, dedication, and participation. About half of the ETH reserve compounds into the next cycle.',
     ethLabel: 'ETH from each Cycle Reserve',
     fixedLabel: 'CST and NFTs, every cycle',
     fixedEach: `Each recipient receives ${protocolFacts.specialAllocationCst.toLocaleString('en-US')} CST and one Cosmic Signature NFT.`,
+    recipients: { one: '{count}\u00a0recipient', other: '{count}\u00a0recipients' },
     items: {
       'signature-allocation': {
         title: 'Signature Allocation',
-        body: 'To the participant who made the Final Gesture. Includes 1,000 CST and one Cosmic Signature NFT.',
+        body: `To the participant who made the Final Gesture. Includes ${protocolFacts.specialAllocationCst.toLocaleString('en-US')} CST and one Cosmic Signature NFT.`,
       },
       'compounding-reserve': {
         percent: '~50%',
@@ -136,25 +135,21 @@ export const landingTextEn = {
       },
       'eth-stellar-selection': {
         title: 'ETH Stellar Selection',
-        body: 'Split across three randomly selected participants. Selection frequency scales with gestures made.',
+        body: `Split across ${protocolFacts.ethStellarSelectionRecipients} randomly selected participants. Selection frequency scales with gestures made.`,
       },
       'participant-nft-stellar-selection': {
-        amount: '10 recipients',
         title: 'NFT Stellar Selection — Participants',
         body: 'Selected at random from the cycle’s participants.',
       },
       'anchored-nft-stellar-selection': {
-        amount: '10 recipients',
         title: 'Anchored-NFT Stellar Selection',
         body: 'Selected at random from Random Walk NFT anchor-holders.',
       },
       'endurance-champion': {
-        amount: '1 recipient',
         title: 'Endurance Champion Allocation',
         body: 'The participant with the longest unbroken endurance window.',
       },
       'final-cst-gesture': {
-        amount: '1 recipient',
         title: 'Final CST Gesture Allocation',
         body: 'The participant who made the cycle’s last CST gesture.',
       },
@@ -199,40 +194,40 @@ export const landingTextEn = {
     eyebrow: 'Cosmic Council',
     heading: 'Protocol Coordination, on-chain.',
     body: 'CST holders coordinate the protocol on-chain: they delegate weight, submit Coordination Proposals and express Support or Opposition.',
-    columns: [
-      {
+    columns: {
+      proposal: {
         title: 'Coordination Proposal',
-        body: 'Any address with at least 100 CST of delegated weight may submit a proposal. Two-day coordination delay, two-week coordination period.',
+        body: `Any address with at least ${protocolFacts.councilProposalThresholdCst} CST of delegated weight may submit a proposal. ${protocolFacts.councilVotingDelayDays}-day coordination delay, ${protocolFacts.councilVotingPeriodWeeks}-week coordination period.`,
       },
-      {
+      weight: {
         title: 'Coordination Weight',
         body: 'Each CST expresses one unit of weight once delegated. Expression is a cryptographic signature, not a share or equity instrument.',
       },
-      {
+      quorum: {
         title: 'Coordination Quorum',
-        body: 'A proposal passes if Support exceeds Opposition and Support plus Abstain weight reaches 3% of total CST supply. Opposition weight does not count toward the quorum.',
+        body: `A proposal passes if Support exceeds Opposition and Support plus Abstain weight reaches ${protocolFacts.councilQuorumPercent}% of total CST supply. Opposition weight does not count toward the quorum.`,
       },
-    ],
+    },
   },
 
   verifiability: {
     eyebrow: 'Verifiability',
     heading: 'Open, verified, reproducible.',
     body: 'Anyone can regenerate a Signature from its seed and check the contracts, source code and audit status the app publishes.',
-    pillars: [
-      {
+    pillars: {
+      cc0: {
         title: 'CC0 1.0',
         body: 'Project-owned materials in the Cosmic Signature repositories: contracts, shaders and rendering pipelines. No rights reserved; third-party dependencies, fonts and assets keep their own licenses.',
       },
-      {
+      verification: {
         title: 'Verification status',
         body: 'The app links public contract addresses, source-code resources, verification context, and audit/report status so anyone can inspect what has been published.',
       },
-      {
+      reproducible: {
         title: 'Reproducible art',
         body: 'SHA-256 hashes of generated frames asserted in continuous integration. Same seed → identical output.',
       },
-    ],
+    },
     evidenceLabel: 'Check it yourself',
   },
 
@@ -243,8 +238,7 @@ export const landingTextEn = {
     items: [
       {
         question: 'What do I actually do as a participant?',
-        answer:
-          'You make gestures. Each gesture is an ETH or CST transaction that extends the Cycle Finalization Time, records a Stellar Selection entry, may imprint dynamic Participation CST, and shapes the cycle’s Signature. You may anchor Cosmic Signature NFTs to receive a share of Anchor Distributions. You may submit Coordination Proposals through the Cosmic Council if you hold at least 100 CST.',
+        answer: `You make gestures. Each gesture is an ETH or CST transaction that extends the Cycle Finalization Time, records a Stellar Selection entry, may imprint dynamic Participation CST, and shapes the cycle’s Signature. You may anchor Cosmic Signature NFTs to receive a share of Anchor Distributions. You may submit Coordination Proposals through the Cosmic Council if you hold at least ${protocolFacts.councilProposalThresholdCst} CST.`,
       },
       {
         question: 'What is the art, technically?',
@@ -259,15 +253,14 @@ export const landingTextEn = {
       // lexicon-allow-start: explicit denial of charitable-tax-treatment framing.
       {
         question: 'What exactly is Public Goods?',
-        answer:
-          'Seven percent of each cycle’s ETH reserve is forwarded to a public-goods address, currently Protocol Guild. Protocol Guild is the collective funding mechanism for 170+ Ethereum core contributors. This is a forwarding of ETH to a public-goods address; it is not a charitable contribution in the U.S. tax sense, and Cosmic Signature makes no representation about its tax treatment.',
+        answer: `${protocolFacts.publicGoodsPercentage}% of each cycle’s ETH reserve is forwarded to a public-goods address, currently Protocol Guild. Protocol Guild is the collective funding mechanism for 170+ Ethereum core contributors. This is a forwarding of ETH to a public-goods address; it is not a charitable contribution in the U.S. tax sense, and Cosmic Signature makes no representation about its tax treatment.`,
       },
       // lexicon-allow-end
       // lexicon-allow-start: explicit denial of lottery, casino, gambling, house, dealer, and bet categories.
       {
         question: 'Is this a lottery, casino, or gambling product?',
         answer:
-          'No. Cosmic Signature is a procedural on-chain art protocol. Participants make gestures during a Performance Cycle; the protocol distributes allocations across more than ten tracks when the cycle finalizes. There is no house, no dealer, no bet. Allocations recognize endurance, timing, and participation. The one random allocation track, Stellar Selection, is a protocol-level procedural distribution.',
+          'No. Cosmic Signature is a procedural on-chain art protocol. Participants make gestures during a Performance Cycle; the protocol distributes allocations across its allocation tracks when the cycle finalizes. There is no house, no dealer, no bet. Allocations recognize endurance, timing, and participation. The one random allocation track, Stellar Selection, is a protocol-level procedural distribution.',
       },
       // lexicon-allow-end
       // lexicon-allow-start: explicit investment and securities denial.

@@ -8,13 +8,12 @@ import { WHITE_PAPER_PATH, getWhitePaperContent } from '@/content/white-paper';
 
 import { PageHeader } from '@/components/layout/PageHeader';
 import { GuideCard } from '@/components/learn/GuideCard';
-import { guideMinutes } from '@/components/learn/guides';
+import { guideReadingTime } from '@/components/learn/guides';
 import { QuizPrompt } from '@/components/learn/QuizPrompt';
 import { ReadingMain } from '@/components/reading/ReadingMain';
 import { SignaturePlate } from '@/components/reading/SignaturePlate';
 import { getSignaturePlateCopy } from '@/components/reading/signaturePlateCopy';
 import { SIGNATURE_PLATES } from '@/components/reading/signaturePlates';
-import { fillTemplate } from '@/components/reading/template';
 import { SectionHeader } from '@/components/ui/section-header';
 import { buttonVariants } from '@/components/ui/button';
 import { Link } from '@/i18n/navigation';
@@ -30,8 +29,8 @@ interface PageProps {
 /** The Signature beside the white paper card. */
 const WHITE_PAPER_PLATE = SIGNATURE_PLATES[23];
 
-/** A card names its reading time only when it tells a reader something (not "1 min read"). */
-const MIN_MINUTES_SHOWN = 3;
+/** The Signature beside the hub's header: art opens the reading room, as on every guide. */
+const HUB_PLATE = SIGNATURE_PLATES[24];
 
 /** Grid columns by the number of guides in a stage, so a stage never leaves a hole. */
 const STAGE_COLUMNS: Record<number, string> = {
@@ -69,7 +68,28 @@ export default async function LearnIndexPage({ params }: PageProps) {
         )}
       />
 
-      <PageHeader variant="reading" title={hub.h1} subtitle={hub.intro} />
+      {/*
+       * The hub opens like its guides: the header, with a Signature beside it
+       * from lg (where the header leaves its right side empty) and none on
+       * narrower screens, where the reading path comes first.
+       */}
+      <div className="border-b border-rule lg:grid lg:grid-cols-[minmax(0,1fr)_minmax(0,26rem)] lg:items-end lg:gap-12 xl:gap-16">
+        <PageHeader
+          variant="reading"
+          host="landing"
+          title={hub.h1}
+          subtitle={hub.intro}
+          className="mb-0 border-b-0 sm:mb-0"
+        />
+        <div className="hidden pb-10 lg:block">
+          <SignaturePlate
+            art={HUB_PLATE}
+            href={localizeCrossHostHref(`${APP_ORIGIN}/detail/${HUB_PLATE.tokenId}`, locale)}
+            sizes="(min-width: 1024px) 26rem, 100vw"
+            copy={plateCopy(HUB_PLATE)}
+          />
+        </div>
+      </div>
 
       {LEARN_GROUP_IDS.map((groupId, groupIndex) => {
         const guides = articles
@@ -81,17 +101,17 @@ export default async function LearnIndexPage({ params }: PageProps) {
           <Fragment key={groupId}>
             <section
               aria-labelledby={headingId}
-              className={cn('mt-16 sm:mt-20', groupIndex === 0 && 'mt-14 sm:mt-16')}
+              className={cn('mt-12 sm:mt-20', groupIndex === 0 && 'mt-10 sm:mt-14')}
             >
+              {/* The guides carry the only sequence (01–11); the stages are named, not numbered. */}
               <SectionHeader
                 headingId={headingId}
-                eyebrow={String(groupIndex + 1).padStart(2, '0')}
                 title={group.title}
                 description={group.description}
               />
               <ol
                 className={cn(
-                  'mt-6 grid gap-4 sm:grid-cols-2 sm:gap-5',
+                  'mt-4 grid border-t border-rule-faint sm:mt-6 sm:grid-cols-2 sm:gap-5 sm:border-t-0',
                   STAGE_COLUMNS[guides.length] ?? 'lg:grid-cols-4',
                 )}
               >
@@ -102,13 +122,7 @@ export default async function LearnIndexPage({ params }: PageProps) {
                       number={number}
                       title={article.cardTitle}
                       description={article.cardDescription}
-                      readingTime={
-                        guideMinutes(article, locale) >= MIN_MINUTES_SHOWN
-                          ? fillTemplate(articleUi.readingTimeTemplate, {
-                              minutes: guideMinutes(article, locale),
-                            })
-                          : null
-                      }
+                      readingTime={guideReadingTime(article, locale, articleUi.readingTimeTemplate)}
                     />
                   </li>
                 ))}

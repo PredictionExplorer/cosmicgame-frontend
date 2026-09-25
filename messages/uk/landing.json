@@ -54,7 +54,6 @@
     },
     "currentCycle": "Відкрити поточний цикл",
     "noscript": "Для годинника наживо потрібен JavaScript. У застосунку поточний цикл завжди актуальний.",
-    "countdownAria": "{label}: {duration}",
     "durationSeparator": ", "
   },
   "artwork": {
@@ -64,6 +63,8 @@
     "resumeRotation": "Відновити зміну творів",
     "playAnimation": "Відтворити анімацію",
     "pauseAnimation": "Призупинити анімацію",
+    "resumeAnimation": "Продовжити анімацію",
+    "replayAnimation": "Відтворити ще раз",
     "unavailable": "Твір недоступний"
   }
 }
