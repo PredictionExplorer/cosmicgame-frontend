@@ -461,17 +461,6 @@ html:is(:lang(zh), :lang(ja)) .headline {
   fill: currentColor;
 }
 
-.cycleSegmentHatched {
-  fill: url(#cycle-diagram-hatch);
-  stroke: currentColor;
-  stroke-width: 1;
-}
-
-.cycleHatch {
-  stroke: hsl(var(--track-compounding));
-  stroke-width: 1.5;
-}
-
 .track-signature {
   color: hsl(var(--track-signature));
 }
@@ -768,10 +757,9 @@ html:is(:lang(zh), :lang(ja)) .headline {
   margin-top: 2rem;
 }
 
+/* Under the claims' closing hairline (Steps framed), so no second rule. */
 .evidence {
-  margin-top: 1.5rem;
-  padding-top: 1.25rem;
-  border-top: 1px solid hsl(var(--rule));
+  margin-top: 1.25rem;
 }
 
 .evidenceLinks {

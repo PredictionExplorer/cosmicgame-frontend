@@ -72,18 +72,6 @@ export function CycleDiagram({
       focusable="false"
       data-testid="cycle-diagram"
     >
-      <defs>
-        <pattern
-          id="cycle-diagram-hatch"
-          width="6"
-          height="6"
-          patternUnits="userSpaceOnUse"
-          patternTransform="rotate(45)"
-        >
-          <line x1="0" y1="0" x2="0" y2="6" className={styles.cycleHatch} />
-        </pattern>
-      </defs>
-
       {/* The cycle's time line, from the opening to the moment the clock reaches zero. */}
       <line x1="0" y1={AXIS_Y} x2={finalAt} y2={AXIS_Y} className={styles.cycleAxis} />
 
@@ -143,11 +131,10 @@ export function CycleDiagram({
           width={BAR_WIDTH}
           height={Math.max(segment.height, 1)}
           rx="2"
-          // The remainder compounds into the next cycle: hatched, as on the bar below.
-          className={cn(
-            segment.id === 'nextCycle' ? styles.cycleSegmentHatched : styles.cycleSegment,
-            styles[`track-${segment.id}`],
-          )}
+          // Every track solid in its own colour, the compounding remainder
+          // included, as on the bar below and on every app page (a hatched
+          // fill is the Stellar Selection NFT track's, never the remainder's).
+          className={cn(styles.cycleSegment, styles[`track-${segment.id}`])}
         />
       ))}
 

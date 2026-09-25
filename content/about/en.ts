@@ -50,7 +50,7 @@ export const aboutContentEn = {
       v2: {
         label: 'V2',
         status: 'Live today',
-        text: 'Five changes drawn from how the protocol is used, among them Participation CST that grows with the time between gestures and a longer window for the Final Gesture participant to finalize.',
+        text: 'Five changes shaped by how the protocol is used, among them Participation CST that grows with the time between gestures and a longer window for the Final Gesture participant to finalize.',
       },
       v3: {
         label: 'V3',
