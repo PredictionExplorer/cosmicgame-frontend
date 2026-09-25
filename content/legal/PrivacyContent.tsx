@@ -97,10 +97,13 @@ function Clauses({
   sectionId,
   items,
   locale,
+  sectionLink,
 }: {
   sectionId: string;
   items: readonly PrivacyItem[];
   locale: string;
+  /** A clause heading link's name. */
+  sectionLink: LegalDocumentLabels['sectionLink'];
 }) {
   return items.map((item) => (
     <LegalClause
@@ -109,6 +112,7 @@ function Clauses({
       heading={item.subtitle}
       text={item.text}
       locale={locale}
+      anchorLabel={item.subtitle ? sectionLink(item.subtitle) : undefined}
     />
   ));
 }
@@ -314,7 +318,14 @@ export function PrivacyContent({
           {
             id,
             heading: found.title,
-            content: <Clauses sectionId={id} items={found.content} locale={locale} />,
+            content: (
+              <Clauses
+                sectionId={id}
+                items={found.content}
+                locale={locale}
+                sectionLink={labels.sectionLink}
+              />
+            ),
           },
         ]
       : [];
@@ -323,6 +334,7 @@ export function PrivacyContent({
   return (
     <LegalDocument
       page="privacy"
+      numbered
       labels={labels}
       title={copy.title}
       intro={copy.subtitle}
@@ -363,7 +375,14 @@ export function PrivacyContent({
         {
           id: 'additional',
           heading: copy.additionalTitle,
-          content: <Clauses sectionId="additional" items={copy.additional} locale={locale} />,
+          content: (
+            <Clauses
+              sectionId="additional"
+              items={copy.additional}
+              locale={locale}
+              sectionLink={labels.sectionLink}
+            />
+          ),
         },
       ]}
     />

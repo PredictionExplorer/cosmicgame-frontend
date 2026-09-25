@@ -1,5 +1,5 @@
 import type { ReactNode } from 'react';
-import { ChevronDown, Link2 } from 'lucide-react';
+import { ChevronDown } from 'lucide-react';
 import { useLocale } from 'next-intl';
 
 import { TrustCenterTabs } from '@/content/legal/TrustCenterTabs';
@@ -19,6 +19,7 @@ import { cn } from '@/lib/utils';
 
 import { BackToContentsLink } from './BackToContentsLink';
 import { LegalContentsRail } from './LegalContentsRail';
+import { HeadingAnchor, NUMBERED_SECTION_CLASS, SECTION_NUMBER_CLASS } from './LegalProse';
 
 /** The H1's id: "Back to top" returns to the title, and the skip link keeps `#main`. */
 const DOCUMENT_TITLE_ID = 'document-title';
@@ -49,6 +50,12 @@ export interface LegalDocumentProps {
   sectionLayout?: 'stack' | 'grid';
   /** A closing note after the sections, outside the contents. */
   closing?: ReactNode;
+  /**
+   * Number the sections and their clauses ("3.", "3.2"), in the headings and
+   * the contents, so a reader can cite a clause: the legal instruments
+   * (Terms, Privacy), not the explanatory pages.
+   */
+  numbered?: boolean;
   /** The Trust Center chrome, read on the server (`getLegalDocumentLabels`). */
   labels: LegalDocumentLabels;
 }
@@ -76,11 +83,16 @@ export function LegalDocument({
   density = 'default',
   sectionLayout = 'stack',
   closing,
+  numbered = false,
   labels,
 }: LegalDocumentProps) {
   const locale = useLocale();
   const documentDate = TRUST_DOCUMENT_DATES[page];
-  const items = sections.map(({ id, heading }) => ({ id, label: heading }));
+  const items = sections.map(({ id, heading }, index) => ({
+    id,
+    label: heading,
+    number: numbered ? `${index + 1}.` : undefined,
+  }));
   const grid = sectionLayout === 'grid';
 
   return (
@@ -134,12 +146,16 @@ export function LegalDocument({
               />
             </summary>
             <ol className="border-t border-rule-faint px-4 py-2">
-              {items.map(({ id, label }) => (
+              {items.map(({ id, label, number }) => (
                 <li key={id}>
                   <a
                     href={`#${id}`}
-                    className="flex min-h-11 items-center type-body-sm text-muted-foreground transition-colors duration-[var(--duration-fast)] hover:text-foreground"
+                    className="flex min-h-11 items-baseline gap-2 py-3 type-body-sm text-muted-foreground transition-colors duration-[var(--duration-fast)] hover:text-foreground"
                   >
+                    {/* The space keeps "3. Allocations" one phrase for assistive tech; the gap draws it. */}
+                    {number ? (
+                      <span className="shrink-0 tabular-nums text-subtle">{`${number} `}</span>
+                    ) : null}
                     {label}
                   </a>
                 </li>
@@ -147,7 +163,14 @@ export function LegalDocument({
             </ol>
           </details>
 
-          <div className={cn(grid && 'xl:grid xl:grid-cols-2 xl:gap-x-12')}>
+          <div
+            data-numbered={numbered ? 'true' : undefined}
+            className={cn(
+              'group/legal',
+              numbered && '[counter-reset:legal-section]',
+              grid && 'xl:grid xl:grid-cols-2 xl:gap-x-12',
+            )}
+          >
             {sections.map((section, index) => (
               <LegalSection
                 key={section.id}
@@ -157,6 +180,7 @@ export function LegalDocument({
                 density={density}
                 anchorLabel={labels.sectionLink(section.heading)}
                 backLabel={density === 'compact' ? null : labels.backToContents}
+                numbered={numbered}
               >
                 {section.content}
               </LegalSection>
@@ -177,6 +201,7 @@ function LegalSection({
   density,
   anchorLabel,
   backLabel,
+  numbered,
   children,
 }: {
   id: string;
@@ -186,6 +211,8 @@ function LegalSection({
   anchorLabel: string;
   /** The phone way back to the contents; `null` in a document of short sections. */
   backLabel: string | null;
+  /** Counts this section, and its heading shows the number. */
+  numbered: boolean;
   children: ReactNode;
 }) {
   const headingId = `${id}-heading`;
@@ -195,6 +222,7 @@ function LegalSection({
       aria-labelledby={headingId}
       className={cn(
         'scroll-mt-6',
+        numbered && NUMBERED_SECTION_CLASS,
         !first &&
           (density === 'compact'
             ? 'mt-10 border-t border-rule pt-8'
@@ -203,16 +231,13 @@ function LegalSection({
     >
       {/* The anchor sits beside the heading, not inside it, so the heading's name is its text. */}
       <div className="group/anchor flex items-start gap-2">
-        <h2 id={headingId} className="min-w-0 type-section text-foreground">
+        <h2
+          id={headingId}
+          className={cn('min-w-0 type-section text-foreground', numbered && SECTION_NUMBER_CLASS)}
+        >
           {heading}
         </h2>
-        <a
-          href={`#${id}`}
-          aria-label={anchorLabel}
-          className="mt-0.5 inline-flex size-7 shrink-0 items-center justify-center rounded-control text-subtle opacity-0 transition-opacity duration-[var(--duration-fast)] group-hover/anchor:opacity-100 hover:text-primary focus-visible:opacity-100 max-sm:hidden"
-        >
-          <Link2 aria-hidden className="size-4" />
-        </a>
+        <HeadingAnchor href={`#${id}`} label={anchorLabel} className="mt-0.5" />
       </div>
       <div className={cn('space-y-5', density === 'compact' ? 'mt-4' : 'mt-5 sm:mt-6')}>
         {children}

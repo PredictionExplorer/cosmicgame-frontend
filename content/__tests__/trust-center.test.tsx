@@ -91,6 +91,10 @@ const PAGES = {
   ),
 } as const;
 
+function escapeRegExp(text: string): string {
+  return text.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+}
+
 /** The visible text: explanation popovers keep a hidden copy of their definition. */
 function visibleText(): string {
   const clone = document.body.cloneNode(true) as HTMLElement;
@@ -132,9 +136,12 @@ describe('Trust Center template', () => {
       for (const section of sections) {
         const heading = section.querySelector('h2');
         expect(section).toHaveAttribute('aria-labelledby', heading?.id);
-        expect(
-          within(rail).getByRole('link', { name: heading?.textContent ?? '' }),
-        ).toHaveAttribute('href', `#${section.id}`);
+        // A numbered document (Terms, Privacy) leads each entry with its number.
+        const entry = new RegExp(`^(\\d+\\. )?${escapeRegExp(heading?.textContent ?? '')}$`);
+        expect(within(rail).getByRole('link', { name: entry })).toHaveAttribute(
+          'href',
+          `#${section.id}`,
+        );
         // The heading's own link names the section it points at.
         expect(
           within(section as HTMLElement).getByRole('link', {
@@ -409,6 +416,40 @@ describe('Trust Center deep links', () => {
       }
       unmount();
     }
+  });
+});
+
+describe('Numbered legal documents', () => {
+  it.each(['terms', 'privacy'] as const)(
+    '%s: numbers its sections in the contents and links every clause heading to itself',
+    (page) => {
+      render(PAGES[page]('en'));
+      const rail = screen.getByRole('navigation', { name: 'On this page' });
+      const entries = within(rail)
+        .getAllByRole('link')
+        .filter((link) => link.getAttribute('href')?.startsWith('#') && link.textContent)
+        .slice(0, 2)
+        .map((link) => link.textContent);
+      expect(entries[0]).toMatch(/^1\. /);
+      expect(entries[1]).toMatch(/^2\. /);
+      // The numbers are counters: the headings keep the copy's own words.
+      expect(document.querySelector('[data-numbered="true"]')).not.toBeNull();
+      for (const heading of document.querySelectorAll('main h2, main h3')) {
+        expect(heading.textContent).not.toMatch(/^\d/);
+      }
+      const clause = document.querySelector('main div[id] > div > h3');
+      const id = clause?.closest('[id]')?.id;
+      expect(
+        within(clause?.parentElement as HTMLElement).getByRole('link', {
+          name: `Link to ${clause?.textContent}`,
+        }),
+      ).toHaveAttribute('href', `#${id}`);
+    },
+  );
+
+  it('leaves the explanatory pages unnumbered', () => {
+    render(PAGES.security('en'));
+    expect(document.querySelector('[data-numbered="true"]')).toBeNull();
   });
 });
 

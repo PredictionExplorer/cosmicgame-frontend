@@ -1,5 +1,12 @@
 import type { ReactNode } from 'react';
-import { AlertTriangle, ArrowRight, ArrowUpRight, Info, type LucideIcon } from 'lucide-react';
+import {
+  AlertTriangle,
+  ArrowRight,
+  ArrowUpRight,
+  Info,
+  Link2,
+  type LucideIcon,
+} from 'lucide-react';
 
 import type { LegalLinkId } from '@/content/legal/links';
 import { LEGAL_LINKS } from '@/content/legal/links';
@@ -28,6 +35,56 @@ import { LegalLink, RichText } from './RichText';
 export const CITABLE_CLASS =
   "relative scroll-mt-6 before:pointer-events-none before:absolute before:inset-y-0 before:-start-3 before:w-0.5 before:rounded-pill before:bg-primary before:opacity-0 before:content-[''] target:before:opacity-100";
 
+/**
+ * A numbered document (Terms, Privacy) numbers its sections and the clauses
+ * under them ("3.", "3.2") with CSS counters, so a clause can be cited by
+ * number while the heading's own text, and every catalog, stay the copy's
+ * words. LegalDocument marks the document (`group/legal`, `data-numbered`)
+ * and each section counts `legal-section` and restarts `legal-clause`.
+ */
+export const NUMBERED_SECTION_CLASS =
+  '[counter-increment:legal-section] [counter-reset:legal-clause]';
+
+/** A section heading's number: the text face in the subtle tier, tabular. */
+export const SECTION_NUMBER_CLASS =
+  "before:me-3 before:font-normal before:tabular-nums before:text-subtle before:content-[counter(legal-section)'.'] before:[font-family:var(--body-font-stack)]";
+
+/** A clause counts only inside a numbered document. */
+const CLAUSE_COUNT_CLASS = 'group-data-[numbered=true]/legal:[counter-increment:legal-clause]';
+
+const CLAUSE_NUMBER_CLASS =
+  "group-data-[numbered=true]/legal:before:me-2 group-data-[numbered=true]/legal:before:font-normal group-data-[numbered=true]/legal:before:tabular-nums group-data-[numbered=true]/legal:before:text-subtle group-data-[numbered=true]/legal:before:content-[counter(legal-section)'.'counter(legal-clause)]";
+
+/**
+ * A heading's own link, beside the heading rather than inside it, so the
+ * heading's name is its text: it shows while the heading (`group/anchor`)
+ * is hovered or the link has focus, and phones, which reach every section
+ * from the contents list, leave it out.
+ */
+export function HeadingAnchor({
+  href,
+  label,
+  className,
+}: {
+  href: string;
+  /** Its accessible name ("Link to Eligibility"). */
+  label: string;
+  className?: string;
+}) {
+  return (
+    <a
+      href={href}
+      aria-label={label}
+      className={cn(
+        'inline-flex size-7 shrink-0 items-center justify-center rounded-control text-subtle opacity-0 transition-opacity duration-[var(--duration-fast)] group-hover/anchor:opacity-100 hover:text-primary focus-visible:opacity-100 max-sm:hidden',
+        className,
+      )}
+    >
+      <Link2 aria-hidden className="size-4" />
+    </a>
+  );
+}
+
 const PARAGRAPH_SIZES = {
   /** Body copy: 17px at the prose measure. */
   prose: 'type-prose text-muted-foreground',
@@ -55,26 +112,43 @@ export function LegalParagraph({
 }
 
 /**
- * A clause: an H3 (with its own anchor, `<section>-<clause>`) over its text.
- * Clauses of one section are separated by space, not boxes; a cited clause
- * is marked while it is the target (`CITABLE_CLASS`).
+ * A clause: an H3 (with its own anchor, `<section>-<clause>`, and in a
+ * numbered document its number) over its text. Clauses of one section are
+ * separated by space, not boxes; a cited clause is marked while it is the
+ * target (`CITABLE_CLASS`), and its heading carries a link to itself, so a
+ * reader can copy the reference.
  */
 export function LegalClause({
   id,
   heading,
   text,
   locale,
+  anchorLabel,
   children,
 }: {
   id?: string;
   heading?: string;
   text?: string;
   locale: string;
+  /** The heading link's name ("Link to Retrieval"); without it the heading has no link. */
+  anchorLabel?: string;
   children?: ReactNode;
 }) {
   return (
-    <div id={id} className={cn('space-y-2 pt-1', id && CITABLE_CLASS)}>
-      {heading ? <h3 className="type-heading-3 text-foreground">{heading}</h3> : null}
+    <div
+      id={id}
+      className={cn('space-y-2 pt-1', id && CITABLE_CLASS, heading && CLAUSE_COUNT_CLASS)}
+    >
+      {heading ? (
+        <div className="group/anchor flex items-start gap-1">
+          <h3 className={cn('min-w-0 type-heading-3 text-foreground', CLAUSE_NUMBER_CLASS)}>
+            {heading}
+          </h3>
+          {id && anchorLabel ? (
+            <HeadingAnchor href={`#${id}`} label={anchorLabel} className="-mt-0.5" />
+          ) : null}
+        </div>
+      ) : null}
       {text ? <LegalParagraph text={text} locale={locale} /> : null}
       {children}
     </div>

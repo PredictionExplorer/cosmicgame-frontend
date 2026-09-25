@@ -167,11 +167,16 @@ function TermsSectionBody({
   section,
   copy,
   locale,
+  sectionLink,
 }: {
   section: TermsSection;
   copy: TermsCopy;
   locale: string;
+  /** A clause heading link's name. */
+  sectionLink: LegalDocumentLabels['sectionLink'];
 }) {
+  const anchorLabel = (item: TermsClause) =>
+    item.subtitle ? sectionLink(item.subtitle) : undefined;
   if (section.id !== 'allocations') {
     return (
       <>
@@ -182,6 +187,7 @@ function TermsSectionBody({
             heading={item.subtitle}
             text={item.text}
             locale={locale}
+            anchorLabel={anchorLabel(item)}
           />
         ))}
         {section.bullets ? <LegalList items={section.bullets} locale={locale} /> : null}
@@ -201,6 +207,7 @@ function TermsSectionBody({
           heading={opening.subtitle}
           text={opening.text}
           locale={locale}
+          anchorLabel={anchorLabel(opening)}
         />
       ) : null}
       <AllocationTracks copy={copy.allocationsTable} tracks={tracks} locale={locale} />
@@ -211,6 +218,7 @@ function TermsSectionBody({
           heading={item.subtitle}
           text={item.text}
           locale={locale}
+          anchorLabel={anchorLabel(item)}
         />
       ))}
     </>
@@ -236,6 +244,7 @@ export function TermsContent({
   return (
     <LegalDocument
       page="terms"
+      numbered
       labels={labels}
       title={copy.title}
       intro={copy.subtitle}
@@ -251,7 +260,14 @@ export function TermsContent({
         ...copy.sections.map((section) => ({
           id: section.id,
           heading: section.title,
-          content: <TermsSectionBody section={section} copy={copy} locale={locale} />,
+          content: (
+            <TermsSectionBody
+              section={section}
+              copy={copy}
+              locale={locale}
+              sectionLink={labels.sectionLink}
+            />
+          ),
         })),
         {
           id: 'additional',
@@ -265,6 +281,7 @@ export function TermsContent({
                   heading={item.subtitle}
                   text={item.text}
                   locale={locale}
+                  anchorLabel={labels.sectionLink(item.subtitle)}
                 />
               ))}
               <LegalCallout
