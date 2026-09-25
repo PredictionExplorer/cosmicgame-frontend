@@ -1,13 +1,14 @@
-import type { SVGProps } from 'react';
+import type { ComponentType, SVGProps } from 'react';
 import { ArrowRight, BadgeCheck, Repeat } from 'lucide-react';
 import { useLocale } from 'next-intl';
 
-import type { LandingContent } from '@/content/landing';
+import type { LandingContent, LandingPillarId } from '@/content/landing';
 
 import { getSiteRoute, resolveRouteHref, type SiteRouteId } from '@/config/siteNav';
 import { SiteLink } from '@/components/layout/SiteLink';
 import { useSiteNavCopy } from '@/components/layout/siteNavCopy';
 
+import { NumberedRows } from './NumberedRows';
 import { SectionHeading } from './SectionHeading';
 import styles from './Landing.module.css';
 
@@ -34,8 +35,14 @@ function PublicDomainMark({ strokeWidth = 2, ...props }: SVGProps<SVGSVGElement>
   );
 }
 
-/** The three pillars in copy order: CC0, verification status, reproducible art. */
-const PILLAR_ICONS = [PublicDomainMark, BadgeCheck, Repeat] as const;
+/** Each pillar's glyph, by its structure id (content/landing/structure.ts). */
+const PILLAR_ICONS: Readonly<Record<LandingPillarId, ComponentType<SVGProps<SVGSVGElement>>>> = {
+  cc0: PublicDomainMark,
+  verification: BadgeCheck,
+  reproducible: Repeat,
+};
+
+const isPillarId = (id: string): id is LandingPillarId => id in PILLAR_ICONS;
 
 /** Where each claim can be checked: the trust pages in the app. */
 const EVIDENCE_ROUTES: readonly SiteRouteId[] = ['contracts', 'sourceCode', 'audits', 'security'];
@@ -62,20 +69,19 @@ export function Verifiability({
         headingId="landing-verifiability-heading"
         description={verifiability.body}
       />
-      <ul className={styles.rows}>
-        {verifiability.pillars.map((pillar, index) => {
-          const Icon = PILLAR_ICONS[index] ?? BadgeCheck;
-          return (
-            <li key={pillar.title} className={styles.row}>
-              <Icon aria-hidden className="mt-0.5 size-5 text-subtle" strokeWidth={1.5} />
-              <div className="min-w-0">
-                <h3 className="type-title">{pillar.title}</h3>
-                <p className="type-body-sm mt-1.5 text-muted-foreground">{pillar.body}</p>
-              </div>
-            </li>
-          );
+      <NumberedRows
+        as="ul"
+        className={styles.rows}
+        rows={verifiability.pillars.map((pillar) => {
+          const Icon = isPillarId(pillar.id) ? PILLAR_ICONS[pillar.id] : BadgeCheck;
+          return {
+            key: pillar.id,
+            marker: <Icon aria-hidden className="size-5" strokeWidth={1.5} />,
+            title: pillar.title,
+            body: pillar.body,
+          };
         })}
-      </ul>
+      />
       <div className={styles.evidence}>
         <h3 className="type-label text-subtle" id="landing-evidence">
           {verifiability.evidenceLabel}

@@ -179,7 +179,7 @@ test.describe('Landing page @ cosmicsignature.com', () => {
     const sectionTitles = [
       getLandingContent('en').art.heading,
       'A Performance Cycle',
-      'More than ten ways the protocol distributes',
+      getLandingContent('en').tracks.heading,
       'Anchor Cosmic Signature',
       'Every cycle funds Ethereum',
       'Protocol Coordination',

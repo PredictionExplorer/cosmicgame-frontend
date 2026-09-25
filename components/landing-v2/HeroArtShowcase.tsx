@@ -202,7 +202,7 @@ export function HeroArtShowcase({ art }: { art: LandingHeroArtContent }) {
         kind={classifyHref(detailHref, 'landing')}
         aria-label={art.viewAriaLabel.replace('{tokenLabel}', tokenLabel)}
         data-testid="hero-art-link"
-        className={cn(ART_PLATE_CLASS, 'block w-full', styles.bleedPlate)}
+        className={cn(ART_PLATE_CLASS, 'block w-full')}
       >
         {previousArtwork ? (
           <PlateLayer

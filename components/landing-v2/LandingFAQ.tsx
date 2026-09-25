@@ -5,6 +5,7 @@ import type { LandingContent } from '@/content/landing';
 
 import { getSiteRoute, resolveRouteHref } from '@/config/siteNav';
 import { SiteLink } from '@/components/layout/SiteLink';
+import { cn } from '@/lib/utils';
 import { JsonLd, faqPageJsonLd, jsonLdInLanguage } from '@/utils/jsonLd';
 
 import { LandingSection, SectionHeading } from './SectionHeading';
@@ -17,6 +18,9 @@ import styles from './Landing.module.css';
  * It opens with what a participant does and what the art is; the plain
  * denials follow.
  */
+const moreLinkClass =
+  'link-quiet type-body-sm inline-flex min-h-11 items-center gap-1.5 text-foreground sm:min-h-8';
+
 export function LandingFAQ({ faq }: { faq: LandingContent['faq'] }) {
   const locale = useLocale();
   const appFaq = resolveRouteHref(getSiteRoute('faq'), 'landing', locale);
@@ -33,11 +37,12 @@ export function LandingFAQ({ faq }: { faq: LandingContent['faq'] }) {
             heading={faq.heading}
             headingId="landing-faq-heading"
           />
+          {/* Beside the list from 64rem, where the intro stays in view. */}
           <SiteLink
             href={appFaq.href}
             kind={appFaq.kind}
             prefetch="intent"
-            className="link-quiet type-body-sm mt-6 inline-flex min-h-11 items-center gap-1.5 text-foreground sm:min-h-8"
+            className={cn(moreLinkClass, 'mt-6 max-lg:hidden')}
           >
             {faq.moreLabel}
             <ArrowRight aria-hidden className="size-4 text-subtle" />
@@ -54,6 +59,16 @@ export function LandingFAQ({ faq }: { faq: LandingContent['faq'] }) {
             </details>
           ))}
         </div>
+        {/* Narrower screens: the way to more answers comes after the questions, not before. */}
+        <SiteLink
+          href={appFaq.href}
+          kind={appFaq.kind}
+          prefetch="intent"
+          className={cn(moreLinkClass, 'lg:hidden')}
+        >
+          {faq.moreLabel}
+          <ArrowRight aria-hidden className="size-4 text-subtle" />
+        </SiteLink>
       </div>
     </LandingSection>
   );

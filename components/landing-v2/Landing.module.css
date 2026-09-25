@@ -102,17 +102,6 @@ html:is(:lang(zh), :lang(ja)) .headline {
   text-spacing-trim: trim-both;
 }
 
-/*
- * The hero plate only: its edges dissolve into the art's own black, so the
- * Signature floats on the atmosphere instead of sitting in a box. Grids keep
- * their hard print edges.
- */
-.bleedPlate {
-  box-shadow:
-    var(--art-edge),
-    0 0 2.5rem 0.5rem hsl(var(--art-ground) / 0.45);
-}
-
 .heroArt {
   grid-area: art;
   min-width: 0;
@@ -294,15 +283,8 @@ html:is(:lang(zh), :lang(ja)) .headline {
   min-width: 0;
 }
 
-.stage {
-  display: grid;
-  grid-template-columns: 2.5rem minmax(0, 1fr);
-  column-gap: 1rem;
-  padding-block: 1.25rem;
-  border-top: 1px solid var(--rule-faint);
-}
-
-.stage:first-child {
+/* The first stage sits level with the top of the plate beside it. */
+.stages .numberedRow:first-child {
   padding-top: 0;
   border-top: 0;
 }
@@ -466,6 +448,17 @@ html:is(:lang(zh), :lang(ja)) .headline {
   align-items: center;
   gap: 0.75rem 1.5rem;
   margin-top: clamp(2.5rem, 2rem + 1.5vw, 3.5rem);
+}
+
+/*
+ * Narrow phones: a section's commit button and its quiet link stack like the
+ * hero's, the button at full width (The Cycle, the closing band).
+ */
+@media (width < 30rem) {
+  .sectionActions {
+    flex-direction: column;
+    align-items: stretch;
+  }
 }
 
 /* ── Allocation Tracks ────────────────────────────────────────────────── */
@@ -665,11 +658,16 @@ html:is(:lang(zh), :lang(ja)) .headline {
   margin-top: 2rem;
 }
 
-.row {
+/*
+ * One numbered-row pattern (./NumberedRows.tsx): the pipeline stages, the
+ * Council's rules and the Verifiability pillars share its gutter, padding
+ * and hairline.
+ */
+.numberedRow {
   display: grid;
-  grid-template-columns: 2.25rem minmax(0, 1fr);
-  column-gap: 0.75rem;
-  padding-block: 1.125rem;
+  grid-template-columns: 2.5rem minmax(0, 1fr);
+  column-gap: 1rem;
+  padding-block: 1.25rem;
   border-top: 1px solid var(--rule-faint);
 }
 
@@ -684,6 +682,14 @@ html:is(:lang(zh), :lang(ja)) .headline {
   flex-wrap: wrap;
   column-gap: 1.5rem;
   margin-top: 0.5rem;
+}
+
+/* Phones: two by two, so a fourth link is never left alone on its line. */
+@media (width < 40rem) {
+  .evidenceLinks {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
 }
 
 /* ── FAQ ──────────────────────────────────────────────────────────────── */

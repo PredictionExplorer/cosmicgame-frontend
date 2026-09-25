@@ -28,16 +28,24 @@ describe('<Hero />', () => {
   it('states the loop in the subhead, with the public-goods share from protocol facts', () => {
     render(<Hero hero={hero} />);
     expect(screen.getByText(hero.subhead)).toBeInTheDocument();
-    expect(hero.subhead).toMatch(/gesture with ETH or CST/);
+    // It says what a gesture is before it asks for one (V168).
+    expect(hero.subhead).toMatch(/^Each gesture, made with ETH or CST, extends the cycle’s clock/);
+    expect(hero.subhead).toMatch(/new Signatures are imprinted for its recipients/);
     expect(hero.subhead).toMatch(/7% of it to Ethereum’s core contributors/);
   });
 
-  it('offers one commit action into the app, in the same tab', () => {
+  it('offers one commit action, the gesture, in the same tab', () => {
+    // V170: the commit gradient is the gesture's, never "Open the app", which
+    // the header and footer render solid.
     render(<Hero hero={hero} />);
-    const primaryCta = screen.getByRole('link', { name: /open the app/i });
-    expect(primaryCta).toHaveAttribute('href', 'https://app.cosmicsignature.com');
+    const primaryCta = screen.getByRole('link', { name: /make a gesture/i });
+    // The same target as The Cycle's gesture: the app home's gesture panel.
+    expect(primaryCta.getAttribute('href')).toMatch(
+      /^https:\/\/app\.cosmicsignature\.com\/?#make-gesture$/,
+    );
     expect(primaryCta).not.toHaveAttribute('target');
     expect(primaryCta.className).toMatch(/bg-signature-gradient/);
+    expect(screen.queryByRole('link', { name: /open the app/i })).not.toBeInTheDocument();
   });
 
   it('offers a quiet second action to the cycle explainer', () => {
@@ -55,7 +63,7 @@ describe('<Hero />', () => {
     const inOrder = [
       screen.getByRole('heading', { level: 1 }),
       screen.getByText(hero.subhead),
-      screen.getByRole('link', { name: /open the app/i }),
+      screen.getByRole('link', { name: /make a gesture/i }),
       screen.getByRole('link', { name: hero.secondaryCta.label }),
       screen.getByTestId('hero-art-showcase'),
     ];
@@ -122,7 +130,7 @@ describe('<Hero />', () => {
     const candidates = [
       screen.getByRole('heading', { level: 1 }),
       screen.getByText(hero.subhead),
-      screen.getByRole('link', { name: /open the app/i }),
+      screen.getByRole('link', { name: /make a gesture/i }),
       container.querySelector('img')!,
     ];
     for (const element of candidates) {

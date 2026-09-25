@@ -4,6 +4,7 @@ import { cn } from '@/lib/utils';
 
 import { ArtAnimationPlate } from './ArtAnimationPlate';
 import { ImprintedFigure } from './ImprintedFigure';
+import { NumberedRows } from './NumberedRows';
 import { LandingSection, SectionHeading } from './SectionHeading';
 import styles from './Landing.module.css';
 
@@ -36,20 +37,20 @@ export function TheArt({ art }: TheArtProps) {
             seedLabel={seed?.title ?? ''}
           />
         </div>
-        <ol className={styles.stages}>
-          {art.stages.map((stage) => (
-            <li key={stage.number} className={styles.stage}>
-              <span className="type-label pt-1 tabular-nums text-subtle">
+        <NumberedRows
+          className={styles.stages}
+          rows={art.stages.map((stage) => ({
+            key: stage.number,
+            marker: (
+              <>
                 <span className="sr-only">{art.stageLabel} </span>
                 {stage.number}
-              </span>
-              <div className="min-w-0">
-                <h3 className="type-heading-3">{stage.title}</h3>
-                <p className="type-body-sm mt-1.5 text-muted-foreground">{stage.body}</p>
-              </div>
-            </li>
-          ))}
-        </ol>
+              </>
+            ),
+            title: stage.title,
+            body: stage.body,
+          }))}
+        />
       </div>
 
       <dl className={styles.figureStrip}>

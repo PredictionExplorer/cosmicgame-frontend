@@ -52,7 +52,7 @@ export function TheCycle({ cycle }: { cycle: LandingContent['cycle'] }) {
           <SiteLink
             href={localizeCrossHostHref(gesture.href, locale)}
             kind={classifyHref(gesture.href, 'landing')}
-            className={cn(buttonVariants({ variant: 'commit', size: 'lg' }), 'no-underline')}
+            className={cn(buttonVariants({ variant: 'commit', size: 'xl' }), 'no-underline')}
           >
             {gesture.label}
             <ArrowRight aria-hidden />

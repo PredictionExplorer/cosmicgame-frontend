@@ -6,7 +6,7 @@ import { LandingFooter } from '@/components/landing-v2/LandingFooter';
 import { routing } from '@/i18n/routing';
 import { APP_ORIGIN, localeHref } from '@/lib/hostRouting';
 
-import { act, checkA11y, render, screen, within } from '@/test-utils';
+import { act, checkA11y, fireEvent, render, screen, within } from '@/test-utils';
 
 import { LandingShell } from '../landing-shell';
 
@@ -143,5 +143,22 @@ describe('Landing chrome', () => {
   it('has accessible navigation and footer landmarks', async () => {
     const { container } = renderShell();
     await checkA11y(container);
+  });
+
+  it('takes keyboard focus to a home section, not only the view (V415)', () => {
+    Element.prototype.scrollIntoView = jest.fn();
+    mockPathname.mockReturnValue('/');
+    render(
+      <LandingShell footer={null} sections={SECTIONS}>
+        <main id="main" tabIndex={-1}>
+          <section id="cycle" aria-labelledby="cycle-heading">
+            <h2 id="cycle-heading">A Performance Cycle</h2>
+          </section>
+        </main>
+      </LandingShell>,
+    );
+    const navigation = screen.getAllByRole('navigation', { name: 'nav.primaryLabel' })[0]!;
+    fireEvent.click(within(navigation).getByRole('link', { name: 'The Cycle' }));
+    expect(screen.getByRole('heading', { name: 'A Performance Cycle' })).toHaveFocus();
   });
 });

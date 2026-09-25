@@ -8,7 +8,7 @@ const cst = protocolFacts.specialAllocationCst.toLocaleString('en-US');
 export const landingTextJa = {
   meta: {
     title: 'Cosmic Signature：Arbitrum上のプロシージャル・オンチェーンアート・プロトコル',
-    description: `Cosmic SignatureはArbitrum上のプロシージャル・オンチェーンアート・プロトコルです。参加者はパフォーマンス・サイクルごとに一筆を入れ、サイクルが確定すると新しいシグネチャーが刻印され、サイクル準備金が10を超える配分トラックへ配られます。そのうち${protocolFacts.publicGoodsPercentage}%はEthereumのコア貢献者へ送られます。`,
+    description: `Cosmic SignatureはArbitrum上のプロシージャル・オンチェーンアート・プロトコルです。参加者はパフォーマンス・サイクルごとに一筆を入れ、サイクルが確定すると新しいシグネチャーが刻印され、サイクル準備金がルールどおり各配分トラックへ配られます。そのうち${protocolFacts.publicGoodsPercentage}%はEthereumのコア貢献者へ送られます。`,
     keywords: [
       'Cosmic Signature',
       'プロシージャルアート・プロトコル',
@@ -24,11 +24,9 @@ export const landingTextJa = {
 
   hero: {
     eyebrow: 'プロシージャル・オンチェーンアート・プロトコル · Arbitrum',
-    headline: '一筆ごとに、 アートが生まれます。',
     headlineLead: '一筆ごとに、',
     headlineAccent: 'アートが生まれます。',
-    subhead: `ETHまたはCSTで一筆を入れると、サイクルの確定時刻が延びます。時間が尽きたらサイクルを確定でき、新しいシグネチャーが刻印されてサイクル準備金が配分されます。そのうち${protocolFacts.publicGoodsPercentage}%はEthereumのコア貢献者へ送られます。`,
-    primaryCtaLabel: 'アプリを開く',
+    subhead: `ETHまたはCSTで入れる一筆ごとに、サイクルの確定時刻が延びます。時間が尽きるとサイクルが確定し、受領者に新しいシグネチャーが刻印され、サイクル準備金が各トラックへ配分されます。そのうち${protocolFacts.publicGoodsPercentage}%はEthereumのコア貢献者へ送られます。`,
     secondaryCtaLabel: 'サイクルの仕組み',
     art: {
       viewAriaLabel: 'Cosmic Signature {tokenLabel}をアプリで見る',
@@ -108,12 +106,13 @@ export const landingTextJa = {
 
   tracks: {
     eyebrow: '配分トラック',
-    heading: 'プロトコルがサイクル準備金を配る、10を超える道筋。',
+    heading: 'サイクル準備金は、すべてルールどおりに配分されます。',
     description:
       'サイクルが確定すると、プロトコルはETHとCSTの準備金を、継続の長さ、タイミング、関わり方、参加を反映する配分トラックへ配ります。ETH準備金のおよそ半分は次のサイクルへ累積します。',
     ethLabel: '各サイクル準備金のETH',
     fixedLabel: 'サイクルごとのCSTとNFT',
     fixedEach: `受領者はそれぞれ${cst} CSTとCosmic Signature NFT 1点を受け取ります。`,
+    recipients: { other: '受領者{count}人' },
     items: {
       'signature-allocation': {
         title: 'シグネチャー配分',
@@ -141,22 +140,18 @@ export const landingTextJa = {
         body: '無作為に選ばれた3人の参加者で分け合います。選ばれる頻度は入れた一筆の数に応じて高まります。',
       },
       'participant-nft-stellar-selection': {
-        amount: '受領者10人',
         title: 'NFT星選——参加者',
         body: 'サイクルの参加者から無作為に選ばれます。',
       },
       'anchored-nft-stellar-selection': {
-        amount: '受領者10人',
         title: '係留NFT星選',
         body: 'Random Walk NFTの係留者から無作為に選ばれます。',
       },
       'endurance-champion': {
-        amount: '受領者1人',
         title: '持久チャンピオン配分',
         body: '最新の一筆を入れた参加者として、最も長く途切れずに先頭を保持した参加者です。',
       },
       'final-cst-gesture': {
-        amount: '受領者1人',
         title: '最後のCST一筆配分',
         body: 'サイクルで最後のCST一筆を入れた参加者です。',
       },
@@ -201,40 +196,40 @@ export const landingTextJa = {
     eyebrow: '宇宙評議会',
     heading: 'プロトコルの調整を、オンチェーンで。',
     body: 'CST保有者はプロトコルをオンチェーンで調整します。ウェイトを委任し、調整提案を提出し、支持または反対を表明します。',
-    columns: [
-      {
+    columns: {
+      proposal: {
         title: '調整提案',
         body: '委任されたウェイトが100 CST以上あるアドレスは誰でも提案を提出できます。調整の遅延は2日、調整の実施期間は2週間です。',
       },
-      {
+      weight: {
         title: '調整ウェイト',
         body: '各CSTは委任されると1単位のウェイトを表します。表明は暗号学的な署名であり、株式や持分の証書ではありません。',
       },
-      {
+      quorum: {
         title: '調整定足数',
         body: '支持が反対を上回り、支持と棄権のウェイトの合計がCST総供給量の3%に達すれば提案は成立します。反対のウェイトは定足数に数えられません。',
       },
-    ],
+    },
   },
 
   verifiability: {
     eyebrow: '検証可能性',
     heading: 'オープンで、検証済みで、再現可能。',
     body: 'シグネチャーは誰でもシードから再生成でき、アプリで公開しているコントラクト、ソースコード、監査の状況と照らし合わせて確認できます。',
-    pillars: [
-      {
+    pillars: {
+      cc0: {
         title: 'CC0 1.0',
         body: 'Cosmic Signatureの各リポジトリにあるプロジェクト所有の素材（コントラクト、シェーダー、レンダリングパイプライン）はCC0 1.0で提供され、権利は一切留保しません。第三者の依存関係、フォント、アセットはそれぞれのライセンスを保持します。',
       },
-      {
+      verification: {
         title: '検証状況',
         body: '公開コントラクトのアドレス、ソースコード、検証の範囲、監査報告書の公開状況をアプリで確認できます。',
       },
-      {
+      reproducible: {
         title: '再現可能なアート',
         body: '生成されたフレームのSHA-256ハッシュを継続的インテグレーションで検証します。同じシード → 同一の出力。',
       },
-    ],
+    },
     evidenceLabel: '自分で確かめる',
   },
 
@@ -269,7 +264,7 @@ export const landingTextJa = {
       {
         question: 'これは宝くじ、カジノ、ギャンブル商品ですか？',
         answer:
-          'いいえ。Cosmic Signatureはプロシージャル・オンチェーンアート・プロトコルです。参加者はパフォーマンス・サイクルの間に一筆を入れ、サイクルが確定するとプロトコルは10を超えるトラックへ配分を配ります。胴元も、ディーラーも、賭けもありません。配分は持久、タイミング、参加を認めるものです。唯一の無作為な配分トラックである星選は、プロトコルレベルの手続き的な分配です。',
+          'いいえ。Cosmic Signatureはプロシージャル・オンチェーンアート・プロトコルです。参加者はパフォーマンス・サイクルの間に一筆を入れ、サイクルが確定するとプロトコルは各配分トラックへ配分を配ります。胴元も、ディーラーも、賭けもありません。配分は持久、タイミング、参加を認めるものです。唯一の無作為な配分トラックである星選は、プロトコルレベルの手続き的な分配です。',
       },
       // lexicon-allow-end
       // lexicon-allow-start: explicit investment and securities denial.

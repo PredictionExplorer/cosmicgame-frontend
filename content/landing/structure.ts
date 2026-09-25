@@ -6,11 +6,9 @@ import { APP_ORIGIN } from '@/lib/hostRouting';
 import type {
   LandingArtFactId,
   LandingArtShowcaseContent,
-  LandingCouncilContent,
   LandingFaqContent,
   LandingHeroArtContent,
   LandingMetaContent,
-  LandingVerifiabilityContent,
 } from './types';
 
 /**
@@ -42,6 +40,12 @@ interface LandingEthTrackStructure {
 
 interface LandingFixedTrackStructure {
   readonly id: string;
+  /** How many recipients the track has each cycle (content/protocol-facts.ts). */
+  readonly recipients: number;
+}
+
+interface LandingKeyedStructure {
+  readonly id: string;
 }
 
 interface LandingArtFactStructure {
@@ -58,9 +62,15 @@ interface LandingTableRowStructure {
   readonly value?: string;
 }
 
+/** The app home's gesture panel carries the #make-gesture anchor. */
+const GESTURE_HREF = `${APP_ORIGIN}/#make-gesture`;
+
 export const LANDING_STRUCTURE = {
   hero: {
-    primaryCtaHref: APP_ORIGIN,
+    // The page's one commit action, with the same label and target wherever
+    // it appears (the hero, The Cycle, the closing band); "Open the app" is
+    // the header's and the footer's solid button.
+    primaryCtaHref: GESTURE_HREF,
     secondaryCtaHref: '#cycle',
   },
   cycle: {
@@ -69,8 +79,7 @@ export const LANDING_STRUCTURE = {
       { id: 'extend', number: '02' },
       { id: 'finalize', number: '03' },
     ],
-    // The app home's gesture panel carries the #make-gesture anchor.
-    gestureCtaHref: `${APP_ORIGIN}/#make-gesture`,
+    gestureCtaHref: GESTURE_HREF,
     guideCtaHref: `${APP_ORIGIN}/how-it-works`,
   },
   art: {
@@ -110,10 +119,17 @@ export const LANDING_STRUCTURE = {
       { id: 'compounding-reserve', track: 'nextCycle' },
     ],
     fixed: [
-      { id: 'participant-nft-stellar-selection' },
-      { id: 'anchored-nft-stellar-selection' },
-      { id: 'endurance-champion' },
-      { id: 'final-cst-gesture' },
+      {
+        id: 'participant-nft-stellar-selection',
+        recipients: protocolFacts.nftStellarSelectionRecipients,
+      },
+      {
+        id: 'anchored-nft-stellar-selection',
+        recipients: protocolFacts.anchoredRwlkNftSelectionRecipients,
+      },
+      // One Endurance Champion and one Final CST Gesture participant per cycle, by definition.
+      { id: 'endurance-champion', recipients: 1 },
+      { id: 'final-cst-gesture', recipients: 1 },
     ],
   },
   anchoring: {
@@ -127,6 +143,12 @@ export const LANDING_STRUCTURE = {
       { id: 'recipient', value: 'pg.eth' },
     ],
     ctaHref: 'https://protocol-guild.readthedocs.io',
+  },
+  council: {
+    columns: [{ id: 'proposal' }, { id: 'weight' }, { id: 'quorum' }],
+  },
+  verifiability: {
+    pillars: [{ id: 'cc0' }, { id: 'verification' }, { id: 'reproducible' }],
   },
   closing: {
     galleryCtaHref: `${APP_ORIGIN}/gallery`,
@@ -155,6 +177,8 @@ export const LANDING_STRUCTURE = {
     readonly cardTableRows: readonly LandingTableRowStructure[];
     readonly ctaHref: string;
   };
+  readonly council: { readonly columns: readonly LandingKeyedStructure[] };
+  readonly verifiability: { readonly pillars: readonly LandingKeyedStructure[] };
   readonly closing: { readonly galleryCtaHref: string };
 };
 
@@ -166,6 +190,20 @@ type ArtFactStructure = LandingStructure['art']['facts'][number];
 type EthTrackStructure = LandingStructure['tracks']['eth'][number];
 type FixedTrackStructure = LandingStructure['tracks']['fixed'][number];
 type TableRowStructure = LandingStructure['publicGoods']['cardTableRows'][number];
+type CouncilColumnStructure = LandingStructure['council']['columns'][number];
+type PillarStructure = LandingStructure['verifiability']['pillars'][number];
+
+export type LandingCouncilColumnId = CouncilColumnStructure['id'];
+export type LandingPillarId = PillarStructure['id'];
+
+/**
+ * A count phrase in each plural form the locale's `Intl.PluralRules` uses
+ * (`{count}` is the number): `other` always, and for Ukrainian `one`, `few`
+ * and `many` too. The builder picks the form for the structure's count.
+ */
+export type LandingPluralText = { readonly other: string } & Partial<
+  Readonly<Record<Exclude<Intl.LDMLPluralRule, 'other'>, string>>
+>;
 
 export type LandingCycleStepId = CycleStepStructure['id'];
 export type LandingArtStageId = ArtStageStructure['id'];
@@ -178,16 +216,16 @@ export interface LandingStageText {
 }
 
 /**
- * Copy for one allocation track. Tracks without a fixed share in the
- * skeleton write their own figure, because its wording differs across
- * locales: the compounding remainder its approximate `percent` ("~50%"),
- * each CST and NFT track its recipient count as `amount` ("10 recipients").
+ * Copy for one allocation track. The compounding remainder, which has no
+ * fixed share in the skeleton, writes its own approximate `percent` ("~50%"),
+ * because its wording differs across locales; the CST and NFT tracks take
+ * their recipient counts from the skeleton (`tracks.recipients` names them).
  */
 type LandingTrackItemText<Item> = Item extends { readonly share: number }
   ? { readonly title: string; readonly body: string }
   : Item extends { readonly track: AllocationTrackId }
     ? { readonly percent: string; readonly title: string; readonly body: string }
-    : { readonly amount: string; readonly title: string; readonly body: string };
+    : { readonly title: string; readonly body: string };
 
 /**
  * Copy for one public-goods table row. The `value` string is required here
@@ -210,11 +248,9 @@ export type LandingText = {
   readonly meta: LandingMetaContent;
   readonly hero: {
     readonly eyebrow: string;
-    readonly headline: string;
     readonly headlineLead: string;
     readonly headlineAccent: string;
     readonly subhead: string;
-    readonly primaryCtaLabel: string;
     readonly secondaryCtaLabel: string;
     readonly art: LandingHeroArtContent;
   };
@@ -247,6 +283,8 @@ export type LandingText = {
     readonly ethLabel: string;
     readonly fixedLabel: string;
     readonly fixedEach: string;
+    /** "10 recipients": the count each CST and NFT track shows. */
+    readonly recipients: LandingPluralText;
     readonly items: {
       readonly [Item in
         | EthTrackStructure
@@ -275,8 +313,23 @@ export type LandingText = {
     };
     readonly ctaLabel: string;
   };
-  readonly council: LandingCouncilContent;
-  readonly verifiability: LandingVerifiabilityContent;
+  readonly council: {
+    readonly eyebrow: string;
+    readonly heading: string;
+    readonly body: string;
+    readonly columns: {
+      readonly [Column in CouncilColumnStructure as Column['id']]: LandingStageText;
+    };
+  };
+  readonly verifiability: {
+    readonly eyebrow: string;
+    readonly heading: string;
+    readonly body: string;
+    readonly pillars: {
+      readonly [Pillar in PillarStructure as Pillar['id']]: LandingStageText;
+    };
+    readonly evidenceLabel: string;
+  };
   readonly faq: LandingFaqContent;
   readonly closing: {
     readonly eyebrow: string;

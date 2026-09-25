@@ -8,7 +8,7 @@ const cstAmount = protocolFacts.specialAllocationCst.toLocaleString('vi-VN');
 export const landingTextVi = {
   meta: {
     title: 'Cosmic Signature: Giao thức nghệ thuật tạo sinh trên chuỗi Arbitrum',
-    description: `Cosmic Signature là giao thức nghệ thuật tạo sinh trên chuỗi Arbitrum. Người tham gia đặt nét bút trong mỗi chu kỳ trình diễn; khi chu kỳ hoàn tất, các Signature mới được khắc và Dự trữ chu kỳ được phân bổ qua hơn mười luồng, trong đó ${protocolFacts.publicGoodsPercentage}% dành cho những người đóng góp cốt lõi của Ethereum.`,
+    description: `Cosmic Signature là giao thức nghệ thuật tạo sinh trên chuỗi Arbitrum. Người tham gia đặt nét bút trong mỗi chu kỳ trình diễn; khi chu kỳ hoàn tất, các Signature mới được khắc và Dự trữ chu kỳ được phân bổ theo quy tắc qua các luồng, trong đó ${protocolFacts.publicGoodsPercentage}% dành cho những người đóng góp cốt lõi của Ethereum.`,
     keywords: [
       'Cosmic Signature',
       'giao thức nghệ thuật tạo sinh',
@@ -24,11 +24,9 @@ export const landingTextVi = {
 
   hero: {
     eyebrow: 'Giao thức nghệ thuật tạo sinh trên chuỗi · Arbitrum',
-    headline: 'Nghệ thuật từ từng nét bút.',
     headlineLead: 'Nghệ thuật từ',
     headlineAccent: 'từng nét bút.',
-    subhead: `Đặt nét bút bằng ETH hoặc CST để kéo dài đồng hồ của chu kỳ. Khi thời gian hết, việc hoàn tất chu kỳ sẽ khắc các Signature mới và phân bổ Dự trữ chu kỳ, trong đó ${protocolFacts.publicGoodsPercentage}% dành cho những người đóng góp cốt lõi của Ethereum.`,
-    primaryCtaLabel: 'Mở ứng dụng',
+    subhead: `Mỗi nét bút, đặt bằng ETH hoặc CST, đều kéo dài đồng hồ của chu kỳ. Khi thời gian hết, chu kỳ được hoàn tất: các Signature mới được khắc cho người nhận, và Dự trữ chu kỳ được phân bổ qua các luồng, trong đó ${protocolFacts.publicGoodsPercentage}% dành cho những người đóng góp cốt lõi của Ethereum.`,
     secondaryCtaLabel: 'Cách một chu kỳ vận hành',
     art: {
       viewAriaLabel: 'Xem Cosmic Signature {tokenLabel} trong ứng dụng',
@@ -108,12 +106,13 @@ export const landingTextVi = {
 
   tracks: {
     eyebrow: 'Các luồng phân bổ',
-    heading: 'Hơn mười cách giao thức phân phối Dự trữ chu kỳ.',
+    heading: 'Mỗi Dự trữ chu kỳ đều được phân bổ theo quy tắc.',
     description:
       'Khi một chu kỳ hoàn tất, giao thức phân phối dự trữ ETH và CST của mình qua các luồng phân bổ ghi nhận sự bền bỉ, thời điểm, sự tận tâm và sự tham gia. Khoảng một nửa dự trữ ETH được tích lũy sang chu kỳ tiếp theo.',
     ethLabel: 'ETH từ mỗi Dự trữ chu kỳ',
     fixedLabel: 'CST và NFT trong mỗi chu kỳ',
     fixedEach: `Mỗi người nhận được ${cstAmount} CST và một Cosmic Signature NFT.`,
+    recipients: { other: '{count}\u00a0người nhận' },
     items: {
       'signature-allocation': {
         title: 'Phân bổ Signature',
@@ -141,22 +140,18 @@ export const landingTextVi = {
         body: 'Chia cho ba người tham gia được chọn ngẫu nhiên. Tần suất được chọn tăng theo số nét bút đã đặt.',
       },
       'participant-nft-stellar-selection': {
-        amount: '10 người nhận',
         title: 'NFT Tinh tuyển — Người tham gia',
         body: 'Được chọn ngẫu nhiên trong số người tham gia của chu kỳ.',
       },
       'anchored-nft-stellar-selection': {
-        amount: '10 người nhận',
         title: 'Tinh tuyển NFT neo giữ',
         body: 'Được chọn ngẫu nhiên trong số người neo giữ Random Walk NFT.',
       },
       'endurance-champion': {
-        amount: '1 người nhận',
         title: 'Phân bổ Quán quân Bền bỉ',
         body: 'Người giữ vị trí người đặt nét bút gần nhất lâu nhất trong một khoảng liên tục.',
       },
       'final-cst-gesture': {
-        amount: '1 người nhận',
         title: 'Phân bổ nét bút CST cuối cùng',
         body: 'Người tham gia đặt nét bút CST cuối cùng của chu kỳ.',
       },
@@ -201,40 +196,40 @@ export const landingTextVi = {
     eyebrow: 'Hội đồng Vũ trụ',
     heading: 'Điều phối giao thức, trên chuỗi.',
     body: 'Người nắm giữ CST điều phối giao thức trên chuỗi: ủy quyền trọng số, gửi đề xuất điều phối và bày tỏ tán thành hoặc phản đối.',
-    columns: [
-      {
+    columns: {
+      proposal: {
         title: 'Đề xuất điều phối',
         body: 'Bất kỳ địa chỉ nào có ít nhất 100 CST trọng số được ủy quyền đều có thể gửi đề xuất. Độ trễ điều phối hai ngày, giai đoạn điều phối hai tuần.',
       },
-      {
+      weight: {
         title: 'Trọng số điều phối',
         body: 'Mỗi CST biểu thị một đơn vị trọng số sau khi được ủy quyền. Ý kiến được ghi nhận bằng chữ ký mật mã; CST không đại diện cho cổ phần hay công cụ vốn.',
       },
-      {
+      quorum: {
         title: 'Túc số điều phối',
         body: 'Đề xuất được thông qua khi trọng số tán thành lớn hơn phản đối và tổng trọng số tán thành cùng bỏ trống đạt ít nhất 3% tổng cung CST. Trọng số phản đối không được tính vào túc số.',
       },
-    ],
+    },
   },
 
   verifiability: {
     eyebrow: 'Khả năng xác minh',
     heading: 'Mở, đã xác minh, có thể tái tạo.',
     body: 'Bất kỳ ai cũng có thể tái tạo Signature từ seed và đối chiếu với hợp đồng, mã nguồn và tình trạng kiểm toán mà ứng dụng công bố.',
-    pillars: [
-      {
+    pillars: {
+      cc0: {
         title: 'CC0 1.0',
         body: 'Tài liệu thuộc dự án trong các kho mã Cosmic Signature (hợp đồng, shader và quy trình kết xuất) được công bố theo CC0 1.0, không bảo lưu quyền nào; các phụ thuộc bên thứ ba, phông chữ và tài sản giữ giấy phép riêng của chúng.',
       },
-      {
+      verification: {
         title: 'Tình trạng xác minh',
         body: 'Ứng dụng liên kết địa chỉ hợp đồng công khai, tài nguyên mã nguồn, bối cảnh xác minh và tình trạng kiểm toán/báo cáo để bất kỳ ai cũng có thể kiểm tra những gì đã được công bố.',
       },
-      {
+      reproducible: {
         title: 'Nghệ thuật tái tạo được',
         body: 'Mã băm SHA-256 của các khung hình đã tạo được kiểm định trong tích hợp liên tục. Cùng seed → cùng kết quả.',
       },
-    ],
+    },
     evidenceLabel: 'Tự kiểm chứng',
   },
 
@@ -269,7 +264,7 @@ export const landingTextVi = {
       {
         question: 'Đây có phải là xổ số, sòng bạc hay sản phẩm cờ bạc không?',
         answer:
-          'Không. Cosmic Signature là giao thức nghệ thuật tạo sinh trên chuỗi. Người tham gia đặt nét bút trong một chu kỳ trình diễn; giao thức phân phối phân bổ qua hơn mười luồng khi chu kỳ hoàn tất. Không có nhà cái, không có người chia bài, không có cược. Các phân bổ ghi nhận sự bền bỉ, thời điểm và sự tham gia. Luồng phân bổ ngẫu nhiên duy nhất, Tinh tuyển, là một phép phân phối theo quy trình ở cấp giao thức.',
+          'Không. Cosmic Signature là giao thức nghệ thuật tạo sinh trên chuỗi. Người tham gia đặt nét bút trong một chu kỳ trình diễn; giao thức phân phối phân bổ qua các luồng phân bổ khi chu kỳ hoàn tất. Không có nhà cái, không có người chia bài, không có cược. Các phân bổ ghi nhận sự bền bỉ, thời điểm và sự tham gia. Luồng phân bổ ngẫu nhiên duy nhất, Tinh tuyển, là một phép phân phối theo quy trình ở cấp giao thức.',
       },
       // lexicon-allow-end
       // lexicon-allow-start: explicit investment and securities denial.

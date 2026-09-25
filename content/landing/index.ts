@@ -1,8 +1,14 @@
 import { withNextCycleShare } from '@/config/allocationTracks';
 import { pickByLocale, type AppLocale, type LocaleRecord } from '@/i18n/locale';
-import { formatPercent } from '@/utils/format/numbers';
+import { getLocaleConfig } from '@/i18n/localeConfig';
+import { formatCount, formatPercent } from '@/utils/format/numbers';
 
-import { LANDING_STRUCTURE, type LandingStageText, type LandingText } from './structure';
+import {
+  LANDING_STRUCTURE,
+  type LandingPluralText,
+  type LandingStageText,
+  type LandingText,
+} from './structure';
 import { landingTextEn } from './text.en';
 import { landingTextJa } from './text.ja';
 import { landingTextKo } from './text.ko';
@@ -18,10 +24,15 @@ export * from './structure';
 
 type TrackText = {
   readonly percent?: string;
-  readonly amount?: string;
   readonly title: string;
   readonly body: string;
 };
+
+/** A count in the locale's words: the plural form `Intl.PluralRules` picks, `{count}` formatted. */
+export function pluralPhrase(template: LandingPluralText, count: number, locale: string): string {
+  const category = new Intl.PluralRules(getLocaleConfig(locale).intlLocale).select(count);
+  return (template[category] ?? template.other).replace('{count}', formatCount(count, locale));
+}
 
 /** Composes the locale-independent skeleton with one locale's copy. */
 function buildLandingContent(text: LandingText, locale: AppLocale): LandingContent {
@@ -58,18 +69,28 @@ function buildLandingContent(text: LandingText, locale: AppLocale): LandingConte
   });
   const fixed = LANDING_STRUCTURE.tracks.fixed.map((item): LandingFixedTrack => {
     const itemText = trackTexts[item.id]!;
-    return { id: item.id, amount: itemText.amount!, title: itemText.title, body: itemText.body };
+    return {
+      id: item.id,
+      amount: pluralPhrase(text.tracks.recipients, item.recipients, locale),
+      title: itemText.title,
+      body: itemText.body,
+    };
   });
+  const councilTexts = text.council.columns as Readonly<Record<string, LandingStageText>>;
+  const pillarTexts = text.verifiability.pillars as Readonly<Record<string, LandingStageText>>;
 
   return {
     meta: text.meta,
     hero: {
       eyebrow: text.hero.eyebrow,
-      headline: text.hero.headline,
       headlineLead: text.hero.headlineLead,
       headlineAccent: text.hero.headlineAccent,
       subhead: text.hero.subhead,
-      primaryCta: { label: text.hero.primaryCtaLabel, href: LANDING_STRUCTURE.hero.primaryCtaHref },
+      // The hero's commit action is The Cycle's: one label for the one action.
+      primaryCta: {
+        label: text.cycle.gestureCtaLabel,
+        href: LANDING_STRUCTURE.hero.primaryCtaHref,
+      },
       secondaryCta: {
         label: text.hero.secondaryCtaLabel,
         href: LANDING_STRUCTURE.hero.secondaryCtaHref,
@@ -142,8 +163,25 @@ function buildLandingContent(text: LandingText, locale: AppLocale): LandingConte
       },
       cta: { label: text.publicGoods.ctaLabel, href: LANDING_STRUCTURE.publicGoods.ctaHref },
     },
-    council: text.council,
-    verifiability: text.verifiability,
+    council: {
+      eyebrow: text.council.eyebrow,
+      heading: text.council.heading,
+      body: text.council.body,
+      columns: LANDING_STRUCTURE.council.columns.map((column) => ({
+        id: column.id,
+        ...councilTexts[column.id]!,
+      })),
+    },
+    verifiability: {
+      eyebrow: text.verifiability.eyebrow,
+      heading: text.verifiability.heading,
+      body: text.verifiability.body,
+      pillars: LANDING_STRUCTURE.verifiability.pillars.map((pillar) => ({
+        id: pillar.id,
+        ...pillarTexts[pillar.id]!,
+      })),
+      evidenceLabel: text.verifiability.evidenceLabel,
+    },
     faq: text.faq,
     closing: {
       eyebrow: text.closing.eyebrow,
