@@ -413,7 +413,7 @@
       "cosmicAnchor": {
         "name": "Neo giữ Cosmic Signature",
         "tooltip": "Người neo giữ Cosmic Signature NFT chia sẻ phân phối neo giữ của mỗi chu kỳ.",
-        "recipientLabel": "Theo tỷ lệ · mọi người neo giữ"
+        "recipientLabel": "Chia đều cho mỗi NFT neo giữ"
       },
       "chronoWarrior": {
         "name": "Phân bổ Chiến binh Thời gian",

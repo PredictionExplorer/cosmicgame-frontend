@@ -413,7 +413,7 @@
       "cosmicAnchor": {
         "name": "Cosmic Signature 앵커링",
         "tooltip": "Cosmic Signature NFT 앵커링 보유자가 사이클마다 앵커링 지급을 나눠 받습니다.",
-        "recipientLabel": "비율에 따라 · 모든 앵커링 보유자"
+        "recipientLabel": "앵커링된 NFT당 균등"
       },
       "chronoWarrior": {
         "name": "시간의 전사 배분",

@@ -413,7 +413,7 @@
       "cosmicAnchor": {
         "name": "Cosmic Signatureの係留",
         "tooltip": "Cosmic Signature NFTの係留者はサイクルごとの係留配分を分け合います。",
-        "recipientLabel": "比例配分 · すべての係留者"
+        "recipientLabel": "係留NFTごとに均等"
       },
       "chronoWarrior": {
         "name": "時の戦士配分",

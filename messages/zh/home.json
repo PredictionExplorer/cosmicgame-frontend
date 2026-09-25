@@ -413,7 +413,7 @@
       "cosmicAnchor": {
         "name": "Cosmic Signature 锚定",
         "tooltip": "每个周期的锚定派发，由 Cosmic Signature NFT 的锚定者按比例分得。",
-        "recipientLabel": "按比例 · 全体锚定者"
+        "recipientLabel": "每枚已锚定 NFT 等分"
       },
       "chronoWarrior": {
         "name": "时之勇士分配",

@@ -413,7 +413,7 @@
       "cosmicAnchor": {
         "name": "Закріплення Cosmic Signature",
         "tooltip": "Власники закріплень Cosmic Signature NFT розділяють надходження за закріплення кожного циклу.",
-        "recipientLabel": "Пропорційно · усі власники закріплень"
+        "recipientLabel": "Порівну на кожен закріплений NFT"
       },
       "chronoWarrior": {
         "name": "Розподіл Воїна часу",

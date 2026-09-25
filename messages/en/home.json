@@ -413,7 +413,7 @@
       "cosmicAnchor": {
         "name": "Cosmic Signature Anchor",
         "tooltip": "Anchor-holders of Cosmic Signature NFTs share the per-cycle Anchor Distribution.",
-        "recipientLabel": "Proportional · all anchor-holders"
+        "recipientLabel": "Equal per anchored NFT"
       },
       "chronoWarrior": {
         "name": "Chrono-Warrior Allocation",
