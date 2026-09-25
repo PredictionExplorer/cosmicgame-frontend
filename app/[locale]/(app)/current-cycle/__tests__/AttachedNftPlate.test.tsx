@@ -1,4 +1,6 @@
+import { networkConfig } from '@/config/networks';
 import type { AttachedNFT } from '@/services/api/types';
+import { buildOpenSeaAssetUrl } from '@/components/attachments/attachedNftLinks';
 
 import { checkA11y, render, screen } from '@/test-utils';
 
@@ -44,11 +46,13 @@ describe('AttachedNftPlate', () => {
       .getAllByRole('link')
       .filter((link) => link.getAttribute('target') === '_blank');
     expect(external).toHaveLength(1);
-    expect(external[0]).toHaveAccessibleName('View NFT nav.link.newTab');
-    expect(external[0]).toHaveAttribute('href', 'https://example.org/rexy/3114');
+    // OpenSea, from the recorded contract and token: never the metadata's own site.
+    const openSea = buildOpenSeaAssetUrl(nft.TokenAddr, nft.NFTTokenId, networkConfig.chainId);
+    expect(external[0]).toHaveAccessibleName('View on OpenSea nav.link.newTab');
+    expect(external[0]).toHaveAttribute('href', openSea);
     // The plate goes to the same page for pointers, out of the tab order.
     const plate = container.querySelector('a[aria-hidden="true"]');
-    expect(plate).toHaveAttribute('href', 'https://example.org/rexy/3114');
+    expect(plate).toHaveAttribute('href', openSea);
     expect(plate).toHaveAttribute('tabindex', '-1');
     expect(container).toHaveTextContent('currentCycle.showcase.facts.attachedBy');
     await checkA11y(container);

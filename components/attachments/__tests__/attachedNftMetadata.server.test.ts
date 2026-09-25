@@ -1,16 +1,41 @@
 /**
  * @jest-environment node
  */
+import { ContractFunctionExecutionError, ContractFunctionRevertedError, erc721Abi } from 'viem';
+
 import { IPFS_GATEWAYS } from '../attachedNftMetadata';
 import {
+  MAX_IMAGE_BYTES,
+  assertPublicHost,
+  capStream,
+  displayContractName,
   fetchAttachedNftImage,
   fetchPublicHttps,
   findAttachedNftRecord,
   imageUrlCandidates,
+  isPublicAddress,
   isPublicHttpsUrl,
+  readAttachedNftContractName,
   resolveAttachedNftDisplay,
   withSameOriginImage,
 } from '../attachedNftMetadata.server';
+
+const mockLookup = jest.fn();
+jest.mock('node:dns/promises', () => ({
+  lookup: (...args: unknown[]) => mockLookup(...args),
+}));
+
+const mockReadContract = jest.fn();
+jest.mock('viem', () => ({
+  ...jest.requireActual('viem'),
+  createPublicClient: () => ({ readContract: (...args: unknown[]) => mockReadContract(...args) }),
+}));
+
+beforeEach(() => {
+  // Every name resolves to a public address unless a test says otherwise.
+  mockLookup.mockReset().mockResolvedValue([{ address: '93.184.215.14', family: 4 }]);
+  mockReadContract.mockReset().mockRejectedValue(new Error('no chain in tests'));
+});
 
 const mockRecords = jest.fn();
 // lexicon-allow-start: test mocks mirror sealed API module filenames.
@@ -61,6 +86,53 @@ describe('isPublicHttpsUrl', () => {
     'not a url',
   ])('refuses %s', (url) => {
     expect(isPublicHttpsUrl(url)).toBe(false);
+  });
+});
+
+describe('isPublicAddress', () => {
+  it.each(['93.184.215.14', '1.1.1.1', '2606:4700:4700::1111'])('accepts %s', (address) => {
+    expect(isPublicAddress(address)).toBe(true);
+  });
+
+  it.each([
+    '127.0.0.1',
+    '10.1.2.3',
+    '172.16.0.1',
+    '192.168.1.1',
+    '169.254.169.254',
+    '100.64.0.1',
+    '0.0.0.0',
+    '224.0.0.1',
+    '::1',
+    '::',
+    'fd00::1',
+    'fe80::1',
+    '::ffff:127.0.0.1',
+    '::ffff:a9fe:a9fe',
+    '64:ff9b::a00:1',
+    'not an address',
+  ])('refuses %s', (address) => {
+    expect(isPublicAddress(address)).toBe(false);
+  });
+});
+
+describe('assertPublicHost', () => {
+  it('passes a name whose every address is public', async () => {
+    await expect(assertPublicHost('art.example.com')).resolves.toBeUndefined();
+    expect(mockLookup).toHaveBeenCalledWith('art.example.com', { all: true, verbatim: true });
+  });
+
+  it('refuses a public-looking name that resolves to a private address', async () => {
+    mockLookup.mockResolvedValue([
+      { address: '93.184.215.14', family: 4 },
+      { address: '127.0.0.1', family: 4 },
+    ]);
+    await expect(assertPublicHost('127.0.0.1.nip.io')).rejects.toThrow('non-public');
+  });
+
+  it('refuses a name that resolves to nothing', async () => {
+    mockLookup.mockResolvedValue([]);
+    await expect(assertPublicHost('empty.example.com')).rejects.toThrow();
   });
 });
 
@@ -119,6 +191,87 @@ describe('fetchPublicHttps', () => {
     global.fetch = jest.fn();
     await expect(fetchPublicHttps('https://127.0.0.1/x')).rejects.toThrow();
     expect(global.fetch).not.toHaveBeenCalled();
+  });
+
+  it('never requests a host whose name resolves to a private address', async () => {
+    global.fetch = jest.fn();
+    mockLookup.mockResolvedValue([{ address: '10.0.0.8', family: 4 }]);
+    await expect(fetchPublicHttps('https://internal.attacker.example/1.json')).rejects.toThrow(
+      'non-public',
+    );
+    expect(global.fetch).not.toHaveBeenCalled();
+  });
+
+  it('checks the address of every redirect hop', async () => {
+    global.fetch = jest
+      .fn()
+      .mockResolvedValue(redirectResponse('https://rebind.attacker.example/x'));
+    mockLookup
+      .mockResolvedValueOnce([{ address: '93.184.215.14', family: 4 }])
+      .mockResolvedValueOnce([{ address: '169.254.169.254', family: 4 }]);
+    await expect(fetchPublicHttps('https://art.example.com/1.json')).rejects.toThrow('non-public');
+    expect(global.fetch).toHaveBeenCalledTimes(1);
+  });
+});
+
+describe('capStream', () => {
+  function streamOf(chunks: number[]) {
+    return new ReadableStream<Uint8Array>({
+      start(controller) {
+        for (const size of chunks) controller.enqueue(new Uint8Array(size));
+        controller.close();
+      },
+    });
+  }
+
+  it('passes a body within the cap through whole', async () => {
+    const onEnd = jest.fn();
+    const bytes = await new Response(capStream(streamOf([4, 4]), 8, onEnd)).arrayBuffer();
+    expect(bytes.byteLength).toBe(8);
+    expect(onEnd).toHaveBeenCalledWith(true);
+  });
+
+  it('cuts a body off once it passes the cap, declared length or not', async () => {
+    const onEnd = jest.fn();
+    await expect(
+      new Response(capStream(streamOf([4, 4, 4]), 8, onEnd)).arrayBuffer(),
+    ).rejects.toThrow();
+    expect(onEnd).toHaveBeenCalledWith(false);
+  });
+});
+
+describe('displayContractName', () => {
+  it('keeps one clean line of at most 64 characters', () => {
+    expect(displayContractName('  Blueberry   Club\n')).toBe('Blueberry Club');
+    expect(displayContractName('Evil\u202eeman')).toBe('Evileman');
+    expect(displayContractName('x'.repeat(80))).toBe(`${'x'.repeat(63)}…`);
+    expect(displayContractName('\u0000\u200b')).toBeUndefined();
+    expect(displayContractName(42)).toBeUndefined();
+  });
+});
+
+describe('readAttachedNftContractName', () => {
+  it('reads the ERC-721 name of the contract', async () => {
+    mockReadContract.mockResolvedValue('Blueberry Club');
+    await expect(readAttachedNftContractName(CONTRACT)).resolves.toBe('Blueberry Club');
+    expect(mockReadContract).toHaveBeenCalledWith(
+      expect.objectContaining({ abi: erc721Abi, functionName: 'name' }),
+    );
+  });
+
+  it('is undefined for a contract without a name or an unreadable chain', async () => {
+    mockReadContract.mockRejectedValue(
+      new ContractFunctionExecutionError(
+        new ContractFunctionRevertedError({ abi: erc721Abi, functionName: 'name' }),
+        {
+          abi: erc721Abi,
+          functionName: 'name',
+        },
+      ),
+    );
+    await expect(readAttachedNftContractName(CONTRACT)).resolves.toBeUndefined();
+    mockReadContract.mockRejectedValue(new Error('network'));
+    await expect(readAttachedNftContractName(CONTRACT)).resolves.toBeUndefined();
   });
 });
 
@@ -184,13 +337,18 @@ describe('resolveAttachedNftDisplay', () => {
   });
 
   it('reads the document through the data cache and serves its image from our origin', async () => {
-    global.fetch = jest
-      .fn()
-      .mockImplementation((url: string) =>
-        url.startsWith(GATEWAY)
-          ? Promise.resolve(jsonResponse({ name: 'GBC #4035', image: 'ipfs://bafy/4035.png' }))
-          : Promise.reject(new Error('gateway down')),
-      );
+    mockReadContract.mockResolvedValue('Blueberry Club');
+    global.fetch = jest.fn().mockImplementation((url: string) =>
+      url.startsWith(GATEWAY)
+        ? Promise.resolve(
+            jsonResponse({
+              name: 'GBC #4035',
+              image: 'ipfs://bafy/4035.png',
+              attributes: [{ trait_type: 'Hat', value: 'Beanie' }],
+            }),
+          )
+        : Promise.reject(new Error('gateway down')),
+    );
 
     await expect(
       resolveAttachedNftDisplay({
@@ -198,10 +356,16 @@ describe('resolveAttachedNftDisplay', () => {
         NFTTokenId: 4035,
         NFTTokenURI: 'ipfs://bafy-doc/4035',
       }),
-    ).resolves.toMatchObject({
+    ).resolves.toEqual({
       name: 'GBC #4035',
+      description: undefined,
       image: `/api/attached-nft/${CONTRACT.toLowerCase()}/4035/image`,
       imageFallback: `${GATEWAY}bafy/4035.png`,
+      external_url: undefined,
+      collection_name: undefined,
+      contract_name: 'Blueberry Club',
+      artist: undefined,
+      platform: undefined,
     });
     expect(global.fetch).toHaveBeenCalledWith(
       `${GATEWAY}bafy-doc/4035`,
@@ -253,5 +417,26 @@ describe('fetchAttachedNftImage', () => {
   it('refuses SVG, which could run script on our origin', async () => {
     global.fetch = jest.fn().mockResolvedValue(imageResponse('image/svg+xml'));
     await expect(fetchAttachedNftImage('https://art.example.com/1.svg')).resolves.toBeNull();
+  });
+
+  it('stops a body without a declared length at the size cap', async () => {
+    let sent = 0;
+    const endless = new ReadableStream<Uint8Array>({
+      pull(controller) {
+        const chunk = new Uint8Array(1024 * 1024);
+        sent += chunk.byteLength;
+        controller.enqueue(chunk);
+      },
+    });
+    global.fetch = jest
+      .fn()
+      .mockResolvedValue(
+        new Response(endless, { status: 200, headers: { 'Content-Type': 'image/png' } }),
+      );
+
+    const image = await fetchAttachedNftImage('https://art.example.com/1.png');
+    expect(image).not.toBeNull();
+    await expect(new Response(image!.body).arrayBuffer()).rejects.toThrow();
+    expect(sent).toBeLessThanOrEqual(MAX_IMAGE_BYTES + 2 * 1024 * 1024);
   });
 });

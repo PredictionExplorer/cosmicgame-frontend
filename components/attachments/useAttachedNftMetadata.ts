@@ -2,7 +2,7 @@ import { useQuery } from '@tanstack/react-query';
 import { erc721Abi } from 'viem';
 import { usePublicClient } from 'wagmi';
 
-import { normalizeHttpUrl } from './attachedNftLinks';
+import { normalizeHttpUrl, normalizeHttpsUrl } from './attachedNftLinks';
 import {
   attachedNftMetadataPath,
   attachedNftMetadataQueryKey,
@@ -48,13 +48,13 @@ export async function fetchSameOriginAttachedNftMetadata(
     if (!body || typeof body !== 'object' || Array.isArray(body)) return null;
     const raw = body as Record<string, unknown>;
     return {
-      ...raw,
       name: optionalString(raw.name),
       description: optionalString(raw.description),
       image: displayableImage(raw.image),
       imageFallback: displayableImage(raw.imageFallback),
-      external_url: normalizeHttpUrl(raw.external_url) ?? undefined,
+      external_url: normalizeHttpsUrl(raw.external_url) ?? undefined,
       collection_name: optionalString(raw.collection_name),
+      contract_name: optionalString(raw.contract_name),
       artist: optionalString(raw.artist),
       platform: optionalString(raw.platform),
     };

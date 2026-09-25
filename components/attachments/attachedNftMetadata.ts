@@ -1,6 +1,6 @@
 import { isAddress } from 'viem';
 
-import { normalizeHttpUrl } from './attachedNftLinks';
+import { normalizeHttpUrl, normalizeHttpsUrl } from './attachedNftLinks';
 
 /*
  * Display metadata of an NFT attached to a gesture: parsing, the IPFS gateway
@@ -10,17 +10,24 @@ import { normalizeHttpUrl } from './attachedNftLinks';
  * share one implementation.
  */
 
+/**
+ * What a page shows of an attached NFT. Only these fields are kept from the
+ * token's metadata document: whoever deployed the contract writes that
+ * document, so nothing else in it is passed on, cached or served.
+ */
 export interface AttachedNftMetadata {
   name?: string;
   description?: string;
   image?: string;
   /** The same image from another source, for the <NFTImage> fallback chain. */
   imageFallback?: string;
+  /** The project site the document names: https only, never a card's primary link. */
   external_url?: string;
   collection_name?: string;
+  /** The contract's own ERC-721 `name()`, read by the server when the document names no collection. */
+  contract_name?: string;
   artist?: string;
   platform?: string;
-  [key: string]: unknown;
 }
 
 /** The contract and token an attached-NFT record points at. */
@@ -44,6 +51,56 @@ export const IPFS_GATEWAYS = [
 
 /** Per-request timeout of one metadata read. */
 export const METADATA_FETCH_TIMEOUT_MS = 10_000;
+
+/**
+ * The largest metadata document read. A token URI is untrusted input, and a
+ * real document (name, description, image, attributes) is a few kilobytes.
+ */
+export const MAX_METADATA_BYTES = 256 * 1024;
+
+/** A response body larger than the reader's cap. */
+export class ResponseTooLargeError extends Error {
+  constructor(maxBytes: number) {
+    super(`Response body exceeds ${maxBytes} bytes`);
+    this.name = 'ResponseTooLargeError';
+  }
+}
+
+/**
+ * The body of `response` as text, read chunk by chunk and abandoned as soon
+ * as it passes `maxBytes`, whether or not the server declared a length.
+ */
+export async function readCappedText(response: Response, maxBytes: number): Promise<string> {
+  const declared = Number(response.headers?.get('content-length') ?? Number.NaN);
+  if (Number.isFinite(declared) && declared > maxBytes) {
+    void response.body?.cancel().catch(() => {});
+    throw new ResponseTooLargeError(maxBytes);
+  }
+  const body = response.body;
+  if (!body) {
+    // Only environments without body streams take this path.
+    const text = await response.text();
+    if (new TextEncoder().encode(text).byteLength > maxBytes) {
+      throw new ResponseTooLargeError(maxBytes);
+    }
+    return text;
+  }
+  const reader = body.getReader();
+  const decoder = new TextDecoder();
+  let received = 0;
+  let text = '';
+  for (;;) {
+    const { done, value } = await reader.read();
+    if (done) break;
+    received += value.byteLength;
+    if (received > maxBytes) {
+      void reader.cancel().catch(() => {});
+      throw new ResponseTooLargeError(maxBytes);
+    }
+    text += decoder.decode(value, { stream: true });
+  }
+  return text + decoder.decode();
+}
 
 function isRecord(value: unknown): value is Record<string, unknown> {
   return !!value && typeof value === 'object' && !Array.isArray(value);
@@ -114,12 +171,11 @@ export function normalizeAttachedNftMetadata(
   const imagePath = ipfsPath(raw.image);
 
   return {
-    ...raw,
     name: optionalString(raw.name),
     description: optionalString(raw.description),
     image: normalizeMetadataAssetUrl(raw.image, metadataUri),
     imageFallback: imagePath && fallbackGateway ? `${fallbackGateway}${imagePath}` : undefined,
-    external_url: normalizeHttpUrl(raw.external_url) ?? undefined,
+    external_url: normalizeHttpsUrl(raw.external_url) ?? undefined,
     collection_name: optionalString(raw.collection_name ?? raw.collectionName),
     artist: optionalString(raw.artist),
     platform: optionalString(raw.platform),
@@ -157,9 +213,11 @@ async function fetchMetadataFromUrl(
       signal: controller.signal,
     });
     if (!response.ok) {
+      void response.body?.cancel().catch(() => {});
       throw new Error(`Failed to fetch NFT metadata (${response.status})`);
     }
-    const data: unknown = await response.json();
+    // The timer stays armed until the whole body is read (see `finally`).
+    const data: unknown = JSON.parse(await readCappedText(response, MAX_METADATA_BYTES));
     const normalized = normalizeAttachedNftMetadata(data, url);
     if (!normalized) {
       throw new Error('Failed to fetch NFT metadata (unusable payload)');

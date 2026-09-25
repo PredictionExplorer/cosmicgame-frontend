@@ -137,6 +137,21 @@ describe('AttachedNFTAllocationShowcase', () => {
     expect(amounts[2]).toHaveTextContent('2.5 GLXY');
   });
 
+  it('shows what was attached, not what is left, once a Recipient has retrieved it', () => {
+    // A Recipient read of a retrieved attachment: nothing held, 2,000 retrieved.
+    render(
+      <AttachedNFTAllocationShowcase
+        nfts={[]}
+        erc20Tokens={[
+          createErc20({ AmountDonated: '0', AmountDonatedEth: 0, AmountClaimedEth: 2000 }),
+        ]}
+        cycleNumber={42}
+      />,
+    );
+
+    expect(screen.getByTestId('erc20-attached-amount')).toHaveTextContent('2,000 GLXY');
+  });
+
   it('says the amount is unknown instead of inventing one', () => {
     render(
       <AttachedNFTAllocationShowcase
@@ -317,16 +332,16 @@ describe('AttachedNFTAllocationShowcase', () => {
     ).toBeInTheDocument();
     expectSingleRecipientRuleSummary();
     expect(
-      screen
-        .getAllByRole('link', { name: /showcase\.nftCard\.links\.project/ })
-        .some((link) => link.getAttribute('href') === 'https://project.example/nft/123'),
-    ).toBe(true);
-    expect(
-      screen.getByRole('link', { name: 'currentCycle.showcase.nftCard.openSea' }),
+      screen.getByRole('link', { name: 'currentCycle.showcase.nftCard.links.opensea' }),
     ).toHaveAttribute('href', buildOpenSeaAssetUrl(CONTRACT, 123, networkConfig.chainId));
     expect(
       screen.getByRole('link', { name: 'currentCycle.showcase.nftCard.explorer' }),
     ).toHaveAttribute('href', expect.stringContaining(CONTRACT));
+    // The metadata's own site is a secondary action that names its host.
+    expect(screen.getByRole('link', { name: 'project.example' })).toHaveAttribute(
+      'href',
+      'https://project.example/nft/123',
+    );
     expect(screen.getByRole('link', { name: /0xabcd/i })).toHaveAttribute(
       'href',
       `/user/${CONTRIBUTOR}`,
@@ -352,6 +367,42 @@ describe('AttachedNFTAllocationShowcase', () => {
       expect(element.className).toContain('max-h-[420px]');
       expect(element.className).toContain('max-w-3xl');
     });
+  });
+
+  it('never makes the metadata’s own site the primary link', () => {
+    // Anyone can attach an NFT from a contract they deployed, metadata included.
+    mockUseAttachedNftMetadata.mockReturnValue({
+      data: {
+        name: 'Retrieve your allocation',
+        image: 'https://cdn.example/nft.png',
+        external_url: 'https://phish.example/claim',
+      },
+      isError: false,
+    });
+
+    render(<AttachedNFTAllocationShowcase nfts={[createNft()]} cycleNumber={42} />);
+
+    const openSea = buildOpenSeaAssetUrl(CONTRACT, 123, networkConfig.chainId);
+    expect(screen.getByTestId('nft-allocation-media')).toHaveAttribute('href', openSea);
+    const project = screen.getByRole('link', { name: 'phish.example' });
+    expect(project).toHaveAttribute('href', 'https://phish.example/claim');
+    expect(project).toHaveAttribute('rel', 'noopener noreferrer nofollow ugc');
+    expect(
+      screen
+        .getAllByRole('link')
+        .filter((link) => link.getAttribute('href') === 'https://phish.example/claim'),
+    ).toHaveLength(1);
+  });
+
+  it('offers no project link for a plain-http site', () => {
+    mockUseAttachedNftMetadata.mockReturnValue({
+      data: { name: 'Insecure', external_url: 'http://project.example/1' },
+      isError: false,
+    });
+
+    render(<AttachedNFTAllocationShowcase nfts={[createNft()]} cycleNumber={42} />);
+
+    expect(screen.queryByRole('link', { name: 'project.example' })).not.toBeInTheDocument();
   });
 
   it('falls back to OpenSea as the primary action when project link is unavailable', () => {
@@ -406,11 +457,15 @@ describe('AttachedNFTAllocationShowcase', () => {
 
     expect(screen.getByText('currentCycle.showcase.facts.unknown')).toBeInTheDocument();
     expect(
-      screen.queryByRole('link', { name: 'currentCycle.showcase.nftCard.openSea' }),
+      screen.queryByRole('link', { name: 'currentCycle.showcase.nftCard.links.opensea' }),
     ).not.toBeInTheDocument();
+    // The contract on the explorer becomes the primary action, listed once.
     expect(
-      screen.getByRole('link', { name: 'currentCycle.showcase.nftCard.explorer' }),
-    ).toBeInTheDocument();
+      screen.getByRole('link', { name: 'currentCycle.showcase.nftCard.links.explorer' }),
+    ).toHaveAttribute('href', expect.stringContaining(CONTRACT));
+    expect(
+      screen.queryByRole('link', { name: 'currentCycle.showcase.nftCard.explorer' }),
+    ).not.toBeInTheDocument();
   });
 
   it('shows floor estimate only when available and labels it as approximate', () => {

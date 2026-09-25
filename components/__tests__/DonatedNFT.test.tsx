@@ -51,10 +51,60 @@ describe('AttachedNFT', () => {
       const decoded = new URL(src, 'http://localhost').searchParams.get('url') ?? src;
       expect(decoded).toEqual(mockImageUrl);
     });
+    // The card links to OpenSea, from the recorded contract and token; the
+    // metadata's own site follows as a secondary link that names its host.
     expect(screen.getByRole('link', { name: /View attached NFT/i })).toHaveAttribute(
+      'href',
+      buildOpenSeaAssetUrl(mockData.TokenAddr, mockData.NFTTokenId, networkConfig.chainId),
+    );
+    expect(screen.getByRole('link', { name: /example\.com/ })).toHaveAttribute(
       'href',
       'https://example.com/',
     );
+    expect(screen.getByText('Project site')).toBeInTheDocument();
+  });
+
+  it('names the collection by its contract in the one address style', () => {
+    mockUseAttachedNftMetadata.mockReturnValue({
+      data: { name: 'Rexy #3114', contract_name: 'Rexy' },
+      isError: false,
+    });
+    renderWithQuery(
+      <AttachedNFT
+        nft={{ TokenAddr: '0xDA012c97a03fC9cec6e080F186C0259E3ED2E31D', NFTTokenId: 3114 }}
+      />,
+    );
+    expect(
+      screen.getByTitle('Rexy · 0xDA012c97a03fC9cec6e080F186C0259E3ED2E31D'),
+    ).toHaveTextContent(/^Rexy$/);
+  });
+
+  it('shows a contract without a known name as a shortened address, never as a link', () => {
+    mockUseAttachedNftMetadata.mockReturnValue({ data: { name: 'Untitled' }, isError: false });
+    const { container } = renderWithQuery(
+      <AttachedNFT
+        nft={{ TokenAddr: '0xDA012c97a03fC9cec6e080F186C0259E3ED2E31D', NFTTokenId: 1 }}
+      />,
+    );
+    const hex = screen.getByTitle('0xDA012c97a03fC9cec6e080F186C0259E3ED2E31D');
+    expect(hex).toHaveTextContent(/^0xDA01…/);
+    // One link per card: nothing nested inside it.
+    expect(container.querySelectorAll('a a')).toHaveLength(0);
+  });
+
+  it('reads the Random Walk contract by its name, not its on-chain symbol', () => {
+    mockUseAttachedNftMetadata.mockReturnValue({
+      data: { name: 'Random Walk #004079', contract_name: 'RandomWalkNFT' },
+      isError: false,
+    });
+    renderWithQuery(
+      <AttachedNFT
+        nft={{ TokenAddr: '0x895a6F444BE4ba9d124F61DF736605792B35D66b', NFTTokenId: 4079 }}
+      />,
+    );
+    // The /contracts name from the formats catalog (a raw key in this harness).
+    expect(screen.getByText('formats.address.known.randomWalk')).toBeInTheDocument();
+    expect(screen.queryByText('RandomWalkNFT')).not.toBeInTheDocument();
   });
 
   it('has no accessibility violations', async () => {

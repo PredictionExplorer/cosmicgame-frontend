@@ -12,6 +12,7 @@ import {
   TableLink,
   type DataTableColumn,
 } from '@/components/ui/data-table';
+import { MEDIA_PLATE_CLASS } from '@/components/ui/art-frame';
 import { DateTime } from '@/components/ui/date-time';
 import NFTImage from '@/components/nft/NFTImage';
 
@@ -62,12 +63,7 @@ function AttachedNftThumb({ nft, className }: { nft: NFTRecord; className?: stri
   const t = useTranslations('tables');
   const { data: metadata, isLoading } = useRecordMetadata(nft);
   return (
-    <div
-      className={cn(
-        'size-16 overflow-hidden rounded-edge bg-art-ground shadow-[var(--art-edge)]',
-        className,
-      )}
-    >
+    <div className={cn(MEDIA_PLATE_CLASS, 'size-16', className)}>
       <NFTImage
         src={metadata?.image}
         fallbackSrc={metadata?.imageFallback}
@@ -93,7 +89,7 @@ function AttachedNftToken({ nft }: { nft: NFTRecord }) {
   const tokenId = getAttachedNftTokenId(nft);
   const number = tokenId ? `#${tokenId}` : t('attachedAssets.nft.unknownToken');
   const name = typeof metadata?.name === 'string' ? metadata.name.trim() : '';
-  const link = resolveAttachedNftLink({ nft, metadata });
+  const link = resolveAttachedNftLink({ nft });
   const title = name || number;
   return (
     <span className="flex min-w-0 items-center gap-3">

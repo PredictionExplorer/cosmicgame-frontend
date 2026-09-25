@@ -1,11 +1,25 @@
+import { lookup } from 'node:dns/promises';
+import { BlockList, isIP } from 'node:net';
+
 import { cache } from 'react';
 import { unstable_cache } from 'next/cache';
+import {
+  ContractFunctionExecutionError,
+  ContractFunctionRevertedError,
+  ContractFunctionZeroDataError,
+  createPublicClient,
+  erc721Abi,
+  http,
+} from 'viem';
 
+import { activeChain } from '@/config/chains';
+import { networkConfig } from '@/config/networks';
 import { get_donations_nft_list } from '@/services/api/donations';
 import type { AttachedNFT } from '@/services/api/types';
 
 import {
   IPFS_GATEWAYS,
+  ResponseTooLargeError,
   attachedNftImagePath,
   attachedNftRef,
   fetchAttachedNftMetadata,
@@ -20,8 +34,14 @@ import {
  * reads each document once a day (Next data cache), the image once per
  * optimizer cache period, and hands the page the result.
  *
- * Only records the indexer lists are resolved, and only over public https,
- * so a request can never make the server fetch an address of its choosing.
+ * Only records the indexer lists are resolved, and only over https to a
+ * public DNS name whose every address is public, checked again at each
+ * redirect (`fetchPublicHttps`). The connection resolves the name once more,
+ * so a host that changes its answer in between (DNS rebinding) could still
+ * aim one connection at a private address; what keeps that connection from
+ * reading anything is TLS, since a private service cannot present a
+ * certificate for the public name. Bodies are read under a size cap and a
+ * deadline that covers the whole transfer.
  */
 
 /** How long a resolved metadata document is reused. */
@@ -40,7 +60,15 @@ const IMAGE_FETCH_TIMEOUT_MS = 15_000;
  */
 const IMAGE_REVALIDATE_SECONDS = 7 * 24 * 60 * 60;
 /** Larger files are left to the browser: the optimizer would only shrink them. */
-const MAX_IMAGE_BYTES = 25 * 1024 * 1024;
+export const MAX_IMAGE_BYTES = 25 * 1024 * 1024;
+/** One DNS lookup before a request; a resolver that hangs fails the read. */
+const DNS_LOOKUP_TIMEOUT_MS = 3_000;
+/** How long a contract's `name()` is reused: collections rarely rename. */
+const CONTRACT_NAME_REVALIDATE_SECONDS = 7 * 24 * 60 * 60;
+/** One `name()` read over RPC. */
+const CONTRACT_NAME_TIMEOUT_MS = 4_000;
+/** Longer contract names are cut, with an ellipsis. */
+const MAX_CONTRACT_NAME_LENGTH = 64;
 
 /**
  * Raster formats the image route serves. SVG is refused on purpose: an SVG
@@ -80,18 +108,94 @@ export function isPublicHttpsUrl(value: string): boolean {
   return !PRIVATE_HOST_SUFFIXES.some((suffix) => host.endsWith(suffix));
 }
 
+/**
+ * Address ranges a public host never resolves to: private, loopback,
+ * link-local (cloud metadata), carrier-grade NAT, unique-local, multicast,
+ * documentation and reserved space, and the IPv6 transition prefixes that
+ * embed an IPv4 address. IPv4-mapped IPv6 addresses match the IPv4 rules.
+ */
+const NON_PUBLIC_ADDRESSES = (() => {
+  const list = new BlockList();
+  const ipv4: ReadonlyArray<readonly [string, number]> = [
+    ['0.0.0.0', 8],
+    ['10.0.0.0', 8],
+    ['100.64.0.0', 10],
+    ['127.0.0.0', 8],
+    ['169.254.0.0', 16],
+    ['172.16.0.0', 12],
+    ['192.0.0.0', 24],
+    ['192.0.2.0', 24],
+    ['192.88.99.0', 24],
+    ['192.168.0.0', 16],
+    ['198.18.0.0', 15],
+    ['198.51.100.0', 24],
+    ['203.0.113.0', 24],
+    ['224.0.0.0', 4],
+    ['240.0.0.0', 4],
+  ];
+  const ipv6: ReadonlyArray<readonly [string, number]> = [
+    ['::', 128],
+    ['::1', 128],
+    ['64:ff9b::', 96],
+    ['64:ff9b:1::', 48],
+    ['100::', 64],
+    ['2001::', 32],
+    ['2001:db8::', 32],
+    ['2002::', 16],
+    ['fc00::', 7],
+    ['fe80::', 10],
+    ['ff00::', 8],
+  ];
+  for (const [network, prefix] of ipv4) list.addSubnet(network, prefix, 'ipv4');
+  for (const [network, prefix] of ipv6) list.addSubnet(network, prefix, 'ipv6');
+  return list;
+})();
+
+/** Whether `address` is an IP address on the public internet. */
+export function isPublicAddress(address: string): boolean {
+  const family = isIP(address);
+  if (family === 0) return false;
+  return !NON_PUBLIC_ADDRESSES.check(address, family === 6 ? 'ipv6' : 'ipv4');
+}
+
+function withDeadline<T>(promise: Promise<T>, ms: number, message: string): Promise<T> {
+  let timer: ReturnType<typeof setTimeout> | undefined;
+  const deadline = new Promise<never>((_, reject) => {
+    timer = setTimeout(() => reject(new Error(message)), ms);
+  });
+  return Promise.race([promise, deadline]).finally(() => clearTimeout(timer));
+}
+
+/**
+ * Resolves `hostname` and rejects unless every address it answers with is
+ * public, so a public-looking name (`127.0.0.1.nip.io`, or any name with an
+ * A record in 10/8) cannot point a server read at a private service.
+ */
+export async function assertPublicHost(hostname: string): Promise<void> {
+  const answers = await withDeadline(
+    lookup(hostname, { all: true, verbatim: true }),
+    DNS_LOOKUP_TIMEOUT_MS,
+    'DNS lookup timed out',
+  );
+  if (answers.length === 0 || answers.some(({ address }) => !isPublicAddress(address))) {
+    throw new Error('Refused a host with a non-public address');
+  }
+}
+
 /** Redirects one server read may follow (IPFS gateways use one or two). */
 const MAX_REDIRECTS = 3;
 
 /**
  * `fetch` for untrusted URLs: redirects are followed by hand, and each hop
- * must pass `isPublicHttpsUrl` too, so a public host cannot bounce the
- * server to a private one. Rejects on a refused hop or too many redirects.
+ * must pass `isPublicHttpsUrl` and resolve only to public addresses, so a
+ * public host cannot bounce the server to a private one. Rejects on a
+ * refused hop or too many redirects.
  */
 export async function fetchPublicHttps(url: string, init: RequestInit = {}): Promise<Response> {
   let current = url;
   for (let hop = 0; hop <= MAX_REDIRECTS; hop += 1) {
     if (!isPublicHttpsUrl(current)) throw new Error('Refused a non-public URL');
+    await assertPublicHost(new URL(current).hostname);
     const response = await fetch(current, { ...init, redirect: 'manual' });
     const location = response.headers.get('location');
     if (response.status < 300 || response.status > 399 || !location) return response;
@@ -163,6 +267,75 @@ export function withSameOriginImage(
   };
 }
 
+/**
+ * A name a contract supplies, made safe to show in a caption: one line, no
+ * control or bidirectional formatting characters, at most 64 characters.
+ */
+export function displayContractName(value: unknown): string | undefined {
+  if (typeof value !== 'string') return undefined;
+  const clean = value
+    .replace(/[\p{Cc}\p{Cf}]/gu, '')
+    .replace(/\s+/g, ' ')
+    .trim();
+  if (!clean) return undefined;
+  const chars = Array.from(clean);
+  return chars.length > MAX_CONTRACT_NAME_LENGTH
+    ? `${chars.slice(0, MAX_CONTRACT_NAME_LENGTH - 1).join('')}…`
+    : clean;
+}
+
+/** Whether a failed `name()` read is the contract's answer (it has none), not a network fault. */
+function contractHasNoName(error: unknown): boolean {
+  return (
+    error instanceof ContractFunctionExecutionError &&
+    (error.cause instanceof ContractFunctionRevertedError ||
+      error.cause instanceof ContractFunctionZeroDataError)
+  );
+}
+
+/**
+ * The contract's ERC-721 `name()`, kept a week in the data cache (so is the
+ * answer that it has none); a network failure is not cached.
+ */
+const readContractNameCached = unstable_cache(
+  async (tokenAddr: `0x${string}`): Promise<string | null> => {
+    if (!networkConfig.rpcUrl) return null;
+    const client = createPublicClient({
+      chain: activeChain,
+      transport: http(networkConfig.rpcUrl, { timeout: CONTRACT_NAME_TIMEOUT_MS, retryCount: 1 }),
+    });
+    try {
+      const name = await client.readContract({
+        address: tokenAddr,
+        abi: erc721Abi,
+        functionName: 'name',
+      });
+      return displayContractName(name) ?? null;
+    } catch (error) {
+      if (contractHasNoName(error)) return null;
+      throw error;
+    }
+  },
+  ['attached-nft-contract-name'],
+  { revalidate: CONTRACT_NAME_REVALIDATE_SECONDS },
+);
+
+/**
+ * The collection name an attached NFT's contract reports, for a caption
+ * whose metadata names no collection; undefined when it has none or the
+ * chain cannot be read.
+ */
+export const readAttachedNftContractName = cache(
+  async (tokenAddr: `0x${string}`): Promise<string | undefined> => {
+    try {
+      const name = await readContractNameCached(tokenAddr.toLowerCase() as `0x${string}`);
+      return name ?? undefined;
+    } catch {
+      return undefined;
+    }
+  },
+);
+
 /** The display metadata of one indexed record, or null when its document cannot be read. */
 export async function resolveAttachedNftDisplay(
   record: Pick<AttachedNFT, 'TokenAddr' | 'NFTTokenId' | 'TokenId' | 'NFTTokenURI'>,
@@ -173,8 +346,16 @@ export async function resolveAttachedNftDisplay(
     tokenId: record.NFTTokenId ?? record.TokenId,
   });
   if (!uri || !tokenAddr || !tokenId) return null;
-  const metadata = await readAttachedNftMetadataDocument(uri);
-  return metadata ? withSameOriginImage(metadata, tokenAddr, tokenId) : null;
+  const [metadata, contractName] = await Promise.all([
+    readAttachedNftMetadataDocument(uri),
+    readAttachedNftContractName(tokenAddr),
+  ]);
+  if (!metadata) return null;
+  return withSameOriginImage(
+    contractName ? { ...metadata, contract_name: contractName } : metadata,
+    tokenAddr,
+    tokenId,
+  );
 }
 
 /** Every URL worth trying for an image: the same file on each gateway, or the URL itself. */
@@ -194,9 +375,58 @@ export interface AttachedNftImage {
 }
 
 /**
+ * `body`, cut off with an error once more than `maxBytes` have passed.
+ * `onEnd` runs once, with `true` when the body was read to its end and
+ * `false` when it failed, was cut off or was cancelled by the reader.
+ */
+export function capStream(
+  body: ReadableStream<Uint8Array>,
+  maxBytes: number,
+  onEnd: (complete: boolean) => void = () => {},
+): ReadableStream<Uint8Array> {
+  const reader = body.getReader();
+  let received = 0;
+  let ended = false;
+  const end = (complete: boolean) => {
+    if (ended) return;
+    ended = true;
+    onEnd(complete);
+  };
+  return new ReadableStream<Uint8Array>({
+    async pull(controller) {
+      try {
+        const { done, value } = await reader.read();
+        if (done) {
+          end(true);
+          controller.close();
+          return;
+        }
+        received += value.byteLength;
+        if (received > maxBytes) {
+          end(false);
+          void reader.cancel().catch(() => {});
+          controller.error(new ResponseTooLargeError(maxBytes));
+          return;
+        }
+        controller.enqueue(value);
+      } catch (error) {
+        end(false);
+        controller.error(error);
+      }
+    },
+    cancel(reason) {
+      end(false);
+      return reader.cancel(reason);
+    },
+  });
+}
+
+/**
  * Fetches an image from the first candidate that answers with a raster image
  * of an acceptable size, cancelling the others; `null` when none does. The
- * bytes are kept in the data cache, so each later width is served at once.
+ * returned body stops at 25 MB, declared or not, and one deadline covers the
+ * whole transfer, so a slow or endless body is cut off with it. The bytes are
+ * kept in the data cache, so each later width is served at once.
  */
 export async function fetchAttachedNftImage(url: string): Promise<AttachedNftImage | null> {
   const candidates = imageUrlCandidates(url);
@@ -229,10 +459,14 @@ export async function fetchAttachedNftImage(url: string): Promise<AttachedNftIma
     controllers.forEach((controller, index) => {
       if (index !== served.index) controller.abort();
     });
-    return { body: served.body, contentType: served.contentType };
+    const body = capStream(served.body, MAX_IMAGE_BYTES, (complete) => {
+      clearTimeout(timer);
+      // Stops the upstream read as well (the data cache reads its own copy).
+      if (!complete) controllers[served.index]!.abort();
+    });
+    return { body, contentType: served.contentType };
   } catch {
-    return null;
-  } finally {
     clearTimeout(timer);
+    return null;
   }
 }

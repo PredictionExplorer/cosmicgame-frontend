@@ -783,7 +783,7 @@
     "attached": "添付済み"
   },
   "attachedNftLinks": {
-    "viewNft": "NFTを見る",
+    "projectSite": "プロジェクトサイト",
     "viewOpenSea": "OpenSeaで見る",
     "viewContract": "コントラクトを見る",
     "detailsUnavailable": "NFTの詳細を利用できません",

@@ -12,6 +12,7 @@ jest.mock('wagmi', () => ({
 
 import {
   IPFS_GATEWAYS,
+  MAX_METADATA_BYTES,
   attachedNftImagePath,
   attachedNftMetadataPath,
   attachedNftMetadataQueryKey,
@@ -32,6 +33,7 @@ function mockJsonResponse(body: unknown, status = 200) {
     ok: status >= 200 && status < 300,
     status,
     json: jest.fn().mockResolvedValue(body),
+    text: jest.fn().mockResolvedValue(JSON.stringify(body)),
   };
 }
 
@@ -103,6 +105,25 @@ describe('useAttachedNftMetadata helpers', () => {
     });
   });
 
+  it('keeps only the fields a page shows, and project sites over https only', () => {
+    const metadata = normalizeAttachedNftMetadata({
+      name: 'Token One',
+      external_url: 'http://project.example/1',
+      attributes: [{ trait_type: 'x', value: 'y'.repeat(10_000) }],
+      animation_url: 'https://cdn.example/1.mp4',
+    });
+    expect(metadata).toEqual({
+      name: 'Token One',
+      description: undefined,
+      image: undefined,
+      imageFallback: undefined,
+      external_url: undefined,
+      collection_name: undefined,
+      artist: undefined,
+      platform: undefined,
+    });
+  });
+
   it('exposes an alternate-gateway fallback for ipfs images', () => {
     const metadata = normalizeAttachedNftMetadata(
       { image: 'ipfs://bafy/image.png' },
@@ -139,6 +160,27 @@ describe('fetchAttachedNftMetadata', () => {
       image: `${GATEWAY}bafy/image.png`,
       external_url: 'https://x.io/',
     });
+  });
+
+  it('refuses a document larger than the cap instead of reading it all', async () => {
+    const oversized = {
+      ok: true,
+      status: 200,
+      headers: { get: () => null },
+      text: jest.fn().mockResolvedValue(`{"name":"${'x'.repeat(MAX_METADATA_BYTES)}"}`),
+    };
+    (global.fetch as jest.Mock).mockResolvedValue(oversized);
+    await expect(fetchAttachedNftMetadata('https://metadata.example/1')).rejects.toThrow(/exceeds/);
+
+    const declared = {
+      ok: true,
+      status: 200,
+      headers: { get: (name: string) => (name === 'content-length' ? '99999999' : null) },
+      text: jest.fn(),
+    };
+    (global.fetch as jest.Mock).mockResolvedValue(declared);
+    await expect(fetchAttachedNftMetadata('https://metadata.example/1')).rejects.toThrow(/exceeds/);
+    expect(declared.text).not.toHaveBeenCalled();
   });
 
   it('passes fetch options through and skips candidates the guard refuses', async () => {
