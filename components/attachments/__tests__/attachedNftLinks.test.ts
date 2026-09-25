@@ -82,9 +82,9 @@ describe('attachedNftLinks', () => {
           ?.host,
       ).toBe('opensea.io-retrieve.example');
       // A look-alike international name shows in its ASCII form.
-      expect(resolveAttachedNftProjectLink({ external_url: 'https://оpensea.io/x' })?.host).toBe(
-        'xn--pensea-vqf.io',
-      );
+      expect(
+        resolveAttachedNftProjectLink({ external_url: 'https://\u043epensea.io/x' })?.host,
+      ).toBe('xn--pensea-vqf.io');
     });
 
     it('offers no link for plain http or an unusable value', () => {

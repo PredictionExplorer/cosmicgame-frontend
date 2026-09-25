@@ -19,14 +19,13 @@ import type { AttachedNFT } from '@/services/api/types';
 
 import {
   IPFS_GATEWAYS,
-  MAX_LABEL_LENGTH,
   attachedNftImagePath,
   attachedNftRef,
-  cleanDisplayText,
   fetchAttachedNftMetadata,
   readCappedBytes,
   type AttachedNftMetadata,
 } from './attachedNftMetadata';
+import { MAX_LABEL_LENGTH, cleanDisplayText } from './displayText';
 
 /*
  * Server-side resolution of attached-NFT display metadata. The browser used to

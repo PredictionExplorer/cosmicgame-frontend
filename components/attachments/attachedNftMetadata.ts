@@ -1,6 +1,7 @@
 import { isAddress } from 'viem';
 
 import { normalizeHttpUrl, normalizeHttpsUrl } from './attachedNftLinks';
+import { MAX_LABEL_LENGTH, cleanDisplayText } from './displayText';
 
 /*
  * Display metadata of an NFT attached to a gesture: parsing, the IPFS gateway
@@ -187,38 +188,10 @@ export function normalizeMetadataAssetUrl(
   return undefined;
 }
 
-/**
- * Characters that change how the text around them reads without being seen:
- * controls, bidirectional overrides and isolates, zero-width marks. The
- * zero-width joiner stays, because emoji sequences need it.
- */
-const INVISIBLE_CHARACTERS = /(?!‍)[\p{Cc}\p{Cf}]/gu;
-
 /** The longest name kept from a metadata document. */
 const MAX_NAME_LENGTH = 120;
-/** The longest collection, artist or platform label kept (a contract's `name()` shares it). */
-export const MAX_LABEL_LENGTH = 64;
 /** The longest description kept: pages show at most a few lines of it. */
 const MAX_DESCRIPTION_LENGTH = 1_000;
-
-/**
- * Text a third party wrote (a metadata document's fields, a contract's
- * `name()`), made safe to show: one line, without invisible or
- * direction-changing characters (a right-to-left override would make
- * "evil‮gnp.exe" read "evilexe.png"), and at most `maxLength`
- * characters, cut with an ellipsis. Undefined when nothing visible is left.
- */
-export function cleanDisplayText(value: unknown, maxLength: number): string | undefined {
-  if (typeof value !== 'string') return undefined;
-  const clean = value
-    .replace(/\s+/g, ' ')
-    .replace(INVISIBLE_CHARACTERS, '')
-    .replace(/ {2,}/g, ' ')
-    .trim();
-  if (!clean) return undefined;
-  const chars = Array.from(clean);
-  return chars.length > maxLength ? `${chars.slice(0, maxLength - 1).join('')}…` : clean;
-}
 
 export function normalizeAttachedNftMetadata(
   raw: unknown,
