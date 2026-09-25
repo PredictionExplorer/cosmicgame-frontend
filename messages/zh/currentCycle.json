@@ -82,10 +82,6 @@
         "tooltip": "每个周期，周期储备的 {percent}% 都会转拨给 Protocol Guild——为 170 多位以太坊核心贡献者提供资助的机制。",
         "recipientLabel": "Protocol Guild"
       },
-      "nextCycle": {
-        "name": "滚动储备",
-        "tooltip": "收官时不分配的份额：它留在周期储备中，滚入下一周期。"
-      },
       "nftStellar": {
         "name": "NFT 星选",
         "tooltip": "协议从本周期的星选资格中程序化随机选出参与者，每位获配表彰 CST 与 Cosmic Signature NFT。"
@@ -107,7 +103,7 @@
   "sections": {
     "allocations": {
       "title": "分配一览",
-      "description": "周期储备如何沿各条分配轨道发放：签名分配、时之勇士、星选、公共物品、锚定派发与滚动储备。"
+      "description": "周期储备会沿签名分配、时之勇士、星选、锚定派发与公共物品等轨道流转，其余作为滚动储备结转至下一周期。"
     },
     "participants": {
       "title": "本周期参与者"

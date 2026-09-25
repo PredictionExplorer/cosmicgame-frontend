@@ -82,10 +82,6 @@
         "tooltip": "每個週期，週期儲備的 {percent}% 都會轉撥給 Protocol Guild——為 170 多位以太坊核心貢獻者提供資助的機制。",
         "recipientLabel": "Protocol Guild"
       },
-      "nextCycle": {
-        "name": "滾動儲備",
-        "tooltip": "收官時不分配的份額：它留在週期儲備中，滾入下一週期。"
-      },
       "nftStellar": {
         "name": "NFT 星選",
         "tooltip": "協議從本週期的星選資格中程序化隨機選出參與者，每位獲配表彰 CST 與 Cosmic Signature NFT。"
@@ -107,7 +103,7 @@
   "sections": {
     "allocations": {
       "title": "分配一覽",
-      "description": "週期儲備如何沿各條分配軌道發放：簽名分配、時之勇士、星選、公共物品、錨定派發與滾動儲備。"
+      "description": "週期儲備會沿簽名分配、時之勇士、星選、錨定派發與公共物品等軌道流轉，其餘作為滾動儲備結轉至下一週期。"
     },
     "participants": {
       "title": "本週期參與者"

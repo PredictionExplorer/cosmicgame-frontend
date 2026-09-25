@@ -107,6 +107,7 @@ function AllocationDefinitions({ rows, summary }: { rows: AllocationRow[]; summa
  */
 export function CycleAllocations({ data, headingId }: { data: DashboardInfo; headingId: string }) {
   const t = useTranslations('currentCycle');
+  const tContracts = useTranslations('contracts');
   const tCommon = useTranslations('common');
   const locale = useLocale();
   const unknown = <UnknownValue label={tCommon('status.unavailable')} />;
@@ -193,10 +194,8 @@ export function CycleAllocations({ data, headingId }: { data: DashboardInfo; hea
     {
       key: 'nextCycle',
       track: 'nextCycle',
-      // The glossary's name for the share that opens the next cycle, as the
-      // section's description calls it; the recipients column says which cycle.
-      name: card('nextCycle', 'name'),
-      definition: card('nextCycle', 'tooltip'),
+      name: tContracts('funds.segments.next.label'),
+      definition: tContracts('funds.segments.next.tooltip'),
       receives: eth(tracks.get('nextCycle')?.eth),
       recipients: t('hero.title', { n: data.CurRoundNum + 1 }),
     },

@@ -82,10 +82,6 @@
         "tooltip": "すべてのサイクル準備金の{percent}%が、170人以上のEthereumコア貢献者の資金支援メカニズムであるProtocol Guildへ送られます。",
         "recipientLabel": "Protocol Guild"
       },
-      "nextCycle": {
-        "name": "累積準備金",
-        "tooltip": "確定時に配分されない分です。サイクル準備金に残り、次のサイクルへ持ち越されます。"
-      },
       "nftStellar": {
         "name": "NFT星選",
         "tooltip": "サイクルの対象の中から無作為に選ばれた参加者が功労CSTとCosmic Signature NFTを受け取ります。"
@@ -107,7 +103,7 @@
   "sections": {
     "allocations": {
       "title": "配分の内訳",
-      "description": "サイクル準備金が配分トラックにどう分かれるか：シグネチャー配分、時の戦士、星選、公共財、係留配分、そして累積準備金。"
+      "description": "サイクル準備金が配分トラックにどう分かれるか：シグネチャー配分、時の戦士、星選、係留配分、公共財。残りは累積準備金として次のサイクルへ繰り越されます。"
     },
     "participants": {
       "title": "このサイクルの参加者"

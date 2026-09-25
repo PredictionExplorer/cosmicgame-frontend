@@ -82,10 +82,6 @@
         "tooltip": "{percent}% của mỗi Dự trữ chu kỳ được chuyển đến Protocol Guild, cơ chế tài trợ cho hơn 170 người đóng góp cốt lõi cho Ethereum.",
         "recipientLabel": "Protocol Guild"
       },
-      "nextCycle": {
-        "name": "Dự trữ tích lũy",
-        "tooltip": "Phần không được phân bổ khi hoàn tất: phần này ở lại trong Dự trữ chu kỳ và chuyển sang chu kỳ tiếp theo."
-      },
       "nftStellar": {
         "name": "NFT Tinh tuyển",
         "tooltip": "Người tham gia được chọn ngẫu nhiên từ các lượt trong chu kỳ để nhận CST ghi nhận và Cosmic Signature NFT."
@@ -107,7 +103,7 @@
   "sections": {
     "allocations": {
       "title": "Chi tiết phân bổ",
-      "description": "Cách Dự trữ chu kỳ được phân phối qua các luồng phân bổ: phân bổ Signature, Chiến binh Thời gian, Tinh tuyển, Hàng hóa công, phân phối neo giữ và Dự trữ tích lũy."
+      "description": "Cách Dự trữ chu kỳ được phân phối qua các luồng phân bổ: phân bổ Signature, Chiến binh Thời gian, Tinh tuyển, phân phối neo giữ và Hàng hóa công; phần còn lại chuyển sang chu kỳ tiếp theo thành Dự trữ tích lũy."
     },
     "participants": {
       "title": "Người tham gia chu kỳ này"

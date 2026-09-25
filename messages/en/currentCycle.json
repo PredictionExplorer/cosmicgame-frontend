@@ -82,10 +82,6 @@
         "tooltip": "{percent}% of every Cycle Reserve is forwarded to Protocol Guild, the funding mechanism for 170+ Ethereum core contributors.",
         "recipientLabel": "Protocol Guild"
       },
-      "nextCycle": {
-        "name": "Compounding Cycle Reserve",
-        "tooltip": "The share not distributed at finalization: it stays in the Cycle Reserve and carries into the next cycle."
-      },
       "nftStellar": {
         "name": "NFT Stellar Selection",
         "tooltip": "Participants are selected at random from the cycle entries to receive Recognition CST and Cosmic Signature NFTs."
@@ -107,7 +103,7 @@
   "sections": {
     "allocations": {
       "title": "Allocation breakdown",
-      "description": "How the Cycle Reserve distributes across allocation tracks: Signature Allocation, Chrono-Warrior, Stellar Selection, Public Goods, Anchor Distribution, and the Compounding Cycle Reserve."
+      "description": "How the Cycle Reserve distributes across allocation tracks: Signature Allocation, Chrono-Warrior, Stellar Selection, Anchor Distribution and Public Goods, with the rest carried into the next cycle as the Compounding Cycle Reserve."
     },
     "participants": {
       "title": "Participants this cycle"
