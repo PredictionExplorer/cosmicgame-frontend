@@ -13,6 +13,18 @@
   },
   "contribute": {
     "title": "向金库资助",
-    "description": "将 ETH 直接发送到公共物品金库。它会与协议份额一起在金库中等待为 {beneficiary} 取回。"
+    "description": "在 {network} 上将 ETH 直接发送到公共物品金库。它会与协议份额一起在金库中等待为 {beneficiary} 取回。",
+    "networkWarning": "仅限在 {network} 上发送。在其他网络上发往此地址的 ETH 不会进入金库。",
+    "network": "网络",
+    "form": {
+      "label": "向公共物品金库资助 ETH",
+      "amountHint": "任意大于 0 的数量，从 {network} 上的钱包发送。",
+      "connectHint": "连接 {network} 上的钱包即可资助。",
+      "summary": "{amount} 将进入公共物品金库，为 {beneficiary} 保管。",
+      "submit": "资助 ETH",
+      "submitAmount": "资助 {amount}",
+      "confirmed": "向公共物品金库资助的 {amount} ETH 已确认。",
+      "failed": "资助未能完成。请检查钱包后重试。"
+    }
   }
 }

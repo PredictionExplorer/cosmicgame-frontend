@@ -13,6 +13,18 @@
   },
   "contribute": {
     "title": "금고에 기여하기",
-    "description": "ETH를 공공재 금고로 직접 보낼 수 있습니다. 프로토콜 몫과 함께 {beneficiary} 앞으로 회수될 때까지 금고에 보관됩니다."
+    "description": "{network} 네트워크에서 ETH를 공공재 금고로 직접 보낼 수 있습니다. 프로토콜 몫과 함께 {beneficiary} 앞으로 회수될 때까지 금고에 보관됩니다.",
+    "networkWarning": "{network} 네트워크에서만 보내 주세요. 다른 네트워크에서 이 주소로 보낸 ETH는 금고에 도착하지 않습니다.",
+    "network": "네트워크",
+    "form": {
+      "label": "공공재 금고에 ETH 기여하기",
+      "amountHint": "{network} 지갑에서 0보다 큰 금액을 보낼 수 있습니다.",
+      "connectHint": "기여하려면 {network} 지갑을 연결해 주세요.",
+      "summary": "{amount} 전액이 {beneficiary} 앞으로 공공재 금고에 들어갑니다.",
+      "submit": "ETH 기여",
+      "submitAmount": "{amount} 기여하기",
+      "confirmed": "공공재 금고에 대한 {amount} ETH 기여가 확인되었습니다.",
+      "failed": "기여를 완료하지 못했습니다. 지갑을 확인한 뒤 다시 시도해 주세요."
+    }
   }
 }

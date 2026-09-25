@@ -19,6 +19,8 @@ export interface FakeTxFlow {
   flow: UseTxFlowResult;
   /** `ctx.writeContract` handed to the callbacks. */
   writeContract: jest.Mock;
+  /** `ctx.sendTransaction` (plain ETH sends) handed to the callbacks. */
+  sendTransaction: jest.Mock;
   /** Every `run` call's options, in order. */
   runs: TxRunOptions[];
   /** Receipt the fake "mines" (override `logs` to test receipt parsing). */
@@ -34,6 +36,7 @@ export interface FakeTxFlow {
 
 export function createFakeTxFlow(account: `0x${string}` = '0xUser' as `0x${string}`): FakeTxFlow {
   const writeContract = jest.fn(async () => '0xctxhash' as `0x${string}`);
+  const sendTransaction = jest.fn(async () => '0xsendhash' as `0x${string}`);
   const state: {
     success: string | null | undefined;
     failure: string | null | undefined;
@@ -42,6 +45,7 @@ export function createFakeTxFlow(account: `0x${string}` = '0xUser' as `0x${strin
 
   const fake: FakeTxFlow = {
     writeContract,
+    sendTransaction,
     runs: [],
     receipt: {
       status: 'success',
@@ -57,6 +61,7 @@ export function createFakeTxFlow(account: `0x${string}` = '0xUser' as `0x${strin
       state.failure = undefined;
       state.approvals = [];
       writeContract.mockClear();
+      sendTransaction.mockClear();
       run.mockClear();
     },
     flow: undefined as unknown as UseTxFlowResult,
@@ -67,7 +72,7 @@ export function createFakeTxFlow(account: `0x${string}` = '0xUser' as `0x${strin
     state.success = undefined;
     state.failure = undefined;
     state.approvals = [];
-    const ctx = { account, writeContract } as unknown as TxContext;
+    const ctx = { account, writeContract, sendTransaction } as unknown as TxContext;
     try {
       if (options.prepare && (await options.prepare(ctx)) === false) return { status: 'aborted' };
       for (const approval of options.approvals ?? []) {

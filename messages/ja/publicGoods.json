@@ -13,6 +13,18 @@
   },
   "contribute": {
     "title": "金庫への拠出",
-    "description": "ETHを公共財金庫へ直接送れます。プロトコルの分とともに、{beneficiary}のために受け取られるまで金庫で保管されます。"
+    "description": "{network}上でETHを公共財金庫へ直接送れます。プロトコルの分とともに、{beneficiary}のために受け取られるまで金庫で保管されます。",
+    "networkWarning": "{network}でのみ送ってください。ほかのネットワークでこのアドレスへ送ったETHは、金庫に届きません。",
+    "network": "ネットワーク",
+    "form": {
+      "label": "公共財金庫へETHを拠出する",
+      "amountHint": "{network}のウォレットから、0より大きい任意の数量を送れます。",
+      "connectHint": "拠出するには、{network}のウォレットを接続してください。",
+      "summary": "{amount}が{beneficiary}のために公共財金庫へ入ります。",
+      "submit": "ETHを拠出",
+      "submitAmount": "{amount}を拠出する",
+      "confirmed": "公共財金庫への{amount} ETHの拠出が確認されました。",
+      "failed": "拠出を完了できませんでした。ウォレットを確認してからもう一度お試しください。"
+    }
   }
 }

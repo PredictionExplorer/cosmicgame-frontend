@@ -4,7 +4,12 @@ import { createElement, useCallback, useEffect, useMemo, useRef, useState } from
 import { useTranslations } from 'next-intl';
 import { toast } from 'sonner';
 import { useConfig, useConnection, usePublicClient, useSwitchChain } from 'wagmi';
-import { writeContract, type Config, type WriteContractParameters } from '@wagmi/core';
+import {
+  sendTransaction,
+  writeContract,
+  type Config,
+  type WriteContractParameters,
+} from '@wagmi/core';
 import type {
   Abi,
   Address,
@@ -77,6 +82,12 @@ export interface TxContext {
   >(
     request: TxWriteRequest<abi, functionName, args>,
   ) => Promise<Hash>;
+  /**
+   * Sends plain ETH, with no calldata, on the protocol's chain: a payment to
+   * a contract's `receive()` (the Public Goods Vault). The signer is resolved
+   * when this runs, as for `writeContract`.
+   */
+  sendTransaction: (request: { to: Address; value: bigint }) => Promise<Hash>;
 }
 
 export interface TxApprovalStep {
@@ -274,6 +285,8 @@ export function useTxFlow(): UseTxFlowResult {
             ...request,
             chainId: activeChain.id,
           } as unknown as WriteContractParameters),
+        sendTransaction: ({ to, value }) =>
+          sendTransaction(config, { to, value, chainId: activeChain.id }),
       };
 
       const waitForReceipt = async (

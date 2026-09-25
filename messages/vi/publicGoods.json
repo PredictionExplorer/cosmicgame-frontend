@@ -13,6 +13,18 @@
   },
   "contribute": {
     "title": "Đóng góp vào kho",
-    "description": "Gửi ETH thẳng đến Kho Hàng hóa công. Số ETH này nằm trong kho cùng phần của giao thức cho đến khi được nhận về cho {beneficiary}."
+    "description": "Gửi ETH trên {network} thẳng đến Kho Hàng hóa công. Số ETH này nằm trong kho cùng phần của giao thức cho đến khi được nhận về cho {beneficiary}.",
+    "networkWarning": "Chỉ gửi trên {network}. ETH gửi đến địa chỉ này trên bất kỳ mạng nào khác sẽ không đến được kho.",
+    "network": "Mạng",
+    "form": {
+      "label": "Đóng góp ETH vào Kho Hàng hóa công",
+      "amountHint": "Bất kỳ số lượng nào lớn hơn 0, gửi từ ví trên {network}.",
+      "connectHint": "Kết nối ví trên {network} để đóng góp.",
+      "summary": "{amount} sẽ vào Kho Hàng hóa công cho {beneficiary}.",
+      "submit": "Đóng góp ETH",
+      "submitAmount": "Đóng góp {amount}",
+      "confirmed": "Đã xác nhận khoản đóng góp {amount} ETH vào Kho Hàng hóa công.",
+      "failed": "Khoản đóng góp chưa hoàn tất. Hãy kiểm tra ví và thử lại."
+    }
   }
 }
