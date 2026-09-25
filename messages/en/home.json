@@ -299,7 +299,7 @@
       "title": "Your Random Walk NFTs",
       "connect": "Connect a wallet to list the Random Walk NFTs it holds.",
       "error": "Could not read this wallet’s Random Walk NFTs. Try again in a moment.",
-      "linkedUnavailable": "Random Walk NFT #{tokenId} is not an unused NFT in this wallet, so it is not selected.",
+      "linkedUnavailable": "Random Walk NFT #{tokenId} is not in this wallet or was already used, so it was not selected.",
       "tooltipAria": "About Random Walk gesture discounts",
       "tooltip": "Attach a Random Walk NFT to an ETH gesture to receive a 50% Gesture Cost reduction. Each NFT can only be used once."
     },

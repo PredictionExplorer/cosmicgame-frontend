@@ -299,7 +299,7 @@
       "title": "你的 Random Walk NFT",
       "connect": "連接錢包後，即可列出其中的 Random Walk NFT。",
       "error": "無法讀取此錢包的 Random Walk NFT，請稍後再試。",
-      "linkedUnavailable": "Random Walk NFT #{tokenId} 不是此錢包中未使用過的 NFT，因此未被選取。",
+      "linkedUnavailable": "Random Walk NFT #{tokenId} 不在此錢包中，或已用於落筆，因此未被選取。",
       "tooltipAria": "了解 Random Walk 落筆價格減半規則",
       "tooltip": "ETH 落筆附加一枚 Random Walk NFT，落筆價格即減半。每枚 NFT 僅可使用一次。"
     },

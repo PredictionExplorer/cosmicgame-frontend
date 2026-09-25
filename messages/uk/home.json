@@ -299,7 +299,7 @@
       "title": "Ваші Random Walk NFT",
       "connect": "Під’єднайте гаманець, щоб побачити Random Walk NFT у ньому.",
       "error": "Не вдалося прочитати Random Walk NFT цього гаманця. Спробуйте трохи згодом.",
-      "linkedUnavailable": "Random Walk NFT #{tokenId} не є невикористаним NFT цього гаманця, тож його не вибрано.",
+      "linkedUnavailable": "Random Walk NFT #{tokenId} немає в цьому гаманці або його вже використано для жесту, тож його не вибрано.",
       "tooltipAria": "Про знижки Random Walk на жести",
       "tooltip": "Долучіть Random Walk NFT до ETH-жесту, щоб зменшити вартість жесту на 50%. Кожен NFT можна використати лише раз."
     },
