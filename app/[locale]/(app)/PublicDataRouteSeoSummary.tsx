@@ -700,10 +700,7 @@ export async function PublicDataRelatedPages({
   const tCommon = await getTranslations({ locale, namespace: 'common' });
   const headingId = `${route}-related-pages`;
   return (
-    <nav
-      aria-labelledby={headingId}
-      className={cn('border-t border-rule-faint pt-6 sm:hidden', className)}
-    >
+    <nav aria-labelledby={headingId} className={cn('sm:hidden', className)}>
       <h2 id={headingId} className="type-label text-subtle">
         {tCommon('pageHeader.relatedPages')}
       </h2>
