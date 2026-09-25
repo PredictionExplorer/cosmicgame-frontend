@@ -12,9 +12,9 @@ import { ScrollRail } from '@/components/ui/scroll-rail';
  * Home and End jump, one tab stop for the list):
  *
  *   segmented  a sunken track with the selected option raised on it, edged
- *              by a hairline: switching views of one thing (the default). It
- *              draws no --primary rule, so it never competes with an
- *              underline tab row above it for "current".
+ *              by the 3:1 control boundary (--input): switching views of one
+ *              thing (the default). It draws no --primary rule, so it never
+ *              competes with an underline tab row above it for "current".
  *   underline  a hairline with a 2px --primary indicator under the selected
  *              tab: page sub-navigation (statistics, detail, Trust Center)
  *   pills      separate chips, the selected one tinted: filters and short sets
@@ -60,8 +60,11 @@ const tabsTriggerVariants = cva(
       variant: {
         segmented: [
           'rounded-[calc(var(--radius-control)-2px)] px-3 py-1.5 sm:min-h-9',
-          'data-[state=active]:bg-surface-raised data-[state=active]:text-foreground data-[state=active]:shadow-[inset_0_0_0_1px_hsl(var(--rule))]',
-          'aria-[current=page]:bg-surface-raised aria-[current=page]:text-foreground aria-[current=page]:shadow-[inset_0_0_0_1px_hsl(var(--rule))]',
+          // The selected edge is --input, the control boundary tuned to 3:1 on
+          // every surface: the fill step alone is 1.1-1.3:1, below what a
+          // component's state needs (WCAG 1.4.11).
+          'data-[state=active]:bg-surface-raised data-[state=active]:text-foreground data-[state=active]:shadow-[inset_0_0_0_1px_hsl(var(--input))]',
+          'aria-[current=page]:bg-surface-raised aria-[current=page]:text-foreground aria-[current=page]:shadow-[inset_0_0_0_1px_hsl(var(--input))]',
         ],
         underline: [
           '-mb-px rounded-t-control px-3 pb-2.5 pt-2 sm:min-h-10',

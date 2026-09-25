@@ -6,7 +6,6 @@ import { useTranslations } from 'next-intl';
 import { Button } from '@/components/ui/button';
 import { DropdownMenuItem } from '@/components/ui/dropdown-menu';
 import { useWalletAccount, type WalletAccountState } from '@/hooks/useWalletAccount';
-import { stateTone } from '@/lib/stateTone';
 import { cn } from '@/lib/utils';
 import { shortenHex } from '@/utils/format';
 
@@ -18,7 +17,7 @@ function NetworkLine({ account }: { account: WalletAccountState }) {
     return (
       <p className="flex items-start gap-2 text-xs text-muted-foreground">
         <AlertTriangle
-          className={cn('mt-0.5 h-3.5 w-3.5 shrink-0', stateTone.attentionText)}
+          className={cn('mt-0.5 h-3.5 w-3.5 shrink-0', 'text-attention')}
           aria-hidden
         />
         <span>
@@ -34,10 +33,7 @@ function NetworkLine({ account }: { account: WalletAccountState }) {
   }
   return (
     <p className="flex items-center gap-2 text-xs text-muted-foreground">
-      <span
-        aria-hidden
-        className={cn('h-1.5 w-1.5 shrink-0 rounded-full', stateTone.positiveDot)}
-      />
+      <span aria-hidden className={cn('h-1.5 w-1.5 shrink-0 rounded-full', 'bg-positive')} />
       {t('network.connectedTo', { network: account.requiredChainName })}
     </p>
   );
@@ -151,7 +147,7 @@ export function WalletNetworkMenuItems() {
           className="cursor-pointer gap-2.5 px-2 font-semibold"
           onSelect={() => void account.switchToRequiredChain()}
         >
-          <Repeat className={cn('h-3.5 w-3.5', stateTone.attentionText)} aria-hidden />
+          <Repeat className={cn('h-3.5 w-3.5', 'text-attention')} aria-hidden />
           {t('network.switchTo', { network: account.requiredChainName })}
         </DropdownMenuItem>
       )}

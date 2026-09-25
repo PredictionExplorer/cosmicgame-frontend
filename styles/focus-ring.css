@@ -176,3 +176,28 @@
     outline-offset: 2px;
   }
 }
+
+/*
+ * Selected and current states in forced colours. The system draws almost every
+ * non-focus state with a background or an inset shadow (the selected tab and
+ * segment, the gesture method, the current page in the header, the option
+ * Enter will open), and forced colours reset both, so those states vanished
+ * for High Contrast readers. Each one gets a system-coloured outline drawn
+ * just inside it; the focus outline above still wins while an element has
+ * keyboard focus.
+ */
+@media (forced-colors: active) {
+  :where(
+    [data-state='active'],
+    [data-state='checked'],
+    [aria-selected='true'],
+    [aria-pressed='true'],
+    [aria-checked='true'],
+    [aria-current='page'],
+    [aria-current='true'],
+    [aria-current='location']
+  ):not(:focus-visible, [role='tabpanel']) {
+    outline: 2px solid Highlight;
+    outline-offset: -2px;
+  }
+}

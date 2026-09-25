@@ -76,4 +76,23 @@ describe('focus ring', () => {
       expect(css).toContain(`@utility ${utility} {`);
     },
   );
+
+  it('keeps selected and current states visible in forced colours', () => {
+    // Forced colours reset the backgrounds and inset shadows that draw the
+    // selected tab, the current page and the pressed option.
+    const start = css.lastIndexOf('@media (forced-colors: active)');
+    const block = css.slice(start);
+    for (const state of [
+      "[data-state='active']",
+      "[aria-selected='true']",
+      "[aria-pressed='true']",
+      "[aria-checked='true']",
+      "[aria-current='page']",
+    ]) {
+      expect(block).toContain(state);
+    }
+    expect(block).toMatch(/outline: 2px solid Highlight;/);
+    // A tab panel shares data-state="active" with its tab: never outline it.
+    expect(block).toContain(":not(:focus-visible, [role='tabpanel'])");
+  });
 });

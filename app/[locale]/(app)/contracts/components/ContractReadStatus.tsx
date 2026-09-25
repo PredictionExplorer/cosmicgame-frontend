@@ -39,5 +39,6 @@ export function ContractReadStatus({
         })
       : 'connecting';
   const ageMs = health.lastSuccessAtMs && nowMs > 0 ? nowMs - health.lastSuccessAtMs : 0;
-  return <LiveStatusView state={state} ageMs={ageMs} variant="inline" still />;
+  // Still, but the page's one stamp: it still speaks its changes.
+  return <LiveStatusView state={state} ageMs={ageMs} variant="inline" still announce />;
 }

@@ -7,12 +7,22 @@ import { cn } from '@/lib/utils';
 /** What counts as the current item, on tabs, links and options alike. */
 const ACTIVE_SELECTOR = '[data-state="active"], [aria-current="page"], [aria-selected="true"]';
 
-/** Width of each edge fade. */
-const FADE = '1.75rem';
+/**
+ * Width of each edge fade: wide enough that what little of an item it covers
+ * reads as fading out, not as a clipped word.
+ */
+const FADE_REM = 2.5;
+const FADE = `${FADE_REM}rem`;
 
 /** Anything a keyboard can reach inside the track. */
 const FOCUSABLE_SELECTOR =
   'a[href], button, input, select, textarea, summary, [tabindex]:not([tabindex="-1"])';
+
+/** The row's items: the children of the element the track scrolls. */
+function railItems(track: HTMLElement): HTMLElement[] {
+  const row = track.firstElementChild;
+  return row ? (Array.from(row.children) as HTMLElement[]) : [];
+}
 
 export interface ScrollRailProps extends React.HTMLAttributes<HTMLDivElement> {
   /** CSS selector for the item to keep in view. */
@@ -69,12 +79,31 @@ export const ScrollRail = React.forwardRef<HTMLDivElement, ScrollRailProps>(
         if (!track || !active || typeof track.scrollBy !== 'function') return;
         const trackBox = track.getBoundingClientRect();
         const box = active.getBoundingClientRect();
-        // Keep a fade's width of room beside the item (1.75rem).
-        const inset = (parseFloat(getComputedStyle(track).fontSize) || 16) * 1.75;
+        // Keep a fade's width of room beside the item.
+        const inset = (parseFloat(getComputedStyle(track).fontSize) || 16) * FADE_REM;
+        const items = railItems(track);
+        const index = items.findIndex((item) => item.contains(active));
         if (box.left < trackBox.left + inset) {
-          track.scrollBy({ left: box.left - trackBox.left - inset, behavior });
+          // Hidden to the start: bring in the item before it too, whole, so
+          // the row never opens on a fragment ("ource code").
+          const lead = items[index - 1] ?? active;
+          track.scrollBy({
+            left: lead.getBoundingClientRect().left - trackBox.left - inset,
+            behavior,
+          });
         } else if (box.right > trackBox.right - inset) {
-          track.scrollBy({ left: box.right - trackBox.right + inset, behavior });
+          let delta = box.right - trackBox.right + inset;
+          // Round on to the next item boundary: the item that would sit cut
+          // under the start fade scrolls out of view entirely.
+          const edge = trackBox.left + delta + inset;
+          const cut = items.find((item) => {
+            const itemBox = item.getBoundingClientRect();
+            return itemBox.left < edge && itemBox.right > edge;
+          });
+          if (cut && !cut.contains(active)) {
+            delta = cut.getBoundingClientRect().right - trackBox.left - inset;
+          }
+          track.scrollBy({ left: delta, behavior });
         }
       },
       [activeSelector],
@@ -131,13 +160,19 @@ export const ScrollRail = React.forwardRef<HTMLDivElement, ScrollRailProps>(
           aria-label={focusableTrack ? label : undefined}
           className={cn(
             'flex min-w-0 overflow-x-auto overscroll-x-contain scroll-smooth scrollbar-none motion-reduce:scroll-auto',
+            // The row inside never shrinks to the rail: its own box (an
+            // underline row's hairline, a segmented track's fill) spans all
+            // of its items, not just the first screenful.
+            '[&>*]:shrink-0',
+            // A flick settles on an item's start, beside the fade.
+            'snap-x snap-proximity [&>*>*]:snap-start',
             // The track clips anything outside it (and its mask hides what
             // lies past its box), so focus rings draw inside their item, and
             // inside the track when the track itself takes focus.
             '[&_:focus-visible]:outline-offset-[-2px] focus-visible:outline-offset-[-2px]',
             trackClassName,
           )}
-          style={{ maskImage: mask, WebkitMaskImage: mask }}
+          style={{ maskImage: mask, WebkitMaskImage: mask, scrollPaddingInline: FADE }}
         >
           {children}
         </div>
