@@ -17,11 +17,10 @@ jest.mock('../../anchoring/GlobalAnchoredTokensTable', () => ({
     <div data-testid="global-staked-tokens">IsRWLK={String(IsRWLK)}</div>
   ),
 }));
-jest.mock('../../tables/UniqueAnchorHoldersCSTTable', () => ({
-  UniqueAnchorHoldersCSTTable: () => <div data-testid="unique-cst-anchorHolders" />,
-}));
-jest.mock('../../tables/UniqueAnchorHoldersRWLKTable', () => ({
-  UniqueAnchorHoldersRWLKTable: () => <div data-testid="unique-rwlk-anchorHolders" />,
+jest.mock('../../tables/AnchorHoldersTable', () => ({
+  AnchorHoldersTable: ({ collection }: { collection: string }) => (
+    <div data-testid={`anchor-holders-${collection}`} />
+  ),
 }));
 function dataState<T>(data: T[] = [], overrides: Partial<AnchoringDataState<T>> = {}) {
   return { data, isLoading: false, isError: false, onRetry: jest.fn(), ...overrides };

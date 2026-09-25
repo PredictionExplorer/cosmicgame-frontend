@@ -42,11 +42,10 @@ jest.mock('../../../../../../components/anchoring/GlobalAnchorActionsTable', () 
 jest.mock('../../../../../../components/anchoring/GlobalAnchoredTokensTable', () => ({
   GlobalAnchoredTokensTable: () => <div data-testid="global-anchored-tokens-table" />,
 }));
-jest.mock('../../../../../../components/tables/UniqueAnchorHoldersCSTTable', () => ({
-  UniqueAnchorHoldersCSTTable: () => <div data-testid="unique-anchor-holders-cst-table" />,
-}));
-jest.mock('../../../../../../components/tables/UniqueAnchorHoldersRWLKTable', () => ({
-  UniqueAnchorHoldersRWLKTable: () => <div data-testid="unique-anchor-holders-rwlk-table" />,
+jest.mock('../../../../../../components/tables/AnchorHoldersTable', () => ({
+  AnchorHoldersTable: ({ collection }: { collection: string }) => (
+    <div data-testid={`anchor-holders-table-${collection}`} />
+  ),
 }));
 
 function okQuery<T>(data: T) {

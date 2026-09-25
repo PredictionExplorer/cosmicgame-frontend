@@ -12,11 +12,9 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import { GlobalAnchorActionsTable } from '@/components/anchoring/GlobalAnchorActionsTable';
 import { GlobalAnchoredTokensTable } from '@/components/anchoring/GlobalAnchoredTokensTable';
-import { UniqueAnchorHoldersCSTTable } from '@/components/tables/UniqueAnchorHoldersCSTTable';
-import { UniqueAnchorHoldersRWLKTable } from '@/components/tables/UniqueAnchorHoldersRWLKTable';
-import type { UniqueAnchorHolderCST } from '@/components/tables/UniqueAnchorHoldersCSTTable';
-import type { UniqueAnchorHolderRWLK } from '@/components/tables/UniqueAnchorHoldersRWLKTable';
+import { AnchorHoldersTable } from '@/components/tables/AnchorHoldersTable';
 import type { AnchorAction, AnchoredTokenInfo } from '@/services/api';
+import type { UniqueAnchorHolderCST, UniqueAnchorHolderRWLK } from '@/services/api/types';
 
 import { StatsSection } from './StatsSection';
 
@@ -220,7 +218,10 @@ export function AnchoringSection({
           state={uniqueCSTAnchorHolders}
           emptyTitle={t('anchoringPage.empty.holders')}
         >
-          <UniqueAnchorHoldersCSTTable list={uniqueCSTAnchorHolders.data ?? []} />
+          <AnchorHoldersTable
+            collection="cosmicSignature"
+            list={uniqueCSTAnchorHolders.data ?? []}
+          />
         </AnchoringTableSection>
       </TabsContent>
 
@@ -253,7 +254,7 @@ export function AnchoringSection({
           state={uniqueRWLKAnchorHolders}
           emptyTitle={t('anchoringPage.empty.holders')}
         >
-          <UniqueAnchorHoldersRWLKTable list={uniqueRWLKAnchorHolders.data ?? []} />
+          <AnchorHoldersTable collection="randomWalk" list={uniqueRWLKAnchorHolders.data ?? []} />
         </AnchoringTableSection>
       </TabsContent>
     </Tabs>

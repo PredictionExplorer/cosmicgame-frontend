@@ -26,9 +26,11 @@ import {
   AnchoringSection,
   type AnchoringDataState,
 } from '@/components/statistics/AnchoringSection';
-import type { UniqueAnchorHolderCST } from '@/components/tables/UniqueAnchorHoldersCSTTable';
-import type { UniqueAnchorHolderRWLK } from '@/components/tables/UniqueAnchorHoldersRWLKTable';
-import type { DashboardInfo } from '@/services/api/types';
+import type {
+  DashboardInfo,
+  UniqueAnchorHolderCST,
+  UniqueAnchorHolderRWLK,
+} from '@/services/api/types';
 
 function toDataState<T>(query: UseQueryResult<T[], Error>): AnchoringDataState<T> {
   return {
