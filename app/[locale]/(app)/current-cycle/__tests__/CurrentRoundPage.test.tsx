@@ -263,11 +263,15 @@ describe('CurrentRoundPage', () => {
     const badge = screen.getByTestId('live-badge');
     expect(badge).toHaveTextContent('home.chrono.phase.live.label');
     expect(badge).toHaveAttribute('data-tone', 'live');
-    // The one Cycle clock: padded groups, as on the app home and the landing.
+    // The one Cycle clock: padded groups, as on the app home and the landing
+    // (HH:MM:SS under a day; the fixture's 20 hours may have ticked a second).
     const clock = screen.getByTestId('cycle-status-clock');
-    expect(
-      Array.from(clock.querySelectorAll('[data-testid="countdown-value"]'), (n) => n.textContent),
-    ).toEqual(['20', '00', '00']);
+    const groups = Array.from(
+      clock.querySelectorAll('[data-testid="countdown-value"]'),
+      (n) => n.textContent,
+    );
+    expect(groups).toHaveLength(3);
+    expect(groups.join(':')).toMatch(/^(20:00:00|19:59:5\d)$/);
     expect(screen.getByText('home.chrono.phase.live.status')).toBeInTheDocument();
   });
 

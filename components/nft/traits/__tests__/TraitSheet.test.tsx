@@ -23,7 +23,7 @@ describe('TraitSheet', () => {
       within(screen.getByTestId('trait-row-palette')).getByTestId('hue-strip'),
     ).toBeInTheDocument();
     expect(screen.getByTestId('trait-row-chaos')).toContainElement(screen.getByRole('meter'));
-    expect(screen.getByTestId('trait-row-cycle')).toHaveTextContent('Cycle 0');
+    expect(screen.getByTestId('trait-row-cycle')).toHaveTextContent('Cycle #0');
     expect(screen.getByRole('link', { name: 'View cycle 0' })).toHaveAttribute(
       'href',
       '/allocation/0',

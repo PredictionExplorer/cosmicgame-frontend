@@ -68,7 +68,7 @@ describe('StatisticsHubPanel', () => {
 
   it('opens on the live cycle: when it opened, what it has taken in, and its daily rhythm', () => {
     render(<StatisticsHubPanel />);
-    const cycle = screen.getByRole('region', { name: 'Cycle 3 so far' });
+    const cycle = screen.getByRole('region', { name: 'Cycle #3 so far' });
     expect(within(cycle).getByText(hub.cycle.opened)).toBeInTheDocument();
     expect(within(cycle).getByText(metrics.ethInGesturesCurrentCycle.label)).toBeInTheDocument();
     const eth = within(cycle).getByText(metrics.ethInGesturesCurrentCycle.label).parentElement!;
@@ -206,7 +206,7 @@ describe('StatisticsHubPanel', () => {
 
   it("dates the opening of the cycle in the reader's zone, as every page does, named inline", () => {
     render(<StatisticsHubPanel />);
-    const cycle = screen.getByRole('region', { name: 'Cycle 3 so far' });
+    const cycle = screen.getByRole('region', { name: 'Cycle #3 so far' });
     const opened = within(cycle).getByText(hub.cycle.opened).parentElement!;
     // The same compact local date-time the current cycle prints for this moment...
     const local = formatDateTime(1_700_000_000, {

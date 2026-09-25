@@ -288,7 +288,10 @@ describe('AllocationInfoPage', () => {
       expect(screen.getByTestId('allocation-split')).toBeInTheDocument();
       // Only the gesture tab waits for the gestures.
       expect(screen.queryByTestId('gesture-history-table')).not.toBeInTheDocument();
-      expect(screen.getByRole('tabpanel')).toHaveTextContent('');
+      // It holds the ledger's skeleton, which says once, in words, that rows are loading.
+      expect(within(screen.getByRole('tabpanel')).getByRole('status')).toHaveTextContent(
+        'tables.skeleton.loadingRows',
+      );
     });
   });
 

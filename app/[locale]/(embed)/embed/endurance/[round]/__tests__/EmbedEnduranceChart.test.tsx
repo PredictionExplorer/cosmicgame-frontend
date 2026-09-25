@@ -78,7 +78,7 @@ describe('EmbedEnduranceChart', () => {
   it('claims neither live nor final while the dashboard loads', () => {
     mockUseDashboardInfo.mockReturnValue(dashboard({ isLoading: true }));
     render(<EmbedEnduranceChart roundNum={3} />);
-    expect(screen.getByRole('heading', { level: 1 })).toHaveTextContent('Cycle 3');
+    expect(screen.getByRole('heading', { level: 1 })).toHaveTextContent('Cycle #3');
     expect(screen.queryByText('Live cycle')).not.toBeInTheDocument();
     expect(screen.queryByText('Final')).not.toBeInTheDocument();
     expect(screen.queryByTestId('endurance-chart')).not.toBeInTheDocument();
