@@ -69,7 +69,7 @@ export default async function LearnIndexPage({ params }: PageProps) {
         )}
       />
 
-      <PageHeader variant="reading" title={hub.h1} subtitle={hub.intro} />
+      <PageHeader variant="reading" host="landing" title={hub.h1} subtitle={hub.intro} />
 
       {LEARN_GROUP_IDS.map((groupId, groupIndex) => {
         const guides = articles

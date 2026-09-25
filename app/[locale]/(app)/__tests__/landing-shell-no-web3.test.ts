@@ -1,22 +1,23 @@
-import { existsSync, readFileSync } from 'node:fs';
-import { dirname, resolve } from 'node:path';
+import { existsSync, readdirSync, readFileSync, statSync } from 'node:fs';
+import { dirname, join, relative, resolve } from 'node:path';
 
 /**
- * LandingShell contract enforcement.
+ * Landing contract enforcement: no Web3 on cosmicsignature.com.
  *
- * The root layout (app/layout.tsx) branches the provider tree by host:
- * - landing host  → <LandingShell>     (no Web3)
- * - app host      → <Providers>        (wagmi + RainbowKit + WalletConnect + ...)
+ * The marketing route group (`app/[locale]/(landing)`) renders its own root
+ * layout with the lightweight <LandingShell>, while the app group renders the
+ * full <Providers> tree (wagmi + RainbowKit + WalletConnect + ...). This test
+ * locks that split so a future refactor cannot silently pull wallet or
+ * smart-contract code into the marketing host.
  *
- * This test locks that contract so a future refactor cannot silently pull
- * wallet / smart-contract code into the marketing landing page's client
- * bundle.
- *
- * Approach: statically walk `import ... from '...'` lines starting at
- * `app/landing-shell.tsx`, follow every relative / @-aliased import into
- * repo source, and collect the set of *external* npm-package specifiers
- * the subtree reaches. We then assert that set is disjoint from a
- * banned list of Web3-shaped packages.
+ * Approach: statically walk `import ... from '...'` lines from every file the
+ * landing group can render (each layout, page, template, error and not-found
+ * file, the shell, and every 'use client' island in the landing component
+ * trees), follow every relative / @-aliased import into repo source, and
+ * collect the *external* npm-package specifiers each root reaches. Each set
+ * must be disjoint from a banned list of Web3-shaped packages. The walk
+ * includes server components on purpose: a server file that reaches a wallet
+ * package is one 'use client' away from shipping it.
  *
  * Limitations (intentional — this is a guardrail, not a linter):
  *   - Static imports only. Dynamic `import()` is not followed; we trust
@@ -32,8 +33,21 @@ import { dirname, resolve } from 'node:path';
 
 const REPO_ROOT = resolve(__dirname, '..', '..', '..', '..');
 
-const LANDING_SHELL = resolve(REPO_ROOT, 'app/[locale]/(landing)/landing-shell.tsx');
+const LANDING_GROUP = resolve(REPO_ROOT, 'app/[locale]/(landing)');
+const LANDING_SHELL = resolve(LANDING_GROUP, 'landing-shell.tsx');
 const APP_PROVIDERS = resolve(REPO_ROOT, 'app/[locale]/(app)/providers.tsx');
+
+/** Component trees only the landing group renders; each 'use client' file is a root. */
+const LANDING_COMPONENT_TREES = [
+  'components/landing-v2',
+  'components/learn',
+  'components/quiz',
+  'components/reading',
+  'components/white-paper',
+].map((dir) => resolve(REPO_ROOT, dir));
+
+/** Next.js route files that render UI (opengraph images are server-only handlers). */
+const ROUTE_ENTRY = /^(layout|page|template|error|not-found|loading|default)\.tsx$/;
 
 const BANNED_PACKAGES: ReadonlyArray<RegExp> = [
   /^wagmi(\/|$)/,
@@ -90,40 +104,108 @@ function resolveLocal(fromFile: string, spec: string): string | null {
 }
 
 function walkImports(entry: string): Set<string> {
-  const visited = new Set<string>();
-  const externals = new Set<string>();
+  return new Set(walkImportChains(entry).keys());
+}
 
-  function visit(file: string): void {
+/**
+ * Every external specifier reachable from `entry`, each with the first import
+ * chain that reaches it (entry first), so a failure names the path to fix.
+ */
+function walkImportChains(entry: string): Map<string, string[]> {
+  const visited = new Set<string>();
+  const externals = new Map<string, string[]>();
+
+  function visit(file: string, chain: string[]): void {
     if (visited.has(file)) return;
     visited.add(file);
+    const path = [...chain, relative(REPO_ROOT, file)];
     for (const spec of extractStaticImports(file)) {
       // Skip `.css` / style-only imports — they never introduce client JS.
       if (/\.(css|scss|less|sass)$/.test(spec)) continue;
       const local = resolveLocal(file, spec);
       if (local) {
-        visit(local);
-      } else {
-        externals.add(spec);
+        visit(local, path);
+      } else if (!externals.has(spec)) {
+        externals.set(spec, path);
       }
     }
   }
 
-  visit(entry);
+  visit(entry, []);
   return externals;
 }
 
-describe('LandingShell contract — no Web3 in landing bundle', () => {
-  const landingExternals = [...walkImports(LANDING_SHELL)];
+function sourceFiles(dir: string): string[] {
+  return readdirSync(dir).flatMap((name) => {
+    const path = join(dir, name);
+    if (statSync(path).isDirectory()) return name === '__tests__' ? [] : sourceFiles(path);
+    return /\.(ts|tsx)$/.test(name) ? [path] : [];
+  });
+}
 
-  it.each(BANNED_PACKAGES)('landing-shell transitive imports do not reach %s', (banned) => {
-    const hits = landingExternals.filter((spec) => banned.test(spec));
-    expect(hits).toEqual([]);
+const isClientModule = (file: string): boolean =>
+  /^\s*['"]use client['"]/.test(readFileSync(file, 'utf8'));
+
+const fileName = (file: string): string => file.slice(file.lastIndexOf('/') + 1);
+
+/** Every file the landing group can render: route entries, the shell, client islands. */
+const LANDING_ROOTS: ReadonlyArray<string> = [
+  ...new Set([
+    LANDING_SHELL,
+    ...sourceFiles(LANDING_GROUP).filter((file) => ROUTE_ENTRY.test(fileName(file))),
+    ...sourceFiles(LANDING_GROUP).filter(isClientModule),
+    ...LANDING_COMPONENT_TREES.flatMap(sourceFiles).filter(isClientModule),
+  ]),
+].sort();
+
+const label = (file: string): string => relative(REPO_ROOT, file);
+
+const bannedHits = (externals: Map<string, string[]>, banned: ReadonlyArray<RegExp>): string[] =>
+  [...externals.entries()]
+    .filter(([spec]) => banned.some((pattern) => pattern.test(spec)))
+    .map(([spec, chain]) => `${spec} via ${chain.join(' -> ')}`);
+
+describe('Landing contract — no Web3 anywhere the landing group renders', () => {
+  it('walks the shell, every route entry and every client island', () => {
+    expect(LANDING_ROOTS.map(label)).toEqual(
+      expect.arrayContaining([
+        'app/[locale]/(landing)/landing-shell.tsx',
+        'app/[locale]/(landing)/layout.tsx',
+        'app/[locale]/(landing)/landing-site/page.tsx',
+        'app/[locale]/(landing)/about/page.tsx',
+        'app/[locale]/(landing)/learn/[slug]/page.tsx',
+        'app/[locale]/(landing)/quiz/[tier]/page.tsx',
+        'app/[locale]/(landing)/white-paper/page.tsx',
+        'components/landing-v2/ImprintedFigure.tsx',
+        'components/quiz/QuizRunner.tsx',
+      ]),
+    );
   });
 
-  it('landing-shell transitive imports list is non-empty (sanity)', () => {
+  describe.each(LANDING_ROOTS.map((root) => [label(root), root] as const))('%s', (_, root) => {
+    const externals = walkImportChains(root);
+
+    it('reaches no Web3 package', () => {
+      expect(bannedHits(externals, BANNED_PACKAGES)).toEqual([]);
+    });
+
+    it('never reaches axios or zod', () => {
+      // The landing countdown once imported the services/api barrel, which
+      // pulled axios + the full zod schema module (~90 KB gzip) into the
+      // marketing bundle for three display-only reads. It now uses zod-free
+      // fetch helpers (components/landing-v2/landing-cycle-data.ts).
+      expect(bannedHits(externals, [/^axios(\/|$)/, /^zod(\/|$)/])).toEqual([]);
+    });
+  });
+
+  it.each(
+    LANDING_ROOTS.filter((root) => !isClientModule(root) || root === LANDING_SHELL).map(label),
+  )('%s has a non-empty import walk (sanity)', (root) => {
     // Prevents a regression where the walker silently returns nothing
-    // (e.g., due to a file rename) and every ban trivially passes.
-    expect(landingExternals.length).toBeGreaterThan(0);
+    // (e.g., a broken resolver) and every ban trivially passes. Route
+    // entries always import React, Next or next-intl; a client island may
+    // be a leaf module, so it is not held to this.
+    expect(walkImportChains(resolve(REPO_ROOT, root)).size).toBeGreaterThan(0);
   });
 
   it('positive control: app Providers tree DOES import wagmi', () => {
@@ -132,26 +214,6 @@ describe('LandingShell contract — no Web3 in landing bundle', () => {
     // that happens so the test stays meaningful.
     const appExternals = [...walkImports(APP_PROVIDERS)];
     expect(appExternals.some((spec) => /^wagmi(\/|$)/.test(spec))).toBe(true);
-  });
-});
-
-describe('Landing page contract — no schema/transport stack on the marketing host', () => {
-  const LANDING_PAGE = resolve(REPO_ROOT, 'app/[locale]/(landing)/landing-site/page.tsx');
-
-  it('landing-site page tree never reaches axios or zod', () => {
-    // The landing countdown once imported the services/api barrel, which
-    // pulled axios + the full zod schema module (~90 KB gzip) into the
-    // marketing bundle for three display-only reads. It now uses zod-free
-    // fetch helpers (components/landing-v2/landing-cycle-data.ts).
-    const landingPageExternals = [...walkImports(LANDING_PAGE)];
-    for (const banned of [/^axios(\/|$)/, /^zod(\/|$)/]) {
-      const hits = landingPageExternals.filter((spec) => banned.test(spec));
-      expect(hits).toEqual([]);
-    }
-  });
-
-  it('landing-site page tree is non-empty (sanity)', () => {
-    expect([...walkImports(LANDING_PAGE)].length).toBeGreaterThan(0);
   });
 });
 

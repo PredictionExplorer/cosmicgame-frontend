@@ -192,6 +192,7 @@ export default async function LearnArticlePage({ params }: PageProps) {
       <div className="mb-8 border-b border-rule sm:mb-10 lg:grid lg:grid-cols-[minmax(0,1fr)_minmax(0,26rem)] lg:items-end lg:gap-12 xl:gap-16">
         <PageHeader
           variant="reading"
+          host="landing"
           breadcrumbs={[{ label: articleUi.breadcrumbs.learnLabel, href: '/learn' }]}
           title={article.h1}
           titleId={TITLE_ID}

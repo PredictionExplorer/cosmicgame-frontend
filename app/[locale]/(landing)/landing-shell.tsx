@@ -3,15 +3,14 @@
 /**
  * Landing-host client shell.
  *
- * The root layout renders this on the marketing host (cosmicsignature.com,
- * cosmicsignature.com) INSTEAD of the full-featured <Providers> used
- * on app.cosmicsignature.com. That keeps every Web3-specific dependency
- * — wagmi, viem, RainbowKit, WalletConnect, Coinbase SDK, MetaMask SDK —
- * out of the landing page's client bundle.
+ * The marketing route group's root layout (`app/[locale]/(landing)/layout.tsx`)
+ * renders this on cosmicsignature.com INSTEAD of the full-featured
+ * <Providers> the app group renders on app.cosmicsignature.com. That keeps
+ * every Web3-specific dependency — wagmi, viem, RainbowKit, WalletConnect,
+ * Coinbase SDK, MetaMask SDK — out of the landing's client bundle.
  *
  * What this shell DOES ship:
  *   - React Cookies context (for analytics consent banner).
- *   - Sonner toaster (small, used by a few shared components).
  *   - Global error handlers (reportError wiring).
  *   - Error boundary.
  *   - The landing header and footer, as top-level landmarks around every
@@ -26,15 +25,18 @@
  *     NotificationProvider — all protocol-state contexts
  *
  * Any static import added here should be reviewed against that contract;
- * see app/__tests__/landing-shell.test.ts for the enforcement check.
+ * app/[locale]/(app)/__tests__/landing-shell-no-web3.test.ts enforces it for
+ * this shell, every landing route file and every landing client island.
+ *
+ * No toaster: nothing on the landing host raises a toast (sonner is used
+ * only by the app's notification and transaction flows), so shipping one
+ * would add dead client code and an unlabelled, English-only live region.
  */
 
 import { useEffect, type ReactNode } from 'react';
 import { CookiesProvider } from 'react-cookie';
-import { Toaster } from 'sonner';
 import { MotionConfig } from 'framer-motion';
 
-import { NOTIFICATION_AUTO_HIDE_MS } from '@/config/constants';
 import ErrorBoundary from '@/components/layout/ErrorBoundary';
 import { LandingHeader, type LandingSectionLabels } from '@/components/landing-v2/LandingHeader';
 import { SkipLink } from '@/components/ui/skip-link';
@@ -72,16 +74,6 @@ export function LandingShell({
               </div>
               {footer}
             </div>
-            <Toaster
-              position="top-right"
-              theme="dark"
-              richColors
-              closeButton
-              toastOptions={{
-                duration: NOTIFICATION_AUTO_HIDE_MS,
-                className: 'border border-rule bg-popover shadow-float',
-              }}
-            />
           </TooltipProvider>
         </CookiesProvider>
       </MotionConfig>

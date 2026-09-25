@@ -133,6 +133,7 @@ export default async function QuizTierPage({ params }: PageProps) {
           only the runner holds to the reading measure. */}
       <PageHeader
         variant="reading"
+        host="landing"
         breadcrumbs={[
           { label: learnLabel, href: '/learn' },
           { label: hub.breadcrumbs.quizLabel, href: QUIZ_PATH },

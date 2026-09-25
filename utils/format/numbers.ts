@@ -1,7 +1,3 @@
-// The `viem/utils` entry: pure helpers, and the real implementation under the
-// jest mock of `viem`, so wei precision is tested for real.
-import { formatUnits } from 'viem/utils';
-
 import { pickByLocale, type LocaleRecord } from '@/i18n/locale';
 import { getLocaleConfig } from '@/i18n/localeConfig';
 
@@ -296,10 +292,25 @@ const TINY_SIGNIFICANT_DIGITS = 4;
 const significantFractionLength = (decimal: string): number =>
   (decimal.split('.')[1] ?? '').replace(/0+$/, '').length;
 
+/**
+ * A bigint of base units as a plain decimal string ("1234000000000000000005"
+ * wei → "1234.000000000000000005"), trailing fraction zeros trimmed. The same
+ * result as viem's `formatUnits`, written here so the formatting layer, which
+ * the landing's client islands import, never pulls viem into the marketing
+ * bundle (app/[locale]/(app)/__tests__/landing-shell-no-web3.test.ts).
+ */
+function baseUnitsToDecimal(value: bigint, decimals: number): string {
+  const negative = value < 0n;
+  const digits = (negative ? -value : value).toString().padStart(decimals + 1, '0');
+  const integer = digits.slice(0, digits.length - decimals);
+  const fraction = digits.slice(digits.length - decimals).replace(/0+$/, '');
+  return `${negative ? '-' : ''}${integer}${fraction ? `.${fraction}` : ''}`;
+}
+
 /** Plain decimal string of an amount input, or `null` when it is not a number. */
 function toDecimalString(value: AmountInput, decimals: number): string | null {
   if (value == null) return null;
-  if (typeof value === 'bigint') return formatUnits(value, decimals);
+  if (typeof value === 'bigint') return baseUnitsToDecimal(value, decimals);
   if (typeof value === 'number') {
     if (!Number.isFinite(value)) return null;
     // Intl prints the shortest round-trip form and never exponent notation.

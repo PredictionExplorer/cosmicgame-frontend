@@ -3,8 +3,9 @@ import { latestArtworkCard, ogImageMetadata } from '@/lib/og/cards';
 import { getOgCopy } from '@/lib/og/copy';
 
 /**
- * The marketing host's brand card, inherited by the pages without their own
- * (the white paper, the quiz and its tiers) through `createPageMetadata`.
+ * The marketing host's brand card. The home, About, Learn and its guides, the
+ * white paper and the quiz (with its tiers) each draw their own card; a
+ * landing route without one inherits this.
  */
 export const contentType = 'image/png';
 export const size = COSMIC_OG_SIZE;

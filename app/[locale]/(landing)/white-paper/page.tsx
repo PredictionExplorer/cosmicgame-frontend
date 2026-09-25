@@ -436,6 +436,7 @@ export default async function WhitePaperPage({ params }: PageProps) {
 
       <PageHeader
         variant="reading"
+        host="landing"
         eyebrow={content.hero.eyebrow}
         title={content.hero.title}
         titleId={TITLE_ID}

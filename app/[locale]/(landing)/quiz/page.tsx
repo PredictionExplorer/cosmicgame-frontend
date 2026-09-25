@@ -68,6 +68,7 @@ export default async function QuizHubPage({ params }: PageProps) {
 
       <PageHeader
         variant="reading"
+        host="landing"
         breadcrumbs={[{ label: learn.hub.breadcrumbs.learnLabel, href: '/learn' }]}
         eyebrow={hub.eyebrow}
         title={hub.h1}

@@ -40,7 +40,7 @@ export default async function Page({ params }: PageProps) {
   ]);
   const description = meta('siteMap.description');
   const inLanguage = jsonLdInLanguage(locale);
-  // Only slugs and titles cross to the client, not the articles' bodies.
+  // The site map lists only each guide's slug and title, not its body.
   const articles = getLearnContent(locale).articles.map(({ slug, h1 }) => ({ slug, title: h1 }));
 
   return (

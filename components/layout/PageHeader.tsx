@@ -2,7 +2,7 @@ import type { ReactNode } from 'react';
 import { ArrowRight, ArrowUpRight } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 
-import { classifyHref } from '@/config/siteNav';
+import { classifyHref, type SiteHost } from '@/config/siteNav';
 import { Link } from '@/i18n/navigation';
 import { cn } from '@/lib/utils';
 import { Breadcrumbs, type BreadcrumbItem } from '@/components/ui/breadcrumbs';
@@ -122,6 +122,12 @@ export interface PageHeaderProps {
   related?: readonly PageHeaderLink[];
   /** Accessible name of the related-pages nav. Defaults to "Related pages". */
   relatedLabel?: string;
+  /**
+   * The host the page is served on, so a related link to the other Cosmic
+   * Signature host is classified as cross-host (and one to this host as
+   * internal). Defaults to `app`; the landing's reading pages pass `landing`.
+   */
+  host?: SiteHost;
   /** Right-aligned action cluster (buttons, links). Stacks below the title on phones. */
   actions?: ReactNode;
   /** Extra header content, rendered after the related pages (an address chip, a network badge). */
@@ -172,7 +178,7 @@ function buildTrail(
 }
 
 /**
- * The one page header of the app: wayfinding (section eyebrow or breadcrumb
+ * The one page header on both hosts: wayfinding (section eyebrow or breadcrumb
  * trail), one H1, the lede, the summary figures, a meta line (snapshot, live
  * status, review date) and related pages. Server-rendered summaries render
  * INTO it; a page never stacks a second header. Renders no client hooks, so it
@@ -201,6 +207,7 @@ export function PageHeader({
   meta,
   related,
   relatedLabel,
+  host = 'app',
   actions,
   children,
   tabs,
@@ -330,7 +337,7 @@ export function PageHeader({
             {related.map((link) => {
               // Third-party pages open in a new tab and carry its arrow; the
               // other Cosmic Signature host stays in this tab, like a page here.
-              const kind = classifyHref(link.href, 'app');
+              const kind = classifyHref(link.href, host);
               const Icon = kind === 'external' ? ArrowUpRight : ArrowRight;
               return (
                 <li key={link.href}>
