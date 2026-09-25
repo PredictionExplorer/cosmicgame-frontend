@@ -80,10 +80,12 @@ export function Steps({
               aria-hidden
               className="absolute bottom-0 left-4 top-10 w-px -translate-x-1/2 bg-rule group-last/step:hidden"
             />
+            {/* The numeral of a stage diagram's circles (how-it-works'
+                CycleTimeline), on a node one size up for the rail. */}
             <span
               aria-hidden
               data-slot="step-index"
-              className="flex size-8 items-center justify-center rounded-pill border border-rule bg-surface-raised type-label tabular-nums text-foreground"
+              className="flex size-8 items-center justify-center rounded-pill border border-rule bg-surface-raised type-caption font-medium tabular-nums text-foreground"
             >
               {index + 1}
             </span>

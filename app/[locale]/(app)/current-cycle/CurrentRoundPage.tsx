@@ -9,6 +9,7 @@ import { getEnduranceChampions } from '@/utils';
 import { StandingsLedger } from '@/components/home/observatory/StandingsLedger';
 import { PageShell } from '@/components/ui/page-shell';
 import { ErrorState } from '@/components/ui/error-state';
+import { SectionHeader } from '@/components/ui/section-header';
 import { Skeleton, SkeletonTable } from '@/components/ui/skeleton';
 import type { DonatedERC20Token } from '@/components/attachments/AttachedERC20Table';
 import type { EthDonation } from '@/components/tables/EthDonationTable';
@@ -35,21 +36,45 @@ import { useActiveWeb3React } from '@/hooks/web3';
 import { cyclePhaseView } from './cyclePhase';
 import { CycleDetails } from './components/CycleDetails';
 import { CYCLE_SECTION_SCROLL_MARGIN, CycleSectionNav } from './components/CycleSectionNav';
-import { CycleStatus } from './components/CycleStatus';
+import { CYCLE_REGION_CLASS, CycleClock, CycleFigures } from './components/CycleStatus';
 
 const EMPTY: never[] = [];
 
-/** The page body while the first dashboard read is in flight: the cycle column and a ledger. */
+/**
+ * The first screen: the header's text beside the cycle's clock and commit
+ * action (under it on smaller screens). The section bar below draws the rule
+ * under both.
+ */
+function HeroRow({ header, aside }: { header: ReactNode; aside: ReactNode }) {
+  return (
+    <div className="grid gap-x-12 gap-y-8 pb-6 sm:pb-10 lg:grid-cols-12 lg:items-end xl:gap-x-16">
+      <div className="min-w-0 lg:col-span-7">{header}</div>
+      <div className="min-w-0 lg:col-span-5">{aside}</div>
+    </div>
+  );
+}
+
+/** The clock's place while the first dashboard read is in flight. */
+function ClockSkeleton() {
+  return (
+    <div aria-hidden className="space-y-4">
+      <Skeleton className="h-5 w-40" />
+      <Skeleton className="h-16 w-4/5" />
+      <Skeleton className="h-4 w-3/5" />
+      <Skeleton className="h-12 w-48 rounded-control" />
+    </div>
+  );
+}
+
+/** The page body while the first dashboard read is in flight: the figures, the standings and a ledger. */
 function CurrentCycleSkeleton() {
   const t = useTranslations('common');
   return (
     <div role="status" aria-label={t('status.loading')} className="space-y-[var(--block-gap)]">
       <div className="grid gap-10 lg:grid-cols-12 lg:gap-x-12" aria-hidden>
-        <div className="space-y-6 lg:col-span-5">
-          <Skeleton className="h-8 w-40" />
-          <Skeleton className="h-16 w-4/5" />
-          <Skeleton className="h-4 w-3/5" />
-          <Skeleton className="h-12 w-48 rounded-control" />
+        <div className="space-y-3 lg:col-span-5">
+          <Skeleton className="h-6 w-40" />
+          <Skeleton className="h-48 w-full rounded-surface" />
         </div>
         <div className="space-y-3 lg:col-span-7">
           <Skeleton className="h-6 w-56" />
@@ -64,9 +89,10 @@ function CurrentCycleSkeleton() {
 
 /**
  * `seoSummary` is the server-rendered page header, the page's only header: it
- * names the cycle and carries its gesture count, Signature Allocation and
- * opening time, so the body starts with the section bar and the clock and
- * never repeats those figures.
+ * names the cycle and carries its gesture count and opening time. Beside it
+ * sit the clock and the page's one commit action, so both are in the first
+ * screen; the body starts with the section bar and never repeats those
+ * figures. `relatedPages` (server-rendered) closes the page, after the rules.
  *
  * The dashboard polls every few seconds. A failed poll keeps the last reading
  * on screen (the live status says it is delayed, and the clock stops calling
@@ -75,7 +101,13 @@ function CurrentCycleSkeleton() {
  * status speaks the changes a reader acts on (a new Last Gesture by someone
  * else, the clock's phase changes), never every poll.
  */
-const CurrentRoundPage = ({ seoSummary }: { seoSummary?: ReactNode }) => {
+const CurrentRoundPage = ({
+  seoSummary,
+  relatedPages,
+}: {
+  seoSummary?: ReactNode;
+  relatedPages?: ReactNode;
+}) => {
   const t = useTranslations('currentCycle');
   const tTables = useTranslations('tables');
   const dashboard = useDashboardInfo();
@@ -165,9 +197,13 @@ const CurrentRoundPage = ({ seoSummary }: { seoSummary?: ReactNode }) => {
   if (!data || !phase) {
     return (
       <PageShell variant="data" backdrop="signature">
-        {seoSummary}
+        <HeroRow header={seoSummary} aside={dashboard.isError ? null : <ClockSkeleton />} />
         {/* The section bar draws the header's bottom rule; until it renders, this does. */}
-        <div aria-hidden className="mb-8 border-b border-rule sm:mb-10" />
+        <div
+          aria-hidden
+          data-testid="header-rule-stand-in"
+          className="mb-8 border-b border-rule sm:mb-10"
+        />
         {dashboard.isError ? (
           <ErrorState
             headingLevel={2}
@@ -184,7 +220,18 @@ const CurrentRoundPage = ({ seoSummary }: { seoSummary?: ReactNode }) => {
 
   return (
     <PageShell variant="data" backdrop="signature">
-      {seoSummary}
+      <HeroRow
+        header={seoSummary}
+        aside={
+          <CycleClock
+            data={data}
+            phase={phase}
+            nowMs={nowMs}
+            // One freshness stamp per page: the ledger's while there is one.
+            liveStatus={!hasStandings}
+          />
+        }
+      />
       <CycleSectionNav hasStandings={hasStandings} />
 
       <p role="status" aria-live="polite" className="sr-only" data-testid="cycle-announcer">
@@ -192,40 +239,41 @@ const CurrentRoundPage = ({ seoSummary }: { seoSummary?: ReactNode }) => {
       </p>
 
       <div className="space-y-[calc(var(--block-gap)*1.5)]">
-        <section
-          aria-labelledby="cycle-status-heading"
-          className={
-            hasStandings ? 'grid gap-12 lg:grid-cols-12 lg:gap-x-12 xl:gap-x-16' : undefined
-          }
-        >
-          <CycleStatus
-            data={data}
-            phase={phase}
-            nowMs={nowMs}
-            participants={participants}
-            headingId="cycle-status-heading"
-            // One freshness stamp per page: the ledger's while there is one.
-            liveStatus={!hasStandings}
-            className={hasStandings ? 'lg:col-span-5' : 'max-w-xl'}
-          />
-          {hasStandings ? (
-            <div id="standings" className={`min-w-0 lg:col-span-7 ${CYCLE_SECTION_SCROLL_MARGIN}`}>
-              <StandingsLedger
-                headingLevel={3}
-                // A peer of "Cycle status" beside it: the same section tier.
-                headingSize="section"
-                headingId="cycle-standings-heading"
-                description={tTables('specialAllocation.headingHelp')}
-                champions={champions}
-                latestGesture={latestResolution.gesture}
-                gestureDetailsPending={latestResolution.isSyncing}
-                account={account}
-                chronoEth={trackAmounts.chronoEth}
-                signatureEth={trackAmounts.signatureEth}
-                className="min-w-0"
-              />
-            </div>
-          ) : null}
+        {/* One section heading over two peer panels, each on the same hairline and tier. */}
+        <section aria-labelledby="cycle-status-heading">
+          <SectionHeader headingId="cycle-status-heading" title={t('status.heading')} />
+          <div
+            className={
+              hasStandings ? 'grid gap-12 lg:grid-cols-12 lg:gap-x-12 xl:gap-x-16' : 'max-w-xl'
+            }
+          >
+            <CycleFigures
+              data={data}
+              nowMs={nowMs}
+              participants={participants}
+              headingId="cycle-figures-heading"
+              className={hasStandings ? 'lg:col-span-5' : undefined}
+            />
+            {hasStandings ? (
+              <div
+                id="standings"
+                className={`min-w-0 lg:col-span-7 ${CYCLE_REGION_CLASS} ${CYCLE_SECTION_SCROLL_MARGIN}`}
+              >
+                <StandingsLedger
+                  headingLevel={3}
+                  headingId="cycle-standings-heading"
+                  description={tTables('specialAllocation.headingHelp')}
+                  champions={champions}
+                  latestGesture={latestResolution.gesture}
+                  gestureDetailsPending={latestResolution.isSyncing}
+                  account={account}
+                  chronoEth={trackAmounts.chronoEth}
+                  signatureEth={trackAmounts.signatureEth}
+                  className="min-w-0"
+                />
+              </div>
+            ) : null}
+          </div>
         </section>
 
         <CycleDetails
@@ -239,6 +287,7 @@ const CurrentRoundPage = ({ seoSummary }: { seoSummary?: ReactNode }) => {
           attachedNfts={attachedNfts}
           attachedErc20={attachedErc20}
         />
+        {relatedPages}
       </div>
     </PageShell>
   );

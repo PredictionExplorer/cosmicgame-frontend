@@ -43,6 +43,17 @@ describe('HeroSection', () => {
     expect(screen.queryByRole('link', { name: 'Learn More' })).not.toBeInTheDocument();
   });
 
+  it('gives both ways in the same arrow, as the live cycle’s commit button has (V242)', () => {
+    render(<HeroSection hero={hero} />);
+    for (const name of ['Make a gesture', 'See the live cycle']) {
+      expect(screen.getByRole('link', { name }).querySelector('svg')).not.toBeNull();
+    }
+  });
+
+  it('opens the lede with the mechanism, not the slogan (V242)', () => {
+    expect(hero.paragraph.startsWith('Gesture. Endure.')).toBe(false);
+  });
+
   it('has no accessibility violations', async () => {
     const { container } = render(<HeroSection hero={hero} />);
     await checkA11y(container);

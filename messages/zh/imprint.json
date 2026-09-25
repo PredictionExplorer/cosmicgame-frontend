@@ -5,8 +5,7 @@
   },
   "page": {
     "title": "铭刻 Random Walk NFT",
-    "subtitle": "拥有 Random Walk NFT，可将一笔 ETH 落笔的价格降低 50%",
-    "description": "每枚 NFT 仅可用于一次价格减免，时机由你选择。锚定 Random Walk NFT 则可取得锚定 NFT 星选资格，与落笔附加是两项独立机制。",
+    "subtitle": "一枚 Random Walk NFT 可让一笔 ETH 落笔的价格降低 50%。在这里铭刻，再把它附加到你选定的那一笔。",
     "currentCost": "当前铭刻价格",
     "costBreakdown": "合约价格 {base} ETH，另加 {percent}% 余量，以免确认前价格上涨导致铭刻失败。",
     "submit": "铭刻",
@@ -17,9 +16,21 @@
     "why": {
       "title": "铭刻能带来什么"
     },
-    "compare": {
-      "label": "附加 Random Walk NFT 后的 ETH 落笔价格",
-      "caption": "比当前 ETH 落笔价格低 {percent}%，每枚 NFT 仅限一次。"
+    "benefits": {
+      "gesture": {
+        "title": "一笔 ETH 落笔减半",
+        "label": "按当前价格，一笔 ETH 落笔可节省",
+        "caption": "即当前 ETH 落笔价格 {cost} ETH 的一半。每枚 Random Walk NFT 仅可使用一次，用在你选定的那一笔。"
+      },
+      "anchoring": {
+        "title": "锚定 NFT 星选",
+        "body": "锚定后，Random Walk NFT 会参与锚定 NFT 星选：每次收官时选出 {count, number} 枚已锚定的 Random Walk NFT，每枚的持有者获配 {cst} CST 与 1 枚 Cosmic Signature NFT。在落笔中使用过的 NFT 仍可锚定。",
+        "link": "了解锚定运作原理"
+      }
+    },
+    "latest": {
+      "meta": "最新铭刻",
+      "earlierAria": "此前的铭刻"
     },
     "success": {
       "eyebrow": "铭刻完成",
@@ -32,6 +43,8 @@
       "used": "已使用",
       "unused": "未使用",
       "use": "用于落笔",
+      "checking": "核对中",
+      "unknownNote": "暂时无法核对这些 Random Walk NFT 是否已使用，因此还不会提供用于落笔的入口。",
       "empty": "此钱包尚未持有 Random Walk NFT。",
       "error": "无法读取此钱包中的 Random Walk NFT。"
     }

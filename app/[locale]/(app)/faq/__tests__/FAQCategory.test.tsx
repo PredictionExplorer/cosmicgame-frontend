@@ -1,12 +1,18 @@
 import userEvent from '@testing-library/user-event';
 
-import type { FAQCategory } from '@/content/faq';
+import type { FAQCategory } from '@/content/faq/types';
 import { protocolFacts } from '@/content/protocol-facts';
 
-import { render, screen, checkA11y } from '@/test-utils';
+import { render, screen, checkA11y, waitFor } from '@/test-utils';
 
 import { FAQCategorySection } from '../components/FAQCategory';
-import { enrichAnswer } from '../components/answerText';
+import {
+  answerParagraphs,
+  enrichAnswer,
+  foldForMatch,
+  highlightMatches,
+  matchesQuery,
+} from '../components/answerText';
 
 const mockCategory: FAQCategory = {
   id: 'test-cat',
@@ -148,12 +154,19 @@ describe('FAQCategorySection', () => {
     const user = userEvent.setup();
     const onExpandAll = jest.fn();
     const { unmount } = renderFAQCategory({ onExpandAll });
-    await user.click(screen.getByRole('button', { name: 'Expand all questions' }));
+    // Named after its category, so the six toggles on the page read apart.
+    const expand = screen.getByRole('button', { name: 'Expand all questions in Test Category' });
+    expect(expand).toHaveTextContent('Expand all');
+    // The label says what a press does; aria-expanded would say the state again.
+    expect(expand).not.toHaveAttribute('aria-expanded');
+    await user.click(expand);
     expect(onExpandAll).toHaveBeenCalledWith('test-cat');
     unmount();
 
     renderFAQCategory({ expandedItems: ['q1', 'q2', 'q3'] });
-    expect(screen.getByRole('button', { name: 'Collapse all questions' })).toBeInTheDocument();
+    expect(
+      screen.getByRole('button', { name: 'Collapse all questions in Test Category' }),
+    ).toHaveTextContent('Collapse all');
   });
 
   it('filters by the search and opens every matching answer, highlighted', () => {
@@ -168,7 +181,7 @@ describe('FAQCategorySection', () => {
     const user = userEvent.setup();
     const onItemToggle = jest.fn();
     const { rerender } = renderFAQCategory({ searchQuery: 'Anchoring', onItemToggle });
-    const trigger = screen.getByRole('button', { name: /How does Anchoring work\?/ });
+    const trigger = screen.getByRole('button', { name: 'How does Anchoring work?' });
     expect(trigger).toHaveAttribute('aria-expanded', 'true');
 
     await user.click(trigger);
@@ -191,10 +204,19 @@ describe('FAQCategorySection', () => {
         onExpandAll={jest.fn()}
       />,
     );
-    expect(screen.getByRole('button', { name: /How does Anchoring work\?/ })).toHaveAttribute(
+    expect(screen.getByRole('button', { name: 'How does Anchoring work?' })).toHaveAttribute(
       'aria-expanded',
       'true',
     );
+  });
+
+  it('finds a curly apostrophe from a typed one, and highlights it (V073)', () => {
+    const category: FAQCategory = {
+      ...mockCategory,
+      items: [{ id: 'nfts', question: 'Can I take part if I don’t own NFTs?', answer: 'Yes.' }],
+    };
+    renderFAQCategory({ category, searchQuery: "don't" });
+    expect(document.querySelector('mark')).toHaveTextContent('don’t');
   });
 
   it('keeps a highlighted question one inline run inside its flex trigger', () => {
@@ -220,11 +242,51 @@ describe('FAQCategorySection', () => {
     expect(terms[0]).toHaveAttribute('role', 'button');
   });
 
-  it('offers a copy link inside an open answer', () => {
+  it('names each copy link after its question and announces the copy outside it', async () => {
+    const user = userEvent.setup();
     renderFAQCategory({ expandedItems: ['q1'] });
+    const copy = screen.getByRole('button', {
+      name: 'Copy link to “What is a Calibration Window?”',
+    });
+    expect(copy).toHaveTextContent('Copy link');
+    // The status region is not inside the button, whose name overrides its text.
+    const status = screen.getByTestId('faq-copy-status');
+    expect(status).toHaveAttribute('role', 'status');
+    expect(copy).not.toContainElement(status);
+    expect(status).toBeEmptyDOMElement();
+
+    await user.click(copy);
+    await waitFor(() => expect(status).toHaveTextContent('Link copied'));
+    expect(copy).toHaveTextContent('Copied');
+  });
+
+  it('sets a long answer as paragraphs, explaining each term once per answer (V235)', () => {
+    const category: FAQCategory = {
+      ...mockCategory,
+      items: [
+        {
+          id: 'long',
+          question: 'How does a Calibration Window work?',
+          answer:
+            'A Calibration Window descends the cost.\n\nEvery Calibration Window ends at its floor.',
+        },
+      ],
+    };
+    renderFAQCategory({ category, expandedItems: ['long'] });
+    const paragraphs = body('long')!.querySelectorAll('p.type-prose');
+    expect(paragraphs).toHaveLength(2);
+    expect(body('long')!.querySelectorAll('[data-term="calibrationWindow"]')).toHaveLength(1);
+  });
+
+  it('marks a search match inside any paragraph', () => {
+    const category: FAQCategory = {
+      ...mockCategory,
+      items: [{ id: 'long', question: 'Q?', answer: 'First part.\n\nThe floor is zero.' }],
+    };
+    renderFAQCategory({ category, searchQuery: 'floor' });
     expect(
-      screen.getAllByRole('button', { name: 'Copy link to this question' })[0],
-    ).toHaveTextContent('Copy link');
+      body('long')!.querySelectorAll('p.type-prose')[1]!.querySelector('mark'),
+    ).toHaveTextContent('floor');
   });
 
   it('keeps legacy ids for deep links', () => {
@@ -236,6 +298,51 @@ describe('FAQCategorySection', () => {
   it('has no accessibility violations', async () => {
     const { container } = renderFAQCategory({ expandedItems: ['q1'] });
     await checkA11y(container);
+  });
+});
+
+describe('answerParagraphs', () => {
+  it('splits on blank lines and drops empty ones', () => {
+    expect(answerParagraphs('One.\n\nTwo.\n\n\nThree.')).toEqual(['One.', 'Two.', 'Three.']);
+    expect(answerParagraphs('Only one.')).toEqual(['Only one.']);
+  });
+});
+
+describe('the FAQ search matcher (V073)', () => {
+  it('folds typographic quotes to the ones a keyboard types', () => {
+    expect(matchesQuery('Can I take part if I don’t own NFTs?', "don't")).toBe(true);
+    expect(matchesQuery('the protocol’s security', "PROTOCOL'S")).toBe(true);
+    expect(matchesQuery('“Final Gesture”', '"final gesture"')).toBe(true);
+  });
+
+  it('folds full-width and no-break forms, as Japanese and Chinese input types them', () => {
+    expect(matchesQuery('1,000 CSTを受け取ります', 'ＣＳＴ')).toBe(true);
+    expect(matchesQuery('1,000 CST', '1,000 cst')).toBe(true);
+    expect(foldForMatch('ＣＳＴ')).toBe('cst');
+  });
+
+  it('meets a composed letter with a typed base and combining mark', () => {
+    expect(matchesQuery('Hàng hóa công', 'hóa')).toBe(true);
+  });
+
+  it('ignores authored phrase breaks inside a match', () => {
+    expect(matchesQuery('公共​物品', '公共物品')).toBe(true);
+  });
+
+  it('matches nothing for an empty query', () => {
+    expect(matchesQuery('anything', '   ')).toBe(false);
+  });
+
+  it('marks the text as written wherever the folded match lands', () => {
+    render(<p>{highlightMatches('Don’t wait: don’t miss it', "don't")}</p>);
+    const marks = Array.from(document.querySelectorAll('mark')).map((mark) => mark.textContent);
+    expect(marks).toEqual(['Don’t', 'don’t']);
+    expect(document.querySelector('p')).toHaveTextContent('Don’t wait: don’t miss it');
+  });
+
+  it('marks a full-width query in Japanese copy', () => {
+    render(<p>{highlightMatches('参加CSTを刻印します', 'ＣＳＴ')}</p>);
+    expect(document.querySelector('mark')).toHaveTextContent('CST');
   });
 });
 

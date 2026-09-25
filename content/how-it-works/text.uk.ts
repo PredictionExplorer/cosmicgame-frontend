@@ -1,8 +1,17 @@
 import { protocolFacts } from '@/content/protocol-facts';
 
+import { copyNumbers } from './copyNumbers';
 import type { HowItWorksText } from './structure';
 
-const cst = protocolFacts.specialAllocationCst.toLocaleString('uk-UA');
+const numbers = copyNumbers('uk');
+const cst = numbers.specialAllocationCst;
+const { ethRecipients, nftRecipients, anchoredRecipients } = numbers;
+/** "3 записи", "10 записів": the count with the noun that agrees with it. */
+const entries = (count: number) =>
+  `${numbers.count(count)} ${numbers.plural(count, { one: 'запис', few: 'записи', many: 'записів', other: 'запису' })}`;
+/** "3 отримувачі", "10 отримувачів". */
+const recipients = (count: number) =>
+  `${numbers.count(count)} ${numbers.plural(count, { one: 'отримувач', few: 'отримувачі', many: 'отримувачів', other: 'отримувача' })}`;
 
 /** Ukrainian how-it-works copy, keyed by the skeleton in structure.ts. */
 export const howItWorksTextUk = {
@@ -38,11 +47,11 @@ export const howItWorksTextUk = {
       },
       {
         title: 'Запис у зоряному відборі',
-        description: `Кожен жест додає один запис. Коли цикл завершується, випадково відбираються три записи, які ділять ${protocolFacts.stellarSelectionEthPercentage}% резерву циклу в ETH.`,
+        description: `Кожен жест додає один запис. Коли цикл завершується, випадково відбирають ${entries(ethRecipients)}, ${numbers.plural(ethRecipients, { one: 'який ділить', other: 'які ділять' })} ${protocolFacts.stellarSelectionEthPercentage}% резерву циклу в ETH.`,
       },
       {
         title: 'Відбір Cosmic Signature NFT',
-        description: `Ще десять записів отримують по ${cst} CST і по одному Cosmic Signature NFT. Одну адресу можуть відібрати кілька разів, і жодна кількість записів не гарантує відбору.`,
+        description: `Ще ${entries(nftRecipients)} ${numbers.plural(nftRecipients, { one: 'отримує', other: 'отримують' })} по ${cst} CST і по одному Cosmic Signature NFT. Одну адресу можуть відібрати кілька разів, і жодна кількість записів не гарантує відбору.`,
       },
       {
         title: 'Розподіл Сигнатури',
@@ -75,6 +84,7 @@ export const howItWorksTextUk = {
     subhead: 'Кожен цикл проходить цю послідовність від відкриття до завершення.',
     legend: {
       gestures: 'Жести',
+      finalization: 'Завершення',
       exclusiveWindow: `${protocolFacts.finalGestureExclusivityHours} годин, коли завершити цикл може лише учасник із завершальним жестом`,
       allocations: 'Напрями розподілу',
     },
@@ -97,7 +107,7 @@ export const howItWorksTextUk = {
       },
       {
         label: 'Зоряні відбори',
-        description: `Три отримувачі зоряного відбору ETH ділять ${protocolFacts.stellarSelectionEthPercentage}% резерву циклу. Десять отримувачів зоряного відбору NFT і десять отримувачів зоряного відбору закріплених NFT, відібраних серед закріплених Random Walk NFT, отримують по ${cst} CST і по одному Cosmic Signature NFT. Запис додається за кожен жест, і кожен відбір відбувається з усіх записів циклу з повторенням.`,
+        description: `${recipients(ethRecipients)} зоряного відбору ETH ${numbers.plural(ethRecipients, { one: 'ділить', other: 'ділять' })} ${protocolFacts.stellarSelectionEthPercentage}% резерву циклу. ${recipients(nftRecipients)} зоряного відбору NFT і ${recipients(anchoredRecipients)} зоряного відбору закріплених NFT, відібраних серед закріплених Random Walk NFT, отримують по ${cst} CST і по одному Cosmic Signature NFT. Запис додається за кожен жест, а відбори ETH і NFT відбуваються з усіх записів циклу з повторенням.`,
       },
       {
         label: 'Наступний цикл',
@@ -107,7 +117,7 @@ export const howItWorksTextUk = {
   },
   payoff: {
     heading: 'Кожен цикл завершується Сигнатурою',
-    body: 'Кожен жест формує твір циклу. Коли цикл завершується, його Сигнатуру закарбовують як Cosmic Signature NFT, і разом із розподілом Сигнатури вона дістається учасникові, який зробив завершальний жест.',
+    body: `Кожен жест формує твір циклу. Коли цикл завершується, його Сигнатуру закарбовують як Cosmic Signature NFT, і разом із розподілом Сигнатури вона дістається тому, хто завершить цикл. Перші ${protocolFacts.finalGestureExclusivityHours} годин після того, як відлік дійде до нуля, це може зробити лише учасник, який зробив завершальний жест; потім — будь-хто.`,
     linkLabel: 'Переглянути цю Сигнатуру',
   },
   stepByStep: {

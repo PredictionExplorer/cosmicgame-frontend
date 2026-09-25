@@ -62,6 +62,46 @@ describe('how-it-works content', () => {
     }
   });
 
+  it('gives the Signature to whoever finalizes, never only the Final Gesture participant (V077)', () => {
+    const { payoff, gameCycle } = howItWorksContentEn;
+    expect(payoff.body).toMatch(/to whoever finalizes the cycle/);
+    expect(payoff.body).not.toMatch(/goes to the Final Gesture participant/);
+    // Every locale states the exclusive window the stages describe, from the facts.
+    for (const locale of routing.locales) {
+      expect(getHowItWorksContent(locale).payoff.body).toContain(
+        String(protocolFacts.finalGestureExclusivityHours),
+      );
+    }
+    expect(gameCycle.phases[2]!.description).toMatch(
+      /whoever does receives the Signature Allocation/,
+    );
+    // The glossary the FAQ and the dotted terms show says the same (V226).
+    const glossary = JSON.parse(
+      readFileSync(path.join(process.cwd(), 'messages/en/glossary.json'), 'utf8'),
+    ) as { terms: { signatureAllocation: { short: string } } };
+    expect(glossary.terms.signatureAllocation.short).toMatch(
+      /^The allocation for whoever finalizes/,
+    );
+  });
+
+  it('reads the Stellar Selection recipient counts from protocol-facts in every locale (V077)', () => {
+    const counts = [
+      protocolFacts.ethStellarSelectionRecipients,
+      protocolFacts.nftStellarSelectionRecipients,
+      protocolFacts.anchoredRwlkNftSelectionRecipients,
+    ];
+    for (const locale of routing.locales) {
+      const stellarStage = getHowItWorksContent(locale).gameCycle.phases[4]!.description;
+      const digits = stellarStage.match(/\d+/g)?.map(Number) ?? [];
+      for (const count of counts) expect(digits).toContain(count);
+    }
+    // English no longer spells the counts out, so a change to them cannot leave words behind.
+    const english =
+      JSON.stringify(howItWorksContentEn.rewardBreakdown) +
+      JSON.stringify(howItWorksContentEn.gameCycle);
+    expect(english).not.toMatch(/\b(?:three|Three|ten|Ten) (?:entries|ETH|NFT|more|Anchored)/);
+  });
+
   it('provides complete Chinese prose and metadata', () => {
     expect(howItWorksContentZh.metadata.title).toMatch(/[㐀-鿿]/);
     expect(howItWorksContentZh.metadata.description).toMatch(/[㐀-鿿]/);

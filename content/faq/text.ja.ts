@@ -1,8 +1,11 @@
 import { protocolFacts } from '@/content/protocol-facts';
 
+import { formatCount } from '@/utils/format/numbers';
+
 import type { FAQText } from './structure';
 
-const cst = protocolFacts.specialAllocationCst.toLocaleString();
+const cst = formatCount(protocolFacts.specialAllocationCst, 'ja');
+const outreachCst = formatCount(protocolFacts.outreachReserveCst, 'ja');
 
 const ELAPSED_JA: Record<
   (typeof protocolFacts.dynamicCstRewardExamples)[number]['elapsed'],
@@ -25,11 +28,6 @@ export const faqTextJa = {
         question: 'Cosmic Signatureとは何ですか？',
         answer:
           'Cosmic SignatureはArbitrum上のプロシージャル・オンチェーンアート・プロトコルです。参加者はパフォーマンス・サイクルの間に一筆を入れ、その一つひとつがサイクルの最終シグネチャーを形づくります。サイクルが確定すると、プロトコルは準備金を10を超える配分トラックへ配ります。その中には、170人以上のEthereumコア貢献者の資金支援メカニズムであるProtocol Guildも含まれます。',
-      },
-      'is-cosmic-signature-related-to-biology': {
-        question: 'Cosmic Signatureは生物学のCOSMICデータベースと関係がありますか？',
-        answer:
-          'いいえ。Cosmic Signatureは、生物学におけるCOSMICがん変異データベースやCOSMIC変異シグネチャーとは関係がありません。決定論的な三体NFTアートに焦点を当てたオンチェーンアートのプロトコルとアプリです。',
       },
       'how-does-the-bidding-game-work': {
         question: 'パフォーマンス・サイクルはどのように進みますか？',
@@ -67,8 +65,7 @@ export const faqTextJa = {
     items: {
       'what-is-the-main-allocation': {
         question: 'シグネチャー配分とは何ですか？',
-        answer:
-          'シグネチャー配分は、サイクルで最後の一筆を入れた参加者が受け取ります。Cosmic Signature NFT 1点、1,000 CSTの功労CST、サイクル準備金の25%のETH、そしてサイクル中に参加者の一筆に添付されたトークンやNFTが含まれます。',
+        answer: `シグネチャー配分は、サイクルを確定した参加者が受け取ります。サイクル確定時刻を過ぎてから${protocolFacts.finalGestureExclusivityHours}時間は、最後の一筆を入れた参加者だけが確定でき、その後は誰でも確定できます。Cosmic Signature NFT 1点、${cst} CSTの功労CST、サイクル準備金の${protocolFacts.mainEthPercentage}%のETH、そしてサイクル中に参加者の一筆に添付されたトークンやNFTが含まれます。`,
       },
       'what-rewards-per-bid': {
         question: '一筆ごとに何を受け取れますか？',
@@ -85,15 +82,15 @@ export const faqTextJa = {
       },
       'how-do-i-claim-my-allocation': {
         question: '受領者になったら、配分はどう受け取りますか？',
-        answer: `受領者はアプリとプロトコルのコントラクトを通じて配分を受け取ります。最後の一筆の参加者には、サイクル確定時刻の後、サイクルを確定してシグネチャー配分を受け取るための${protocolFacts.finalGestureExclusivityHours}時間の優先時間があります。その後は公開確定期間が始まります。誰でもサイクルを確定でき、スマートコントラクトは確定した人をサイクル受領者として扱います。確定実行者がシグネチャー配分全体（ETHの分、${cst} CSTの刻印、Cosmic Signature NFT、添付されたアセットへの優先権）を受け取ります。二次的なETHや、添付されたトークン・NFTの配分は配分ウォレットのエスクローに置かれ、既定で${protocolFacts.secondaryRetrievalTimeoutWeeks}週間の別の受け取りタイムアウトがあります。それが切れると、コントラクトは未受け取りの配分を誰でも自分のものとして受け取ることを許します。早めに受け取ってください。`,
+        answer: `受領者はアプリとプロトコルのコントラクトを通じて配分を受け取ります。最後の一筆の参加者には、サイクル確定時刻の後、サイクルを確定してシグネチャー配分を受け取るための${protocolFacts.finalGestureExclusivityHours}時間の優先時間があります。\n\nその後は公開確定期間が始まります。誰でもサイクルを確定でき、スマートコントラクトは確定した人をサイクル受領者として扱います。確定実行者がシグネチャー配分全体（ETHの分、${cst} CSTの刻印、Cosmic Signature NFT、添付されたアセットへの優先権）を受け取ります。\n\n二次的なETHや、添付されたトークン・NFTの配分は配分ウォレットのエスクローに置かれ、既定で${protocolFacts.secondaryRetrievalTimeoutWeeks}週間の別の受け取りタイムアウトがあります。それが切れると、コントラクトは未受け取りの配分を誰でも自分のものとして受け取ることを許します。早めに受け取ってください。`,
       },
       'how-does-anchoring-work': {
         question: '係留はどのような仕組みですか？',
-        answer: `Cosmic Signature NFTはプロトコルに係留してETHの係留配分を受け取れます。確定したサイクルごとにサイクル準備金の${protocolFacts.anchorDistributionPercentage}%が配分され、係留中のCosmic Signature NFT 1点ごとに等分され、累積したETHは係留を解除したときに支払われます。Random Walk NFTも係留できますが、係留NFT星選の対象になるためだけです。選ばれた係留者はETHではなく、CSTとCosmic Signature NFTを受け取ります。知っておきたい二つのルール：すべてのNFTを係留できるのは生涯で一度だけ（係留を解除すると、そのNFTは二度と係留できません）、そしてサイクルが確定した時点でCosmic Signature NFTが一つも係留されていなければ、そのサイクルの${protocolFacts.anchorDistributionPercentage}%はサイクル準備金に残ります。CST（ERC-20）は係留できません。係留の管理は、アカウントメニューの「自分の係留」ページで行います。`,
+        answer: `Cosmic Signature NFTはプロトコルに係留してETHの係留配分を受け取れます。確定したサイクルごとにサイクル準備金の${protocolFacts.anchorDistributionPercentage}%が配分され、係留中のCosmic Signature NFT 1点ごとに等分され、累積したETHは係留を解除したときに支払われます。\n\nRandom Walk NFTも係留できますが、係留NFT星選の対象になるためだけです。選ばれた係留者はETHではなく、CSTとCosmic Signature NFTを受け取ります。\n\n知っておきたい二つのルール：すべてのNFTを係留できるのは生涯で一度だけ（係留を解除すると、そのNFTは二度と係留できません）、そしてサイクルが確定した時点でCosmic Signature NFTが一つも係留されていなければ、そのサイクルの${protocolFacts.anchorDistributionPercentage}%はサイクル準備金に残ります。CST（ERC-20）は係留できません。係留の管理は、アカウントメニューの「自分の係留」ページで行います。`,
       },
       'what-are-marketing-rewards': {
         question: '広報準備金とは何ですか？',
-        answer: `プロトコルを広める手助けをすると、CSTトークン（ERC-20）を受け取れます。広報準備金はサイクルごとに${protocolFacts.outreachReserveCst.toLocaleString()} CSTを刻印し、エコシステムの貢献者へ配ります。案内が必要な場合は、Discordで広報の管理者に連絡してください。`,
+        answer: `プロトコルを広める手助けをすると、CSTトークン（ERC-20）を受け取れます。広報準備金はサイクルごとに${outreachCst} CSTを刻印し、エコシステムの貢献者へ配ります。案内が必要な場合は、Discordで広報の管理者に連絡してください。`,
       },
       'how-many-nfts-minted': {
         question: '各サイクルで刻印されるCosmic Signature NFTはいくつですか？',
@@ -130,7 +127,7 @@ export const faqTextJa = {
       },
       'how-is-participation-cst-calculated': {
         question: '参加CSTはどのように計算されますか？',
-        answer: `参加CSTは、前の一筆からの経過時間に基づく平方根の式を使います：${protocolFacts.dynamicCstRewardFormula}。平方根を使うため、前の一筆から時間が空くほど数量は増えますが、増加のペースは次第に緩やかになります。開始時のパラメーター（時間増分がちょうど一時間）では、例はおよそ${protocolFacts.dynamicCstRewardExamples.map((example) => `${ELAPSED_JA[example.elapsed]}後に${example.cst} CST`).join('、')}です。増分は確定したサイクルごとに${protocolFacts.cycleTimeIncrementIncreasePercentPerCycle}%ずつ大きくなるので、実際の量は時間とともにこれらよりわずかに下へずれていきます。一筆が届いた瞬間の正確な量は、アプリのライブプレビューとコントラクトが基準です。`,
+        answer: `参加CSTは、前の一筆からの経過時間に基づく平方根の式を使います：${protocolFacts.dynamicCstRewardFormula}。平方根を使うため、前の一筆から時間が空くほど数量は増えますが、増加のペースは次第に緩やかになります。\n\n開始時のパラメーター（時間増分がちょうど一時間）では、例はおよそ${protocolFacts.dynamicCstRewardExamples.map((example) => `${ELAPSED_JA[example.elapsed]}後に${example.cst} CST`).join('、')}です。増分は確定したサイクルごとに${protocolFacts.cycleTimeIncrementIncreasePercentPerCycle}%ずつ大きくなるので、実際の量は時間とともにこれらよりわずかに下へずれていきます。一筆が届いた瞬間の正確な量は、アプリのライブプレビューとコントラクトが基準です。`,
       },
       'why-minimum-cst-reward-protection': {
         question: '最低参加CST保護とは何ですか？',
@@ -310,6 +307,11 @@ export const faqTextJa = {
         answer:
           '一筆の費用そのものに加えて、トランザクションごとにArbitrumネットワークのガス代を支払います。ガス代はネットワークの状況によって変動し、Cosmic Signatureが管理するものではありません。',
       },
+      'is-cosmic-signature-related-to-biology': {
+        question: 'Cosmic Signatureは生物学のCOSMICデータベースと関係がありますか？',
+        answer:
+          'いいえ。Cosmic Signatureは、生物学におけるCOSMICがん変異データベースやCOSMIC変異シグネチャーとは関係がありません。決定論的な三体NFTアートに焦点を当てたオンチェーンアートのプロトコルとアプリです。',
+      },
     },
   },
   'trust-and-governance': {
@@ -319,7 +321,7 @@ export const faqTextJa = {
       'team-controls': {
         question: 'チームはプロトコルに対してどんな権限を持っていますか？',
         answer:
-          '当初、チームは一筆ごとの時間増分や配分トラックの割合など、プロトコルの一部のパラメーターを調整できます。この権限はスマートコントラクトの「Ownable」パターンで実装され、サイクル間の期間に限られます。次のサイクルが有効になると——これはその最初の一筆の前に起こります——中核となるプロトコルのパラメーターはそのサイクルが確定するまでロックされます。このロックの外でも、より狭い権限がいくつか残ります。所有者は、最初の一筆が届くまでサイクルの有効化を延期でき、次のサイクルまでの遅延をいつでも調整でき、周辺のコントラクト（公共財金庫の受け手、NFTメタデータのURI、配分ウォレットの受け取りタイムアウト）をいつでも管理できます。プロトコルのコントラクトは所有者によってアップグレード可能（UUPS）でもありますが、サイクルの間だけです。現在デプロイされている実装は、公開検証済みのV2です。',
+          '当初、チームは一筆ごとの時間増分や配分トラックの割合など、プロトコルの一部のパラメーターを調整できます。この権限はスマートコントラクトの「Ownable」パターンで実装され、サイクル間の期間に限られます。次のサイクルが有効になると——これはその最初の一筆の前に起こります——中核となるプロトコルのパラメーターはそのサイクルが確定するまでロックされます。\n\nこのロックの外でも、より狭い権限がいくつか残ります。所有者は、最初の一筆が届くまでサイクルの有効化を延期でき、次のサイクルまでの遅延をいつでも調整でき、周辺のコントラクト（公共財金庫の受け手、NFTメタデータのURI、配分ウォレットの受け取りタイムアウト）をいつでも管理できます。\n\nプロトコルのコントラクトは所有者によってアップグレード可能（UUPS）でもありますが、サイクルの間だけです。現在デプロイされている実装は、公開検証済みのV2です。',
       },
       'will-team-always-have-control': {
         question: 'チームは常にプロトコルのパラメーターを管理し続けるのですか？',

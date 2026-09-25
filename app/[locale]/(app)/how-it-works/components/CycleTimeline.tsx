@@ -42,8 +42,12 @@ interface DrawingLayout {
   readonly gestures: ReadonlyArray<{ x: number; method: GestureMethod }>;
   /** Where the finalization time stood before the last gestures pushed it right. */
   readonly earlierEnds: readonly number[];
-  /** The six stages, numbered where they happen. */
-  readonly stages: ReadonlyArray<{ x: number; y: number }>;
+  /**
+   * The rows the stage numbers sit on: above the drawing; for the number
+   * where the reserve divides, above the bar, or under it where the bar is
+   * too short to hold two numbers side by side; and on the loop.
+   */
+  readonly stageRows: { readonly above: number; readonly division: number; readonly loop: number };
 }
 
 /** Tablets and wider: the full clock with seven gestures. */
@@ -67,14 +71,7 @@ const WIDE: DrawingLayout = {
     { x: 418, method: 'cst' },
   ],
   earlierEnds: [482, 528, 574],
-  stages: [
-    { x: 40, y: 44 },
-    { x: 262, y: 44 },
-    { x: 620, y: 44 },
-    { x: 686, y: 44 },
-    { x: 812, y: 44 },
-    { x: 470, y: 186 },
-  ],
+  stageRows: { above: 44, division: 44, loop: 186 },
 };
 
 /** Phones: half the width and fewer gestures, so each mark stays readable. */
@@ -95,14 +92,7 @@ const COMPACT: DrawingLayout = {
     { x: 190, method: 'cst' },
   ],
   earlierEnds: [230, 260],
-  stages: [
-    { x: 16, y: 38 },
-    { x: 146, y: 38 },
-    { x: 290, y: 38 },
-    { x: 319, y: 138 },
-    { x: 419, y: 38 },
-    { x: 222, y: 190 },
-  ],
+  stageRows: { above: 38, division: 128, loop: 190 },
 };
 
 /** Each track's share of the reserve, from protocol-facts, in the order every chart uses. */
@@ -164,6 +154,28 @@ function splitSegments(layout: DrawingLayout) {
     x += width;
     return segment;
   });
+}
+
+/**
+ * Where each of the six stages is numbered, on the object its caption is
+ * about: 1 the opening gesture, 2 the gestures, 3 the zero point (its
+ * exclusive window follows it), 4 the allocation bar where the reserve
+ * divides, 5 the Stellar Selection segment of that bar, 6 the loop back to
+ * the next cycle's opening.
+ */
+function stagePositions(layout: DrawingLayout): ReadonlyArray<{ x: number; y: number }> {
+  const segments = splitSegments(layout);
+  const stellar = segments.find((segment) => segment.id === 'stellar');
+  const middleGesture = layout.gestures[Math.floor(layout.gestures.length / 2)]?.x ?? layout.openX;
+  const { above, division, loop } = layout.stageRows;
+  return [
+    { x: layout.openX, y: above },
+    { x: middleGesture, y: above },
+    { x: layout.zeroX, y: above },
+    { x: layout.splitStartX, y: division },
+    { x: stellar ? stellar.x + stellar.width / 2 : layout.splitEndX, y: above },
+    { x: (layout.openX + layout.splitEndX) / 2, y: loop },
+  ];
 }
 
 function StageNumber({
@@ -346,7 +358,7 @@ function CycleDrawing({ layout, className }: { layout: DrawingLayout; className?
       </svg>
 
       <div aria-hidden className="pointer-events-none absolute inset-0">
-        {layout.stages.map((mark, index) => (
+        {stagePositions(layout).map((mark, index) => (
           <StageNumber
             key={index}
             n={index + 1}
@@ -376,7 +388,7 @@ function CycleLegend({
   const itemsClass = 'flex flex-wrap items-center gap-x-5 gap-y-1.5';
   return (
     // Three rows, each named in the start column: the gesture methods, the
-    // hatched window (its swatch stands in for a name) and the allocation tracks.
+    // finalization window (its hatched swatch leads its line) and the tracks.
     <figcaption className="mt-5 grid grid-cols-[auto_minmax(0,1fr)] items-baseline gap-x-5 gap-y-2.5 type-caption text-subtle sm:mt-3">
       <span className="type-label text-muted-foreground">{legend.gestures}</span>
       <ul className={itemsClass}>
@@ -390,18 +402,16 @@ function CycleLegend({
           </li>
         ))}
       </ul>
-      <svg
-        aria-hidden
-        focusable="false"
-        viewBox="0 0 24 8"
-        className="h-2 w-6 shrink-0 self-center justify-self-end"
-      >
-        <defs>
-          <WindowPattern id="cycle-window-legend" />
-        </defs>
-        <rect width="24" height="8" rx="1" fill="url(#cycle-window-legend)" />
-      </svg>
-      <p data-legend="exclusive-window">{legend.exclusiveWindow}</p>
+      <span className="type-label text-muted-foreground">{legend.finalization}</span>
+      <p data-legend="exclusive-window" className="inline-flex items-center gap-1.5">
+        <svg aria-hidden focusable="false" viewBox="0 0 24 8" className="h-2 w-6 shrink-0">
+          <defs>
+            <WindowPattern id="cycle-window-legend" />
+          </defs>
+          <rect width="24" height="8" rx="1" fill="url(#cycle-window-legend)" />
+        </svg>
+        <span>{legend.exclusiveWindow}</span>
+      </p>
       <span className="type-label text-muted-foreground">{legend.allocations}</span>
       <ul className={itemsClass}>
         {ALLOCATION_TRACK_IDS.map((id) => (
@@ -456,13 +466,14 @@ export function CycleTimeline({
         <CycleLegend legend={gameCycle.legend} trackLabels={trackLabels} locale={locale} />
       </figure>
 
-      <ol className="mt-10 grid gap-x-10 gap-y-8 border-t border-rule pt-8 sm:grid-cols-2 lg:grid-cols-3">
+      {/* Teaching copy at body size; two columns keep its lines at a reading length. */}
+      <ol className="mt-10 grid gap-x-12 gap-y-9 border-t border-rule pt-8 md:grid-cols-2">
         {gameCycle.phases.map((phase, index) => (
-          <li key={phase.label} className="flex gap-4">
+          <li key={phase.label} className="flex max-w-[var(--measure-prose)] gap-4">
             <StageNumber n={index + 1} className="mt-0.5 shrink-0" />
             <div className="min-w-0">
               <h3 className="type-title text-foreground">{phase.label}</h3>
-              <p className="mt-1.5 type-body-sm text-muted-foreground">{phase.description}</p>
+              <p className="mt-1.5 type-body-md text-muted-foreground">{phase.description}</p>
             </div>
           </li>
         ))}

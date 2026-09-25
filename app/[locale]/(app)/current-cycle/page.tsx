@@ -6,6 +6,7 @@ import { PageMessages } from '@/components/i18n/PageMessages';
 
 import { DashboardQuerySeed } from '../QuerySeed';
 
+import { CurrentCycleRelated } from './CurrentCycleRelated';
 import { CurrentCycleSeoSummary } from './CurrentCycleSeoSummary';
 import CurrentRoundPage from './CurrentRoundPage';
 
@@ -45,7 +46,10 @@ export default async function Page({ params }: PageProps) {
       ]}
     >
       <DashboardQuerySeed>
-        <CurrentRoundPage seoSummary={<CurrentCycleSeoSummary />} />
+        <CurrentRoundPage
+          seoSummary={<CurrentCycleSeoSummary />}
+          relatedPages={<CurrentCycleRelated />}
+        />
       </DashboardQuerySeed>
     </PageMessages>
   );

@@ -1,6 +1,16 @@
 import { protocolFacts } from '@/content/protocol-facts';
 
+import { formatCount } from '@/utils/format/numbers';
+
 import type { FAQText } from './structure';
+
+/**
+ * Protocol amounts in this locale's number style (grouping from
+ * `i18n/localeConfig.ts` through the format layer, never an Intl tag typed
+ * into a copy module).
+ */
+const cst = formatCount(protocolFacts.specialAllocationCst, 'ko');
+const outreachCst = formatCount(protocolFacts.outreachReserveCst, 'ko');
 
 /** protocolFacts stores the example gaps as English strings; render them in Korean. */
 const ELAPSED_KO: Record<
@@ -24,11 +34,6 @@ export const faqTextKo = {
         question: 'Cosmic Signature란 무엇인가요?',
         answer:
           'Cosmic Signature는 Arbitrum 위의 절차적 온체인 아트 프로토콜입니다. 참여자는 퍼포먼스 사이클 동안 제스처를 남기고, 모든 제스처가 사이클의 최종 시그니처를 빚어냅니다. 사이클이 마감되면 프로토콜은 준비금을 10개가 넘는 배분 경로로 배분합니다. 이더리움 핵심 기여자 170명 이상을 위한 자금 지원 메커니즘인 Protocol Guild도 그중 하나입니다.',
-      },
-      'is-cosmic-signature-related-to-biology': {
-        question: 'Cosmic Signature는 생물학의 COSMIC 데이터베이스와 관련이 있나요?',
-        answer:
-          '아닙니다. Cosmic Signature는 COSMIC 암 돌연변이 데이터베이스나 생물학의 COSMIC 돌연변이 시그니처와 아무 관련이 없습니다. 결정론적 삼체 NFT 아트에 집중하는 온체인 아트 프로토콜이자 앱입니다.',
       },
       'how-does-the-bidding-game-work': {
         question: '퍼포먼스 사이클은 어떻게 진행되나요?',
@@ -66,8 +71,7 @@ export const faqTextKo = {
     items: {
       'what-is-the-main-allocation': {
         question: '시그니처 배분이란 무엇인가요?',
-        answer:
-          '시그니처 배분은 사이클의 최종 제스처를 남긴 참여자가 받습니다. Cosmic Signature NFT 1개, 공로 CST 1,000개, 사이클 준비금 ETH의 25%, 그리고 사이클 동안 참여자 제스처에 첨부된 모든 토큰과 NFT가 포함됩니다.',
+        answer: `시그니처 배분은 사이클을 마감한 참여자가 받습니다. 사이클 마감 시각이 지난 뒤 ${protocolFacts.finalGestureExclusivityHours}시간 동안은 최종 제스처를 남긴 참여자만 마감할 수 있고, 그 뒤에는 누구나 마감할 수 있습니다. Cosmic Signature NFT 1개, 공로 CST ${cst}개, 사이클 준비금 ETH의 ${protocolFacts.mainEthPercentage}%, 그리고 사이클 동안 참여자 제스처에 첨부된 모든 토큰과 NFT가 포함됩니다.`,
       },
       'what-rewards-per-bid': {
         question: '제스처마다 무엇을 받나요?',
@@ -75,7 +79,7 @@ export const faqTextKo = {
       },
       'how-does-the-stellarSelection-work': {
         question: '별빛 선정은 어떻게 이루어지나요?',
-        answer: `제스처마다 별빛 선정 자격이 한 건씩 기록됩니다. 사이클이 마감되면 스마트 컨트랙트가 풀에서 자격을 무작위로 선정합니다. 선정된 자격 ${protocolFacts.ethStellarSelectionRecipients}건이 사이클 준비금 ETH의 ${protocolFacts.stellarSelectionEthPercentage}%를 나누어 받고, 또 다른 ${protocolFacts.nftStellarSelectionRecipients}건은 각각 ${protocolFacts.specialAllocationCst.toLocaleString('ko-KR')} CST와 Cosmic Signature NFT를 받으며, 앵커링된 Random Walk NFT 가운데 선정되는 ${protocolFacts.anchoredRwlkNftSelectionRecipients}건도 각각 ${protocolFacts.specialAllocationCst.toLocaleString('ko-KR')} CST와 Cosmic Signature NFT를 받습니다. 선정은 복원 추출 방식으로 이루어지므로 같은 주소가 한 사이클에서 여러 번 선정될 수 있습니다. 제스처를 많이 남길수록 선정 빈도가 높아집니다.`,
+        answer: `제스처마다 별빛 선정 자격이 한 건씩 기록됩니다. 사이클이 마감되면 스마트 컨트랙트가 풀에서 자격을 무작위로 선정합니다. 선정된 자격 ${protocolFacts.ethStellarSelectionRecipients}건이 사이클 준비금 ETH의 ${protocolFacts.stellarSelectionEthPercentage}%를 나누어 받고, 또 다른 ${protocolFacts.nftStellarSelectionRecipients}건은 각각 ${cst} CST와 Cosmic Signature NFT를 받으며, 앵커링된 Random Walk NFT 가운데 선정되는 ${protocolFacts.anchoredRwlkNftSelectionRecipients}건도 각각 ${cst} CST와 Cosmic Signature NFT를 받습니다. 선정은 복원 추출 방식으로 이루어지므로 같은 주소가 한 사이클에서 여러 번 선정될 수 있습니다. 제스처를 많이 남길수록 선정 빈도가 높아집니다.`,
       },
       'how-random-selection-works': {
         question: '무작위 선정은 어떻게 이루어지나요?',
@@ -84,19 +88,19 @@ export const faqTextKo = {
       },
       'how-do-i-claim-my-allocation': {
         question: '수령자가 되면 배분을 어떻게 회수하나요?',
-        answer: `수령자는 앱과 프로토콜 컨트랙트를 통해 배분을 회수합니다. 최종 제스처 참여자는 사이클 마감 시각이 지난 뒤 ${protocolFacts.finalGestureExclusivityHours}시간 동안 단독으로 사이클을 마감하고 시그니처 배분을 회수할 수 있습니다. 그 뒤에는 공개 마감 구간이 시작됩니다. 누구나 사이클을 마감할 수 있고, 스마트 컨트랙트는 마감을 실행한 사람을 사이클 수령자로 취급합니다. 즉 마감 실행자가 시그니처 배분 전체(ETH 몫, ${protocolFacts.specialAllocationCst.toLocaleString('ko-KR')} CST 각인, Cosmic Signature NFT, 첨부 자산 우선권)를 받습니다. 2차 ETH 배분과 첨부 토큰 또는 첨부 NFT 배분은 배분 지갑 에스크로에 보관되며, 별도의 회수 기한이 적용됩니다. 기본값은 ${protocolFacts.secondaryRetrievalTimeoutWeeks}주이며, 기한이 지나면 누구든 미회수 배분을 자기 몫으로 회수할 수 있습니다. 배분은 서둘러 회수해 주세요.`,
+        answer: `수령자는 앱과 프로토콜 컨트랙트를 통해 배분을 회수합니다. 최종 제스처 참여자는 사이클 마감 시각이 지난 뒤 ${protocolFacts.finalGestureExclusivityHours}시간 동안 단독으로 사이클을 마감하고 시그니처 배분을 회수할 수 있습니다.\n\n그 뒤에는 공개 마감 구간이 시작됩니다. 누구나 사이클을 마감할 수 있고, 스마트 컨트랙트는 마감을 실행한 사람을 사이클 수령자로 취급합니다. 즉 마감 실행자가 시그니처 배분 전체(ETH 몫, ${cst} CST 각인, Cosmic Signature NFT, 첨부 자산 우선권)를 받습니다.\n\n2차 ETH 배분과 첨부 토큰 또는 첨부 NFT 배분은 배분 지갑 에스크로에 보관되며, 별도의 회수 기한이 적용됩니다. 기본값은 ${protocolFacts.secondaryRetrievalTimeoutWeeks}주이며, 기한이 지나면 누구든 미회수 배분을 자기 몫으로 회수할 수 있습니다. 배분은 서둘러 회수해 주세요.`,
       },
       'how-does-anchoring-work': {
         question: '앵커링은 어떻게 작동하나요?',
-        answer: `Cosmic Signature NFT를 프로토콜에 앵커링하면 ETH 앵커링 지급을 받을 수 있습니다. 마감되는 사이클마다 사이클 준비금의 ${protocolFacts.anchorDistributionPercentage}%가 앵커링된 Cosmic Signature NFT에 균등하게 나뉘고, 쌓인 ETH는 앵커링을 해제할 때 지급됩니다. Random Walk NFT도 앵커링할 수 있지만, 이는 앵커링 NFT 별빛 선정 자격을 얻기 위한 것입니다. 선정된 앵커링 보유자는 ETH가 아니라 CST와 Cosmic Signature NFT를 받습니다. 알아 두어야 할 규칙이 두 가지 있습니다. 모든 NFT는 단 한 번만 앵커링할 수 있으며(앵커링을 해제한 NFT는 다시 앵커링할 수 없습니다), 사이클이 마감될 때 앵커링된 Cosmic Signature NFT가 하나도 없으면 그 사이클의 ${protocolFacts.anchorDistributionPercentage}%는 사이클 준비금에 그대로 남습니다. CST(ERC-20)는 앵커링할 수 없습니다. 앵커링 관리는 계정 메뉴의 내 앵커링 페이지에서 할 수 있습니다.`,
+        answer: `Cosmic Signature NFT를 프로토콜에 앵커링하면 ETH 앵커링 지급을 받을 수 있습니다. 마감되는 사이클마다 사이클 준비금의 ${protocolFacts.anchorDistributionPercentage}%가 앵커링된 Cosmic Signature NFT에 균등하게 나뉘고, 쌓인 ETH는 앵커링을 해제할 때 지급됩니다.\n\nRandom Walk NFT도 앵커링할 수 있지만, 이는 앵커링 NFT 별빛 선정 자격을 얻기 위한 것입니다. 선정된 앵커링 보유자는 ETH가 아니라 CST와 Cosmic Signature NFT를 받습니다.\n\n알아 두어야 할 규칙이 두 가지 있습니다. 모든 NFT는 단 한 번만 앵커링할 수 있으며(앵커링을 해제한 NFT는 다시 앵커링할 수 없습니다), 사이클이 마감될 때 앵커링된 Cosmic Signature NFT가 하나도 없으면 그 사이클의 ${protocolFacts.anchorDistributionPercentage}%는 사이클 준비금에 그대로 남습니다. CST(ERC-20)는 앵커링할 수 없습니다. 앵커링 관리는 계정 메뉴의 내 앵커링 페이지에서 할 수 있습니다.`,
       },
       'what-are-marketing-rewards': {
         question: '홍보 준비금이란 무엇인가요?',
-        answer: `프로토콜을 알리는 데 힘을 보태면 CST 토큰(ERC-20)을 받을 수 있습니다. 홍보 준비금은 사이클마다 ${protocolFacts.outreachReserveCst.toLocaleString('ko-KR')} CST를 각인해 생태계 기여자에게 전달합니다. 자세한 안내는 Discord에서 홍보 준비금 재무 담당자에게 문의해 주세요.`,
+        answer: `프로토콜을 알리는 데 힘을 보태면 CST 토큰(ERC-20)을 받을 수 있습니다. 홍보 준비금은 사이클마다 ${outreachCst} CST를 각인해 생태계 기여자에게 전달합니다. 자세한 안내는 Discord에서 홍보 준비금 재무 담당자에게 문의해 주세요.`,
       },
       'how-many-nfts-minted': {
         question: '사이클마다 Cosmic Signature NFT가 몇 개 각인되나요?',
-        answer: `대부분의 사이클에서는 Cosmic Signature NFT ${protocolFacts.typicalNftsPerCycle}개가 각인됩니다. 시그니처 배분 수령자에게 1개, 최종 CST 제스처 수령자에게 1개, 수호 챔피언에게 1개, 시간의 전사에게 1개, NFT 별빛 선정 수령자에게 ${protocolFacts.nftStellarSelectionRecipients}개, 그리고 앵커링 NFT 별빛 선정으로 선정된 Random Walk NFT 앵커링 보유자에게 ${protocolFacts.anchoredRwlkNftSelectionRecipients}개입니다. 이 ${protocolFacts.typicalNftsPerCycle}개의 NFT 배분에는 각각 ${protocolFacts.specialAllocationCst.toLocaleString('ko-KR')} CST도 함께 포함됩니다. 사이클에 CST 제스처가 없거나 앵커링된 Random Walk NFT가 없으면 해당 각인은 그 사이클에서 이루어지지 않습니다.`,
+        answer: `대부분의 사이클에서는 Cosmic Signature NFT ${protocolFacts.typicalNftsPerCycle}개가 각인됩니다. 시그니처 배분 수령자에게 1개, 최종 CST 제스처 수령자에게 1개, 수호 챔피언에게 1개, 시간의 전사에게 1개, NFT 별빛 선정 수령자에게 ${protocolFacts.nftStellarSelectionRecipients}개, 그리고 앵커링 NFT 별빛 선정으로 선정된 Random Walk NFT 앵커링 보유자에게 ${protocolFacts.anchoredRwlkNftSelectionRecipients}개입니다. 이 ${protocolFacts.typicalNftsPerCycle}개의 NFT 배분에는 각각 ${cst} CST도 함께 포함됩니다. 사이클에 CST 제스처가 없거나 앵커링된 Random Walk NFT가 없으면 해당 각인은 그 사이클에서 이루어지지 않습니다.`,
       },
       'what-happens-to-remaining-eth': {
         question: '사이클 준비금에 남은 ETH는 어떻게 되나요?',
@@ -129,7 +133,7 @@ export const faqTextKo = {
       },
       'how-is-participation-cst-calculated': {
         question: '참여 CST는 어떻게 계산되나요?',
-        answer: `참여 CST는 이전 제스처 이후 흐른 시간에 제곱근 공식을 적용해 계산합니다: ${protocolFacts.dynamicCstRewardFormula}. 제곱근을 쓰는 이유는 긴 공백을 더 크게 반영하되, 양이 끝없이 선형으로 늘어나지는 않게 하기 위해서입니다. 출시 매개변수(시간 증가량 정확히 1시간) 기준의 예시는 대략 다음과 같습니다: ${protocolFacts.dynamicCstRewardExamples.map((example) => `${ELAPSED_KO[example.elapsed]}에 ${example.cst} CST`).join(', ')}. 시간 증가량은 사이클이 마감될 때마다 ${protocolFacts.cycleTimeIncrementIncreasePercentPerCycle}% 늘어나므로, 실제 양은 시간이 지날수록 이 예시보다 조금씩 낮아집니다. 제스처가 반영되는 순간의 정확한 양은 앱의 실시간 미리 보기와 컨트랙트가 기준입니다.`,
+        answer: `참여 CST는 이전 제스처 이후 흐른 시간에 제곱근 공식을 적용해 계산합니다: ${protocolFacts.dynamicCstRewardFormula}. 제곱근을 쓰는 이유는 긴 공백을 더 크게 반영하되, 양이 끝없이 선형으로 늘어나지는 않게 하기 위해서입니다.\n\n출시 매개변수(시간 증가량 정확히 1시간) 기준의 예시는 대략 다음과 같습니다: ${protocolFacts.dynamicCstRewardExamples.map((example) => `${ELAPSED_KO[example.elapsed]}에 ${example.cst} CST`).join(', ')}. 시간 증가량은 사이클이 마감될 때마다 ${protocolFacts.cycleTimeIncrementIncreasePercentPerCycle}% 늘어나므로, 실제 양은 시간이 지날수록 이 예시보다 조금씩 낮아집니다. 제스처가 반영되는 순간의 정확한 양은 앱의 실시간 미리 보기와 컨트랙트가 기준입니다.`,
       },
       'why-minimum-cst-reward-protection': {
         question: '최소 참여 CST 보호란 무엇인가요?',
@@ -142,7 +146,7 @@ export const faqTextKo = {
       },
       'what-is-open-finalization-window': {
         question: '공개 마감 구간이란 무엇인가요?',
-        answer: `사이클 마감 시각이 지나면 최종 제스처 참여자는 ${protocolFacts.finalGestureExclusivityHours}시간 동안 단독으로 사이클을 마감할 수 있습니다. 이 우선 마감 구간 안에 마감하지 않으면 누구나 마감 트랜잭션을 호출할 수 있고, 스마트 컨트랙트는 마감을 실행한 사람을 사이클 수령자로 삼습니다. 마감 실행자가 시그니처 배분 전체(ETH 몫, ${protocolFacts.specialAllocationCst.toLocaleString('ko-KR')} CST, Cosmic Signature NFT, 첨부 자산 우선권)를 받으므로, 최종 제스처 참여자는 구간이 끝나기 전에 마감해야 합니다. 공개 마감은 최종 제스처 참여자가 사라지더라도 프로토콜이 멈추지 않도록 합니다.`,
+        answer: `사이클 마감 시각이 지나면 최종 제스처 참여자는 ${protocolFacts.finalGestureExclusivityHours}시간 동안 단독으로 사이클을 마감할 수 있습니다. 이 우선 마감 구간 안에 마감하지 않으면 누구나 마감 트랜잭션을 호출할 수 있고, 스마트 컨트랙트는 마감을 실행한 사람을 사이클 수령자로 삼습니다. 마감 실행자가 시그니처 배분 전체(ETH 몫, ${cst} CST, Cosmic Signature NFT, 첨부 자산 우선권)를 받으므로, 최종 제스처 참여자는 구간이 끝나기 전에 마감해야 합니다. 공개 마감은 최종 제스처 참여자가 사라지더라도 프로토콜이 멈추지 않도록 합니다.`,
       },
       'what-is-endurance-champion': {
         question: '수호 챔피언이란 무엇인가요?',
@@ -156,7 +160,7 @@ export const faqTextKo = {
       },
       'what-is-chrono-warrior': {
         question: '시간의 전사란 무엇인가요?',
-        answer: `수호 챔피언 자리를 끊기지 않고 가장 오래 지킨 참여자입니다. 수호 챔피언이 최근 제스처 참여자 자리를 가장 오래 지킨 사람이라면, 시간의 전사는 수호 챔피언 자리를 가장 오래 지킨 사람입니다. 사이클이 마감되면 시간의 전사는 사이클 준비금 ETH의 ${protocolFacts.chronoWarriorEthPercentage}%, ${protocolFacts.specialAllocationCst.toLocaleString('ko-KR')} CST, Cosmic Signature NFT 1개를 받습니다.`,
+        answer: `수호 챔피언 자리를 끊기지 않고 가장 오래 지킨 참여자입니다. 수호 챔피언이 최근 제스처 참여자 자리를 가장 오래 지킨 사람이라면, 시간의 전사는 수호 챔피언 자리를 가장 오래 지킨 사람입니다. 사이클이 마감되면 시간의 전사는 사이클 준비금 ETH의 ${protocolFacts.chronoWarriorEthPercentage}%, ${cst} CST, Cosmic Signature NFT 1개를 받습니다.`,
       },
       'does-time-per-bid-stay-same': {
         question: '제스처마다 더해지는 시간은 늘 같나요?',
@@ -308,6 +312,11 @@ export const faqTextKo = {
         answer:
           '제스처 비용 외에 트랜잭션마다 Arbitrum 네트워크 가스 비용을 냅니다. 가스 비용은 네트워크 상황에 따라 변동하며, Cosmic Signature가 정하는 것이 아닙니다.',
       },
+      'is-cosmic-signature-related-to-biology': {
+        question: 'Cosmic Signature는 생물학의 COSMIC 데이터베이스와 관련이 있나요?',
+        answer:
+          '아닙니다. Cosmic Signature는 COSMIC 암 돌연변이 데이터베이스나 생물학의 COSMIC 돌연변이 시그니처와 아무 관련이 없습니다. 결정론적 삼체 NFT 아트에 집중하는 온체인 아트 프로토콜이자 앱입니다.',
+      },
     },
   },
   'trust-and-governance': {
@@ -317,7 +326,7 @@ export const faqTextKo = {
       'team-controls': {
         question: '팀은 프로토콜에 어떤 권한을 갖고 있나요?',
         answer:
-          '초기에는 팀이 제스처당 시간 증가량이나 배분 경로 비율 같은 프로토콜의 일부 매개변수를 조정할 수 있습니다. 이 권한은 스마트 컨트랙트의 ‘Ownable’ 패턴으로 구현되며 사이클 사이의 구간으로 한정됩니다. 다음 사이클이 활성화되면(첫 제스처 전에 이루어집니다) 핵심 프로토콜 매개변수는 그 사이클이 마감될 때까지 잠깁니다. 이 잠금과 별개로 몇 가지 제한된 권한은 남아 있습니다. 소유자는 첫 제스처가 오기 전까지 사이클 활성화를 미룰 수 있고, 다음 사이클 전의 지연 시간을 언제든 조정할 수 있으며, 주변 컨트랙트(공공재 금고 수령처, NFT 메타데이터 URI, 배분 지갑 회수 기한)를 언제든 관리할 수 있습니다. 프로토콜 컨트랙트는 소유자가 업그레이드(UUPS)할 수도 있지만 사이클 사이에만 가능하며, 현재 배포된 구현은 공개 검증된 V2입니다.',
+          '초기에는 팀이 제스처당 시간 증가량이나 배분 경로 비율 같은 프로토콜의 일부 매개변수를 조정할 수 있습니다. 이 권한은 스마트 컨트랙트의 ‘Ownable’ 패턴으로 구현되며 사이클 사이의 구간으로 한정됩니다. 다음 사이클이 활성화되면(첫 제스처 전에 이루어집니다) 핵심 프로토콜 매개변수는 그 사이클이 마감될 때까지 잠깁니다.\n\n이 잠금과 별개로 몇 가지 제한된 권한은 남아 있습니다. 소유자는 첫 제스처가 오기 전까지 사이클 활성화를 미룰 수 있고, 다음 사이클 전의 지연 시간을 언제든 조정할 수 있으며, 주변 컨트랙트(공공재 금고 수령처, NFT 메타데이터 URI, 배분 지갑 회수 기한)를 언제든 관리할 수 있습니다.\n\n프로토콜 컨트랙트는 소유자가 업그레이드(UUPS)할 수도 있지만 사이클 사이에만 가능하며, 현재 배포된 구현은 공개 검증된 V2입니다.',
       },
       'will-team-always-have-control': {
         question: '팀이 프로토콜 매개변수 권한을 계속 갖게 되나요?',

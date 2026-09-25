@@ -11,14 +11,15 @@ import { CurrentCycleTitle } from './CurrentCycleTitle';
 /**
  * The /current-cycle page header, rendered on the server: the page's name as
  * the eyebrow, the cycle itself as the H1 ("Cycle 2"), a one-sentence lede
- * and the cycle's live figures (gestures, Signature Allocation, opening time
- * with its zone). The figures read the same polled dashboard query as the
+ * and the cycle's live figures (gestures, and its opening time, which names
+ * its zone itself). The figures read the same polled dashboard query as the
  * page body and start from this request's server read, so the server HTML
  * holds them. They are plain labels: the page explains its coined words in
  * place (dotted terms) and the allocations in one disclosure, so the first
- * screen has one explanation pattern. The page's one freshness stamp is in
- * the body, which follows the live cycle: on the standings ledger, or on
- * the status column before the first gesture.
+ * screen has one explanation pattern. The Signature Allocation is the Last
+ * Gesture's figure in the standings, shown once. The header sits in the
+ * page's hero row beside the clock, which draws the space under both; the
+ * related pages close the page (CurrentCycleRelated).
  */
 export async function CurrentCycleSeoSummary() {
   const locale = await getLocale();
@@ -44,26 +45,15 @@ export async function CurrentCycleSeoSummary() {
           value: figure('gestures'),
         },
         {
-          id: 'signatureAllocation',
-          label: t('currentCycleSummary.cards.signatureAllocation'),
-          value: figure('reserve'),
-        },
-        {
           id: 'opened',
           label: t('currentCycleSummary.cards.opened'),
           value: figure('opened'),
-          // A date is set a size down from the amounts; it names its zone inline.
+          // A date is set a size down from the counts; it names its zone inline.
           size: 'md',
         },
       ]}
-      related={[
-        { href: '/how-it-works', label: t('currentCycleSummary.links.learn') },
-        { href: '/statistics', label: t('currentCycleSummary.links.statistics') },
-        { href: '/contracts', label: t('currentCycleSummary.links.contracts') },
-      ]}
-      relatedLabel={t('currentCycleSummary.relatedAria')}
-      // The section bar under the header (or its stand-in while the body loads) draws its bottom rule.
-      className="mb-0 border-b-0 sm:mb-0"
+      // The section bar under the hero row (or its stand-in while the body loads) draws its rule.
+      className="mb-0 border-b-0 pb-0 sm:mb-0 sm:pb-0"
     />
   );
 }

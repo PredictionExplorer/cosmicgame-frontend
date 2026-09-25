@@ -1,8 +1,13 @@
 import { protocolFacts } from '@/content/protocol-facts';
 
+import { copyNumbers } from './copyNumbers';
 import type { HowItWorksText } from './structure';
 
-const cst = protocolFacts.specialAllocationCst.toLocaleString('en-US');
+const numbers = copyNumbers('ja');
+const cst = numbers.specialAllocationCst;
+const eth = numbers.count(numbers.ethRecipients);
+const nft = numbers.count(numbers.nftRecipients);
+const anchored = numbers.count(numbers.anchoredRecipients);
 
 /** Japanese how-it-works copy, keyed by the skeleton in structure.ts. */
 export const howItWorksTextJa = {
@@ -23,7 +28,7 @@ export const howItWorksTextJa = {
   hero: {
     heading: 'Cosmic Signatureの仕組み',
     paragraph:
-      '一筆を重ね、時間を見守り、シグネチャーを形づくります。確定時刻を過ぎるとサイクルを確定でき、準備金はシグネチャー配分、係留配分、Protocol Guildなど、10を超えるトラックへ配分されます。',
+      'パフォーマンス・サイクルの間に参加者が一筆を入れ、その一筆一筆がサイクルのシグネチャーを形づくります。確定時刻を過ぎるとサイクルを確定でき、準備金はシグネチャー配分、係留配分、Protocol Guildなど、10を超えるトラックへ配分されます。',
     primaryCtaLabel: '一筆を入れる',
     secondaryCtaLabel: '現在のサイクルを見る',
   },
@@ -38,11 +43,11 @@ export const howItWorksTextJa = {
       },
       {
         title: '星選の対象',
-        description: `一筆ごとに対象が1件記録されます。サイクルが確定すると無作為に3件が選ばれ、サイクル準備金の${protocolFacts.stellarSelectionEthPercentage}%をETHで分け合います。`,
+        description: `一筆ごとに対象が1件記録されます。サイクルが確定すると無作為に${eth}件が選ばれ、サイクル準備金の${protocolFacts.stellarSelectionEthPercentage}%をETHで分け合います。`,
       },
       {
         title: 'Cosmic Signature NFTの選定',
-        description: `さらに10件が選ばれ、それぞれ${cst} CSTとCosmic Signature NFTを受け取ります。同じアドレスが複数回選ばれることもあり、対象が何件あっても選ばれる保証はありません。`,
+        description: `さらに${nft}件が選ばれ、それぞれ${cst} CSTとCosmic Signature NFTを受け取ります。同じアドレスが複数回選ばれることもあり、対象が何件あっても選ばれる保証はありません。`,
       },
       {
         title: 'シグネチャー配分',
@@ -75,6 +80,7 @@ export const howItWorksTextJa = {
     subhead: 'すべてのサイクルは、開始から確定までこの順序で進みます。',
     legend: {
       gestures: '一筆',
+      finalization: '確定',
       exclusiveWindow: `最後の一筆の参加者だけが確定できる${protocolFacts.finalGestureExclusivityHours}時間`,
       allocations: '配分トラック',
     },
@@ -97,7 +103,7 @@ export const howItWorksTextJa = {
       },
       {
         label: '星選',
-        description: `3人のETH星選受領者がサイクル準備金の${protocolFacts.stellarSelectionEthPercentage}%を分け合います。10人のNFT星選受領者と、係留されたRandom Walk NFTから選ばれる10人の係留NFT星選受領者が、それぞれ${cst} CSTとCosmic Signature NFTを受け取ります。対象は一筆ごとに1件記録され、すべての星選はサイクルの対象全体から復元抽出で選ばれます。`,
+        description: `${eth}人のETH星選受領者がサイクル準備金の${protocolFacts.stellarSelectionEthPercentage}%を分け合います。${nft}人のNFT星選受領者と、係留されたRandom Walk NFTから選ばれる${anchored}人の係留NFT星選受領者が、それぞれ${cst} CSTとCosmic Signature NFTを受け取ります。対象は一筆ごとに1件記録され、ETHとNFTの星選はサイクルの対象全体から復元抽出で選ばれます。`,
       },
       {
         label: '次のサイクル',
@@ -107,7 +113,7 @@ export const howItWorksTextJa = {
   },
   payoff: {
     heading: 'すべてのサイクルはシグネチャーで締めくくられます',
-    body: '一筆ごとにサイクルの作品が形づくられます。サイクルが確定すると、そのシグネチャーはCosmic Signature NFTとして刻印され、シグネチャー配分とともに最後の一筆を入れた参加者に渡ります。',
+    body: `一筆ごとにサイクルの作品が形づくられます。サイクルが確定すると、そのシグネチャーはCosmic Signature NFTとして刻印され、シグネチャー配分とともにサイクルを確定した参加者に渡ります。カウントダウンがゼロになってから${protocolFacts.finalGestureExclusivityHours}時間は、最後の一筆を入れた参加者だけが確定でき、その後は誰でも確定できます。`,
     linkLabel: 'このシグネチャーを見る',
   },
   stepByStep: {

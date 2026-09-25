@@ -5,7 +5,8 @@
   },
   "status": {
     "notStarted": "尚未開始",
-    "heading": "週期狀態"
+    "heading": "週期狀態",
+    "figuresHeading": "本週期至今"
   },
   "sectionNav": {
     "aria": "本頁內容",
@@ -61,7 +62,7 @@
     "cards": {
       "signature": {
         "name": "簽名分配",
-        "tooltip": "倒數歸零後，寫下收官之筆的參與者可取回這份分配：ETH、1,000 CST、一枚 Cosmic Signature NFT，以及已附加的代幣。"
+        "tooltip": "倒數歸零後，寫下收官之筆的參與者可收官並取回這份分配：ETH、1,000 CST、一枚 Cosmic Signature NFT，以及已附加的代幣。若其未在專屬收官窗口內收官，這份分配歸實際收官者。"
       },
       "chronoWarrior": {
         "name": "時之勇士分配",
@@ -74,7 +75,7 @@
       "cosmicAnchor": {
         "name": "錨定派發",
         "tooltip": "週期儲備中以 ETH 計的一份，收官時由所有已錨定的 Cosmic Signature NFT 平均分享。",
-        "recipientLabel": "按比例 · 全體錨定者"
+        "recipientLabel": "每枚已錨定 NFT 等分"
       },
       "publicGoods": {
         "name": "公共物品",
@@ -102,7 +103,7 @@
   "sections": {
     "allocations": {
       "title": "分配一覽",
-      "description": "週期儲備如何沿各條分配軌道發放：簽名分配、時之勇士、星選、公共物品、錨定派發與滾動儲備。"
+      "description": "週期儲備會沿簽名分配、時之勇士、星選、錨定派發與公共物品等軌道流轉，其餘作為滾動儲備結轉至下一週期。"
     },
     "participants": {
       "title": "本週期參與者"
@@ -151,9 +152,9 @@
     "heading": "本週期的附加資產",
     "cycleFallback": "目前",
     "description": {
-      "nftOnly": "第 {cycle} 個週期收官後，寫下收官之筆的參與者將一併獲得 {nftCount} 枚已附加 NFT。",
-      "erc20Only": "第 {cycle} 個週期收官後，寫下收官之筆的參與者將一併獲得 {erc20Count} 筆已附加的 ERC-20 代幣存入。",
-      "mixed": "第 {cycle} 個週期收官後，寫下收官之筆的參與者將一併獲得 {nftCount} 枚已附加 NFT 與 {erc20Count} 筆 ERC-20 代幣存入。"
+      "nftOnly": "第 {cycle} 個週期收官後，收官者將一併獲得 {nftCount} 枚已附加 NFT。",
+      "erc20Only": "第 {cycle} 個週期收官後，收官者將一併獲得 {erc20Count} 筆已附加的 ERC-20 代幣存入。",
+      "mixed": "第 {cycle} 個週期收官後，收官者將一併獲得 {nftCount} 枚已附加 NFT 與 {erc20Count} 筆 ERC-20 代幣存入。"
     },
     "bonusReceipt": {
       "nftOnly": "{nftCount} 枚 ERC-721 代幣",
@@ -165,7 +166,7 @@
       "cycle": "週期",
       "cycleValue": "{cycle}",
       "recipientRule": "獲配規則",
-      "recipientRuleValue": "收官之筆"
+      "recipientRuleValue": "收官者"
     },
     "remainder": {
       "nftOnly": "此處僅展示精選清單預覽，完整週期明細中還有 {nftCount} 枚已附加 NFT。",

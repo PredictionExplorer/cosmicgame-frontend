@@ -20,11 +20,12 @@
   "category": {
     "expandAll": "Mở rộng tất cả",
     "collapseAll": "Thu gọn tất cả",
-    "expandAllAria": "Mở rộng tất cả câu hỏi",
-    "collapseAllAria": "Thu gọn tất cả câu hỏi",
+    "expandAllAria": "Mở rộng tất cả: {category}",
+    "collapseAllAria": "Thu gọn tất cả: {category}",
     "copyLink": "Sao chép liên kết",
     "copied": "Đã sao chép",
-    "copyLinkAria": "Sao chép liên kết đến câu hỏi này"
+    "copyLinkAria": "Sao chép liên kết: {question}",
+    "linkCopied": "Đã sao chép liên kết"
   },
   "popular": {
     "heading": "Câu hỏi phổ biến"

@@ -1,8 +1,15 @@
 import { protocolFacts } from '@/content/protocol-facts';
 
+import { copyNumbers } from './copyNumbers';
 import type { HowItWorksText } from './structure';
 
-const cst = protocolFacts.specialAllocationCst.toLocaleString('en-US');
+const numbers = copyNumbers('en');
+const cst = numbers.specialAllocationCst;
+const { ethRecipients, nftRecipients, anchoredRecipients } = numbers;
+const entriesAre = (count: number) =>
+  `${numbers.count(count)} ${numbers.plural(count, { one: 'entry is', other: 'entries are' })}`;
+const recipients = (count: number) =>
+  `${numbers.count(count)} ${numbers.plural(count, { one: 'recipient', other: 'recipients' })}`;
 
 /** English how-it-works copy, keyed by the skeleton in structure.ts. */
 export const howItWorksTextEn = {
@@ -23,7 +30,7 @@ export const howItWorksTextEn = {
   hero: {
     heading: 'How Cosmic Signature works',
     paragraph:
-      'Gesture. Endure. Shape the Signature. Participants make gestures during a Performance Cycle. When the Cycle Finalization Time expires, the cycle can be finalized and allocations distribute across more than ten tracks — including the Signature Allocation, Anchor Distributions, and Protocol Guild.',
+      'Participants make gestures during a Performance Cycle, and every gesture shapes the cycle’s Signature. When the Cycle Finalization Time expires, the cycle can be finalized and allocations distribute across more than ten tracks — including the Signature Allocation, Anchor Distributions, and Protocol Guild.',
     primaryCtaLabel: 'Make a gesture',
     secondaryCtaLabel: 'See the live cycle',
   },
@@ -38,11 +45,11 @@ export const howItWorksTextEn = {
       },
       {
         title: 'Stellar Selection entry',
-        description: `Each gesture records one entry. When the cycle finalizes, three entries are selected at random to share ${protocolFacts.stellarSelectionEthPercentage}% of the Cycle Reserve in ETH.`,
+        description: `Each gesture records one entry. When the cycle finalizes, ${entriesAre(ethRecipients)} selected at random to share ${protocolFacts.stellarSelectionEthPercentage}% of the Cycle Reserve in ETH.`,
       },
       {
         title: 'Cosmic Signature NFT selection',
-        description: `Ten more entries are selected to receive ${cst} CST and a Cosmic Signature NFT each. The same address can be selected more than once, and no number of entries guarantees a selection.`,
+        description: `Another ${entriesAre(nftRecipients)} selected to receive ${cst} CST and a Cosmic Signature NFT each. The same address can be selected more than once, and no number of entries guarantees a selection.`,
       },
       {
         title: 'Signature Allocation',
@@ -75,6 +82,7 @@ export const howItWorksTextEn = {
     subhead: 'Every cycle follows this sequence from open to finalization.',
     legend: {
       gestures: 'Gestures',
+      finalization: 'Finalization',
       exclusiveWindow: `${protocolFacts.finalGestureExclusivityHours}-hour window: only the Final Gesture participant can finalize`,
       allocations: 'Allocation tracks',
     },
@@ -97,17 +105,17 @@ export const howItWorksTextEn = {
       },
       {
         label: 'Stellar Selections',
-        description: `Three ETH Stellar Selection recipients share ${protocolFacts.stellarSelectionEthPercentage}% of the Cycle Reserve. Ten NFT Stellar Selection recipients, and ten Anchored-NFT Stellar Selection recipients chosen among anchored Random Walk NFTs, each receive ${cst} CST and a Cosmic Signature NFT. Each gesture adds one entry, and every selection is made from all of the cycle’s entries, so one entry can be selected more than once.`,
+        description: `The ETH Stellar Selection chooses ${recipients(ethRecipients)}, who share ${protocolFacts.stellarSelectionEthPercentage}% of the Cycle Reserve. The NFT Stellar Selection chooses ${numbers.count(nftRecipients)}, and the Anchored-NFT Stellar Selection chooses ${numbers.count(anchoredRecipients)} among anchored Random Walk NFTs; each of them receives ${cst} CST and a Cosmic Signature NFT. Each gesture adds one entry, and the ETH and NFT selections are made from all of the cycle’s entries, so one entry can be selected more than once.`,
       },
       {
         label: 'The next cycle begins',
-        description: `The remaining ${protocolFacts.compoundingReservePercentage}% of the Cycle Reserve rolls forward as the Compounding Reserve, and the next cycle opens with fresh Calibration Windows.`,
+        description: `The remaining ${protocolFacts.compoundingReservePercentage}% of the Cycle Reserve rolls forward as the Compounding Cycle Reserve, and the next cycle opens with fresh Calibration Windows.`,
       },
     ],
   },
   payoff: {
     heading: 'Every cycle ends in a Signature',
-    body: 'Every gesture shapes the cycle’s artwork. When the cycle finalizes, its Signature is imprinted as a Cosmic Signature NFT and goes to the Final Gesture participant with the Signature Allocation.',
+    body: `Every gesture shapes the cycle’s artwork. When the cycle finalizes, its Signature is imprinted as a Cosmic Signature NFT and goes, with the Signature Allocation, to whoever finalizes the cycle. For the first ${protocolFacts.finalGestureExclusivityHours} hours after the countdown reaches zero, only the participant who made the Final Gesture can.`,
     linkLabel: 'View this Signature',
   },
   stepByStep: {

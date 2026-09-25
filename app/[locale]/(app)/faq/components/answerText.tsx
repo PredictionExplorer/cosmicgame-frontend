@@ -41,8 +41,79 @@ export const EXPLAINED_AD_HOC_KEYS = [
   'renounceOwnership',
 ] as const;
 
-export function normalizeForMatch(value: string): string {
-  return value.normalize('NFKC').toLocaleLowerCase();
+/**
+ * What a reader types differently from the copy. The copy sets typographic
+ * quotes and apostrophes (don’t, «ціна»); a keyboard types straight ones.
+ * Joiners and soft hyphens (authored phrase breaks) are invisible, so a
+ * query never has to match them.
+ */
+const TYPED_EQUIVALENT: Readonly<Record<string, string>> = {
+  '‘': "'",
+  '’': "'",
+  '‚': "'",
+  '‛': "'",
+  '′': "'",
+  '“': '"',
+  '”': '"',
+  '„': '"',
+  '‟': '"',
+  '″': '"',
+  '«': '"',
+  '»': '"',
+  '​': '',
+  '⁠': '',
+  '­': '',
+};
+
+/** One character as a search compares it: its typed form, compatibility-folded, lower case. */
+function foldCharacter(character: string): string {
+  return TYPED_EQUIVALENT[character] ?? character.normalize('NFKC').toLocaleLowerCase();
+}
+
+/**
+ * Text folded for search, with where each folded unit came from: `starts[i]`
+ * and `ends[i]` bound the source character behind folded unit `i`, so a
+ * match in the folded text maps back onto the text as written.
+ */
+function foldWithSource(value: string): {
+  source: string;
+  folded: string;
+  starts: number[];
+  ends: number[];
+} {
+  // Composed first, so a typed "e" + combining accent meets the copy's "é".
+  const source = value.normalize('NFC');
+  let folded = '';
+  const starts: number[] = [];
+  const ends: number[] = [];
+  let offset = 0;
+  for (const character of source) {
+    const unit = foldCharacter(character);
+    for (let index = 0; index < unit.length; index += 1) {
+      starts.push(offset);
+      ends.push(offset + character.length);
+    }
+    folded += unit;
+    offset += character.length;
+  }
+  return { source, folded, starts, ends };
+}
+
+/**
+ * Text as the FAQ search compares it: composed (NFC), compatibility forms
+ * folded (NFKC: full-width ＣＳＴ is CST, a no-break space a space), lower
+ * case, and typographic quotes and apostrophes as typed. Every layer of the
+ * search (which questions match, the count, the highlight) folds through
+ * this one function, so they never disagree.
+ */
+export function foldForMatch(value: string): string {
+  return foldWithSource(value).folded;
+}
+
+/** Whether `text` contains the search `query` (both folded); an empty query matches nothing. */
+export function matchesQuery(text: string, query: string): boolean {
+  const needle = foldForMatch(query.trim());
+  return needle.length > 0 && foldForMatch(text).includes(needle);
 }
 
 export function escapeRegExp(value: string): string {
@@ -65,15 +136,30 @@ function termPattern(term: string): string {
 }
 
 /**
+ * An answer's paragraphs. The copy marks a paragraph break with a blank line
+ * ("\n\n"), so a long, procedural answer reads as short paragraphs while
+ * search, JSON-LD and the numeric guards still see one string.
+ */
+export function answerParagraphs(answer: string): string[] {
+  return answer
+    .split(/\n{2,}/)
+    .map((paragraph) => paragraph.trim())
+    .filter(Boolean);
+}
+
+/**
  * An answer as a reader sees it: each explained term marked once, at its
  * first use, as a dotted-underline trigger that opens its definition
  * (glossary terms through `<Term>`, so the FAQ and the glossary never
- * disagree), and contract identifiers (`code`) set as code.
+ * disagree), and contract identifiers (`code`) set as code. Pass the same
+ * `seen` set to every paragraph of one answer, so a term is marked once per
+ * answer, not once per paragraph.
  */
 export function enrichAnswer(
   text: string,
   terms: readonly AnswerTerm[],
   code: readonly string[] = [],
+  seen: Set<string> = new Set(),
 ): ReactNode[] {
   const codeParts = code.filter(Boolean);
   const segments = codeParts.length
@@ -82,11 +168,10 @@ export function enrichAnswer(
   const sorted = terms
     .filter(({ term }) => term.length > 0)
     .sort((a, b) => b.term.length - a.term.length);
-  const byWord = new Map(sorted.map((entry) => [normalizeForMatch(entry.term), entry] as const));
+  const byWord = new Map(sorted.map((entry) => [foldForMatch(entry.term), entry] as const));
   const pattern = sorted.length
     ? new RegExp(`(${sorted.map(({ term }) => termPattern(term)).join('|')})`, 'giu')
     : null;
-  const seen = new Set<string>();
 
   return segments.flatMap((segment, segmentIndex) => {
     if (codeParts.includes(segment)) {
@@ -102,7 +187,7 @@ export function enrichAnswer(
     if (!pattern) return [<Fragment key={segmentIndex}>{segment}</Fragment>];
     return segment.split(pattern).map((part, partIndex) => {
       const key = `${segmentIndex}-${partIndex}`;
-      const normalized = normalizeForMatch(part);
+      const normalized = foldForMatch(part);
       const entry = byWord.get(normalized);
       if (!entry || seen.has(normalized)) return <Fragment key={key}>{part}</Fragment>;
       seen.add(normalized);
@@ -119,18 +204,32 @@ export function enrichAnswer(
   });
 }
 
-/** The answer (or question) with every match of the search query marked. */
+/**
+ * The answer (or question) with every match of the search query marked,
+ * found the way `matchesQuery` finds it: a typed "don't" marks the copy's
+ * "don’t", a full-width "ＣＳＴ" marks "CST".
+ */
 export function highlightMatches(text: string, query: string): ReactNode {
-  if (!query.trim()) return text;
-  const normalizedQuery = normalizeForMatch(query);
-  const parts = text.split(new RegExp(`(${escapeRegExp(query)})`, 'giu'));
-  return parts.map((part, index) =>
-    normalizeForMatch(part) === normalizedQuery ? (
-      <mark key={index} className="rounded-edge bg-primary/25 px-0.5 text-foreground">
-        {part}
-      </mark>
-    ) : (
-      part
-    ),
-  );
+  const needle = foldForMatch(query.trim());
+  if (!needle) return text;
+  const { source, folded, starts, ends } = foldWithSource(text);
+  const parts: ReactNode[] = [];
+  let cursor = 0;
+  let from = 0;
+  for (let at = folded.indexOf(needle); at !== -1; at = folded.indexOf(needle, from)) {
+    const start = starts[at] ?? cursor;
+    const end = ends[at + needle.length - 1] ?? start;
+    from = at + needle.length;
+    if (start < cursor) continue;
+    if (start > cursor) parts.push(source.slice(cursor, start));
+    parts.push(
+      <mark key={start} className="rounded-edge bg-primary/25 px-0.5 text-foreground">
+        {source.slice(start, end)}
+      </mark>,
+    );
+    cursor = end;
+  }
+  if (parts.length === 0) return text;
+  if (cursor < source.length) parts.push(source.slice(cursor));
+  return parts;
 }

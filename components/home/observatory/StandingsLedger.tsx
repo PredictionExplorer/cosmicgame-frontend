@@ -316,8 +316,9 @@ interface LedgerFact {
  * the figure sits in its own column and never does, so a ticking figure can
  * never re-wrap the line and move the desk (the ledger is measured against
  * the rows of the page, not its own content). Every figure reads as a clock
- * ("1d 01:12:05" over "8d 00:24:38"), so stacked lines share one format,
- * their digits align, and a width holds while it ticks.
+ * ("1d 01:12:05" over "8d 00:24:38"), as the "Time held" column and the
+ * gesture log do, so stacked lines share one format, their digits align, and
+ * a width holds while it ticks.
  */
 function LedgerFacts({ facts }: { facts: LedgerFact[] }) {
   return (

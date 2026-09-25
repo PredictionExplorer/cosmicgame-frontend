@@ -20,18 +20,40 @@ jest.mock('../../../../../hooks/useTxFlow', () => ({
 
 const mockGetImprintCost = jest.fn(() => Promise.resolve(COST_WEI));
 const mockWalletOfOwner = jest.fn(() => Promise.resolve([] as readonly bigint[]));
+const mockNextTokenId = jest.fn(() => Promise.resolve(4115n));
 jest.mock('../../../../../hooks/useRWLKNFTContract', () => ({
   __esModule: true,
   default: () => ({
-    read: { getMintPrice: mockGetImprintCost, walletOfOwner: mockWalletOfOwner }, // lexicon-allow-abi
+    read: {
+      getMintPrice: mockGetImprintCost, // lexicon-allow-abi
+      walletOfOwner: mockWalletOfOwner,
+      nextTokenId: mockNextTokenId,
+    },
   }),
 }));
 
+/** The game contract's record of used Random Walk NFTs, by token id (1 = used). */
+type MulticallResult = { status: 'success'; result: bigint } | { status: 'failure' };
+const mockMulticall = jest.fn(
+  (args: { contracts: { args: readonly [bigint] }[] }): Promise<MulticallResult[]> =>
+    Promise.resolve(args.contracts.map(() => ({ status: 'success', result: 0n }))),
+);
 const mockReadContract = jest.fn(() => Promise.resolve(COST_WEI));
 jest.mock('wagmi', () => ({
   ...jest.requireActual('../../../../../__mocks__/wagmi'),
-  usePublicClient: () => ({ readContract: mockReadContract }),
+  usePublicClient: () => ({ readContract: mockReadContract, multicall: mockMulticall }),
 }));
+
+/** Answers the used-NFT multicall from a set of used ids. */
+const usedOnChain = (used: readonly number[]) =>
+  mockMulticall.mockImplementation((args) =>
+    Promise.resolve(
+      args.contracts.map((call) => ({
+        status: 'success',
+        result: used.includes(Number(call.args[0])) ? 1n : 0n,
+      })),
+    ),
+  );
 
 const mockAccount = jest.fn<string | null, []>(() => '0xUser');
 jest.mock('../../../../../hooks/web3', () => ({
@@ -39,10 +61,15 @@ jest.mock('../../../../../hooks/web3', () => ({
 }));
 
 jest.mock('../../../../../contexts/ContractAddressesContext', () => ({
-  useContractAddresses: () => ({ randomWalkNft: CONTRACT }),
+  useContractAddresses: () => ({
+    randomWalkNft: CONTRACT,
+    cosmicGame: '0x1111111111111111111111111111111111111111',
+  }),
 }));
 
-const mockUsed = jest.fn(() => ({ data: [] as { RWalkTokenId: number }[] }));
+const mockUsed = jest.fn((): { data?: { RWalkTokenId: number }[]; isPending?: boolean } => ({
+  data: [],
+}));
 jest.mock('../../../../../hooks/useApiQuery', () => ({
   useDashboardInfo: () => ({ data: { CurBidPriceEth: 0.10211 } }),
   useUsedRWLKNFTs: () => mockUsed(),
@@ -81,8 +108,16 @@ beforeEach(() => {
   mockTx.reset();
   mockAccount.mockReturnValue('0xUser');
   mockWalletOfOwner.mockResolvedValue([]);
+  mockNextTokenId.mockResolvedValue(4115n);
   mockUsed.mockReturnValue({ data: [] });
+  usedOnChain([]);
 });
+
+/** The list of the wallet's own Random Walk NFTs. */
+const ownedList = async () =>
+  within(
+    (await screen.findByRole('heading', { name: 'Your Random Walk NFTs' })).closest('section')!,
+  ).findByRole('list');
 
 describe('Imprint', () => {
   it('shows the value it sends — the contract cost plus the buffer — never a guessed 0', async () => {
@@ -94,11 +129,38 @@ describe('Imprint', () => {
     expect(screen.getByTestId('imprint-cost-breakdown')).toHaveTextContent('0.090498');
   });
 
-  it('quotes the Random Walk Gesture Cost as the header and the gesture form do (D088)', async () => {
+  it('states what one use saves at today’s cost, beside the imprint cost (V231)', async () => {
     renderWithQuery(<Imprint />);
-    const comparison = await screen.findByTestId('imprint-gesture-cost');
+    const saving = await screen.findByTestId('imprint-gesture-saving');
     // Half of 0.10211 ETH, at the gesture quote's five significant digits.
-    expect(comparison).toHaveTextContent('0.051055 ETH');
+    expect(saving).toHaveTextContent('0.051055 ETH');
+    expect(screen.getByText(/Half of today’s ETH Gesture Cost of 0\.10211/)).toBeInTheDocument();
+    // The constant reduction is the lede's to state; the body names the second benefit instead.
+    expect(screen.getByText('Anchored-NFT Stellar Selection')).toBeInTheDocument();
+    expect(screen.getByText(/10 anchored Random Walk NFTs are selected/)).toBeInTheDocument();
+    expect(screen.getByRole('link', { name: /See how anchoring works/ })).toHaveAttribute(
+      'href',
+      '/anchoring',
+    );
+  });
+
+  it('shows the newest Random Walk NFTs before a wallet connects (V225)', async () => {
+    mockAccount.mockReturnValue(null);
+    renderWithQuery(<Imprint latestSeed={4115} />);
+    const hero = screen.getByTestId('recent-imprints');
+    // The server's reading paints the plate first: the newest id is the next one less one.
+    const plates = within(hero).getAllByTestId('rwlk-art');
+    expect(plates.map((plate) => plate.textContent)).toEqual(['4114', '4113', '4112', '4111']);
+    expect(plates[0]).toHaveAttribute('data-alt', 'Random Walk NFT #004114');
+    expect(within(hero).getByText('Latest imprint')).toBeInTheDocument();
+  });
+
+  it('keeps the hero plate current from the contract, and holds its place until then', async () => {
+    mockNextTokenId.mockResolvedValue(4200n);
+    renderWithQuery(<Imprint />);
+    expect(screen.getByTestId('pending-plate')).toBeInTheDocument();
+    const hero = await screen.findByTestId('recent-imprints');
+    expect(within(hero).getAllByTestId('rwlk-art')[0]).toHaveTextContent('4199');
   });
 
   it('asks a disconnected visitor to connect instead of offering an imprint', async () => {
@@ -149,12 +211,13 @@ describe('Imprint', () => {
   it('lists the wallet’s Random Walk NFTs, newest first, marking used ones', async () => {
     mockWalletOfOwner.mockResolvedValue([3n, 12n, 7n]);
     mockUsed.mockReturnValue({ data: [{ RWalkTokenId: 7 }] });
+    usedOnChain([7]);
     renderWithQuery(<Imprint />);
 
-    const list = await screen.findByRole('list');
+    const list = await ownedList();
     const items = within(list).getAllByRole('listitem');
     expect(items.map((item) => item.getAttribute('data-token'))).toEqual(['12', '7', '3']);
-    expect(items[1]).toHaveTextContent('Used');
+    await waitFor(() => expect(items[1]).toHaveTextContent('Used'));
     // Each plate is named by its token, with nothing drawn over the art.
     expect(within(items[0]!).getByTestId('rwlk-art')).toHaveAttribute(
       'data-alt',
@@ -178,11 +241,59 @@ describe('Imprint', () => {
 
     mockWalletOfOwner.mockResolvedValueOnce([5n]);
     await user.click(screen.getByRole('button', { name: /errors\.state\.retry|Try again/ }));
-    const list = await screen.findByRole('list');
+    const list = await ownedList();
     expect(within(list).getAllByRole('listitem')).toHaveLength(1);
     expect(
       screen.queryByText('The Random Walk NFTs in this wallet could not be read.'),
     ).not.toBeInTheDocument();
+  });
+
+  describe('which Random Walk NFTs are offered for a gesture (V070)', () => {
+    it('says it is checking, and offers none, while the contract read is on its way', async () => {
+      mockWalletOfOwner.mockResolvedValue([12n]);
+      mockMulticall.mockImplementation(() => new Promise(() => {}));
+      renderWithQuery(<Imprint />);
+      const [item] = within(await ownedList()).getAllByRole('listitem');
+      expect(item).toHaveTextContent('Checking');
+      expect(item).not.toHaveTextContent('Unused');
+      expect(within(item!).queryByRole('link', { name: /Use in a gesture/ })).toBeNull();
+    });
+
+    it('offers none, and says why, when the contract cannot be read and the indexer is silent', async () => {
+      mockWalletOfOwner.mockResolvedValue([12n, 7n]);
+      mockMulticall.mockRejectedValue(new Error('rpc down'));
+      mockUsed.mockReturnValue({ data: [{ RWalkTokenId: 7 }] });
+      renderWithQuery(<Imprint />);
+      const list = await ownedList();
+      await screen.findByTestId('imprint-use-unknown');
+      const [twelve, seven] = within(list).getAllByRole('listitem');
+      // The indexer can say "used" (a use never reverts), never "unused".
+      expect(seven).toHaveTextContent('Used');
+      expect(twelve).not.toHaveTextContent(/Unused|Checking/);
+      expect(within(list).queryByRole('link', { name: /Use in a gesture/ })).toBeNull();
+    });
+
+    it('trusts the contract over an indexer that has not seen a recent gesture yet', async () => {
+      mockWalletOfOwner.mockResolvedValue([12n]);
+      mockUsed.mockReturnValue({ data: [] });
+      usedOnChain([12]);
+      renderWithQuery(<Imprint />);
+      const [item] = within(await ownedList()).getAllByRole('listitem');
+      await waitFor(() => expect(item).toHaveTextContent('Used'));
+      expect(within(item!).queryByRole('link', { name: /Use in a gesture/ })).toBeNull();
+    });
+
+    it('offers a token the contract confirms unused, while the indexer list still loads', async () => {
+      mockWalletOfOwner.mockResolvedValue([12n]);
+      mockUsed.mockReturnValue({ data: undefined, isPending: true });
+      renderWithQuery(<Imprint />);
+      const [item] = within(await ownedList()).getAllByRole('listitem');
+      expect(await within(item!).findByRole('link', { name: /Use in a gesture/ })).toHaveAttribute(
+        'href',
+        '/?randomwalk=1&tokenId=12#make-gesture',
+      );
+      expect(item).toHaveTextContent('Unused');
+    });
   });
 
   it('has no accessibility violations', async () => {

@@ -74,7 +74,7 @@
       },
       "imprint": {
         "heading": "铭刻 Random Walk NFT",
-        "description": "铭刻 Random Walk NFT，以参与 Cosmic Signature。每枚尚未使用的 Random Walk NFT 都可附加至一笔 ETH 落笔，使落笔价格降低 50%。",
+        "description": "一枚 Random Walk NFT 可让一笔 ETH 落笔的价格降低 50%。在这里铭刻，再把它附加到你选定的那一笔。",
         "links": {
           "cycle": "打开当前演绎周期",
           "learn": "了解落笔机制",
@@ -83,9 +83,6 @@
         "cards": {
           "imprinted": {
             "label": "已铭刻的 Random Walk NFT"
-          },
-          "discount": {
-            "label": "Random Walk 减免"
           },
           "used": {
             "label": "已使用的 Random Walk NFT"
@@ -301,7 +298,6 @@
     "description": "正在进行的周期：倒计时、席位、分配与每一次落笔，实时更新。",
     "cards": {
       "gestures": "落笔总次数",
-      "signatureAllocation": "签名分配",
       "opened": "开启时间"
     },
     "relatedAria": "当前周期相关页面",

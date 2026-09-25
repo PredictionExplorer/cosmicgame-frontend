@@ -1,6 +1,16 @@
 import { protocolFacts } from '@/content/protocol-facts';
 
+import { formatCount } from '@/utils/format/numbers';
+
 import type { FAQText } from './structure';
+
+/**
+ * Protocol amounts in this locale's number style (grouping from
+ * `i18n/localeConfig.ts` through the format layer, never an Intl tag typed
+ * into a copy module).
+ */
+const cst = formatCount(protocolFacts.specialAllocationCst, 'zh');
+const outreachCst = formatCount(protocolFacts.outreachReserveCst, 'zh');
 
 /** protocolFacts stores the example gaps as English strings; render them in zh. */
 const ELAPSED_ZH: Record<
@@ -24,11 +34,6 @@ export const faqTextZh = {
         question: 'Cosmic Signature 是什么？',
         answer:
           'Cosmic Signature 是 Arbitrum 上的程序化链上艺术协议。参与者在演绎周期中落笔，每一笔都会塑造这一周期最终的签名。周期收官后，协议将储备分配至十余条轨道，其中包括支持 170 多位以太坊核心贡献者的 Protocol Guild。',
-      },
-      'is-cosmic-signature-related-to-biology': {
-        question: 'Cosmic Signature 与生物学领域的 COSMIC 数据库有关吗？',
-        answer:
-          '没有关系。Cosmic Signature 与 COSMIC 癌症突变数据库及生物学中的 COSMIC 突变特征均无关联。它是链上艺术协议及应用，聚焦由确定性三体运动生成的 NFT 艺术。',
       },
       'how-does-the-bidding-game-work': {
         question: '演绎周期如何运作？',
@@ -66,8 +71,7 @@ export const faqTextZh = {
     items: {
       'what-is-the-main-allocation': {
         question: '什么是签名分配？',
-        answer:
-          '签名分配由周期收官之笔的参与者获得，其中包括 1 枚 Cosmic Signature NFT、1,000 CST 的表彰铭刻、周期储备中 25% 的 ETH，以及该周期内随参与者落笔附加的所有代币或 NFT。',
+        answer: `签名分配交给周期的收官者：周期收官倒计时结束后的 ${protocolFacts.finalGestureExclusivityHours} 小时内，只有写下收官之笔的参与者可以收官，此后任何人都可收官。其中包括 1 枚 Cosmic Signature NFT、${cst} CST 的表彰铭刻、周期储备中 ${protocolFacts.mainEthPercentage}% 的 ETH，以及该周期内随参与者落笔附加的所有代币或 NFT。`,
       },
       'what-rewards-per-bid': {
         question: '每次落笔会带来什么？',
@@ -75,7 +79,7 @@ export const faqTextZh = {
       },
       'how-does-the-stellarSelection-work': {
         question: '星选如何运作？',
-        answer: `每笔落笔都会记录 1 次星选资格。每个周期结束时，智能合约会从资格池中进行程序化随机选择：${protocolFacts.ethStellarSelectionRecipients} 次选择共同分得周期储备中 ${protocolFacts.stellarSelectionEthPercentage}% 的 ETH；${protocolFacts.nftStellarSelectionRecipients} 次选择各获得 ${protocolFacts.specialAllocationCst.toLocaleString('zh-CN')} CST 与 1 枚 Cosmic Signature NFT；已锚定 Random Walk NFT 中另有 ${protocolFacts.anchoredRwlkNftSelectionRecipients} 次选择，也各获得 ${protocolFacts.specialAllocationCst.toLocaleString('zh-CN')} CST 与 1 枚 Cosmic Signature NFT。选择采用放回方式，同一地址在同一周期内可能被选中多次。落笔次数越多，被选中的频次也会增加。`,
+        answer: `每笔落笔都会记录 1 次星选资格。每个周期结束时，智能合约会从资格池中进行程序化随机选择：${protocolFacts.ethStellarSelectionRecipients} 次选择共同分得周期储备中 ${protocolFacts.stellarSelectionEthPercentage}% 的 ETH；${protocolFacts.nftStellarSelectionRecipients} 次选择各获得 ${cst} CST 与 1 枚 Cosmic Signature NFT；已锚定 Random Walk NFT 中另有 ${protocolFacts.anchoredRwlkNftSelectionRecipients} 次选择，也各获得 ${cst} CST 与 1 枚 Cosmic Signature NFT。选择采用放回方式，同一地址在同一周期内可能被选中多次。落笔次数越多，被选中的频次也会增加。`,
       },
       'how-random-selection-works': {
         question: '程序化随机选择是怎样完成的？',
@@ -84,19 +88,19 @@ export const faqTextZh = {
       },
       'how-do-i-claim-my-allocation': {
         question: '成为获配者后，如何取回分配？',
-        answer: `获配者可通过应用与协议合约取回分配。周期收官倒计时结束后，收官之笔参与者享有 ${protocolFacts.finalGestureExclusivityHours} 小时的专属时间，可完成周期收官并取回签名分配。此后进入公开收官窗口：任何人都可发起收官交易，智能合约会把实际完成收官的人视为周期受益方——收官者将获得整份签名分配，包括 ETH 份额、${protocolFacts.specialAllocationCst.toLocaleString('zh-CN')} CST 铭刻、Cosmic Signature NFT，以及对已附加资产的优先权。次级 ETH、已附加代币与已附加 NFT 会由分配钱包托管，并采用另一项取回超时设置，当前默认为 ${protocolFacts.secondaryRetrievalTimeoutWeeks} 周；超时后，合约允许任何人为自己取回仍未取回的分配。请及时处理。`,
+        answer: `获配者可通过应用与协议合约取回分配。周期收官倒计时结束后，收官之笔参与者享有 ${protocolFacts.finalGestureExclusivityHours} 小时的专属时间，可完成周期收官并取回签名分配。\n\n此后进入公开收官窗口：任何人都可发起收官交易，智能合约会把实际完成收官的人视为周期受益方——收官者将获得整份签名分配，包括 ETH 份额、${cst} CST 铭刻、Cosmic Signature NFT，以及对已附加资产的优先权。\n\n次级 ETH、已附加代币与已附加 NFT 会由分配钱包托管，并采用另一项取回超时设置，当前默认为 ${protocolFacts.secondaryRetrievalTimeoutWeeks} 周；超时后，合约允许任何人为自己取回仍未取回的分配。请及时处理。`,
       },
       'how-does-anchoring-work': {
         question: '锚定如何运作？',
-        answer: `Cosmic Signature NFT 可锚定至协议，以获得 ETH 锚定派发：每个已收官周期会划出周期储备的 ${protocolFacts.anchorDistributionPercentage}%，按当时已锚定的 Cosmic Signature NFT 数量平均分配；累积的 ETH 会在解锚时派发。Random Walk NFT 也可以锚定，但只用于取得锚定 NFT 星选资格——被选中的锚定者会获得 CST 与 Cosmic Signature NFT，而不是 ETH。还需注意两条规则：每枚 NFT 永远只能锚定一次（解锚后不可再次锚定）；若周期收官时没有任何 Cosmic Signature NFT 处于锚定状态，该周期的 ${protocolFacts.anchorDistributionPercentage}% 会留在周期储备中。CST（ERC-20）不能锚定。可从账户菜单进入"我的锚定"页面管理锚定。`,
+        answer: `Cosmic Signature NFT 可锚定至协议，以获得 ETH 锚定派发：每个已收官周期会划出周期储备的 ${protocolFacts.anchorDistributionPercentage}%，按当时已锚定的 Cosmic Signature NFT 数量平均分配；累积的 ETH 会在解锚时派发。\n\nRandom Walk NFT 也可以锚定，但只用于取得锚定 NFT 星选资格——被选中的锚定者会获得 CST 与 Cosmic Signature NFT，而不是 ETH。\n\n还需注意两条规则：每枚 NFT 永远只能锚定一次（解锚后不可再次锚定）；若周期收官时没有任何 Cosmic Signature NFT 处于锚定状态，该周期的 ${protocolFacts.anchorDistributionPercentage}% 会留在周期储备中。CST（ERC-20）不能锚定。可从账户菜单进入"我的锚定"页面管理锚定。`,
       },
       'what-are-marketing-rewards': {
         question: '什么是推广储备？',
-        answer: `帮助推广协议可获得 CST 代币（ERC-20）。推广储备每个周期铭刻 ${protocolFacts.outreachReserveCst.toLocaleString('zh-CN')} CST，并将其发放给生态贡献者。具体方式可在 Discord 联系推广托管人。`,
+        answer: `帮助推广协议可获得 CST 代币（ERC-20）。推广储备每个周期铭刻 ${outreachCst} CST，并将其发放给生态贡献者。具体方式可在 Discord 联系推广托管人。`,
       },
       'how-many-nfts-minted': {
         question: '每个周期会铭刻多少枚 Cosmic Signature NFT？',
-        answer: `绝大多数周期会铭刻 ${protocolFacts.typicalNftsPerCycle} 枚 Cosmic Signature NFT：签名分配获配者、CST 收官之笔获配者、坚守冠军与时之勇士各 1 枚；参与者 NFT 星选获配者共 ${protocolFacts.nftStellarSelectionRecipients} 枚；通过锚定 NFT 星选选出的 Random Walk NFT 锚定者共 ${protocolFacts.anchoredRwlkNftSelectionRecipients} 枚。这 ${protocolFacts.typicalNftsPerCycle} 份 NFT 分配还会各附带 ${protocolFacts.specialAllocationCst.toLocaleString('zh-CN')} CST。若某周期没有 CST 落笔或没有已锚定的 Random Walk NFT，对应的铭刻便会在该周期跳过。`,
+        answer: `绝大多数周期会铭刻 ${protocolFacts.typicalNftsPerCycle} 枚 Cosmic Signature NFT：签名分配获配者、CST 收官之笔获配者、坚守冠军与时之勇士各 1 枚；参与者 NFT 星选获配者共 ${protocolFacts.nftStellarSelectionRecipients} 枚；通过锚定 NFT 星选选出的 Random Walk NFT 锚定者共 ${protocolFacts.anchoredRwlkNftSelectionRecipients} 枚。这 ${protocolFacts.typicalNftsPerCycle} 份 NFT 分配还会各附带 ${cst} CST。若某周期没有 CST 落笔或没有已锚定的 Random Walk NFT，对应的铭刻便会在该周期跳过。`,
       },
       'what-happens-to-remaining-eth': {
         question: '周期储备中剩余的 ETH 会怎样处理？',
@@ -129,7 +133,7 @@ export const faqTextZh = {
       },
       'how-is-participation-cst-calculated': {
         question: '参与 CST 如何计算？',
-        answer: `参与 CST 按距上一笔落笔的时间，以平方根公式计算：${protocolFacts.dynamicCstRewardFormula}。采用平方根，是为了让较长的静默期获得更多 CST，同时避免数量永远线性增长。按协议上线时恰为 1 小时的时间增量计算，示例约为：${protocolFacts.dynamicCstRewardExamples.map((example) => `${ELAPSED_ZH[example.elapsed]}后为 ${example.cst} CST`).join('、')}。每个周期收官后，时间增量会增长 ${protocolFacts.cycleTimeIncrementIncreasePercentPerCycle}%，因此实时数量会随时间逐渐略低于这些示例。落笔实际成交时，应以应用中的实时预览和合约计算为准。`,
+        answer: `参与 CST 按距上一笔落笔的时间，以平方根公式计算：${protocolFacts.dynamicCstRewardFormula}。采用平方根，是为了让较长的静默期获得更多 CST，同时避免数量永远线性增长。\n\n按协议上线时恰为 1 小时的时间增量计算，示例约为：${protocolFacts.dynamicCstRewardExamples.map((example) => `${ELAPSED_ZH[example.elapsed]}后为 ${example.cst} CST`).join('、')}。每个周期收官后，时间增量会增长 ${protocolFacts.cycleTimeIncrementIncreasePercentPerCycle}%，因此实时数量会随时间逐渐略低于这些示例。落笔实际成交时，应以应用中的实时预览和合约计算为准。`,
       },
       'why-minimum-cst-reward-protection': {
         question: '什么是最低 CST 铭刻保护？',
@@ -142,7 +146,7 @@ export const faqTextZh = {
       },
       'what-is-open-finalization-window': {
         question: '什么是公开收官窗口？',
-        answer: `周期收官倒计时结束后，收官之笔参与者享有 ${protocolFacts.finalGestureExclusivityHours} 小时的专属收官时间。若未在该窗口内完成收官，任何人都可发起收官交易，智能合约会把实际收官者设为周期受益方。收官者将获得完整的签名分配，包括 ETH 份额、${protocolFacts.specialAllocationCst.toLocaleString('zh-CN')} CST、Cosmic Signature NFT，以及对已附加资产的优先权。因此，收官之笔参与者应在专属窗口结束前完成收官。即使该参与者离开，公开收官机制也能让协议继续运行。`,
+        answer: `周期收官倒计时结束后，收官之笔参与者享有 ${protocolFacts.finalGestureExclusivityHours} 小时的专属收官时间。若未在该窗口内完成收官，任何人都可发起收官交易，智能合约会把实际收官者设为周期受益方。收官者将获得完整的签名分配，包括 ETH 份额、${cst} CST、Cosmic Signature NFT，以及对已附加资产的优先权。因此，收官之笔参与者应在专属窗口结束前完成收官。即使该参与者离开，公开收官机制也能让协议继续运行。`,
       },
       'what-is-endurance-champion': {
         question: '什么是坚守冠军？',
@@ -156,7 +160,7 @@ export const faqTextZh = {
       },
       'what-is-chrono-warrior': {
         question: '什么是时之勇士？',
-        answer: `时之勇士是在坚守冠军位置上连续保持最久的参与者。坚守冠军对应保持"最近一笔落笔者"身份最久的人，时之勇士则对应保持坚守冠军身份最久的人。周期收官时，时之勇士将获得周期储备中 ${protocolFacts.chronoWarriorEthPercentage}% 的 ETH、${protocolFacts.specialAllocationCst.toLocaleString('zh-CN')} CST 与 1 枚 Cosmic Signature NFT。`,
+        answer: `时之勇士是在坚守冠军位置上连续保持最久的参与者。坚守冠军对应保持"最近一笔落笔者"身份最久的人，时之勇士则对应保持坚守冠军身份最久的人。周期收官时，时之勇士将获得周期储备中 ${protocolFacts.chronoWarriorEthPercentage}% 的 ETH、${cst} CST 与 1 枚 Cosmic Signature NFT。`,
       },
       'does-time-per-bid-stay-same': {
         question: '每笔落笔增加的时间始终相同吗？',
@@ -308,6 +312,11 @@ export const faqTextZh = {
         answer:
           '除落笔价格外，每笔交易还需支付 Arbitrum 网络燃料费。燃料费会随网络状况波动，不由 Cosmic Signature 控制。',
       },
+      'is-cosmic-signature-related-to-biology': {
+        question: 'Cosmic Signature 与生物学领域的 COSMIC 数据库有关吗？',
+        answer:
+          '没有关系。Cosmic Signature 与 COSMIC 癌症突变数据库及生物学中的 COSMIC 突变特征均无关联。它是链上艺术协议及应用，聚焦由确定性三体运动生成的 NFT 艺术。',
+      },
     },
   },
   'trust-and-governance': {
@@ -317,7 +326,7 @@ export const faqTextZh = {
       'team-controls': {
         question: '团队对协议拥有哪些控制权限？',
         answer:
-          '初期，团队可以调整部分协议参数，例如落笔时间增量或分配轨道比例。这些权限通过智能合约的 Ownable 模式实现，并限定在周期间窗口：下一个周期一旦启用（启用发生在首笔落笔之前），核心协议参数便会锁定，直至该周期收官。锁定期间仍保留少量范围更窄的权限：所有者可把周期启用推迟至首笔落笔到来，也可随时调整下一周期前的延迟，并随时管理外围合约（公共物品金库受益方、NFT 元数据 URI 与分配钱包取回期限）。协议合约还可由所有者通过 UUPS 升级，但只能在周期间进行；当前部署的是已公开验证的 V2 实现。',
+          '初期，团队可以调整部分协议参数，例如落笔时间增量或分配轨道比例。这些权限通过智能合约的 Ownable 模式实现，并限定在周期间窗口：下一个周期一旦启用（启用发生在首笔落笔之前），核心协议参数便会锁定，直至该周期收官。\n\n锁定期间仍保留少量范围更窄的权限：所有者可把周期启用推迟至首笔落笔到来，也可随时调整下一周期前的延迟，并随时管理外围合约（公共物品金库受益方、NFT 元数据 URI 与分配钱包取回期限）。\n\n协议合约还可由所有者通过 UUPS 升级，但只能在周期间进行；当前部署的是已公开验证的 V2 实现。',
       },
       'will-team-always-have-control': {
         question: '团队会一直控制协议参数吗？',

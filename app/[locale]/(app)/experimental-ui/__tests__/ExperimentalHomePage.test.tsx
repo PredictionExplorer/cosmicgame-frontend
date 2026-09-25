@@ -914,7 +914,7 @@ describe('ExperimentalHomePage', () => {
     // (7h 3m 11s + 1s) − 2h 21m 9s, read as a clock beside its fixed label.
     const countdown = within(latest).getByTestId('latest-endurance-countdown');
     expect(countdown).toHaveTextContent('home.observatory.ledger.passesRecordIn');
-    expect(countdown).toHaveTextContent('04:42:03');
+    expect(countdown).toHaveTextContent('4h 42m 03s');
   });
 
   it('counts the wallet’s entries only once the feed holds the whole cycle', () => {

@@ -3,18 +3,14 @@
 import { ArrowDown } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 
-import {
-  faqContentEn,
-  type FAQCategory,
-  type FAQContent,
-  type FAQItem,
-  findFaqItemById,
-} from '@/content/faq';
+import { findFaqItemById } from '@/content/faq/lookup';
+import type { FAQCategory, FAQContent, FAQItem } from '@/content/faq/types';
 
 import { cn } from '@/lib/utils';
 
 interface PopularQuestionsProps {
-  content?: FAQContent;
+  /** The reader's locale's FAQ, from the page (the client never bundles another locale's). */
+  content: FAQContent;
   onQuestionClick: (itemId: string, categoryId: string) => void;
   className?: string;
 }
@@ -35,11 +31,7 @@ function resolvePopular(content: FAQContent): ResolvedPopular[] {
  * The questions most readers start with, as an index: each row names the
  * question and its category, and jumps to the answer opened in place.
  */
-export function PopularQuestions({
-  content = faqContentEn,
-  onQuestionClick,
-  className,
-}: PopularQuestionsProps) {
+export function PopularQuestions({ content, onQuestionClick, className }: PopularQuestionsProps) {
   const t = useTranslations('faq');
   const items = resolvePopular(content);
 

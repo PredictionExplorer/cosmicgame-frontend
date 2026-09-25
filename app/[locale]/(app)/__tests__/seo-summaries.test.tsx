@@ -447,18 +447,21 @@ describe('server-rendered page headers', () => {
     // The H1 names the cycle; no figure repeats its number.
     expect(document.querySelector('[data-figure="cycle"]')).toBeNull();
     expect(figureValue('gestures')).toHaveTextContent('17');
-    expect(figureValue('signatureAllocation')).toHaveTextContent('5.5000 ETH');
-    // The opening date is set a size down and names its zone inline, once
-    // (D082, D275): no second "Time zone" caption under it.
+    // The Signature Allocation is the Last Gesture's figure in the standings, shown once (V227).
+    expect(document.querySelector('[data-figure="signatureAllocation"]')).toBeNull();
+    // The opening date is set a size down and names its zone inline, once,
+    // with no second zone caption under it (D082, D275, V237).
     const opened = document.querySelector('[data-figure="opened"]');
     expect(opened).toHaveTextContent(/UTC$/);
     expect(opened).not.toHaveTextContent(/formats\.dateTime\.timeZone/);
     // One explanation pattern per screen (D079): the figures are plain labels,
     // the coined words below explain themselves in place.
     const cards = seoMessages.currentCycleSummary.cards;
-    for (const label of [cards.gestures, cards.signatureAllocation]) {
+    for (const label of [cards.gestures, cards.opened]) {
       expect(screen.getByText(label, { exact: true })).toBeInTheDocument();
     }
+    // The related pages close the page, after the rules (CurrentCycleRelated).
+    expect(screen.queryByText(seoMessages.currentCycleSummary.links.learn)).not.toBeInTheDocument();
     expect(screen.queryByRole('button')).not.toBeInTheDocument();
     // The page's one freshness stamp is in the body, which follows the live cycle.
     expect(screen.queryByRole('status')).not.toBeInTheDocument();
@@ -473,7 +476,6 @@ describe('server-rendered page headers', () => {
     // The status block names the cycle; the header does not repeat its number.
     expect(document.querySelector('[data-figure="cycle"]')).toBeNull();
     expect(figureValue('gestures')).toHaveTextContent('17');
-    expect(figureValue('signatureAllocation')).toHaveTextContent('5.5000 ETH');
   });
 
   it('prefers the client read over the server read', async () => {
@@ -609,18 +611,19 @@ describe('server-rendered page headers', () => {
 
       // Read from the Random Walk contract.
       expect(figureValue('imprinted')).toHaveTextContent(/^4,115$/);
-      expect(figureValue('discount')).toHaveTextContent(
-        `${protocolFacts.randomWalkDiscountPercentage}%`,
-      );
       expect(figureValue('used')).toHaveTextContent(/^3$/);
       // The imprint cost is the panel's figure, shown once where it is paid;
-      // the gesture cost and the live cycle belong to the gesture form.
-      for (const id of ['imprintCost', 'cost', 'cycle']) {
+      // the gesture cost and the live cycle belong to the gesture form. The
+      // constant reduction is stated once, in the lede, not as a figure (V231).
+      for (const id of ['imprintCost', 'cost', 'cycle', 'discount']) {
         expect(document.querySelector(`[data-figure="${id}"]`)).toBeNull();
       }
-      // Three short figures, but labels too long for a third of a phone's row
-      // ("Random Walk NFTs imprinted"): label-and-value rows, never a label
-      // broken over three lines.
+      // The constant reduction reads once, in the lede (V231).
+      expect(
+        screen.getByText(new RegExp(`${protocolFacts.randomWalkDiscountPercentage}%`)),
+      ).toBeInTheDocument();
+      // Labels too long for half a phone's row ("Random Walk NFTs imprinted"):
+      // label-and-value rows, never a label broken over three lines.
       expect(document.querySelector('dl')).toHaveAttribute('data-layout', 'rows');
     });
 

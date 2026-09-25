@@ -1,5 +1,7 @@
 import { protocolFacts } from '@/content/protocol-facts';
 
+import { formatCount, formatNumber } from '@/utils/format/numbers';
+
 import type { FAQText } from './structure';
 
 const ELAPSED_VI: Record<
@@ -16,12 +18,16 @@ const ELAPSED_VI: Record<
 /** Vietnamese decimal mark for a protocol figure quoted in English notation ("1.73"). */
 const viDecimal = (value: string): string => value.replace('.', ',');
 
-const cstAmount = protocolFacts.specialAllocationCst.toLocaleString('vi-VN');
-const outreachCst = protocolFacts.outreachReserveCst.toLocaleString('vi-VN');
-const cstWindowDecrease =
-  protocolFacts.cstCalibrationWindowDecreasePercentPerEthGesture.toLocaleString('vi-VN');
-const cstWindowIncrease =
-  protocolFacts.cstCalibrationWindowIncreasePercentPerCstGesture.toLocaleString('vi-VN');
+const cstAmount = formatCount(protocolFacts.specialAllocationCst, 'vi');
+const outreachCst = formatCount(protocolFacts.outreachReserveCst, 'vi');
+const cstWindowDecrease = formatNumber(
+  protocolFacts.cstCalibrationWindowDecreasePercentPerEthGesture,
+  'vi',
+);
+const cstWindowIncrease = formatNumber(
+  protocolFacts.cstCalibrationWindowIncreasePercentPerCstGesture,
+  'vi',
+);
 
 /** Vietnamese FAQ copy, keyed by the skeleton in structure.ts. */
 export const faqTextVi = {
@@ -33,11 +39,6 @@ export const faqTextVi = {
         question: 'Cosmic Signature là gì?',
         answer:
           'Cosmic Signature là giao thức nghệ thuật tạo sinh trên chuỗi Arbitrum. Người tham gia đặt nét bút trong một chu kỳ trình diễn; mỗi nét bút đều định hình Signature cuối cùng của chu kỳ. Khi chu kỳ hoàn tất, giao thức phân phối dự trữ của mình qua hơn mười luồng phân bổ — bao gồm Protocol Guild, cơ chế tài trợ cho hơn 170 người đóng góp cốt lõi cho Ethereum.',
-      },
-      'is-cosmic-signature-related-to-biology': {
-        question: 'Cosmic Signature có liên quan đến cơ sở dữ liệu sinh học COSMIC không?',
-        answer:
-          'Không. Cosmic Signature không liên quan đến cơ sở dữ liệu đột biến ung thư COSMIC hay các chữ ký đột biến COSMIC trong sinh học. Đây là một giao thức và ứng dụng nghệ thuật trên chuỗi tập trung vào nghệ thuật NFT ba vật thể tất định.',
       },
       'how-does-the-bidding-game-work': {
         question: 'Một chu kỳ trình diễn hoạt động như thế nào?',
@@ -75,8 +76,7 @@ export const faqTextVi = {
     items: {
       'what-is-the-main-allocation': {
         question: 'Phân bổ Signature là gì?',
-        answer:
-          'Phân bổ Signature thuộc về người tham gia đặt nét bút cuối cùng của một chu kỳ. Nó bao gồm một Cosmic Signature NFT, 1.000 CST ghi nhận và 25% Dự trữ chu kỳ bằng ETH, cộng với mọi token hoặc NFT được đính kèm vào nét bút của người tham gia trong chu kỳ.',
+        answer: `Phân bổ Signature thuộc về người hoàn tất chu kỳ. Trong ${protocolFacts.finalGestureExclusivityHours} giờ đầu sau thời điểm hoàn tất chu kỳ, chỉ người đặt nét bút cuối cùng được hoàn tất; sau đó bất kỳ ai cũng có thể hoàn tất. Phân bổ bao gồm một Cosmic Signature NFT, ${cstAmount} CST ghi nhận và ${protocolFacts.mainEthPercentage}% Dự trữ chu kỳ bằng ETH, cộng với mọi token hoặc NFT được đính kèm vào nét bút của người tham gia trong chu kỳ.`,
       },
       'what-rewards-per-bid': {
         question: 'Tôi nhận được gì cho mỗi nét bút?',
@@ -93,11 +93,11 @@ export const faqTextVi = {
       },
       'how-do-i-claim-my-allocation': {
         question: 'Tôi nhận về phân bổ bằng cách nào nếu là người nhận?',
-        answer: `Người nhận nhận về phân bổ thông qua ứng dụng và các hợp đồng giao thức. Người đặt nét bút cuối cùng có ${protocolFacts.finalGestureExclusivityHours} giờ ưu tiên sau thời điểm hoàn tất chu kỳ để hoàn tất chu kỳ và nhận về phân bổ Signature. Sau đó, cửa sổ hoàn tất mở bắt đầu: bất kỳ ai cũng có thể hoàn tất chu kỳ, và hợp đồng thông minh coi người hoàn tất là người nhận của chu kỳ — người hoàn tất nhận toàn bộ phân bổ Signature (phần ETH, ${cstAmount} CST được khắc, Cosmic Signature NFT và quyền ưu tiên với các tài sản đính kèm). Các phân bổ ETH phụ cùng phân bổ token hoặc NFT đính kèm nằm trong ký quỹ của ví phân bổ với một thời hạn nhận về riêng, mặc định là ${protocolFacts.secondaryRetrievalTimeoutWeeks} tuần; khi hết hạn, các hợp đồng cho phép bất kỳ ai nhận về một phân bổ chưa được nhận cho chính họ. Hãy nhận về kịp thời.`,
+        answer: `Người nhận nhận về phân bổ thông qua ứng dụng và các hợp đồng giao thức. Người đặt nét bút cuối cùng có ${protocolFacts.finalGestureExclusivityHours} giờ ưu tiên sau thời điểm hoàn tất chu kỳ để hoàn tất chu kỳ và nhận về phân bổ Signature.\n\nSau đó, cửa sổ hoàn tất mở bắt đầu: bất kỳ ai cũng có thể hoàn tất chu kỳ, và hợp đồng thông minh coi người hoàn tất là người nhận của chu kỳ — người hoàn tất nhận toàn bộ phân bổ Signature (phần ETH, ${cstAmount} CST được khắc, Cosmic Signature NFT và quyền ưu tiên với các tài sản đính kèm).\n\nCác phân bổ ETH phụ cùng phân bổ token hoặc NFT đính kèm nằm trong ký quỹ của ví phân bổ với một thời hạn nhận về riêng, mặc định là ${protocolFacts.secondaryRetrievalTimeoutWeeks} tuần; khi hết hạn, các hợp đồng cho phép bất kỳ ai nhận về một phân bổ chưa được nhận cho chính họ. Hãy nhận về kịp thời.`,
       },
       'how-does-anchoring-work': {
         question: 'Neo giữ hoạt động như thế nào?',
-        answer: `Cosmic Signature NFT có thể được neo giữ với giao thức để nhận phân phối neo giữ bằng ETH: mỗi chu kỳ hoàn tất phân bổ ${protocolFacts.anchorDistributionPercentage}% Dự trữ chu kỳ, chia đều cho mỗi Cosmic Signature NFT đang neo giữ, và ETH tích lũy được chi trả khi bạn gỡ neo. Random Walk NFT cũng có thể được neo giữ, nhưng chỉ để thuộc diện Tinh tuyển NFT neo giữ — những người neo giữ được chọn nhận CST và Cosmic Signature NFT, không nhận ETH. Hai quy tắc cần biết: mỗi NFT chỉ được neo giữ đúng một lần (sau khi bạn gỡ neo, NFT đó không bao giờ có thể neo giữ lại), và nếu không có Cosmic Signature NFT nào đang neo giữ khi một chu kỳ hoàn tất, ${protocolFacts.anchorDistributionPercentage}% của chu kỳ đó chỉ đơn giản ở lại trong Dự trữ chu kỳ. CST (ERC-20) không thể neo giữ. Hãy vào trang Neo giữ của tôi (từ menu tài khoản) để quản lý neo giữ.`,
+        answer: `Cosmic Signature NFT có thể được neo giữ với giao thức để nhận phân phối neo giữ bằng ETH: mỗi chu kỳ hoàn tất phân bổ ${protocolFacts.anchorDistributionPercentage}% Dự trữ chu kỳ, chia đều cho mỗi Cosmic Signature NFT đang neo giữ, và ETH tích lũy được chi trả khi bạn gỡ neo.\n\nRandom Walk NFT cũng có thể được neo giữ, nhưng chỉ để thuộc diện Tinh tuyển NFT neo giữ — những người neo giữ được chọn nhận CST và Cosmic Signature NFT, không nhận ETH.\n\nHai quy tắc cần biết: mỗi NFT chỉ được neo giữ đúng một lần (sau khi bạn gỡ neo, NFT đó không bao giờ có thể neo giữ lại), và nếu không có Cosmic Signature NFT nào đang neo giữ khi một chu kỳ hoàn tất, ${protocolFacts.anchorDistributionPercentage}% của chu kỳ đó chỉ đơn giản ở lại trong Dự trữ chu kỳ. CST (ERC-20) không thể neo giữ. Hãy vào trang Neo giữ của tôi (từ menu tài khoản) để quản lý neo giữ.`,
       },
       'what-are-marketing-rewards': {
         question: 'Dự trữ truyền thông là gì?',
@@ -138,7 +138,7 @@ export const faqTextVi = {
       },
       'how-is-participation-cst-calculated': {
         question: 'CST tham gia được tính như thế nào?',
-        answer: `CST tham gia dùng công thức căn bậc hai dựa trên thời gian đã trôi qua kể từ nét bút trước: ${protocolFacts.dynamicCstRewardFormula}. Công thức căn bậc hai cho lượng CST lớn hơn khi khoảng cách giữa hai nét bút dài hơn, nhưng mức tăng chậm hơn thời gian chờ. Với các tham số lúc ra mắt (mức tăng thời gian đúng một giờ), các ví dụ xấp xỉ là ${protocolFacts.dynamicCstRewardExamples.map((example) => `${viDecimal(example.cst)} CST sau ${ELAPSED_VI[example.elapsed]}`).join(', ')}. Mức tăng lớn thêm ${protocolFacts.cycleTimeIncrementIncreasePercentPerCycle}% sau mỗi chu kỳ hoàn tất, nên lượng thực tế theo thời gian trôi thấp hơn một chút so với các con số này. Ứng dụng hiển thị lượng CST ước tính hiện tại. Hợp đồng xác định lượng thực tế khi nét bút được xử lý.`,
+        answer: `CST tham gia dùng công thức căn bậc hai dựa trên thời gian đã trôi qua kể từ nét bút trước: ${protocolFacts.dynamicCstRewardFormula}. Công thức căn bậc hai cho lượng CST lớn hơn khi khoảng cách giữa hai nét bút dài hơn, nhưng mức tăng chậm hơn thời gian chờ.\n\nVới các tham số lúc ra mắt (mức tăng thời gian đúng một giờ), các ví dụ xấp xỉ là ${protocolFacts.dynamicCstRewardExamples.map((example) => `${viDecimal(example.cst)} CST sau ${ELAPSED_VI[example.elapsed]}`).join(', ')}. Mức tăng lớn thêm ${protocolFacts.cycleTimeIncrementIncreasePercentPerCycle}% sau mỗi chu kỳ hoàn tất, nên lượng thực tế theo thời gian trôi thấp hơn một chút so với các con số này. Ứng dụng hiển thị lượng CST ước tính hiện tại. Hợp đồng xác định lượng thực tế khi nét bút được xử lý.`,
       },
       'why-minimum-cst-reward-protection': {
         question: 'Bảo đảm CST tham gia tối thiểu là gì?',
@@ -317,6 +317,11 @@ export const faqTextVi = {
         answer:
           'Ngoài chính chi phí nét bút, bạn trả phí gas của mạng Arbitrum cho mỗi giao dịch. Phí gas dao động theo điều kiện mạng và không do Cosmic Signature kiểm soát.',
       },
+      'is-cosmic-signature-related-to-biology': {
+        question: 'Cosmic Signature có liên quan đến cơ sở dữ liệu sinh học COSMIC không?',
+        answer:
+          'Không. Cosmic Signature không liên quan đến cơ sở dữ liệu đột biến ung thư COSMIC hay các chữ ký đột biến COSMIC trong sinh học. Đây là một giao thức và ứng dụng nghệ thuật trên chuỗi tập trung vào nghệ thuật NFT ba vật thể tất định.',
+      },
     },
   },
   'trust-and-governance': {
@@ -326,7 +331,7 @@ export const faqTextVi = {
       'team-controls': {
         question: 'Đội ngũ có những quyền kiểm soát nào đối với giao thức?',
         answer:
-          'Ban đầu, đội ngũ có khả năng điều chỉnh một số tham số của giao thức, như mức tăng thời gian nét bút hay tỷ lệ các luồng phân bổ. Quyền kiểm soát này được triển khai qua mẫu “Ownable” của hợp đồng thông minh và giới hạn trong cửa sổ giữa các chu kỳ: một khi chu kỳ tiếp theo kích hoạt — điều xảy ra trước nét bút đầu tiên của nó — các tham số cốt lõi của giao thức bị khóa cho đến khi chu kỳ đó hoàn tất. Một vài quyền kiểm soát hẹp hơn vẫn khả dụng ngoài khóa đó: chủ sở hữu có thể lùi thời điểm kích hoạt một chu kỳ cho đến khi nét bút đầu tiên xuất hiện, điều chỉnh độ trễ trước chu kỳ tiếp theo bất cứ lúc nào, và quản lý các hợp đồng ngoại vi (đơn vị thụ hưởng của Kho Hàng hóa công, URI siêu dữ liệu NFT và thời hạn nhận về của ví phân bổ) bất cứ lúc nào. Hợp đồng giao thức cũng có thể được chủ sở hữu nâng cấp (UUPS), nhưng chỉ giữa các chu kỳ; bản triển khai hiện tại là V2 đã được xác minh công khai.',
+          'Ban đầu, đội ngũ có khả năng điều chỉnh một số tham số của giao thức, như mức tăng thời gian nét bút hay tỷ lệ các luồng phân bổ. Quyền kiểm soát này được triển khai qua mẫu “Ownable” của hợp đồng thông minh và giới hạn trong cửa sổ giữa các chu kỳ: một khi chu kỳ tiếp theo kích hoạt — điều xảy ra trước nét bút đầu tiên của nó — các tham số cốt lõi của giao thức bị khóa cho đến khi chu kỳ đó hoàn tất.\n\nMột vài quyền kiểm soát hẹp hơn vẫn khả dụng ngoài khóa đó: chủ sở hữu có thể lùi thời điểm kích hoạt một chu kỳ cho đến khi nét bút đầu tiên xuất hiện, điều chỉnh độ trễ trước chu kỳ tiếp theo bất cứ lúc nào, và quản lý các hợp đồng ngoại vi (đơn vị thụ hưởng của Kho Hàng hóa công, URI siêu dữ liệu NFT và thời hạn nhận về của ví phân bổ) bất cứ lúc nào.\n\nHợp đồng giao thức cũng có thể được chủ sở hữu nâng cấp (UUPS), nhưng chỉ giữa các chu kỳ; bản triển khai hiện tại là V2 đã được xác minh công khai.',
       },
       'will-team-always-have-control': {
         question: 'Đội ngũ có luôn nắm quyền kiểm soát các tham số của giao thức không?',

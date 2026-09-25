@@ -20,7 +20,9 @@
   "figures": {
     "cost": "Gesture Cost",
     "participationCst": "Participation CST",
-    "cycle": "Cycle"
+    "held": "Time held",
+    "heldInfo": "How long this gesture was the Last Gesture: until the next gesture, or until the cycle finalized.",
+    "heldLive": "Still the Last Gesture"
   },
   "method": {
     "eth": "ETH",
@@ -41,6 +43,7 @@
   "rows": {
     "participant": "Participant",
     "finalizationTime": "Finalization time after this gesture",
+    "clockExtended": "Extended by {duration}",
     "transaction": "Transaction",
     "copyHash": "Copy transaction hash",
     "hashCopied": "Transaction hash copied",
@@ -63,5 +66,11 @@
   },
   "randomWalk": {
     "heading": "Random Walk NFT"
+  },
+  "rail": {
+    "position": "Gesture {position} of {total}",
+    "positionLive": "Gesture {position} of {total} so far",
+    "liveNote": "This cycle is still open. Its Signature is imprinted when it finalizes.",
+    "signature": "The Signature of Cycle #{cycle}"
   }
 }

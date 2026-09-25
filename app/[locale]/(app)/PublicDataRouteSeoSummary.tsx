@@ -375,20 +375,16 @@ async function getRouteFigures(
     }
     case 'imprint': {
       // The page's own subject: how many Random Walk NFTs exist (read from
-      // the contract), what one is worth and how many have been used. What an
-      // imprint costs is the panel's to say, once, where it is paid.
+      // the contract) and how many have been used. What an imprint costs is
+      // the panel's to say, once, where it is paid.
       const [imprinted, used] = await Promise.all([readRandomWalkImprinted(), readUsedRwlkNfts()]);
       return {
         reads: [imprinted, used],
         figures: [
+          // The reduction itself is a constant, stated once in the lede.
           {
             key: 'imprinted',
             value: imprinted.data === null ? null : count(imprinted.data),
-            compact: true,
-          },
-          {
-            key: 'discount',
-            value: formatPercent(protocolFacts.randomWalkDiscountPercentage, locale),
             compact: true,
           },
           { key: 'used', value: used.data && count(used.data.length), compact: true },
@@ -606,6 +602,8 @@ export interface PublicDataRouteSeoSummaryProps {
   actions?: ReactNode;
   /** Sibling pages as `PageHeaderTabs`, opening the header (e.g. `RouteGroupNav`). */
   tabs?: ReactNode;
+  /** Classes for the header, for a page that sets it inside a wider hero row. */
+  className?: string;
 }
 
 /**
@@ -620,6 +618,7 @@ export async function PublicDataRouteSeoSummary({
   note,
   actions,
   tabs,
+  className,
 }: PublicDataRouteSeoSummaryProps) {
   const locale = await getLocale();
   const t = await getTranslations({ locale, namespace: 'seo' });
@@ -703,6 +702,7 @@ export async function PublicDataRouteSeoSummary({
       }
       related={related}
       relatedLabel={relatedLabel}
+      className={className}
     />
   );
 }

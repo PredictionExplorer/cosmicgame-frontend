@@ -20,7 +20,9 @@
   "figures": {
     "cost": "제스처 비용",
     "participationCst": "참여 CST",
-    "cycle": "사이클"
+    "held": "유지 시간",
+    "heldInfo": "이 제스처가 최근 제스처로 유지된 시간입니다. 다음 제스처가 나오거나 사이클이 마감될 때까지 셉니다.",
+    "heldLive": "현재도 최근 제스처"
   },
   "method": {
     "eth": "ETH",
@@ -41,6 +43,7 @@
   "rows": {
     "participant": "참여자",
     "finalizationTime": "이 제스처 이후 마감 시각",
+    "clockExtended": "{duration} 연장됨",
     "transaction": "트랜잭션",
     "copyHash": "트랜잭션 해시 복사",
     "hashCopied": "트랜잭션 해시를 복사했습니다",
@@ -63,5 +66,11 @@
   },
   "randomWalk": {
     "heading": "Random Walk NFT"
+  },
+  "rail": {
+    "position": "전체 {total}개 중 {position}번째 제스처",
+    "positionLive": "지금까지 {total}개 중 {position}번째 제스처",
+    "liveNote": "이 사이클은 아직 진행 중입니다. 시그니처는 사이클이 마감될 때 각인됩니다.",
+    "signature": "사이클 {cycle}의 시그니처"
   }
 }

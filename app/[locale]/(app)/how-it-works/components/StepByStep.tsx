@@ -32,7 +32,8 @@ export function StepByStep({ stepByStep }: { stepByStep: HowItWorksContent['step
           id: step.title,
           title: step.title,
           body: (
-            <ul className="flex max-w-[var(--measure-lede)] flex-col gap-2.5">
+            // Step copy at body size, as the stages and tips on this page (V233).
+            <ul className="flex max-w-[var(--measure-lede)] flex-col gap-2.5 type-body-md">
               {step.highlights.map((highlight) => (
                 <li key={highlight} className="flex items-baseline gap-2.5">
                   <span
@@ -48,15 +49,14 @@ export function StepByStep({ stepByStep }: { stepByStep: HowItWorksContent['step
       />
       <p
         data-testid="funding-help"
-        className="mt-8 border-t border-rule pt-4 type-body-sm text-muted-foreground lg:col-span-4 lg:row-start-2 lg:mt-0 lg:self-start"
+        className="mt-8 border-t border-rule pt-4 type-body-md text-muted-foreground lg:col-span-4 lg:row-start-2 lg:mt-0 lg:self-start"
       >
         {stepByStep.funding.text}{' '}
-        <Link
-          href={stepByStep.funding.link.href}
-          className="link inline-flex min-h-6 items-center gap-1.5 whitespace-nowrap"
-        >
+        {/* Inline, so a long label (Korean, Ukrainian) wraps with the sentence at 320px
+            instead of running past the column; the arrow follows its last word. */}
+        <Link href={stepByStep.funding.link.href} className="link">
           {stepByStep.funding.link.label}
-          <ArrowRight aria-hidden className="size-3.5" />
+          <ArrowRight aria-hidden className="ms-1.5 inline-block size-3.5 align-middle" />
         </Link>
       </p>
     </section>

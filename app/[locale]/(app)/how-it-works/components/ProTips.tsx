@@ -2,9 +2,11 @@ import type { HowItWorksContent } from '@/content/how-it-works';
 
 import { SectionHeader } from '@/components/ui/section-header';
 
+import { FACT_LIST_CLASS, FACT_ROW_CLASS } from './factList';
+
 /**
- * Good to know: the details that are easy to miss, as a two-column
- * definition list on the page's hairlines (the name, then the plain fact).
+ * Good to know: the details that are easy to miss, on the same ruled
+ * label-and-fact list as the costs (the name, then the plain fact).
  */
 export function ProTips({ proTips }: { proTips: HowItWorksContent['proTips'] }) {
   return (
@@ -14,16 +16,11 @@ export function ProTips({ proTips }: { proTips: HowItWorksContent['proTips'] }) 
         title={proTips.heading}
         description={proTips.subhead}
       />
-      <dl className="divide-y divide-rule-faint border-y border-rule">
+      <dl className={FACT_LIST_CLASS}>
         {proTips.tips.map((tip) => (
-          <div
-            key={tip.title}
-            className="grid gap-1.5 py-4 sm:grid-cols-[minmax(0,15rem)_minmax(0,1fr)] sm:gap-x-10 sm:py-5"
-          >
+          <div key={tip.title} className={FACT_ROW_CLASS}>
             <dt className="type-title text-foreground">{tip.title}</dt>
-            <dd className="max-w-[var(--measure-lede)] type-body-sm text-muted-foreground">
-              {tip.body}
-            </dd>
+            <dd className="type-body-md text-muted-foreground">{tip.body}</dd>
           </div>
         ))}
       </dl>

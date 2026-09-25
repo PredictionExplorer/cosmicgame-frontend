@@ -195,8 +195,9 @@ describe('GestureHistoryTable', () => {
     const holds = Array.from(container.querySelectorAll('td[data-kind="duration"]')).map((cell) =>
       cell.textContent?.replace(/\s+/g, ' '),
     );
-    // Fixed clock fields, so the right-aligned column lines up.
-    expect(holds).toEqual(['01:00:39', '00:10:00']);
+    // The fixed grammar for held times, as the standings' "Time held" reads, with
+    // two-digit inner fields so the right-aligned column lines up (V224).
+    expect(holds).toEqual(['1h 00m 39s', '10m 00s']);
   });
 
   test('names the Random Walk NFT a gesture used as a link, with no image to break', () => {

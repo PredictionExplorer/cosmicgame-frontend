@@ -1,6 +1,16 @@
 import { protocolFacts } from '@/content/protocol-facts';
 
+import { formatCount } from '@/utils/format/numbers';
+
 import type { FAQText } from './structure';
+
+/**
+ * Protocol amounts in this locale's number style (grouping from
+ * `i18n/localeConfig.ts` through the format layer, never an Intl tag typed
+ * into a copy module).
+ */
+const cst = formatCount(protocolFacts.specialAllocationCst, 'en');
+const outreachCst = formatCount(protocolFacts.outreachReserveCst, 'en');
 
 /** English FAQ copy, keyed by the skeleton in structure.ts. */
 export const faqTextEn = {
@@ -12,11 +22,6 @@ export const faqTextEn = {
         question: 'What is Cosmic Signature?',
         answer:
           'Cosmic Signature is a procedural on-chain art protocol on Arbitrum. Participants make gestures during a Performance Cycle; every gesture shapes the cycle’s final Signature. When the cycle finalizes, the protocol distributes its reserves across more than ten allocation tracks — including Protocol Guild, the funding mechanism for 170+ Ethereum core contributors.',
-      },
-      'is-cosmic-signature-related-to-biology': {
-        question: 'Is Cosmic Signature related to the COSMIC biology database?',
-        answer:
-          'No. Cosmic Signature is not related to the COSMIC cancer mutation database or COSMIC mutational signatures in biology. It is an on-chain art protocol and app focused on deterministic three-body NFT art.',
       },
       'how-does-the-bidding-game-work': {
         question: 'How does a Performance Cycle work?',
@@ -54,8 +59,7 @@ export const faqTextEn = {
     items: {
       'what-is-the-main-allocation': {
         question: 'What is the Signature Allocation?',
-        answer:
-          'The Signature Allocation is received by the participant who made the Final Gesture of a cycle. It includes one Cosmic Signature NFT, a Recognition CST imprint of 1,000 CST, and 25% of the Cycle Reserve in ETH, plus any tokens or NFTs attached to participant gestures during the cycle.',
+        answer: `The Signature Allocation goes to whoever finalizes the cycle. For the first ${protocolFacts.finalGestureExclusivityHours} hours after the Cycle Finalization Time, only the participant who made the Final Gesture can finalize; after that, anyone can. It includes one Cosmic Signature NFT, a Recognition CST imprint of ${cst} CST, and ${protocolFacts.mainEthPercentage}% of the Cycle Reserve in ETH, plus any tokens or NFTs attached to participant gestures during the cycle.`,
       },
       'what-rewards-per-bid': {
         question: 'What do I receive for each gesture?',
@@ -63,7 +67,7 @@ export const faqTextEn = {
       },
       'how-does-the-stellarSelection-work': {
         question: 'How does Stellar Selection work?',
-        answer: `Each gesture records one entry in Stellar Selection. At the end of each cycle, the smart contract randomly selects entries from the pool: ${protocolFacts.ethStellarSelectionRecipients} selections share ${protocolFacts.stellarSelectionEthPercentage}% of the Cycle Reserve in ETH, ${protocolFacts.nftStellarSelectionRecipients} selections each receive ${protocolFacts.specialAllocationCst.toLocaleString()} CST and a Cosmic Signature NFT, and ${protocolFacts.anchoredRwlkNftSelectionRecipients} selections among anchored Random Walk NFTs also receive ${protocolFacts.specialAllocationCst.toLocaleString()} CST and Cosmic Signature NFTs. Selections are made with replacement, so the same address can be selected more than once in a cycle. Selection frequency increases with the number of gestures you make.`,
+        answer: `Each gesture records one entry in Stellar Selection. At the end of each cycle, the smart contract randomly selects entries from the pool: ${protocolFacts.ethStellarSelectionRecipients} selections share ${protocolFacts.stellarSelectionEthPercentage}% of the Cycle Reserve in ETH, ${protocolFacts.nftStellarSelectionRecipients} selections each receive ${cst} CST and a Cosmic Signature NFT, and ${protocolFacts.anchoredRwlkNftSelectionRecipients} selections among anchored Random Walk NFTs also receive ${cst} CST and Cosmic Signature NFTs. Selections are made with replacement, so the same address can be selected more than once in a cycle. Selection frequency increases with the number of gestures you make.`,
       },
       'how-random-selection-works': {
         question: 'How are random selections made?',
@@ -72,19 +76,19 @@ export const faqTextEn = {
       },
       'how-do-i-claim-my-allocation': {
         question: 'How do I retrieve my allocation if I’m a recipient?',
-        answer: `Recipients retrieve allocations through the app and protocol contracts. The Final Gesture participant has ${protocolFacts.finalGestureExclusivityHours} hours of exclusive time after the Cycle Finalization Time to finalize the cycle and retrieve the Signature Allocation. After that, the Open-Finalization Window begins: anyone may finalize the cycle, and the smart contract treats whoever finalizes as the cycle beneficiary — the finalizer receives the entire Signature Allocation (the ETH share, the ${protocolFacts.specialAllocationCst.toLocaleString()} CST imprint, the Cosmic Signature NFT, and priority over attached assets). Secondary ETH and attached-token or attached-NFT allocations sit in the Allocations Wallet escrow with a separate retrieval timeout that defaults to ${protocolFacts.secondaryRetrievalTimeoutWeeks} weeks; once it expires, the contracts permit anyone to retrieve an unretrieved allocation for themselves. Retrieve promptly.`,
+        answer: `Recipients retrieve allocations through the app and protocol contracts. The Final Gesture participant has ${protocolFacts.finalGestureExclusivityHours} hours of exclusive time after the Cycle Finalization Time to finalize the cycle and retrieve the Signature Allocation.\n\nAfter that, the Open-Finalization Window begins: anyone may finalize the cycle, and the smart contract treats whoever finalizes as the cycle beneficiary — the finalizer receives the entire Signature Allocation (the ETH share, the ${cst} CST imprint, the Cosmic Signature NFT, and priority over attached assets).\n\nSecondary ETH and attached-token or attached-NFT allocations sit in the Allocations Wallet escrow with a separate retrieval timeout that defaults to ${protocolFacts.secondaryRetrievalTimeoutWeeks} weeks; once it expires, the contracts permit anyone to retrieve an unretrieved allocation for themselves. Retrieve promptly.`,
       },
       'how-does-anchoring-work': {
         question: 'How does Anchoring work?',
-        answer: `Cosmic Signature NFTs can be anchored to the protocol to receive ETH Anchor Distributions: each finalized cycle allocates ${protocolFacts.anchorDistributionPercentage}% of the Cycle Reserve, split equally per anchored Cosmic Signature NFT, and the accumulated ETH is paid out when you release the anchor. Random Walk NFTs can also be anchored, but only for Anchored-NFT Stellar Selection eligibility — selected anchor-holders receive CST and Cosmic Signature NFTs, not ETH. Two rules to know: every NFT can be anchored only once, ever (after you release an anchor, that NFT can never be anchored again), and if no Cosmic Signature NFTs are anchored when a cycle finalizes, that cycle’s ${protocolFacts.anchorDistributionPercentage}% simply stays in the Cycle Reserve. CST (ERC-20) cannot be anchored. Visit the My Anchors page (from your account menu) to manage anchors.`,
+        answer: `Cosmic Signature NFTs can be anchored to the protocol to receive ETH Anchor Distributions: each finalized cycle allocates ${protocolFacts.anchorDistributionPercentage}% of the Cycle Reserve, split equally per anchored Cosmic Signature NFT, and the accumulated ETH is paid out when you release the anchor.\n\nRandom Walk NFTs can also be anchored, but only for Anchored-NFT Stellar Selection eligibility — selected anchor-holders receive CST and Cosmic Signature NFTs, not ETH.\n\nTwo rules to know: every NFT can be anchored only once, ever (after you release an anchor, that NFT can never be anchored again), and if no Cosmic Signature NFTs are anchored when a cycle finalizes, that cycle’s ${protocolFacts.anchorDistributionPercentage}% simply stays in the Cycle Reserve. CST (ERC-20) cannot be anchored. Visit the My Anchors page (from your account menu) to manage anchors.`,
       },
       'what-are-marketing-rewards': {
         question: 'What is the Outreach Reserve?',
-        answer: `You can receive CST tokens (ERC-20) for helping promote the protocol. The Outreach Reserve imprints ${protocolFacts.outreachReserveCst.toLocaleString()} CST per cycle and distributes it to ecosystem contributors. Contact the Outreach Custodian via Discord for guidance.`,
+        answer: `You can receive CST tokens (ERC-20) for helping promote the protocol. The Outreach Reserve imprints ${outreachCst} CST per cycle and distributes it to ecosystem contributors. Contact the Outreach Custodian via Discord for guidance.`,
       },
       'how-many-nfts-minted': {
         question: 'How many Cosmic Signature NFTs are imprinted each cycle?',
-        answer: `In the vast majority of cycles, ${protocolFacts.typicalNftsPerCycle} Cosmic Signature NFTs are imprinted: one for the Signature Allocation recipient, one for the Final CST Gesture recipient, one for the Endurance Champion, one for the Chrono-Warrior, ${protocolFacts.nftStellarSelectionRecipients} for NFT Stellar Selection recipients, and ${protocolFacts.anchoredRwlkNftSelectionRecipients} for Random Walk NFT anchor-holders selected through Anchored-NFT Stellar Selection. Each of those ${protocolFacts.typicalNftsPerCycle} NFT allocations also includes ${protocolFacts.specialAllocationCst.toLocaleString()} CST. If a cycle has no CST gestures or no anchored Random Walk NFTs, those specific imprints are skipped for that cycle.`,
+        answer: `In the vast majority of cycles, ${protocolFacts.typicalNftsPerCycle} Cosmic Signature NFTs are imprinted: one for the Signature Allocation recipient, one for the Final CST Gesture recipient, one for the Endurance Champion, one for the Chrono-Warrior, ${protocolFacts.nftStellarSelectionRecipients} for NFT Stellar Selection recipients, and ${protocolFacts.anchoredRwlkNftSelectionRecipients} for Random Walk NFT anchor-holders selected through Anchored-NFT Stellar Selection. Each of those ${protocolFacts.typicalNftsPerCycle} NFT allocations also includes ${cst} CST. If a cycle has no CST gestures or no anchored Random Walk NFTs, those specific imprints are skipped for that cycle.`,
       },
       'what-happens-to-remaining-eth': {
         question: 'What happens to the remaining ETH in the Cycle Reserve?',
@@ -117,7 +121,7 @@ export const faqTextEn = {
       },
       'how-is-participation-cst-calculated': {
         question: 'How is Participation CST calculated?',
-        answer: `Participation CST uses a square-root formula based on elapsed time since the previous gesture: ${protocolFacts.dynamicCstRewardFormula}. The square root matters because it rewards longer quiet periods without making the reward grow linearly forever. At the launch parameters (a time increment of exactly one hour), examples are approximately ${protocolFacts.dynamicCstRewardExamples.map((example) => `${example.cst} CST after ${example.elapsed}`).join(', ')}. The increment grows ${protocolFacts.cycleTimeIncrementIncreasePercentPerCycle}% per finalized cycle, so live amounts drift slightly below these over time. The live app preview and the contract are the source of truth for the exact amount at the moment your gesture lands.`,
+        answer: `Participation CST uses a square-root formula based on elapsed time since the previous gesture: ${protocolFacts.dynamicCstRewardFormula}. The square root matters because it rewards longer quiet periods without making the reward grow linearly forever.\n\nAt the launch parameters (a time increment of exactly one hour), examples are approximately ${protocolFacts.dynamicCstRewardExamples.map((example) => `${example.cst} CST after ${example.elapsed}`).join(', ')}. The increment grows ${protocolFacts.cycleTimeIncrementIncreasePercentPerCycle}% per finalized cycle, so live amounts drift slightly below these over time. The live app preview and the contract are the source of truth for the exact amount at the moment your gesture lands.`,
       },
       'why-minimum-cst-reward-protection': {
         question: 'What is Minimum CST Reward Protection?',
@@ -130,7 +134,7 @@ export const faqTextEn = {
       },
       'what-is-open-finalization-window': {
         question: 'What is the Open-Finalization Window?',
-        answer: `When the Cycle Finalization Time expires, the Final Gesture participant has ${protocolFacts.finalGestureExclusivityHours} hours of exclusive time to finalize the cycle. If they do not finalize during that exclusivity window, anyone may call the finalization transaction — and the smart contract makes whoever finalizes the cycle beneficiary. The finalizer receives the full Signature Allocation (ETH share, ${protocolFacts.specialAllocationCst.toLocaleString()} CST, the Cosmic Signature NFT, and priority over attached assets), so the Final Gesture participant should finalize before the window ends. Open finalization keeps the protocol moving even if the Final Gesture participant disappears.`,
+        answer: `When the Cycle Finalization Time expires, the Final Gesture participant has ${protocolFacts.finalGestureExclusivityHours} hours of exclusive time to finalize the cycle. If they do not finalize during that exclusivity window, anyone may call the finalization transaction — and the smart contract makes whoever finalizes the cycle beneficiary. The finalizer receives the full Signature Allocation (ETH share, ${cst} CST, the Cosmic Signature NFT, and priority over attached assets), so the Final Gesture participant should finalize before the window ends. Open finalization keeps the protocol moving even if the Final Gesture participant disappears.`,
       },
       'what-is-endurance-champion': {
         question: 'What is an Endurance Champion?',
@@ -144,7 +148,7 @@ export const faqTextEn = {
       },
       'what-is-chrono-warrior': {
         question: 'What is a Chrono-Warrior?',
-        answer: `The participant who held the Endurance Champion position for the longest consecutive interval. Analogous to the Endurance Champion being the longest-reigning recent gesture maker, the Chrono-Warrior is the longest-reigning Endurance Champion. When the cycle finalizes, the Chrono-Warrior receives ${protocolFacts.chronoWarriorEthPercentage}% of the Cycle Reserve in ETH, ${protocolFacts.specialAllocationCst.toLocaleString()} CST, and one Cosmic Signature NFT.`,
+        answer: `The participant who held the Endurance Champion position for the longest consecutive interval. Analogous to the Endurance Champion being the longest-reigning recent gesture maker, the Chrono-Warrior is the longest-reigning Endurance Champion. When the cycle finalizes, the Chrono-Warrior receives ${protocolFacts.chronoWarriorEthPercentage}% of the Cycle Reserve in ETH, ${cst} CST, and one Cosmic Signature NFT.`,
       },
       'does-time-per-bid-stay-same': {
         question: 'Does the time added per gesture always stay the same?',
@@ -296,6 +300,11 @@ export const faqTextEn = {
         answer:
           'Beyond the Gesture Cost itself, you pay Arbitrum network gas fees for each transaction. Gas fees fluctuate with network conditions and are not controlled by Cosmic Signature.',
       },
+      'is-cosmic-signature-related-to-biology': {
+        question: 'Is Cosmic Signature related to the COSMIC biology database?',
+        answer:
+          'No. Cosmic Signature is not related to the COSMIC cancer mutation database or COSMIC mutational signatures in biology. It is an on-chain art protocol and app focused on deterministic three-body NFT art.',
+      },
     },
   },
   'trust-and-governance': {
@@ -305,7 +314,7 @@ export const faqTextEn = {
       'team-controls': {
         question: 'What controls does the team have over the protocol?',
         answer:
-          'Initially, the team has the ability to adjust certain parameters of the protocol, such as gesture-time increments or allocation-track percentages. This control is implemented through the smart contract’s “Ownable” pattern and is scoped to the inter-cycle window: once the next cycle activates — which happens before its first gesture — the core protocol parameters are locked until that cycle finalizes. A few narrower controls remain available outside that lock: the owner can postpone a cycle’s activation until its first gesture arrives, adjust the delay before the next cycle at any time, and manage peripheral contracts (the Public Goods Vault beneficiary, NFT metadata URIs, and the Allocations Wallet retrieval timeout) at any time. The protocol contract is also upgradeable (UUPS) by the owner, but only between cycles; the currently deployed implementation is the publicly verified V2.',
+          'Initially, the team has the ability to adjust certain parameters of the protocol, such as gesture-time increments or allocation-track percentages. This control is implemented through the smart contract’s “Ownable” pattern and is scoped to the inter-cycle window: once the next cycle activates — which happens before its first gesture — the core protocol parameters are locked until that cycle finalizes.\n\nA few narrower controls remain available outside that lock: the owner can postpone a cycle’s activation until its first gesture arrives, adjust the delay before the next cycle at any time, and manage peripheral contracts (the Public Goods Vault beneficiary, NFT metadata URIs, and the Allocations Wallet retrieval timeout) at any time.\n\nThe protocol contract is also upgradeable (UUPS) by the owner, but only between cycles; the currently deployed implementation is the publicly verified V2.',
       },
       'will-team-always-have-control': {
         question: 'Will the team always have control over the protocol’s parameters?',

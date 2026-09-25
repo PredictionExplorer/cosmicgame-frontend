@@ -3,20 +3,38 @@ import { formatTimeZoneLabel } from '@/utils/format';
 
 import { fireEvent, render, screen, within, checkA11y } from '@/test-utils';
 
-import GesturePage from '../[id]/GesturePage';
+import GesturePage, { clockExtension, gestureHold, gestureTrail } from '../[id]/GesturePage';
+import type { GestureNeighbour } from '../[id]/gestureNeighbours';
 
 const mockUseGestureInfo = jest.fn();
-const mockUseDashboardInfo = jest.fn((): { data?: { CurRoundNum: number }; isError?: boolean } => ({
-  data: { CurRoundNum: 9 },
-}));
+const mockUseDashboardInfo = jest.fn(
+  (): { data?: { CurRoundNum: number; CurNumBids?: number }; isError?: boolean } => ({
+    data: { CurRoundNum: 9 },
+  }),
+);
+const mockUseRoundInfo = jest.fn(
+  (_cycle: number): { data?: Record<string, unknown> | null; isPending: boolean } => ({
+    data: undefined,
+    isPending: true,
+  }),
+);
 jest.mock('../../../../../hooks/useApiQuery', () => ({
   useGestureInfo: (...args: unknown[]) => mockUseGestureInfo(...args),
   useDashboardInfo: () => mockUseDashboardInfo(),
+  useRoundInfo: (cycle: number) => mockUseRoundInfo(cycle),
 }));
 
+const neighbour = (
+  id: number,
+  position: number,
+  timestamp: number | null = null,
+  finalizationTime: number | null = null,
+): GestureNeighbour => ({ id, position, timestamp, finalizationTime });
+
 const mockNeighbours = jest.fn(() => ({
-  previous: null as { id: number; position: number } | null,
-  next: null as { id: number; position: number } | null,
+  previous: null as GestureNeighbour | null,
+  next: null as GestureNeighbour | null,
+  settled: false,
 }));
 jest.mock('../[id]/gestureNeighbours', () => ({
   useGestureNeighbours: () => mockNeighbours(),
@@ -49,7 +67,8 @@ jest.mock('../../../../../components/nft/NFTImage', () => ({
 
 beforeEach(() => {
   jest.clearAllMocks();
-  mockNeighbours.mockReturnValue({ previous: null, next: null });
+  mockNeighbours.mockReturnValue({ previous: null, next: null, settled: false });
+  mockUseRoundInfo.mockReturnValue({ data: undefined, isPending: true });
 });
 
 const baseGestureInfo = {
@@ -212,7 +231,7 @@ describe('GesturePage', () => {
   });
 
   it('does not guess the cycle’s page before the dashboard says which cycle is live', () => {
-    mockUseDashboardInfo.mockReturnValueOnce({ data: undefined });
+    mockUseDashboardInfo.mockReturnValue({ data: undefined });
     renderGesture();
     const trail = screen.getByRole('navigation', { name: 'common.accessibility.breadcrumb' });
     // Home and the Records section, but no cycle page yet.
@@ -221,6 +240,12 @@ describe('GesturePage', () => {
         .getAllByRole('link')
         .map((link) => link.getAttribute('href')),
     ).toEqual(['/', '/site-map#records']);
+    // Regression (V084): a live cycle's number never leads to its allocation record meanwhile.
+    expect(
+      screen.getAllByRole('link').filter((link) => link.getAttribute('href') === '/allocation/5'),
+    ).toHaveLength(0);
+    expect(screen.queryByRole('link', { name: /gesture\.nav\.all/ })).not.toBeInTheDocument();
+    mockUseDashboardInfo.mockReturnValue({ data: { CurRoundNum: 9 } });
   });
 
   it('takes the cycle as finalized when the dashboard cannot be read', () => {
@@ -232,14 +257,76 @@ describe('GesturePage', () => {
     ).toHaveAttribute('href', '/allocation/5');
   });
 
-  it('carries the cost exactly, the Participation CST and the cycle as header figures', () => {
+  it('carries the cost exactly, the Participation CST and how long it held as header figures', () => {
+    mockNeighbours.mockReturnValue({
+      previous: null,
+      next: neighbour(108, 8, baseGestureInfo.TimeStamp + 6768),
+      settled: true,
+    });
     const { container } = renderGesture();
     expect(figure(container, 'cost')).toHaveTextContent('0.10211');
     expect(figure(container, 'cost')).toHaveTextContent('ETH');
     expect(figure(container, 'participationCst')).toHaveTextContent('100');
-    expect(within(figure(container, 'cycle') as HTMLElement).getByRole('link')).toHaveAttribute(
+    // Held until the next gesture, in the page's one grammar for elapsed times (V224, V239).
+    expect(figure(container, 'held')?.querySelector('dd time')).toHaveTextContent('1h 52m 48s');
+    // No bare cycle number as a headline figure: the trail and the cycle column name it.
+    expect(figure(container, 'cycle')).toBeNull();
+  });
+
+  it('says a live cycle’s latest gesture is still holding', () => {
+    mockUseDashboardInfo.mockReturnValue({ data: { CurRoundNum: 5, CurNumBids: 7 } });
+    mockNeighbours.mockReturnValue({ previous: null, next: null, settled: true });
+    const { container } = renderGesture();
+    expect(figure(container, 'held')).toHaveTextContent('gesture.figures.heldLive');
+    expect(screen.getByTestId('gesture-position')).toHaveTextContent(
+      'gesture.rail.positionLive(position=7,total=7)',
+    );
+    // The Signature does not exist yet: the rail says when it will.
+    expect(screen.getByText('gesture.rail.liveNote')).toBeInTheDocument();
+    expect(screen.queryByTestId('gesture-cycle-signature')).not.toBeInTheDocument();
+    mockUseDashboardInfo.mockReturnValue({ data: { CurRoundNum: 9 } });
+  });
+
+  it('sets a finalized cycle’s place and Signature beside the record', () => {
+    mockUseRoundInfo.mockReturnValue({
+      data: {
+        TokenId: 24,
+        TokenSeed: '5084a87375896c7103ba17b57264f20de35d9e6eb545314680ad5e074dfc33ad',
+        TimeStamp: baseGestureInfo.TimeStamp + 90,
+        RoundStats: { TotalBids: 1141 },
+      },
+      isPending: false,
+    });
+    mockNeighbours.mockReturnValue({ previous: null, next: null, settled: true });
+    const { container } = renderGesture();
+    expect(mockUseRoundInfo).toHaveBeenLastCalledWith(5);
+    // The cycle's latest gesture held until the cycle finalized.
+    expect(figure(container, 'held')?.querySelector('dd time')).toHaveTextContent('1m 30s');
+    const rail = screen.getByRole('complementary', {
+      name: 'common.pageHeader.crumbs.cycle(cycle=5)',
+    });
+    expect(within(rail).getByTestId('gesture-position')).toHaveTextContent(
+      'gesture.rail.position(position=7,total=1,141)',
+    );
+    expect(within(rail).getByRole('link', { name: /gesture\.rail\.signature/ })).toHaveAttribute(
+      'href',
+      '/detail/24',
+    );
+    expect(within(rail).getByRole('link', { name: /gesture\.nav\.all/ })).toHaveAttribute(
       'href',
       '/allocation/5',
+    );
+  });
+
+  it('says how far the gesture moved the finalization clock', () => {
+    mockNeighbours.mockReturnValue({
+      previous: neighbour(101, 6, null, baseGestureInfo.PrizeTime - 3672),
+      next: null,
+      settled: true,
+    });
+    renderGesture();
+    expect(screen.getByTestId('clock-extension')).toHaveTextContent(
+      'gesture.rows.clockExtended(duration=1h 01m 12s)',
     );
   });
 
@@ -260,7 +347,10 @@ describe('GesturePage', () => {
 
   it('prints its times in UTC and names the zone, as every record does', () => {
     const { container } = renderGesture();
-    const times = container.querySelectorAll('time');
+    // Instants, not durations ("PT…").
+    const times = Array.from(container.querySelectorAll('time')).filter(
+      (time) => !time.getAttribute('dateTime')?.startsWith('P'),
+    );
     expect(times).toHaveLength(2);
     expect(times[0]).toHaveAttribute('dateTime', '2026-05-29T09:06:06.000Z');
     // The same text on the server and after hydration: it never rewrites itself.
@@ -309,13 +399,11 @@ describe('GesturePage', () => {
           link.getAttribute('href')?.includes('/user/0x76Cd6127403163a2a74Aa4b6968579DC6435034e'),
         ),
     ).toBe(true);
-    // The meta line's proof and the transaction row's icon link go to the same explorer page.
+    // The explorer proof is the transaction row's, once (V239).
     const proofs = screen.getAllByRole('link', { name: /gesture\.header\.explorer/ });
-    expect(proofs).toHaveLength(2);
-    for (const proof of proofs) {
-      expect(proof).toHaveAttribute('href', expect.stringContaining(baseGestureInfo.TxHash));
-      expect(proof).toHaveAttribute('target', '_blank');
-    }
+    expect(proofs).toHaveLength(1);
+    expect(proofs[0]).toHaveAttribute('href', expect.stringContaining(baseGestureInfo.TxHash));
+    expect(proofs[0]).toHaveAttribute('target', '_blank');
   });
 
   it('lets the transaction hash be copied from its row (D080)', () => {
@@ -380,8 +468,9 @@ describe('GesturePage', () => {
 
   it('steps to the previous and next gesture of the cycle', () => {
     mockNeighbours.mockReturnValue({
-      previous: { id: 101, position: 6 },
-      next: { id: 108, position: 8 },
+      previous: neighbour(101, 6),
+      next: neighbour(108, 8),
+      settled: true,
     });
     renderGesture();
     // Beside the title from `sm`, after the record on phones (one is hidden at each width).
@@ -408,5 +497,81 @@ describe('GesturePage', () => {
   it('has no accessibility violations', async () => {
     const { container } = renderGesture();
     await checkA11y(container);
+  });
+});
+
+describe('gestureTrail', () => {
+  const t = (key: string, values?: Record<string, string | number>) =>
+    values ? `${key}(${JSON.stringify(values)})` : key;
+
+  it('links the cycle only once the dashboard says whether it is live (V084)', () => {
+    expect(gestureTrail(5, undefined, false, t)).toMatchObject({
+      cycleState: 'unknown',
+      cycleHref: null,
+    });
+    expect(gestureTrail(5, 5, false, t)).toMatchObject({
+      cycleState: 'live',
+      cycleHref: '/current-cycle#gesture-history',
+    });
+    expect(gestureTrail(5, 9, false, t)).toMatchObject({
+      cycleState: 'finalized',
+      cycleHref: '/allocation/5',
+    });
+    expect(gestureTrail(5, null, true, t)).toMatchObject({ cycleState: 'finalized' });
+  });
+});
+
+describe('gestureHold', () => {
+  const base = { timestamp: 1000, settled: true, cycleEnd: null } as const;
+
+  it('holds until the next gesture', () => {
+    expect(gestureHold({ ...base, next: neighbour(2, 2, 1600), cycleState: 'finalized' })).toEqual({
+      state: 'known',
+      seconds: 600,
+    });
+  });
+
+  it('is still holding as the open cycle’s latest', () => {
+    expect(gestureHold({ ...base, next: null, cycleState: 'live' })).toEqual({
+      state: 'holding',
+      since: 1000,
+    });
+  });
+
+  it('holds until a finalized cycle ended, once its record is read', () => {
+    expect(
+      gestureHold({ ...base, next: null, cycleState: 'finalized', cycleEnd: undefined }),
+    ).toEqual({ state: 'pending' });
+    expect(gestureHold({ ...base, next: null, cycleState: 'finalized', cycleEnd: 1900 })).toEqual({
+      state: 'known',
+      seconds: 900,
+    });
+  });
+
+  it('waits for the neighbours and the dashboard, and never guesses a missing time', () => {
+    expect(gestureHold({ ...base, next: null, settled: false, cycleState: 'live' })).toEqual({
+      state: 'pending',
+    });
+    expect(gestureHold({ ...base, next: null, cycleState: 'unknown' })).toEqual({
+      state: 'pending',
+    });
+    expect(gestureHold({ ...base, timestamp: null, next: null, cycleState: 'live' })).toEqual({
+      state: 'unknown',
+    });
+    expect(gestureHold({ ...base, next: neighbour(2, 2), cycleState: 'live' })).toEqual({
+      state: 'unknown',
+    });
+  });
+});
+
+describe('clockExtension', () => {
+  it('is the move from the finalization time the previous gesture left', () => {
+    expect(clockExtension(5000, neighbour(1, 1, null, 1400))).toBe(3600);
+  });
+
+  it('is unknown for a cycle’s first gesture or a missing time', () => {
+    expect(clockExtension(5000, null)).toBeNull();
+    expect(clockExtension(null, neighbour(1, 1, null, 1400))).toBeNull();
+    expect(clockExtension(5000, neighbour(1, 1))).toBeNull();
   });
 });

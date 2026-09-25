@@ -5,7 +5,8 @@
   },
   "status": {
     "notStarted": "未開始",
-    "heading": "サイクルの状況"
+    "heading": "サイクルの状況",
+    "figuresHeading": "これまでのサイクル"
   },
   "sectionNav": {
     "aria": "このページの内容",
@@ -61,7 +62,7 @@
     "cards": {
       "signature": {
         "name": "シグネチャー配分",
-        "tooltip": "確定時刻を過ぎると、最後に一筆を入れた参加者がサイクルを確定できます。シグネチャー配分にはETH、1,000 CST、Cosmic Signature NFT、添付されたトークンが含まれます。"
+        "tooltip": "確定時刻を過ぎると、最後に一筆を入れた参加者がサイクルを確定できます。シグネチャー配分にはETH、1,000 CST、Cosmic Signature NFT、添付されたトークンが含まれます。その参加者が優先期間内に確定しなければ、確定実行者が受け取ります。"
       },
       "chronoWarrior": {
         "name": "時の戦士配分",
@@ -74,7 +75,7 @@
       "cosmicAnchor": {
         "name": "係留配分",
         "tooltip": "サイクル準備金のうちETH建ての一部で、確定時に係留されたすべてのCosmic Signature NFTで均等に分けられます。",
-        "recipientLabel": "比例配分 · すべての係留者"
+        "recipientLabel": "係留NFTごとに均等"
       },
       "publicGoods": {
         "name": "公共財",
@@ -102,7 +103,7 @@
   "sections": {
     "allocations": {
       "title": "配分の内訳",
-      "description": "サイクル準備金が配分トラックにどう分かれるか：シグネチャー配分、時の戦士、星選、公共財、係留配分、そして累積準備金。"
+      "description": "サイクル準備金が配分トラックにどう分かれるか：シグネチャー配分、時の戦士、星選、係留配分、公共財。残りは累積準備金として次のサイクルへ繰り越されます。"
     },
     "participants": {
       "title": "このサイクルの参加者"
@@ -151,9 +152,9 @@
     "heading": "このサイクルに添付されたアセット",
     "cycleFallback": "現在",
     "description": {
-      "nftOnly": "コミュニティが添付したアセットは、シグネチャー配分とともに移ります。サイクル{cycle}が確定すると、最後の一筆の参加者が{nftCount, plural, other {添付された{nftCount}点のNFTすべて}}を受け取ります。",
-      "erc20Only": "コミュニティが添付したアセットは、シグネチャー配分とともに移ります。サイクル{cycle}が確定すると、最後の一筆の参加者が{erc20Count, plural, other {添付された{erc20Count}件のERC-20トークン添付分すべて}}を受け取ります。",
-      "mixed": "コミュニティが添付したアセットは、シグネチャー配分とともに移ります。サイクル{cycle}が確定すると、最後の一筆の参加者が{nftCount, plural, other {添付された{nftCount}点のNFT}}と{erc20Count, plural, other {添付された{erc20Count}件のERC-20トークン添付分}}のすべてを受け取ります。"
+      "nftOnly": "コミュニティが添付したアセットは、シグネチャー配分とともに移ります。サイクル{cycle}が確定すると、確定実行者が{nftCount, plural, other {添付された{nftCount}点のNFTすべて}}を受け取ります。",
+      "erc20Only": "コミュニティが添付したアセットは、シグネチャー配分とともに移ります。サイクル{cycle}が確定すると、確定実行者が{erc20Count, plural, other {添付された{erc20Count}件のERC-20トークン添付分すべて}}を受け取ります。",
+      "mixed": "コミュニティが添付したアセットは、シグネチャー配分とともに移ります。サイクル{cycle}が確定すると、確定実行者が{nftCount, plural, other {添付された{nftCount}点のNFT}}と{erc20Count, plural, other {添付された{erc20Count}件のERC-20トークン添付分}}のすべてを受け取ります。"
     },
     "bonusReceipt": {
       "nftOnly": "{nftCount, plural, other {ERC-721トークン{nftCount}点}}",
@@ -165,7 +166,7 @@
       "cycle": "サイクル",
       "cycleValue": "{cycle}",
       "recipientRule": "受領者のルール",
-      "recipientRuleValue": "最後の一筆"
+      "recipientRuleValue": "確定実行者"
     },
     "remainder": {
       "nftOnly": "注目の受領証プレビューを表示しています。サイクルの詳細では、さらに{nftCount, plural, other {{nftCount}点の添付NFT}}を確認できます。",

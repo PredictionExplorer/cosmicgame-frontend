@@ -27,7 +27,7 @@
     },
     "signatureAllocation": {
       "term": "签名分配",
-      "short": "周期收官时给予最新落笔者的分配：一份以 ETH 计的周期储备、表彰 CST 与一枚 Cosmic Signature NFT。",
+      "short": "周期收官时给予收官者的分配：一份以 ETH 计的周期储备、表彰 CST 与一枚 Cosmic Signature NFT。",
       "long": "最新落笔者可以执行收官并取回这份分配，并优先取回附加在落笔上的代币与 NFT。若其未在专属时段内收官，则由执行收官者获配。"
     },
     "finalCstGesture": {

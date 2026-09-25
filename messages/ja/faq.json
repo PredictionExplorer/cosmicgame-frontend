@@ -20,11 +20,12 @@
   "category": {
     "expandAll": "すべて開く",
     "collapseAll": "すべて閉じる",
-    "expandAllAria": "すべての質問を開く",
-    "collapseAllAria": "すべての質問を閉じる",
+    "expandAllAria": "すべて開く：{category}",
+    "collapseAllAria": "すべて閉じる：{category}",
     "copyLink": "リンクをコピー",
     "copied": "コピーしました",
-    "copyLinkAria": "この質問へのリンクをコピー"
+    "copyLinkAria": "リンクをコピー：{question}",
+    "linkCopied": "リンクをコピーしました"
   },
   "popular": {
     "heading": "よく読まれている質問"

@@ -1,12 +1,19 @@
 import { protocolFacts } from '@/content/protocol-facts';
 
+import { copyNumbers } from './copyNumbers';
 import type { HowItWorksText } from './structure';
 
-const cstAmount = protocolFacts.specialAllocationCst.toLocaleString('vi-VN');
-const cstWindowDecrease =
-  protocolFacts.cstCalibrationWindowDecreasePercentPerEthGesture.toLocaleString('vi-VN');
-const cstWindowIncrease =
-  protocolFacts.cstCalibrationWindowIncreasePercentPerCstGesture.toLocaleString('vi-VN');
+const numbers = copyNumbers('vi');
+const cstAmount = numbers.specialAllocationCst;
+const cstWindowDecrease = numbers.decimal(
+  protocolFacts.cstCalibrationWindowDecreasePercentPerEthGesture,
+);
+const cstWindowIncrease = numbers.decimal(
+  protocolFacts.cstCalibrationWindowIncreasePercentPerCstGesture,
+);
+const eth = numbers.count(numbers.ethRecipients);
+const nft = numbers.count(numbers.nftRecipients);
+const anchored = numbers.count(numbers.anchoredRecipients);
 
 /** Vietnamese how-it-works copy, keyed by the skeleton in structure.ts. */
 export const howItWorksTextVi = {
@@ -42,11 +49,11 @@ export const howItWorksTextVi = {
       },
       {
         title: 'Lượt Tinh tuyển',
-        description: `Mỗi nét bút ghi nhận một lượt. Khi chu kỳ hoàn tất, ba lượt được chọn ngẫu nhiên để chia ${protocolFacts.stellarSelectionEthPercentage}% Dự trữ chu kỳ bằng ETH.`,
+        description: `Mỗi nét bút ghi nhận một lượt. Khi chu kỳ hoàn tất, ${eth} lượt được chọn ngẫu nhiên để chia ${protocolFacts.stellarSelectionEthPercentage}% Dự trữ chu kỳ bằng ETH.`,
       },
       {
         title: 'Tinh tuyển Cosmic Signature NFT',
-        description: `Mười lượt khác được chọn, mỗi lượt nhận ${cstAmount} CST và một Cosmic Signature NFT. Cùng một địa chỉ có thể được chọn nhiều lần, và không số lượt nào bảo đảm được chọn.`,
+        description: `Thêm ${nft} lượt khác được chọn, mỗi lượt nhận ${cstAmount} CST và một Cosmic Signature NFT. Cùng một địa chỉ có thể được chọn nhiều lần, và không số lượt nào bảo đảm được chọn.`,
       },
       {
         title: 'Phân bổ Signature',
@@ -79,6 +86,7 @@ export const howItWorksTextVi = {
     subhead: 'Mỗi chu kỳ đi theo trình tự này từ lúc mở đến khi hoàn tất.',
     legend: {
       gestures: 'Nét bút',
+      finalization: 'Hoàn tất',
       exclusiveWindow: `${protocolFacts.finalGestureExclusivityHours} giờ chỉ người đặt nét bút cuối cùng được hoàn tất`,
       allocations: 'Luồng phân bổ',
     },
@@ -101,7 +109,7 @@ export const howItWorksTextVi = {
       },
       {
         label: 'Tinh tuyển',
-        description: `Ba người nhận ETH Tinh tuyển chia ${protocolFacts.stellarSelectionEthPercentage}% Dự trữ chu kỳ. Mười người nhận NFT Tinh tuyển, cùng mười người nhận Tinh tuyển NFT neo giữ được chọn từ các Random Walk NFT đang neo giữ, mỗi người nhận ${cstAmount} CST và một Cosmic Signature NFT. Lượt được ghi nhận theo từng nét bút, và mỗi lượt chọn được thực hiện trong toàn bộ lượt của chu kỳ, có hoàn lại.`,
+        description: `${eth} người nhận ETH Tinh tuyển chia ${protocolFacts.stellarSelectionEthPercentage}% Dự trữ chu kỳ. ${nft} người nhận NFT Tinh tuyển, cùng ${anchored} người nhận Tinh tuyển NFT neo giữ được chọn từ các Random Walk NFT đang neo giữ, mỗi người nhận ${cstAmount} CST và một Cosmic Signature NFT. Lượt được ghi nhận theo từng nét bút, và các lượt chọn ETH và NFT được thực hiện trong toàn bộ lượt của chu kỳ, có hoàn lại.`,
       },
       {
         label: 'Chu kỳ tiếp theo',
@@ -111,7 +119,7 @@ export const howItWorksTextVi = {
   },
   payoff: {
     heading: 'Mỗi chu kỳ khép lại bằng một Signature',
-    body: 'Mỗi nét bút góp phần tạo nên tác phẩm của chu kỳ. Khi chu kỳ hoàn tất, Signature được khắc thành một Cosmic Signature NFT và trao cho người đặt nét bút cuối cùng cùng với phân bổ Signature.',
+    body: `Mỗi nét bút góp phần tạo nên tác phẩm của chu kỳ. Khi chu kỳ hoàn tất, Signature được khắc thành một Cosmic Signature NFT và trao cùng phân bổ Signature cho người hoàn tất chu kỳ. Trong ${protocolFacts.finalGestureExclusivityHours} giờ đầu sau khi đếm ngược về 0, chỉ người đặt nét bút cuối cùng được hoàn tất; sau đó bất kỳ ai cũng có thể hoàn tất.`,
     linkLabel: 'Xem Signature này',
   },
   stepByStep: {

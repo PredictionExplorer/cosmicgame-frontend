@@ -5,8 +5,7 @@
   },
   "page": {
     "title": "Khắc Random Walk NFT",
-    "subtitle": "Sở hữu một Random Walk NFT để được giảm 50% chi phí nét bút ETH",
-    "description": "Mỗi NFT chỉ áp dụng mức giảm này một lần, vì vậy thời điểm sử dụng tùy thuộc vào lựa chọn của bạn. Bạn cũng có thể neo giữ Random Walk NFT để thuộc diện Tinh tuyển NFT neo giữ; đây là cơ chế riêng, không liên quan đến việc đính kèm NFT vào nét bút.",
+    "subtitle": "Một Random Walk NFT giảm 50% chi phí của một nét bút ETH. Khắc NFT tại đây, rồi đính kèm vào nét bút bạn chọn.",
     "currentCost": "Chi phí khắc hiện tại",
     "costBreakdown": "Chi phí trong hợp đồng {base} ETH, cộng thêm {percent}% dự phòng để lượt khắc vẫn thành công nếu chi phí tăng trước khi được xác nhận.",
     "submit": "Khắc ngay",
@@ -17,9 +16,21 @@
     "why": {
       "title": "Việc khắc mang lại gì cho bạn"
     },
-    "compare": {
-      "label": "Chi phí nét bút ETH khi đính kèm Random Walk NFT",
-      "caption": "Thấp hơn {percent}% so với chi phí nét bút ETH hiện tại, mỗi NFT một lần."
+    "benefits": {
+      "gesture": {
+        "title": "Giảm một nửa chi phí cho một nét bút ETH",
+        "label": "Khoản tiết kiệm cho một nét bút ETH theo chi phí hiện tại",
+        "caption": "Bằng một nửa chi phí nét bút ETH hiện tại là {cost} ETH. Mỗi Random Walk NFT chỉ dùng được một lần, cho nét bút bạn chọn."
+      },
+      "anchoring": {
+        "title": "Tinh tuyển NFT neo giữ",
+        "body": "Khi được neo giữ, Random Walk NFT tham gia Tinh tuyển NFT neo giữ: mỗi lần chu kỳ hoàn tất, {count, number} Random Walk NFT đang neo giữ được chọn và người nắm giữ mỗi NFT nhận {cst} CST cùng một Cosmic Signature NFT. NFT đã dùng cho nét bút vẫn có thể được neo giữ.",
+        "link": "Xem cách neo giữ hoạt động"
+      }
+    },
+    "latest": {
+      "meta": "Lần khắc gần nhất",
+      "earlierAria": "Các lần khắc ngay trước đó"
     },
     "success": {
       "eyebrow": "Đã khắc",
@@ -32,6 +43,8 @@
       "used": "Đã dùng",
       "unused": "Chưa dùng",
       "use": "Dùng cho nét bút",
+      "checking": "Đang kiểm tra",
+      "unknownNote": "Hiện chưa thể kiểm tra các Random Walk NFT này đã được dùng hay chưa, nên chưa đề xuất NFT nào cho nét bút.",
       "empty": "Ví này chưa có Random Walk NFT nào.",
       "error": "Không thể đọc Random Walk NFT trong ví này."
     }

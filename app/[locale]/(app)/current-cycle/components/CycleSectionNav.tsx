@@ -6,7 +6,6 @@ import { useTranslations } from 'next-intl';
 import { jumpToSection } from '@/lib/jumpToSection';
 import { cn } from '@/lib/utils';
 import { ScrollRail } from '@/components/ui/scroll-rail';
-import { tabsListVariants, tabsTriggerVariants } from '@/components/ui/tabs';
 
 /**
  * The page's sections, in page order: each id is the element the entry
@@ -60,26 +59,29 @@ function useStuck() {
 }
 
 /**
- * The current cycle's in-page navigation: one underline row of anchors
- * (Standings, Allocations, Participants, Gestures, Rules) stuck under the
- * site header, so a phone reader reaches the gesture history without
- * scrolling past every ledger. Its underline row is the page header's
- * bottom rule. The section being read is marked
- * `aria-current="location"`; a jump scrolls to the section, updates the
- * address and moves keyboard focus to its heading. Once the bar floats over
- * content it takes the header's glass across the full width. Standings are
- * listed only while the cycle has them.
+ * The current cycle's "On this page" bar: its label, then a row of plain
+ * anchors (Standings, Allocations, Participants, Gestures, Rules) stuck under
+ * the site header, so a phone reader reaches the gesture history without
+ * scrolling past every ledger. It is not a tab row: no underline track, and
+ * the section being read is marked with a small dot and full-contrast text
+ * (`aria-current="location"`), so it never reads like the Participants view
+ * switcher further down. The first section is current from the top of the
+ * page. A jump scrolls to the section, updates the address and moves keyboard
+ * focus to its heading. The bar's bottom edge is the page header's rule; once
+ * it floats over content it takes the header's glass across the full width.
+ * Standings are listed only while the cycle has them.
  */
 export function CycleSectionNav({ hasStandings }: { hasStandings: boolean }) {
   const t = useTranslations('currentCycle');
   const { sentinelRef, stickyRef, stuck } = useStuck();
   const sections = CYCLE_SECTIONS.filter((section) => hasStandings || section.id !== 'standings');
-  const [active, setActive] = useState<string | null>(null);
+  const [active, setActive] = useState<string | null>(sections[0]?.id ?? null);
   const ids = sections.map((section) => section.id).join(' ');
+  const labelId = 'cycle-section-nav-label';
 
   // The first section (in page order) crossing the reading band is the
   // current one. In a gap between sections the one above stays current; above
-  // the first section (the page header) none is.
+  // the first section (the page header) the first one is, where the bar leads.
   useEffect(() => {
     if (typeof IntersectionObserver === 'undefined') return;
     const order = ids.split(' ');
@@ -97,7 +99,7 @@ export function CycleSectionNav({ hasStandings }: { hasStandings: boolean }) {
         }
         const first = order.map((id) => document.getElementById(id)).find(Boolean);
         if (first && first.getBoundingClientRect().top > window.innerHeight * READING_BAND_BOTTOM) {
-          setActive(null);
+          setActive(first.id);
         }
       },
       { rootMargin: READING_BAND_MARGIN },
@@ -114,24 +116,22 @@ export function CycleSectionNav({ hasStandings }: { hasStandings: boolean }) {
       <div ref={sentinelRef} aria-hidden className="h-0" />
       <nav
         ref={stickyRef}
-        aria-label={t('sectionNav.aria')}
+        aria-labelledby={labelId}
         data-sticky-subnav=""
         data-stuck={stuck || undefined}
         className={cn(
           // Its own stacking layer, so the band behind the row covers the page.
-          'sticky top-[var(--header-height)] z-[var(--z-sticky-nav)] mb-8 sm:mb-10',
+          'sticky top-[var(--header-height)] z-[var(--z-sticky-nav)] mb-8 flex items-center gap-x-6 border-b border-rule sm:mb-10',
           // The glass band spans the viewport, behind the container-wide row.
           'before:pointer-events-none before:absolute before:inset-y-0 before:left-1/2 before:-z-10 before:w-screen before:-translate-x-1/2 before:border-b before:border-rule before:opacity-0 before:glass before:transition-opacity before:duration-base',
           'data-[stuck]:before:opacity-100',
         )}
       >
-        <ScrollRail activeSelector='[aria-current="location"]'>
-          <ul
-            className={cn(
-              tabsListVariants({ variant: 'underline' }),
-              'w-max min-w-full flex-nowrap',
-            )}
-          >
+        <span id={labelId} className="shrink-0 type-eyebrow text-subtle max-sm:sr-only">
+          {t('sectionNav.aria')}
+        </span>
+        <ScrollRail activeSelector='[aria-current="location"]' className="min-w-0 flex-1">
+          <ul className="flex w-max min-w-full flex-nowrap items-center gap-x-6">
             {sections.map((section) => (
               <li key={section.id} className="shrink-0">
                 <a
@@ -143,11 +143,15 @@ export function CycleSectionNav({ hasStandings }: { hasStandings: boolean }) {
                     setActive(section.id);
                   }}
                   className={cn(
-                    tabsTriggerVariants({ variant: 'underline', scroll: true }),
-                    'focus-ring-inset no-underline',
-                    'aria-[current=location]:text-foreground aria-[current=location]:shadow-[inset_0_-2px_0_0_hsl(var(--primary))]',
+                    'group focus-ring-inset inline-flex min-h-11 items-center gap-2 whitespace-nowrap type-label text-muted-foreground no-underline transition-colors duration-fast hover:text-foreground',
+                    'aria-[current=location]:text-foreground',
                   )}
                 >
+                  {/* The dot marks the section being read; it keeps its space, so nothing shifts. */}
+                  <span
+                    aria-hidden
+                    className="size-1.5 shrink-0 rounded-pill bg-primary opacity-0 transition-opacity duration-fast group-aria-[current=location]:opacity-100"
+                  />
                   {t(`sectionNav.${section.key}`)}
                 </a>
               </li>

@@ -22,8 +22,16 @@ test.describe('/current-cycle tooltips', () => {
   test('sets the header figures as plain labels, with no info buttons', async ({ page }) => {
     const header = page.getByRole('main').locator('header').first();
     await expect(header.getByText('Total gestures', { exact: true })).toBeVisible();
-    await expect(header.getByText('Signature Allocation', { exact: true })).toBeVisible();
+    await expect(header.getByText('Opened', { exact: true })).toBeVisible();
+    // The Signature Allocation is the standings' Last Gesture figure, shown once (V227).
+    await expect(header.getByText('Signature Allocation', { exact: true })).toHaveCount(0);
     await expect(header.getByRole('button', { name: /^More information/ })).toHaveCount(0);
+  });
+
+  test('puts the clock and the commit action in the first screen (V227)', async ({ page }) => {
+    const clock = page.getByTestId('cycle-clock');
+    await expect(clock).toBeInViewport();
+    await expect(clock.getByRole('link').first()).toBeInViewport();
   });
 
   test('explains the coined Cycle Reserve in place, fully visible and portaled', async ({
@@ -36,8 +44,8 @@ test.describe('/current-cycle tooltips', () => {
     await term.scrollIntoViewIfNeeded();
     await openTooltip(term);
 
-    await expectTooltipFullyVisible(page, /The ETH held for the current Cycle/);
-    await expectTooltipPortaledOutOfMain(page, /The ETH held for the current Cycle/);
+    await expectTooltipFullyVisible(page, /The ETH held for the current cycle/);
+    await expectTooltipPortaledOutOfMain(page, /The ETH held for the current cycle/);
   });
 
   test('explains every allocation in one disclosure instead of ten hover cards', async ({
