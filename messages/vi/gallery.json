@@ -62,7 +62,7 @@
   },
   "about": {
     "title": "Về bộ sưu tập",
-    "description": "Mỗi Cosmic Signature NFT là tác phẩm tạo sinh độc nhất, được tạo từ seed trên chuỗi bằng mô phỏng bài toán ba vật thể. Ai cũng có thể tái tạo một Signature từ bản ghi giao thức, và mỗi Signature thuộc về một chu kỳ cụ thể. Một chu kỳ điển hình khắc 24 NFT: bốn NFT dành cho các vai trò, mười NFT Tinh tuyển dành cho người tham gia và mười NFT qua Tinh tuyển NFT neo giữ dành cho người neo giữ Random Walk NFT."
+    "description": "Mỗi Cosmic Signature là một tác phẩm nghệ thuật tạo sinh độc nhất, được tạo từ seed trên chuỗi bằng mô phỏng vật lý ba vật thể. Ai cũng có thể tái tạo tác phẩm từ bản ghi giao thức, và mỗi tác phẩm thuộc về chu kỳ đã khắc nó. Một chu kỳ điển hình khắc 24 tác phẩm Signature mới: bốn dành cho những người giữ vai trò của chu kỳ, mười cho người tham gia được chọn qua Tinh tuyển, và mười cho người neo giữ Random Walk NFT."
   },
   "toolbar": {
     "filters": "Bộ lọc",
