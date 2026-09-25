@@ -172,7 +172,6 @@
     "links": {
       "viewCycle": "サイクル{cycle}を見る",
       "myAllocations": "自分の配分",
-      "allRecipients": "配分の受領者",
       "allCycles": "すべてのサイクル"
     },
     "result": {

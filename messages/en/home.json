@@ -70,7 +70,6 @@
         "body": "Protocol reserves flow across allocation tracks, including Protocol Guild."
       }
     },
-    "viewCycleDetails": "View cycle details",
     "artUnavailable": {
       "eyebrow": "Awaiting generated Signature",
       "body": "Real Cosmic Signature artwork will appear here once indexed token metadata is available."
@@ -78,16 +77,12 @@
     "console": {
       "ariaLabel": "Current cycle observatory",
       "eyebrow": "Observatory console",
-      "cycleLoading": "Cycle loading",
       "parameters": "Parameters",
-      "viewSignatureAria": "View Cosmic Signature {id}",
       "artworkAlt": "Cosmic Signature artwork {id}",
-      "signatureBadge": "Signature {id}",
       "stats": {
         "gestures": "Gestures",
         "signature": "Signature",
-        "publicGoods": "Public Goods",
-        "publicGoodsFallback": "10+ tracks"
+        "publicGoods": "Public Goods"
       },
       "previousAllocations": "Cycle {number} allocations"
     }
@@ -216,16 +211,12 @@
       "title": "New here? Read the cycle in 30 seconds.",
       "body": "When a cycle opens, you can make a gesture and follow the finalization clock. Each gesture helps shape the final Signature, can extend the time, and updates allocation eligibility. Once time expires, the cycle can be finalized and its reserve distributed on-chain.",
       "faqLink": "Read the FAQ",
-      "walkthroughLink": "See the full walkthrough",
-      "dismissAria": "Dismiss cycle explainer"
+      "walkthroughLink": "See the full walkthrough"
     }
   },
   "status": {
     "opensAt": "Cycle {cycle} opens at {dateTime}",
-    "finalizesIn": "Cycle finalizes in",
-    "finalizesInTooltip": "When this timer hits zero, the participant holding the Last Gesture may finalize the cycle and receive the Signature Allocation. Each new gesture extends the timer.",
     "readyToFinalize": "Cycle ready to finalize",
-    "clockReachedZero": "The finalization clock reached zero.",
     "metrics": {
       "signatureTooltip": {
         "base": "The ETH portion of the Signature Allocation. The recipient also receives 1,000 CST and a Cosmic Signature NFT.",
@@ -233,15 +224,9 @@
         "withErc20": "The ETH portion of the Signature Allocation; the recipient also receives 1,000 CST, a Cosmic Signature NFT, and {erc20Count, plural, one {the attached ERC20 token deposit} other {all # attached ERC20 token deposits}}.",
         "withBoth": "The ETH portion of the Signature Allocation; the recipient also receives 1,000 CST, a Cosmic Signature NFT, and {nftCount, plural, one {the attached NFT} other {all # attached NFTs}} and {erc20Count, plural, one {the attached ERC20 token deposit} other {all # attached ERC20 token deposits}}."
       },
-      "ethGesture": "ETH gesture",
-      "ethGestureTooltip": "Current cost to make a gesture with ETH",
-      "randomWalkGesture": "ETH + Random Walk gesture",
-      "randomWalkGestureTooltip": "50% ETH Gesture Cost reduction when attaching a Random Walk NFT to an ETH gesture",
       "cstGesture": "CST gesture",
-      "cstGestureTooltip": "Gesture with CST. Cost descends through the live Calibration Window, which CST gestures lengthen and ETH gestures shorten.",
       "free": "0 CST",
       "cstWindow": "CST Window",
-      "cstWindowProgressAria": "CST Calibration Window progress",
       "duration": "Duration {duration}"
     },
     "standing": {
@@ -253,21 +238,11 @@
         "withErc20": "You made the most recent gesture. If no one else makes a gesture before the clock reaches zero, you can finalize the cycle and receive the Signature Allocation ({amount} ETH, 1,000 CST, 1 Cosmic Signature NFT, plus {erc20Count, plural, one {the attached ERC20 token deposit} other {all # attached ERC20 token deposits}} shown below).",
         "withBoth": "You made the most recent gesture. If no one else makes a gesture before the clock reaches zero, you can finalize the cycle and receive the Signature Allocation ({amount} ETH, 1,000 CST, 1 Cosmic Signature NFT, plus {nftCount, plural, one {the attached NFT} other {all # attached NFTs}} and {erc20Count, plural, one {the attached ERC20 token deposit} other {all # attached ERC20 token deposits}} shown below)."
       },
-      "notLeader": "Another participant holds the Last Gesture. Your earlier gestures stay in the Stellar Selection pool.",
       "ethStellar": "ETH Stellar Selection",
       "nftStellar": "NFT Stellar Selection"
-    },
-    "openCycle": {
-      "cycleNumber": "Cycle {cycle}",
-      "title": "Open the cycle",
-      "body": "The Calibration Window for the first ETH gesture is open. Make your gesture."
     }
   },
   "ticker": {
-    "openLatestAria": "Open latest gesture {id}",
-    "gestureLine": "{address} made {kind, select, cst {a CST gesture} randomWalk {an ETH + Random Walk gesture} other {an ETH gesture}}",
-    "paymentUnavailable": "cost syncing…",
-    "rwlkToken": "Random Walk #{id}",
     "age": {
       "justNow": "just now",
       "seconds": "{count}s ago",
@@ -299,12 +274,10 @@
       "title": "Your Random Walk NFTs",
       "connect": "Connect a wallet to list the Random Walk NFTs it holds.",
       "error": "Could not read this wallet’s Random Walk NFTs. Try again in a moment.",
-      "tooltipAria": "About Random Walk gesture discounts",
       "tooltip": "Attach a Random Walk NFT to an ETH gesture to receive a 50% Gesture Cost reduction. Each NFT can only be used once."
     },
     "cstTrade": "Need CST for this gesture method? Trade ETH for CST on Arbitrum through Uniswap.",
     "reward": {
-      "economicsTitle": "CST gesture economics",
       "previewTitle": "Participation CST preview",
       "economicsDescription": "Net CST is the Participation CST reward minus the current CST gesture cost.",
       "previewDescription": "Estimated dynamic CST you receive if this gesture lands. The amount depends on time since the previous gesture, and every gesture method has two protections: maximum cost and minimum CST reward.",
@@ -314,7 +287,6 @@
       "cstAmount": "{amount} CST",
       "minAccepted": "Min accepted: {value}",
       "minAcceptedAny": "any reward, including 0 CST",
-      "minAcceptedAria": "What minimum accepted CST means",
       "minAcceptedTooltip": "The minimum Participation CST reward your transaction will accept. It is the current preview minus your Minimum CST Reward Protection tolerance. If the contract would imprint less by confirmation, the gesture reverts instead of accepting a lower reward.",
       "minAcceptedTooltipAny": "Accept any CST reward sends a minimum accepted reward of 0, so the gesture can land with any dynamic CST reward, including none.",
       "netPositive": "The CST reward exceeds the CST cost if this lands.",
@@ -327,14 +299,12 @@
       "title": "Advanced options",
       "messageLabel": "Message",
       "messageOptionalHint": "(optional, {maxLength} chars)",
-      "messageTooltipAria": "How gesture messages work",
       "messageTooltip": "Leave a message to appear in Gesture Chat. Your message is recorded on-chain with your gesture and remains on the blockchain permanently.",
       "messagePlaceholder": "Leave a message with your gesture…",
       "attachIntro": "Attach tokens or NFTs to your gesture, or adjust Gesture Cost collision prevention.",
       "minCstProtection": {
         "title": "Minimum CST reward protection",
         "body": "Participation CST uses a square-root formula based on elapsed time. This setting protects you if another gesture lands first and lowers the amount before your transaction confirms.",
-        "acceptAnyAria": "Accept any CST reward",
         "acceptAnyTitle": "Accept any CST reward, including 0",
         "acceptAnyBody": "Sends a minimum accepted CST reward of 0. Use this when you prefer the gesture to land even if the dynamic CST amount changes before confirmation.",
         "toleranceLabel": "Allow reward to move down by",
@@ -374,8 +344,6 @@
     "processing": "Processing…",
     "finalGestureMade": "You made the final gesture for this cycle. When the timer ends, use Finalize Cycle below.",
     "finalize": "Finalize cycle",
-    "finalizeAvailableIn": "available in",
-    "finalizeWaitNote": "Please wait for the participant who made the Final Gesture to finalize the cycle.",
     "connect": {
       "title": "Connect to submit your gesture",
       "body": "Review the live gesture methods and costs above, then connect MetaMask or another wallet to submit on Arbitrum.",
@@ -389,7 +357,6 @@
   },
   "calibration": {
     "defaultTitle": "Calibration Window",
-    "defaultSubtitle": "Gesture cost descends as this window progresses.",
     "defaultEndedMessage": "Calibration Window closed.",
     "firstGestureTitle": "First Gesture Calibration Window",
     "firstGestureSubtitle": "The first ETH gesture cost descends while this opening window progresses.",
@@ -410,7 +377,6 @@
   },
   "allocation": {
     "title": "Allocation breakdown",
-    "titleTooltip": "Allocations distributed when the cycle finalizes across more than ten tracks.",
     "recipientCount": "{count, plural, one {# recipient} other {# recipients}}",
     "amounts": {
       "eth": "{amount} ETH",
@@ -566,8 +532,6 @@
       "title": "Your cycle standing",
       "leader": "You hold the Last Gesture",
       "heldFor": "held {duration}",
-      "notLeader": "Another participant holds the Last Gesture",
-      "enduranceIn": "Endurance record in {duration}",
       "extending": "Extending the Endurance record now",
       "gestures": "{count, plural, =0 {No gestures this cycle yet} one {# gesture this cycle} other {# gestures this cycle}}",
       "retrieve": "Retrieve waiting allocations",
@@ -714,12 +678,9 @@
     "heading": "Funding Ethereum’s core contributors.",
     "stats": {
       "vault": "In vault now",
-      "vaultTooltip": "ETH currently held in the Public Goods Vault before retrieval.",
-      "retrieved": "Already retrieved",
-      "retrievedTooltip": "Total ETH retrieved from the Public Goods Vault for beneficiaries."
+      "retrieved": "Already retrieved"
     },
-    "projected": "Projected this cycle",
-    "projectedTooltip": "The current Cycle Reserve × the {percent} public-goods share. It is paid into the Public Goods Vault when the cycle finalizes, so it can still change."
+    "projected": "Projected this cycle"
   },
   "latestNfts": {
     "title": "Latest NFTs",

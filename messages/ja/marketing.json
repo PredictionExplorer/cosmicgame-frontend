@@ -63,16 +63,7 @@
       "title": "無効なアドレス",
       "description": "リンクには完全なアドレス（0xに続く40文字の英数字）が必要です。",
       "action": "すべての広報配分"
-    },
-    "smallNote": "薄く表示された数量は{amount}未満の配分で、この精度では表示しきれません。"
-  },
-  "transferForm": {
-    "title": "CST広報配分を送付",
-    "description": "広報準備金コントラクトの`payReward`関数を呼び出します。接続中のウォレットが現在の財務担当者である必要があります。",
-    "reserveLabel": "広報準備金",
-    "ownerLabel": "所有者",
-    "treasurerLabel": "財務担当者",
-    "historyLink": "広報準備金の送付履歴を見る"
+    }
   },
   "learnHow": "参加の流れを見る",
   "loadError": "広報配分の記録を読み込めませんでした。"

@@ -6,18 +6,11 @@
     "minutes": "MIN",
     "seconds": "SEC"
   },
-  "countdownLong": {
-    "days": "Days",
-    "hours": "Hours",
-    "minutes": "Min",
-    "seconds": "Sec"
-  },
   "durationCompact": {
     "days": "d",
     "hours": "h",
     "minutes": "m",
-    "seconds": "s",
-    "leftPattern": "{duration} left"
+    "seconds": "s"
   },
   "address": {
     "zero": "Zero address",

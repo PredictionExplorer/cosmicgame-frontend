@@ -172,7 +172,6 @@
     "links": {
       "viewCycle": "查看第 {cycle} 个周期",
       "myAllocations": "我的分配",
-      "allRecipients": "分配名录",
       "allCycles": "全部周期"
     },
     "result": {

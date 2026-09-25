@@ -205,10 +205,6 @@
       "label": "プロトコル拠出",
       "tooltip": "Cosmic Signatureプロトコルを通じて送られたインデックス済みの公共財拠出トランザクションの数。"
     },
-    "protocolContributionsSum": {
-      "label": "プロトコル拠出の合計",
-      "tooltip": "インデックス済みのCosmic Signatureプロトコル公共財拠出トランザクションを通じて拠出されたETHの総額。"
-    },
     "voluntaryContributions": {
       "label": "自発的な拠出",
       "tooltip": "必須のサイクルの流れの外で、コミュニティメンバーが自発的に行ったETH拠出。"
@@ -263,9 +259,7 @@
     "cstTotalAnchorDistributions": "Cosmic Signature NFTの係留者へ係留配分として配られたETHの総額。",
     "cstUnretrievedAnchorDistributions": "配分されたが、Cosmic Signature NFTの係留者がまだ受け取っていない係留配分。",
     "rwlkActiveAnchorHolders": "RandomWalk NFTを少なくとも1点現在係留しているウォレット。",
-    "rwlkTotalTokensImprinted": "係留NFT星選を通じてRandomWalk NFTの係留者のために刻印されたCosmic Signature NFTと、それに伴うCSTの総数。",
-    "cstGroup": "Cosmic Signature NFTの係留は、現在係留中のCosmic Signature NFTの間でETHの係留配分を分け合います。",
-    "rwlkGroup": "Random Walk NFTの係留は、係留NFT星選の配分の対象資格を与えます。"
+    "rwlkTotalTokensImprinted": "係留NFT星選を通じてRandomWalk NFTの係留者のために刻印されたCosmic Signature NFTと、それに伴うCSTの総数。"
   },
   "activity": {
     "heading": "一筆の活動",
@@ -411,7 +405,6 @@
       },
       "allClaimed": "すべて受け取り済み",
       "unclaimedCount": "未受け取り{count}件",
-      "viewUnclaimed": "未受け取りのアセットを見る",
       "cycleDetails": "サイクル{cycle}の詳細",
       "dialog": {
         "unclaimedTitle": "未受け取りのアセット——サイクル{cycle}",
@@ -467,7 +460,6 @@
     },
     "spikes": {
       "count": "急増（{count}）",
-      "groupAria": "検出された一筆の急増",
       "previousAria": "前の急増",
       "nextAria": "次の急増",
       "summary": "ピーク 毎時{peak}筆 · 急増中の合計{total} · {date}",
@@ -477,7 +469,6 @@
       "loadErrorMessage": "急増検出データを取得できませんでした。",
       "empty": "インデックス済みの履歴に一筆の急増は検出されていません。",
       "noneRecent": "最近の急増はないため、記録上で最も新しい急増を表示しています。",
-      "selectEarlier": "上で急増の番号を選ぶと過去にさかのぼり、以前の活動の急増を調べられます。",
       "emptyWindow": "選択した急増の期間に時間別の集計はありません。",
       "optionAria": "{date}の急増、毎時最大{peak}筆"
     },
@@ -485,7 +476,6 @@
       "description": "活動が多い上位{count}人の参加者を表示しています。間隔が6時間以内で2筆以上続いた期間を、一つの活動期間としてまとめています。各バーがその期間を表します。",
       "participant": "参加者",
       "ariaLabel": "{address}：{start}から{end}まで{count, number}筆",
-      "tooltipSummary": "{count}筆 · {minutes}分間",
       "loadErrorTitle": "活動期間を読み込めませんでした",
       "loadErrorMessage": "上位参加者の活動タイムラインを取得できませんでした。",
       "empty": "上位参加者の活動期間は見つかりませんでした。",
@@ -519,7 +509,6 @@
       "enduranceRecord": "持久記録",
       "enduranceChampionRecord": "持久チャンピオンの記録",
       "chronoRecord": "時の戦士の記録",
-      "leadHeldBy": "先頭の保持者",
       "legendEndurance": "持久チャンピオン（最長の単一保持）",
       "legendChrono": "時の戦士（最長の保持期間）",
       "legendLead": "先頭の保持",
@@ -528,7 +517,6 @@
       "enduranceChampionAbbr": "EC",
       "chronoWarrior": "時の戦士",
       "chronoWarriorAbbr": "CW",
-      "newRecord": "新記録",
       "roleEndurance": "（持久チャンピオン）",
       "roleNewRecord": "（新記録）",
       "stintAria": "{address} • 保持{duration} • 開始から{from} → {to}{role}",
@@ -723,15 +711,12 @@
     "errorMessage": "このアドレスの配分を読み取れませんでした。少し時間をおいてもう一度お試しください。"
   },
   "systemEvent": {
-    "titleBeforeCycle": "サイクル{cycle}より前に設定されたシステム構成",
-    "titleBeforeDeployment": "デプロイより前に設定されたシステム構成",
     "range": "イベントログの範囲：{start}〜{end}",
     "breadcrumbs": {
       "coordination": "調整の変更"
     },
     "loading": "読み込み中…",
     "loadError": "システムイベントを読み込めませんでした",
-    "explainEvent": "{event}の説明",
     "adminEvents": {
       "undefined": "未定義",
       "publicGoodsPercentage": "公共財金庫に指定された資金の配分割合が変更されました。",
@@ -788,62 +773,6 @@
     "viewContract": "コントラクトを見る",
     "detailsUnavailable": "NFTの詳細を利用できません",
     "contractUnavailable": "コントラクトを利用できません"
-  },
-  "publicDataSummaries": {
-    "common": {
-      "lastUpdated": "最終更新：{date}。データソース：{source}。",
-      "relatedPagesAria": "{heading}の関連ページ",
-      "unavailable": "取得不可"
-    },
-    "attachedNfts": {
-      "eyebrow": "添付されたNFT拠出 · Arbitrum",
-      "heading": "添付されたNFT拠出",
-      "description": "Cosmic Signatureの一筆に添付されたNFTを見る。添付されたERC-721トークンは、サイクルが確定するとシグネチャー配分を受け取る参加者へ送られます。",
-      "source": "Cosmic Signature公開添付NFT API",
-      "cards": {
-        "records": "添付NFTの記録",
-        "contracts": "ユニークNFTコントラクト",
-        "contributors": "拠出者ウォレット"
-      },
-      "links": {
-        "gallery": "Cosmic Signatureギャラリーを探索する",
-        "cycle": "現在のパフォーマンス・サイクルを見る",
-        "learn": "添付がサイクルにどう関わるかを学ぶ"
-      }
-    },
-    "namedNfts": {
-      "eyebrow": "名前付きNFT · Arbitrum",
-      "heading": "名前付きCosmic Signature NFT",
-      "description": "所有者が名前を付けたCosmic Signature NFTを紹介します。作品とオンチェーンの来歴をあわせて確認できます。",
-      "source": "Cosmic Signature公開トークンAPI",
-      "cards": {
-        "named": "名前付きCosmic Signature NFT",
-        "owners": "現在の所有者",
-        "collection": "コレクション"
-      },
-      "links": {
-        "gallery": "ギャラリー全体を探索する",
-        "learn": "アートについて学ぶ",
-        "code": "レンダリングのソースコードを確認する"
-      }
-    },
-    "usedRwlkNfts": {
-      "eyebrow": "Random Walk NFTの使用 · Arbitrum",
-      "heading": "使用済みのRandom Walk NFT",
-      "description": "ETH一筆の割引に使用済みのRandom Walk NFTを確認できます。各NFTを割引に使えるのは一度だけです。",
-      "source": "Cosmic Signature公開Random Walk使用API",
-      "cards": {
-        "used": "使用済みのRandom Walk NFT",
-        "discount": "一度だけの割引",
-        "scope": "使用範囲",
-        "scopeValue": "NFTごとに一筆1回"
-      },
-      "links": {
-        "imprint": "Random Walk NFTを刻印する",
-        "learn": "一筆の仕組みを学ぶ",
-        "cycle": "現在のサイクルデータを見る"
-      }
-    }
   },
   "routeError": {
     "title": "統計を読み込めませんでした",

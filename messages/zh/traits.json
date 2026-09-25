@@ -162,7 +162,6 @@
     "rarest": "最罕见特征",
     "share": "{total} 枚中有 {count} 枚拥有此特征",
     "shareShort": "{count}/{total}",
-    "scoreLabel": "稀有度分值",
     "unavailable": "暂未排名"
   },
   "facets": {

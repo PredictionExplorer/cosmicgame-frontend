@@ -70,7 +70,6 @@
         "body": "协议储备沿分配轨道流转，其中一条通向 Protocol Guild。"
       }
     },
-    "viewCycleDetails": "查看周期详情",
     "artUnavailable": {
       "eyebrow": "等待签名生成",
       "body": "索引到代币元数据后，真实的 Cosmic Signature 作品会随即在此呈现。"
@@ -78,16 +77,12 @@
     "console": {
       "ariaLabel": "当前周期观测台",
       "eyebrow": "观测控制台",
-      "cycleLoading": "周期加载中",
       "parameters": "参数",
-      "viewSignatureAria": "查看 Cosmic Signature {id}",
       "artworkAlt": "Cosmic Signature 作品 {id}",
-      "signatureBadge": "签名 {id}",
       "stats": {
         "gestures": "落笔次数",
         "signature": "签名分配",
-        "publicGoods": "公共物品",
-        "publicGoodsFallback": "十余条轨道"
+        "publicGoods": "公共物品"
       },
       "previousAllocations": "第 {number} 个周期的分配"
     }
@@ -216,16 +211,12 @@
       "title": "初来乍到？30 秒读懂周期。",
       "body": "周期开启后即可落笔，并留意收官倒计时。每一笔都在塑造最终签名，可能延长时间，也会更新有望获配的人选。倒计时归零后即可收官；收官完成后，储备会在链上发放。",
       "faqLink": "阅读常见问题",
-      "walkthroughLink": "查看完整流程",
-      "dismissAria": "关闭周期简介"
+      "walkthroughLink": "查看完整流程"
     }
   },
   "status": {
     "opensAt": "第 {cycle} 个周期将于 {dateTime} 开启",
-    "finalizesIn": "周期收官倒计时",
-    "finalizesInTooltip": "倒计时归零后，最新落笔者即可收官，并获得签名分配。每一次新落笔都会延长倒计时。",
     "readyToFinalize": "周期已可收官",
-    "clockReachedZero": "收官倒计时已归零。",
     "metrics": {
       "signatureTooltip": {
         "base": "签名分配中的 ETH 部分；获配者还将获得 1,000 CST 与一枚 Cosmic Signature NFT。",
@@ -233,15 +224,9 @@
         "withErc20": "签名分配中的 ETH 部分；获配者还将获得 1,000 CST、一枚 Cosmic Signature NFT，以及 {erc20Count, number} 笔已附加的 ERC-20 代币存入。",
         "withBoth": "签名分配中的 ETH 部分；获配者还将获得 1,000 CST、一枚 Cosmic Signature NFT，以及 {nftCount, number} 枚已附加 NFT 与 {erc20Count, number} 笔已附加的 ERC-20 代币存入。"
       },
-      "ethGesture": "ETH 落笔",
-      "ethGestureTooltip": "当前以 ETH 落笔的价格。",
-      "randomWalkGesture": "ETH + Random Walk 落笔",
-      "randomWalkGestureTooltip": "ETH 落笔附加一枚 Random Walk NFT，落笔价格减半。",
       "cstGesture": "CST 落笔",
-      "cstGestureTooltip": "以 CST 落笔。价格会随校准窗口推进而下降；CST 落笔使窗口延长，ETH 落笔使其缩短。",
       "free": "0 CST",
       "cstWindow": "CST 窗口",
-      "cstWindowProgressAria": "CST 校准窗口进度",
       "duration": "时长 {duration}"
     },
     "standing": {
@@ -253,21 +238,11 @@
         "withErc20": "最新一笔由你写下。若时钟归零前无人再落笔，你收官后即可获得签名分配（{amount} ETH、1,000 CST、1 枚 Cosmic Signature NFT，外加下方展示的 {erc20Count, number} 笔已附加的 ERC-20 代币存入）。",
         "withBoth": "最新一笔由你写下。若时钟归零前无人再落笔，你收官后即可获得签名分配（{amount} ETH、1,000 CST、1 枚 Cosmic Signature NFT，外加下方展示的 {nftCount, number} 枚已附加 NFT 与 {erc20Count, number} 笔 ERC-20 代币存入）。"
       },
-      "notLeader": "最新一笔由其他参与者写下。你之前的落笔仍计入星选。",
       "ethStellar": "ETH 星选",
       "nftStellar": "NFT 星选"
-    },
-    "openCycle": {
-      "cycleNumber": "第 {cycle} 个周期",
-      "title": "周期已开启",
-      "body": "首个 ETH 校准窗口已开启，落笔吧。"
     }
   },
   "ticker": {
-    "openLatestAria": "查看最新落笔 {id}",
-    "gestureLine": "{address} 以 {kind, select, cst {CST} randomWalk {ETH + Random Walk} other {ETH}} 落笔",
-    "paymentUnavailable": "费用同步中…",
-    "rwlkToken": "Random Walk #{id}",
     "age": {
       "justNow": "刚刚",
       "seconds": "{count} 秒前",
@@ -299,12 +274,10 @@
       "title": "你的 Random Walk NFT",
       "connect": "连接钱包后，即可列出其中的 Random Walk NFT。",
       "error": "未能读取此钱包的 Random Walk NFT，请稍后重试。",
-      "tooltipAria": "了解 Random Walk 落笔价格减半规则",
       "tooltip": "ETH 落笔附加一枚 Random Walk NFT，落笔价格即减半。每枚 NFT 仅可使用一次。"
     },
     "cstTrade": "缺少 CST？可通过 Uniswap 在 Arbitrum 上用 ETH 兑换 CST。",
     "reward": {
-      "economicsTitle": "CST 落笔收支",
       "previewTitle": "CST 铭刻预览",
       "economicsDescription": "净 CST 即参与 CST 铭刻量减去当前 CST 落笔价格。",
       "previewDescription": "这一笔预计铭刻的动态参与 CST。数量取决于距上一笔经过的时间；每种落笔方式都有双重保护：价格上限与 CST 铭刻下限。",
@@ -314,7 +287,6 @@
       "cstAmount": "{amount} CST",
       "minAccepted": "最低接受：{value}",
       "minAcceptedAny": "任意数额（含 0 CST）",
-      "minAcceptedAria": "了解最低接受 CST 的含义",
       "minAcceptedTooltip": "交易可接受的参与 CST 铭刻下限：由当前预览值减去你在“CST 铭刻下限保护”中设定的下浮幅度得出。若确认时合约的实际铭刻量低于该下限，这一笔会回退，而不会接受更低的数额。",
       "minAcceptedTooltipAny": "勾选“接受任意 CST 铭刻量”后，最低接受值即为 0：无论动态 CST 是多少，甚至为零，这一笔都能照常落下。",
       "netPositive": "这一笔若落下，铭刻的 CST 将多于支出的 CST。",
@@ -327,14 +299,12 @@
       "title": "高级选项",
       "messageLabel": "留言",
       "messageOptionalHint": "（选填，至多 {maxLength} 字符）",
-      "messageTooltipAria": "了解落笔留言机制",
       "messageTooltip": "留言会出现在落笔留言板中，与这一笔一同记录在链上，并永久保存。",
       "messagePlaceholder": "为这一笔留下一句话…",
       "attachIntro": "可为这一笔附加代币或 NFT，也可调整落笔价格的防碰撞设置。",
       "minCstProtection": {
         "title": "CST 铭刻下限保护",
         "body": "参与 CST 取决于距上一笔经过的时间，按其平方根计算。若他人抢先落笔，铭刻数额可能在交易确认前下降，此设置可为你守住下限。",
-        "acceptAnyAria": "接受任意 CST 铭刻量",
         "acceptAnyTitle": "接受任意 CST 铭刻量（含 0）",
         "acceptAnyBody": "将最低接受值设为 0：即便动态 CST 在确认前有所变动，这一笔也会照常落下。",
         "toleranceLabel": "允许铭刻量下浮",
@@ -374,8 +344,6 @@
     "processing": "处理中…",
     "finalGestureMade": "本周期的最新一笔由你写下。倒计时走完后，点击下方的“收官”即可。",
     "finalize": "收官",
-    "finalizeAvailableIn": "还需等待",
-    "finalizeWaitNote": "请等待写下收官之笔的参与者完成收官。",
     "connect": {
       "title": "连接钱包，提交这一笔",
       "body": "先在上方查看实时落笔方式与价格，再连接 MetaMask 或其他钱包，即可在 Arbitrum 上提交。",
@@ -389,7 +357,6 @@
   },
   "calibration": {
     "defaultTitle": "校准窗口",
-    "defaultSubtitle": "窗口推进期间，落笔价格逐步下降。",
     "defaultEndedMessage": "校准窗口已结束。",
     "firstGestureTitle": "首笔校准窗口",
     "firstGestureSubtitle": "窗口推进期间，首笔 ETH 落笔的价格会逐步下降。",
@@ -410,7 +377,6 @@
   },
   "allocation": {
     "title": "分配一览",
-    "titleTooltip": "周期收官后，分配将沿十余条轨道发放。",
     "recipientCount": "{count, number} 位获配者",
     "amounts": {
       "eth": "{amount} ETH",
@@ -566,8 +532,6 @@
       "title": "你在本周期的位置",
       "leader": "最新一笔由你写下",
       "heldFor": "已保持 {duration}",
-      "notLeader": "最新一笔由其他参与者写下",
-      "enduranceIn": "距离刷新坚守纪录还有 {duration}",
       "extending": "正在刷新坚守纪录",
       "gestures": "{count, plural, =0 {本周期尚未落笔} other {本周期已落笔 # 次}}",
       "retrieve": "取回等待中的分配",
@@ -714,12 +678,9 @@
     "heading": "资助以太坊核心贡献者。",
     "stats": {
       "vault": "金库现存",
-      "vaultTooltip": "当前存放于公共物品金库、尚未取回的 ETH。",
-      "retrieved": "已取回",
-      "retrievedTooltip": "已从公共物品金库为受益方取回的 ETH 总额。"
+      "retrieved": "已取回"
     },
-    "projected": "本周期预计",
-    "projectedTooltip": "当前周期储备 × {percent} 公共物品份额。将在周期收官时存入公共物品金库，因此仍可能变化。"
+    "projected": "本周期预计"
   },
   "latestNfts": {
     "title": "最新 NFT",

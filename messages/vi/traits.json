@@ -162,7 +162,6 @@
     "rarest": "Đặc tính hiếm nhất",
     "share": "{count} trên {total} có chung đặc tính này",
     "shareShort": "{count}/{total}",
-    "scoreLabel": "Điểm độ hiếm",
     "unavailable": "Chưa xếp hạng"
   },
   "facets": {

@@ -162,7 +162,6 @@
     "rarest": "Rarest trait",
     "share": "{count} of {total} share this",
     "shareShort": "{count}/{total}",
-    "scoreLabel": "Rarity score",
     "unavailable": "Not ranked yet"
   },
   "facets": {

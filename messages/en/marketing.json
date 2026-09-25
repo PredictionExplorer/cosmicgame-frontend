@@ -63,16 +63,7 @@
       "title": "Invalid address",
       "description": "The link needs a full address: 0x followed by 40 letters and digits.",
       "action": "All outreach allocations"
-    },
-    "smallNote": "Muted amounts are allocations of less than {amount}, too small to show at this precision."
-  },
-  "transferForm": {
-    "title": "Send a CST allocation",
-    "description": "Send CST from the Outreach Reserve. Connect the current treasurer wallet to use this form.",
-    "reserveLabel": "Outreach Reserve",
-    "ownerLabel": "Owner",
-    "treasurerLabel": "Treasurer",
-    "historyLink": "View Outreach Reserve transfers"
+    }
   },
   "learnHow": "Learn how",
   "loadError": "The outreach allocations couldn’t be loaded."

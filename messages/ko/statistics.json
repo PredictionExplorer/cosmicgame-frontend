@@ -205,10 +205,6 @@
       "label": "프로토콜 기여",
       "tooltip": "Cosmic Signature 프로토콜을 통해 전송되어 인덱싱된 공공재 기여 트랜잭션 수를 나타냅니다."
     },
-    "protocolContributionsSum": {
-      "label": "프로토콜 기여 합계",
-      "tooltip": "인덱싱된 Cosmic Signature 프로토콜 공공재 기여 트랜잭션으로 기여된 ETH 총액입니다."
-    },
     "voluntaryContributions": {
       "label": "자발적 기여",
       "tooltip": "커뮤니티 구성원이 필수 사이클 흐름과 별개로 자발적으로 기여한 ETH입니다."
@@ -263,9 +259,7 @@
     "cstTotalAnchorDistributions": "Cosmic Signature NFT 앵커링 보유자에게 앵커링 지급으로 전달된 ETH 총액입니다.",
     "cstUnretrievedAnchorDistributions": "Cosmic Signature NFT 앵커링 보유자에게 배분되었지만 아직 회수되지 않은 앵커링 지급입니다.",
     "rwlkActiveAnchorHolders": "현재 RandomWalk NFT를 한 개 이상 앵커링 중인 지갑입니다.",
-    "rwlkTotalTokensImprinted": "앵커링 NFT 별빛 선정을 통해 RandomWalk NFT 앵커링 보유자에게 각인된 Cosmic Signature NFT와 짝지어진 CST를 모두 합한 값입니다.",
-    "cstGroup": "Cosmic Signature NFT 앵커링에서는 현재 앵커링된 Cosmic Signature NFT가 ETH 앵커링 지급을 나누어 받습니다.",
-    "rwlkGroup": "Random Walk NFT 앵커링은 앵커링 NFT 별빛 선정 배분 자격을 부여합니다."
+    "rwlkTotalTokensImprinted": "앵커링 NFT 별빛 선정을 통해 RandomWalk NFT 앵커링 보유자에게 각인된 Cosmic Signature NFT와 짝지어진 CST를 모두 합한 값입니다."
   },
   "activity": {
     "heading": "제스처 활동",
@@ -411,7 +405,6 @@
       },
       "allClaimed": "모두 회수됨",
       "unclaimedCount": "미회수 {count}건",
-      "viewUnclaimed": "미회수 자산 보기",
       "cycleDetails": "사이클 {cycle} 상세 정보",
       "dialog": {
         "unclaimedTitle": "미회수 자산: 사이클 {cycle}",
@@ -467,7 +460,6 @@
     },
     "spikes": {
       "count": "급증 ({count})",
-      "groupAria": "감지된 제스처 급증",
       "previousAria": "이전 급증",
       "nextAria": "다음 급증",
       "summary": "시간당 최고 {peak}개 · 급증 구간 총 {total}개 · {date}",
@@ -477,7 +469,6 @@
       "loadErrorMessage": "급증 감지 데이터를 불러오지 못했습니다.",
       "empty": "인덱싱된 내역에서 감지된 제스처 급증이 없습니다.",
       "noneRecent": "최근에는 급증이 없어 기록상 가장 최근의 급증을 표시합니다.",
-      "selectEarlier": "위에서 급증 번호를 선택하면 과거로 이동해 이전 활동 급증을 살펴볼 수 있습니다.",
       "emptyWindow": "선택한 급증 구간에는 시간별 데이터가 없습니다.",
       "optionAria": "{date} 급증, 시간당 최대 {peak}회"
     },
@@ -485,7 +476,6 @@
       "description": "상위 참여자 {count}명의 활동 구간입니다(연속 제스처 간 간격이 6시간 이하인 제스처 2개 이상). 각 막대는 하나의 연속 활동 구간입니다.",
       "participant": "참여자",
       "ariaLabel": "{address}: {start}부터 {end}까지 제스처 {count, number}개",
-      "tooltipSummary": "제스처 {count}개 · {minutes}분 지속",
       "loadErrorTitle": "활동 구간을 불러오지 못했습니다",
       "loadErrorMessage": "상위 참여자 활동 타임라인을 불러오지 못했습니다.",
       "empty": "상위 참여자의 활동 구간을 찾지 못했습니다.",
@@ -519,7 +509,6 @@
       "enduranceRecord": "최장 선두 기록",
       "enduranceChampionRecord": "수호 챔피언 기록",
       "chronoRecord": "시간의 전사 기록",
-      "leadHeldBy": "선두",
       "legendEndurance": "수호 챔피언 (최장 단일 선두 유지)",
       "legendChrono": "시간의 전사 (최장 지위 유지)",
       "legendLead": "선두 유지",
@@ -528,7 +517,6 @@
       "enduranceChampionAbbr": "수호",
       "chronoWarrior": "시간의 전사",
       "chronoWarriorAbbr": "전사",
-      "newRecord": "신기록",
       "roleEndurance": " (수호 챔피언)",
       "roleNewRecord": " (신기록)",
       "stintAria": "{address} · {duration} 선두 유지 · 사이클 시작 후 {from} → {to}{role}",
@@ -723,15 +711,12 @@
     "errorMessage": "이 주소의 배분을 읽지 못했습니다. 잠시 후 다시 시도해 주세요."
   },
   "systemEvent": {
-    "titleBeforeCycle": "사이클 {cycle} 이전에 설정된 시스템 구성",
-    "titleBeforeDeployment": "배포 이전에 설정된 시스템 구성",
     "range": "이벤트 로그 범위 {start}~{end}",
     "breadcrumbs": {
       "coordination": "조율 변경 내역"
     },
     "loading": "불러오는 중…",
     "loadError": "시스템 이벤트를 불러오지 못했습니다",
-    "explainEvent": "{event} 설명 보기",
     "adminEvents": {
       "undefined": "정의되지 않음",
       "publicGoodsPercentage": "공공재 금고로 지정된 자금의 배분 비율이 변경되었습니다.",
@@ -788,62 +773,6 @@
     "viewContract": "컨트랙트 보기",
     "detailsUnavailable": "NFT 상세 정보 없음",
     "contractUnavailable": "컨트랙트 정보 없음"
-  },
-  "publicDataSummaries": {
-    "common": {
-      "lastUpdated": "최종 업데이트: {date}. 데이터 출처: {source}.",
-      "relatedPagesAria": "{heading} 관련 페이지",
-      "unavailable": "확인 불가"
-    },
-    "attachedNfts": {
-      "eyebrow": "첨부된 NFT 기여 · Arbitrum",
-      "heading": "첨부된 NFT 기여",
-      "description": "Cosmic Signature 제스처에 첨부된 NFT를 둘러볼 수 있습니다. 첨부된 ERC-721 토큰은 사이클이 마감될 때 시그니처 배분을 받는 참여자에게 전달됩니다.",
-      "source": "Cosmic Signature 공개 첨부 NFT API",
-      "cards": {
-        "records": "첨부된 NFT 기록",
-        "contracts": "고유 NFT 컨트랙트",
-        "contributors": "기여자 지갑"
-      },
-      "links": {
-        "gallery": "Cosmic Signature 갤러리 탐색",
-        "cycle": "현재 퍼포먼스 사이클 보기",
-        "learn": "첨부가 사이클에서 하는 역할 알아보기"
-      }
-    },
-    "namedNfts": {
-      "eyebrow": "이름 붙인 NFT · Arbitrum",
-      "heading": "이름 붙인 Cosmic Signature NFT",
-      "description": "소유자가 이름을 붙인 Cosmic Signature NFT를 소개합니다. 작품과 온체인에 기록된 이력을 함께 살펴볼 수 있습니다.",
-      "source": "Cosmic Signature 공개 토큰 API",
-      "cards": {
-        "named": "이름 붙인 Cosmic Signature NFT",
-        "owners": "현재 소유자",
-        "collection": "컬렉션"
-      },
-      "links": {
-        "gallery": "전체 갤러리 탐색",
-        "learn": "작품 알아보기",
-        "code": "렌더링 소스 코드 살펴보기"
-      }
-    },
-    "usedRwlkNfts": {
-      "eyebrow": "Random Walk NFT 사용 · Arbitrum",
-      "heading": "사용된 Random Walk NFT",
-      "description": "일회성 제스처 비용 할인을 위해 이미 ETH 제스처에 첨부된 Random Walk NFT를 살펴볼 수 있습니다.",
-      "source": "Cosmic Signature 공개 Random Walk 사용 API",
-      "cards": {
-        "used": "사용된 Random Walk NFT",
-        "discount": "일회성 할인",
-        "scope": "사용 범위",
-        "scopeValue": "NFT당 제스처 1회"
-      },
-      "links": {
-        "imprint": "Random Walk NFT 각인",
-        "learn": "제스처 작동 원리 알아보기",
-        "cycle": "현재 사이클 데이터 보기"
-      }
-    }
   },
   "routeError": {
     "title": "통계를 불러오지 못했습니다",

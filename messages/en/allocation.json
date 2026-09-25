@@ -172,7 +172,6 @@
     "links": {
       "viewCycle": "View Cycle #{cycle}",
       "myAllocations": "My Allocations",
-      "allRecipients": "Allocation Recipients",
       "allCycles": "All cycles"
     },
     "result": {

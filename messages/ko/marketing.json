@@ -63,16 +63,7 @@
       "title": "잘못된 주소",
       "description": "링크에 0x 뒤에 영문자와 숫자 40자가 이어지는 전체 주소가 필요합니다.",
       "action": "전체 홍보 배분"
-    },
-    "smallNote": "흐리게 표시된 수량은 {amount} 미만의 배분으로, 이 정밀도에서는 표시되지 않습니다."
-  },
-  "transferForm": {
-    "title": "CST 홍보 배분 전달",
-    "description": "홍보 준비금 컨트랙트의 `payReward` 함수를 호출합니다. 연결된 지갑이 현재 재무 담당자여야 합니다.",
-    "reserveLabel": "홍보 준비금",
-    "ownerLabel": "소유자",
-    "treasurerLabel": "재무 담당자",
-    "historyLink": "홍보 준비금 전송 내역 보기"
+    }
   },
   "learnHow": "참여 방법 보기",
   "loadError": "홍보 배분 내역을 불러오지 못했습니다."

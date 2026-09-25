@@ -566,7 +566,12 @@ Noto cut per glyph is their intended rendering.
    (an argument the English formats as a number, `#` or `{n, number}`, is never printed
    bare and ungrouped), no-break unit joins in every catalog including the English
    (`{amount}`, `{cost}`, `{count}`… or `#` before ETH, CST, USD or NFT takes U+00A0), and
-   verbatim-copy catalogs. It
+   verbatim-copy catalogs. The English source is also held to its typography (`…`, never
+   three dots; `’`, never a straight apostrophe) and to reachability
+   (`scripts/i18n-unused-keys-core.ts`): a key with a path segment that no application
+   source file spells cannot be rendered, so it fails until it is deleted from every
+   locale (the few families keyed by data, such as trait values, are listed in
+   `DYNAMIC_KEY_FAMILIES`). It
    then reports every long-form content area (`scripts/i18n-content-areas.ts`) as the
    share of prose still identical to the English, and `--strict` fails an area that is
    untranslated — a scaffolded module cannot ship as a translation. `npm run

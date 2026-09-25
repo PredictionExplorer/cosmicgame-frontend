@@ -1,23 +1,14 @@
 {
-  "gestureSubmitted": "落筆已提交，正在等待確認。",
-  "gestureConfirmed": "落筆已確認，週期繼續推進。",
   "allocationRetrieved": "分配已取回至錢包。",
-  "anchorSet": "NFT 已錨定至協議。",
-  "anchorReleased": "NFT 已解錨。",
   "cycleFinalized": "週期已收官，分配已完成。",
   "walletTransactionCancelled": "交易未發送，已在錢包中取消。",
-  "unexpectedError": "操作未能完成，請重試。",
   "generic": {
-    "unexpectedError": "操作未能完成，請重試。",
-    "rpcFailure": "交易未能完成。請檢查錢包與網絡連接後重試。",
-    "receiptFailure": "交易已發送但未能確認。請先在錢包或區塊瀏覽器中查看狀態，再決定是否重試。",
-    "transactionFailed": "交易失敗，請重試。"
+    "rpcFailure": "交易未能完成。請檢查錢包與網絡連接後重試。"
   },
   "wallet": {
     "connect": "請先連接錢包。",
     "connectCorrectNetwork": "請連接錢包並切換至應用程式所用網絡。",
-    "notReady": "錢包尚未就緒，請重新連接後重試。",
-    "stillConnecting": "錢包仍在連接中，請稍後再試。"
+    "notReady": "錢包尚未就緒，請重新連接後重試。"
   },
   "watchAsset": {
     "metaMaskRequired": "請連接 MetaMask 後再添加此資產。",
@@ -118,12 +109,10 @@
       "nameClearFailed": "未能清除代幣名稱，請重試。"
     },
     "marketingCst": {
-      "reserveUnavailable": "推廣儲備錢包暫不可用。",
       "treasurerRequired": "請連接目前推廣錢包財務執行人的錢包，再撥付推廣 CST。",
       "confirmed": "推廣 CST 撥付已確認。",
       "failed": "未能撥付推廣 CST。請檢查錢包與網絡連接後重試。",
-      "pay": "撥付推廣 CST",
-      "payAmount": "發送 {amount}"
+      "pay": "撥付推廣 CST"
     }
   },
   "contribution": {

@@ -172,7 +172,6 @@
     "links": {
       "viewCycle": "Переглянути цикл {cycle}",
       "myAllocations": "Мої розподіли",
-      "allRecipients": "Отримувачі розподілів",
       "allCycles": "Усі цикли"
     },
     "result": {

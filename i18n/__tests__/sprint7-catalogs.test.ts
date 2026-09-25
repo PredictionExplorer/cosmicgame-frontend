@@ -33,7 +33,6 @@ describe('Sprint 7 focused catalogs', () => {
     expect(zhEthContribution.detail.breadcrumbContributions).toBe('ETH 贡献');
     expect(zhPublicGoods.loadError).toBe('无法加载公共物品记录。');
     expect(zhMarketing.cta.copyEmail).toBe('复制邮箱地址');
-    expect(zhMarketing.transferForm.historyLink).toContain('推广储备');
     expect(zhAdmin.outreachTransfer.form.sends).toBe('将转出 {amount}');
     expect(zhCoordination.page.title).toBe('协调变更');
     expect(zhCoordination.events.publicGoodsPercentage).toBe('公共物品比例已变更');

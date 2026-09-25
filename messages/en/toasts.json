@@ -1,23 +1,14 @@
 {
-  "gestureSubmitted": "Gesture submitted. Waiting for confirmation.",
-  "gestureConfirmed": "Gesture confirmed. The cycle continues.",
   "allocationRetrieved": "Allocation retrieved to your wallet.",
-  "anchorSet": "NFT anchored to the protocol.",
-  "anchorReleased": "Anchor released.",
   "cycleFinalized": "Cycle finalized. Allocations distributed.",
   "walletTransactionCancelled": "Transaction not sent — you cancelled it in your wallet.",
-  "unexpectedError": "Unexpected error. Please try again.",
   "generic": {
-    "unexpectedError": "Unexpected error. Please try again.",
-    "rpcFailure": "The transaction could not be completed. Check your wallet and network connection, then try again.",
-    "receiptFailure": "The transaction was sent but could not be confirmed. Check its status in your wallet or a block explorer before trying again.",
-    "transactionFailed": "Transaction failed. Please try again."
+    "rpcFailure": "The transaction could not be completed. Check your wallet and network connection, then try again."
   },
   "wallet": {
     "connect": "Please connect your wallet.",
     "connectCorrectNetwork": "Please connect your wallet and ensure you are on the correct network.",
-    "notReady": "Your wallet is not ready. Reconnect and try again.",
-    "stillConnecting": "Wallet is still connecting. Please try again in a moment."
+    "notReady": "Your wallet is not ready. Reconnect and try again."
   },
   "watchAsset": {
     "metaMaskRequired": "Connect MetaMask to add this asset.",
@@ -118,12 +109,10 @@
       "nameClearFailed": "An error occurred while clearing the token name. Please try again."
     },
     "marketingCst": {
-      "reserveUnavailable": "Outreach reserve wallet is not available.",
       "treasurerRequired": "Connect the Outreach Reserve treasurer wallet to send CST allocations.",
       "confirmed": "Outreach Reserve CST allocation confirmed.",
       "failed": "Unable to send the CST allocation. Please try again.",
-      "pay": "Send CST allocation",
-      "payAmount": "Send {amount}"
+      "pay": "Send CST allocation"
     }
   },
   "contribution": {

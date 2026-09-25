@@ -9,6 +9,7 @@ import {
   strictProblems,
   type Messages,
 } from '../../scripts/i18n-parity-core';
+import { sourceTokens, unreferencedKeys } from '../../scripts/i18n-unused-keys-core';
 import { getLocaleConfig } from '../localeConfig';
 import { NAMESPACES } from '../request';
 import { routing, TRANSLATED_LOCALES } from '../routing';
@@ -38,6 +39,21 @@ describe('source catalogs', () => {
     expect(report.typography).toEqual([]);
     expect(report.empty).toEqual([]);
     expect(report.invalidValues).toEqual([]);
+  });
+
+  // V138: 96 keys (and 47 more in whole dead subtrees) outlived the code that
+  // rendered them, each still translated in eight locales.
+  describe('reachability', () => {
+    let tokens: Set<string>;
+    beforeAll(() => {
+      tokens = sourceTokens(process.cwd());
+    });
+
+    it.each(NAMESPACES)('%s has no key that no code can reach', (namespace) => {
+      expect(
+        unreferencedKeys(namespace, readCatalog(routing.defaultLocale, namespace), tokens),
+      ).toEqual([]);
+    });
   });
 });
 

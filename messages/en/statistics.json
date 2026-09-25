@@ -205,10 +205,6 @@
       "label": "Protocol contributions",
       "tooltip": "Number of indexed public-goods contribution transactions sent through the Cosmic Signature protocol."
     },
-    "protocolContributionsSum": {
-      "label": "Protocol contributions sum",
-      "tooltip": "Total ETH contributed through indexed Cosmic Signature protocol public-goods contribution transactions."
-    },
     "voluntaryContributions": {
       "label": "Voluntary contributions",
       "tooltip": "ETH contributions made voluntarily by community members outside required cycle flows."
@@ -263,9 +259,7 @@
     "cstTotalAnchorDistributions": "Total ETH distributed as Anchor Distributions to Cosmic Signature NFT anchor-holders.",
     "cstUnretrievedAnchorDistributions": "Anchor Distributions allocated but not yet retrieved by Cosmic Signature NFT anchor-holders.",
     "rwlkActiveAnchorHolders": "Wallets currently anchoring at least one Random Walk NFT.",
-    "rwlkTotalTokensImprinted": "Total Cosmic Signature NFTs and paired CST imprinted for Random Walk NFT anchor-holders through Anchored-NFT Stellar Selection.",
-    "cstGroup": "Cosmic Signature NFT anchoring shares ETH Anchor Distributions among currently anchored Cosmic Signature NFTs.",
-    "rwlkGroup": "Random Walk NFT anchoring provides eligibility for Anchored-NFT Stellar Selection allocations."
+    "rwlkTotalTokensImprinted": "Total Cosmic Signature NFTs and paired CST imprinted for Random Walk NFT anchor-holders through Anchored-NFT Stellar Selection."
   },
   "activity": {
     "heading": "Gesture activity",
@@ -411,7 +405,6 @@
       },
       "allClaimed": "All retrieved",
       "unclaimedCount": "{count} unretrieved",
-      "viewUnclaimed": "View unretrieved assets",
       "cycleDetails": "Cycle {cycle} details",
       "dialog": {
         "unclaimedTitle": "Unretrieved assets — Cycle {cycle}",
@@ -467,7 +460,6 @@
     },
     "spikes": {
       "count": "Spikes ({count})",
-      "groupAria": "Detected gesture spikes",
       "previousAria": "Previous spike",
       "nextAria": "Next spike",
       "summary": "Peak {peak} gestures/hr · {total} total in spike · {date}",
@@ -477,7 +469,6 @@
       "loadErrorMessage": "Could not fetch spike detection data.",
       "empty": "No gesture spikes detected in indexed history.",
       "noneRecent": "No spike in recent activity; showing the latest one on record.",
-      "selectEarlier": "Select a spike above to inspect an earlier period of activity.",
       "emptyWindow": "No hourly data for the selected spike window.",
       "optionAria": "Spike on {date}, peak of {peak} per hour"
     },
@@ -485,7 +476,6 @@
       "description": "Active periods for the top {count} participants: at least 2 gestures, with no more than 6 hours between consecutive gestures. Each bar represents one active period.",
       "participant": "Participant",
       "ariaLabel": "{address}: {count, plural, one {# gesture} other {# gestures}} from {start} to {end}",
-      "tooltipSummary": "{count} gestures · {minutes} min span",
       "loadErrorTitle": "Failed to load active periods",
       "loadErrorMessage": "Could not fetch top participant activity timeline.",
       "empty": "No active gesture periods found for top participants.",
@@ -519,7 +509,6 @@
       "enduranceRecord": "Endurance record",
       "enduranceChampionRecord": "Endurance Champion record",
       "chronoRecord": "Chrono-Warrior record",
-      "leadHeldBy": "Lead held by",
       "legendEndurance": "Endurance Champion (longest single hold)",
       "legendChrono": "Chrono-Warrior (longest reign)",
       "legendLead": "Lead held",
@@ -528,7 +517,6 @@
       "enduranceChampionAbbr": "EC",
       "chronoWarrior": "Chrono-Warrior",
       "chronoWarriorAbbr": "CW",
-      "newRecord": "new record",
       "roleEndurance": " (Endurance Champion)",
       "roleNewRecord": " (new record)",
       "stintAria": "{address} • held {duration} • {from} → {to} into cycle{role}",
@@ -723,15 +711,12 @@
     "errorMessage": "The allocations of this address couldn’t be read. Try again in a moment."
   },
   "systemEvent": {
-    "titleBeforeCycle": "System Configuration Made Before Cycle {cycle}",
-    "titleBeforeDeployment": "System Configuration Made Before Deployment",
     "range": "Event log range {start}–{end}",
     "breadcrumbs": {
       "coordination": "Coordination changes"
     },
     "loading": "Loading…",
     "loadError": "Failed to load system events",
-    "explainEvent": "Explain {event}",
     "adminEvents": {
       "undefined": "Undefined",
       "publicGoodsPercentage": "The allocation percentage for the funds designated to the Public Goods Vault has been changed.",
@@ -788,62 +773,6 @@
     "viewContract": "View contract",
     "detailsUnavailable": "NFT details unavailable",
     "contractUnavailable": "Contract unavailable"
-  },
-  "publicDataSummaries": {
-    "common": {
-      "lastUpdated": "Last updated: {date}. Source: {source}.",
-      "relatedPagesAria": "{heading} related pages",
-      "unavailable": "Unavailable"
-    },
-    "attachedNfts": {
-      "eyebrow": "Attached NFT contributions · Arbitrum",
-      "heading": "Attached NFT Contributions",
-      "description": "Browse NFTs attached to Cosmic Signature gestures. Attached ERC-721 tokens forward to the participant who receives the Signature Allocation when a cycle finalizes.",
-      "source": "Cosmic Signature public attached NFT APIs",
-      "cards": {
-        "records": "Attached NFT Records",
-        "contracts": "Unique NFT Contracts",
-        "contributors": "Contributor Wallets"
-      },
-      "links": {
-        "gallery": "Explore Cosmic Signature gallery",
-        "cycle": "View the current Performance Cycle",
-        "learn": "Learn how attachments fit the cycle"
-      }
-    },
-    "namedNfts": {
-      "eyebrow": "Named NFTs · Arbitrum",
-      "heading": "Named Cosmic Signature NFTs",
-      "description": "Browse Cosmic Signature NFTs that owners have given custom names, connecting token identity, gallery discovery, and on-chain collection history.",
-      "source": "Cosmic Signature public token APIs",
-      "cards": {
-        "named": "Named Cosmic Signature NFTs",
-        "owners": "Current Owners",
-        "collection": "Collection"
-      },
-      "links": {
-        "gallery": "Explore the full gallery",
-        "learn": "Learn about the art",
-        "code": "Review rendering source code"
-      }
-    },
-    "usedRwlkNfts": {
-      "eyebrow": "Random Walk NFT usage · Arbitrum",
-      "heading": "Used Random Walk NFTs",
-      "description": "Review Random Walk NFTs that have already been attached to ETH gestures for their one-time Gesture Cost reduction.",
-      "source": "Cosmic Signature public Random Walk usage APIs",
-      "cards": {
-        "used": "Used Random Walk NFTs",
-        "discount": "One-Time Discount",
-        "scope": "Usage Scope",
-        "scopeValue": "One gesture per NFT"
-      },
-      "links": {
-        "imprint": "Imprint Random Walk NFTs",
-        "learn": "Learn how gestures work",
-        "cycle": "View current cycle data"
-      }
-    }
   },
   "routeError": {
     "title": "Statistics failed to load",

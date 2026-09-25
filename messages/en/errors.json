@@ -1,9 +1,7 @@
 {
   "generic": "Something went wrong. Please try again.",
-  "networkOffline": "You’re offline. Reconnect to continue.",
   "walletNotConnected": "Connect a Web3 wallet to make a gesture.",
   "insufficientEth": "Not enough ETH in your wallet for this gesture.",
-  "cycleClosed": "This cycle has closed. The next Performance Cycle opens soon.",
   "state": {
     "title": "Something went wrong",
     "retry": "Try again"
@@ -37,7 +35,6 @@
     "missing": "Missing or invalid:",
     "resolution": "Set them in your shell or in a .env file, then restart the dev server."
   },
-  "apiFailure": "The service did not respond. Try again in a moment.",
   "unexpected": "Unexpected error. Please try again.",
   "notFound": {
     "code": "Error 404",

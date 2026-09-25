@@ -6,18 +6,11 @@
     "minutes": "分",
     "seconds": "秒"
   },
-  "countdownLong": {
-    "days": "日",
-    "hours": "時間",
-    "minutes": "分",
-    "seconds": "秒"
-  },
   "durationCompact": {
     "days": "日",
     "hours": "時間",
     "minutes": "分",
-    "seconds": "秒",
-    "leftPattern": "残り{duration}"
+    "seconds": "秒"
   },
   "address": {
     "zero": "ゼロアドレス",

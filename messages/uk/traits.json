@@ -162,7 +162,6 @@
     "rarest": "Найрідкісніша ознака",
     "share": "{count, plural, one {# з {total} має цю ознаку} few {# з {total} мають цю ознаку} many {# з {total} мають цю ознаку} other {# з {total} має цю ознаку}}",
     "shareShort": "{count}/{total}",
-    "scoreLabel": "Оцінка рідкості",
     "unavailable": "Ще без рангу"
   },
   "facets": {
