@@ -33,8 +33,11 @@ describe('HeroSection', () => {
     render(<HeroSection {...defaultProps} />);
     const heading = screen.getByRole('heading', { level: 1 });
     expect(heading).toHaveTextContent(/^Cosmic Signature FAQ$/);
-    // One text node: the raw server HTML reads "Cosmic Signature FAQ" with no markup inside.
-    expect(heading.childNodes).toHaveLength(1);
+    // One string, with the brand held whole on its line (V425): no other markup.
+    expect(heading.textContent).toBe('Cosmic Signature FAQ');
+    expect([...heading.querySelectorAll('*')].map((node) => node.textContent)).toEqual([
+      'Cosmic Signature',
+    ]);
     expect(heading).toHaveClass('type-display-md');
   });
 
@@ -43,7 +46,7 @@ describe('HeroSection', () => {
       expect(faqTitle(locale)).not.toMatch(/<\/?accent>/);
     }
     // Regression: the halves were joined with a JSX space, giving "Cosmic Signature よくある質問".
-    expect(faqTitle('ja')).toBe('Cosmic Signatureよくある質問');
+    expect(faqTitle('ja')).toBe('Cosmic Signatureのよくある質問');
   });
 
   it('names the Learn section in the eyebrow, linked to its hub', () => {

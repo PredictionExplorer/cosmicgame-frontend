@@ -125,7 +125,7 @@ describe('UserStellarSelectionNFTPage', () => {
     });
     render(<UserStellarSelectionNFTPage address={ADDRESS} />);
     expect(
-      screen.getByRole('heading', { level: 2, name: "Couldn't load the Stellar Selection NFTs" }),
+      screen.getByRole('heading', { level: 2, name: 'Couldn’t load the Stellar Selection NFTs' }),
     ).toBeInTheDocument();
     expect(screen.queryByText('No Stellar Selection NFTs yet')).not.toBeInTheDocument();
     await userEvent.click(screen.getByRole('button', { name: /try again/i }));

@@ -8,6 +8,7 @@ import { cn } from '@/lib/utils';
 import { Breadcrumbs, type BreadcrumbItem } from '@/components/ui/breadcrumbs';
 import { ExplainedTerm } from '@/components/ui/explain-popover';
 import { ScrollRail } from '@/components/ui/scroll-rail';
+import { SiteNameText } from '@/components/ui/site-name-text';
 import { UnknownValue } from '@/components/ui/unknown-value';
 import { HeaderLede } from '@/components/layout/HeaderLede';
 import { PAGE_SECTIONS, type PageSectionId } from '@/components/layout/pageSections';
@@ -275,7 +276,7 @@ export function PageHeader({
             id={titleId}
             className={cn('text-foreground print:!text-foreground', TITLE_CLASS[variant])}
           >
-            {title}
+            {typeof title === 'string' ? <SiteNameText>{title}</SiteNameText> : title}
           </h1>
           {identity ? (
             <div
