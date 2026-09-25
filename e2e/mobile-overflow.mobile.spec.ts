@@ -99,6 +99,34 @@ test.describe('Mobile overflow — phone ledgers fit their column at 320px', () 
   }
 });
 
+/*
+ * A shortened address is one word. The CST holders ledger once broke every
+ * address before its last character at 390px ("0x360E…FB3" / "2"): the hex
+ * could wrap, so the compact table never measured as too wide and never
+ * turned into records.
+ */
+for (const width of [NARROW.width, 390]) {
+  test.describe(`Mobile overflow — ledger addresses stay whole at ${width}px`, () => {
+    test.use({ viewport: { width, height: 844 } });
+
+    for (const route of APP_AUDIT_ROUTES.filter((r) => LEDGER_ROUTE_IDS.has(r.id))) {
+      test(`${route.path} never splits an address across lines`, async ({ page }) => {
+        await page.goto(route.path, { waitUntil: 'domcontentloaded' });
+        await waitForStableLayout(page);
+
+        const split = await page.$$eval(
+          ".cs-table td[data-kind='address'] .font-mono",
+          (elements) =>
+            elements
+              .filter((element) => element.getClientRects().length > 1)
+              .map((element) => element.textContent),
+        );
+        expect(split, `${route.path}: addresses broken across lines`).toEqual([]);
+      });
+    }
+  });
+}
+
 test.describe('Mobile overflow — every app route at 320px', () => {
   test.use({ viewport: { width: NARROW.width, height: NARROW.height } });
 

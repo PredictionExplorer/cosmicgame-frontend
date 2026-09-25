@@ -96,32 +96,19 @@ test.describe('/statistics tooltips', () => {
       await expect(participantsTable).toHaveAttribute('data-layout', 'compact');
       await expect(participantsTable.locator('thead th').first()).toBeVisible();
 
-      // A wider table becomes one record per row. Each value still carries its
-      // column name: the header stays in `thead` for assistive tech, and every
-      // cell repeats it from `data-label` via CSS `::before`.
+      // The recipients ledger leaves its mostly blank "Largest Signature
+      // Allocation" off a phone, so it keeps the address, the count and the
+      // ETH received and stays a table like every other ledger on the page.
       const recipientsTable = page
         .getByRole('table')
         .filter({ hasText: 'Allocations (all kinds)' })
         .first();
-      await expect(recipientsTable).toHaveAttribute('data-layout', 'cards');
-      const firstRecipientRow = recipientsTable.locator('tbody tr').first();
-      await firstRecipientRow.scrollIntoViewIfNeeded();
-      await expect(firstRecipientRow.locator('td').first()).toHaveAttribute(
-        'data-label',
-        'Recipient',
-      );
-
-      const renderedLabels = await firstRecipientRow.locator('td').evaluateAll((cells) =>
-        // The label is drawn with empty alternative text
-        // (`"Recipient Address" / ""`): read the drawn string only.
-        cells.map(
-          (cell) =>
-            /^"((?:[^"\\]|\\.)*)"/.exec(getComputedStyle(cell, '::before').content)?.[1] ?? '',
-        ),
-      );
-      expect(renderedLabels).toEqual(
-        expect.arrayContaining(['Recipient', 'Allocations (all kinds)', 'ETH received']),
-      );
+      await recipientsTable.scrollIntoViewIfNeeded();
+      await expect(recipientsTable).toHaveAttribute('data-layout', 'compact');
+      await expect(
+        recipientsTable.getByRole('columnheader', { name: 'ETH received' }),
+      ).toBeVisible();
+      await expect(recipientsTable.locator('thead th[data-priority="secondary"]')).toBeHidden();
       return;
     }
 

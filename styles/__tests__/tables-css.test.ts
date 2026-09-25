@@ -203,13 +203,15 @@ describe('styles/tables.css', () => {
     expect(declaration(phoneRules, `${RECORD} tbody td[data-phone='title']`, 'font-weight')).toBe(
       '600',
     );
-    expect(
-      declaration(
-        phoneRules,
-        `${RECORD} tbody td[data-phone='title']:is([data-kind='address'], [data-kind='datetime'])`,
-        'font-weight',
-      ),
-    ).toBe('400');
+    for (const kind of ['address', 'datetime']) {
+      expect(
+        declaration(
+          phoneRules,
+          `${RECORD} tbody td[data-phone='title'][data-kind='${kind}']`,
+          'font-weight',
+        ),
+      ).toBe('400');
+    }
     expect(declaration(phoneRules, `${RECORD} tbody td[data-phone='omit']`, 'display')).toBe(
       'none',
     );

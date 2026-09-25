@@ -749,6 +749,18 @@ describe('DataTable layout and naming', () => {
     expect(heading.closest('header')).toContainElement(intro);
   });
 
+  it('scopes a titled ledger’s header to its own section, never a page banner', async () => {
+    const { container } = render(
+      <>
+        <DataTable ariaLabel="Holders" title="Holders" data={rows} columns={columns} />
+        <DataTable ariaLabel="Owners" title="Owners" data={[]} columns={columns} />
+      </>,
+    );
+    expect(container.querySelectorAll('section > header')).toHaveLength(2);
+    // axe scopes a <header> to its sectioning ancestor: no duplicate banner.
+    await checkA11y(container);
+  });
+
   it('sets an intro inside a panel at the panel size', () => {
     render(
       <DataTable

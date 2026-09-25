@@ -626,7 +626,10 @@ export function DataTable<T>({
 
   // The title block is the site's one section header, so a ledger's heading,
   // intro and spacing match every other section on its page: the page tier
-  // for an h2, the panel tier inside a section.
+  // for an h2, the panel tier inside a section. A titled ledger is itself a
+  // <section> (unnamed, so not a landmark), which scopes that <header> to it:
+  // outside one, a <header> that is not in <main> would be a banner.
+  const Frame = title ? 'section' : 'div';
   const header = title ? (
     <SectionHeader
       as={`h${headingLevel}`}
@@ -654,7 +657,7 @@ export function DataTable<T>({
 
   if (error) {
     return (
-      <div ref={wrapperRef} className={className}>
+      <Frame ref={wrapperRef} className={className}>
         {header}
         {notice}
         <ErrorState
@@ -663,13 +666,13 @@ export function DataTable<T>({
           onRetry={onRetry}
           headingLevel={stateHeadingLevel}
         />
-      </div>
+      </Frame>
     );
   }
 
   if (!loading && data.length === 0) {
     return (
-      <div ref={wrapperRef} className={className}>
+      <Frame ref={wrapperRef} className={className}>
         {header}
         {notice}
         {toolbar}
@@ -680,14 +683,14 @@ export function DataTable<T>({
           action={emptyAction}
           headingLevel={stateHeadingLevel}
         />
-      </div>
+      </Frame>
     );
   }
 
   const showSkeleton = loading && data.length === 0;
 
   return (
-    <div
+    <Frame
       ref={wrapperRef}
       data-slot="data-table"
       className={cn('scroll-mt-[calc(var(--header-height,4.5rem)+1rem)]', fitClass, className)}
@@ -952,7 +955,7 @@ export function DataTable<T>({
           label={t('pagination.labelFor', { table: ariaLabel })}
         />
       ) : null}
-    </div>
+    </Frame>
   );
 }
 

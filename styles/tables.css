@@ -298,9 +298,8 @@
   /* An address or a date that titles a record keeps its own weight: bold
    * monospace hex and bold figures read heavier than the words they stand
    * beside, so the title line leads by its place and ink alone. */
-  .cs-table:not([data-layout='compact'])
-    tbody
-    td[data-phone='title']:is([data-kind='address'], [data-kind='datetime']) {
+  .cs-table:not([data-layout='compact']) tbody td[data-phone='title'][data-kind='address'],
+  .cs-table:not([data-layout='compact']) tbody td[data-phone='title'][data-kind='datetime'] {
     font-weight: 400;
   }
 
