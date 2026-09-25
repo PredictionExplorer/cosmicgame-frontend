@@ -11,7 +11,7 @@ import { AnchoringIcon, ImprintIcon } from '@/lib/conceptIcons';
 import { formatAmount, formatCount } from '@/utils/format';
 import { getExplorerUrl } from '@/utils/urls';
 import { useContractAddresses } from '@/contexts/ContractAddressesContext';
-import { useCSTTransfers, useCTTransfers } from '@/hooks/useApiQuery';
+import { useCSTList, useCSTTransfers, useCTTransfers } from '@/hooks/useApiQuery';
 import { useSignatureSeeds } from '@/components/anchoring/useSignatureSeeds';
 import { LedgerPage } from '@/components/ledger/LedgerPage';
 import { PageHeader, PageHeaderTabs, type PageHeaderFigure } from '@/components/layout/PageHeader';
@@ -27,6 +27,7 @@ import {
   ACTIVITY_DIRECTION,
   classifyTransfer,
   countByActivity,
+  isPeerTransfer,
   movesInDirection,
   sumCstTransfers,
   transferWei,
@@ -38,9 +39,16 @@ import { TransferTokenCell } from './TransferTokenCell';
 /** Which history: the CST token's transfers, or the Cosmic Signature NFTs'. */
 export type TransferAsset = 'cst' | 'nft';
 
-type Filter = 'all' | TransferDirection;
+/** All rows, the peer transfers alone (no protocol imprints or consumptions), or one direction. */
+type Filter = 'all' | 'transfers' | TransferDirection;
 
-const FILTERS: readonly Filter[] = ['all', 'in', 'out'];
+const FILTERS: readonly Filter[] = ['all', 'transfers', 'in', 'out'];
+
+function matchesFilter(entry: TransferEntry, filter: Filter): boolean {
+  if (filter === 'all') return true;
+  if (filter === 'transfers') return isPeerTransfer(entry);
+  return movesInDirection(entry, filter);
+}
 
 /** One row of either history, classified from the page address's side. */
 interface TransferEntry {
@@ -159,9 +167,11 @@ export function AddressTransferHistory({
   const query = asset === 'cst' ? cst : nft;
   // The NFT rows are artworks but carry no seed: one collection read (the
   // gallery's) draws every row's plate.
-  const { pending: seedsPending, seedFor } = useSignatureSeeds(
-    asset === 'nft' && (nft.data?.length ?? 0) > 0,
-  );
+  const seedsWanted = asset === 'nft' && (nft.data?.length ?? 0) > 0;
+  const { pending: seedsPending, seedFor } = useSignatureSeeds(seedsWanted);
+  // The same query (and cache entry) as the seeds: when the collection could not
+  // be read, each plate says so instead of looking its token up one by one.
+  const collectionFailed = useCSTList({ enabled: seedsWanted }).isError;
 
   const entries = useMemo<TransferEntry[]>(() => {
     if (!address) return [];
@@ -188,7 +198,7 @@ export function AddressTransferHistory({
   }, [address, asset, query.data, stakingCst, stakingRwalk]);
 
   const shown = useMemo(
-    () => (filter === 'all' ? entries : entries.filter((entry) => movesInDirection(entry, filter))),
+    () => (filter === 'all' ? entries : entries.filter((entry) => matchesFilter(entry, filter))),
     [entries, filter],
   );
 
@@ -248,8 +258,8 @@ export function AddressTransferHistory({
           unit: 'CST',
           width: '10rem',
           // Signed from this address's side, so a column of changes adds up;
-          // a transfer that changes no hands carries no sign.
-          value: (entry) => (entry.wei === null ? null : Number(entry.wei) * signOf(entry)),
+          // a transfer that changes no hands carries no sign and sorts by its size.
+          value: (entry) => (entry.wei === null ? null : Number(entry.wei) * (signOf(entry) || 1)),
           cell: (entry) => {
             if (entry.wei === null) return null;
             const sign = signOf(entry);
@@ -282,6 +292,7 @@ export function AddressTransferHistory({
               tokenId={entry.tokenId}
               seed={seedFor(entry.tokenId)}
               seedPending={seedsPending}
+              lookUpMissing={!collectionFailed}
             />
           ),
         sortable: true,
@@ -289,7 +300,7 @@ export function AddressTransferHistory({
       },
       counterparty,
     ];
-  }, [address, asset, seedFor, seedsPending, t, tFormats, tTables]);
+  }, [address, asset, collectionFailed, seedFor, seedsPending, t, tFormats, tTables]);
 
   // While the history loads a figure is a skeleton, with its caption line
   // held open; when it fails, the header's unavailable dash (`null`). Totals
@@ -328,11 +339,17 @@ export function AddressTransferHistory({
   } else {
     const counts = countByActivity(entries);
     const count = (value: number) => (ready ? formatCount(value, locale) : pending);
+    // Every row counts in one figure, so the four add up to the ledger's rows.
     figures = [
       { id: 'imprinted', label: t('nft.figures.imprinted'), value: count(counts.imprinted) },
       { id: 'received', label: t('nft.figures.received'), value: count(counts.received) },
       { id: 'sent', label: t('nft.figures.sent'), value: count(counts.sent) },
-    ];
+      {
+        id: 'anchoring',
+        label: t('nft.figures.anchoring'),
+        value: count(counts.anchored + counts.released),
+      },
+    ].map((figure) => ({ ...figure, compact: true }));
   }
 
   const header = (
@@ -424,9 +441,11 @@ export function AddressTransferHistory({
         emptyTitle={t(filter === 'all' ? `${asset}.empty` : 'filter.empty')}
         emptyDescription={filter === 'all' ? t(`${asset}.emptyDescription`) : undefined}
         resetPageKey={filter}
-        // Short values: the ledger keeps to a readable width instead of
-        // spreading four columns across the whole screen.
-        className="max-w-5xl"
+        // Several links per row (the date's proof, the token, the counterparty):
+        // they keep their ink and underline on hover and focus.
+        links="quiet"
+        // The ledger, its filter and its count share the header's and tabs' edges.
+        width="fill"
         toolbar={
           showToolbar ? (
             <div className="mb-4 flex flex-wrap items-center justify-between gap-x-4 gap-y-2">

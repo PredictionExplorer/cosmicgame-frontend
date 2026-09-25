@@ -29,10 +29,12 @@ jest.mock('@/components/tables/EthDonationTable', () => ({
   ),
 }));
 
+const A = '0xaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa';
+const B = '0xbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb';
 const ROWS = [
-  { EvtLogId: 1, DonorAddr: '0xAA', AmountEth: 1.5 },
-  { EvtLogId: 2, DonorAddr: '0xaa', AmountEth: 2 },
-  { EvtLogId: 3, DonorAddr: '0xBB', AmountEth: 0.5 },
+  { EvtLogId: 1, DonorAddr: A.toUpperCase().replace('0X', '0x'), AmountEth: 1.5 },
+  { EvtLogId: 2, DonorAddr: A, AmountEth: 2 },
+  { EvtLogId: 3, DonorAddr: B, AmountEth: 0.5 },
 ];
 
 function withRows(
@@ -62,10 +64,20 @@ describe('EthDonationByRoundPage', () => {
       'ethContribution.cycle.title(cycle=7)',
     );
     expect(document.querySelector('[data-figure="count"]')).toHaveTextContent('3');
-    expect(document.querySelector('[data-figure="total"]')).toHaveTextContent('4.0000 ETH');
+    // A headline figure: whole ETH without the table's four zeros.
+    expect(document.querySelector('[data-figure="total"]')).toHaveTextContent(/(^|\D)4\sETH/);
     // Contributors count once per address, in any letter case.
     expect(document.querySelector('[data-figure="contributors"]')).toHaveTextContent('2');
     expect(screen.getByTestId('contribution-table')).toHaveTextContent('rows: 3');
+  });
+
+  // Regression: one indexer row without a contributor threw and took the page down.
+  it('survives a malformed row, which adds nothing it cannot read', () => {
+    withRows([...ROWS, { EvtLogId: 4, AmountEth: 'n/a' }]);
+    render(<EthDonationByRoundPage round={7} />);
+    expect(document.querySelector('[data-figure="count"]')).toHaveTextContent('4');
+    expect(document.querySelector('[data-figure="contributors"]')).toHaveTextContent('2');
+    expect(document.querySelector('[data-figure="total"]')).toHaveTextContent(/(^|\D)4\sETH/);
   });
 
   it('links the neighbouring cycles and the finalized cycle allocation', () => {

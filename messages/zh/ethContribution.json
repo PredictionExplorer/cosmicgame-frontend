@@ -23,7 +23,8 @@
     "urlError": "请填写以 https:// 或 http:// 开头的完整链接。",
     "summary": "{amount} 将进入第 {cycle} 个周期的周期储备。",
     "summaryNoCycle": "{amount} 将进入周期储备。",
-    "submitAmount": "贡献 {amount}"
+    "submitAmount": "贡献 {amount}",
+    "riskLink": "贡献前请阅读风险披露"
   },
   "detail": {
     "invalidId": "贡献 ID 无效",

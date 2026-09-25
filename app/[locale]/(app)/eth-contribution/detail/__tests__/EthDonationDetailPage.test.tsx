@@ -134,30 +134,6 @@ describe('EthDonationDetailPage', () => {
     );
   });
 
-  it('opens on the not-found state the server found, with no figures to drop (regression)', () => {
-    // Every missing record drew four figure skeletons, then removed them when
-    // the client read answered, shifting the page (desktop CLS 0.095).
-    withRecord(undefined, { isLoading: true });
-    render(<EthDonationDetailPage id={9} knownMissing />);
-
-    expect(screen.getByRole('heading', { level: 1 })).toHaveTextContent(
-      'ethContribution.detail.notFoundHeading',
-    );
-    expect(document.querySelector('[data-figure]')).toBeNull();
-    expect(screen.queryByRole('status')).not.toBeInTheDocument();
-    expect(screen.getByText('ethContribution.detail.notFoundTitle(id=9)')).toBeInTheDocument();
-  });
-
-  it('shows the record when the client read finds it after all', () => {
-    withRecord(DONATION);
-    render(<EthDonationDetailPage id={7} knownMissing />);
-
-    expect(screen.getByRole('heading', { level: 1 })).toHaveTextContent(
-      'ethContribution.detail.title(id=7)',
-    );
-    expect(document.querySelector('[data-figure="amount"]')).toHaveTextContent('20.0000 ETH');
-  });
-
   it('refuses an invalid id without querying', () => {
     withRecord(null);
     render(<EthDonationDetailPage id={-1} />);

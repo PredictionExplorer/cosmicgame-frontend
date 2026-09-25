@@ -296,7 +296,8 @@
       "figures": {
         "imprinted": "각인",
         "received": "받음",
-        "sent": "보냄"
+        "sent": "보냄",
+        "anchoring": "앵커링 또는 해제"
       }
     },
     "cst": {
@@ -305,8 +306,8 @@
       "lede": "이 주소에 각인된 CST, 이 주소가 받고 보낸 CST, 그리고 CST 제스처로 소모한 CST입니다.",
       "emptyDescription": "제스처로 CST가 각인되거나 다른 지갑이 CST를 보내면 여기에 표시됩니다.",
       "figures": {
-        "received": "받은 수량",
-        "sent": "보낸 수량",
+        "received": "총 유입",
+        "sent": "총 유출",
         "net": "순변동",
         "imprintedCaption": "각인: {amount}",
         "consumedCaption": "소모: {amount}"
@@ -330,7 +331,8 @@
       "all": "전체",
       "in": "받은 내역",
       "out": "보낸 내역",
-      "empty": "이 방향의 내역이 아직 없습니다."
+      "empty": "이 방향의 내역이 아직 없습니다.",
+      "transfers": "지갑 간 전송"
     },
     "columns": {
       "activity": "내역",

@@ -296,7 +296,8 @@
       "figures": {
         "imprinted": "Đã khắc",
         "received": "Đã nhận",
-        "sent": "Đã gửi"
+        "sent": "Đã gửi",
+        "anchoring": "Neo giữ hoặc gỡ neo"
       }
     },
     "cst": {
@@ -305,8 +306,8 @@
       "lede": "CST được khắc cho địa chỉ này, CST địa chỉ này nhận và gửi, cùng CST bị tiêu thụ bởi các nét bút CST của nó.",
       "emptyDescription": "CST đến một địa chỉ khi một nét bút khắc CST cho nó hoặc một ví khác gửi đến.",
       "figures": {
-        "received": "Đã nhận",
-        "sent": "Đã gửi",
+        "received": "Tổng vào",
+        "sent": "Tổng ra",
         "net": "Thay đổi ròng",
         "imprintedCaption": "Đã khắc: {amount}",
         "consumedCaption": "Đã tiêu thụ: {amount}"
@@ -330,7 +331,8 @@
       "all": "Tất cả",
       "in": "Chuyển vào",
       "out": "Chuyển ra",
-      "empty": "Chưa có giao dịch nào theo chiều này."
+      "empty": "Chưa có giao dịch nào theo chiều này.",
+      "transfers": "Giữa các ví"
     },
     "columns": {
       "activity": "Hoạt động",

@@ -21,11 +21,6 @@ import { Skeleton, SkeletonDetailRows } from '@/components/ui/skeleton';
 
 interface EthDonationDetailPageProps {
   id: number;
-  /**
-   * The server read found no such record: the page opens on its not-found
-   * state instead of figure skeletons that would then vanish.
-   */
-  knownMissing?: boolean;
 }
 
 /** A label and its value on one hairline row; the value wraps under the label on phones. */
@@ -60,8 +55,9 @@ function BackToAll() {
  * fetched: opening a record page does not make the visitor's browser call a
  * stranger's server.
  */
-const EthDonationDetailPage = ({ id, knownMissing = false }: EthDonationDetailPageProps) => {
+const EthDonationDetailPage = ({ id }: EthDonationDetailPageProps) => {
   const t = useTranslations('ethContribution.detail');
+  const tCycle = useTranslations('ethContribution.cycle');
   const locale = useLocale();
   const valid = Number.isInteger(id) && id >= 0;
   const { data, isLoading, isError, refetch } = useDonationsWithInfoById(valid ? id : null);
@@ -104,15 +100,15 @@ const EthDonationDetailPage = ({ id, knownMissing = false }: EthDonationDetailPa
       id: 'cycle',
       label: t('figures.cycle'),
       value: data ? (
-        // The figure shows the number; the link says where it leads ("All
-        // contributions in cycle 7"), which a title attribute did not announce.
+        // "Cycle 7", as a cycle reads everywhere; the link says where it leads
+        // ("All contributions in cycle 7"), which a title attribute did not announce.
         <Link
           href={`/eth-contribution/round/${data.RoundNum}`}
           aria-label={t('cycleLink', { cycle: data.RoundNum })}
           title={t('cycleLink', { cycle: data.RoundNum })}
           className="link-quiet"
         >
-          {formatCount(data.RoundNum, locale)}
+          {tCycle('cycleLabel', { cycle: formatCount(data.RoundNum, locale) })}
         </Link>
       ) : (
         pending
@@ -126,10 +122,10 @@ const EthDonationDetailPage = ({ id, knownMissing = false }: EthDonationDetailPa
     },
   ];
 
-  // A record that does not exist is not titled as if it did. The server may
-  // already know (then the client read only confirms it); otherwise the
-  // figures hold their place until the client read answers.
-  const notFound = !data && (knownMissing || (!isLoading && !isError));
+  // A record that does not exist is not titled as if it did. The server
+  // answers a missing record with a 404; when its read failed, the figures
+  // hold their place until the client read answers.
+  const notFound = !data && !isLoading && !isError;
   const header = (
     <PageHeader
       section="records"

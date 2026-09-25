@@ -23,7 +23,8 @@
     "urlError": "https://またはhttp://で始まる完全なリンクを入力してください。",
     "summary": "{amount}がサイクル{cycle}のサイクル準備金に入ります。",
     "summaryNoCycle": "{amount}がサイクル準備金に入ります。",
-    "submitAmount": "{amount}を拠出する"
+    "submitAmount": "{amount}を拠出する",
+    "riskLink": "拠出する前にリスク開示をお読みください"
   },
   "detail": {
     "invalidId": "拠出IDが無効です",

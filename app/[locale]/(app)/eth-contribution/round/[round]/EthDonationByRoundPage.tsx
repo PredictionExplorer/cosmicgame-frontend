@@ -8,6 +8,7 @@ import { formatCount } from '@/utils/format';
 import { useDashboardInfo, useDonationsBothByRound } from '@/hooks/useApiQuery';
 import { LedgerPage } from '@/components/ledger/LedgerPage';
 import { PageHeader, type PageHeaderFigure } from '@/components/layout/PageHeader';
+import { summarizeContributions } from '@/components/contributions/summary';
 import EthDonationTable, { type EthDonation } from '@/components/tables/EthDonationTable';
 import { Amount } from '@/components/ui/amount';
 import { buttonVariants } from '@/components/ui/button';
@@ -16,11 +17,6 @@ import { Skeleton } from '@/components/ui/skeleton';
 
 interface EthDonationByRoundPageProps {
   round: number;
-}
-
-/** Distinct contributor addresses, case-insensitively. */
-function countContributors(rows: readonly EthDonation[]): number {
-  return new Set(rows.map((row) => row.DonorAddr.toLowerCase())).size;
 }
 
 /**
@@ -68,25 +64,23 @@ const EthDonationByRoundPage = ({ round }: EthDonationByRoundPageProps) => {
   const rows = (data ?? []) as EthDonation[];
   const ready = !isLoading && !isError;
   const pending = isLoading ? <Skeleton className="h-7 w-20" /> : null;
-  const total = rows.reduce(
-    (sum, row) => sum + (Number.isFinite(row.AmountEth) ? row.AmountEth : 0),
-    0,
-  );
+  // The same guarded summary as the all-contributions header.
+  const summary = summarizeContributions(rows);
   const figures: PageHeaderFigure[] = [
     {
       id: 'count',
       label: t('figures.count'),
-      value: ready ? formatCount(rows.length, locale) : pending,
+      value: ready ? formatCount(summary.records, locale) : pending,
     },
     {
       id: 'total',
       label: t('figures.total'),
-      value: ready ? <Amount value={total} unit="ETH" /> : pending,
+      value: ready ? <Amount value={summary.totalEth} unit="ETH" context="hero" /> : pending,
     },
     {
       id: 'contributors',
       label: t('figures.contributors'),
-      value: ready ? formatCount(countContributors(rows), locale) : pending,
+      value: ready ? formatCount(summary.contributors, locale) : pending,
     },
   ];
 

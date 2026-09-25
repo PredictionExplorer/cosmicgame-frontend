@@ -296,7 +296,8 @@
       "figures": {
         "imprinted": "刻印",
         "received": "受け取り",
-        "sent": "送付"
+        "sent": "送付",
+        "anchoring": "係留・係留解除"
       }
     },
     "cst": {
@@ -305,8 +306,8 @@
       "lede": "このアドレスに刻印されたCST、受け取ったCSTと送ったCST、そしてCSTでの一筆に消費したCSTです。",
       "emptyDescription": "一筆でCSTが刻印されるか、別のウォレットから送られると、ここに表示されます。",
       "figures": {
-        "received": "受け取り",
-        "sent": "送付",
+        "received": "流入の合計",
+        "sent": "流出の合計",
         "net": "純増減",
         "imprintedCaption": "うち刻印：{amount}",
         "consumedCaption": "うち消費：{amount}"
@@ -330,7 +331,8 @@
       "all": "すべて",
       "in": "受け取り",
       "out": "送り出し",
-      "empty": "この方向の記録はまだありません。"
+      "empty": "この方向の記録はまだありません。",
+      "transfers": "ウォレット間"
     },
     "columns": {
       "activity": "内容",
