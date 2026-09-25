@@ -1,10 +1,19 @@
 'use client';
 
-import { useMemo } from 'react';
+import { useCallback, useMemo } from 'react';
 import { MessageSquare } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 
-import { DataTable, TableLink, type DataTableColumn } from '@/components/ui/data-table';
+import { Amount } from '@/components/ui/amount';
+import {
+  DataTable,
+  KindValue,
+  TableLink,
+  type DataTableColumn,
+  type PhoneRecordContent,
+  type PhoneRecordContext,
+} from '@/components/ui/data-table';
+import { DateTime } from '@/components/ui/date-time';
 import type { LedgerStateProps } from '@/components/tables/ledger-props';
 
 export interface EthDonation {
@@ -30,10 +39,13 @@ interface EthDonationTableProps extends LedgerStateProps {
  * Direct ETH contributions to the Cycle Reserve, newest first, read as when,
  * which cycle, who and how much. A contribution with a note says "With note"
  * in a last column and leads to its record page; one without leaves that
- * cell blank (its phone record drops the line) and links its date to the
- * transaction, and a page where no row has a note shows no Note column at
- * all. The cycle links to that cycle's contribution list. Every row carries
+ * cell blank and links its date to the transaction, and a page where no row
+ * has a note shows no Note column at all. The cycle links to that cycle's contribution list. Every row carries
  * several links, so they stay quiet until hovered or focused.
+ *
+ * On a phone a contribution is a two-line record like a transfer's: the date
+ * and the amount on the first line; who contributed, the cycle and the note
+ * under it, with no label repeated.
  */
 const EthDonationTable = ({
   list,
@@ -50,7 +62,50 @@ const EthDonationTable = ({
     [showType],
   );
 
+  // What a row shows in both layouts: the ledger's cells and its phone record.
+  const cycleLink = useCallback(
+    (row: EthDonation) => (
+      // "Cycle 5", not a bare "5": a word-wide target that says where it leads.
+      <TableLink href={`/eth-contribution/round/${row.RoundNum}`}>
+        {t('allocation.cycle', { cycle: String(row.RoundNum) })}
+      </TableLink>
+    ),
+    [t],
+  );
+  const withNote = useMemo(
+    () => (
+      // Its ink comes from where it stands: the cell's foreground, the record's second tier.
+      <span className="inline-flex items-center gap-1.5 whitespace-nowrap">
+        <MessageSquare aria-hidden className="size-3.5 shrink-0 text-subtle" />
+        {t('ethContribution.withNote')}
+      </span>
+    ),
+    [t],
+  );
+
+  const phoneRecord = useCallback(
+    (row: EthDonation, { linked }: PhoneRecordContext): PhoneRecordContent => ({
+      // A contribution with a note leads to its record (the row link wraps
+      // the date); one without links its date to the transaction.
+      title: linked ? (
+        <DateTime timestamp={row.TimeStamp} year="always" />
+      ) : (
+        <KindValue kind="datetime" value={row.TimeStamp} txHash={row.TxHash} year="always" />
+      ),
+      titleEnd: (
+        <Amount value={row.AmountEth} unit="ETH" context="table" unitClassName="text-subtle" />
+      ),
+      details: [
+        <KindValue key="contributor" kind="address" value={row.DonorAddr} />,
+        showCycle ? cycleLink(row) : null,
+        showType && row.RecordType > 0 ? withNote : null,
+      ],
+    }),
+    [cycleLink, showCycle, showType, withNote],
+  );
+
   const columns = useMemo<DataTableColumn<EthDonation>[]>(() => {
+    // The phone record says all but the date, which opens it.
     const all: (DataTableColumn<EthDonation> | false)[] = [
       {
         id: 'datetime',
@@ -70,20 +125,17 @@ const EthDonationTable = ({
         kind: 'link',
         header: t('columns.round'),
         value: (row) => Number(row.RoundNum),
-        // "Cycle 5", not a bare "5": a word-wide target that says where it leads.
-        cell: (row) => (
-          <TableLink href={`/eth-contribution/round/${row.RoundNum}`}>
-            {t('allocation.cycle', { cycle: String(row.RoundNum) })}
-          </TableLink>
-        ),
+        cell: cycleLink,
         nowrap: true,
         sortable: true,
+        phone: 'omit',
       },
       {
         id: 'contributor',
         kind: 'address',
         header: t('columns.contributor'),
         value: (row) => row.DonorAddr,
+        phone: 'omit',
       },
       {
         id: 'amount',
@@ -92,6 +144,7 @@ const EthDonationTable = ({
         value: (row) => row.AmountEth,
         showUnit: false,
         sortable: true,
+        phone: 'omit',
       },
       showType && {
         id: 'note',
@@ -100,25 +153,22 @@ const EthDonationTable = ({
         // One bit per row, in the form's own words: the contract calls a
         // contribution with a note `donateEthWithInfo`.
         value: (row) => (row.RecordType > 0 ? t('ethContribution.withNote') : null),
-        // A blank cell, not a dash, for a contribution without one, so the
-        // phone record has no empty "Note" line; no note on the page, no column.
+        // A blank cell, not a dash, for a contribution without one; no note
+        // on the page, no column.
         cell: (row) =>
-          row.RecordType > 0 ? (
-            <span className="inline-flex items-center gap-1.5 whitespace-nowrap text-foreground">
-              <MessageSquare aria-hidden className="size-3.5 shrink-0 text-subtle" />
-              {t('ethContribution.withNote')}
-            </span>
-          ) : null,
+          row.RecordType > 0 ? <span className="text-foreground">{withNote}</span> : null,
         hideWhenEmpty: true,
+        phone: 'omit',
       },
     ];
     return all.filter((column): column is DataTableColumn<EthDonation> => Boolean(column));
-  }, [t, showType, showCycle]);
+  }, [t, showType, showCycle, cycleLink, withNote]);
 
   return (
     <DataTable
       data={list}
       columns={columns}
+      phoneRecord={phoneRecord}
       ariaLabel={t('names.ethContributions')}
       getRowKey={(row) => row.EvtLogId}
       getRowHref={(row) => (hasDetail(row) ? `/eth-contribution/detail/${row.CGRecordId}` : null)}

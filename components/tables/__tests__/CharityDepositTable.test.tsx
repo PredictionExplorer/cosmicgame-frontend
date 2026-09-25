@@ -1,8 +1,11 @@
 import '@testing-library/jest-dom';
 
-import { CharityDepositTable } from '@/components/tables/CharityDepositTable';
+import { phoneRecords, recordLines, wideLedger } from '@/test-utils/ledger';
 
-import { checkA11y, render, screen } from '@/test-utils';
+import { CharityDepositTable } from '@/components/tables/CharityDepositTable';
+import { formatAddress } from '@/utils/format';
+
+import { checkA11y, render, screen, within } from '@/test-utils';
 
 const createDonation = (overrides = {}) => ({
   EvtLogId: 1,
@@ -31,17 +34,20 @@ describe('CharityDepositTable', () => {
   it('renders datetime as explorer link', () => {
     const donation = createDonation();
     render(<CharityDepositTable list={[donation]} />);
-    const datetime = screen.getByText('Nov 30, 2023, 12:18');
-    expect(datetime.closest('a')).toHaveAttribute('target', '_blank');
-    expect(datetime.closest('a')).toHaveAttribute('rel', 'noopener noreferrer');
+    // In the ledger's cell and in the phone record alike.
+    const dates = screen.getAllByText('Nov 30, 2023, 12:18');
+    expect(dates).toHaveLength(2);
+    for (const datetime of dates) {
+      expect(datetime.closest('a')).toHaveAttribute('target', '_blank');
+      expect(datetime.closest('a')).toHaveAttribute('rel', 'noopener noreferrer');
+    }
   });
 
   it('names the cycle, never a bare number, and links it to its record', () => {
     render(<CharityDepositTable list={[createDonation({ RoundNum: 5 })]} />);
-    expect(screen.getByRole('link', { name: 'tables.allocation.cycle(cycle=5)' })).toHaveAttribute(
-      'href',
-      '/allocation/5',
-    );
+    for (const link of screen.getAllByRole('link', { name: 'tables.allocation.cycle(cycle=5)' })) {
+      expect(link).toHaveAttribute('href', '/allocation/5');
+    }
   });
 
   it('drops the cycle column when no contribution has a cycle', () => {
@@ -53,9 +59,47 @@ describe('CharityDepositTable', () => {
   });
 
   it('shows ETH at the ledger precision, end-aligned', () => {
-    render(<CharityDepositTable list={[createDonation({ AmountEth: 1.5 })]} />);
-    const amount = screen.getByText('1.5000');
-    expect(amount.closest('td')).toHaveAttribute('data-align', 'end');
+    const { container } = render(
+      <CharityDepositTable list={[createDonation({ AmountEth: 1.5 })]} />,
+    );
+    const amount = container.querySelector('td[data-kind="amount"]');
+    expect(amount).toHaveTextContent(/^1\.5000$/);
+    expect(amount).toHaveAttribute('data-align', 'end');
+  });
+
+  it('reads each contribution as a two-line record on a phone, with no label repeated', () => {
+    const { container } = render(
+      <CharityDepositTable list={[createDonation({ AmountEth: 1.5, RoundNum: 5 })]} />,
+    );
+    const [line1, line2] = recordLines(phoneRecords(container)[0]!);
+    // The date, linked to its transaction, then the amount with its unit.
+    expect(within(line1).getByText('Nov 30, 2023, 12:18').closest('a')).toHaveAttribute(
+      'target',
+      '_blank',
+    );
+    expect(line1).toHaveTextContent(/1\.5000\sETH$/);
+    // Who contributed and in which cycle.
+    expect(line2!.textContent!.split('·').map((fact) => fact.trim())).toEqual([
+      formatAddress('0x1234567890abcdef1234567890abcdef12345678'),
+      'tables.allocation.cycle(cycle=5)',
+    ]);
+    // Only the date, which opens the record, is a line of its own.
+    const cells = [...container.querySelectorAll('tbody tr:first-child td')];
+    expect(cells.map((cell) => cell.getAttribute('data-phone'))).toEqual([
+      'title',
+      'omit',
+      'omit',
+      'omit',
+    ]);
+  });
+
+  it('keeps a protocol contribution’s record to its date, amount and cycle', () => {
+    const { container } = render(
+      <CharityDepositTable list={[createDonation({ RoundNum: 5 })]} showContributor={false} />,
+    );
+    const [, line2] = recordLines(phoneRecords(container)[0]!);
+    expect(line2).toHaveTextContent(/^tables\.allocation\.cycle\(cycle=5\)$/);
+    expect(within(wideLedger(container)).queryByText(/0x1234/)).toBeNull();
   });
 
   it('shows 20 contributions a page', () => {

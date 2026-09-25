@@ -280,7 +280,8 @@ export interface DataTableProps<T> {
    * no column is the title); give `phone: 'omit'` to every column the
    * record already says, and leave long text such as a message in its own
    * stacked line. The record's title carries the row link and the "You"
-   * tag. Wider screens keep every column.
+   * tag. Such a table is records on a phone whatever `layout` says; wider
+   * screens keep every column.
    */
   phoneRecord?: (row: T, context: PhoneRecordContext) => PhoneRecordContent;
   /** Row height: `comfortable` 48px (default) or `compact` 40px. */
@@ -496,19 +497,19 @@ export function DataTable<T>({
     [resolved, data],
   );
 
-  // A two-line record is a record: its table never stays a table on a phone.
-  const kindLayout: TableLayout =
-    layoutProp === 'auto' && phoneRecord
-      ? 'cards'
-      : layoutProp === 'auto'
-        ? phoneLayoutFor(
-            datasetColumns.map((col) => ({
-              kind: col.kind,
-              priority: col.priority,
-              stack: col.column.stack,
-            })),
-          )
-        : layoutProp;
+  // A two-line record is a record: its table never stays a table on a
+  // phone, whatever `layout` says.
+  const kindLayout: TableLayout = phoneRecord
+    ? 'cards'
+    : layoutProp === 'auto'
+      ? phoneLayoutFor(
+          datasetColumns.map((col) => ({
+            kind: col.kind,
+            priority: col.priority,
+            stack: col.column.stack,
+          })),
+        )
+      : layoutProp;
   const pageSize = pageSizeProp ?? (isPhone ? PHONE_PAGE_SIZE : DEFAULT_PAGE_SIZE);
 
   // ── Sorting ───────────────────────────────────────────────────────────

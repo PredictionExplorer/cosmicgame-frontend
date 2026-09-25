@@ -198,8 +198,9 @@ export function AddressTransferHistory({
       <AddressChip address={other} variant="plain" showCopy={false} currentAddress={address} />
     );
     // Signed from this address's side, so a column of changes adds up; a
-    // transfer that changes no hands carries no sign.
-    const cstAmount = (entry: TransferEntry) => {
+    // transfer that changes no hands carries no sign. The column's header
+    // names the unit; a phone record, which has no header, prints it.
+    const cstAmount = (entry: TransferEntry, { unit = false }: { unit?: boolean } = {}) => {
       if (entry.wei === null) return null;
       const sign = signOf(entry);
       return (
@@ -207,7 +208,8 @@ export function AddressTransferHistory({
           value={sign === 0 ? entry.wei : BigInt(sign) * entry.wei}
           unit="CST"
           context="table"
-          showUnit={false}
+          showUnit={unit}
+          unitClassName="text-subtle"
           signDisplay={sign === 0 ? 'never' : 'exceptZero'}
         />
       );
@@ -234,7 +236,7 @@ export function AddressTransferHistory({
   const phoneRecord = useCallback(
     (entry: TransferEntry): PhoneRecordContent => ({
       title: <ActivityCell activity={entry.activity} />,
-      titleEnd: asset === 'cst' ? cells.cstAmount(entry) : cells.token(entry),
+      titleEnd: asset === 'cst' ? cells.cstAmount(entry, { unit: true }) : cells.token(entry),
       details: [
         entry.counterparty ? cells.counterpartyChip(entry.counterparty) : null,
         <KindValue
@@ -305,7 +307,7 @@ export function AddressTransferHistory({
           phone: 'omit',
           // A transfer that changes no hands sorts by its size, not as zero.
           value: (entry) => (entry.wei === null ? null : Number(entry.wei) * (signOf(entry) || 1)),
-          cell: cstAmount,
+          cell: (entry) => cstAmount(entry),
           sortable: true,
         },
       ];

@@ -1,10 +1,11 @@
 import '@testing-library/jest-dom';
 
 import { protocolFacts } from '@/content/protocol-facts';
+import { phoneRecords, recordLines, wideLedger } from '@/test-utils/ledger';
 
 import CharityWithdrawalTable from '@/components/tables/CharityWithdrawalTable';
 
-import { render, screen, checkA11y } from '@/test-utils';
+import { render, screen, checkA11y, within } from '@/test-utils';
 
 describe('CharityWithdrawalTable', () => {
   test('with no records', () => {
@@ -25,12 +26,18 @@ describe('CharityWithdrawalTable', () => {
         AmountEth: 0.10041564272868614,
       },
     ];
-    render(<CharityWithdrawalTable list={mockData} />);
-    expect(screen.getByText('Nov 30, 2023, 12:18')).toBeInTheDocument();
-    expect(screen.getByText('0x555e…\u20600e60')).toBeInTheDocument();
+    const { container } = render(<CharityWithdrawalTable list={mockData} />);
+    const wide = within(wideLedger(container));
+    expect(wide.getAllByText('Nov 30, 2023, 12:18')).toHaveLength(1);
+    expect(wide.getAllByText('0x555e…\u20600e60')).toHaveLength(1);
     // ETH reads at the ledger precision, with the exact value on hover.
-    const amount = screen.getByText('0.1004');
+    const amount = wide.getByText('0.1004');
     expect(amount).toHaveAttribute('title', expect.stringContaining('0.10041564272868614'));
+
+    // On a phone: the date and the amount, then where the ETH went.
+    const [line1, line2] = recordLines(phoneRecords(container)[0]!);
+    expect(line1).toHaveTextContent(/^Nov 30, 2023, 12:18.*0\.1004\sETH$/);
+    expect(line2).toHaveTextContent('0x555e…\u20600e60');
   });
 
   test('names the documented beneficiary, as the page header does', () => {
@@ -52,8 +59,9 @@ describe('CharityWithdrawalTable', () => {
         ]}
       />,
     );
-    expect(screen.getByText(name)).toBeInTheDocument();
-    expect(screen.getByTitle(`${name} · ${address}`)).toBeInTheDocument();
+    // In the ledger's cell and in the phone record alike.
+    expect(screen.getAllByText(name)).toHaveLength(2);
+    expect(screen.getAllByTitle(`${name} · ${address}`)).toHaveLength(2);
   });
 
   test('external links have rel="noopener noreferrer"', () => {

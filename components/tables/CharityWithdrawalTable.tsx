@@ -1,13 +1,19 @@
 'use client';
 
-import { useMemo } from 'react';
+import { useCallback, useMemo } from 'react';
 import { useTranslations } from 'next-intl';
 
 import { protocolFacts } from '@/content/protocol-facts';
 
 import { sameAddress } from '@/utils/format';
 import { AddressChip } from '@/components/ui/address-chip';
-import { DataTable, type DataTableColumn } from '@/components/ui/data-table';
+import { Amount } from '@/components/ui/amount';
+import {
+  DataTable,
+  KindValue,
+  type DataTableColumn,
+  type PhoneRecordContent,
+} from '@/components/ui/data-table';
 import type { LedgerStateProps } from '@/components/tables/ledger-props';
 import type { CharityWithdrawal } from '@/services/api/types';
 
@@ -22,10 +28,35 @@ interface CharityWithdrawalTableProps extends LedgerStateProps {
 /**
  * ETH forwarded out of the Public Goods Vault, each date linked to its
  * transaction. The vault's documented beneficiary reads by name, as it does
- * in the page header; any other destination reads as hex.
+ * in the page header; any other destination reads as hex. On a phone each
+ * is a two-line record: the date and the amount, then where it went.
  */
 const CharityWithdrawalTable = ({ list, ...state }: CharityWithdrawalTableProps) => {
   const t = useTranslations('tables');
+
+  // Where the ETH went, by name when the vault's beneficiary took it.
+  const destination = useCallback(
+    (row: CharityWithdrawal) => (
+      <AddressChip
+        address={row.DestinationAddr}
+        variant="plain"
+        showCopy={false}
+        label={sameAddress(row.DestinationAddr, BENEFICIARY.address) ? BENEFICIARY.name : undefined}
+      />
+    ),
+    [],
+  );
+
+  const phoneRecord = useCallback(
+    (row: CharityWithdrawal): PhoneRecordContent => ({
+      title: <KindValue kind="datetime" value={row.TimeStamp} txHash={row.TxHash} year="always" />,
+      titleEnd: (
+        <Amount value={row.AmountEth} unit="ETH" context="table" unitClassName="text-subtle" />
+      ),
+      details: [destination(row)],
+    }),
+    [destination],
+  );
 
   const columns = useMemo<DataTableColumn<CharityWithdrawal>[]>(
     () => [
@@ -42,19 +73,10 @@ const CharityWithdrawalTable = ({ list, ...state }: CharityWithdrawalTableProps)
       {
         id: 'destination',
         kind: 'address',
-        // Where the ETH went, by name when the vault's beneficiary took it.
         header: t('columns.destination'),
         value: (row) => row.DestinationAddr,
-        cell: (row) => (
-          <AddressChip
-            address={row.DestinationAddr}
-            variant="plain"
-            showCopy={false}
-            label={
-              sameAddress(row.DestinationAddr, BENEFICIARY.address) ? BENEFICIARY.name : undefined
-            }
-          />
-        ),
+        cell: destination,
+        phone: 'omit',
       },
       {
         id: 'amount',
@@ -63,9 +85,10 @@ const CharityWithdrawalTable = ({ list, ...state }: CharityWithdrawalTableProps)
         value: (row) => row.AmountEth,
         showUnit: false,
         sortable: true,
+        phone: 'omit',
       },
     ],
-    [t],
+    [t, destination],
   );
 
   return (
@@ -74,9 +97,7 @@ const CharityWithdrawalTable = ({ list, ...state }: CharityWithdrawalTableProps)
       columns={columns}
       ariaLabel={t('names.publicGoodsRetrievals')}
       getRowKey={(row) => row.EvtLogId}
-      // A dated, year-stamped proof beside an address and an amount is wider
-      // than a 320px screen: each retrieval reads as a record on phones.
-      layout="cards"
+      phoneRecord={phoneRecord}
       emptyTitle={t('empty.retrievals')}
       {...state}
     />

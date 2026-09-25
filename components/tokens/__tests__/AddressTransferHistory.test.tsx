@@ -145,7 +145,9 @@ describe('AddressTransferHistory — phone records', () => {
     const cells = within(first!).getAllByRole('cell');
     const activity = cells.find((cell) => cell.getAttribute('data-phone') === 'title');
     expect(activity).toHaveTextContent('myPages.transferHistory.activity.imprinted');
-    expect(activity).toHaveTextContent('+176.00');
+    // With its unit: a record has no column header to name it.
+    const record = activity!.querySelector<HTMLElement>('[data-slot="phone-record"]');
+    expect(record).toHaveTextContent(/\+176\.00\sCST/);
     expect(within(activity!).getByRole('link', { name: /Sep|Oct/ })).toHaveAttribute(
       'href',
       expect.stringContaining('/tx/0x4'),

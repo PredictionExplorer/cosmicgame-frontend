@@ -1,6 +1,10 @@
 import '@testing-library/jest-dom';
 
-import { render, screen, checkA11y } from '@/test-utils';
+import { phoneRecords, recordLines, wideLedger } from '@/test-utils/ledger';
+
+import { formatAddress } from '@/utils/format';
+
+import { render, screen, checkA11y, within } from '@/test-utils';
 
 jest.mock('next/navigation', () => ({
   useRouter: () => ({
@@ -38,21 +42,64 @@ describe('EthDonationTable', () => {
 
   it('renders datetime from data', () => {
     const donation = createDonation();
-    render(<EthDonationTable list={[donation]} />);
-    expect(screen.getByText('Nov 30, 2023, 12:18')).toBeInTheDocument();
+    const { container } = render(<EthDonationTable list={[donation]} />);
+    expect(within(wideLedger(container)).getAllByText('Nov 30, 2023, 12:18')).toHaveLength(1);
   });
 
   it('names the cycle as "Cycle 5", linked to that cycle’s contributions', () => {
     render(<EthDonationTable list={[createDonation({ RoundNum: '5' })]} />);
-    expect(screen.getByRole('link', { name: 'tables.allocation.cycle(cycle=5)' })).toHaveAttribute(
-      'href',
-      '/eth-contribution/round/5',
-    );
+    // In the ledger's cell and in the phone record alike.
+    const links = screen.getAllByRole('link', { name: 'tables.allocation.cycle(cycle=5)' });
+    expect(links).toHaveLength(2);
+    for (const link of links) expect(link).toHaveAttribute('href', '/eth-contribution/round/5');
   });
 
   it('renders amount', () => {
-    render(<EthDonationTable list={[createDonation({ AmountEth: 0.5 })]} />);
-    expect(screen.getByText('0.5000')).toBeInTheDocument();
+    const { container } = render(<EthDonationTable list={[createDonation({ AmountEth: 0.5 })]} />);
+    // The column's header names the unit; the figure alone sits under it.
+    expect(within(wideLedger(container)).getByText('0.5000')).toHaveTextContent(/^0\.5000$/);
+  });
+
+  it('reads each contribution as a two-line record on a phone, with no label repeated', () => {
+    const { container } = render(
+      <EthDonationTable
+        list={[createDonation({ RecordType: 1, CGRecordId: '7', AmountEth: 0.5, RoundNum: '5' })]}
+      />,
+    );
+    const [record] = phoneRecords(container);
+    const [line1, line2] = recordLines(record!);
+    // The date opens the record and leads to the contribution's record; the
+    // amount, with its unit, closes the line.
+    expect(
+      within(line1).getByRole('link', {
+        name: /tables\.ethContribution\.viewContribution\(id=7\)$/,
+      }),
+    ).toHaveAttribute('href', '/eth-contribution/detail/7');
+    expect(line1).toHaveTextContent(/0\.5000\sETH$/);
+    // Who, which cycle, and the note, in the second tier.
+    const facts = line2!.textContent!.split('·').map((fact) => fact.trim());
+    expect(facts).toEqual([
+      formatAddress('0x1234567890abcdef1234567890abcdef12345678'),
+      'tables.allocation.cycle(cycle=5)',
+      'tables.ethContribution.withNote',
+    ]);
+    // The record says every column but the date, which opens it.
+    const cells = [...container.querySelectorAll('tbody tr:first-child td')];
+    expect(cells.map((cell) => cell.getAttribute('data-phone'))).toEqual([
+      'title',
+      'omit',
+      'omit',
+      'omit',
+      'omit',
+    ]);
+  });
+
+  it('links a plain contribution’s date in its record to the transaction', () => {
+    const { container } = render(<EthDonationTable list={[createDonation({ RecordType: 0 })]} />);
+    const [line1] = recordLines(phoneRecords(container)[0]!);
+    const proof = within(line1).getByText('Nov 30, 2023, 12:18').closest('a');
+    expect(proof).toHaveAttribute('target', '_blank');
+    expect(proof?.getAttribute('href')).toMatch(/\/tx\/0xabc123/);
   });
 
   it('says in the Note column which contributions carry a note, in the form’s words', () => {
@@ -68,8 +115,10 @@ describe('EthDonationTable', () => {
     const headers = screen.getAllByRole('columnheader').map((header) => header.textContent);
     // Last, after when, which cycle, who and how much.
     expect(headers.at(-1)).toBe('tables.columns.note');
-    expect(screen.getByText('tables.ethContribution.withNote')).toBeInTheDocument();
-    // No note leaves the cell blank (a phone record drops the line), not a dash per row.
+    expect(
+      within(wideLedger(document.body)).getAllByText('tables.ethContribution.withNote'),
+    ).toHaveLength(1);
+    // No note leaves the cell blank, not a dash per row.
     expect(screen.queryByText('tables.status.none')).not.toBeInTheDocument();
     expect(screen.queryByText(/ethContribution\.(simple|withInfo)/)).not.toBeInTheDocument();
   });
@@ -82,11 +131,15 @@ describe('EthDonationTable', () => {
 
   it('names a contribution’s record link by its date, then the record it opens', () => {
     render(<EthDonationTable list={[createDonation({ RecordType: 1, CGRecordId: '7' })]} />);
-    const link = screen.getByRole('link', {
+    // The ledger's cell and the phone record name it alike.
+    const links = screen.getAllByRole('link', {
       name: /^\S.* tables\.ethContribution\.viewContribution\(id=7\)$/,
     });
-    expect(link).toHaveAttribute('href', '/eth-contribution/detail/7');
-    expect(link).not.toHaveAttribute('aria-label');
+    expect(links).toHaveLength(2);
+    for (const link of links) {
+      expect(link).toHaveAttribute('href', '/eth-contribution/detail/7');
+      expect(link).not.toHaveAttribute('aria-label');
+    }
   });
 
   it('shows the newest contribution first, and says so on the Date header', () => {
@@ -121,16 +174,18 @@ describe('EthDonationTable', () => {
   it('renders TxHash datetime as a link to explorer', () => {
     const donation = createDonation();
     render(<EthDonationTable list={[donation]} />);
-    const datetimeLink = screen.getByText('Nov 30, 2023, 12:18');
-    expect(datetimeLink.closest('a')).toHaveAttribute('target', '_blank');
-    expect(datetimeLink.closest('a')).toHaveAttribute('rel', 'noopener noreferrer');
+    for (const datetime of screen.getAllByText('Nov 30, 2023, 12:18')) {
+      expect(datetime.closest('a')).toHaveAttribute('target', '_blank');
+      expect(datetime.closest('a')).toHaveAttribute('rel', 'noopener noreferrer');
+    }
   });
 
   it('links the cycle to its contribution list in the same tab', () => {
     render(<EthDonationTable list={[createDonation({ RoundNum: '5' })]} />);
-    const roundLink = screen.getByText('tables.allocation.cycle(cycle=5)');
-    expect(roundLink.closest('a')).toHaveAttribute('href', '/eth-contribution/round/5');
-    expect(roundLink.closest('a')).not.toHaveAttribute('target');
+    for (const roundLink of screen.getAllByText('tables.allocation.cycle(cycle=5)')) {
+      expect(roundLink.closest('a')).toHaveAttribute('href', '/eth-contribution/round/5');
+      expect(roundLink.closest('a')).not.toHaveAttribute('target');
+    }
   });
 
   it('hides the cycle column on a page about one cycle', () => {
@@ -138,6 +193,7 @@ describe('EthDonationTable', () => {
     expect(
       screen.queryByRole('columnheader', { name: 'tables.columns.round' }),
     ).not.toBeInTheDocument();
+    expect(screen.queryByText('tables.allocation.cycle(cycle=5)')).not.toBeInTheDocument();
   });
 
   it('has no accessibility violations', async () => {

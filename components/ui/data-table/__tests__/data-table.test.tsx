@@ -1002,6 +1002,19 @@ describe('DataTable phone records', () => {
     expect(within(recordOf(container, 2)!).queryByText('tables.status.youBadge')).toBeNull();
   });
 
+  it('stays records on a phone even when a layout is pinned', () => {
+    render(
+      <DataTable
+        ariaLabel="Transfers"
+        data={transfers}
+        columns={transferColumns}
+        layout="compact"
+        phoneRecord={record}
+      />,
+    );
+    expect(screen.getByRole('table')).toHaveAttribute('data-layout', 'cards');
+  });
+
   it('puts the record in the row-link column when no column is the title', () => {
     const { container } = render(
       <DataTable

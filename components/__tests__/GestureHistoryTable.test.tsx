@@ -5,24 +5,11 @@ import '@testing-library/jest-dom';
 import userEvent from '@testing-library/user-event';
 
 import { formatAddress } from '@/utils';
+import { phoneRecords, wideLedger } from '@/test-utils/ledger';
 
 import GestureHistoryTable, { holdDurations } from '@/components/tables/GestureHistoryTable';
 
 import { render, screen, checkA11y, within } from '@/test-utils';
-
-/**
- * The ledger as a wide screen reads it. jsdom applies no media queries, so
- * each row holds both layouts: its cells and, in the date's cell, the phone
- * record CSS shows below `sm` only. The copy leaves the records out.
- */
-function wideLedger(container: HTMLElement): HTMLElement {
-  const copy = container.cloneNode(true) as HTMLElement;
-  copy.querySelectorAll('[data-slot="phone-record"]').forEach((record) => record.remove());
-  return copy;
-}
-
-const phoneRecords = (container: HTMLElement) =>
-  Array.from(container.querySelectorAll<HTMLElement>('[data-slot="phone-record"]'));
 
 describe('GestureHistoryTable', () => {
   test('with no records', () => {
