@@ -209,7 +209,9 @@ export function AllocationTracksBoard({ data, className }: AllocationTracksBoard
     <section
       aria-labelledby="allocation-tracks-title"
       data-testid="allocation-tracks-board"
-      className={cn('min-w-0', className)}
+      // The Gesture Chat's frame beside it (a rule, then 1rem): the two
+      // headings share a baseline under one hairline.
+      className={cn('min-w-0 border-t border-rule pt-4', className)}
     >
       <SectionHeader
         as="h2"

@@ -42,6 +42,16 @@ describe('AllocationTracksBoard', () => {
     expect(screen.getAllByRole('listitem')).toHaveLength(10);
   });
 
+  it('takes the Gesture Chat’s frame beside it, so the two headings share a baseline', () => {
+    render(<AllocationTracksBoard data={makeDashboard()} />);
+    // The chat's own frame: a rule over 1rem (GestureMessageChat's root and header).
+    expect(screen.getByTestId('allocation-tracks-board')).toHaveClass(
+      'border-t',
+      'border-rule',
+      'pt-4',
+    );
+  });
+
   it('gives ETH Stellar Selection its total, with the per-recipient amount as detail', () => {
     render(<AllocationTracksBoard data={makeDashboard()} />);
 
