@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import userEvent from '@testing-library/user-event';
 
-import { render, screen, checkA11y } from '@/test-utils';
+import { act, render, screen, checkA11y } from '@/test-utils';
 
 import { MethodSelector, type MethodOption } from '../MethodSelector';
 
@@ -72,8 +72,8 @@ describe('MethodSelector', () => {
     expect(rwlk).toHaveClass('shadow-[inset_2px_0_0_hsl(var(--primary))]', 'ring-1');
     // Side by side: the segmented control's foot rule, no ring.
     expect(rwlk).toHaveClass(
-      '@min-[21rem]:shadow-[inset_0_-2px_0_hsl(var(--primary))]',
-      '@min-[21rem]:ring-0',
+      '@min-[21rem]/method:shadow-[inset_0_-2px_0_hsl(var(--primary))]',
+      '@min-[21rem]/method:ring-0',
     );
     expect(eth).not.toHaveClass('ring-1');
   });
@@ -83,7 +83,10 @@ describe('MethodSelector', () => {
 
     // Each segment shares the group's label and price rows.
     screen.getAllByRole('radio').forEach((radio) => {
-      expect(radio).toHaveClass('@min-[21rem]:row-span-2', '@min-[21rem]:grid-rows-subgrid');
+      expect(radio).toHaveClass(
+        '@min-[21rem]/method:row-span-2',
+        '@min-[21rem]/method:grid-rows-subgrid',
+      );
     });
   });
 
@@ -96,12 +99,12 @@ describe('MethodSelector', () => {
     // Stacked, the note runs the row's full width under label and price.
     expect(screen.getByText('50% discount', { selector: 'button span' })).toHaveClass(
       'col-span-2',
-      '@min-[21rem]:sr-only',
+      '@min-[21rem]/method:sr-only',
     );
     expect(rwlk).toHaveTextContent('50% discount');
     const notes = screen.getByTestId('gesture-method-notes');
     expect(notes).toHaveAttribute('aria-hidden', 'true');
-    expect(notes).toHaveClass('hidden', '@min-[21rem]:block');
+    expect(notes).toHaveClass('hidden', '@min-[21rem]/method:block');
     // Under the whole track it starts under the first segment, so it names
     // its method rather than read as a note on that one.
     expect(notes).toHaveTextContent(/^ETH \+ RWLK gives a 50% discount$/);
@@ -126,7 +129,9 @@ describe('MethodSelector', () => {
 
     // Content-sized columns share out the rest of the track; equal fractions
     // would wrap "ETH + Random Walk" in a 450px console.
-    expect(screen.getByRole('radiogroup')).toHaveClass('@min-[21rem]:grid-cols-[repeat(3,auto)]');
+    expect(screen.getByRole('radiogroup')).toHaveClass(
+      '@min-[21rem]/method:grid-cols-[repeat(3,auto)]',
+    );
   });
 
   it('shows no note line when no method has one', () => {
@@ -173,6 +178,84 @@ describe('MethodSelector', () => {
     expect(onChange).toHaveBeenLastCalledWith('ETH');
     await userEvent.keyboard('{End}');
     expect(onChange).toHaveBeenLastCalledWith('CST');
+  });
+
+  describe('side by side or stacked', () => {
+    let restore: () => void = () => {};
+    afterEach(() => restore());
+
+    /**
+     * jsdom lays nothing out: a container `width` px wide in which each price
+     * needs `priceWidth` px and gets `segmentWidth` px, plus a
+     * ResizeObserver the test can fire.
+     */
+    function layout(width: number, priceWidth: number, segmentWidth: number) {
+      const isPrice = (element: HTMLElement) => element.dataset.slot === 'method-price';
+      const resize: Array<() => void> = [];
+      const originalObserver = window.ResizeObserver;
+      window.ResizeObserver = class {
+        constructor(callback: () => void) {
+          resize.push(callback);
+        }
+        observe() {}
+        unobserve() {}
+        disconnect() {}
+      } as unknown as typeof ResizeObserver;
+      const size = { width, priceWidth, segmentWidth };
+      const spies = [
+        jest.spyOn(HTMLElement.prototype, 'clientWidth', 'get').mockImplementation(function (
+          this: HTMLElement,
+        ) {
+          return isPrice(this) ? size.segmentWidth : size.width;
+        }),
+        jest.spyOn(HTMLElement.prototype, 'scrollWidth', 'get').mockImplementation(function (
+          this: HTMLElement,
+        ) {
+          return isPrice(this) ? size.priceWidth : size.width;
+        }),
+      ];
+      restore = () => {
+        window.ResizeObserver = originalObserver;
+        spies.forEach((spy) => spy.mockRestore());
+      };
+      return {
+        resizeTo(next: Partial<typeof size>) {
+          Object.assign(size, next);
+          act(() => resize.forEach((callback) => callback()));
+        },
+      };
+    }
+
+    const container = () => screen.getByRole('radiogroup').parentElement!;
+
+    it('sets the methods side by side while every price fits its segment', () => {
+      layout(453, 112, 140);
+      renderSelector();
+      // The named query container lays them out from 21rem.
+      expect(container()).toHaveClass('@container/method');
+      expect(container()).not.toHaveAttribute('data-layout');
+    });
+
+    it('stacks them when a price is wider than its segment, instead of running into the next', () => {
+      // Regression: at 350px testnet prices ("0.0000087087 ETH") collided.
+      layout(350, 140, 90);
+      renderSelector();
+      expect(container()).not.toHaveClass('@container/method');
+      expect(container()).toHaveAttribute('data-layout', 'stacked');
+    });
+
+    it('stays stacked at that width, and tries the row again once the container grows', () => {
+      const view = layout(350, 140, 90);
+      renderSelector();
+      expect(container()).toHaveAttribute('data-layout', 'stacked');
+
+      view.resizeTo({ width: 340 });
+      expect(container()).toHaveAttribute('data-layout', 'stacked');
+
+      view.resizeTo({ width: 453, segmentWidth: 164 });
+      expect(container()).toHaveClass('@container/method');
+      expect(container()).not.toHaveAttribute('data-layout');
+    });
   });
 
   it('has no accessibility violations', async () => {

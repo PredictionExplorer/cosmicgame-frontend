@@ -1,6 +1,13 @@
 'use client';
 
-import { useRef, type KeyboardEvent, type ReactNode } from 'react';
+import {
+  useLayoutEffect,
+  useRef,
+  useState,
+  type KeyboardEvent,
+  type ReactNode,
+  type RefObject,
+} from 'react';
 
 import { cn } from '@/lib/utils';
 
@@ -41,10 +48,62 @@ const PREVIOUS_KEYS = new Set(['ArrowLeft', 'ArrowUp']);
  * label wraps rather than overflow.
  */
 const COLUMNS: Record<number, string> = {
-  1: '@min-[21rem]:grid-cols-1',
-  2: '@min-[21rem]:grid-cols-[repeat(2,auto)]',
-  3: '@min-[21rem]:grid-cols-[repeat(3,auto)]',
+  1: '@min-[21rem]/method:grid-cols-1',
+  2: '@min-[21rem]/method:grid-cols-[repeat(2,auto)]',
+  3: '@min-[21rem]/method:grid-cols-[repeat(3,auto)]',
 };
+
+/**
+ * Whether the methods may sit side by side. From 21rem they share one row
+ * (the `method` container query), but a price is one unbreakable figure, and
+ * a long one (a testnet price such as "0.0000087087 ETH", a locale's longer
+ * figures) can still be wider than its segment there and run into the next.
+ * This measures the row before paint: when a price overflows its segment,
+ * the selector stops being the query container, so the segments stack as
+ * rows, and stays stacked at that width or narrower. A container that grows
+ * wider (a rotated phone, a wider sheet) tries the row again, so the two
+ * layouts never flip back and forth. Until the browser measures (the server
+ * render), the width alone decides.
+ */
+function useSideBySide(container: RefObject<HTMLElement | null>): boolean {
+  // The container width at which a price was found wider than its segment.
+  const [tooNarrowAt, setTooNarrowAt] = useState<number | null>(null);
+  const sideBySide = tooNarrowAt === null;
+
+  useLayoutEffect(() => {
+    const element = container.current;
+    if (!element) return;
+    let live = true;
+    const check = () => {
+      if (!live) return;
+      const width = element.clientWidth;
+      setTooNarrowAt((current) => {
+        if (current !== null) return width > current ? null : current;
+        const prices = element.querySelectorAll<HTMLElement>('[data-slot="method-price"]');
+        const overflows = Array.from(prices).some(
+          (price) => price.scrollWidth > price.clientWidth + 1,
+        );
+        return overflows ? width : null;
+      });
+    };
+    check();
+    // The width changes (a rotated phone, the sheet opening), a price changes
+    // (a live update, a figure that finished loading), or a late figure face
+    // is wider than its fallback: each can decide it again.
+    const resize = typeof ResizeObserver === 'undefined' ? null : new ResizeObserver(check);
+    resize?.observe(element);
+    const content = typeof MutationObserver === 'undefined' ? null : new MutationObserver(check);
+    content?.observe(element, { subtree: true, childList: true, characterData: true });
+    void document.fonts?.ready.then(check);
+    return () => {
+      live = false;
+      resize?.disconnect();
+      content?.disconnect();
+    };
+  }, [container, sideBySide]);
+
+  return sideBySide;
+}
 
 /**
  * The gesture method as a segmented control: one sunken track, the chosen
@@ -54,8 +113,9 @@ const COLUMNS: Record<number, string> = {
  * a label wraps, and the chosen one carries a 2px primary rule along its
  * foot; a method's note reads once under the track as a sentence that names
  * its method, because inside a segment it would open an empty row under
- * every other one. Where the column is narrow (a phone, the bottom sheet) the
- * segments stack as rows with the price at the end, so a price never wraps,
+ * every other one. Where the column is narrow (a phone, the bottom sheet),
+ * or a price would not fit its segment beside the others, the segments stack
+ * as rows with the price at the end, so a price never wraps or collides,
  * each note runs the full row under them, and the chosen row is marked along
  * its start edge and ringed, never with a rule that could read as a row
  * divider.
@@ -71,6 +131,8 @@ export function MethodSelector({
   className,
 }: MethodSelectorProps) {
   const refs = useRef(new Map<GestureMethod, HTMLButtonElement>());
+  const containerRef = useRef<HTMLDivElement>(null);
+  const sideBySide = useSideBySide(containerRef);
   const matched = options.findIndex((option) => option.value === value);
   const focusIndex = Math.max(0, matched);
   const noted = options.filter((option) => option.note);
@@ -92,7 +154,12 @@ export function MethodSelector({
   };
 
   return (
-    <div className={cn('@container', className)}>
+    <div
+      ref={containerRef}
+      data-layout={sideBySide ? undefined : 'stacked'}
+      // Only a query container lays the segments side by side.
+      className={cn(sideBySide && '@container/method', className)}
+    >
       <div
         role="radiogroup"
         aria-labelledby={labelledBy}
@@ -120,22 +187,25 @@ export function MethodSelector({
               data-method={option.value}
               className={cn(
                 'focus-ring-inset grid min-h-12 min-w-0 grid-cols-[minmax(0,1fr)_auto] items-center gap-x-3 gap-y-0.5 rounded-[calc(var(--radius-control)-2px)] px-3 py-2 text-start',
-                '@min-[21rem]:row-span-2 @min-[21rem]:min-h-16 @min-[21rem]:grid-cols-1 @min-[21rem]:grid-rows-subgrid @min-[21rem]:items-start',
+                '@min-[21rem]/method:row-span-2 @min-[21rem]/method:min-h-16 @min-[21rem]/method:grid-cols-1 @min-[21rem]/method:grid-rows-subgrid @min-[21rem]/method:items-start',
                 'transition-[background-color,color,box-shadow] duration-[var(--duration-fast)] ease-[var(--ease-out-soft)]',
                 selected
-                  ? 'bg-surface-raised text-foreground shadow-[inset_2px_0_0_hsl(var(--primary))] ring-1 ring-inset ring-primary/40 @min-[21rem]:shadow-[inset_0_-2px_0_hsl(var(--primary))] @min-[21rem]:ring-0'
+                  ? 'bg-surface-raised text-foreground shadow-[inset_2px_0_0_hsl(var(--primary))] ring-1 ring-inset ring-primary/40 @min-[21rem]/method:shadow-[inset_0_-2px_0_hsl(var(--primary))] @min-[21rem]/method:ring-0'
                   : 'text-muted-foreground hover:bg-surface hover:text-foreground',
               )}
             >
               <span className="col-start-1 row-start-1 type-label">{option.label}</span>
-              <span className="col-start-2 row-start-1 whitespace-nowrap text-end type-figure-sm text-foreground @min-[21rem]:col-start-1 @min-[21rem]:row-start-2 @min-[21rem]:text-start">
+              <span
+                data-slot="method-price"
+                className="col-start-2 row-start-1 whitespace-nowrap text-end type-figure-sm text-foreground @min-[21rem]/method:col-start-1 @min-[21rem]/method:row-start-2 @min-[21rem]/method:text-start"
+              >
                 {option.price}
               </span>
               {option.note ? (
                 // Stacked, it runs the row's full width under the label and
                 // price. Side by side it stays the segment's description for
                 // screen readers; the visible copy is the one under the track.
-                <span className="col-span-2 col-start-1 row-start-2 type-caption text-subtle @min-[21rem]:sr-only">
+                <span className="col-span-2 col-start-1 row-start-2 type-caption text-subtle @min-[21rem]/method:sr-only">
                   {option.note}
                 </span>
               ) : null}
@@ -147,7 +217,7 @@ export function MethodSelector({
         <div
           aria-hidden
           data-testid="gesture-method-notes"
-          className="mt-2 hidden space-y-0.5 px-4 @min-[21rem]:block"
+          className="mt-2 hidden space-y-0.5 px-4 @min-[21rem]/method:block"
         >
           {noted.map((option) => (
             <p
