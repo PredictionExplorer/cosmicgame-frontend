@@ -136,8 +136,13 @@
   --stack-gap: 1.5rem;
   --row-h: 3rem;
   --row-h-dense: 2.75rem;
-  --measure-prose: 66ch;
-  --measure-lede: 60ch;
+  /*
+   * Measures in em, not ch: `ch` is the width of Inter's "0" (about 0.63em),
+   * so 66ch ran to 81-91 characters of text. 36em is about 66 characters of
+   * 17px prose (612px); 34em about 65 characters of the 18px lede.
+   */
+  --measure-prose: 36em;
+  --measure-lede: 34em;
   /* A long document's one column (the Trust Center): every rule, ledger, table
    * and callout ends on this edge; paragraphs keep --measure-prose inside it. */
   --measure-document: 52rem;

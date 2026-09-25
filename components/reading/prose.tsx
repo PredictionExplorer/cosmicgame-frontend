@@ -256,14 +256,19 @@ export function FormulaFigure({
   return (
     <figure
       className={cn(
-        BREAKOUT_CLASS,
-        'rounded-surface bg-surface-sunken px-5 py-5 sm:px-7 sm:py-6',
+        // Sized to its content (the prose measure at most), not a 60rem well
+        // the equation sat in the corner of.
+        'max-w-[var(--measure-prose)] rounded-surface bg-surface-sunken px-5 py-5 sm:px-7 sm:py-6',
         className,
       )}
     >
       <p className="type-label text-subtle">{label}</p>
       {notation && NOTATION_MATH[notation] ? (
-        <div className="mt-3 type-body-lg">{NOTATION_MATH[notation]()}</div>
+        // The key equation of the token model set as a figure: at display
+        // size, centred, with room above and below.
+        <div className="type-formula my-4 flex justify-center overflow-x-auto py-2 sm:my-6">
+          {NOTATION_MATH[notation]()}
+        </div>
       ) : (
         <p className="mt-3 break-words font-mono type-body-lg text-foreground">
           {notation ?? formula}
@@ -273,8 +278,13 @@ export function FormulaFigure({
         <dl className="mt-4 grid gap-1.5">
           {legend.map((entry) => (
             <div key={entry.symbol} className="flex items-baseline gap-4">
-              <dt className="w-8 shrink-0 font-mono type-body-sm text-foreground">
-                {entry.symbol}
+              <dt className="type-formula-symbol w-8 shrink-0 text-foreground">
+                {h(
+                  'math',
+                  null,
+                  // As in the equation: a multi-letter name upright, a single letter italic.
+                  h('mi', entry.symbol.length > 1 ? { mathvariant: 'normal' } : null, entry.symbol),
+                )}
               </dt>
               <dd className="type-body-sm text-muted-foreground">{entry.meaning}</dd>
             </div>

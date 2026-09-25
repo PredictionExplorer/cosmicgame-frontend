@@ -214,6 +214,12 @@
   --display-weight-strong: 600;
   --display-tracking-scale: 1;
   --display-word-spacing: 0.06em;
+  /*
+   * The two largest tiers track tightest (-0.03em, -0.025em), which closes
+   * the narrow space further: "Art, shaped by" read as "Art,shaped by". A
+   * third more opening, and none where the base token is 0 (Onest).
+   */
+  --display-word-spacing-lg: calc(var(--display-word-spacing) * 4 / 3);
 }
 
 @media (width >= 40rem) {
@@ -281,6 +287,25 @@
 }
 
 /*
+ * CJK display digits. In a Chinese, Japanese or Korean heading a digit
+ * ("第 2 个周期", "サイクル2の現況") fell through to Clash Display, whose wide
+ * geometric figures sit off the CJK face's baseline and weight, so the
+ * heading read as two typefaces. This alias, first in the CJK display stacks,
+ * sets only 0-9 in Noto Sans CJK (its Latin digits are one design across the
+ * regional cuts); Latin words (Cosmic Signature, ETH) keep Clash. A 3 KB
+ * self-hosted cut of the checked-in share-card subset
+ * assets/fonts/NotoSansSC-700.subset.ttf (SIL OFL), loaded only where a
+ * CJK heading shows a digit.
+ */
+@font-face {
+  font-family: 'CS CJK Display Digits';
+  src: url('/fonts/noto-sans-cjk/NotoSansCJK-digits.woff2') format('woff2');
+  font-weight: 100 900;
+  font-display: swap;
+  unicode-range: U+0030-0039;
+}
+
+/*
  * Simplified Chinese: the mainland cut of Noto Sans CJK, then the platform
  * faces. Unlayered next to :root for the same reason as the Ukrainian
  * override below.
@@ -289,6 +314,9 @@ html:lang(zh) {
   --cjk-font-stack: var(--font-noto-sc), 'PingFang SC', 'Microsoft YaHei';
   --body-font-stack:
     'CS CJK Punctuation SC', var(--font-inter), Inter, var(--cjk-font-stack), sans-serif;
+  --display-font-stack:
+    'CS CJK Display Digits', var(--font-clash-display), 'ClashDisplay-Variable',
+    var(--cjk-font-stack), sans-serif;
 }
 
 /*
@@ -320,8 +348,8 @@ html:lang(zh-HK) {
 html:lang(ko) {
   --cjk-font-stack: var(--font-noto-kr), 'Apple SD Gothic Neo', 'Malgun Gothic';
   --display-font-stack:
-    'CS Korean Display Punctuation', var(--font-clash-display), 'ClashDisplay-Variable',
-    var(--cjk-font-stack), sans-serif;
+    'CS Korean Display Punctuation', 'CS CJK Display Digits', var(--font-clash-display),
+    'ClashDisplay-Variable', var(--cjk-font-stack), sans-serif;
   word-break: keep-all;
 }
 
@@ -335,6 +363,9 @@ html:lang(ko) {
 html:lang(ja) {
   --cjk-font-stack:
     var(--font-noto-jp), 'Hiragino Sans', 'Hiragino Kaku Gothic ProN', 'Yu Gothic', 'Meiryo';
+  --display-font-stack:
+    'CS CJK Display Digits', var(--font-clash-display), 'ClashDisplay-Variable',
+    var(--cjk-font-stack), sans-serif;
   line-break: strict;
 }
 
@@ -372,7 +403,8 @@ html:lang(uk),
 html:lang(vi) {
   --display-font-stack: var(--font-onest), var(--font-inter), Inter, system-ui, sans-serif;
   --display-tracking-scale: 0.45;
-  --display-word-spacing: 0;
+  /* A length, not a bare 0: --display-word-spacing-lg multiplies it in calc(). */
+  --display-word-spacing: 0em;
 }
 
 /*

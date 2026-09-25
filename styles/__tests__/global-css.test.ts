@@ -144,6 +144,32 @@ describe('global typography guarantees', () => {
     );
   });
 
+  it.each([
+    'type-display-xl',
+    'type-display-lg',
+    'type-display-md',
+    'type-display-sm',
+    'type-heading-1',
+    'type-heading-2',
+    'type-section',
+  ])('opens the narrow Clash word space in %s', (tier) => {
+    // Regression: the three largest tiers, which track tightest, had none,
+    // so the landing hero read "Art,shaped by" and legal H1s "Termsof Service".
+    expect(ruleBody(typographyCss, `@utility ${tier} {`)).toMatch(
+      /word-spacing: var\(--display-word-spacing(-lg)?\)/,
+    );
+  });
+
+  it('opens the two tightest tiers a third more, and never where the base is 0', () => {
+    expect(ruleBody(typographyCss, '@utility type-display-xl {')).toContain(
+      'word-spacing: var(--display-word-spacing-lg)',
+    );
+    expect(globalCss).toContain(
+      '--display-word-spacing-lg: calc(var(--display-word-spacing) * 4 / 3)',
+    );
+    expect(ruleBody(globalCss, 'html:lang(vi) {')).toContain('--display-word-spacing: 0em');
+  });
+
   it('keeps the mobile table-card label at 12px or more, in the subtle tier', () => {
     const label = ruleBody(tablesCss, ".cs-table:not([data-layout='compact']) tbody td::before");
     expect(label).toContain('color: hsl(var(--subtle-foreground))');
@@ -294,5 +320,29 @@ describe('Korean display punctuation', () => {
     expect(url).toBe('/fonts/noto-sans-kr/NotoSansKR-punctuation.ttf');
     expect(face.trimEnd().indexOf('url(')).toBeGreaterThan(face.lastIndexOf('local('));
     expect(existsSync(resolve(STYLES, '..', 'public', url!.slice(1)))).toBe(true);
+  });
+});
+
+describe('CJK display digits', () => {
+  it('sets digits in CJK headings in the CJK face, never in Clash', () => {
+    // Regression: "第 2 个周期" and "サイクル2の現況" set the digit in Clash's wide
+    // geometric figure beside the Noto CJK strokes.
+    const name = globalCss.indexOf("font-family: 'CS CJK Display Digits'");
+    expect(name).toBeGreaterThan(-1);
+    const face = globalCss.slice(
+      globalCss.lastIndexOf('@font-face', name),
+      globalCss.indexOf('}', name),
+    );
+    expect(face).toContain('unicode-range: U+0030-0039');
+    const url = face.match(/url\('([^']+)'\) format\('woff2'\)/)?.[1];
+    expect(existsSync(resolve(STYLES, '..', 'public', url!.slice(1)))).toBe(true);
+    for (const locale of ['zh', 'ja', 'ko']) {
+      const rule = ruleBody(globalCss, `html:lang(${locale}) {`);
+      const stack = rule.slice(rule.indexOf('--display-font-stack:'));
+      expect(stack.indexOf("'CS CJK Display Digits'")).toBeGreaterThan(-1);
+      expect(stack.indexOf("'CS CJK Display Digits'")).toBeLessThan(
+        stack.indexOf('var(--font-clash-display)'),
+      );
+    }
   });
 });
