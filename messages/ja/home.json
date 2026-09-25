@@ -495,7 +495,6 @@
   },
   "deck": {
     "title": "Cosmic Signature観測所",
-    "intro": "ETHまたはCSTで一筆を入れると最新の参加者になります。時計がゼロになると、最新の参加者がサイクルを確定してシグネチャー配分を受け取れます。",
     "newHere": "初めてですか？仕組みを見る",
     "howItWorks": "仕組みを見る",
     "artViewTitle": "観測所のアートビュー",
@@ -519,6 +518,7 @@
       "title": "配分トラック",
       "subtitle": "このサイクルの確定時に配分されるもの",
       "cstPlusNft": "1,000 CST + NFT",
+      "cstPlusNftEach": "各1,000 CST + NFT",
       "stellarStatus": "一筆はすべて対象になります",
       "ethGroup": "サイクル準備金のETH",
       "fixedGroup": "CSTとNFTの配分"
@@ -531,7 +531,9 @@
       "alt": "Cosmic Signatureのアートワーク{id}——決定論的な三体ジェネラティブアート",
       "pairingNote": "オンチェーンに刻印された決定論的な三体アート。すべてのシグネチャーには1,000 CSTが添えられています。",
       "title": "Cosmic Signature {id}",
-      "titleNamed": "「{name}」"
+      "titleNamed": "「{name}」",
+      "watchDrawing": "描かれる過程を見る",
+      "showFinished": "完成した作品を表示"
     },
     "personal": {
       "title": "このサイクルでの位置",

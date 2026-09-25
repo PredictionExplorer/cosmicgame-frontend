@@ -7,7 +7,13 @@ import { MethodSelector, type MethodOption } from '../MethodSelector';
 
 const OPTIONS: MethodOption[] = [
   { value: 'ETH', label: 'ETH', price: '0.10211 ETH' },
-  { value: 'RandomWalk', label: 'ETH + RWLK', price: '0.051055 ETH', note: '50% discount' },
+  {
+    value: 'RandomWalk',
+    label: 'ETH + RWLK',
+    price: '0.051055 ETH',
+    note: '50% discount',
+    trackNote: 'ETH + RWLK gives a 50% discount',
+  },
   { value: 'CST', label: 'CST', price: '250.52 CST' },
 ];
 
@@ -96,9 +102,31 @@ describe('MethodSelector', () => {
     const notes = screen.getByTestId('gesture-method-notes');
     expect(notes).toHaveAttribute('aria-hidden', 'true');
     expect(notes).toHaveClass('hidden', '@min-[21rem]:block');
-    expect(notes).toHaveTextContent(/^50% discount$/);
+    // Under the whole track it starts under the first segment, so it names
+    // its method rather than read as a note on that one.
+    expect(notes).toHaveTextContent(/^ETH \+ RWLK gives a 50% discount$/);
     // The chosen method's note reads a step stronger.
     expect(notes.firstElementChild).toHaveClass('text-muted-foreground');
+  });
+
+  it('falls back to the segment note under the track', () => {
+    render(
+      <MethodSelector
+        options={OPTIONS.map((option) => ({ ...option, trackNote: undefined }))}
+        value="ETH"
+        onChange={jest.fn()}
+        labelledBy="method-label"
+      />,
+    );
+    expect(screen.getByTestId('gesture-method-notes')).toHaveTextContent(/^50% discount$/);
+  });
+
+  it('sizes the side-by-side segments to their content, so a label keeps one line', () => {
+    renderSelector();
+
+    // Content-sized columns share out the rest of the track; equal fractions
+    // would wrap "ETH + Random Walk" in a 450px console.
+    expect(screen.getByRole('radiogroup')).toHaveClass('@min-[21rem]:grid-cols-[repeat(3,auto)]');
   });
 
   it('shows no note line when no method has one', () => {

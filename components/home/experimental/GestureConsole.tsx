@@ -60,6 +60,7 @@ export type ConsoleFormState = Pick<
   | 'advancedExpanded'
   | 'setAdvancedExpanded'
   | 'rwlknftIds'
+  | 'rwlkListStatus'
   | 'ethGestureInfo'
   | 'gestureCstRewardAmount'
   | 'gestureCstRewardAmountMin'
@@ -194,6 +195,7 @@ export function GestureConsole({
     rwlkId,
     setRwlkId,
     rwlknftIds,
+    rwlkListStatus,
     gestureCostPlus,
     ethGestureInfo,
     gestureCstRewardAmount,
@@ -237,6 +239,8 @@ export function GestureConsole({
       label: t('form.method.randomWalk.label'),
       price: ethPriceLabel('RandomWalk'),
       note: t('deck.console.randomWalkNote'),
+      // Under the whole track the note names its method, as the Observatory's does.
+      trackNote: t('form.method.randomWalk.desc'),
     },
     { value: 'CST', label: t('form.method.cst.label'), price: cstPriceLabel },
   ];
@@ -267,7 +271,10 @@ export function GestureConsole({
         })
       : null;
 
-  const needsRwlkToken = gestureType === 'RandomWalk' && rwlkId === -1;
+  // Only one of the wallet's own unused Random Walk NFTs can halve the cost: a
+  // token from a shared link, or one picked before a wallet switch, would
+  // revert on-chain and still cost gas.
+  const needsRwlkToken = gestureType === 'RandomWalk' && !rwlknftIds.includes(rwlkId);
   const hasSelectedQuote = gestureType === 'CST' ? hasCstQuote : hasEthQuote;
   const submitUnavailable = needsRwlkToken || gestureType === '' || !hasSelectedQuote;
   const busyLabel = isGesturing ? stageLabel(gestureTxStage) : null;
@@ -355,14 +362,25 @@ export function GestureConsole({
                   {t('form.rwlk.title')}
                 </ExplainedTerm>
               </h3>
-              <PaginationRWLKGrid
-                compact
-                loading={false}
-                data={rwlknftIds}
-                selectedToken={rwlkId}
-                setSelectedToken={setRwlkId}
-                labelledBy={ids.rwlk}
-              />
+              {/* Where the wallet's list stands: loading, read, or failed. */}
+              {rwlkListStatus === 'error' ? (
+                <p
+                  role="status"
+                  data-testid="rwlk-picker-error"
+                  className="mt-1 type-caption text-subtle"
+                >
+                  {t('form.rwlk.error')}
+                </p>
+              ) : (
+                <PaginationRWLKGrid
+                  compact
+                  loading={rwlkListStatus === 'loading'}
+                  data={rwlknftIds}
+                  selectedToken={rwlkId}
+                  setSelectedToken={setRwlkId}
+                  labelledBy={ids.rwlk}
+                />
+              )}
             </div>
           ) : null}
 

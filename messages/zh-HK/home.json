@@ -495,7 +495,6 @@
   },
   "deck": {
     "title": "Cosmic Signature 觀測台",
-    "intro": "用 ETH 或 CST 落筆，成為最新落筆者。倒數歸零後，最新落筆者可收官並獲得簽名分配。",
     "newHere": "初來乍到？了解運作方式",
     "howItWorks": "了解運作方式",
     "artViewTitle": "觀測台藝術視圖",
@@ -519,6 +518,7 @@
       "title": "分配軌道",
       "subtitle": "本週期收官時發放的全部內容",
       "cstPlusNft": "1,000 CST + NFT",
+      "cstPlusNftEach": "每位 1,000 CST + NFT",
       "stellarStatus": "每一次落筆都是一份星選資格",
       "ethGroup": "來自週期儲備的 ETH",
       "fixedGroup": "CST 與 NFT 分配"
@@ -531,7 +531,9 @@
       "alt": "Cosmic Signature 藝術作品 {id} —— 確定性三體生成藝術",
       "pairingNote": "確定性三體藝術，銘刻於鏈上。每枚簽名作品都配有 1,000 CST。",
       "title": "Cosmic Signature {id}",
-      "titleNamed": "《{name}》"
+      "titleNamed": "《{name}》",
+      "watchDrawing": "觀看成形過程",
+      "showFinished": "顯示完成的作品"
     },
     "personal": {
       "title": "你在本週期的位置",

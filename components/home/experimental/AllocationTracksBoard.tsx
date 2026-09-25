@@ -49,7 +49,10 @@ export function AllocationTracksBoard({ data, className }: AllocationTracksBoard
   const locale = useLocale();
   const amounts = deriveAllocationTrackAmounts(data);
   const recipients = (count: number) => t('allocation.recipientCount', { count });
-  const cstPlusNft = t('deck.board.cstPlusNft');
+  // Every recipient of a fixed track receives the whole 1,000 CST and an NFT:
+  // a shared track says "each", so the figure never reads as a total to split.
+  const cstPlusNft = (recipientCount: number) =>
+    recipientCount > 1 ? t('deck.board.cstPlusNftEach') : t('deck.board.cstPlusNft');
 
   const ethTracks: TrackRow[] = [
     {
@@ -124,28 +127,28 @@ export function AllocationTracksBoard({ data, className }: AllocationTracksBoard
       key: 'endurance',
       name: t('allocation.cards.endurance.name'),
       definition: t('allocation.cards.endurance.tooltip'),
-      amount: { text: cstPlusNft },
+      amount: { text: cstPlusNft(1) },
       detail: recipients(1),
     },
     {
       key: 'final-cst',
       name: t('allocation.cards.finalCst.name'),
       definition: t('allocation.cards.finalCst.tooltip'),
-      amount: { text: cstPlusNft },
+      amount: { text: cstPlusNft(1) },
       detail: recipients(1),
     },
     {
       key: 'stellar-nft',
       name: t('allocation.cards.nftStellar.name'),
       definition: t('allocation.cards.nftStellar.tooltip'),
-      amount: { text: cstPlusNft },
+      amount: { text: cstPlusNft(amounts.stellarNftRecipients) },
       detail: `${recipients(amounts.stellarNftRecipients)} · ${t('deck.board.stellarStatus')}`,
     },
     {
       key: 'rwlk-anchor',
       name: t('allocation.cards.randomWalkAnchor.name'),
       definition: t('allocation.cards.randomWalkAnchor.tooltip'),
-      amount: { text: cstPlusNft },
+      amount: { text: cstPlusNft(amounts.rwlkAnchorRecipients) },
       detail: recipients(amounts.rwlkAnchorRecipients),
     },
   ];

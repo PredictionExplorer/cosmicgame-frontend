@@ -495,7 +495,6 @@
   },
   "deck": {
     "title": "Đài quan sát Cosmic Signature",
-    "intro": "Đặt nét bút bằng ETH hoặc CST để trở thành người tham gia gần nhất. Khi đếm ngược về 0, người tham gia gần nhất có thể hoàn tất chu kỳ và nhận phân bổ Signature.",
     "newHere": "Mới đến đây? Cách hoạt động",
     "howItWorks": "Cách hoạt động",
     "artViewTitle": "Chế độ nghệ thuật của Đài quan sát",
@@ -519,6 +518,7 @@
       "title": "Các luồng phân bổ",
       "subtitle": "Mọi thứ chu kỳ này phân phối khi hoàn tất",
       "cstPlusNft": "1.000 CST + NFT",
+      "cstPlusNftEach": "1.000 CST + NFT mỗi người",
       "stellarStatus": "mỗi nét bút là một lượt",
       "ethGroup": "ETH từ Dự trữ chu kỳ",
       "fixedGroup": "Phân bổ CST và NFT"
@@ -531,7 +531,9 @@
       "alt": "Tác phẩm Cosmic Signature {id} — nghệ thuật tạo sinh ba vật thể tất định",
       "pairingNote": "Nghệ thuật ba vật thể tất định, khắc trên chuỗi. Mỗi Signature đi cùng 1.000 CST.",
       "title": "Cosmic Signature {id}",
-      "titleNamed": "“{name}”"
+      "titleNamed": "“{name}”",
+      "watchDrawing": "Xem tác phẩm thành hình",
+      "showFinished": "Hiện tác phẩm hoàn chỉnh"
     },
     "personal": {
       "title": "Vị thế của bạn trong chu kỳ",

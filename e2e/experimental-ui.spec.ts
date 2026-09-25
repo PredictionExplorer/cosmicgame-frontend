@@ -60,19 +60,65 @@ test.describe('experimental UI', () => {
     }
   });
 
-  test('keeps the clock and the art in the first desktop viewport', async ({ page, isMobile }) => {
+  test('keeps the art, the clock and the method choice in the first desktop viewport', async ({
+    page,
+    isMobile,
+  }) => {
     test.skip(Boolean(isMobile), 'desktop geometry contract');
     await page.setViewportSize({ width: 1440, height: 900 });
     await openExperiment(page);
+    // The scenario note exists only in this test mode; lay the page out as
+    // visitors see it.
+    await page.getByText('UX scenario: live-mid-cycle').evaluate((note) => {
+      (note.closest('[role="note"]') as HTMLElement).style.display = 'none';
+    });
 
-    const clock = await page.getByRole('timer').boundingBox();
-    const art = await page.getByTestId('home-art-hero').boundingBox();
-    expect(clock).not.toBeNull();
-    expect(art).not.toBeNull();
-    expect(clock!.y + clock!.height).toBeLessThanOrEqual(900);
-    expect(art!.y).toBeLessThan(900);
+    const box = async (testId: string) => {
+      const found = await page.getByTestId(testId).first().boundingBox();
+      expect(found, testId).not.toBeNull();
+      return found!;
+    };
+    const art = await box('home-art-hero');
+    const clock = await box('monument-clock');
+    const methods = await box('gesture-method-selector');
+    const calibration = await box('calibration-window');
+    // One header row: the plate starts high, not under a tall lede.
+    expect(art.y).toBeLessThanOrEqual(210);
+    for (const [name, found] of [
+      ['clock', clock],
+      ['method selector', methods],
+      ['Calibration Window', calibration],
+    ] as const) {
+      expect(found.y + found.height, name).toBeLessThanOrEqual(900);
+    }
     // The monument sits beside the art, not under it.
-    expect(clock!.x).toBeGreaterThan(art!.x + art!.width);
+    expect(clock.x).toBeGreaterThan(art.x + art.width);
+    // The clock is on screen, so the dock does not repeat it.
+    await expect(page.locator('[data-action-dock]')).toHaveAttribute('inert', '');
+  });
+
+  test('draws a Signature only when the viewer asks', async ({ page, isMobile }) => {
+    test.skip(Boolean(isMobile), 'the reel is offered on wide screens');
+    await page.setViewportSize({ width: 1440, height: 1000 });
+    const clipRequests: string[] = [];
+    page.on('request', (request) => {
+      if (new URL(request.url()).pathname.endsWith('.mp4')) clipRequests.push(request.url());
+    });
+    await openExperiment(page);
+
+    // The finished still is the plate; no clip mounts or downloads unasked.
+    const toggle = page.getByTestId('art-reel-toggle');
+    await expect(toggle).toHaveAccessibleName('Watch it take shape');
+    await expect(page.locator('[data-testid="deck-art-reel"]')).toHaveCount(0);
+    expect(clipRequests).toEqual([]);
+
+    // Asked, the clip loads. (This test mode has no artwork files, so the
+    // plate may still be skipping unavailable stills: a request that a skip
+    // swallowed is asked again.)
+    await expect(async () => {
+      if (clipRequests.length === 0) await toggle.click();
+      expect(clipRequests.length).toBeGreaterThan(0);
+    }).toPass({ intervals: [1_000, 2_000], timeout: 15_000 });
   });
 
   test('prices every method in its segment and opens Advanced inside the console', async ({
@@ -135,7 +181,7 @@ test.describe('experimental UI', () => {
     });
   }
 
-  test('draws the bell and "Return" as one control family', async ({ page }) => {
+  test('draws the bell and "Back to the Observatory" as one control family', async ({ page }) => {
     await openExperiment(page);
 
     // One radius, one edge and one height: a round bell beside a rounded
@@ -185,12 +231,14 @@ test.describe('experimental UI', () => {
     expect(positions.board).toBeLessThan(positions.chat);
     expect(positions.scrollWidth).toBeLessThanOrEqual(positions.clientWidth + 1);
 
-    // Phones: the lede reads in full, the newcomer's link follows it as text,
-    // then the bell and "Back to the Observatory" share one row at one height.
+    // Phones: the H1, the newcomer's link as text, then the bell and "Back to the
+    // Observatory" on one row at one height; the plate follows inside the first screen.
     const header = page.getByTestId('home-deck-header');
     await expect(header.getByTestId('experimental-ui-new-here')).toBeVisible();
     await expect(header.getByRole('navigation')).toBeHidden();
     await expect(header.getByRole('button', { name: /read more/i })).toHaveCount(0);
+    const plate = await page.getByTestId('deck-art-link').boundingBox();
+    expect(plate!.y + plate!.height).toBeLessThanOrEqual(844);
     const rows = await page.evaluate(() => {
       const box = (selector: string) => document.querySelector(selector)!.getBoundingClientRect();
       return {
@@ -219,7 +267,10 @@ test.describe('experimental UI', () => {
       )
       .toBe(true);
 
-    // The dock carries the clock and the priced action, and opens the same console.
+    // Past the console the dock carries the clock and the priced action again,
+    // and opens the same console.
+    await page.getByTestId('home-deck-chat').scrollIntoViewIfNeeded();
+    await expect(page.locator('[data-action-dock]')).not.toHaveAttribute('inert');
     await expect(page.getByTestId('action-dock')).toBeVisible();
     await page.getByTestId('dock-open-sheet').click();
     await expect(
@@ -229,25 +280,49 @@ test.describe('experimental UI', () => {
     await expect(page.getByRole('dialog', { name: 'Make a gesture' })).toBeVisible();
   });
 
-  test('keeps keyboard focus clear of the phone dock', async ({ page, isMobile }) => {
-    test.skip(!isMobile, 'the dock floats over phones only');
+  test('steps the phone dock aside while the monument’s clock is on screen', async ({
+    page,
+    isMobile,
+  }) => {
+    test.skip(!isMobile, 'phone dock contract');
     await page.setViewportSize({ width: 390, height: 844 });
     await openExperiment(page);
-    await expect(page.getByTestId('action-dock')).toBeVisible();
+    const dockLayer = page.locator('[data-action-dock]');
 
-    // Tab to the art's Pause control, which first paints under the dock.
+    // Two copies of one clock never tick on one screen.
+    await page
+      .getByTestId('monument-clock')
+      .evaluate((node) => node.scrollIntoView({ block: 'center', behavior: 'instant' }));
+    await expect(dockLayer).toHaveAttribute('inert', '');
+    // Past the console the dock returns with the clock and the action.
+    await page
+      .getByTestId('home-deck-chat')
+      .evaluate((node) => node.scrollIntoView({ block: 'start', behavior: 'instant' }));
+    await expect(dockLayer).not.toHaveAttribute('inert');
+  });
+
+  test('keeps keyboard focus clear of the phone dock', async ({ page, isMobile }) => {
+    test.skip(!isMobile, 'the dock floats over phones only');
+    // A short phone: the dock floats over the art, whose controls paint under it.
+    await page.setViewportSize({ width: 390, height: 700 });
+    await openExperiment(page);
+
     const toggle = page.getByTestId('art-motion-toggle');
     for (let press = 0; press < 40; press += 1) {
       await page.keyboard.press('Tab');
       if (await toggle.evaluate((node) => node === document.activeElement)) break;
     }
     await expect(toggle).toBeFocused();
-    const overlap = await page.evaluate(() => {
+    // Not obscured: the control clears the dock, or the dock stepped aside.
+    const state = await page.evaluate(() => {
       const focused = document.activeElement!.getBoundingClientRect();
-      const dock = document.querySelector('[data-action-dock]')!.getBoundingClientRect();
-      return focused.bottom - dock.top;
+      const layer = document.querySelector('[data-action-dock]')!;
+      return {
+        overlap: focused.bottom - layer.getBoundingClientRect().top,
+        aside: layer.hasAttribute('inert'),
+      };
     });
-    expect(overlap).toBeLessThanOrEqual(0);
+    expect(state.aside || state.overlap <= 0).toBe(true);
   });
 
   test('pauses the artwork and remembers it', async ({ page, isMobile }) => {

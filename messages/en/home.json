@@ -495,7 +495,6 @@
   },
   "deck": {
     "title": "The Cosmic Signature Observatory",
-    "intro": "Make a gesture with ETH or CST to become the latest participant. After the clock reaches zero, the latest participant can finalize and receive the Signature Allocation.",
     "newHere": "New here? How it works",
     "howItWorks": "How it works",
     "artViewTitle": "Observatory art view",
@@ -519,6 +518,7 @@
       "title": "Allocation tracks",
       "subtitle": "Everything this cycle distributes at finalization",
       "cstPlusNft": "1,000 CST + NFT",
+      "cstPlusNftEach": "1,000 CST + NFT each",
       "stellarStatus": "every gesture is an entry",
       "ethGroup": "ETH from the Cycle Reserve",
       "fixedGroup": "CST and NFT allocations"
@@ -531,7 +531,9 @@
       "alt": "Cosmic Signature artwork {id} — deterministic three-body generative art",
       "pairingNote": "Deterministic three-body art, imprinted on-chain. Every Signature is paired with 1,000 CST.",
       "title": "Cosmic Signature {id}",
-      "titleNamed": "“{name}”"
+      "titleNamed": "“{name}”",
+      "watchDrawing": "Watch it take shape",
+      "showFinished": "Show the finished work"
     },
     "personal": {
       "title": "Your cycle standing",

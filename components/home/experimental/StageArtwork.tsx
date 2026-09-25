@@ -1,7 +1,7 @@
 'use client';
 
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { ArrowRight, Pause, Play } from 'lucide-react';
+import { ArrowRight, Clapperboard, ImageIcon, LoaderCircle, Pause, Play } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 
 import { formatId } from '@/utils/format/ids';
@@ -16,7 +16,7 @@ import { cn } from '@/lib/utils';
 
 import { ArtReel, type ReelToken } from './ArtReel';
 
-/** The generation reel only runs where a 3456px 60fps clip is reasonable. */
+/** The generation reel is offered only where a 3456px 60fps clip is reasonable. */
 export const REEL_MEDIA_QUERY = '(min-width: 1024px)';
 
 /** The featured token, with what its wall label needs. */
@@ -31,16 +31,12 @@ export interface StageToken extends ReelToken {
 
 interface StageArtworkProps {
   token: StageToken | null;
-  /** The token the rotation shows next; the reel pre-loads its clip. */
-  nextToken?: ReelToken | null;
   /** More than one Signature exists, so the plate changes on its own. */
   rotates: boolean;
-  /** The viewer paused the artwork (reel and rotation). */
+  /** The viewer paused the artwork (the rotation, and a drawing under way). */
   paused: boolean;
   onPausedChange: (paused: boolean) => void;
-  /** The current clip finished (after its fade): advance the token. */
-  onReelEnded: () => void;
-  /** Whether the reel drives the rotation; the parent stops its timer while it does. */
+  /** The viewer is watching a Signature take shape; the parent holds its rotation meanwhile. */
   onReelActiveChange: (active: boolean) => void;
   /**
    * The still of a token loaded, or every source of it failed (the parent may
@@ -59,25 +55,24 @@ function prefersStillArt(reducedMotion: boolean): boolean {
 /**
  * The page's featured Signature, hung on its black plate at the native
  * 3456:2234 ratio with nothing on top of it, and its wall label beneath:
- * name, cycle and imprint date, and the one control the artwork needs.
+ * name, cycle and imprint date, and the controls the artwork needs.
  *
- * The still is always the plate's base layer: the server renders it, so it is
- * the page's first large paint, and nothing ever unmounts it. On wide screens
- * the generation clip (the seeded simulation drawing the Signature) is laid
- * over it and fades in only once it plays; the plate advances when a clip
- * ends. Elsewhere, and whenever the viewer prefers reduced motion, the still
- * is all there is. Pause holds whatever is showing — the clip on its frame,
- * the still in place — and is remembered in this browser. A token whose files
- * all fail ends in the designed unavailable plate, and the parent may skip to
- * the next one.
+ * The finished still is the plate: the server renders it, so it is the
+ * page's first large paint, and nothing unmounts or covers it unasked. On
+ * wide screens the wall label offers "Watch it take shape": the generation
+ * clip (the seeded simulation drawing the Signature from its first stroke)
+ * loads then, fades in over the still once it plays, and fades back to the
+ * finished still at its end. The rotation of stills holds while it plays.
+ * Elsewhere, and whenever the viewer prefers reduced motion, the still is all
+ * there is. Pause holds whatever moves (the rotation, a drawing on its frame)
+ * and is remembered in this browser. A token whose files all fail ends in the
+ * designed unavailable plate, and the parent may skip to the next one.
  */
 export function StageArtwork({
   token,
-  nextToken = null,
   rotates,
   paused,
   onPausedChange,
-  onReelEnded,
   onReelActiveChange,
   onArtStatus,
   className,
@@ -88,12 +83,19 @@ export function StageArtwork({
   const reducedMotion = usePrefersReducedMotion();
   const isReelViewport = useMediaQuery(REEL_MEDIA_QUERY);
   const [failedClipSeed, setFailedClipSeed] = useState<string | null>(null);
+  // The token the viewer asked to watch, and the one whose clip plays. Keyed
+  // by seed, so a token change ends a drawing without an effect.
+  const [watchSeed, setWatchSeed] = useState<string | null>(null);
+  const [playingSeed, setPlayingSeed] = useState<string | null>(null);
 
-  const reelActive =
+  const canDraw =
     token != null &&
     isReelViewport &&
     !prefersStillArt(reducedMotion) &&
     failedClipSeed !== token.seed;
+  const drawing = canDraw && watchSeed === token.seed;
+  const clipLoading = drawing && playingSeed !== token.seed;
+  const clipFailed = token != null && isReelViewport && failedClipSeed === token.seed;
 
   // The server-picked first token paints at once; only a token the rotation
   // brings in later arrives with a fade ("adjust state when a prop changes").
@@ -102,34 +104,49 @@ export function StageArtwork({
   if (!rotated && token != null && token.id !== firstTokenId) setRotated(true);
 
   useEffect(() => {
-    onReelActiveChange(reelActive);
-  }, [reelActive, onReelActiveChange]);
+    onReelActiveChange(drawing);
+  }, [drawing, onReelActiveChange]);
 
+  const tokenSeed = token?.seed ?? null;
+  const toggleDrawing = useCallback(() => {
+    if (!tokenSeed) return;
+    if (drawing) {
+      setWatchSeed(null);
+      return;
+    }
+    setWatchSeed(tokenSeed);
+    setPlayingSeed(null);
+    // Asking to watch is asking for motion: a paused plate plays again.
+    if (paused) onPausedChange(false);
+  }, [drawing, onPausedChange, paused, tokenSeed]);
+
+  const handleClipPlaying = useCallback(() => setPlayingSeed(tokenSeed), [tokenSeed]);
+  const handleClipEnded = useCallback(() => setWatchSeed(null), []);
   const handleClipError = useCallback(() => {
-    if (token) setFailedClipSeed(token.seed);
-  }, [token]);
+    if (tokenSeed) setFailedClipSeed(tokenSeed);
+  }, [tokenSeed]);
 
   // While the clip covers the still, a still that failed is no reason to skip
-  // the token; if the clip gives up too, the failure is reported then.
+  // the token; if the clip ends or gives up, the failure is reported then.
   const tokenId = token?.id ?? null;
   const stillStatusRef = useRef<ArtStatus | null>(null);
   const handleStatus = useCallback(
     (status: ArtStatus) => {
       stillStatusRef.current = status;
       if (tokenId == null) return;
-      if (status === 'unavailable' && reelActive) return;
+      if (status === 'unavailable' && drawing) return;
       onArtStatus?.(tokenId, status);
     },
-    [onArtStatus, tokenId, reelActive],
+    [onArtStatus, tokenId, drawing],
   );
-  const wasReelActiveRef = useRef(reelActive);
+  const wasDrawingRef = useRef(drawing);
   useEffect(() => {
-    const clipGaveUp = wasReelActiveRef.current && !reelActive;
-    wasReelActiveRef.current = reelActive;
-    if (clipGaveUp && tokenId != null && stillStatusRef.current === 'unavailable') {
+    const drawingStopped = wasDrawingRef.current && !drawing;
+    wasDrawingRef.current = drawing;
+    if (drawingStopped && tokenId != null && stillStatusRef.current === 'unavailable') {
       onArtStatus?.(tokenId, 'unavailable');
     }
-  }, [reelActive, tokenId, onArtStatus]);
+  }, [drawing, tokenId, onArtStatus]);
 
   const media = signatureMedia(token?.seed);
   const tokenLabel = token ? formatId(token.id) : null;
@@ -141,12 +158,19 @@ export function StageArtwork({
       : t('deck.art.title', { id: tokenLabel ?? '' });
   // The shared Signature alt: the name and number (traits when the token carries them).
   const alt = token && tokenLabel ? signatureAlt({ id: tokenLabel, name }) : '';
-  const canPause = reelActive || rotates;
+  const canPause = drawing || rotates;
+
+  let drawingIcon = <Clapperboard aria-hidden />;
+  if (clipLoading) {
+    drawingIcon = <LoaderCircle aria-hidden className="animate-spin" />;
+  } else if (drawing) {
+    drawingIcon = <ImageIcon aria-hidden />;
+  }
 
   return (
     <figure
       data-testid="home-art-hero"
-      data-reel={reelActive ? 'active' : 'still'}
+      data-reel={drawing ? 'drawing' : canDraw ? 'available' : 'still'}
       className={cn('min-w-0', className)}
     >
       {token && media ? (
@@ -173,14 +197,15 @@ export function StageArtwork({
               onStatusChange={handleStatus}
             />
           </div>
-          {reelActive ? (
+          {drawing ? (
             // The clip layer covers the plate and keeps its print edge on top.
             <div className="pointer-events-none absolute inset-0 z-[3] overflow-hidden rounded-edge">
               <ArtReel
-                current={token}
-                next={nextToken}
+                key={token.seed}
+                token={token}
                 paused={paused}
-                onEnded={onReelEnded}
+                onPlaying={handleClipPlaying}
+                onEnded={handleClipEnded}
                 onError={handleClipError}
               />
               <span
@@ -194,7 +219,10 @@ export function StageArtwork({
         <PendingPlate label={t('hero.artUnavailable.body')} className="px-6" />
       )}
 
-      <figcaption className="mt-4 flex items-start justify-between gap-x-6 gap-y-3 max-sm:flex-col">
+      {/* The controls sit beside the label under a full-width plate, and
+          under it beside the monument (from 1024px), where the plate's
+          column is too narrow for both. */}
+      <figcaption className="mt-4 flex items-start justify-between gap-x-6 gap-y-3 max-sm:flex-col lg:flex-col lg:gap-y-2">
         <WallLabel
           title={title}
           meta={
@@ -218,9 +246,28 @@ export function StageArtwork({
           className="min-w-0 flex-1"
         >
           <p className="type-caption text-subtle">{t('deck.art.pairingNote')}</p>
+          {clipFailed ? (
+            <p role="status" data-testid="art-reel-error" className="mt-1 type-caption text-subtle">
+              {tDetail('viewer.motionError')}
+            </p>
+          ) : null}
         </WallLabel>
-        {/* The row wraps rather than widen a 320px page in long-label locales. */}
-        <div className="-me-3 flex shrink-0 flex-wrap items-center gap-1 max-sm:-ms-3 max-sm:max-w-[calc(100%+1.5rem)]">
+        {/* The row wraps rather than widen a 320px page in long-label
+            locales; a ghost button's text lines up with the label's. */}
+        <div className="-me-3 flex shrink-0 flex-wrap items-center gap-1 max-sm:-ms-3 max-sm:max-w-[calc(100%+1.5rem)] lg:-ms-3 lg:me-0 lg:max-w-[calc(100%+0.75rem)]">
+          {canDraw ? (
+            <Button
+              type="button"
+              variant="ghost"
+              size="sm"
+              onClick={toggleDrawing}
+              aria-busy={clipLoading || undefined}
+              data-testid="art-reel-toggle"
+            >
+              {drawingIcon}
+              {drawing ? t('deck.art.showFinished') : t('deck.art.watchDrawing')}
+            </Button>
+          ) : null}
           {canPause && token ? (
             <Button
               type="button"
@@ -230,10 +277,7 @@ export function StageArtwork({
               data-testid="art-motion-toggle"
             >
               {paused ? <Play aria-hidden /> : <Pause aria-hidden />}
-              {/* Beside a narrow plate (lg) the icon carries it; the name stays. */}
-              <span className="lg:max-xl:sr-only">
-                {paused ? tDetail('viewer.play') : tDetail('viewer.pause')}
-              </span>
+              {paused ? tDetail('viewer.play') : tDetail('viewer.pause')}
             </Button>
           ) : null}
           <Button asChild variant="ghost" size="sm">

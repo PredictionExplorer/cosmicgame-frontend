@@ -48,6 +48,7 @@ function makeForm(overrides: Partial<ConsoleFormState> = {}): ConsoleFormState {
     advancedExpanded: false,
     setAdvancedExpanded: jest.fn(),
     rwlknftIds: [11, 12],
+    rwlkListStatus: 'ready',
     ethGestureInfo: { AuctionDuration: 3600, SecondsElapsed: 900, ETHPrice: 0.10211 },
     gestureCstRewardAmount: 186.18,
     gestureCstRewardAmountMin: 184.31,
@@ -210,6 +211,34 @@ describe('GestureConsole', () => {
 
     expect(screen.getByTestId('gesture-submit')).toBeDisabled();
     expect(screen.getByTestId('rwlk-grid')).toHaveAttribute('data-count', '2');
+  });
+
+  it('submits a RandomWalk Gesture only with one of the wallet’s own unused NFTs', () => {
+    // A token from a shared link, or picked before a wallet switch, would
+    // revert on-chain and still cost gas.
+    const { unmount } = renderConsole({
+      form: makeForm({ gestureType: 'RandomWalk', rwlkId: 99 }),
+    });
+    expect(screen.getByTestId('gesture-submit')).toBeDisabled();
+    unmount();
+
+    renderConsole({ form: makeForm({ gestureType: 'RandomWalk', rwlkId: 12 }) });
+    expect(screen.getByTestId('gesture-submit')).toBeEnabled();
+  });
+
+  it('says so when the wallet’s Random Walk NFTs could not be read', () => {
+    renderConsole({
+      form: makeForm({
+        gestureType: 'RandomWalk',
+        rwlkId: 11,
+        rwlknftIds: [],
+        rwlkListStatus: 'error',
+      }),
+    });
+
+    expect(screen.getByTestId('rwlk-picker-error')).toHaveTextContent('home.form.rwlk.error');
+    expect(screen.queryByTestId('rwlk-grid')).not.toBeInTheDocument();
+    expect(screen.getByTestId('gesture-submit')).toBeDisabled();
   });
 
   it('keeps the label and focus while the transaction is busy', () => {

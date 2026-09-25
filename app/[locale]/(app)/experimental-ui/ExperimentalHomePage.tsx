@@ -18,11 +18,12 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Container } from '@/components/ui/container';
 import { ErrorState } from '@/components/ui/error-state';
+import { InfoTooltip } from '@/components/ui/info-tooltip';
 import { PageShell } from '@/components/ui/page-shell';
 import { Sheet, SheetContent } from '@/components/ui/sheet';
 import { Surface } from '@/components/ui/surface';
 import { useActiveWeb3React } from '@/hooks/web3';
-import { GestureMessageChat, type PendingChatMessage } from '@/components/home/GestureMessageChat';
+import { GestureMessageChat } from '@/components/home/GestureMessageChat';
 import { deriveFeedSystemEvents } from '@/components/home/deck/feedSystemEvents';
 import { ActionDock } from '@/components/home/observatory/ActionDock';
 import {
@@ -43,20 +44,23 @@ import { useArtMotionPreference } from '@/components/home/experimental/useArtMot
 import { AttachedNFTAllocationShowcase } from '@/components/attachments/DonatedNFTPrizeShowcase';
 import type { ArtStatus } from '@/components/ui/art-frame';
 import { useContractAddresses } from '@/contexts/ContractAddressesContext';
+import { useAttentionPreferences } from '@/hooks/useAttentionPreferences';
 import { useChampions } from '@/hooks/useChampions';
+import { useBackgroundDeadlineRefresh, useReturnResync } from '@/hooks/useDeadlineWatch';
 import { useGestureForm } from '@/hooks/useGestureForm';
 import { useHomeGestureFeed } from '@/hooks/useHomeGestureFeed';
 import { useAllocationFinalize } from '@/hooks/useAllocationFinalize';
 import { useEndgameChainSync } from '@/hooks/useEndgameChainSync';
 import { useGestureChime } from '@/hooks/useGestureChime';
+import { useLiveFreshness } from '@/hooks/useLiveFreshness';
 import { useOwnGestureOverlay } from '@/hooks/useOwnGestureOverlay';
+import { usePendingChatMessages } from '@/hooks/usePendingChatMessages';
 import { usePositionMoment } from '@/hooks/usePositionMoment';
 import { useVerifiedFinalizationAlert } from '@/hooks/useVerifiedFinalizationAlert';
 import { invalidateLiveGameQueries } from '@/hooks/useLiveGameDataRefresh';
 import { useNow } from '@/hooks/useNow';
 import { useRotatingIndex } from '@/hooks/useRotatingIndex';
 import { useTabTitleCountdown } from '@/hooks/useTabTitleCountdown';
-import { useMediaQuery } from '@/hooks/useMediaQuery';
 import {
   trackChatJoinCtaClicked,
   trackFinalizeSubmitted,
@@ -76,9 +80,11 @@ import { AllocationIcon } from '@/lib/conceptIcons';
 import { OUTBOUND_LINKS } from '@/config/siteNav';
 import { SITE_ROUTE_ICONS } from '@/config/siteNavIcons';
 import { getCycleState, getDashboardActivationTime } from '@/lib/cycleState';
+import { headerRootMargin } from '@/lib/headerOffset';
 import { resolveLatestGesture, type LatestParticipantEvidence } from '@/lib/latestGesture';
 import { fetchEndgameChainSample, type EndgameChainSample } from '@/lib/rpcRace';
 import { TOUCH_TARGET_TEXT_LINK_CLASS } from '@/lib/touch-target';
+import { cn } from '@/lib/utils';
 import {
   UX_SCENARIO_DEMO_ACCOUNT,
   simulateUxScenarioGesture,
@@ -100,14 +106,11 @@ const MemoAttachedNFTAllocationShowcase = memo(AttachedNFTAllocationShowcase);
 const MemoStageArtwork = memo(StageArtwork);
 const MemoAllocationTracksBoard = memo(AllocationTracksBoard);
 
-/** Pending optimistic chat rows expire if the indexer never echoes them. */
-const PENDING_MESSAGE_EXPIRY_MS = 90_000;
-
 /** Consecutive artworks that may fail to load before the plate stops skipping. */
 const MAX_UNAVAILABLE_SKIPS = 3;
 
-/** Roughly the sticky header: a region counts as gone once it passed under it. */
-const HEADER_ROOT_MARGIN = '-96px 0px 0px 0px';
+/** The deadline read whose freshness the opted-in tab-title countdown follows. */
+const DEADLINE_FRESHNESS_KEYS = [['allocationTime']] as const;
 
 /** Feedback on the preview goes to the community's Discord. */
 const FEEDBACK_HREF = OUTBOUND_LINKS.find((link) => link.id === 'discord')!.href;
@@ -292,18 +295,14 @@ const ExperimentalHomePage = ({
 
   // ── Featured artwork ────────────────────────────────────────────────
   // The server picks the first artwork so its URL is in the prerendered
-  // HTML. While the generation reel plays, the reel (not the timer) decides
-  // when to move on; the viewer's pause holds both.
+  // HTML. The stills rotate on a timer; it holds while the viewer watches a
+  // Signature take shape, and the viewer's pause holds both.
   const imprintedTokenCount = dashboardData?.MainStats.NumCSTokenMints ?? 0;
   const { paused: artPaused, setPaused: setArtPaused } = useArtMotionPreference();
   const [reelActive, setReelActive] = useState(false);
   const [artAdvance, setArtAdvance] = useState(0);
   // Consecutive tokens whose files all failed; a loaded artwork resets it.
   const unavailableSkipsRef = useRef(0);
-  const handleReelEnded = useCallback(() => {
-    unavailableSkipsRef.current = 0;
-    setArtAdvance((n) => n + 1);
-  }, []);
   const handleArtStatus = useCallback((_tokenId: number, status: ArtStatus) => {
     if (status === 'loaded') unavailableSkipsRef.current = 0;
     if (status !== 'unavailable' || unavailableSkipsRef.current >= MAX_UNAVAILABLE_SKIPS) return;
@@ -318,7 +317,7 @@ const ExperimentalHomePage = ({
     initialIndex: initialBannerToken?.id ?? null,
     advanceSignal: artAdvance,
   });
-  const { data: bannerCSTInfo, isError: bannerCSTError } = useCSTInfo(
+  const { data: bannerCSTInfo } = useCSTInfo(
     bannerTokenId,
     bannerTokenId != null && bannerTokenId === initialBannerToken?.id
       ? initialBannerToken.info
@@ -340,19 +339,6 @@ const ExperimentalHomePage = ({
       heldBannerToken ??
       (initialBannerToken ? toStageToken(initialBannerToken.id, initialBannerToken.info) : null),
     [resolvedBannerToken, heldBannerToken, initialBannerToken],
-  );
-  // The reel cannot finish a clip it never got a seed for: skip that token.
-  useEffect(() => {
-    if (reelActive && bannerCSTError) setArtAdvance((n) => n + 1);
-  }, [reelActive, bannerCSTError, bannerTokenId]);
-  const nextBannerTokenId =
-    bannerTokenId != null && imprintedTokenCount > 1
-      ? (bannerTokenId + 1) % imprintedTokenCount
-      : null;
-  const { data: nextBannerCSTInfo } = useCSTInfo(nextBannerTokenId);
-  const nextBannerToken = useMemo(
-    () => (nextBannerTokenId != null ? toStageToken(nextBannerTokenId, nextBannerCSTInfo) : null),
-    [nextBannerTokenId, nextBannerCSTInfo],
   );
 
   // ── Cycle state ──────────────────────────────────────────────────────
@@ -427,14 +413,32 @@ const ExperimentalHomePage = ({
 
   // Final-minute synchronizer: direct-chain reads around the zero-cross.
   const endgame = useEndgameChainSync({ targetMs: allocationTime });
-  const finalizationConfirmed = !endgame.isConfirmationPending;
+  // A tab that returns with a stale deadline holds "ready" until a fresh
+  // reading lands: a Gesture may have moved it while the tab was hidden, and
+  // a Finalize sent on the stale reading would revert and still cost gas.
+  const returnResync = useReturnResync();
+  const finalizationConfirmed = !endgame.isConfirmationPending && !returnResync;
 
+  /**
+   * Refreshes the live reads after a confirmed transaction. A finalization
+   * leaves the current special recipients out: during the rollover the
+   * backend answers that read with an error, so its stale value is dropped
+   * rather than refetched.
+   */
   const withPostTxRefresh = useCallback(
-    (retryMs = 1500, activationMs = 3000) => {
-      void invalidateLiveGameQueries(queryClient).catch((e) => reportError(e, 'refresh live data'));
+    (retryMs = 1500, activationMs = 3000, includeCurrentSpecialRecipients = true) => {
+      if (!includeCurrentSpecialRecipients) {
+        void queryClient.cancelQueries({ queryKey: ['currentSpecialWinners'] });
+        queryClient.setQueryData(['currentSpecialWinners'], null);
+      }
+      void invalidateLiveGameQueries(queryClient, { includeCurrentSpecialRecipients }).catch((e) =>
+        reportError(e, 'refresh live data'),
+      );
       setMessage('');
       setTimeout(() => {
-        void invalidateLiveGameQueries(queryClient).catch((e) => reportError(e, 'retry live data'));
+        void invalidateLiveGameQueries(queryClient, { includeCurrentSpecialRecipients }).catch(
+          (e) => reportError(e, 'retry live data'),
+        );
       }, retryMs);
       setTimeout(() => {
         fetchActivationTime().catch((e) => reportError(e, 'fetchActivationTime'));
@@ -449,43 +453,11 @@ const ExperimentalHomePage = ({
     if (account) recordOwnGesture(account, offset);
   }, [account, offset, recordOwnGesture]);
 
-  // Optimistic chat rows: a just-sent message shows instantly and is removed
-  // once the indexer echoes the real gesture (or after a safety timeout).
-  const [pendingMessages, setPendingMessages] = useState<PendingChatMessage[]>([]);
-  const pendingExpiryTimersRef = useRef<ReturnType<typeof setTimeout>[]>([]);
-  useEffect(() => {
-    const timers = pendingExpiryTimersRef.current;
-    return () => timers.forEach(clearTimeout);
-  }, []);
-
-  const recordPendingMessage = useCallback((address: string, message: string) => {
-    const id = `pending-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
-    setPendingMessages((prev) => [
-      ...prev,
-      { id, address, message, timestamp: Math.floor(Date.now() / 1000) },
-    ]);
-    pendingExpiryTimersRef.current.push(
-      setTimeout(() => {
-        setPendingMessages((prev) => prev.filter((entry) => entry.id !== id));
-      }, PENDING_MESSAGE_EXPIRY_MS),
-    );
-  }, []);
-
-  useEffect(() => {
-    setPendingMessages((prev) => {
-      if (prev.length === 0) return prev;
-      const next = prev.filter(
-        (entry) =>
-          !chatGestures.some(
-            (gesture) =>
-              gesture.BidderAddr?.toLowerCase() === entry.address.toLowerCase() &&
-              typeof gesture.Message === 'string' &&
-              gesture.Message.trim() === entry.message,
-          ),
-      );
-      return next.length === prev.length ? prev : next;
-    });
-  }, [chatGestures]);
+  // Optimistic chat rows until the indexer echoes them (F221), the app's one
+  // implementation: each keeps its transaction, and a slow echo says so.
+  const { pending: pendingMessages, record: recordPendingMessage } =
+    usePendingChatMessages(chatGestures);
+  const { getLastGestureHash } = gestureForm;
 
   /** Resolves `true` once the Gesture is confirmed (or simulated). */
   const handleGesture = useCallback(
@@ -510,7 +482,7 @@ const ExperimentalHomePage = ({
       if (!(await (gestureType === 'CST' ? onGestureWithCST() : onGesture()))) return false;
       trackGestureSubmitted({ source, method: gestureType, hasMessage: trimmedMessage !== '' });
       if (trimmedMessage && account) {
-        recordPendingMessage(account, trimmedMessage);
+        recordPendingMessage(account, trimmedMessage, getLastGestureHash());
       }
       recordConfirmedGesture();
       withPostTxRefresh();
@@ -520,6 +492,7 @@ const ExperimentalHomePage = ({
       account,
       gestureForm.message,
       gestureType,
+      getLastGestureHash,
       notify,
       onGesture,
       onGestureWithCST,
@@ -536,7 +509,7 @@ const ExperimentalHomePage = ({
     async (source: GestureSurface = 'console'): Promise<boolean> => {
       if (!(await onFinalize())) return false;
       trackFinalizeSubmitted(source);
-      withPostTxRefresh(1000, 3000);
+      withPostTxRefresh(1000, 3000, false);
       return true;
     },
     [onFinalize, withPostTxRefresh],
@@ -545,12 +518,16 @@ const ExperimentalHomePage = ({
   // Deep link from the RandomWalk collection (?randomwalk=1&tokenId=N), read
   // in an effect: the search-params hook would force this statically
   // generated route into client-side rendering.
+  // Only a whole token number preselects: a missing id is not token #0, and
+  // text is not NaN. The console still checks it against the wallet's own
+  // unused NFTs before it offers the Gesture.
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
-    if (params.get('randomwalk')) {
-      setRwlkId(Number(params.get('tokenId')));
-      setBidType('RandomWalk');
-    }
+    if (!params.get('randomwalk')) return;
+    setBidType('RandomWalk');
+    const raw = params.get('tokenId')?.trim();
+    const tokenId = raw ? Number(raw) : Number.NaN;
+    if (Number.isSafeInteger(tokenId) && tokenId >= 0) setRwlkId(tokenId);
     // eslint-disable-next-line react-hooks/exhaustive-deps -- runs once, on arrival
   }, []);
 
@@ -588,7 +565,22 @@ const ExperimentalHomePage = ({
   const showConsole = loading || isRoundActive;
 
   // The tab title ticks in the final window only when the viewer opted in.
-  useTabTitleCountdown({ enabled: isFinalWindow, targetMs: allocationTime });
+  // An armed alert or countdown keeps the deadline fresh while the tab is
+  // hidden, and the title never counts toward a deadline that stopped
+  // updating.
+  const { preferences: attention } = useAttentionPreferences();
+  useBackgroundDeadlineRefresh(
+    attention.finalizationAlert || (attention.tabTitle && isFinalWindow),
+  );
+  const deadlineFreshness = useLiveFreshness({
+    queryKeys: DEADLINE_FRESHNESS_KEYS,
+    pollIntervalMs: 60_000,
+  });
+  useTabTitleCountdown({
+    enabled: isFinalWindow,
+    targetMs: allocationTime,
+    stale: deadlineFreshness.state === 'delayed' || deadlineFreshness.state === 'offline',
+  });
 
   // The one quote behind every gesture submit (console, sheet and dock), so
   // the cost shown can never drift between them. The shared dock sets the
@@ -640,41 +632,22 @@ const ExperimentalHomePage = ({
     el.focus({ preventScroll: true });
   }, []);
 
-  // The action dock steps aside while the console itself is on screen; from
-  // 1024px it also waits until the monument has scrolled past.
-  const isDesktop = useMediaQuery('(min-width: 64rem)');
-  const monumentRef = useRef<HTMLDivElement | null>(null);
-  const consoleRef = useRef<HTMLDivElement | null>(null);
-  const [monumentOutOfView, setMonumentOutOfView] = useState(false);
-  const [consoleInView, setConsoleInView] = useState(false);
+  // The action dock repeats the clock and the priced action, so it steps
+  // aside at every width while the monument (the clock, the Signature
+  // Allocation and the console under them) is on screen: it shows over the
+  // header and the art, and again once the console has scrolled past.
+  // A callback ref: the monument mounts only once the dashboard read landed.
+  const [monumentEl, setMonumentEl] = useState<HTMLDivElement | null>(null);
+  const [monumentInView, setMonumentInView] = useState(false);
   useEffect(() => {
-    const el = monumentRef.current;
-    if (!el || typeof IntersectionObserver === 'undefined') return undefined;
+    if (!monumentEl || typeof IntersectionObserver === 'undefined') return undefined;
     const observer = new IntersectionObserver(
-      ([entry]) => {
-        if (!entry) return;
-        const rootTop = entry.rootBounds?.top ?? 0;
-        const bottom = entry.boundingClientRect?.bottom ?? Number.POSITIVE_INFINITY;
-        setMonumentOutOfView(!entry.isIntersecting && bottom <= rootTop);
-      },
-      { rootMargin: HEADER_ROOT_MARGIN },
+      ([entry]) => setMonumentInView(entry?.isIntersecting ?? false),
+      { rootMargin: headerRootMargin() },
     );
-    observer.observe(el);
+    observer.observe(monumentEl);
     return () => observer.disconnect();
-  }, []);
-  useEffect(() => {
-    const el = consoleRef.current;
-    if (!el || typeof IntersectionObserver === 'undefined') {
-      setConsoleInView(false);
-      return undefined;
-    }
-    const observer = new IntersectionObserver(
-      ([entry]) => setConsoleInView(entry?.isIntersecting ?? false),
-      { rootMargin: HEADER_ROOT_MARGIN },
-    );
-    observer.observe(el);
-    return () => observer.disconnect();
-  }, [showConsole]);
+  }, [monumentEl]);
 
   // The source-aligned clock discovers milestones even between Gestures. A
   // 30-second bucket keeps this timeline out of the one-second render path.
@@ -723,8 +696,9 @@ const ExperimentalHomePage = ({
 
   const hasAttachedAssets = donatedNFTs.length > 0 || donatedERC20Tokens.length > 0;
   const cycleNumber = data?.CurRoundNum;
+  // Cycles count from 0, so Cycle 1 links the allocations of Cycle 0.
   const previousCycle = (cycleNumber ?? 0) - 1;
-  const hasPreviousCycle = previousCycle > 0;
+  const hasPreviousCycle = previousCycle >= 0;
   const CurrentCycleIcon = SITE_ROUTE_ICONS.currentCycle;
 
   // Without the dashboard read there is no cycle number, countdown or
@@ -765,7 +739,13 @@ const ExperimentalHomePage = ({
 
   return (
     <>
-      <PageShell variant="data" backdrop="hero" className="max-w-none px-0 sm:px-0">
+      {/* The page starts high, as the Observatory does: one header row, then
+          the art. */}
+      <PageShell
+        variant="data"
+        backdrop="hero"
+        className="max-w-none px-0 pt-[calc(var(--header-height)+1.25rem)] max-sm:pt-[calc(var(--header-height)+1rem)] sm:px-0"
+      >
         <Container>
           {uxScenario && (
             <p
@@ -781,7 +761,7 @@ const ExperimentalHomePage = ({
 
           <div data-testid="home-deck-header">
             {/* A preview of the Observatory, not a second one: its own name, a
-                Preview mark beside the cycle, one lede on what differs, and a
+                Preview mark beside the cycle that explains what differs, and a
                 way back and a way to say what works. */}
             <PageHeader
               eyebrow={
@@ -789,28 +769,40 @@ const ExperimentalHomePage = ({
                   {cycleNumber == null
                     ? t('hero.cycleFallback')
                     : t('hero.cycleNumber', { number: String(cycleNumber) })}
-                  <Badge tone="accent" size="sm" overline data-testid="experimental-ui-preview">
-                    {t('deck.previewBadge')}
-                  </Badge>
+                  <span className="inline-flex items-center gap-1">
+                    <Badge tone="accent" size="sm" overline data-testid="experimental-ui-preview">
+                      {t('deck.previewBadge')}
+                    </Badge>
+                    <InfoTooltip
+                      content={t('deck.artViewIntro')}
+                      label={t('deck.previewBadge')}
+                      side="bottom"
+                    />
+                  </span>
                 </span>
               }
               title={t('deck.artViewTitle')}
               titleId="home-deck-title"
-              subtitle={t('deck.artViewIntro')}
-              // Two sentences: a "Read more" line would hide just one line.
-              clampLede={false}
+              // One row, as on the Observatory: no standing lede, so the art
+              // starts high on every screen. What the preview changes is the
+              // Preview mark's explanation; while Gestures run, the clock's
+              // status, the console and the phase guide say how to take part.
               actions={
-                // Phones: the newcomer's link reads straight after the lede,
-                // then the two controls share a row. They are one control
-                // family: one height (44px on phones, 36px from sm), the
-                // control radius and the outline edge.
-                <div className="flex flex-col items-start gap-4 max-sm:-mt-2 sm:flex-row sm:items-center sm:gap-2">
+                // The route to the walkthrough, then the two controls on one
+                // row. They are one control family: one height (44px on
+                // phones, 36px from sm), the control radius and the outline
+                // edge.
+                <div className="flex flex-col items-start gap-3 sm:flex-row sm:items-center sm:gap-5">
                   <Link
                     href="/how-it-works"
                     data-testid="experimental-ui-new-here"
-                    className={`${TOUCH_TARGET_TEXT_LINK_CLASS} link inline-flex items-center gap-1.5 type-body-sm sm:hidden`}
+                    className={cn(
+                      TOUCH_TARGET_TEXT_LINK_CLASS,
+                      'link-quiet inline-flex items-center gap-1.5 type-label text-primary',
+                    )}
                   >
-                    {t('deck.newHere')}
+                    <span className="lg:hidden">{t('deck.newHere')}</span>
+                    <span className="max-lg:hidden">{t('deck.howItWorks')}</span>
                     <ArrowRight aria-hidden className="size-3.5 shrink-0" />
                   </Link>
                   <div className="flex max-w-full items-center gap-2">
@@ -841,31 +833,34 @@ const ExperimentalHomePage = ({
                   </SiteLink>
                 </div>
               }
-              // From sm the related link sits in the header's own row.
-              related={[{ href: '/how-it-works', label: t('deck.newHere') }]}
-              className="mb-8 pb-6 max-sm:[&>nav]:hidden sm:mb-10 sm:pb-8"
+              // A compact H1 lets the art lead; the header ends one rule
+              // above the plate.
+              className="mb-6 pb-5 sm:mb-6 sm:pb-4 [&_h1]:type-heading-1"
             />
           </div>
 
+          {/* From 1024px the art and the standings share the left column and
+              the monument takes the right one across both rows. The first row
+              is the art's own height and the second takes the rest, so the
+              standings keep the grid's gap under the art whatever the height
+              of the console beside them. */}
           <div
             id="deck"
             data-testid="home-deck-layout"
-            className="grid scroll-mt-24 grid-cols-1 gap-x-10 gap-y-12 lg:grid-cols-12 xl:gap-x-14"
+            className="grid scroll-mt-24 grid-cols-1 gap-x-10 gap-y-12 lg:grid-cols-12 lg:grid-rows-[auto_1fr] xl:gap-x-14"
           >
             <MemoStageArtwork
               token={bannerToken}
-              nextToken={nextBannerToken}
               rotates={imprintedTokenCount > 1}
               paused={artPaused}
               onPausedChange={setArtPaused}
-              onReelEnded={handleReelEnded}
               onReelActiveChange={setReelActive}
               onArtStatus={handleArtStatus}
               className="lg:col-span-7 lg:row-start-1"
             />
 
             <div
-              ref={monumentRef}
+              ref={setMonumentEl}
               data-testid="home-deck-monument"
               className="min-w-0 lg:col-span-5 lg:col-start-8 lg:row-span-2 lg:row-start-1"
             >
@@ -880,7 +875,7 @@ const ExperimentalHomePage = ({
                 attachedERC20Count={donatedERC20Tokens.length}
               >
                 {showConsole ? (
-                  <div ref={consoleRef} className="mt-8">
+                  <div className="mt-8">
                     <Surface variant="quiet" className="p-5 sm:p-6">
                       <GestureConsole
                         variant="page"
@@ -898,7 +893,10 @@ const ExperimentalHomePage = ({
               </CycleMonument>
             </div>
 
-            <div data-testid="home-deck-board" className="min-w-0 lg:col-span-7 lg:row-start-2">
+            <div
+              data-testid="home-deck-board"
+              className="min-w-0 lg:col-span-7 lg:row-start-2 lg:self-start"
+            >
               {/* The one standings ledger of the app, as on the Observatory. */}
               <StandingsLedger
                 champions={champions}
@@ -1026,7 +1024,7 @@ const ExperimentalHomePage = ({
       {/* The one persistent quick action: it routes to the console (the sheet
           on phones, a scroll on desktop) and never submits by itself. */}
       <ActionDock
-        stepAside={consoleInView || (isDesktop && !monumentOutOfView)}
+        stepAside={sheetOpen || monumentInView}
         data={data}
         loading={loading}
         allocationTime={allocationTime}
@@ -1049,6 +1047,8 @@ const ExperimentalHomePage = ({
       <Sheet open={sheetOpen} onOpenChange={setSheetOpen}>
         <SheetContent
           side="bottom"
+          // The console's heading names the dialog; there is no separate description.
+          aria-describedby={undefined}
           className="max-h-[85dvh] overflow-y-auto rounded-t-surface border-rule bg-surface-raised p-5 pb-8 lg:hidden"
         >
           <GestureConsole
