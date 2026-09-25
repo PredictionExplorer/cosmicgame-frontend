@@ -19,6 +19,24 @@ export const PROSE_CLASS = 'type-prose text-muted-foreground';
 /** Blocks that carry data (tables, figures, formulas) may run wider than the prose. */
 export const BREAKOUT_CLASS = 'max-w-[60rem]';
 
+/**
+ * A reading column's one text edge, set on the column that holds the
+ * blocks. `--measure-prose` is 66ch, and `ch` follows each element's own
+ * font size, so the 14px tables, lists, callouts and captions ended short of
+ * the 17px prose. Here the measure is the prose's own width in rem (66ch of
+ * 17px Inter is 44rem; CJK prose sets 40em at 16px), so every text block ends
+ * on one edge and only figures and wide tables break out to 60rem.
+ */
+export const READING_TEXT_EDGE_CLASS =
+  '[--measure-prose:44rem] [&:is(:lang(zh),:lang(ja),:lang(ko))]:[--measure-prose:40rem]';
+
+/**
+ * A reading ledger's text starts and ends on the prose edges: no cell inset
+ * at the first and last column from 40em (a phone record sets its own).
+ */
+export const READING_TABLE_CLASS =
+  'sm:[&_:is(th,td):first-child]:ps-0 sm:[&_:is(th,td):last-child]:pe-0';
+
 export interface ReadingHeadingProps {
   as: 'h2' | 'h3';
   /** The section's anchor: the heading's link points at it. */

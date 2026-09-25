@@ -26,7 +26,7 @@ export const ABOUT_RESOURCE_IDS = Object.keys(ABOUT_RESOURCE_HREFS) as readonly 
 
 /**
  * The protocol's path from launch to handover, as the white paper records it
- * (§12 Deployment History and §13 The Path to Full Decentralization).
+ * (§12 Deployment history and §13 The path to full decentralization).
  */
 export const ABOUT_MILESTONE_IDS = ['v1', 'v2', 'v3', 'handover'] as const;
 

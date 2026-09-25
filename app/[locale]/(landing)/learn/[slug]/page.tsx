@@ -28,7 +28,12 @@ import { QuizPrompt } from '@/components/learn/QuizPrompt';
 import { AllocationBar, AllocationKey } from '@/components/reading/AllocationBar';
 import { ReadingContents } from '@/components/reading/ContentsNav';
 import { MetaItems } from '@/components/reading/MetaItems';
-import { NumberedFigure, PROSE_CLASS, ReadingHeading } from '@/components/reading/prose';
+import {
+  NumberedFigure,
+  PROSE_CLASS,
+  READING_TEXT_EDGE_CLASS,
+  ReadingHeading,
+} from '@/components/reading/prose';
 import { ReadingMain } from '@/components/reading/ReadingMain';
 import { SignaturePlate } from '@/components/reading/SignaturePlate';
 import { getSignaturePlateCopy } from '@/components/reading/signaturePlateCopy';
@@ -50,8 +55,12 @@ interface PageProps {
 const TITLE_ID = 'guide-title';
 const ARTICLE_ID = 'guide-body';
 
-/** The text measure inside the guide; figures break out to the white paper's 60rem. */
-const TEXT_COLUMN = 'max-w-[46rem]';
+/**
+ * The text measure inside the guide, the prose's own edge (the column sets
+ * it in rem, READING_TEXT_EDGE_CLASS); figures break out to the white
+ * paper's 60rem.
+ */
+const TEXT_COLUMN = 'max-w-[var(--measure-prose)]';
 
 /** The app pages every guide is read against: common questions, and the risks before taking part. */
 const VERIFY_ROUTES: readonly SiteRouteId[] = ['faq', 'riskDisclosures'];
@@ -342,7 +351,12 @@ export default async function LearnArticlePage({ params }: PageProps) {
         {plateView ? <div className="hidden pb-10 lg:block">{plateView('26rem')}</div> : null}
       </div>
 
-      <div className="lg:grid lg:grid-cols-[minmax(0,14rem)_minmax(0,1fr)] lg:gap-12 xl:grid-cols-[minmax(0,16rem)_minmax(0,1fr)] xl:gap-16">
+      <div
+        className={cn(
+          READING_TEXT_EDGE_CLASS,
+          'lg:grid lg:grid-cols-[minmax(0,14rem)_minmax(0,1fr)] lg:gap-12 xl:grid-cols-[minmax(0,16rem)_minmax(0,1fr)] xl:gap-16',
+        )}
+      >
         <div>
           <ReadingContents
             entries={entries}

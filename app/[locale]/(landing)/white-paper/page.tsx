@@ -34,6 +34,8 @@ import {
   FormulaFigure,
   NumberedFigure,
   PROSE_CLASS,
+  READING_TABLE_CLASS,
+  READING_TEXT_EDGE_CLASS,
   ReadingHeading,
   RunInList,
 } from '@/components/reading/prose';
@@ -187,6 +189,7 @@ function BlockView({ block, context }: { block: WhitePaperBlock; context: BlockC
            */}
           <Table
             labelledBy={context.headingId}
+            className={READING_TABLE_CLASS}
             containerClassName={columns.length <= 2 ? 'max-w-[var(--measure-prose)]' : undefined}
           >
             <TableHeader>
@@ -204,7 +207,13 @@ function BlockView({ block, context }: { block: WhitePaperBlock; context: BlockC
                   {row.map((cell, cellIndex) => (
                     <TableCell
                       key={`${cellIndex}-${cell}`}
-                      label={cellIndex === 0 ? undefined : columns[cellIndex]}
+                      // On a phone each row is a record titled by its first
+                      // cell. A term and its description need no label; a
+                      // wider table labels each value with its column.
+                      phone={cellIndex === 0 ? 'title' : undefined}
+                      label={
+                        cellIndex === 0 || columns.length <= 2 ? undefined : columns[cellIndex]
+                      }
                       stack={cellIndex === 0 || !numeric[cellIndex]}
                       align={numeric[cellIndex] ? 'end' : 'start'}
                       numeric={numeric[cellIndex]}
@@ -475,7 +484,12 @@ export default async function WhitePaperPage({ params }: PageProps) {
         }
       />
 
-      <div className="lg:grid lg:grid-cols-[minmax(0,14rem)_minmax(0,1fr)] lg:gap-12 xl:grid-cols-[minmax(0,16rem)_minmax(0,1fr)] xl:gap-16">
+      <div
+        className={cn(
+          READING_TEXT_EDGE_CLASS,
+          'lg:grid lg:grid-cols-[minmax(0,14rem)_minmax(0,1fr)] lg:gap-12 xl:grid-cols-[minmax(0,16rem)_minmax(0,1fr)] xl:gap-16',
+        )}
+      >
         <div className="lg:row-span-4">
           <ReadingContents
             entries={entries}
