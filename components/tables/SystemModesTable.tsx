@@ -12,8 +12,24 @@ type EventRow = SystemModeChangeEvent;
 export type { EventRow };
 
 interface SystemModesTableProps extends LedgerStateProps {
-  /** Newest first: each activation ends when the one before it in the list began. */
+  /** Cycle activations, in any order. */
   list: EventRow[];
+}
+
+/**
+ * When each activation ended, by `EvtLogId`: when the next one in time
+ * began, or `null` for the one still active. Worked out from the list in
+ * time order rather than from a row's position, which a sort would change.
+ */
+export function activationEnds(
+  list: readonly Pick<EventRow, 'EvtLogId' | 'TimeStamp'>[],
+): Map<EventRow['EvtLogId'], number | null> {
+  const inTime = [...list].sort(
+    (a, b) => a.TimeStamp - b.TimeStamp || Number(a.EvtLogId) - Number(b.EvtLogId),
+  );
+  return new Map(
+    inTime.map((row, index) => [row.EvtLogId, inTime[index + 1]?.TimeStamp ?? null] as const),
+  );
 }
 
 /**
@@ -23,6 +39,7 @@ interface SystemModesTableProps extends LedgerStateProps {
  */
 export const SystemModesTable = ({ list, ...state }: SystemModesTableProps) => {
   const t = useTranslations('tables');
+  const ends = useMemo(() => activationEnds(list), [list]);
 
   const columns = useMemo<DataTableColumn<EventRow>[]>(
     () => [
@@ -34,6 +51,7 @@ export const SystemModesTable = ({ list, ...state }: SystemModesTableProps) => {
         cell: (row) =>
           row.RoundNum ? t('allocation.cycle', { cycle: row.RoundNum }) : t('status.deployment'),
         nowrap: true,
+        phone: 'title',
       },
       {
         id: 'started',
@@ -45,18 +63,16 @@ export const SystemModesTable = ({ list, ...state }: SystemModesTableProps) => {
         id: 'ended',
         kind: 'datetime',
         header: t('columns.ended'),
-        value: (row) => row.TimeStamp,
-        cell: (_row, { index }) => {
-          const next = index > 0 ? list[index - 1] : undefined;
-          return next ? (
-            <DateTime timestamp={next.TimeStamp} />
+        value: (row) => ends.get(row.EvtLogId) ?? null,
+        cell: (_row, { value }) =>
+          typeof value === 'number' ? (
+            <DateTime timestamp={value} />
           ) : (
             <span className="text-foreground">{t('status.currentlyActive')}</span>
-          );
-        },
+          ),
       },
     ],
-    [t, list],
+    [t, ends],
   );
 
   return (

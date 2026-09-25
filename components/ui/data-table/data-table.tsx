@@ -13,6 +13,7 @@ import { EmptyState } from '@/components/ui/empty-state';
 import { ErrorState } from '@/components/ui/error-state';
 import { InfoTooltip } from '@/components/ui/info-tooltip';
 import { TablePagination, pageCountFor } from '@/components/ui/pagination';
+import { SectionHeader } from '@/components/ui/section-header';
 import {
   ResponsiveTable,
   ResponsiveTableBody,
@@ -70,7 +71,9 @@ export interface DataTableColumn<T> {
   header: React.ReactNode;
   /**
    * The column name as plain text: the label beside each value in a phone
-   * record. Required when `header` is not a string.
+   * record. Required when `header` is not a string (an icon, a visually
+   * hidden word): without it the record shows no label, never the id, and
+   * development builds warn.
    */
   label?: string;
   /** What the column holds. Default `text`. */
@@ -111,11 +114,15 @@ export interface DataTableColumn<T> {
   /** `address`: the address the page is about, which reads "This address". */
   currentAddress?: string | null;
   /**
-   * What a blank value shows: `empty` (not applicable) or `unknown` (a dash
-   * that is announced as unavailable). Numeric kinds default to `unknown`.
+   * What a blank value shows: `empty` (not applicable: nothing), `unknown`
+   * (a dash announced as unavailable: the value could not be read) or
+   * `none` (a dash announced as "None": there is truly none, such as a
+   * largest Signature Allocation for a wallet that never received one). A
+   * phone record leaves a `none` line out, since its absence already says
+   * so. Numeric kinds default to `unknown`.
    */
-  whenBlank?: 'empty' | 'unknown';
-  /** What a blank value's dash says to a screen reader ("None"). Default "Unavailable". */
+  whenBlank?: 'empty' | 'unknown' | 'none';
+  /** What a blank value's dash says to a screen reader. Default "Unavailable", or "None". */
   blankLabel?: string;
 
   /**
@@ -128,6 +135,14 @@ export interface DataTableColumn<T> {
 
   /** `secondary`: dropped from phone records. */
   priority?: ColumnPriority;
+  /**
+   * The column's part in a phone record: `title` opens each record with its
+   * value alone, unlabelled, at the start and in the foreground tier (the
+   * row's identity: an address, a cycle, a date), so the reader scans the
+   * records by it; `omit` leaves the value out of the record. A table that
+   * stays a table on a phone (`compact`) ignores it.
+   */
+  phone?: 'title' | 'omit';
   /** In a phone record, put the value under its label (long text). */
   stack?: boolean;
   /** Drop the column on a page where no row has a value, instead of an empty column. */
@@ -254,8 +269,8 @@ export interface DataTableProps<T> {
    * stacked on a page share a right edge. `fill` always runs the full width
    * of its container. Without this prop the table takes the width of the
    * nearest `<DataTableWidth>`, which a page sets when it stacks short and
-   * wide ledgers. The empty and error states always take the full width, so
-   * they stay centred on their section.
+   * wide ledgers, so all of them share one right edge. The empty and error
+   * states always take the full width, so they stay centred on their section.
    */
   width?: DataTableWidthMode;
   /**
@@ -284,12 +299,25 @@ interface ResolvedColumn<T> {
   hasValue: boolean;
 }
 
+/** The label beside a column's value in a phone record; see `DataTableColumn.label`. */
+function columnLabel<T>(column: DataTableColumn<T>): string {
+  if (column.label !== undefined) return column.label;
+  if (typeof column.header === 'string') return column.header;
+  if (process.env.NODE_ENV !== 'production') {
+    console.warn(
+      `DataTable column "${column.id}": a header that is not plain text needs a \`label\` for phone records.`,
+    );
+  }
+  // Never the developer id ("quickView") beside a value, in any locale.
+  return '';
+}
+
 function resolveColumn<T>(column: DataTableColumn<T>): ResolvedColumn<T> {
   const kind = column.kind ?? 'text';
   const spec = COLUMN_KINDS[kind];
   return {
     column,
-    label: column.label ?? (typeof column.header === 'string' ? column.header : column.id),
+    label: columnLabel(column),
     kind,
     align: column.align ? logicalAlign(column.align) : spec.align,
     numeric: spec.numeric,
@@ -308,7 +336,8 @@ function hasAnyValue<T>(col: ResolvedColumn<T>, rows: readonly T[]): boolean {
 /**
  * The most columns a ledger can have and still stop at the reading width
  * under `width="auto"`. One width for all of them, so short ledgers stacked
- * on one page (three columns, then four) end at the same right edge.
+ * on one page (three columns, then four) end at the same right edge; sizing
+ * each to its column count gave /statistics/participation three edges.
  */
 const FIT_MAX_COLUMNS = 4;
 const FIT_WIDTH_CLASS = 'max-w-4xl';
@@ -330,12 +359,6 @@ function columnGroups<T>(columns: readonly ResolvedColumn<T>[]): ColumnGroupCell
   }
   return cells;
 }
-
-const HEADING_CLASS: Record<2 | 3 | 4, string> = {
-  2: 'type-section',
-  3: 'type-heading-3',
-  4: 'type-title',
-};
 
 /** Placeholder widths per kind, so the skeleton has the finished table's rhythm. */
 const SKELETON_WIDTH: Record<ColumnKind, string> = {
@@ -509,13 +532,17 @@ export function DataTable<T>({
   );
   const layout: TableLayout = kindLayout === 'compact' && !compactFits ? 'cards' : kindLayout;
 
-  const goToPage = (next: number) => {
+  // Set by "Show my row": once its page is on screen, focus moves to the
+  // connected wallet's row, since the button that was pressed is gone.
+  const focusCurrentRowRef = React.useRef(false);
+
+  const goToPage = (next: number, { scroll = true }: { scroll?: boolean } = {}) => {
     setPageState({ page: next, key: resetPageKey, sortKey });
     onPageChange?.(next);
     // Keep the reader at the top of the new page when they paged from the
     // bottom of a long table.
     const wrapper = wrapperRef.current;
-    if (!wrapper || typeof window === 'undefined') return;
+    if (!scroll || !wrapper || typeof window === 'undefined') return;
     window.requestAnimationFrame(() => {
       if (wrapper.getBoundingClientRect().top < 0) {
         wrapper.scrollIntoView({
@@ -525,6 +552,39 @@ export function DataTable<T>({
       }
     });
   };
+
+  React.useEffect(() => {
+    if (!focusCurrentRowRef.current) return;
+    focusCurrentRowRef.current = false;
+    const row = scrollRef.current?.querySelector<HTMLElement>('tbody tr[data-current]');
+    if (!row) return;
+    // Its first link or button (the row link, the address), else the row
+    // itself, which takes focus only from script (tabindex -1, no tab stop).
+    let target = row.querySelector<HTMLElement>('a[href], button');
+    if (!target) {
+      row.tabIndex = -1;
+      target = row;
+    }
+    target.focus({ preventScroll: true });
+    if (typeof row.scrollIntoView === 'function') {
+      row.scrollIntoView({
+        block: 'nearest',
+        behavior: prefersReducedMotion() ? 'auto' : 'smooth',
+      });
+    }
+  }, [page]);
+
+  // Development only: a link inside the row link is invalid HTML and an axe
+  // `nested-interactive` failure. The kinds' own links are dropped from the
+  // row-link column; this catches a custom `cell` that renders one there.
+  React.useEffect(() => {
+    if (process.env.NODE_ENV === 'production' || !getRowHref) return;
+    if (wrapperRef.current?.querySelector('tbody a a')) {
+      console.error(
+        `DataTable "${ariaLabel}": a cell in the row-link column renders a link inside the row link. Render plain content there, or move the link to another column.`,
+      );
+    }
+  });
 
   const toggleSort = (col: ResolvedColumn<T>) => {
     setSort((current) =>
@@ -543,7 +603,6 @@ export function DataTable<T>({
   const linkColumnId = rowLinkColumn ?? visible[0]?.column.id;
   const hasDatetime = visible.some((col) => col.kind === 'datetime');
   const cellPadding = density === 'compact' ? 'py-2.5' : 'py-3';
-  const Heading = `h${headingLevel}` as const;
   // An empty or error state's title sits one level under the table's own
   // heading, or takes the table's place in the outline when it has none.
   const stateHeadingLevel = title ? (Math.min(headingLevel + 1, 4) as 3 | 4) : headingLevel;
@@ -565,28 +624,40 @@ export function DataTable<T>({
       return next;
     });
 
-  const header =
-    title || actions || description ? (
-      <div className="mb-4 flex flex-wrap items-end justify-between gap-x-6 gap-y-2">
-        <div className="min-w-0 space-y-1">
-          {title ? (
-            <Heading id={headingId} className={cn(HEADING_CLASS[headingLevel], 'text-foreground')}>
-              {title}
-            </Heading>
-          ) : null}
-          {description ? (
-            <p className="max-w-[var(--measure-lede)] type-body-sm text-muted-foreground">
-              {description}
-            </p>
-          ) : null}
-        </div>
-        {actions ? <div className="flex shrink-0 items-center gap-2">{actions}</div> : null}
-      </div>
-    ) : null;
+  // The title block is the site's one section header, so a ledger's heading,
+  // intro and spacing match every other section on its page: the page tier
+  // for an h2, the panel tier inside a section. A titled ledger is itself a
+  // <section> (unnamed, so not a landmark), which scopes that <header> to it:
+  // outside one, a <header> that is not in <main> would be a banner.
+  const Frame = title ? 'section' : 'div';
+  const header = title ? (
+    <SectionHeader
+      as={`h${headingLevel}`}
+      size={headingLevel === 2 ? 'page' : 'panel'}
+      headingId={headingId}
+      title={title}
+      description={description}
+      actions={actions}
+    />
+  ) : actions || description ? (
+    <div className="mb-4 flex flex-wrap items-end justify-between gap-x-6 gap-y-3">
+      {description ? (
+        <p
+          className={cn(
+            'min-w-0 max-w-[var(--measure-lede)] text-muted-foreground',
+            headingLevel === 2 ? 'type-body-md' : 'type-body-sm',
+          )}
+        >
+          {description}
+        </p>
+      ) : null}
+      {actions ? <div className="flex shrink-0 flex-wrap items-center gap-2">{actions}</div> : null}
+    </div>
+  ) : null;
 
   if (error) {
     return (
-      <div ref={wrapperRef} className={className}>
+      <Frame ref={wrapperRef} className={className}>
         {header}
         {notice}
         <ErrorState
@@ -595,13 +666,13 @@ export function DataTable<T>({
           onRetry={onRetry}
           headingLevel={stateHeadingLevel}
         />
-      </div>
+      </Frame>
     );
   }
 
   if (!loading && data.length === 0) {
     return (
-      <div ref={wrapperRef} className={className}>
+      <Frame ref={wrapperRef} className={className}>
         {header}
         {notice}
         {toolbar}
@@ -612,14 +683,14 @@ export function DataTable<T>({
           action={emptyAction}
           headingLevel={stateHeadingLevel}
         />
-      </div>
+      </Frame>
     );
   }
 
   const showSkeleton = loading && data.length === 0;
 
   return (
-    <div
+    <Frame
       ref={wrapperRef}
       data-slot="data-table"
       className={cn('scroll-mt-[calc(var(--header-height,4.5rem)+1rem)]', fitClass, className)}
@@ -643,7 +714,10 @@ export function DataTable<T>({
           {currentPage !== page ? (
             <button
               type="button"
-              onClick={() => goToPage(currentPage)}
+              onClick={() => {
+                focusCurrentRowRef.current = true;
+                goToPage(currentPage, { scroll: false });
+              }}
               data-touch-target="extended"
               className={cn(TABLE_LINK_CLASS, TOUCH_TARGET_EXTENDED_CLASS, 'type-body-sm')}
             >
@@ -700,9 +774,7 @@ export function DataTable<T>({
                   col={col}
                   sort={sort}
                   onSort={toggleSort}
-                  explainLabel={t('tableHeaderHelp.explainColumn', {
-                    column: typeof col.column.header === 'string' ? col.column.header : col.label,
-                  })}
+                  explainLabel={t('tableHeaderHelp.explainColumn', { column: headerName(col) })}
                 />
               ))}
               {renderDetails ? (
@@ -760,8 +832,16 @@ export function DataTable<T>({
                       >
                         {visible.map((col) => {
                           const value = col.valueOf(row);
-                          let content = renderCell(col, row, { index, value, isCurrent });
                           const carriesRow = col.column.id === linkColumnId;
+                          // The row link wraps this column's value, so the
+                          // value's own link (an address, a proof) is dropped
+                          // rather than nested inside it.
+                          let content = renderCell(
+                            col,
+                            row,
+                            { index, value, isCurrent },
+                            { links: !(carriesRow && href) },
+                          );
                           if (carriesRow && href) {
                             const destination = getRowLabel?.(row, index);
                             content = (
@@ -781,6 +861,9 @@ export function DataTable<T>({
                               </span>
                             );
                           }
+                          // Truly none: a phone record leaves the line out.
+                          const noneHere =
+                            col.column.whenBlank === 'none' && col.hasValue && isBlankValue(value);
                           return (
                             <ResponsiveTableCell
                               key={col.column.id}
@@ -790,6 +873,7 @@ export function DataTable<T>({
                               nowrap={col.nowrap}
                               stack={col.column.stack}
                               priority={col.priority}
+                              phone={noneHere ? 'omit' : col.column.phone}
                               data-kind={col.kind}
                               className={cn(
                                 cellPadding,
@@ -871,7 +955,7 @@ export function DataTable<T>({
           label={t('pagination.labelFor', { table: ariaLabel })}
         />
       ) : null}
-    </div>
+    </Frame>
   );
 }
 
@@ -879,6 +963,7 @@ function renderCell<T>(
   col: ResolvedColumn<T>,
   row: T,
   context: DataTableCellContext,
+  { links }: { links: boolean },
 ): React.ReactNode {
   const { column } = col;
   if (column.cell) return column.cell(row, context);
@@ -889,8 +974,10 @@ function renderCell<T>(
     <KindValue
       kind={col.kind}
       value={context.value}
-      href={column.href ? column.href(row) : undefined}
-      txHash={column.txHash?.(row)}
+      // `null` drops the kind's own link (an address's profile, a date's
+      // proof) where the row link already wraps the value.
+      href={!links ? null : column.href ? column.href(row) : undefined}
+      txHash={links ? column.txHash?.(row) : null}
       unit={column.unit}
       showUnit={column.showUnit}
       percentScale={column.percentScale}
@@ -903,6 +990,11 @@ function renderCell<T>(
       blankLabel={column.blankLabel}
     />
   );
+}
+
+/** A column's name as its header says it: the header text, else its label. */
+function headerName<T>(col: ResolvedColumn<T>): string {
+  return typeof col.column.header === 'string' ? col.column.header : col.label;
 }
 
 function HeaderCell<T>({
@@ -978,6 +1070,11 @@ function HeaderCell<T>({
       align={col.align}
       numeric={col.numeric}
       priority={col.priority}
+      // A header with a help button would otherwise be named by both
+      // ("Net (ETH) Explain column: Net (ETH)"), and a screen reader repeats
+      // a column's name every time the reader moves into it. The button
+      // inside stays operable.
+      aria-label={col.help ? headerName(col) : undefined}
       style={column.width ? { width: column.width } : undefined}
       aria-sort={
         column.sortable

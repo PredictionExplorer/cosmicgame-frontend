@@ -37,11 +37,13 @@ const CharityWithdrawalTable = ({ list, ...state }: CharityWithdrawalTableProps)
         txHash: (row) => row.TxHash,
         year: 'always',
         sortable: true,
+        phone: 'title',
       },
       {
         id: 'destination',
         kind: 'address',
-        header: t('columns.destinationAddress'),
+        // Where the ETH went, by name when the vault's beneficiary took it.
+        header: t('columns.destination'),
         value: (row) => row.DestinationAddr,
         cell: (row) => (
           <AddressChip
@@ -57,7 +59,7 @@ const CharityWithdrawalTable = ({ list, ...state }: CharityWithdrawalTableProps)
       {
         id: 'amount',
         kind: 'amount',
-        header: t('columns.retrievalAmountEth'),
+        header: t('columns.amountEth'),
         value: (row) => row.AmountEth,
         showUnit: false,
         sortable: true,

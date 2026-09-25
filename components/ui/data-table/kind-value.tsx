@@ -29,8 +29,8 @@ export interface KindOptions {
   copy?: boolean;
   zeroRole?: 'from' | 'to';
   currentAddress?: string | null;
-  whenBlank?: 'empty' | 'unknown';
-  /** What a blank value's dash says to a screen reader. Default "Unavailable". */
+  whenBlank?: 'empty' | 'unknown' | 'none';
+  /** What a blank value's dash says to a screen reader. Default "Unavailable", or "None". */
   blankLabel?: string;
 }
 
@@ -42,9 +42,12 @@ const UNKNOWN_WHEN_BLANK: ReadonlySet<ColumnKind> = new Set([
   'duration',
 ]);
 
-/** Whether a blank value of this kind shows the unavailable dash (otherwise nothing). */
-export function blankShowsUnknown(kind: ColumnKind, whenBlank?: 'empty' | 'unknown'): boolean {
-  return whenBlank ? whenBlank === 'unknown' : UNKNOWN_WHEN_BLANK.has(kind);
+/** Whether a blank value of this kind shows a dash ("Unavailable" or "None"), otherwise nothing. */
+export function blankShowsUnknown(
+  kind: ColumnKind,
+  whenBlank?: 'empty' | 'unknown' | 'none',
+): boolean {
+  return whenBlank ? whenBlank !== 'empty' : UNKNOWN_WHEN_BLANK.has(kind);
 }
 
 const toNumber = (value: SortValue): number =>
@@ -96,7 +99,9 @@ export function KindValue({
 
   if (isBlankValue(value)) {
     return blankShowsUnknown(kind, whenBlank) ? (
-      <UnknownValue label={blankLabel ?? t('status.unavailable')} />
+      <UnknownValue
+        label={blankLabel ?? t(whenBlank === 'none' ? 'status.none' : 'status.unavailable')}
+      />
     ) : null;
   }
 

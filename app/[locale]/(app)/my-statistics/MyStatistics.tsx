@@ -7,6 +7,7 @@ import UserStatisticsView from '@/components/UserStatisticsView';
 import { PageHeader } from '@/components/layout/PageHeader';
 import { PageShell } from '@/components/ui/page-shell';
 import { SITE_EDGE_SHELL_CLASS } from '@/components/statistics/shell';
+import { DataTableWidth } from '@/components/ui/data-table';
 import { WalletRequiredState } from '@/components/wallet/WalletRequiredState';
 
 /**
@@ -40,7 +41,12 @@ const MyStatistics = () => {
     );
   }
 
-  return <UserStatisticsView address={account} isOwnProfile={true} />;
+  // Short and wide ledgers stacked on one profile share one right edge.
+  return (
+    <DataTableWidth value="fill">
+      <UserStatisticsView address={account} isOwnProfile={true} />
+    </DataTableWidth>
+  );
 };
 
 export default MyStatistics;

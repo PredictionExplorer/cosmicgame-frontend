@@ -24,12 +24,8 @@ describe('CharityDepositTable', () => {
     render(<CharityDepositTable list={[createDonation()]} />);
     expect(screen.getAllByText('tables.columns.datetime').length).toBeGreaterThanOrEqual(1);
     expect(screen.getAllByText('tables.columns.cycle').length).toBeGreaterThanOrEqual(1);
-    expect(screen.getAllByText('tables.columns.contributorAddress').length).toBeGreaterThanOrEqual(
-      1,
-    );
-    expect(
-      screen.getAllByText('tables.columns.contributionAmountEth').length,
-    ).toBeGreaterThanOrEqual(1);
+    expect(screen.getAllByText('tables.columns.contributor').length).toBeGreaterThanOrEqual(1);
+    expect(screen.getAllByText('tables.columns.amountEth').length).toBeGreaterThanOrEqual(1);
   });
 
   it('renders datetime as explorer link', () => {
@@ -40,10 +36,12 @@ describe('CharityDepositTable', () => {
     expect(datetime.closest('a')).toHaveAttribute('rel', 'noopener noreferrer');
   });
 
-  it('renders round number as a link', () => {
+  it('names the cycle, never a bare number, and links it to its record', () => {
     render(<CharityDepositTable list={[createDonation({ RoundNum: 5 })]} />);
-    const roundLink = screen.getByText('5');
-    expect(roundLink.closest('a')).toHaveAttribute('href', '/allocation/5');
+    expect(screen.getByRole('link', { name: 'tables.allocation.cycle(cycle=5)' })).toHaveAttribute(
+      'href',
+      '/allocation/5',
+    );
   });
 
   it('drops the cycle column when no contribution has a cycle', () => {
@@ -89,6 +87,16 @@ describe('CharityDepositTable', () => {
         expect(link).toHaveAttribute('rel', 'noopener noreferrer');
       }
     }
+  });
+
+  it('leaves out the contributor on the protocol’s own ledger, where every row is the protocol', () => {
+    render(<CharityDepositTable list={[createDonation()]} showContributor={false} />);
+    expect(
+      screen.queryByRole('columnheader', { name: 'tables.columns.contributor' }),
+    ).not.toBeInTheDocument();
+    expect(
+      screen.getByRole('columnheader', { name: /tables\.columns\.amountEth/ }),
+    ).toBeInTheDocument();
   });
 
   it('has no accessibility violations', async () => {

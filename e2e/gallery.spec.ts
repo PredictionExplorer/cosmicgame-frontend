@@ -58,7 +58,7 @@ test.describe('Gallery page', () => {
   });
 
   test('pagination moves to the next page', async ({ page }) => {
-    const next = page.getByRole('button', { name: 'Go to next page' });
+    const next = page.getByRole('button', { name: 'Next', exact: true });
     if (await next.isVisible()) {
       await ensureVisible(next);
       await next.click();

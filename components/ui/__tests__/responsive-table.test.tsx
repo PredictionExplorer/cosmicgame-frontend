@@ -1,3 +1,4 @@
+import { createPortal } from 'react-dom';
 import userEvent from '@testing-library/user-event';
 
 import {
@@ -9,10 +10,9 @@ import {
   ResponsiveTableHeadCell,
   ResponsiveTableRow,
   TABLE_LINK_CLASS,
-  TABLE_ROW_LINK_CLASS,
 } from '@/components/ui/responsive-table';
 
-import { act, checkA11y, render, screen } from '@/test-utils';
+import { act, checkA11y, fireEvent, render, screen } from '@/test-utils';
 
 /** Wraps cells in the minimum valid table so jsdom nesting stays legal. */
 function TableWith({ children }: { children: React.ReactNode }) {
@@ -425,6 +425,59 @@ describe('ResponsiveTableRow activation', () => {
     expect(onActivate).not.toHaveBeenCalled();
   });
 
+  it.each([
+    ['Cmd', { metaKey: true }],
+    ['Ctrl', { ctrlKey: true }],
+    ['Shift', { shiftKey: true }],
+    ['Alt', { altKey: true }],
+  ])('leaves a %s-click to the browser (new tab, window or download)', (_key, modifier) => {
+    const onActivate = jest.fn();
+    rowWith(onActivate);
+
+    fireEvent.click(screen.getByRole('cell', { name: '7' }), modifier);
+
+    expect(onActivate).not.toHaveBeenCalled();
+  });
+
+  it('does not fire at the end of a drag that selected text in the row', () => {
+    const onActivate = jest.fn();
+    rowWith(onActivate);
+    const cell = screen.getByRole('cell', { name: '7' });
+
+    const range = document.createRange();
+    range.selectNodeContents(cell);
+    // addRange is ignored while a range (a caret an earlier click left) exists.
+    window.getSelection()?.removeAllRanges();
+    window.getSelection()?.addRange(range);
+    fireEvent.click(cell);
+    expect(onActivate).not.toHaveBeenCalled();
+
+    // Once the selection is gone, a plain click follows the row again.
+    window.getSelection()?.removeAllRanges();
+    fireEvent.click(cell);
+    expect(onActivate).toHaveBeenCalledTimes(1);
+  });
+
+  it('does not fire for a click inside a portal a cell opened', async () => {
+    // React bubbles events through portals: a click in a popover's content
+    // reaches the row although it is outside the row in the DOM.
+    const user = userEvent.setup();
+    const onActivate = jest.fn();
+    render(
+      <TableWith>
+        <ResponsiveTableRow onActivate={onActivate}>
+          <ResponsiveTableCell label="Cycle">
+            7{createPortal(<p>Popover text</p>, document.body)}
+          </ResponsiveTableCell>
+        </ResponsiveTableRow>
+      </TableWith>,
+    );
+
+    await user.click(screen.getByText('Popover text'));
+
+    expect(onActivate).not.toHaveBeenCalled();
+  });
+
   it('supports a plain onClick row with no onActivate', async () => {
     const user = userEvent.setup();
     const onClick = jest.fn();
@@ -486,7 +539,7 @@ describe('ResponsiveTableRow accessibility', () => {
       <TableWith>
         <ResponsiveTableRow onActivate={onActivate}>
           <ResponsiveTableCell label="Cycle">
-            <a href="#detail" className={TABLE_ROW_LINK_CLASS}>
+            <a href="#detail" className={TABLE_LINK_CLASS}>
               7
             </a>
           </ResponsiveTableCell>
@@ -513,7 +566,7 @@ describe('ResponsiveTableRow accessibility', () => {
           <ResponsiveTableBody>
             <ResponsiveTableRow onActivate={jest.fn()}>
               <ResponsiveTableCell label="Cycle">
-                <a href="#detail" className={TABLE_ROW_LINK_CLASS}>
+                <a href="#detail" className={TABLE_LINK_CLASS}>
                   7
                 </a>
               </ResponsiveTableCell>
@@ -547,7 +600,6 @@ describe('ResponsiveTableRow accessibility', () => {
   });
 
   it('styles the row link as a link, leaving the focus ring to the shared outline', () => {
-    expect(TABLE_ROW_LINK_CLASS).toBe(TABLE_LINK_CLASS);
     expect(TABLE_LINK_CLASS).toContain('underline');
     expect(TABLE_LINK_CLASS).not.toContain('outline-none');
   });

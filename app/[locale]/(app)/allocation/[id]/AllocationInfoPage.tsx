@@ -502,7 +502,7 @@ const AllocationInfoPage = ({ roundNum }: AllocationInfoPageProps) => {
               <SkeletonTable rows={6} columns={4} />
             ) : stellarSelectionLedger.length > 0 ? (
               <RecipientHistoryTable
-                winningHistory={stellarSelectionLedger}
+                allocationRecords={stellarSelectionLedger}
                 showRoundColumn={false}
                 perPage={10}
               />
@@ -758,7 +758,7 @@ function CycleRecord({
       >
         {ledger.length > 0 ? (
           <RecipientHistoryTable
-            winningHistory={ledger}
+            allocationRecords={ledger}
             showRoundColumn={false}
             groupBy="recipient"
           />

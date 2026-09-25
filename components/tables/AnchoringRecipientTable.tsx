@@ -29,6 +29,7 @@ const AnchoringRecipientTable = ({ list, ...state }: AnchoringRecipientTableProp
         kind: 'address',
         header: t('columns.anchorHolder'),
         value: (row) => row.StakerAddr,
+        phone: 'title',
       },
       {
         id: 'nfts',

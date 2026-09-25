@@ -12,7 +12,9 @@ const METHODS: Readonly<Record<number, { label: string; method: GestureMethod }>
 /**
  * How a gesture was paid, as a tag with the method's series dot, so the
  * method reads the same here as in every chart. Tickers are Latin in every
- * locale. Replaces the unexplained per-method row tints.
+ * locale. Replaces the unexplained per-method row tints. The tag keeps its
+ * one line and the dot its size in a narrow column: the dot is the method's
+ * only colour cue.
  */
 export function GestureMethodTag({
   gestureType,
@@ -28,7 +30,7 @@ export function GestureMethodTag({
       {method ? (
         <span
           aria-hidden
-          className={cn('size-1.5 rounded-full', GESTURE_METHOD_BG_CLASS[method.method])}
+          className={cn('size-1.5 shrink-0 rounded-full', GESTURE_METHOD_BG_CLASS[method.method])}
         />
       ) : null}
       {method?.label ?? unknownLabel}

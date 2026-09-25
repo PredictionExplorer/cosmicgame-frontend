@@ -25,7 +25,10 @@ describe('UniqueEthDonorsTable', () => {
 
   it('renders short table headers with no info buttons', () => {
     render(<UniqueEthDonorsTable list={[createDonor()]} />);
-    const headers = screen.getAllByRole('columnheader').map((header) => header.textContent);
+    // The sorted header's arrow is joined to its label by U+2060.
+    const headers = screen
+      .getAllByRole('columnheader')
+      .map((header) => header.textContent?.replace(/\u2060/g, ''));
     expect(headers).toEqual([
       'tables.columns.contributor',
       'tables.columns.numberOfContributions',

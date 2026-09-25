@@ -32,6 +32,7 @@ const CharityCGDeposits = ({ header }: { header: ReactNode }) => {
         error={isError ? t('loadError') : undefined}
         onRetry={() => void refetch()}
         title={t('ledger.contributions')}
+        showContributor={false}
       />
     </LedgerPage>
   );

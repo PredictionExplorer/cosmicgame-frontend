@@ -25,7 +25,8 @@ describe('GlobalMarketingRewardsTable', () => {
     expect(screen.getAllByText('tables.columns.outreachContributor').length).toBeGreaterThanOrEqual(
       1,
     );
-    expect(screen.getAllByText('tables.columns.amount').length).toBeGreaterThanOrEqual(1);
+    // The unit is in the header, as on a contributor's own ledger.
+    expect(screen.getAllByText('tables.columns.amountCst').length).toBeGreaterThanOrEqual(1);
   });
 
   it('renders datetime from TxHash as explorer link', () => {
@@ -36,11 +37,9 @@ describe('GlobalMarketingRewardsTable', () => {
     expect(datetime.closest('a')).toHaveAttribute('rel', 'noopener noreferrer');
   });
 
-  it('formats amount to 2 decimal places with CST suffix', () => {
+  it('formats amount to 2 decimal places under a header that names the unit', () => {
     render(<GlobalMarketingRewardsTable list={[createReward({ AmountEth: 100.1 })]} />);
-    const amount = screen.getByText('100.10');
-    // The unit joins its number with a no-break space, so the two never split.
-    expect(amount.textContent).toBe('100.10\u00a0CST');
+    expect(screen.getByText('100.10').textContent).toBe('100.10');
   });
 
   it('mutes dust like every ledger and explains it beside the row range', () => {

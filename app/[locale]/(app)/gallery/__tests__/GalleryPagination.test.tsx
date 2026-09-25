@@ -18,7 +18,7 @@ describe('GalleryPagination', () => {
   it('shows the ledger pager with the range and moves between pages', () => {
     const { props } = renderPagination();
     expect(screen.getByText(/tables\.pagination\.range/)).toBeInTheDocument();
-    fireEvent.click(screen.getByRole('button', { name: 'tables.pagination.nextAria' }));
+    fireEvent.click(screen.getByRole('button', { name: 'tables.pagination.next' }));
     expect(props.onPageChange).toHaveBeenCalledWith(2);
   });
 

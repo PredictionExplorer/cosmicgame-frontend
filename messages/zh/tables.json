@@ -119,8 +119,7 @@
     "status": "状态",
     "message": "留言",
     "contributor": "贡献者",
-    "contributorAddress": "贡献者地址",
-    "destinationAddress": "目标地址",
+    "destination": "去向",
     "from": "转出方",
     "to": "接收方",
     "event": "事件",
@@ -133,8 +132,6 @@
     "note": "备注",
     "userAddress": "用户地址",
     "spentAmountEth": "支出金额（ETH）",
-    "contributionAmountEth": "贡献金额（ETH）",
-    "retrievalAmountEth": "取回金额（ETH）",
     "distributionAmountEth": "派发金额（ETH）",
     "outreachContributor": "推广贡献者",
     "maxGestureEth": "最高 ETH 落笔",
@@ -177,9 +174,7 @@
     "goToPage": "转到页码：",
     "goToPageAria": "转到页码",
     "previous": "上一页",
-    "previousAria": "转到上一页",
     "next": "下一页",
-    "nextAria": "转到下一页",
     "morePages": "更多页面"
   },
   "currentRow": {
@@ -252,8 +247,10 @@
     "banned": "留言已隐藏。",
     "unbanned": "留言已恢复。",
     "error": "未能更新留言状态，请重试。",
+    "hiddenLoadError": "未能加载已隐藏的留言。",
     "ban": "隐藏",
     "unban": "恢复",
+    "undo": "撤销",
     "visibilityLabel": "显示留言",
     "hiddenTag": "已隐藏",
     "allCycles": "全部周期",
@@ -303,7 +300,6 @@
       "anchoredStellarSelection": "锚定 NFT 星选"
     },
     "nft": "NFT #{id}",
-    "nftCount": "{count, plural, other {# 个 NFT}}",
     "readyToRetrieve": "可取回",
     "retrieve": "取回",
     "retrieved": "已取回",
@@ -311,6 +307,11 @@
     "showRecords": "{count, plural, other {查看 # 条记录}}",
     "hideRecords": "收起记录",
     "recordsHeader": "记录",
+    "received": {
+      "eth": "ETH",
+      "cst": "CST",
+      "nfts": "NFT"
+    },
     "totals": {
       "eth": "获配 ETH",
       "cst": "获配 CST",

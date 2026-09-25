@@ -225,6 +225,10 @@
     text-transform: none;
     text-align: start;
     overflow-wrap: normal;
+    /* A label is words, not figures: a numeric cell's tabular setting would
+     * space its hyphens and digits ("Chrono - Warrior", "ERC - 20") apart. */
+    font-variant-numeric: normal;
+    font-feature-settings: normal;
   }
 
   /* Every value sits at the end edge, whatever its desktop alignment. */
@@ -289,6 +293,14 @@
 
   .cs-table:not([data-layout='compact']) tbody td[data-phone='title'] > [data-slot='value'] {
     text-align: start;
+  }
+
+  /* An address or a date that titles a record keeps its own weight: bold
+   * monospace hex and bold figures read heavier than the words they stand
+   * beside, so the title line leads by its place and ink alone. */
+  .cs-table:not([data-layout='compact']) tbody td[data-phone='title'][data-kind='address'],
+  .cs-table:not([data-layout='compact']) tbody td[data-phone='title'][data-kind='datetime'] {
+    font-weight: 400;
   }
 
   .cs-table:not([data-layout='compact']) tbody td[data-phone='omit'] {
@@ -368,6 +380,22 @@
   .cs-table[data-layout='compact'] td[data-kind='address'] > [data-slot='value'] * {
     text-wrap-mode: wrap;
   }
+}
+
+/*
+ * A shortened address is one word, at every width and in either phone
+ * layout: never split mid-hex. The global `.font-mono` rule lets hex break
+ * anywhere (for full hashes in prose), and the wrap rules above turn
+ * wrapping back on inside a record's value and a compact address cell (for
+ * a protocol address shown by its name). Both reached the hex too, so a
+ * three-column holders table squeezed at 390px broke "0x360E…FB32" before
+ * its last character instead of turning into records. With the hex whole,
+ * such a table is wider than its column, and `useCompactFit` turns it into
+ * records by itself. This rule outranks both wrap rules and follows them.
+ */
+.cs-table tbody td[data-kind='address'] > [data-slot='value'] :is(.font-mono, .font-mono *) {
+  overflow-wrap: normal;
+  text-wrap-mode: nowrap;
 }
 
 /* ── Paper ────────────────────────────────────────────────────────────── */

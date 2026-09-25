@@ -2,11 +2,13 @@
 
 import '@testing-library/jest-dom';
 
+import userEvent from '@testing-library/user-event';
+
 import { formatAddress } from '@/utils';
 
-import GestureHistoryTable from '@/components/tables/GestureHistoryTable';
+import GestureHistoryTable, { holdDurations } from '@/components/tables/GestureHistoryTable';
 
-import { render, screen, checkA11y } from '@/test-utils';
+import { render, screen, checkA11y, within } from '@/test-utils';
 
 describe('GestureHistoryTable', () => {
   test('with no records', () => {
@@ -304,6 +306,47 @@ describe('GestureHistoryTable', () => {
       />,
     );
     expect(cellOf(spanning.container, 'link')).toHaveAttribute('data-priority', 'primary');
+  });
+
+  // Regression: each hold was measured to the row before it in the list, so
+  // a list that arrived oldest first got every duration wrong.
+  test('measures each hold to the next gesture in time, whatever the order', () => {
+    const gestures = [
+      { EvtLogId: 1, TimeStamp: 1_000 },
+      { EvtLogId: 3, TimeStamp: 1_900 },
+      { EvtLogId: 2, TimeStamp: 1_300 },
+    ];
+    const holds = holdDurations(gestures, 2_000);
+    expect(holds.get(1)).toBe(300);
+    expect(holds.get(2)).toBe(600);
+    expect(holds.get(3)).toBe(100);
+    expect(holdDurations([...gestures].reverse(), 2_000)).toEqual(holds);
+    // The cycle in progress: the newest is still holding.
+    expect(holdDurations(gestures, null).get(3)).toBeNull();
+  });
+
+  test('says it lists the newest first, so a first click on the date turns it around', async () => {
+    const user = userEvent.setup();
+    const gesture = (id: number, timeStamp: number) => ({
+      EvtLogId: id,
+      TimeStamp: timeStamp,
+      BidderAddr: '0x555eced709352759Ed0f1317dfC0a5FEf1310e60',
+      GestureType: 0,
+      EthPriceEth: 0.1,
+      RoundNum: 1,
+    });
+    const { container } = render(
+      <GestureHistoryTable
+        gestureHistory={[gesture(2, 1_700_000_600), gesture(1, 1_700_000_000)]}
+        showRound={false}
+      />,
+    );
+    const date = screen.getByRole('columnheader', { name: /tables\.columns\.datetime/ });
+    expect(date).toHaveAttribute('aria-sort', 'descending');
+
+    await user.click(within(date).getByRole('button'));
+    expect(date).toHaveAttribute('aria-sort', 'ascending');
+    expect(container.querySelector('tbody tr a')).toHaveAttribute('href', '/gesture/1');
   });
 
   it('has no accessibility violations', async () => {

@@ -193,7 +193,7 @@ describe('DonatedERC20Table', () => {
       createToken({ EvtLogId: i + 1, RoundNum: i + 1 }),
     );
     render(<DonatedERC20Table list={list} handleClaim={null} />);
-    expect(screen.getByRole('button', { name: 'tables.pagination.nextAria' })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'tables.pagination.next' })).toBeInTheDocument();
   });
 
   it('includes a print-only PDF fallback in the DOM', () => {

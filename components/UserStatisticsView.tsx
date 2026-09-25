@@ -355,9 +355,9 @@ const UserStatisticsView = ({ address, isOwnProfile }: UserStatisticsViewProps) 
 
           <SectionShell title={t('statistics.page.sections.recipientHistory')}>
             <RecipientHistoryTable
-              winningHistory={claimHistory}
+              allocationRecords={claimHistory}
               showClaimedStatus
-              showWinnerAddr={false}
+              showRecipient={false}
               loading={claimsQuery.isLoading}
               error={claimsQuery.isError ? t('statistics.page.loadErrorMessage') : undefined}
               onRetry={() => claimsQuery.refetch()}

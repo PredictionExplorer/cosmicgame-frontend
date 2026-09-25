@@ -260,6 +260,13 @@ interface CellProps
    * of at the end of the line. For long text: a message, a description.
    */
   stack?: boolean;
+  /**
+   * The cell's part in a phone record: `title` opens the record with the
+   * value alone (no label), at the start and in the foreground tier, the
+   * name a reader anchors each record on; `omit` leaves the cell out of the
+   * record. Tables that stay tables on a phone (`compact`) ignore it.
+   */
+  phone?: 'title' | 'omit';
 }
 
 /** True when a cell would render nothing a reader could see. */
@@ -280,6 +287,7 @@ export function ResponsiveTableCell({
   numeric = false,
   nowrap = false,
   stack = false,
+  phone,
   children,
   ...props
 }: CellProps) {
@@ -293,6 +301,7 @@ export function ResponsiveTableCell({
       data-numeric={numeric ? 'true' : undefined}
       data-nowrap={nowrap ? 'true' : undefined}
       data-stack={stack ? 'true' : undefined}
+      data-phone={phone}
       data-empty={isEmptyContent(children) ? 'true' : undefined}
       className={cn(
         'border-b border-rule-faint px-4 py-3 align-middle text-sm leading-5',
@@ -308,6 +317,30 @@ export function ResponsiveTableCell({
 
 const NESTED_INTERACTIVE_SELECTOR = 'a,button,input,select,textarea,[role="button"],[role="link"]';
 
+/**
+ * Whether a click on a row is the reader asking for the row's destination,
+ * rather than something else a pointer does over a row:
+ *
+ * - a press on a nested link, button or field belongs to that control;
+ * - a modified click (Cmd, Ctrl, Shift, Alt) asks the browser for a new tab,
+ *   a new window or a download, which only the row's real link can give, so
+ *   the row must not also navigate this tab;
+ * - the mouseup that ends a drag-selection over a message or an amount is a
+ *   click too, and must not carry the reader away from what they selected;
+ * - React bubbles events through portals, so a click inside a popover a
+ *   cell opened reaches the row without being inside it in the DOM.
+ */
+export function isRowActivation(event: React.MouseEvent<HTMLElement>): boolean {
+  if (event.button !== 0) return false;
+  if (event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return false;
+  const target = event.target;
+  if (!(target instanceof Node) || !event.currentTarget.contains(target)) return false;
+  if (target instanceof Element && target.closest(NESTED_INTERACTIVE_SELECTOR)) return false;
+  const selection = typeof window === 'undefined' ? null : window.getSelection();
+  if (selection && !selection.isCollapsed && selection.toString().trim() !== '') return false;
+  return true;
+}
+
 interface RowProps extends React.HTMLAttributes<HTMLTableRowElement> {
   /**
    * Convenience click target covering the whole row, for pointer users only.
@@ -317,7 +350,8 @@ interface RowProps extends React.HTMLAttributes<HTMLTableRowElement> {
    * on the row would nest those inside a control, a serious
    * `nested-interactive` axe violation. Keyboard and assistive-tech users
    * reach the same destination through a real link in the row's first cell
-   * (styled with {@link TABLE_ROW_LINK_CLASS}).
+   * (styled with {@link TABLE_LINK_CLASS}). A click that is not a plain
+   * activation of the row (see {@link isRowActivation}) is left alone.
    */
   onActivate?: () => void;
   /**
@@ -337,11 +371,7 @@ export function ResponsiveTableRow({
   const handleClick = (event: React.MouseEvent<HTMLTableRowElement>) => {
     onClick?.(event);
     if (!onActivate || event.defaultPrevented) return;
-    // A click on a nested link or button belongs to that control, not the row.
-    if (event.target instanceof Element && event.target.closest(NESTED_INTERACTIVE_SELECTOR)) {
-      return;
-    }
-    onActivate();
+    if (isRowActivation(event)) onActivate();
   };
 
   return (
@@ -362,9 +392,11 @@ export function ResponsiveTableRow({
 
 /**
  * A link inside a ledger cell: an internal route (an address, a token, a
- * cycle) or a proof link to the explorer. Foreground text with a quiet
- * underline, so it reads as a link beside the muted static values without
- * turning the ledger into a column of accent colour.
+ * cycle), a proof link to the explorer, or the row link in an activatable
+ * row's first cell, which gives keyboard and screen-reader users the
+ * destination `onActivate` gives pointer users. Foreground text with a
+ * quiet underline, so it reads as a link beside the muted static values
+ * without turning the ledger into a column of accent colour.
  */
 export const TABLE_LINK_CLASS = cn(
   'rounded-sm text-foreground underline decoration-1 underline-offset-[0.2em]',
@@ -372,12 +404,3 @@ export const TABLE_LINK_CLASS = cn(
   'transition-colors duration-[var(--duration-fast)]',
   'hover:text-primary hover:decoration-current',
 );
-
-/**
- * Styling for the keyboard-accessible entry point of an activatable row.
- *
- * Apply it to a `Link` from `@/i18n/navigation` in the row's first cell,
- * wrapping that cell's existing content. This is what gives keyboard and
- * screen-reader users the destination that `onActivate` gives pointer users.
- */
-export const TABLE_ROW_LINK_CLASS = TABLE_LINK_CLASS;

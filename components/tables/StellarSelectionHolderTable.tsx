@@ -21,9 +21,9 @@ interface PoolEntry {
 interface StellarSelectionHolderTableProps extends LedgerStateProps {
   list: GestureInfo[];
   /** ETH Stellar Selections drawn at finalization, when the dashboard carries them. */
-  numRaffleEthWinner?: number;
+  stellarEthSelections?: number;
   /** NFT Stellar Selections drawn at finalization. */
-  numRaffleNFTWinner?: number;
+  stellarNftSelections?: number;
 }
 
 /**
@@ -59,8 +59,8 @@ function poolEntriesFrom(list: readonly GestureInfo[]): PoolEntry[] {
  */
 const StellarSelectionHolderTable = ({
   list,
-  numRaffleEthWinner,
-  numRaffleNFTWinner,
+  stellarEthSelections,
+  stellarNftSelections,
   ...state
 }: StellarSelectionHolderTableProps) => {
   const t = useTranslations('tables');
@@ -76,6 +76,7 @@ const StellarSelectionHolderTable = ({
         kind: 'address',
         header: t('columns.participant'),
         value: (row) => row.userAddr,
+        phone: 'title',
       },
       {
         id: 'gestures',
@@ -95,10 +96,10 @@ const StellarSelectionHolderTable = ({
   );
 
   const drawsKnown =
-    typeof numRaffleEthWinner === 'number' &&
-    numRaffleEthWinner > 0 &&
-    typeof numRaffleNFTWinner === 'number' &&
-    numRaffleNFTWinner > 0;
+    typeof stellarEthSelections === 'number' &&
+    stellarEthSelections > 0 &&
+    typeof stellarNftSelections === 'number' &&
+    stellarNftSelections > 0;
 
   return (
     <DataTable
@@ -111,8 +112,8 @@ const StellarSelectionHolderTable = ({
       caption={
         drawsKnown
           ? t('stellarSelection.draws', {
-              eth: formatCount(numRaffleEthWinner, locale),
-              nft: formatCount(numRaffleNFTWinner, locale),
+              eth: formatCount(stellarEthSelections, locale),
+              nft: formatCount(stellarNftSelections, locale),
             })
           : undefined
       }

@@ -30,6 +30,7 @@ export const UniqueRecipientsTable = ({ list, ...state }: UniqueRecipientsTableP
         kind: 'address',
         header: t('columns.recipient'),
         value: (row) => row.WinnerAddr,
+        phone: 'title',
       },
       {
         id: 'allocations',
@@ -47,9 +48,13 @@ export const UniqueRecipientsTable = ({ list, ...state }: UniqueRecipientsTableP
         // 0 means the wallet never received one (its allocations came from
         // other tracks): a dash that says "None", not a column of zeros.
         value: (row) => (row.MaxWinAmountEth > 0 ? row.MaxWinAmountEth : null),
-        blankLabel: t('status.none'),
+        whenBlank: 'none',
         showUnit: false,
         sortable: true,
+        // Most recipients have none: on a phone the ledger keeps the address,
+        // the count and the ETH received, and stays a table like the other
+        // ledgers of the page instead of a stack of dashes.
+        priority: 'secondary',
       },
       {
         id: 'allocationsSum',
@@ -70,6 +75,8 @@ export const UniqueRecipientsTable = ({ list, ...state }: UniqueRecipientsTableP
       columns={columns}
       ariaLabel={t('names.recipients')}
       getRowKey={(row) => row.WinnerAid}
+      // Most allocations first, as the API lists them: the header shows it.
+      initialSort={{ id: 'allocations', direction: 'desc' }}
       emptyTitle={t('empty.recipients')}
       {...state}
     />

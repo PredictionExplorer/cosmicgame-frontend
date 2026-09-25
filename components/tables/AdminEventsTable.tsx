@@ -108,6 +108,8 @@ export const AdminEventsTable = ({ list, ...state }: AdminEventsTableProps) => {
         kind: 'text',
         header: t('columns.event'),
         value: nameOf,
+        // A phone record opens on what changed.
+        phone: 'title',
         cell: (row) => {
           const event = eventOf(row);
           const name = nameOf(row);

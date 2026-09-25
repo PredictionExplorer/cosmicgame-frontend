@@ -21,6 +21,10 @@
  *                         staking/cst/rewards/to_claim/by_user/…
  *                         prizes/eth/unclaimed/by_user/…
  *                         donations/nft/unclaimed/by_user/…
+ *                       and the moderation view's hidden list, where an
+ *                       empty list would show every hidden message as
+ *                       visible (get_banned_bids_required):
+ *                         get_banned_bids
  *
  *   apiCallEmptyOn404   404 means "nothing yet"; everything else rejects.
  *                       Analytics routes that ship ahead of the Go server:

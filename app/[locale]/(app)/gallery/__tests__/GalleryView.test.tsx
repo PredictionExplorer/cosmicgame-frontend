@@ -180,7 +180,7 @@ describe('GalleryView', () => {
     });
     render(<GalleryView search="" />);
     expect(screen.getAllByTestId('signature-card')).toHaveLength(24);
-    fireEvent.click(screen.getByRole('button', { name: 'tables.pagination.nextAria' }));
+    fireEvent.click(screen.getByRole('button', { name: 'tables.pagination.next' }));
     expect(mockPush).toHaveBeenCalledWith('/gallery?page=2', { scroll: false });
   });
 

@@ -33,6 +33,7 @@ export const UniqueAnchorHoldersRWLKTable = ({
         kind: 'address',
         header: t('columns.anchorHolder'),
         value: (row) => row.StakerAddr,
+        phone: 'title',
       },
       {
         id: 'anchors',

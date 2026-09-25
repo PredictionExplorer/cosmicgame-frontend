@@ -28,6 +28,7 @@ export const UniqueParticipantsTable = ({ list, ...state }: UniqueParticipantsTa
         kind: 'address',
         header: t('columns.participant'),
         value: (row) => row.BidderAddr,
+        phone: 'title',
       },
       {
         id: 'gestures',
@@ -43,7 +44,7 @@ export const UniqueParticipantsTable = ({ list, ...state }: UniqueParticipantsTa
         // A wallet that only ever gestured with CST has no ETH gesture: the
         // API reports a negative sentinel, which reads as none, not as dust.
         value: (row) => (row.MaxBidAmountEth >= 0 ? row.MaxBidAmountEth : null),
-        blankLabel: t('status.none'),
+        whenBlank: 'none',
         showUnit: false,
         sortable: true,
       },
@@ -57,6 +58,8 @@ export const UniqueParticipantsTable = ({ list, ...state }: UniqueParticipantsTa
       columns={columns}
       ariaLabel={t('names.participants')}
       getRowKey={(row) => row.BidderAid}
+      // Most gestures first, as the page lists them: the header shows it.
+      initialSort={{ id: 'gestures', direction: 'desc' }}
       emptyTitle={t('empty.participants')}
       {...state}
     />

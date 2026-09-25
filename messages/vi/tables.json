@@ -119,8 +119,7 @@
     "status": "Trạng thái",
     "message": "Lời nhắn",
     "contributor": "Người đóng góp",
-    "contributorAddress": "Địa chỉ người đóng góp",
-    "destinationAddress": "Địa chỉ đích",
+    "destination": "Nơi nhận",
     "from": "Từ",
     "to": "Đến",
     "event": "Sự kiện",
@@ -133,8 +132,6 @@
     "note": "Ghi chú",
     "userAddress": "Địa chỉ người dùng",
     "spentAmountEth": "Số tiền đã chi (ETH)",
-    "contributionAmountEth": "Số tiền đóng góp (ETH)",
-    "retrievalAmountEth": "Số tiền nhận về (ETH)",
     "distributionAmountEth": "Số tiền phân phối (ETH)",
     "outreachContributor": "Người đóng góp truyền thông",
     "maxGestureEth": "Nét bút lớn nhất (ETH)",
@@ -177,9 +174,7 @@
     "goToPage": "Đến trang:",
     "goToPageAria": "đến trang",
     "previous": "Trước",
-    "previousAria": "Đến trang trước",
     "next": "Sau",
-    "nextAria": "Đến trang sau",
     "morePages": "Thêm trang"
   },
   "currentRow": {
@@ -252,8 +247,10 @@
     "banned": "Đã ẩn lời nhắn.",
     "unbanned": "Đã khôi phục lời nhắn.",
     "error": "Không cập nhật được trạng thái lời nhắn. Hãy thử lại.",
+    "hiddenLoadError": "Không tải được các lời nhắn đã ẩn.",
     "ban": "Ẩn",
     "unban": "Khôi phục",
+    "undo": "Hoàn tác",
     "visibilityLabel": "Hiển thị lời nhắn",
     "hiddenTag": "Đã ẩn",
     "allCycles": "Tất cả chu kỳ",
@@ -303,7 +300,6 @@
       "anchoredStellarSelection": "Tinh tuyển neo giữ"
     },
     "nft": "NFT #{id}",
-    "nftCount": "{count, plural, other {# NFT}}",
     "readyToRetrieve": "Có thể nhận về",
     "retrieve": "Nhận về",
     "retrieved": "Đã nhận về",
@@ -311,6 +307,11 @@
     "showRecords": "{count, plural, other {Xem # bản ghi}}",
     "hideRecords": "Ẩn bản ghi",
     "recordsHeader": "Bản ghi",
+    "received": {
+      "eth": "ETH",
+      "cst": "CST",
+      "nfts": "NFT"
+    },
     "totals": {
       "eth": "ETH đã nhận",
       "cst": "CST đã nhận",

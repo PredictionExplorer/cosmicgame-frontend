@@ -58,7 +58,7 @@ describe('NFTDonationsPage', () => {
     );
     render(<NFTDonationsPage />);
     expect(screen.getAllByTestId('attached-nft')).toHaveLength(12);
-    fireEvent.click(screen.getByRole('button', { name: 'tables.pagination.nextAria' }));
+    fireEvent.click(screen.getByRole('button', { name: 'tables.pagination.next' }));
     expect(screen.getAllByTestId('attached-nft')).toHaveLength(2);
   });
 
@@ -103,7 +103,7 @@ describe('NFTDonationsPage', () => {
     );
     render(<NFTDonationsPage page={2} onPageChange={onPageChange} />);
     expect(screen.getAllByTestId('attached-nft')).toHaveLength(2);
-    fireEvent.click(screen.getByRole('button', { name: 'tables.pagination.previousAria' }));
+    fireEvent.click(screen.getByRole('button', { name: 'tables.pagination.previous' }));
     expect(onPageChange).toHaveBeenCalledWith(1);
   });
 

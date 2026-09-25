@@ -86,10 +86,10 @@ function WinningHistory() {
         />
       ) : (
         <RecipientHistoryTable
-          winningHistory={history}
+          allocationRecords={history}
           loading={isLoading}
           showClaimedStatus
-          showWinnerAddr={false}
+          showRecipient={false}
           showSummary
           className="mb-10"
         />
