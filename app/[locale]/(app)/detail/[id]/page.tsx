@@ -13,7 +13,7 @@ import {
   type CosmicSignatureMetadata,
   type TraitTranslator,
 } from '@/lib/nftMetadata';
-import { flattenTx, getAPIUrl } from '@/services/api/client';
+import { flattenTx } from '@/services/api/client';
 import type { CSTTokenInfo } from '@/services/api/types';
 import { createMetadata } from '@/utils/seo';
 import { JsonLd, nftProductJsonLd, breadcrumbJsonLd } from '@/utils/jsonLd';
@@ -21,6 +21,7 @@ import { PageMessages } from '@/components/i18n/PageMessages';
 import { signatureTitle } from '@/components/nft/nftName';
 
 import DetailPage from './DetailPage';
+import { loadTokenInfo } from './tokenInfo';
 import { parseTokenId } from './tokenId';
 
 /**
@@ -41,28 +42,6 @@ function tokenImageUrl(seed: string | number | undefined): string {
   if (seed === undefined || seed === null || String(seed) === '') return logoImgUrl;
   return getAssetsUrl(`cosmicsignature/0x${seed}.png`);
 }
-
-/**
- * `fetch` (not axios) so the read lands in the Next.js Data Cache, and
- * React `cache()` so generateMetadata and the page body share one request
- * per render instead of the two this page used to make.
- * Returns null for a confirmed missing token (404), undefined on transport
- * errors — callers 404 the page only on the former.
- */
-const loadTokenInfo = cache(async (tokenId: number): Promise<CSTTokenInfo | null | undefined> => {
-  try {
-    const response = await fetch(getAPIUrl(`cst/info/${tokenId}`), {
-      headers: { Accept: 'application/json' },
-      next: { revalidate: 300 },
-    });
-    if (response.status === 404) return null;
-    if (!response.ok) return undefined;
-    const data = (await response.json()) as { TokenInfo?: CSTTokenInfo | null };
-    return data.TokenInfo ?? null;
-  } catch {
-    return undefined;
-  }
-});
 
 /**
  * The token's metadata document (traits, palette, simulation), read once per
@@ -94,16 +73,19 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
     notFound();
   }
 
-  // A named piece is shared by its name: `Twisted Mind · Cosmic Signature #25`.
+  // A named piece is shared by its name: `Twisted Mind · Cosmic Signature
+  // #000025`, the number as the H1 and the JSON-LD write it. The canonical
+  // is the one URL a Signature has (the layout moves /detail/025 there).
+  const number = formatId(tokenId).slice(1); // "000025": the catalog writes the "#"
   const name = typeof tokenInfo?.TokenName === 'string' ? tokenInfo.TokenName.trim() : '';
   const title = name
-    ? t('tokenDetail.titleWithName', { name, id })
-    : t('tokenDetail.titleFor', { id });
-  const description = t('tokenDetail.descriptionFor', { id });
+    ? t('tokenDetail.titleWithName', { name, id: number })
+    : t('tokenDetail.titleFor', { id: number });
+  const description = t('tokenDetail.descriptionFor', { id: number });
 
   // The share image is the co-located artwork card (./opengraph-image.tsx):
   // a 1200×630 PNG of the piece on its black plate, never the multi-MB source.
-  return createMetadata(title, description, undefined, '/detail/' + id, { locale });
+  return createMetadata(title, description, undefined, `/detail/${tokenId}`, { locale });
 }
 
 export default async function Page({ params }: PageProps) {
@@ -125,7 +107,8 @@ export default async function Page({ params }: PageProps) {
   ]);
 
   const description = t('jsonLd.productDescription');
-  const pageUrl = localeHref(APP_ORIGIN, `/detail/${id}`, locale);
+  const pagePath = `/detail/${tokenId}`;
+  const pageUrl = localeHref(APP_ORIGIN, pagePath, locale);
 
   if (tokenInfo === null) {
     notFound();
@@ -159,7 +142,7 @@ export default async function Page({ params }: PageProps) {
             [
               { name: tCommon('breadcrumbs.home'), path: '/' },
               { name: tCommon('breadcrumbs.gallery'), path: '/gallery' },
-              { name: title, path: `/detail/${id}` },
+              { name: title, path: pagePath },
             ],
             localeHref(APP_ORIGIN, '/', locale),
           )}

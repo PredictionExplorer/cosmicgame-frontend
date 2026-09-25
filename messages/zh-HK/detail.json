@@ -1,6 +1,10 @@
 {
-  "invalid": {
-    "title": "代幣 ID 無效"
+  "notFound": {
+    "title": "這枚簽名尚未銘刻",
+    "titleInvalid": "這個連結沒有對應的簽名",
+    "description": "簽名按銘刻的先後次序編號。",
+    "newest": "最新的一枚是 #{id}。",
+    "newestLink": "查看最新的簽名"
   },
   "jsonLd": {
     "productDescription": "Cosmic Signature 的生成藝術 NFT，以三體物理模擬生成獨一無二的圖像。"
