@@ -120,7 +120,13 @@ test.describe('Sprint 3 Chinese layout QA', () => {
       await expect(
         page.getByRole('heading', { level: 1, name: 'Cosmic Signature 画廊' }),
       ).toBeVisible();
-      await expect(page.getByText('已铭刻 NFT', { exact: true })).toBeVisible();
+      // The facts line: "已铭刻 NFT", or the short "已铭刻" on a phone.
+      await expect(
+        page
+          .getByText(/^已铭刻( NFT)?$/)
+          .filter({ visible: true })
+          .first(),
+      ).toBeVisible();
       await expectNoHorizontalOverflow(page);
       await testInfo.attach(`zh-gallery-${viewport.name}`, {
         body: await page.screenshot({ fullPage: true }),

@@ -72,7 +72,13 @@ test.describe('zh Sprint 3 — core dApp routes', () => {
     await expect(
       page.getByRole('heading', { level: 1, name: 'Cosmic Signature 画廊' }),
     ).toBeVisible();
-    await expect(page.getByText('已铭刻 NFT', { exact: true })).toBeVisible();
+    // The facts line: "已铭刻 NFT", or the short "已铭刻" on a phone.
+    await expect(
+      page
+        .getByText(/^已铭刻( NFT)?$/)
+        .filter({ visible: true })
+        .first(),
+    ).toBeVisible();
     await expect(page.getByRole('searchbox', { name: '搜索 NFT' })).toBeVisible();
     // The status filter sits in the toolbar from lg and in the Filters sheet
     // on smaller screens.
