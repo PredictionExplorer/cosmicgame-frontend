@@ -1,9 +1,29 @@
 import '@testing-library/jest-dom';
+import { QueryClientProvider } from '@tanstack/react-query';
 import userEvent from '@testing-library/user-event';
 
-import { act, checkA11y, render, screen, waitFor } from '@/test-utils';
+import {
+  act as rtlAct,
+  checkA11y,
+  createTestQueryClient,
+  renderWithQuery as render,
+  render as renderPlain,
+  screen,
+  waitFor,
+} from '@/test-utils';
+
+/**
+ * `act`, then the wait for the hidden list: the rows show only once it is
+ * known which of them are hidden, a read that settles a few ticks later.
+ */
+async function act<T>(callback: () => T | Promise<T>): Promise<T> {
+  const result = await rtlAct(callback);
+  await waitFor(() => expect(document.querySelector('table[aria-busy="true"]')).toBeNull());
+  return result;
+}
 
 const mockSetNotification = jest.fn();
+const mockToastSuccess = jest.fn();
 const mockBanGesture = jest.fn().mockResolvedValue(undefined);
 const mockUnbanGesture = jest.fn().mockResolvedValue(undefined);
 const mockGetBannedGestures = jest.fn().mockResolvedValue([]);
@@ -11,17 +31,33 @@ const mockGetBannedGestures = jest.fn().mockResolvedValue([]);
 jest.mock('../../../contexts/NotificationContext', () => ({
   useNotification: jest.fn(() => ({ setNotification: mockSetNotification })),
 }));
+jest.mock('sonner', () => ({
+  toast: { success: (...args: unknown[]) => mockToastSuccess(...args) },
+}));
 jest.mock('../../../services/api', () => ({
   __esModule: true,
   default: {
     ban_bid: (...args: unknown[]) => mockBanGesture(...args),
     unban_gesture: (...args: unknown[]) => mockUnbanGesture(...args),
-    get_banned_bids: (...args: unknown[]) => mockGetBannedGestures(...args),
+    // The moderation view reads the hidden list strictly.
+    get_banned_bids_required: (...args: unknown[]) => mockGetBannedGestures(...args),
   },
 }));
 jest.mock('../../../utils/errors', () => ({
   reportError: jest.fn(),
 }));
+// The hidden list lives in React Query's cache, shared with the public
+// ledgers: these tests run the real client, not the inert global mock.
+jest.unmock('@tanstack/react-query');
+
+/** The toast a successful change raised: its text and its Undo. */
+function lastToast(): { text: string; undo: { label: string; onClick: () => void } } {
+  const call = mockToastSuccess.mock.calls.at(-1) as
+    | [string, { action: { label: string; onClick: () => void } }]
+    | undefined;
+  if (!call) throw new Error('no success toast');
+  return { text: call[0], undo: call[1].action };
+}
 
 // eslint-disable-next-line import/order
 import BanGestureTable from '@/components/tables/BanGestureTable';
@@ -126,7 +162,8 @@ describe('BanGestureTable', () => {
   });
 
   it('shows the filters and the notice before the list arrives, so nothing shifts', async () => {
-    await act(async () => {
+    // Still loading: the plain act, since the list never settles here.
+    await rtlAct(async () => {
       render(
         <BanGestureTable
           gestureHistory={[]}
@@ -171,31 +208,75 @@ describe('BanGestureTable', () => {
         'secondary',
       );
     }
-    // ...and come back as one quiet line under the message.
-    const message = container.querySelector('tbody td[data-label="tables.columns.message"]');
+    // ...and come back as one quiet line under the message, which opens the
+    // record with no "Message" label before it.
+    const message = container.querySelector('tbody td[data-stack="true"]');
+    expect(message).toHaveAttribute('data-label', '');
+    expect(message).toHaveTextContent('Hello world');
     expect(message).toHaveTextContent('tables.allocation.cycle(cycle=5)');
     expect(message?.querySelector('time')).not.toBeNull();
+    // The header still names the column on a wide screen.
+    expect(
+      screen.getByRole('columnheader', { name: 'tables.columns.message' }),
+    ).toBeInTheDocument();
   });
 
-  it('calls get_banned_bids on mount', async () => {
+  it('reads which messages are hidden on mount', async () => {
     await act(async () => {
       render(<BanGestureTable gestureHistory={[createGestureHistory()]} />);
     });
     expect(mockGetBannedGestures).toHaveBeenCalled();
   });
 
-  // A network failure on the hidden list once escaped as an unhandled rejection.
-  it('keeps the list and reports it when the hidden list cannot be read', async () => {
-    const { reportError } = jest.requireMock('../../../utils/errors') as {
-      reportError: jest.Mock;
-    };
-    const failure = new Error('network down');
-    mockGetBannedGestures.mockRejectedValueOnce(failure);
-    await act(async () => {
-      render(<BanGestureTable gestureHistory={[createGestureHistory()]} />);
+  // Regression: before the hidden list arrived every row offered Hide and
+  // the filter counted "Hidden 0" as if that were known.
+  it('waits for the hidden list before it counts or offers Hide', async () => {
+    let settle: (list: { bid_id: number }[]) => void = () => undefined;
+    mockGetBannedGestures.mockReturnValueOnce(new Promise((resolve) => (settle = resolve)));
+    render(
+      <BanGestureTable
+        gestureHistory={[createGestureHistory({ EvtLogId: 1 })]}
+        moderatorAddress={MODERATOR}
+      />,
+    );
+
+    expect(screen.queryByRole('button', { name: 'tables.banGesture.ban' })).not.toBeInTheDocument();
+    expect(
+      screen.queryByRole('button', { name: 'tables.banGesture.unban' }),
+    ).not.toBeInTheDocument();
+    const hiddenFilter = screen.getByRole('button', {
+      name: /tables\.banGesture\.filters\.hidden/,
     });
-    expect(reportError).toHaveBeenCalledWith(failure, 'load hidden gestures');
-    expect(screen.getAllByText('Hello world').length).toBeGreaterThanOrEqual(1);
+    expect(hiddenFilter).toHaveTextContent('–');
+    expect(hiddenFilter).toBeDisabled();
+
+    await act(async () => settle([{ bid_id: 1 }]));
+    expect(
+      await screen.findByRole('button', { name: 'tables.banGesture.unban' }),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByRole('button', { name: /tables\.banGesture\.filters\.hidden/ }),
+    ).toHaveTextContent('1');
+  });
+
+  // Regression: a refused read (403) resolved to an empty list, so every
+  // hidden message showed as visible with a Hide button beside it.
+  it('says the hidden list could not be read, with a retry, instead of showing all as visible', async () => {
+    const user = userEvent.setup();
+    mockGetBannedGestures.mockRejectedValueOnce(new Error('403'));
+    render(
+      <BanGestureTable gestureHistory={[createGestureHistory()]} moderatorAddress={MODERATOR} />,
+    );
+
+    expect(await screen.findByText('tables.banGesture.hiddenLoadError')).toBeInTheDocument();
+    expect(screen.queryByText('Hello world')).not.toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: 'tables.banGesture.ban' })).not.toBeInTheDocument();
+
+    mockGetBannedGestures.mockResolvedValueOnce([]);
+    await user.click(screen.getByRole('button', { name: /retry|try/i }));
+    expect(
+      await screen.findByRole('button', { name: 'tables.banGesture.ban' }),
+    ).toBeInTheDocument();
   });
 
   // After a successful Hide, a failed refresh once showed the "could not hide" toast.
@@ -211,11 +292,7 @@ describe('BanGestureTable', () => {
     mockGetBannedGestures.mockRejectedValueOnce(new Error('network down'));
     await user.click(banButton);
 
-    await waitFor(() =>
-      expect(mockSetNotification).toHaveBeenCalledWith(
-        expect.objectContaining({ type: 'success', text: 'tables.banGesture.banned' }),
-      ),
-    );
+    await waitFor(() => expect(lastToast().text).toBe('tables.banGesture.banned'));
     expect(mockSetNotification).not.toHaveBeenCalledWith(
       expect.objectContaining({ type: 'error' }),
     );
@@ -223,6 +300,48 @@ describe('BanGestureTable', () => {
     expect(
       await screen.findByRole('button', { name: 'tables.banGesture.unban' }),
     ).toBeInTheDocument();
+  });
+
+  it('offers Undo on the toast, which sends the opposite request', async () => {
+    const user = userEvent.setup();
+    render(
+      <BanGestureTable
+        gestureHistory={[createGestureHistory({ EvtLogId: 7 })]}
+        moderatorAddress={MODERATOR}
+      />,
+    );
+    await user.click(await screen.findByRole('button', { name: 'tables.banGesture.ban' }));
+    await waitFor(() => expect(mockBanGesture).toHaveBeenCalledWith(7, MODERATOR));
+
+    const { undo } = lastToast();
+    expect(undo.label).toBe('tables.banGesture.undo');
+    await act(async () => undo.onClick());
+
+    expect(mockUnbanGesture).toHaveBeenCalledWith(7);
+    await waitFor(() => expect(lastToast().text).toBe('tables.banGesture.unbanned'));
+    expect(
+      await screen.findByRole('button', { name: 'tables.banGesture.ban' }),
+    ).toBeInTheDocument();
+  });
+
+  // Regression: the public ledgers kept showing a message just hidden here.
+  it('hides the message from the public ledgers too, through the shared cache', async () => {
+    const user = userEvent.setup();
+    const client = createTestQueryClient();
+    client.setQueryData(['bannedBids'], []);
+    renderPlain(
+      <QueryClientProvider client={client}>
+        <BanGestureTable
+          gestureHistory={[createGestureHistory({ EvtLogId: 7 })]}
+          moderatorAddress={MODERATOR}
+        />
+      </QueryClientProvider>,
+    );
+
+    await user.click(await screen.findByRole('button', { name: 'tables.banGesture.ban' }));
+
+    await waitFor(() => expect(client.getQueryData(['bannedBids'])).toEqual([{ bid_id: 7 }]));
+    expect(client.getQueryState(['bannedBids'])?.isInvalidated).toBe(true);
   });
 
   it('Ban click calls api.ban_bid with EvtLogId and account', async () => {
@@ -252,14 +371,7 @@ describe('BanGestureTable', () => {
     const banButton = await screen.findByRole('button', { name: 'tables.banGesture.ban' });
     await user.click(banButton);
 
-    await waitFor(() => {
-      expect(mockSetNotification).toHaveBeenCalledWith(
-        expect.objectContaining({
-          type: 'success',
-          text: 'tables.banGesture.banned',
-        }),
-      );
-    });
+    await waitFor(() => expect(lastToast().text).toBe('tables.banGesture.banned'));
   });
 
   it('shows Unban button for banned gestures', async () => {
@@ -308,14 +420,7 @@ describe('BanGestureTable', () => {
     const unbanButton = await screen.findByRole('button', { name: 'tables.banGesture.unban' });
     await user.click(unbanButton);
 
-    await waitFor(() => {
-      expect(mockSetNotification).toHaveBeenCalledWith(
-        expect.objectContaining({
-          type: 'success',
-          text: 'tables.banGesture.unbanned',
-        }),
-      );
-    });
+    await waitFor(() => expect(lastToast().text).toBe('tables.banGesture.unbanned'));
   });
 
   it('reports a failed request and says the message could not be updated', async () => {
@@ -428,7 +533,9 @@ describe('BanGestureTable', () => {
       createGestureHistory({ EvtLogId: 1, Message: 'Hello world' }),
       createGestureHistory({ EvtLogId: 2, Message: 'Something else' }),
     ];
-    render(<BanGestureTable gestureHistory={list} />);
+    await act(async () => {
+      render(<BanGestureTable gestureHistory={list} />);
+    });
     const search = screen.getByRole('searchbox', { name: 'tables.banGesture.search' });
 
     await user.type(search, 'hello');

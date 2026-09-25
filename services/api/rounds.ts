@@ -253,6 +253,19 @@ export function get_banned_bids(opts?: ApiRequestOptions): Promise<BannedGesture
   }, []);
 }
 
+/**
+ * The same hidden list, read strictly for the moderation view: a refused or
+ * failed read rejects instead of resolving to an empty list, because there
+ * an empty list would show every hidden message as visible, with a Hide
+ * button beside it.
+ */
+export function get_banned_bids_required(opts?: ApiRequestOptions): Promise<BannedGesture[]> {
+  return apiCallRequired(async () => {
+    const { data } = await apiGet(getAPIUrl('get_banned_bids'), opts);
+    return data as BannedGesture[];
+  });
+}
+
 /** Bans a bid by its ID and the bidder's address (admin action). Uses Cosmic Game / Go API. */
 export function ban_bid(bid_id: number, user_addr: string) {
   return apiPost(async () => {

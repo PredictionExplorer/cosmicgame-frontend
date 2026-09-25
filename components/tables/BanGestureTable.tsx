@@ -1,7 +1,9 @@
 'use client';
 
-import { useCallback, useEffect, useMemo, useState, type ReactNode } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { useLocale, useTranslations } from 'next-intl';
+import { toast } from 'sonner';
 
 import { cn } from '@/lib/utils';
 import { formatCount } from '@/utils/format';
@@ -29,6 +31,7 @@ import { GestureMethodTag } from '@/components/tables/GestureMethodTag';
 import type { LedgerStateProps } from '@/components/tables/ledger-props';
 import { useCycleHref } from '@/components/tables/useCycleHref';
 import api from '@/services/api';
+import type { BannedGesture } from '@/services/api/types';
 import { useNotification } from '@/contexts/NotificationContext';
 import { reportError } from '@/utils/errors';
 
@@ -74,51 +77,131 @@ const MODERATION_PAGE_SIZE = 25;
 /** Placeholder rows while the list loads: about a first screen of messages. */
 const MODERATION_SKELETON_ROWS = 8;
 
+/** The public ledgers' hidden list (`useBannedGestures`). */
+const PUBLIC_HIDDEN_KEY = ['bannedBids'] as const;
 /**
- * Hides a gesture's message from public view, or restores it. The button
- * keeps its label beside a spinner while the request runs and ignores
- * further presses until it settles. Only the hide or restore request can
- * fail the action: once it succeeds the change is reported and applied,
- * whatever happens to the list refresh that follows.
+ * The moderation view's own read of the same list, strict where the public
+ * one is lenient, under the public key so that one invalidation refreshes
+ * both.
+ */
+const MODERATION_HIDDEN_KEY = [...PUBLIC_HIDDEN_KEY, 'moderation'] as const;
+
+/**
+ * Which messages are hidden, for moderation. It shares React Query's cache
+ * with every public ledger (`useBannedGestures`), so a message hidden here
+ * disappears there too, and its reads are deduplicated, so two quick
+ * changes cannot land out of order. The read is strict: a refused or failed
+ * read is an error here, never an empty list that shows every hidden
+ * message as visible.
+ */
+function useHiddenGestures() {
+  const queryClient = useQueryClient();
+  const query = useQuery<BannedGesture[]>({
+    queryKey: MODERATION_HIDDEN_KEY,
+    queryFn: ({ signal }) => api.get_banned_bids_required({ signal }),
+    staleTime: 30_000,
+  });
+  const ids = useMemo(() => new Set((query.data ?? []).map((entry) => entry.bid_id)), [query.data]);
+
+  /** A confirmed change: shown at once in both caches, then read again to reconcile. */
+  const apply = useCallback(
+    (id: number, hidden: boolean) => {
+      const update = (list: BannedGesture[] | undefined) => {
+        if (!list) return list;
+        const rest = list.filter((entry) => entry.bid_id !== id);
+        return hidden ? [...rest, { bid_id: id }] : rest;
+      };
+      queryClient.setQueryData<BannedGesture[]>(MODERATION_HIDDEN_KEY, update);
+      queryClient.setQueryData<BannedGesture[]>(PUBLIC_HIDDEN_KEY, update);
+      void queryClient.invalidateQueries({ queryKey: PUBLIC_HIDDEN_KEY });
+    },
+    [queryClient],
+  );
+
+  return {
+    ids,
+    /** The list is known: counts and actions can be trusted. */
+    ready: query.data !== undefined,
+    /** The list could not be read at all. */
+    failed: query.isError && query.data === undefined,
+    retry: () => void query.refetch(),
+    apply,
+  };
+}
+
+/**
+ * Hides a message from public view, or restores it: the request, then the
+ * change applied at once and a toast whose Undo sends the opposite request.
+ * Only the request itself can fail the action: once it succeeds the change
+ * is reported and applied, whatever happens to the refresh that follows.
+ * Resolves `true` when the change went through.
+ */
+function useModerate(
+  moderatorAddress: string | null,
+  apply: (id: number, hidden: boolean) => void,
+) {
+  const t = useTranslations('tables');
+  const { setNotification } = useNotification();
+  // Undo calls the latest `moderate`, which the toast outlives.
+  const latest = useRef<(id: number, hide: boolean) => Promise<boolean>>(async () => false);
+
+  const moderate = useCallback(
+    async (id: number, hide: boolean): Promise<boolean> => {
+      if (!moderatorAddress) return false;
+      try {
+        if (hide) await api.ban_bid(id, moderatorAddress);
+        else await api.unban_gesture(id);
+      } catch (error) {
+        reportError(error, hide ? 'ban gesture' : 'unban gesture');
+        setNotification({ visible: true, type: 'error', text: t('banGesture.error') });
+        return false;
+      }
+      apply(id, hide);
+      // A hide is one press on a phone; the toast offers the way back.
+      toast.success(t(hide ? 'banGesture.banned' : 'banGesture.unbanned'), {
+        id: `moderation:${id}`,
+        action: {
+          label: t('banGesture.undo'),
+          onClick: () => void latest.current(id, !hide),
+        },
+      });
+      return true;
+    },
+    [moderatorAddress, apply, setNotification, t],
+  );
+
+  useEffect(() => {
+    latest.current = moderate;
+  }, [moderate]);
+
+  return moderate;
+}
+
+/**
+ * Hide or Restore for one message. The button keeps its label beside a
+ * spinner while the request runs and ignores further presses until it
+ * settles.
  */
 function ModerationAction({
   gesture,
   hidden,
-  moderatorAddress,
   disabled,
   disabledReasonId,
-  onChanged,
+  onModerate,
 }: {
   gesture: GestureHistory;
   hidden: boolean;
-  moderatorAddress: string;
   disabled: boolean;
   disabledReasonId?: string;
-  /** The request succeeded: the gesture is now hidden (`true`) or visible. */
-  onChanged: (id: number, hidden: boolean) => void;
+  onModerate: (id: number, hide: boolean) => Promise<boolean>;
 }) {
   const t = useTranslations('tables');
-  const { setNotification } = useNotification();
   const [busy, setBusy] = useState(false);
 
   const run = async () => {
     setBusy(true);
-    try {
-      if (hidden) await api.unban_gesture(gesture.EvtLogId);
-      else await api.ban_bid(gesture.EvtLogId, moderatorAddress);
-    } catch (error) {
-      reportError(error, hidden ? 'unban gesture' : 'ban gesture');
-      setNotification({ visible: true, type: 'error', text: t('banGesture.error') });
-      setBusy(false);
-      return;
-    }
+    await onModerate(gesture.EvtLogId, !hidden);
     setBusy(false);
-    onChanged(gesture.EvtLogId, !hidden);
-    setNotification({
-      visible: true,
-      type: 'success',
-      text: t(hidden ? 'banGesture.unbanned' : 'banGesture.banned'),
-    });
   };
 
   return (
@@ -182,46 +265,25 @@ const BanGestureTable = ({
   actionsDisabledReasonId,
   description,
   notice,
+  loading: listLoading = false,
+  error: listError,
+  onRetry: onListRetry,
   ...state
 }: BanGestureTableProps) => {
   const t = useTranslations('tables');
   const tAdmin = useTranslations('admin');
   const locale = useLocale();
   const cycleHref = useCycleHref();
-  const loading = Boolean(state.loading) && gestureHistory.length === 0;
-  const [hiddenIds, setHiddenIds] = useState<ReadonlySet<number>>(() => new Set());
+  const hidden = useHiddenGestures();
+  const hiddenIds = hidden.ids;
+  const moderate = useModerate(moderatorAddress, hidden.apply);
+  // Until both the messages and which of them are hidden are known, the
+  // list waits in its skeleton: no row offers Hide for a message that is
+  // already hidden, and no filter counts "Hidden 0" before it can count.
+  const loading = (listLoading && gestureHistory.length === 0) || (!hidden.ready && !hidden.failed);
   const [visibility, setVisibility] = useState<Visibility>('all');
   const [cycle, setCycle] = useState<string>(ALL_CYCLES);
   const [query, setQuery] = useState('');
-
-  /** Reads the hidden list; a failed read keeps the list as it is and is reported. */
-  const refreshHidden = useCallback(async () => {
-    try {
-      const hidden = await api.get_banned_bids();
-      setHiddenIds(new Set(hidden.map((entry: { bid_id: number }) => entry.bid_id)));
-    } catch (error) {
-      reportError(error, 'load hidden gestures');
-    }
-  }, []);
-
-  /** Applies a confirmed change at once, then re-reads the list to reconcile. */
-  const applyChange = useCallback(
-    (id: number, hidden: boolean) => {
-      setHiddenIds((current) => {
-        const next = new Set(current);
-        if (hidden) next.add(id);
-        else next.delete(id);
-        return next;
-      });
-      void refreshHidden();
-    },
-    [refreshHidden],
-  );
-
-  useEffect(() => {
-    // The hidden list is small; it loads once and after every change.
-    void refreshHidden(); // eslint-disable-line react-hooks/set-state-in-effect -- async fetch on mount
-  }, [refreshHidden]);
 
   const cycles = useMemo(
     () => [...new Set(gestureHistory.map((gesture) => gesture.RoundNum))].sort((a, b) => b - a),
@@ -291,13 +353,17 @@ const BanGestureTable = ({
           <GestureMethodTag gestureType={gesture.GestureType} unknownLabel={t('status.unknown')} />
         ),
         headerClassName: 'whitespace-nowrap',
-        width: '7.5rem',
+        // The widest tag ("ETH + RWLK") with its dot, plus the cell's inset.
+        width: '8.75rem',
         priority: 'secondary',
       },
       {
         id: 'message',
         kind: 'text',
         header: t('columns.message'),
+        // The message is what a phone record is about: it opens the record
+        // with no "Message" label before it (the moderator reads 25 a page).
+        label: '',
         value: (gesture) => gesture.Message,
         cell: (gesture) => {
           const hidden = hiddenIds.has(gesture.EvtLogId);
@@ -330,10 +396,9 @@ const BanGestureTable = ({
           <ModerationAction
             gesture={gesture}
             hidden={hiddenIds.has(gesture.EvtLogId)}
-            moderatorAddress={moderatorAddress}
             disabled={actionsDisabled}
             disabledReasonId={actionsDisabledReasonId}
-            onChanged={applyChange}
+            onModerate={moderate}
           />
         ),
       },
@@ -341,7 +406,7 @@ const BanGestureTable = ({
   }, [
     t,
     hiddenIds,
-    applyChange,
+    moderate,
     moderatorAddress,
     actionsDisabled,
     actionsDisabledReasonId,
@@ -401,10 +466,13 @@ const BanGestureTable = ({
   );
 
   const filtered = rows.length !== gestureHistory.length;
+  // The messages failing to load wins; otherwise a hidden list that cannot
+  // be read is an error of its own, with its own retry.
+  const error = listError ?? (hidden.failed ? t('banGesture.hiddenLoadError') : undefined);
 
   return (
     <DataTable
-      data={rows}
+      data={loading ? [] : rows}
       columns={columns}
       ariaLabel={t('names.gestureMessages')}
       description={description}
@@ -422,6 +490,9 @@ const BanGestureTable = ({
       tableClassName="lg:table-fixed"
       skeletonRows={MODERATION_SKELETON_ROWS}
       {...state}
+      loading={loading}
+      error={error}
+      onRetry={listError ? onListRetry : hidden.failed ? hidden.retry : undefined}
     />
   );
 };
