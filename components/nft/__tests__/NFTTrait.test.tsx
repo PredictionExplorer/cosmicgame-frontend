@@ -321,11 +321,8 @@ describe('NFTTrait', () => {
     withNft();
     withNameHistory();
     render(<NFTTrait tokenId={5} />);
-    const modes = screen.getByRole('group', { name: 'detail.viewer.modeLabel' });
-    expect(within(modes).getByRole('button', { name: /detail.viewer.still/ })).toHaveAttribute(
-      'aria-pressed',
-      'true',
-    );
+    const modes = screen.getByRole('radiogroup', { name: 'detail.viewer.modeLabel' });
+    expect(within(modes).getByRole('radio', { name: /detail.viewer.still/ })).toBeChecked();
     expect(screen.getByRole('button', { name: /detail.viewer.fullscreen/ })).toBeInTheDocument();
     const neighbours = screen.getByRole('navigation', { name: 'detail.navigation.label' });
     expect(within(neighbours).getByRole('link', { name: /Previous Signature/ })).toHaveAttribute(
@@ -533,8 +530,8 @@ describe('NFTTrait', () => {
       withDashboard();
       withNft();
       render(<NFTTrait tokenId={5} />);
-      const modes = screen.getByRole('group', { name: 'detail.viewer.modeLabel' });
-      const still = within(modes).getByRole('button', { name: /detail.viewer.still/ });
+      const modes = screen.getByRole('radiogroup', { name: 'detail.viewer.modeLabel' });
+      const still = within(modes).getByRole('radio', { name: /detail.viewer.still/ });
       still.focus();
       fireEvent.keyDown(still, { key: 'ArrowRight' });
       fireEvent.keyDown(screen.getByRole('button', { name: /detail.viewer.fullscreen/ }), {
