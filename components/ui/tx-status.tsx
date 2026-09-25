@@ -114,9 +114,13 @@ export function TxStatus({ stage, variant = 'line', className }: TxStatusProps) 
       break;
     case 'cancelled':
       icon = <CircleSlash className="h-4 w-4 shrink-0" aria-hidden />;
-      // With a hash, the wallet's "cancel" replaced a sent transaction: the
-      // replacement paid a fee, so "nothing was sent" would be wrong.
-      message = stage.hash ? t('tx.status.cancelledInWallet') : t('tx.status.cancelled');
+      // With a hash, the wallet replaced a sent transaction: the replacement
+      // paid a fee, so "nothing was sent" would be wrong.
+      message = stage.replaced
+        ? t('tx.status.replacedInWallet')
+        : stage.hash
+          ? t('tx.status.cancelledInWallet')
+          : t('tx.status.cancelled');
       break;
     default:
       icon = <Loader2 className="h-4 w-4 shrink-0 animate-spin text-primary" aria-hidden />;

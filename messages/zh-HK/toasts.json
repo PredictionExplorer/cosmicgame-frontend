@@ -46,7 +46,10 @@
       "notErc20": "所選合約不符合 ERC-20 標準。",
       "insufficientAttachedToken": "錢包中的代幣餘額不足，無法附加至本次落筆。",
       "insufficientEth": "本次落筆需要 {required} ETH 及網絡手續費，錢包在 {network} 上只有 {available} ETH。",
-      "insufficientCst": "本次落筆最多需要 {required} CST，錢包中有 {available} CST。"
+      "insufficientCst": "本次落筆最多需要 {required} CST，錢包中有 {available} CST。",
+      "invalidNftId": "請以純數字輸入 NFT 的代幣 ID。",
+      "invalidTokenAmount": "請輸入大於 0 的數量，只用數字，且小數位數不超過該代幣的精度。",
+      "cstRewardUnavailable": "暫時無法讀取參與 CST 預覽，因此無法套用 CST 銘刻下限保護。請稍後重試，或選擇「接受任意 CST 銘刻量」。"
     },
     "transaction": {
       "failed": "未能提交落筆。請檢查錢包與網絡連接，重新整理目前落筆價格後重試。",
@@ -61,7 +64,8 @@
       "wrongBidType": "所選落筆類型不正確。",
       "fundTransferFailed": "資金轉移失敗。",
       "ethCostChanged": "ETH 落筆價格已升至 {required} ETH，比提交時高 {increase} ETH。請重試。",
-      "cstCostChanged": "交易處理期間，CST 落筆價格已變動。目前需 {required} CST，超過你設定的 {maximum} CST 上限。請重新整理後再試。"
+      "cstCostChanged": "交易處理期間，CST 落筆價格已變動。目前需 {required} CST，超過你設定的 {maximum} CST 上限。請重新整理後再試。",
+      "cstRewardBelowMinimum": "本次落筆的參與 CST 將低於你設定的下限，很可能是他人搶先落筆。請重新整理預覽後重試，或放寬允許的下浮幅度。"
     },
     "confirmedWithCst": "落筆已記錄，週期收官時間已延長，{cst} 參與 CST 已存入錢包。",
     "approval": {
@@ -177,7 +181,8 @@
     "status": {
       "confirmed": "已在鏈上確認。",
       "cancelled": "已在錢包中取消，未發送任何內容。",
-      "cancelledInWallet": "已在錢包中取消。取消操作消耗了網絡手續費，除此之外未發送任何內容。"
+      "cancelledInWallet": "已在錢包中取消。取消操作消耗了網絡手續費，除此之外未發送任何內容。",
+      "replacedInWallet": "已在錢包中被另一筆交易取代，該交易消耗了網絡手續費。本次操作未被記錄。"
     },
     "confirmedRefresh": "已在鏈上確認。如果頁面尚未更新，請重新載入頁面。",
     "error": {
@@ -188,7 +193,8 @@
       "wouldRevert": "合約會拒絕這筆交易，因此沒有發送。請重新載入頁面後重試。",
       "reverted": "交易在鏈上執行失敗，只消耗了網絡手續費。請重新載入頁面後重試。",
       "timeout": "仍在等待確認。重試之前，請先在 {explorer} 上查看這筆交易。",
-      "network": "無法連接網絡。請檢查網絡連接後重試。"
+      "network": "無法連接網絡。請檢查網絡連接後重試。",
+      "untrustedContract": "這筆交易的目標地址與鏈上的 Cosmic Signature 合約不符，因此沒有發送。請重新載入頁面後重試。"
     },
     "viewOnExplorer": "在 {explorer} 上查看",
     "viewOnExplorerShort": "查看交易",

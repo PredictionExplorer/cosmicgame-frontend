@@ -46,7 +46,10 @@
       "notErc20": "Hợp đồng token đính kèm không phải là hợp đồng token ERC20.",
       "insufficientAttachedToken": "Số dư token không đủ để đính kèm vào nét bút này.",
       "insufficientEth": "Nét bút này cần {required} ETH cộng phí mạng. Ví có {available} ETH trên {network}.",
-      "insufficientCst": "Nét bút này cần tối đa {required} CST. Ví có {available} CST."
+      "insufficientCst": "Nét bút này cần tối đa {required} CST. Ví có {available} CST.",
+      "invalidNftId": "Hãy nhập mã token của NFT, chỉ gồm chữ số.",
+      "invalidTokenAmount": "Hãy nhập số lượng lớn hơn 0 bằng chữ số, với số chữ số thập phân không vượt quá mức token này hỗ trợ.",
+      "cstRewardUnavailable": "Không đọc được bản xem trước CST tham gia nên chưa thể áp dụng bảo đảm CST tham gia tối thiểu. Hãy thử lại sau giây lát, hoặc chọn “Chấp nhận mọi mức CST tham gia”."
     },
     "transaction": {
       "failed": "Không thể gửi nét bút. Hãy kiểm tra ví và kết nối mạng, làm mới chi phí hiện tại, rồi thử lại.",
@@ -61,7 +64,8 @@
       "wrongBidType": "Đã chọn sai loại nét bút.",
       "fundTransferFailed": "Chuyển tiền thất bại.",
       "ethCostChanged": "Chi phí nét bút đã tăng {increase} ETH trong khi giao dịch của bạn đang được gửi. Chi phí mới cần thiết là {required} ETH. Vui lòng thử lại.",
-      "cstCostChanged": "Chi phí nét bút CST đã thay đổi trong khi giao dịch của bạn đang được gửi, có thể do một nét bút khác đã đến trước. Hợp đồng yêu cầu {required} CST, cao hơn mức tối đa {maximum} CST của bạn. Hãy làm mới và thử lại."
+      "cstCostChanged": "Chi phí nét bút CST đã thay đổi trong khi giao dịch của bạn đang được gửi, có thể do một nét bút khác đã đến trước. Hợp đồng yêu cầu {required} CST, cao hơn mức tối đa {maximum} CST của bạn. Hãy làm mới và thử lại.",
+      "cstRewardBelowMinimum": "Lượng CST tham gia của nét bút này sẽ thấp hơn mức tối thiểu của bạn, nhiều khả năng do một nét bút khác đã đến trước. Hãy làm mới bản xem trước và thử lại, hoặc cho phép mức giảm lớn hơn."
     },
     "confirmedWithCst": "Nét bút đã được ghi nhận. Thời điểm hoàn tất chu kỳ đã được kéo dài, và {cst} CST tham gia đã về ví.",
     "approval": {
@@ -177,7 +181,8 @@
     "status": {
       "confirmed": "Đã xác nhận trên chuỗi.",
       "cancelled": "Đã hủy trong ví. Không có gì được gửi.",
-      "cancelledInWallet": "Đã hủy trong ví. Việc hủy đã tốn phí mạng, ngoài ra không có gì được gửi."
+      "cancelledInWallet": "Đã hủy trong ví. Việc hủy đã tốn phí mạng, ngoài ra không có gì được gửi.",
+      "replacedInWallet": "Giao dịch đã bị thay thế trong ví bằng một giao dịch khác, và giao dịch đó đã tốn phí mạng. Thao tác này chưa được ghi nhận."
     },
     "confirmedRefresh": "Đã xác nhận trên chuỗi. Nếu trang chưa cập nhật, hãy tải lại trang.",
     "error": {
@@ -188,7 +193,8 @@
       "wouldRevert": "Hợp đồng sẽ từ chối giao dịch này nên chưa có gì được gửi. Hãy tải lại trang và thử lại.",
       "reverted": "Giao dịch đã thất bại trên chuỗi. Chỉ phí mạng bị trừ. Hãy tải lại trang và thử lại.",
       "timeout": "Vẫn đang chờ xác nhận. Hãy kiểm tra giao dịch trên {explorer} trước khi thử lại.",
-      "network": "Không kết nối được mạng. Hãy kiểm tra kết nối rồi thử lại."
+      "network": "Không kết nối được mạng. Hãy kiểm tra kết nối rồi thử lại.",
+      "untrustedContract": "Giao dịch này sẽ đi đến một địa chỉ không thuộc các hợp đồng Cosmic Signature trên chuỗi nên chưa có gì được gửi. Hãy tải lại trang và thử lại."
     },
     "viewOnExplorer": "Xem trên {explorer}",
     "viewOnExplorerShort": "Xem giao dịch",

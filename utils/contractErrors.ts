@@ -2,6 +2,7 @@ import { decodeErrorResult, formatEther, type Abi, type Hex } from 'viem';
 
 import { cosmicGameAbi } from '@/contracts/abis';
 
+import { SUPPLEMENTAL_ERROR_ABI } from '@/utils/cosmicGameContractCompat';
 import { formatAmount } from '@/utils/format/numbers';
 
 /**
@@ -50,6 +51,7 @@ const CUSTOM_ERROR_TRANSLATION_KEYS: Record<string, string> = {
   MainPrizeEarlyClaim: 'finalize.contractErrors.mainPrizeEarlyClaim',
   MainPrizeClaimDenied: 'finalize.contractErrors.mainPrizeClaimDenied',
   NoBidsPlacedInCurrentRound: 'finalize.contractErrors.noGestures',
+  BidCstRewardAmountMinLimitNotReached: 'gesture.contractErrors.cstRewardBelowMinimum',
 };
 
 type GestureCurrency = 'ETH' | 'CST';
@@ -73,32 +75,58 @@ export interface ContractErrorDescriptor {
   errorName: string;
 }
 
+/** Full ABI used only for decoding revert data (game ABI + supplemental V2 errors). */
+const ERROR_DECODE_ABI = [...cosmicGameAbi, ...SUPPLEMENTAL_ERROR_ABI] as Abi;
+
+interface DecodedRevert {
+  errorName: string;
+  args: readonly unknown[];
+}
+
 /**
- * Extracts the custom error name from a viem `ContractFunctionRevertedError`
- * nested inside a `ContractFunctionExecutionError`.
+ * The custom error a contract revert carried, from anywhere in a viem/wagmi
+ * error chain. viem fills `ContractFunctionRevertedError.data` only when the
+ * ABI the call was made with defines the error; when it does not (a narrow
+ * function slice, an older ABI), the raw revert data is decoded here against
+ * the full game ABI plus the supplemental V2 errors. Built-in `Error(string)`
+ * and `Panic` reverts are not custom errors and return null.
  */
-function extractContractErrorName(err: unknown): string | null {
-  if (!(err instanceof Error)) return null;
-
-  const walkable = err as Error & { cause?: unknown; walk?: (fn: (e: Error) => boolean) => Error };
-
-  if (typeof walkable.walk === 'function') {
+function decodedRevertOf(err: unknown): DecodedRevert | null {
+  const walkable = err as { walk?: (fn: (e: Error) => boolean) => Error | null } | null;
+  if (typeof walkable?.walk === 'function') {
     try {
       const inner = walkable.walk((e: Error) => e.name === 'ContractFunctionRevertedError');
-      if (inner && 'data' in inner) {
-        const data = (inner as Error & { data?: { errorName?: string; args?: unknown[] } }).data;
-        if (data?.errorName) return data.errorName;
+      const data = (inner as (Error & { data?: { errorName?: string; args?: unknown } }) | null)
+        ?.data;
+      if (data?.errorName) {
+        return {
+          errorName: data.errorName,
+          args: Array.isArray(data.args) ? (data.args as readonly unknown[]) : [],
+        };
       }
     } catch {
-      /* Fall through to the explicit cause chain. */
+      /* Fall through to the raw revert data. */
     }
   }
 
-  if (walkable.cause instanceof Error) {
-    return extractContractErrorName(walkable.cause);
+  const raw = extractRevertData(err);
+  if (!raw || raw === '0x') return null;
+  try {
+    const decoded = decodeErrorResult({ abi: ERROR_DECODE_ABI, data: raw });
+    if (decoded.errorName === 'Error' || decoded.errorName === 'Panic') return null;
+    return { errorName: decoded.errorName, args: (decoded.args ?? []) as readonly unknown[] };
+  } catch {
+    return null;
   }
+}
 
-  return null;
+/**
+ * The name of the custom error a contract revert carried ("UsedRandomWalkNft"),
+ * or null. For logs and `TxErrorInfo.contractErrorName`; the UI shows the
+ * localized sentence from {@link getContractErrorDescriptor} instead.
+ */
+export function contractErrorNameOf(err: unknown): string | null {
+  return decodedRevertOf(err)?.errorName ?? null;
 }
 
 function normalizeContractErrorOptions(
@@ -110,10 +138,10 @@ function normalizeContractErrorOptions(
 }
 
 function getPriceChangeDescriptor(
-  err: unknown,
-  errorName: string,
+  revert: DecodedRevert,
   options: ContractErrorOptions,
 ): ContractErrorDescriptor | null {
+  const { errorName } = revert;
   if (
     errorName !== 'InsufficientReceivedBidAmount' ||
     (options.displayedPrice === undefined && options.displayedPriceWei == null)
@@ -121,19 +149,7 @@ function getPriceChangeDescriptor(
     return null;
   }
 
-  const walkable = err as Error & { walk?: (fn: (e: Error) => boolean) => Error };
-  if (typeof walkable.walk !== 'function') return null;
-
-  let inner: Error | null = null;
-  try {
-    inner = walkable.walk((e: Error) => e.name === 'ContractFunctionRevertedError');
-  } catch {
-    return null;
-  }
-  if (!inner || !('data' in inner)) return null;
-
-  const data = (inner as Error & { data?: { args?: readonly unknown[] } }).data;
-  const requiredWei = data?.args?.[1];
+  const requiredWei = revert.args[1];
   if (typeof requiredWei !== 'bigint') return null;
 
   const displayedPrice =
@@ -186,36 +202,16 @@ export function getContractErrorDescriptor(
   err: unknown,
   optionsOrDisplayedEthPrice?: number | ContractErrorOptions,
 ): ContractErrorDescriptor | null {
-  const errorName = extractContractErrorName(err);
-  if (!errorName) return null;
+  const revert = decodedRevertOf(err);
+  if (!revert) return null;
 
   const options = normalizeContractErrorOptions(optionsOrDisplayedEthPrice);
-  const priceChange = getPriceChangeDescriptor(err, errorName, options);
+  const priceChange = getPriceChangeDescriptor(revert, options);
   if (priceChange) return priceChange;
 
-  const key = CUSTOM_ERROR_TRANSLATION_KEYS[errorName];
-  return key ? { key, errorName } : null;
+  const key = CUSTOM_ERROR_TRANSLATION_KEYS[revert.errorName];
+  return key ? { key, errorName: revert.errorName } : null;
 }
-
-/**
- * Custom errors that the V2 bid paths can revert with but that are missing from
- * the generated `cosmicGameAbi` (the ABI has the V2 bid *functions* but not these
- * V2 error definitions). Regenerating the ABI from the V2 contracts would make
- * this list unnecessary — keep it in sync until then.
- */
-const SUPPLEMENTAL_ERROR_ABI = [
-  {
-    type: 'error',
-    name: 'BidCstRewardAmountMinLimitNotReached',
-    inputs: [
-      { name: 'bidCstRewardAmount', type: 'uint256', internalType: 'uint256' },
-      { name: 'bidCstRewardAmountMinLimit', type: 'uint256', internalType: 'uint256' },
-    ],
-  },
-] as const;
-
-/** Full ABI used only for decoding revert data (game ABI + supplemental V2 errors). */
-const ERROR_DECODE_ABI = [...cosmicGameAbi, ...SUPPLEMENTAL_ERROR_ABI] as Abi;
 
 /** Pulls the raw revert data (`0x<selector><args>`) out of a viem/wagmi error chain. */
 function extractRevertData(err: unknown): Hex | undefined {

@@ -2,14 +2,14 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import { useTranslations } from 'next-intl';
 import type { Hash } from 'viem';
 
+import { prizesWalletAbi } from '@/contracts/abis';
+
 import { tokenClaimKey, uniqueRounds, type TokenClaim } from '@/utils/allocationRetrieval';
 import { useApiData } from '@/contexts/ApiDataContext';
+import { useContractAddresses } from '@/contexts/ContractAddressesContext';
 import { useNotify } from '@/hooks/useNotify';
 import { useTxFlow, type TxResult } from '@/hooks/useTxFlow';
 import { toDonatedErc20ClaimAmountBigInt } from '@/utils/donatedErc20';
-import { assertTransactionHash } from '@/utils/transactions';
-
-import useStellarSelectionWalletContract from './useStellarSelectionWalletContract';
 
 interface ClaimingState {
   /** The one-transaction retrieval of everything PrizesWallet holds for the wallet. */
@@ -33,6 +33,17 @@ export interface RetrieveEverythingRequest {
 
 type ClaimingFlag = keyof ClaimingState;
 
+/** One Allocations wallet (PrizesWallet) write. */
+interface RetrieveCall {
+  functionName:
+    | 'withdrawEverything'
+    | 'claimDonatedNft'
+    | 'claimManyDonatedNfts'
+    | 'claimDonatedToken'
+    | 'claimManyDonatedTokens';
+  args: readonly unknown[];
+}
+
 const NOT_RUN: TxResult = { status: 'aborted' };
 
 /**
@@ -54,7 +65,7 @@ export function useClaimAllocations(onSuccess?: () => void) {
   const t = useTranslations('toasts');
   const { notify } = useNotify();
   const { fetchData: fetchStatusData } = useApiData();
-  const stellarSelectionWalletContract = useStellarSelectionWalletContract();
+  const { prizesWallet } = useContractAddresses();
   const { run: runTx, stage: txStage } = useTxFlow();
 
   const [isClaiming, setIsClaiming] = useState<ClaimingState>({
@@ -84,27 +95,31 @@ export function useClaimAllocations(onSuccess?: () => void) {
   }, [fetchStatusData, onSuccess]);
 
   /**
-   * Runs one retrieve transaction through the shared flow. `send` returns the
-   * contract write's hash; a missing hash is a failure, never a success.
+   * Runs one retrieve transaction through the shared flow, which checks the
+   * Allocations wallet against the game's own record of it and simulates
+   * the call before the wallet prompt. `buildCall` runs inside the flow, so
+   * an amount it cannot convert fails like any other write, before anything
+   * is sent.
    */
   const retrieve = useCallback(
     async (
-      send: (
-        contract: NonNullable<typeof stellarSelectionWalletContract>,
-      ) => Promise<unknown> | undefined,
+      buildCall: () => RetrieveCall,
       successMessage: string,
       errorContext: string,
     ): Promise<TxResult> => {
-      const contract = stellarSelectionWalletContract;
-      if (!contract) {
+      if (!prizesWallet) {
         notify('error', t('claim.walletNotConnected'));
         return NOT_RUN;
       }
       return runTx({
-        write: async () => {
-          const hash = (await send(contract)) as Hash | undefined;
-          assertTransactionHash(hash);
-          return hash;
+        write: (ctx): Promise<Hash> => {
+          const { functionName, args } = buildCall();
+          return ctx.writeContract({
+            address: prizesWallet as `0x${string}`,
+            abi: prizesWalletAbi,
+            functionName,
+            args,
+          });
         },
         successMessage,
         failureMessage: t('claim.failed'),
@@ -112,7 +127,7 @@ export function useClaimAllocations(onSuccess?: () => void) {
         onConfirmed: refreshAfterClaim,
       });
     },
-    [notify, refreshAfterClaim, stellarSelectionWalletContract, runTx, t],
+    [notify, prizesWallet, refreshAfterClaim, runTx, t],
   );
 
   const withFlag = useCallback(
@@ -136,18 +151,17 @@ export function useClaimAllocations(onSuccess?: () => void) {
     }: RetrieveEverythingRequest): Promise<void> => {
       await withFlag('everything', () =>
         retrieve(
-          (contract) => {
+          () => {
             // Inside the flow, so a display-unit amount fails like any other
             // write, before anything is sent.
             const tokens = tokenClaims.map((claim) => ({
               ...claim,
               amount: toDonatedErc20ClaimAmountBigInt(claim.amount),
             }));
-            return contract.write.withdrawEverything?.([
-              uniqueRounds(ethRounds),
-              tokens,
-              [...new Set(nftIndexes)],
-            ]);
+            return {
+              functionName: 'withdrawEverything',
+              args: [uniqueRounds(ethRounds), tokens, [...new Set(nftIndexes)]],
+            };
           },
           successMessage,
           'retrieve everything',
@@ -161,7 +175,7 @@ export function useClaimAllocations(onSuccess?: () => void) {
     async (roundNums: readonly number[]): Promise<void> => {
       await withFlag('raffleETH', () =>
         retrieve(
-          (contract) => contract.write.withdrawEverything?.([uniqueRounds(roundNums), [], []]),
+          () => ({ functionName: 'withdrawEverything', args: [uniqueRounds(roundNums), [], []] }),
           t('claim.stellarEthSuccess'),
           'retrieve all Stellar Selection ETH',
         ),
@@ -175,7 +189,7 @@ export function useClaimAllocations(onSuccess?: () => void) {
       setClaimingDonatedNFTs((prev) => [...prev, tokenID]);
       try {
         await retrieve(
-          (contract) => contract.write.claimDonatedNft?.([tokenID]),
+          () => ({ functionName: 'claimDonatedNft', args: [tokenID] }),
           t('claim.nftSuccess'),
           'retrieve attached NFT',
         );
@@ -192,7 +206,7 @@ export function useClaimAllocations(onSuccess?: () => void) {
     async (indexList: number[]): Promise<void> => {
       await withFlag('donatedNFT', () =>
         retrieve(
-          (contract) => contract.write.claimManyDonatedNfts?.([indexList]),
+          () => ({ functionName: 'claimManyDonatedNfts', args: [indexList] }),
           t('claim.nftsSuccess', { count: indexList.length }),
           'retrieve all attached NFTs',
         ),
@@ -211,12 +225,10 @@ export function useClaimAllocations(onSuccess?: () => void) {
       setClaimingDonatedTokens((prev) => [...prev, key]);
       try {
         await retrieve(
-          (contract) =>
-            contract.write.claimDonatedToken?.([
-              roundNum,
-              tokenAddr,
-              toDonatedErc20ClaimAmountBigInt(amount),
-            ]),
+          () => ({
+            functionName: 'claimDonatedToken',
+            args: [roundNum, tokenAddr, toDonatedErc20ClaimAmountBigInt(amount)],
+          }),
           t('claim.tokenSuccess'),
           'retrieve attached ERC20 token',
         );
@@ -239,14 +251,14 @@ export function useClaimAllocations(onSuccess?: () => void) {
     ): Promise<void> => {
       await withFlag('donatedERC20', () =>
         retrieve(
-          (contract) => {
+          () => {
             // Inside the flow, so an amount in display units (which would be
             // scaled wrongly) fails like any other write, before anything is sent.
             const rawTokens = tokens.map((token) => ({
               ...token,
               amount: toDonatedErc20ClaimAmountBigInt(token.amount),
             }));
-            return contract.write.claimManyDonatedTokens?.([rawTokens]);
+            return { functionName: 'claimManyDonatedTokens', args: [rawTokens] };
           },
           t('claim.tokensSuccess', { count: tokens.length }),
           'retrieve all attached ERC20 tokens',

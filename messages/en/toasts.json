@@ -46,7 +46,10 @@
       "notErc20": "The attached token must use an ERC-20 contract.",
       "insufficientAttachedToken": "Insufficient token balance to attach to this gesture.",
       "insufficientEth": "This gesture needs {required} ETH plus a network fee. Your wallet has {available} ETH on {network}.",
-      "insufficientCst": "This gesture needs up to {required} CST. Your wallet has {available} CST."
+      "insufficientCst": "This gesture needs up to {required} CST. Your wallet has {available} CST.",
+      "invalidNftId": "Enter the NFT's token ID as a whole number, digits only.",
+      "invalidTokenAmount": "Enter an amount above zero in digits, with no more decimal places than this token has.",
+      "cstRewardUnavailable": "The Participation CST preview couldn't be read, so your minimum CST reward protection can't be applied. Try again in a moment, or choose \"Accept any CST reward\"."
     },
     "transaction": {
       "failed": "Unable to submit the gesture. Check your wallet and network connection, refresh the current cost, and try again.",
@@ -61,7 +64,8 @@
       "wrongBidType": "Wrong gesture type selected.",
       "fundTransferFailed": "Fund transfer failed.",
       "ethCostChanged": "Gesture Cost rose by {increase} ETH while your transaction was in transit. The new required cost is {required} ETH. Please try again.",
-      "cstCostChanged": "CST Gesture Cost changed while your transaction was in transit, likely because another gesture landed first. The contract required {required} CST, above your {maximum} CST maximum. Refresh and try again."
+      "cstCostChanged": "CST Gesture Cost changed while your transaction was in transit, likely because another gesture landed first. The contract required {required} CST, above your {maximum} CST maximum. Refresh and try again.",
+      "cstRewardBelowMinimum": "The Participation CST for this gesture would fall below your minimum, most likely because another gesture landed first. Refresh the preview and try again, or allow a larger drop."
     },
     "confirmedWithCst": "Gesture recorded. Cycle Finalization Time extended, and {cst} Participation CST arrived in your wallet.",
     "approval": {
@@ -177,7 +181,8 @@
     "status": {
       "confirmed": "Confirmed on-chain.",
       "cancelled": "Cancelled in your wallet. Nothing was sent.",
-      "cancelledInWallet": "Cancelled in your wallet. The cancellation used a network fee; nothing else was sent."
+      "cancelledInWallet": "Cancelled in your wallet. The cancellation used a network fee; nothing else was sent.",
+      "replacedInWallet": "Replaced in your wallet by a different transaction, which used a network fee. This action was not recorded."
     },
     "confirmedRefresh": "Confirmed on-chain. Refresh the page if it hasn’t updated yet.",
     "error": {
@@ -188,7 +193,8 @@
       "wouldRevert": "The contract would reject this transaction, so nothing was sent. Refresh the page and try again.",
       "reverted": "The transaction failed on-chain. Only the network fee was spent. Refresh the page and try again.",
       "timeout": "Still waiting for confirmation. Check the transaction on {explorer} before you try again.",
-      "network": "The network could not be reached. Check your connection and try again."
+      "network": "The network could not be reached. Check your connection and try again.",
+      "untrustedContract": "This transaction would go to an address that isn't one of the Cosmic Signature contracts on-chain, so nothing was sent. Refresh the page and try again."
     },
     "viewOnExplorer": "View on {explorer}",
     "viewOnExplorerShort": "View transaction",

@@ -12,6 +12,7 @@ import api from '@/services/api';
 import { isAxiosError } from '@/services/api/client';
 import useCosmicGameContract from '@/hooks/useCosmicGameContract';
 import type { DashboardInfo } from '@/services/api/types';
+import { classifyTxError } from '@/lib/txErrors';
 import { reportError } from '@/utils/errors';
 import { isEmptyContractReadError } from '@/utils/contractErrors';
 import { useNotify } from '@/hooks/useNotify';
@@ -161,6 +162,11 @@ export function useAllocationFinalize({
             });
             if (estimate) gasLimit = estimate + GAS_EXTRA;
           } catch (estimateErr) {
+            // A revert means the contract would reject the finalization (too
+            // early, or someone else just finalized): stop here with its
+            // decoded reason instead of sending with the gas floor. Only an
+            // estimate that could not run falls back to the floor.
+            if (classifyTxError(estimateErr).kind === 'would-revert') throw estimateErr;
             reportError(estimateErr, 'finalize-cycle-gas-estimate');
           }
         },
