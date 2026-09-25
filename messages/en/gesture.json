@@ -71,6 +71,6 @@
     "position": "Gesture {position} of {total}",
     "positionLive": "Gesture {position} of {total} so far",
     "liveNote": "This cycle is still open. Its Signature is imprinted when it finalizes.",
-    "signature": "The Signature of Cycle {cycle}"
+    "signature": "The Signature of Cycle #{cycle}"
   }
 }

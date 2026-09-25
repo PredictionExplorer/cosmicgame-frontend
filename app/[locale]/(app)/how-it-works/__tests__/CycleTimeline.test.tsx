@@ -151,7 +151,7 @@ describe('CycleTimeline', () => {
 
   it('closes on a real Signature with its wall label and a link to the record', () => {
     renderTimeline();
-    expect(screen.getByText('The Signature of Cycle 1')).toBeInTheDocument();
+    expect(screen.getByText('The Signature of Cycle #1')).toBeInTheDocument();
     expect(screen.getByText('Cosmic Signature #000024')).toBeInTheDocument();
     expect(screen.getByRole('link', { name: /View this Signature/ })).toHaveAttribute(
       'href',

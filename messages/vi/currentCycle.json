@@ -156,9 +156,9 @@
     "heading": "Tài sản đính kèm trong chu kỳ này",
     "cycleFallback": "hiện tại",
     "description": {
-      "nftOnly": "Tài sản cộng đồng đính kèm thuộc phân bổ Signature. Người hoàn tất chu kỳ #{cycle} nhận {nftCount, plural, other {toàn bộ {nftCount} NFT đính kèm}}.",
-      "erc20Only": "Tài sản cộng đồng đính kèm thuộc phân bổ Signature. Người hoàn tất chu kỳ #{cycle} nhận {erc20Count, plural, other {toàn bộ {erc20Count} khoản nạp token ERC-20 đính kèm}}.",
-      "mixed": "Tài sản cộng đồng đính kèm thuộc phân bổ Signature. Người hoàn tất chu kỳ #{cycle} nhận {nftCount, plural, other {toàn bộ {nftCount} NFT đính kèm}} và {erc20Count, plural, other {toàn bộ {erc20Count} khoản nạp token ERC-20 đính kèm}}."
+      "nftOnly": "Tài sản cộng đồng đính kèm thuộc phân bổ Signature. Người hoàn tất chu kỳ {cycle} nhận {nftCount, plural, other {toàn bộ {nftCount} NFT đính kèm}}.",
+      "erc20Only": "Tài sản cộng đồng đính kèm thuộc phân bổ Signature. Người hoàn tất chu kỳ {cycle} nhận {erc20Count, plural, other {toàn bộ {erc20Count} khoản nạp token ERC-20 đính kèm}}.",
+      "mixed": "Tài sản cộng đồng đính kèm thuộc phân bổ Signature. Người hoàn tất chu kỳ {cycle} nhận {nftCount, plural, other {toàn bộ {nftCount} NFT đính kèm}} và {erc20Count, plural, other {toàn bộ {erc20Count} khoản nạp token ERC-20 đính kèm}}."
     },
     "bonusReceipt": {
       "nftOnly": "{nftCount, plural, other {{nftCount} token ERC-721}}",
