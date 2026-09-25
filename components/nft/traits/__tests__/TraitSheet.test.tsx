@@ -24,7 +24,7 @@ describe('TraitSheet', () => {
     ).toBeInTheDocument();
     expect(screen.getByTestId('trait-row-chaos')).toContainElement(screen.getByRole('meter'));
     expect(screen.getByTestId('trait-row-cycle')).toHaveTextContent('Cycle #0');
-    expect(screen.getByRole('link', { name: 'View cycle 0' })).toHaveAttribute(
+    expect(screen.getByRole('link', { name: 'View Cycle #0' })).toHaveAttribute(
       'href',
       '/allocation/0',
     );

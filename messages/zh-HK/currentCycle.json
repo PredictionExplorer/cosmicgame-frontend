@@ -151,9 +151,9 @@
     "heading": "本週期的附加資產",
     "cycleFallback": "目前",
     "description": {
-      "nftOnly": "本週期（#{cycle}）收官後，寫下收官之筆的參與者將一併獲得 {nftCount} 枚已附加 NFT。",
-      "erc20Only": "本週期（#{cycle}）收官後，寫下收官之筆的參與者將一併獲得 {erc20Count} 筆已附加的 ERC-20 代幣存入。",
-      "mixed": "本週期（#{cycle}）收官後，寫下收官之筆的參與者將一併獲得 {nftCount} 枚已附加 NFT 與 {erc20Count} 筆 ERC-20 代幣存入。"
+      "nftOnly": "第 {cycle} 個週期收官後，寫下收官之筆的參與者將一併獲得 {nftCount} 枚已附加 NFT。",
+      "erc20Only": "第 {cycle} 個週期收官後，寫下收官之筆的參與者將一併獲得 {erc20Count} 筆已附加的 ERC-20 代幣存入。",
+      "mixed": "第 {cycle} 個週期收官後，寫下收官之筆的參與者將一併獲得 {nftCount} 枚已附加 NFT 與 {erc20Count} 筆 ERC-20 代幣存入。"
     },
     "bonusReceipt": {
       "nftOnly": "{nftCount} 枚 ERC-721 代幣",

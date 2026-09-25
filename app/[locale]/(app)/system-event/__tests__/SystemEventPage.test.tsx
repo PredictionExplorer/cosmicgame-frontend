@@ -78,10 +78,10 @@ describe('SystemEventPage', () => {
     mockEvents({ data: rows });
     render(<SystemEventPage round={5} start={100} end={200} />);
     expect(
-      screen.getByRole('heading', { level: 1, name: 'Configuration before cycle 5' }),
+      screen.getByRole('heading', { level: 1, name: 'Configuration before Cycle #5' }),
     ).toBeInTheDocument();
     expect(
-      screen.getByText(/The protocol parameters the contract owner changed before cycle 5 opened/),
+      screen.getByText(/The protocol parameters the contract owner changed before Cycle #5 opened/),
     ).toBeInTheDocument();
     expect(screen.queryByText(/100/)).not.toBeInTheDocument();
     expect(screen.queryByText(/200/)).not.toBeInTheDocument();
@@ -133,7 +133,7 @@ describe('SystemEventPage', () => {
     expect(screen.queryByText('First change')).not.toBeInTheDocument();
     expect(document.querySelector('[data-figure]')).toBeNull();
     expect(
-      screen.getByText('The contract owner changed no settings before cycle 1 opened.'),
+      screen.getByText('The contract owner changed no settings before Cycle #1 opened.'),
     ).toBeInTheDocument();
     expect(screen.getAllByRole('link', { name: /All coordination changes/ })).toHaveLength(1);
   });
@@ -183,7 +183,7 @@ describe('SystemEventPage', () => {
       );
       expect(screen.queryByText(/Network response/)).not.toBeInTheDocument();
       expect(
-        screen.getByRole('heading', { level: 1, name: 'Configuration before cycle 3' }),
+        screen.getByRole('heading', { level: 1, name: 'Configuration before Cycle #3' }),
       ).toBeInTheDocument();
       screen.getByRole('button', { name: 'Try again' }).click();
       expect(mockRefetch).toHaveBeenCalled();

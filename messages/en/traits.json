@@ -150,7 +150,7 @@
     "traitsPending": "Traits pending",
     "traitSummary": "{structure} · {palette}",
     "cycleLong": "Cycle #{n}",
-    "viewCycle": "View cycle {n}",
+    "viewCycle": "View Cycle #{n}",
     "anchoredState": "Anchored"
   },
   "rarity": {

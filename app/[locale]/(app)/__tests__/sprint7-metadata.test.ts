@@ -187,7 +187,7 @@ describe('Sprint 7 route metadata', () => {
     });
 
     expect(documentTitleOf(en)).toBe('Cycle #42 Allocation Information · Cosmic Signature');
-    expect(en.description).toContain('cycle #42');
+    expect(en.description).toContain('Cycle #42');
     expect(en.alternates?.canonical).toBe(`${APP_ORIGIN}/allocation/42`);
     expect(en.robots).toEqual(expect.objectContaining({ index: true }));
 
