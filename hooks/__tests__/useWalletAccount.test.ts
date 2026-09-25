@@ -37,7 +37,7 @@ beforeEach(() => {
   jest.clearAllMocks();
   mockAccount = ACCOUNT;
   mockDisconnectAsync.mockResolvedValue(undefined);
-  mockCopy.mockResolvedValue(undefined);
+  mockCopy.mockResolvedValue(true);
 });
 
 afterEach(() => {
@@ -76,6 +76,15 @@ describe('useWalletAccount', () => {
 
     act(() => {
       jest.advanceTimersByTime(2_000);
+    });
+    expect(result.current.copied).toBe(false);
+  });
+
+  it('never says "copied" when the copy failed', async () => {
+    mockCopy.mockResolvedValue(false);
+    const { result } = renderHook(() => useWalletAccount());
+    await act(async () => {
+      await result.current.copyAddress();
     });
     expect(result.current.copied).toBe(false);
   });

@@ -33,7 +33,8 @@ export function NFTShareMenu({ imageUrl, videoUrl, className }: NFTShareMenuProp
   const { setNotification } = useNotification();
 
   const copyLink = async (url: string) => {
-    await copy(url);
+    // Confirm only a copy that happened (useClipboard resolves false when every route failed).
+    if (!(await copy(url))) return;
     setNotification({ text: tCommon('actions.copied'), type: 'success', visible: true });
   };
 
