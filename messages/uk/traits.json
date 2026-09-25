@@ -37,62 +37,62 @@
   },
   "values": {
     "vocabulary": {
-      "orbitRibbons": "орбітальні стрічки",
-      "timeChords": "часові акорди",
-      "harmonicWeave": "гармонічне плетіння",
-      "tangentCaustics": "дотичні каустики",
-      "stippleConstellation": "пунктирне сузір’я",
-      "nebulaVeil": "серпанок туманності"
+      "orbitRibbons": "Орбітальні стрічки",
+      "timeChords": "Часові акорди",
+      "harmonicWeave": "Гармонічне плетіння",
+      "tangentCaustics": "Дотичні каустики",
+      "stippleConstellation": "Пунктирне сузір’я",
+      "nebulaVeil": "Серпанок туманності"
     },
     "symmetry": {
-      "mirror": "дзеркальна",
-      "rosette": "розета ×{n}",
-      "mandala": "мандала ×{n}"
+      "mirror": "Дзеркальна",
+      "rosette": "Розета ×{n}",
+      "mandala": "Мандала ×{n}"
     },
     "projection": {
-      "crossBraid": "перехресне плетиво",
-      "phasePortrait": "фазовий портрет",
-      "hodograph": "годограф"
+      "crossBraid": "Перехресне плетиво",
+      "phasePortrait": "Фазовий портрет",
+      "hodograph": "Годограф"
     },
     "wildcard": {
       "yes": "Так"
     },
     "finish": {
-      "stardust": "зоряний пил",
-      "prism": "призма"
+      "stardust": "Зоряний пил",
+      "prism": "Призма"
     },
     "massBalance": {
-      "heavyPrimary": "важка головна",
-      "twinBinary": "подвійна пара",
-      "equalTrio": "рівне тріо"
+      "heavyPrimary": "Важка головна",
+      "twinBinary": "Подвійна пара",
+      "equalTrio": "Рівне тріо"
     },
     "fate": {
-      "eternalDance": "вічний танець",
-      "ejection": "викид"
+      "eternalDance": "Вічний танець",
+      "ejection": "Викид"
     },
     "allocation": {
-      "stellarSelection": "зоряний відбір",
-      "anchoredSelection": "відбір закріплених NFT",
-      "finalGesture": "завершальний жест",
-      "lastCstGesture": "останній CST-жест",
+      "stellarSelection": "Зоряний відбір",
+      "anchoredSelection": "Відбір закріплених NFT",
+      "finalGesture": "Завершальний жест",
+      "lastCstGesture": "Останній CST-жест",
       "enduranceChampion": "Чемпіон витривалості",
       "chronoWarrior": "Воїн часу"
     },
     "palette": {
-      "pattern": "{hue} · {scheme}",
+      "pattern": "{hue} ({scheme})",
       "hues": {
-        "amber": "бурштин",
-        "aurora": "аврора",
-        "cerulean": "лазур",
-        "ember": "жарина",
-        "glacial": "крига",
-        "jade": "нефрит",
-        "nebular": "туманність",
-        "orchid": "орхідея",
-        "rose": "троянда",
-        "sapphire": "сапфір",
-        "solar": "сонце",
-        "violet": "фіалка"
+        "amber": "Бурштин",
+        "aurora": "Аврора",
+        "cerulean": "Лазур",
+        "ember": "Жарина",
+        "glacial": "Крига",
+        "jade": "Нефрит",
+        "nebular": "Туманність",
+        "orchid": "Орхідея",
+        "rose": "Троянда",
+        "sapphire": "Сапфір",
+        "solar": "Сонце",
+        "violet": "Фіалка"
       },
       "schemes": {
         "mono": "моно",
@@ -105,31 +105,31 @@
     },
     "spectralClass": {
       "O": {
-        "label": "клас O",
+        "label": "Клас O",
         "tone": "Блакитний — найгарячіший клас"
       },
       "B": {
-        "label": "клас B",
+        "label": "Клас B",
         "tone": "Блакитно-білий"
       },
       "A": {
-        "label": "клас A",
+        "label": "Клас A",
         "tone": "Білий"
       },
       "F": {
-        "label": "клас F",
+        "label": "Клас F",
         "tone": "Жовто-білий"
       },
       "G": {
-        "label": "клас G",
+        "label": "Клас G",
         "tone": "Жовтий, як Сонце"
       },
       "K": {
-        "label": "клас K",
+        "label": "Клас K",
         "tone": "Оранжевий"
       },
       "M": {
-        "label": "клас M",
+        "label": "Клас M",
         "tone": "Червоний — найхолодніший клас"
       }
     }
@@ -148,7 +148,7 @@
     "quickView": "Швидкий перегляд",
     "quickViewAria": "Швидкий перегляд Cosmic Signature {id}",
     "traitsPending": "Очікування даних ознак",
-    "traitSummary": "{structure}, {palette}",
+    "traitSummary": "{structure} · {palette}",
     "cycleLong": "Цикл {n}",
     "viewCycle": "Переглянути цикл {n}",
     "anchoredState": "Закріплено"

@@ -122,9 +122,14 @@ Formatting is code, not copy (`i18n/localeConfig.ts` → `intlLocale: 'uk-UA'`,
 | Relative time                          | 2 години тому · 5 днів тому · щойно         |
 | Compact duration                       | 1д 2год 30хв 45с                            |
 | Countdown labels (`formats.countdown`) | ДН · ГОД · ХВ · С                           |
+| Clock captions under figures           | днів · годин · хвилин · секунд              |
 | Grouped number                         | 1 000 000 (Intl, no-break space)            |
 | Token amount                           | 1.2345 ETH · 12.50 CST (formatter output)   |
 | Week start                             | Monday (`weekStartsMonday: true`)           |
+
+A caption under a ticking figure names the unit, not the count: the genitive plural
+(днів, годин) reads right under any number, where дні or години would disagree with 05
+or 50 and a per-count form would change every second.
 
 In prose, write times as «48 годин», «2 тижні», «1 день» — always through the plural
 forms in §7 so the numeric-claims guard can find them (годин[аиу], тиж…, дн…).
