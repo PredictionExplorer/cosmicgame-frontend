@@ -9,18 +9,27 @@ import { cn } from '@/lib/utils';
 import { SiteLink } from '@/components/layout/SiteLink';
 import { buttonVariants } from '@/components/ui/button';
 
+import { CycleDiagram } from './CycleDiagram';
 import { LandingSection, SectionHeading } from './SectionHeading';
 import styles from './Landing.module.css';
 
 /**
- * How a cycle works, in three numbered steps, then the way to take the first
- * one: a gesture in the app, or the full walkthrough. From 64rem the heading
- * and the actions hold the left five columns while the steps run down the
- * right seven; on phones the steps come between the heading and the actions.
- * The Calibration Window mechanics live in the FAQ and on How it works, not
- * here.
+ * How a cycle works, drawn and then told: the cycle's time line (gestures
+ * pushing the finalization time out, the clock reaching zero, the reserve
+ * fanning into the tracks of the next section), captioned by three numbered
+ * steps, one under each zone of the drawing, and the way to take the first
+ * one: a gesture in the app, or the full walkthrough. From 64rem the actions
+ * sit beside the heading; on phones they close the section. The Calibration
+ * Window mechanics live in the FAQ and on How it works, not here.
  */
-export function TheCycle({ cycle }: { cycle: LandingContent['cycle'] }) {
+export function TheCycle({
+  cycle,
+  tracks,
+}: {
+  cycle: LandingContent['cycle'];
+  /** The ETH tracks the drawing's fan ends in (`content.tracks.eth`). */
+  tracks: LandingContent['tracks']['eth'];
+}) {
   const locale = useLocale();
   const gesture = cycle.gestureCta;
   const guide = cycle.guideCta;
@@ -34,16 +43,16 @@ export function TheCycle({ cycle }: { cycle: LandingContent['cycle'] }) {
           headingId="landing-cycle-heading"
           className={styles.cycleIntro}
         />
+        <CycleDiagram tracks={tracks} />
         <ol className={styles.steps}>
           {cycle.steps.map((step) => (
             <li key={step.number} className={styles.step}>
-              {/* Inter figures: Clash's round zeros read as the letter O. */}
-              <span className={cn('type-figure-lg text-subtle', styles.stepNumber)}>
-                {step.number}
-              </span>
+              <span className="type-label pt-1 tabular-nums text-subtle">{step.number}</span>
               <div className="min-w-0">
-                <h3 className="type-heading-2">{step.title}</h3>
-                <p className="type-body-md mt-2 max-w-[48ch] text-muted-foreground">{step.body}</p>
+                <h3 className="type-heading-3">{step.title}</h3>
+                <p className="type-body-sm mt-1.5 max-w-[48ch] text-muted-foreground">
+                  {step.body}
+                </p>
               </div>
             </li>
           ))}

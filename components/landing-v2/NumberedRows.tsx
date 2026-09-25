@@ -24,7 +24,8 @@ export interface NumberedRowsProps {
  * stages, the Council's rules and the Verifiability pillars: a marker column,
  * an H3 and one line of body between hairlines, with one gutter, one padding
  * and one title size, so sibling sections read as one system. The Cycle's
- * three steps keep their larger figures: they are the page's core mechanic.
+ * three steps set the same marker and title type as captions under its
+ * drawing (./CycleDiagram.tsx).
  */
 export function NumberedRows({ rows, as: List = 'ol', className }: NumberedRowsProps) {
   return (

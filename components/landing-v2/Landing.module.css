@@ -383,6 +383,7 @@ html:is(:lang(zh), :lang(ja)) .headline {
   grid-template-columns: minmax(0, 1fr);
   grid-template-areas:
     'intro'
+    'diagram'
     'steps'
     'actions';
 }
@@ -391,49 +392,146 @@ html:is(:lang(zh), :lang(ja)) .headline {
   grid-area: intro;
 }
 
+/* The steps caption the drawing: on phones as numbered rows under it. */
 .steps {
   grid-area: steps;
   min-width: 0;
-  margin-top: clamp(2rem, 1.5rem + 2vw, 3rem);
+  margin-top: clamp(1.5rem, 1rem + 1.5vw, 2.25rem);
   border-bottom: 1px solid var(--rule-faint);
 }
 
 .step {
   display: grid;
-  grid-template-columns: 3.5rem minmax(0, 1fr);
-  column-gap: clamp(1rem, 2vw, 2rem);
-  padding-block: clamp(1.25rem, 1rem + 1vw, 2rem);
+  grid-template-columns: 2.5rem minmax(0, 1fr);
+  align-content: start;
+  column-gap: 1rem;
+  padding-block: 1.25rem;
   border-top: 1px solid var(--rule-faint);
-}
-
-.step:first-child {
-  border-top-color: hsl(var(--rule));
-}
-
-.stepNumber {
-  line-height: 1.1;
 }
 
 .cycleActions {
   grid-area: actions;
 }
 
+/*
+ * The cycle drawn (./CycleDiagram.tsx): hairlines in the rule colour, the
+ * gestures and the latest extension in the accent, the fan in the tracks'
+ * own colours. Strokes keep their width however wide the drawing is.
+ */
+.cycleDiagram {
+  grid-area: diagram;
+  display: block;
+  width: 100%;
+  height: auto;
+  margin-top: clamp(2rem, 1.5rem + 2.5vw, 3.5rem);
+  overflow: visible;
+}
+
+.cycleDiagram :is(line, path, rect, circle) {
+  vector-effect: non-scaling-stroke;
+}
+
+.cycleAxis,
+.cycleTick,
+.cycleArc {
+  fill: none;
+  stroke: hsl(var(--rule));
+  stroke-width: 1;
+}
+
+.cycleArcLatest {
+  fill: none;
+  stroke: hsl(var(--primary));
+  stroke-width: 1.5;
+}
+
+.cycleGesture {
+  stroke: hsl(var(--primary));
+  stroke-width: 2;
+  stroke-linecap: round;
+}
+
+.cycleFinal {
+  fill: hsl(var(--background));
+  stroke: hsl(var(--foreground));
+  stroke-width: 2;
+}
+
+.cycleFan {
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.25;
+}
+
+.cycleSegment {
+  fill: currentColor;
+}
+
+.cycleSegmentHatched {
+  fill: url(#cycle-diagram-hatch);
+  stroke: currentColor;
+  stroke-width: 1;
+}
+
+.cycleHatch {
+  stroke: hsl(var(--track-compounding));
+  stroke-width: 1.5;
+}
+
+.track-signature {
+  color: hsl(var(--track-signature));
+}
+
+.track-chrono {
+  color: hsl(var(--track-chrono));
+}
+
+.track-stellar {
+  color: hsl(var(--track-stellar-eth));
+}
+
+.track-anchor {
+  color: hsl(var(--track-anchoring));
+}
+
+.track-publicGoods {
+  color: hsl(var(--track-public-goods));
+}
+
+.track-nextCycle {
+  color: hsl(var(--track-compounding));
+}
+
+/* From 40rem the three steps caption the drawing's three zones, one column each. */
+@media (width >= 40rem) {
+  .steps {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    column-gap: clamp(1.5rem, 3vw, 3rem);
+    border-bottom: 0;
+  }
+
+  .step {
+    grid-template-columns: minmax(0, 1fr);
+    row-gap: 0.5rem;
+    padding-block: 1.25rem 0;
+    border-top: 1px solid hsl(var(--rule));
+  }
+}
+
 @media (width >= 64rem) {
   .cycleLayout {
-    grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
-    grid-template-rows: auto 1fr;
+    grid-template-columns: minmax(0, 1fr) auto;
     grid-template-areas:
-      'intro steps'
-      'actions steps';
+      'intro actions'
+      'diagram diagram'
+      'steps steps';
     column-gap: clamp(3rem, 6vw, 6rem);
   }
 
-  .steps {
-    margin-top: 0;
-  }
-
   .cycleActions {
-    align-self: start;
+    align-self: end;
+    margin-top: 0;
   }
 }
 
