@@ -34,9 +34,11 @@ type SectionKey = StatisticsSectionDef['messageKey'];
 /**
  * One row of the section index: the page's name over what it covers, its
  * key figure on the right, and an arrow. The whole row is the link; rows are
- * divided by hairlines like a ledger, with the same inset as a table cell.
- * On a phone the figure moves under the description. The row prefetches its
- * page on hover or focus, not on sight (each page carries its own charts).
+ * divided by hairlines like a ledger, with the same inset as a table cell
+ * from `sm`. On a phone the figure moves under the description and the text
+ * sits on the content edge, under the heading, as a phone's ledger records
+ * do. The row prefetches its page on hover or focus, not on sight (each page
+ * carries its own charts).
  */
 function SectionEntry({ section, figure }: { section: StatisticsSectionDef; figure: ReactNode }) {
   const t = useTranslations('statistics');
@@ -47,7 +49,7 @@ function SectionEntry({ section, figure }: { section: StatisticsSectionDef; figu
         kind="internal"
         prefetch="intent"
         className={cn(
-          'group grid grid-cols-[minmax(0,1fr)_auto] items-center gap-x-6 gap-y-1.5 px-4 py-4 no-underline sm:grid-cols-[minmax(0,1fr)_auto_auto] sm:py-5',
+          'group grid grid-cols-[minmax(0,1fr)_auto] items-center gap-x-6 gap-y-1.5 py-4 no-underline sm:grid-cols-[minmax(0,1fr)_auto_auto] sm:px-4 sm:py-5',
           'focus-ring-inset transition-colors duration-fast hover:bg-surface',
         )}
       >
