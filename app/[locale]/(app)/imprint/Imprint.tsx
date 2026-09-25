@@ -281,7 +281,8 @@ const Imprint = ({
                 )}
               </p>
               {ethGestureCost === null ? null : (
-                <p className="mt-2 type-body-sm text-muted-foreground">
+                // Explanations in both benefit rows read at one body size.
+                <p className="mt-2 type-body-md text-muted-foreground">
                   {t('page.benefits.gesture.caption', {
                     cost: formatEthQuote(ethGestureCost, locale),
                   })}
