@@ -98,6 +98,8 @@ export interface HowItWorksCyclePhase {
 export interface HowItWorksCycleLegend {
   /** Names the gesture dots, which are labelled by their tickers. */
   readonly gestures: string;
+  /** Names the row of the hatched band, as the other rows are named. */
+  readonly finalization: string;
   /** The hatched band after zero: the Final Gesture participant's exclusive window. */
   readonly exclusiveWindow: string;
   /** Names the allocation bar, whose segments are labelled by track. */

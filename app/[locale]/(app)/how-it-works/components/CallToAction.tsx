@@ -1,3 +1,5 @@
+import { ArrowRight } from 'lucide-react';
+
 import type { HowItWorksContent } from '@/content/how-it-works';
 
 import { Link } from '@/i18n/navigation';
@@ -27,12 +29,14 @@ export function CallToAction({
           className={buttonVariants({ variant: 'commit', size: 'lg' })}
         >
           {callToAction.primaryCta.label}
+          <ArrowRight aria-hidden />
         </Link>
         <Link
           href={callToAction.faqCta.href}
           className={buttonVariants({ variant: 'outline', size: 'lg' })}
         >
           {callToAction.faqCta.label}
+          <ArrowRight aria-hidden />
         </Link>
       </div>
       <ul className="mt-6 flex flex-wrap gap-x-6 gap-y-2 type-body-sm text-muted-foreground">

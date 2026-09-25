@@ -74,7 +74,7 @@
       "cosmicAnchor": {
         "name": "係留配分",
         "tooltip": "サイクル準備金のうちETH建ての一部で、確定時に係留されたすべてのCosmic Signature NFTで均等に分けられます。",
-        "recipientLabel": "比例配分 · すべての係留者"
+        "recipientLabel": "係留NFTごとに均等"
       },
       "publicGoods": {
         "name": "公共財",

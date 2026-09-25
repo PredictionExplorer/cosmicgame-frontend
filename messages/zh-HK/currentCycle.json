@@ -74,7 +74,7 @@
       "cosmicAnchor": {
         "name": "錨定派發",
         "tooltip": "週期儲備中以 ETH 計的一份，收官時由所有已錨定的 Cosmic Signature NFT 平均分享。",
-        "recipientLabel": "按比例 · 全體錨定者"
+        "recipientLabel": "每枚已錨定 NFT 等分"
       },
       "publicGoods": {
         "name": "公共物品",

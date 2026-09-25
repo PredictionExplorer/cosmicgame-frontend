@@ -74,7 +74,7 @@
       "cosmicAnchor": {
         "name": "锚定派发",
         "tooltip": "周期储备中以 ETH 计的一份，收官时由所有已锚定的 Cosmic Signature NFT 平均分享。",
-        "recipientLabel": "按比例 · 全体锚定者"
+        "recipientLabel": "每枚已锚定 NFT 等分"
       },
       "publicGoods": {
         "name": "公共物品",

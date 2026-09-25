@@ -27,7 +27,7 @@
     },
     "signatureAllocation": {
       "term": "Phân bổ Signature",
-      "short": "Phân bổ dành cho người đang giữ Nét bút gần nhất khi chu kỳ khép lại: một phần Dự trữ chu kỳ bằng ETH, CST ghi nhận và một Cosmic Signature NFT.",
+      "short": "Phân bổ dành cho người hoàn tất chu kỳ: một phần Dự trữ chu kỳ bằng ETH, CST ghi nhận và một Cosmic Signature NFT.",
       "long": "Người đang giữ Nét bút gần nhất có thể hoàn tất chu kỳ và nhận về phân bổ này, kèm quyền ưu tiên với các token và NFT đính kèm nét bút. Nếu người đó không hoàn tất trong khoảng thời gian dành riêng, người thực hiện hoàn tất sẽ nhận phân bổ."
     },
     "finalCstGesture": {

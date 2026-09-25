@@ -74,7 +74,7 @@
       "cosmicAnchor": {
         "name": "Phân phối neo giữ",
         "tooltip": "Một phần Dự trữ chu kỳ bằng ETH, được chia đều cho mọi Cosmic Signature NFT đang neo giữ khi chu kỳ hoàn tất.",
-        "recipientLabel": "Theo tỷ lệ · mọi người neo giữ"
+        "recipientLabel": "Chia đều cho mỗi NFT neo giữ"
       },
       "publicGoods": {
         "name": "Hàng hóa công",

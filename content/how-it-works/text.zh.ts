@@ -1,8 +1,13 @@
 import { protocolFacts } from '@/content/protocol-facts';
 
+import { copyNumbers } from './copyNumbers';
 import type { HowItWorksText } from './structure';
 
-const cst = protocolFacts.specialAllocationCst.toLocaleString('zh-CN');
+const numbers = copyNumbers('zh');
+const cst = numbers.specialAllocationCst;
+const eth = numbers.count(numbers.ethRecipients);
+const nft = numbers.count(numbers.nftRecipients);
+const anchored = numbers.count(numbers.anchoredRecipients);
 
 /** 中文运作原理文案，以 structure.ts 中的骨架为键。 */
 export const howItWorksTextZh = {
@@ -23,7 +28,7 @@ export const howItWorksTextZh = {
   hero: {
     heading: 'Cosmic Signature 运作原理',
     paragraph:
-      '落笔，坚守，塑造签名。参与者在演绎周期中落笔；收官倒计时归零后，周期即可收官，储备将沿十余条分配轨道发放——签名分配、锚定派发与 Protocol Guild 都在其中。',
+      '参与者在演绎周期中落笔，每一笔都在塑造本周期的签名；收官倒计时归零后，周期即可收官，储备将沿十余条分配轨道发放——签名分配、锚定派发与 Protocol Guild 都在其中。',
     primaryCtaLabel: '落笔',
     secondaryCtaLabel: '查看当前周期',
   },
@@ -38,11 +43,11 @@ export const howItWorksTextZh = {
       },
       {
         title: '星选资格',
-        description: `每一笔都会计入一次星选资格。周期收官时，协议从中随机选出 3 个资格，均分周期储备中 ${protocolFacts.stellarSelectionEthPercentage}% 的 ETH。`,
+        description: `每一笔都会计入一次星选资格。周期收官时，协议从中随机选出 ${eth} 个资格，均分周期储备中 ${protocolFacts.stellarSelectionEthPercentage}% 的 ETH。`,
       },
       {
         title: 'Cosmic Signature NFT 星选',
-        description: `另有 10 个资格被选出，每个获配 ${cst} CST 与 1 枚 Cosmic Signature NFT。同一地址可能多次入选；资格再多，也不保证入选。`,
+        description: `另有 ${nft} 个资格被选出，每个获配 ${cst} CST 与 1 枚 Cosmic Signature NFT。同一地址可能多次入选；资格再多，也不保证入选。`,
       },
       {
         title: '签名分配',
@@ -75,6 +80,7 @@ export const howItWorksTextZh = {
     subhead: '从开启到收官，每个周期都沿同一顺序展开。',
     legend: {
       gestures: '落笔',
+      finalization: '收官',
       exclusiveWindow: `${protocolFacts.finalGestureExclusivityHours} 小时窗口：仅写下收官之笔的参与者可收官`,
       allocations: '分配轨道',
     },
@@ -97,7 +103,7 @@ export const howItWorksTextZh = {
       },
       {
         label: '星选',
-        description: `3 位 ETH 星选获配者均分周期储备的 ${protocolFacts.stellarSelectionEthPercentage}%。参与者 NFT 星选选出 10 位获配者，锚定 NFT 星选再从已锚定的 Random Walk NFT 中选出 10 位，每位获配 ${cst} CST 与 1 枚 Cosmic Signature NFT。星选资格随每一笔计入；每次星选都从本周期的全部落笔中选取，同一笔落笔可再次获选。`,
+        description: `${eth} 位 ETH 星选获配者均分周期储备的 ${protocolFacts.stellarSelectionEthPercentage}%。参与者 NFT 星选选出 ${nft} 位获配者，锚定 NFT 星选再从已锚定的 Random Walk NFT 中选出 ${anchored} 位，每位获配 ${cst} CST 与 1 枚 Cosmic Signature NFT。星选资格随每一笔计入；ETH 星选与参与者 NFT 星选都从本周期的全部落笔中选取，同一笔落笔可再次获选。`,
       },
       {
         label: '下一周期',
@@ -107,7 +113,7 @@ export const howItWorksTextZh = {
   },
   payoff: {
     heading: '每个周期都以一幅签名收官',
-    body: '每一次落笔都在塑造本周期的作品。周期收官时，这幅签名会铭刻为 Cosmic Signature NFT，随签名分配交给完成收官之笔的参与者。',
+    body: `每一次落笔都在塑造本周期的作品。周期收官时，这幅签名会铭刻为 Cosmic Signature NFT，随签名分配交给收官者：倒计时归零后的 ${protocolFacts.finalGestureExclusivityHours} 小时内，只有写下收官之笔的参与者可以收官，此后任何人都可收官。`,
     caption: '第 {cycle} 个周期的签名',
     linkLabel: '查看这幅签名',
   },

@@ -1,8 +1,13 @@
 import { protocolFacts } from '@/content/protocol-facts';
 
+import { copyNumbers } from './copyNumbers';
 import type { HowItWorksText } from './structure';
 
-const cst = protocolFacts.specialAllocationCst.toLocaleString('ko-KR');
+const numbers = copyNumbers('ko');
+const cst = numbers.specialAllocationCst;
+const eth = numbers.count(numbers.ethRecipients);
+const nft = numbers.count(numbers.nftRecipients);
+const anchored = numbers.count(numbers.anchoredRecipients);
 
 /** 한국어 작동 원리 copy, keyed by the skeleton in structure.ts. */
 export const howItWorksTextKo = {
@@ -23,7 +28,7 @@ export const howItWorksTextKo = {
   hero: {
     heading: 'Cosmic Signature 작동 원리',
     paragraph:
-      '제스처를 남기고, 시간을 지켜보며, 시그니처를 함께 빚어냅니다. 참여자는 퍼포먼스 사이클 동안 제스처를 남기고, 사이클 마감 시각이 지나면 사이클을 마감할 수 있습니다. 배분은 시그니처 배분, 앵커링 지급, Protocol Guild를 비롯한 10개가 넘는 경로로 이루어집니다.',
+      '참여자는 퍼포먼스 사이클 동안 제스처를 남기고, 제스처 하나하나가 사이클의 시그니처를 빚어냅니다. 사이클 마감 시각이 지나면 사이클을 마감할 수 있고, 배분은 시그니처 배분, 앵커링 지급, Protocol Guild를 비롯한 10개가 넘는 경로로 이루어집니다.',
     primaryCtaLabel: '제스처 남기기',
     secondaryCtaLabel: '현재 사이클 보기',
   },
@@ -38,11 +43,11 @@ export const howItWorksTextKo = {
       },
       {
         title: '별빛 선정 자격',
-        description: `제스처마다 자격이 한 건 기록됩니다. 사이클이 마감되면 무작위로 세 건이 선정되어 사이클 준비금 ETH의 ${protocolFacts.stellarSelectionEthPercentage}%를 나누어 받습니다.`,
+        description: `제스처마다 자격이 한 건 기록됩니다. 사이클이 마감되면 무작위로 ${eth}건이 선정되어 사이클 준비금 ETH의 ${protocolFacts.stellarSelectionEthPercentage}%를 나누어 받습니다.`,
       },
       {
         title: 'Cosmic Signature NFT 선정',
-        description: `열 건이 추가로 선정되어 각각 ${cst} CST와 Cosmic Signature NFT를 받습니다. 같은 주소가 두 번 이상 선정될 수 있으며, 자격이 아무리 많아도 선정이 보장되지는 않습니다.`,
+        description: `${nft}건이 추가로 선정되어 각각 ${cst} CST와 Cosmic Signature NFT를 받습니다. 같은 주소가 두 번 이상 선정될 수 있으며, 자격이 아무리 많아도 선정이 보장되지는 않습니다.`,
       },
       {
         title: '시그니처 배분',
@@ -75,6 +80,7 @@ export const howItWorksTextKo = {
     subhead: '모든 사이클은 시작부터 마감까지 이 순서를 따릅니다.',
     legend: {
       gestures: '제스처',
+      finalization: '마감',
       exclusiveWindow: `최종 제스처 참여자만 마감할 수 있는 ${protocolFacts.finalGestureExclusivityHours}시간`,
       allocations: '배분 경로',
     },
@@ -97,7 +103,7 @@ export const howItWorksTextKo = {
       },
       {
         label: '별빛 선정',
-        description: `ETH 별빛 선정 수령자 세 명이 사이클 준비금의 ${protocolFacts.stellarSelectionEthPercentage}%를 나누어 받습니다. NFT 별빛 선정 수령자 열 명과, 앵커링된 Random Walk NFT 가운데 선정되는 앵커링 NFT 별빛 선정 수령자 열 명이 각각 ${cst} CST와 Cosmic Signature NFT를 받습니다. 자격은 제스처마다 1건씩 기록되며, 모든 선정은 사이클의 전체 자격 가운데 복원 추출 방식으로 이루어집니다.`,
+        description: `ETH 별빛 선정 수령자 ${eth}명이 사이클 준비금의 ${protocolFacts.stellarSelectionEthPercentage}%를 나누어 받습니다. NFT 별빛 선정 수령자 ${nft}명과, 앵커링된 Random Walk NFT 가운데 선정되는 앵커링 NFT 별빛 선정 수령자 ${anchored}명이 각각 ${cst} CST와 Cosmic Signature NFT를 받습니다. 자격은 제스처마다 1건씩 기록되며, ETH와 NFT 별빛 선정은 사이클의 전체 자격 가운데 복원 추출 방식으로 이루어집니다.`,
       },
       {
         label: '다음 사이클',
@@ -107,7 +113,7 @@ export const howItWorksTextKo = {
   },
   payoff: {
     heading: '모든 사이클은 시그니처로 마무리됩니다',
-    body: '모든 제스처가 사이클의 작품을 빚어냅니다. 사이클이 마감되면 시그니처가 Cosmic Signature NFT로 각인되어 시그니처 배분과 함께 최종 제스처를 남긴 참여자에게 전달됩니다.',
+    body: `모든 제스처가 사이클의 작품을 빚어냅니다. 사이클이 마감되면 시그니처가 Cosmic Signature NFT로 각인되어 시그니처 배분과 함께 사이클을 마감한 참여자에게 전달됩니다. 카운트다운이 0에 이른 뒤 ${protocolFacts.finalGestureExclusivityHours}시간 동안은 최종 제스처를 남긴 참여자만 마감할 수 있고, 그 뒤에는 누구나 마감할 수 있습니다.`,
     caption: '사이클 {cycle}의 시그니처',
     linkLabel: '이 시그니처 보기',
   },

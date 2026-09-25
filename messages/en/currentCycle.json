@@ -74,7 +74,7 @@
       "cosmicAnchor": {
         "name": "Anchor Distribution",
         "tooltip": "A share of the Cycle Reserve in ETH, split equally among all anchored Cosmic Signature NFTs at finalization.",
-        "recipientLabel": "Proportional · all anchor-holders"
+        "recipientLabel": "Equal per anchored NFT"
       },
       "publicGoods": {
         "name": "Public Goods",

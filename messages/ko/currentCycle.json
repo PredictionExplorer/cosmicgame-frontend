@@ -74,7 +74,7 @@
       "cosmicAnchor": {
         "name": "앵커링 지급",
         "tooltip": "사이클 준비금 중 ETH로 된 몫으로, 마감 때 앵커링한 모든 Cosmic Signature NFT가 똑같이 나눕니다.",
-        "recipientLabel": "비율에 따라 · 모든 앵커링 보유자"
+        "recipientLabel": "앵커링된 NFT당 균등"
       },
       "publicGoods": {
         "name": "공공재",

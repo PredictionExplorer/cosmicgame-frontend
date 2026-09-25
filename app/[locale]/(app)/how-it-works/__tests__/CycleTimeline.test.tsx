@@ -88,6 +88,50 @@ describe('CycleTimeline', () => {
     );
   });
 
+  it('numbers each stage on the object its caption is about (V241)', () => {
+    renderTimeline();
+    for (const drawing of screen
+      .getByTestId('cycle-diagram')
+      .querySelectorAll<HTMLElement>('[data-layout]')) {
+      const svg = drawing.querySelector('svg')!;
+      const viewWidth = Number(svg.getAttribute('viewBox')!.split(' ')[2]);
+      const at = (n: number) =>
+        (parseFloat(
+          [...drawing.querySelectorAll<HTMLElement>('span[style]')].find(
+            (mark) => mark.textContent === String(n),
+          )!.style.left,
+        ) /
+          100) *
+        viewWidth;
+      const bar = (id: string) => {
+        const rect = drawing.querySelector(`[data-track="${id}"]`)!;
+        const x = Number(rect.getAttribute('x'));
+        return { start: x - 1, end: x + Number(rect.getAttribute('width')) + 1 };
+      };
+      // 4, the finalization that divides the reserve: the start of the allocation bar.
+      expect(at(4)).toBeCloseTo(bar('signature').start, 0);
+      // 5, the Stellar Selections: over the Stellar Selection segment only.
+      expect(at(5)).toBeGreaterThanOrEqual(bar('stellar').start);
+      expect(at(5)).toBeLessThanOrEqual(bar('stellar').end);
+    }
+  });
+
+  it('names the hatched band’s row like the other rows of the key, its swatch inline', () => {
+    renderTimeline();
+    const key = screen.getByTestId('cycle-diagram').querySelector('figcaption')!;
+    const label = within(key).getByText(gameCycle.legend.finalization);
+    const row = key.querySelector('[data-legend="exclusive-window"]')!;
+    expect(label.nextElementSibling).toBe(row);
+    expect(row.querySelector('svg')).not.toBeNull();
+  });
+
+  it('sets the stages’ teaching copy at body size', () => {
+    const { container } = renderTimeline();
+    for (const description of container.querySelectorAll('ol li p')) {
+      expect(description).toHaveClass('type-body-md');
+    }
+  });
+
   it('splits the reserve in proportion to the shares in protocol-facts', () => {
     renderTimeline();
     const width = (id: string) =>

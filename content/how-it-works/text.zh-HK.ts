@@ -1,8 +1,13 @@
 import { protocolFacts } from '@/content/protocol-facts';
 
+import { copyNumbers } from './copyNumbers';
 import type { HowItWorksText } from './structure';
 
-const cst = protocolFacts.specialAllocationCst.toLocaleString('zh-HK');
+const numbers = copyNumbers('zh-HK');
+const cst = numbers.specialAllocationCst;
+const eth = numbers.count(numbers.ethRecipients);
+const nft = numbers.count(numbers.nftRecipients);
+const anchored = numbers.count(numbers.anchoredRecipients);
 
 /** 繁體中文（香港）運作原理文案，以 structure.ts 中的骨架為鍵。 */
 export const howItWorksTextZhHk = {
@@ -23,7 +28,7 @@ export const howItWorksTextZhHk = {
   hero: {
     heading: 'Cosmic Signature 運作原理',
     paragraph:
-      '落筆，堅守，塑造簽名。參與者在演繹週期中落筆；收官倒數歸零後，週期即可收官，儲備將沿十餘條分配軌道發放——簽名分配、錨定派發與 Protocol Guild 都在其中。',
+      '參與者在演繹週期中落筆，每一筆都在塑造本週期的簽名；收官倒數歸零後，週期即可收官，儲備將沿十餘條分配軌道發放——簽名分配、錨定派發與 Protocol Guild 都在其中。',
     primaryCtaLabel: '落筆',
     secondaryCtaLabel: '查看目前週期',
   },
@@ -38,11 +43,11 @@ export const howItWorksTextZhHk = {
       },
       {
         title: '星選資格',
-        description: `每一筆都會計入一次星選資格。週期收官時，協議從中隨機選出 3 個資格，均分週期儲備中 ${protocolFacts.stellarSelectionEthPercentage}% 的 ETH。`,
+        description: `每一筆都會計入一次星選資格。週期收官時，協議從中隨機選出 ${eth} 個資格，均分週期儲備中 ${protocolFacts.stellarSelectionEthPercentage}% 的 ETH。`,
       },
       {
         title: 'Cosmic Signature NFT 星選',
-        description: `另有 10 個資格被選出，每個獲配 ${cst} CST 與 1 枚 Cosmic Signature NFT。同一地址可能多次入選；資格再多，也不保證入選。`,
+        description: `另有 ${nft} 個資格被選出，每個獲配 ${cst} CST 與 1 枚 Cosmic Signature NFT。同一地址可能多次入選；資格再多，也不保證入選。`,
       },
       {
         title: '簽名分配',
@@ -75,6 +80,7 @@ export const howItWorksTextZhHk = {
     subhead: '從開啟到收官，每個週期都沿同一順序展開。',
     legend: {
       gestures: '落筆',
+      finalization: '收官',
       exclusiveWindow: `${protocolFacts.finalGestureExclusivityHours} 小時窗口：僅寫下收官之筆的參與者可收官`,
       allocations: '分配軌道',
     },
@@ -97,7 +103,7 @@ export const howItWorksTextZhHk = {
       },
       {
         label: '星選',
-        description: `3 位 ETH 星選獲配者均分週期儲備的 ${protocolFacts.stellarSelectionEthPercentage}%。參與者 NFT 星選選出 10 位獲配者，錨定 NFT 星選再從已錨定的 Random Walk NFT 中選出 10 位，每位獲配 ${cst} CST 與 1 枚 Cosmic Signature NFT。星選資格隨每一筆計入；每次星選都從本週期的全部落筆中選取，同一筆落筆可再次獲選。`,
+        description: `${eth} 位 ETH 星選獲配者均分週期儲備的 ${protocolFacts.stellarSelectionEthPercentage}%。參與者 NFT 星選選出 ${nft} 位獲配者，錨定 NFT 星選再從已錨定的 Random Walk NFT 中選出 ${anchored} 位，每位獲配 ${cst} CST 與 1 枚 Cosmic Signature NFT。星選資格隨每一筆計入；ETH 星選與參與者 NFT 星選都從本週期的全部落筆中選取，同一筆落筆可再次獲選。`,
       },
       {
         label: '下一週期',
@@ -107,7 +113,7 @@ export const howItWorksTextZhHk = {
   },
   payoff: {
     heading: '每個週期都以一幅簽名收官',
-    body: '每一次落筆都在塑造本週期的作品。週期收官時，這幅簽名會銘刻為 Cosmic Signature NFT，隨簽名分配交給完成收官之筆的參與者。',
+    body: `每一次落筆都在塑造本週期的作品。週期收官時，這幅簽名會銘刻為 Cosmic Signature NFT，隨簽名分配交給收官者：倒數歸零後的 ${protocolFacts.finalGestureExclusivityHours} 小時內，只有寫下收官之筆的參與者可以收官，此後任何人都可收官。`,
     caption: '第 {cycle} 個週期的簽名',
     linkLabel: '查看這幅簽名',
   },

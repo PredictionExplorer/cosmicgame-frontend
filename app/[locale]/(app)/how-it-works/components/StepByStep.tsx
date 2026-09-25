@@ -34,9 +34,10 @@ export function StepByStep({ stepByStep }: { stepByStep: HowItWorksContent['step
               aria-hidden
               className="absolute bottom-0 left-4 top-10 w-px -translate-x-1/2 bg-rule group-last/step:hidden"
             />
+            {/* The stage diagram's numeral, one size up for the rail it sits on. */}
             <span
               aria-hidden
-              className="flex size-8 items-center justify-center rounded-pill border border-rule bg-surface-raised type-label tabular-nums text-foreground"
+              className="flex size-8 items-center justify-center rounded-pill border border-rule bg-surface-raised type-caption font-medium tabular-nums text-foreground"
             >
               {index + 1}
             </span>
@@ -47,7 +48,7 @@ export function StepByStep({ stepByStep }: { stepByStep: HowItWorksContent['step
                 {step.highlights.map((highlight) => (
                   <li
                     key={highlight}
-                    className="flex items-baseline gap-2.5 type-body-sm text-muted-foreground"
+                    className="flex items-baseline gap-2.5 type-body-md text-muted-foreground"
                   >
                     <span
                       aria-hidden
@@ -63,7 +64,7 @@ export function StepByStep({ stepByStep }: { stepByStep: HowItWorksContent['step
       </ol>
       <p
         data-testid="funding-help"
-        className="mt-8 border-t border-rule pt-4 type-body-sm text-muted-foreground lg:col-span-4 lg:row-start-2 lg:mt-0 lg:self-start"
+        className="mt-8 border-t border-rule pt-4 type-body-md text-muted-foreground lg:col-span-4 lg:row-start-2 lg:mt-0 lg:self-start"
       >
         {stepByStep.funding.text}{' '}
         <Link

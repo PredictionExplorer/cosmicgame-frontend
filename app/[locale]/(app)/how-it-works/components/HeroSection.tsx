@@ -9,6 +9,8 @@ import { buttonVariants } from '@/components/ui/button';
 /**
  * The How it works header: the reading PageHeader (the Help hub), a plain
  * H1, the lede, and two ways in: make a gesture, or watch the live cycle.
+ * Both lead somewhere else on the site, so both carry the arrow, as the
+ * live cycle's own commit button does.
  */
 export function HeroSection({ hero }: { hero: HowItWorksContent['hero'] }) {
   return (
@@ -26,6 +28,7 @@ export function HeroSection({ hero }: { hero: HowItWorksContent['hero'] }) {
           className={buttonVariants({ variant: 'commit', size: 'lg' })}
         >
           {hero.primaryCta.label}
+          <ArrowRight aria-hidden />
         </Link>
         <Link
           href={hero.secondaryCta.href}
