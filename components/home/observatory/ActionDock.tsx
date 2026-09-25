@@ -5,7 +5,12 @@ import { ArrowRight } from 'lucide-react';
 import { useLocale, useTranslations } from 'next-intl';
 
 import { SmoothCountdown } from '@/components/common/SmoothCountdown';
-import { CountdownFigures, countdownGroups } from '@/components/ui/countdown-figures';
+import {
+  CountdownFigures,
+  countdownGroups,
+  countdownPartsFromMs,
+  countdownSeconds,
+} from '@/components/ui/countdown-figures';
 import { Amount } from '@/components/ui/amount';
 import { Button } from '@/components/ui/button';
 import { Duration } from '@/components/ui/duration';
@@ -19,7 +24,6 @@ import type { DashboardInfo } from '@/services/api';
 import { sameAddress } from '@/utils/format';
 import { toFiniteNumber } from '@/utils/finiteNumber';
 
-import { countdownSeconds, countdownUnits } from './countdown';
 import type { GestureSubmitParts } from './gestureSubmitLabel';
 import { PHASE_TEXT_CLASS, viewForPhase } from './phaseView';
 import { useFocusClearOfDock } from './useFocusClearOfDock';
@@ -207,7 +211,7 @@ export function ActionDock({
                   // decorative; the spelled-out time is for screen readers.
                   <>
                     <CountdownFigures
-                      groups={countdownGroups(countdownUnits(parts.total), locale)}
+                      groups={countdownGroups(countdownPartsFromMs(parts.total), locale)}
                       size="inline"
                       align="start"
                       data-testid="dock-clock"

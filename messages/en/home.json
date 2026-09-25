@@ -705,7 +705,7 @@
     "allocationsTitle": "Where the Cycle Reserve goes",
     "allocationsDescription": "See every allocation, including Stellar Selection and Public Goods.",
     "storyTitle": "The art behind the cycle",
-    "storyDescription": "How gestures shape the Signature, what CST records and how allocations fund public goods.",
+    "storyDescription": "How gestures shape the Signature, what CST records and how allocations fund Public Goods.",
     "methods": {
       "eth": "Pay the current Gesture Cost in ETH.",
       "cst": "Use CST already in your wallet. The live cost changes over time.",

@@ -10,7 +10,12 @@ import {
 } from '@/components/common/SmoothCountdown';
 import { Amount } from '@/components/ui/amount';
 import { Button } from '@/components/ui/button';
-import { CountdownFigures, countdownGroups } from '@/components/ui/countdown-figures';
+import {
+  CountdownFigures,
+  countdownGroups,
+  countdownPartsFromMs,
+  countdownSeconds,
+} from '@/components/ui/countdown-figures';
 import { Duration } from '@/components/ui/duration';
 import { InfoTooltip } from '@/components/ui/info-tooltip';
 import { useHydrated } from '@/hooks/useHydrated';
@@ -27,7 +32,6 @@ import type { DashboardInfo } from '@/services/api';
 import { formatAmount, sameAddress } from '@/utils/format';
 import { toFiniteNumber } from '@/utils/finiteNumber';
 
-import { countdownSeconds, countdownUnits } from './countdown';
 import { PHASE_TEXT_CLASS, viewForPhase } from './phaseView';
 import { ValuePending } from './ValuePending';
 
@@ -207,12 +211,12 @@ export function CycleClock({
                 initialNowMs={now}
                 renderer={({ total }) => (
                   // The one Cycle clock (the landing's and /current-cycle's
-                  // too): padded groups, one set of captions. Its units come
-                  // from the Observatory's one rounding rule (countdown.ts),
-                  // like the dock's and the pre-hydration tick's, so no two
-                  // readings on the page are ever a second apart.
+                  // too): padded groups, one set of captions, and one
+                  // rounding rule (countdownSeconds), like the dock's and the
+                  // pre-hydration tick's, so no two readings on the page are
+                  // ever a second apart.
                   <CountdownFigures
-                    groups={countdownGroups(countdownUnits(total), locale)}
+                    groups={countdownGroups(countdownPartsFromMs(total), locale)}
                     size="desk"
                     align="start"
                     deadlineMs={targetMs}

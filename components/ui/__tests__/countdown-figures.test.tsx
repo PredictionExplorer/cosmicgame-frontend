@@ -6,6 +6,7 @@ import {
   countdownFontSize,
   countdownGroups,
   countdownPartsFromMs,
+  countdownSeconds,
   padCountdown,
 } from '@/components/ui/countdown-figures';
 import { routing } from '@/i18n/routing';
@@ -54,6 +55,34 @@ describe('<CountdownFigures />', () => {
     expect(padCountdown(-3)).toBe('00');
     expect(padCountdown(4.8)).toBe('04');
     expect(padCountdown(123)).toBe('123');
+  });
+});
+
+describe('countdown rounding', () => {
+  it('rounds up to whole seconds, so zero lands exactly on the deadline', () => {
+    expect(countdownSeconds(1)).toBe(1);
+    expect(countdownSeconds(999)).toBe(1);
+    expect(countdownSeconds(1000)).toBe(1);
+    expect(countdownSeconds(1001)).toBe(2);
+    expect(countdownSeconds(0)).toBe(0);
+  });
+
+  it('never counts below zero or from a broken reading', () => {
+    expect(countdownSeconds(-5_000)).toBe(0);
+    expect(countdownSeconds(Number.NaN)).toBe(0);
+    expect(countdownSeconds(Number.POSITIVE_INFINITY)).toBe(0);
+  });
+
+  it('splits the time left into the clock groups by the same rule', () => {
+    // 5d 10:55:18.4 reads 5d 10:55:19 on the clock and on the dock.
+    const remaining = ((5 * 24 + 10) * 3600 + 55 * 60 + 18) * 1000 + 400;
+    expect(countdownPartsFromMs(remaining)).toEqual({
+      days: 5,
+      hours: 10,
+      minutes: 55,
+      seconds: 19,
+    });
+    expect(countdownPartsFromMs(59_001)).toEqual({ days: 0, hours: 0, minutes: 1, seconds: 0 });
   });
 });
 

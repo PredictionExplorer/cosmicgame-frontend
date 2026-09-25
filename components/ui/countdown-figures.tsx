@@ -49,9 +49,21 @@ export interface CountdownParts {
   seconds: number;
 }
 
-/** A number of milliseconds as whole units (negative reads as zero). */
+/**
+ * The one rounding rule for a countdown: whole seconds, rounded up, so it
+ * reads 00:00:01 until the deadline and reaches zero exactly at it. Every
+ * reading of one deadline (the app home's clock, its dock, its finalize
+ * window and the clock's pre-hydration tick, /current-cycle) rounds here, so
+ * two of them never read a second apart. A negative or broken reading is zero.
+ */
+export function countdownSeconds(remainingMs: number): number {
+  if (!Number.isFinite(remainingMs) || remainingMs <= 0) return 0;
+  return Math.ceil(remainingMs / 1000);
+}
+
+/** A number of milliseconds as whole units, rounded like `countdownSeconds`. */
 export function countdownPartsFromMs(remainingMs: number): CountdownParts {
-  const total = Math.max(0, Math.floor(remainingMs / 1000));
+  const total = countdownSeconds(remainingMs);
   return {
     days: Math.floor(total / 86_400),
     hours: Math.floor((total % 86_400) / 3_600),

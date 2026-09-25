@@ -151,11 +151,12 @@ describe('ActionDock', () => {
           <ActionDock {...props} />
         </>,
       );
-      const clockSeconds = screen
-        .getByTestId('clock-figures')
-        .querySelector('[data-unit="seconds"]')!.textContent;
-      const dockReading = within(screen.getByTestId('action-dock')).getByRole('timer').textContent!;
-      expect(dockReading.endsWith(`:${clockSeconds}`)).toBe(true);
+      const secondsOf = (figures: HTMLElement) =>
+        figures.querySelector('[data-countdown-unit="seconds"] [data-testid="countdown-value"]')!
+          .textContent;
+      const clockSeconds = secondsOf(screen.getByTestId('clock-figures'));
+      expect(clockSeconds).toMatch(/^\d{2}$/);
+      expect(secondsOf(screen.getByTestId('dock-clock'))).toBe(clockSeconds);
     },
   );
 

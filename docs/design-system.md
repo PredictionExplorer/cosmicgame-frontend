@@ -413,9 +413,9 @@ counts down (the clock, the dock, the Calibration Window's "in 06:34:39"), grows
 or stands as a record in the same column ("9d 01:36:42" under "Time held"), so stacked
 values align ("1d 01:12:05" over "8d 00:24:38") and nobody converts "02:49:48" into
 "2h 49m" in their head. Words ("7h 25m") are for durations inside prose: explanations,
-tooltips and sentences. Every countdown rounds the same way, whole seconds up
-(`countdownSeconds` in `components/home/observatory/countdown.ts`), so two readings of
-one deadline never differ by a second. A `flex-wrap` row of ticking values re-wraps as
+tooltips and sentences. Every countdown in the app rounds the same way, whole seconds up
+(`countdownSeconds` in `components/ui/countdown-figures`), so two readings of one
+deadline never differ by a second. A `flex-wrap` row of ticking values re-wraps as
 the digits change and moves everything below it. A duration wider than its whole column
 (Vietnamese writes the unit words, "9 ngày 1 giờ 36 phút 42 giây") breaks between unit
 groups, never inside one: `<Duration>` marks the break points, a nowrap container (every

@@ -2,6 +2,7 @@ import { fireEvent } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { createRef } from 'react';
 
+import { SEGMENT_SELECTED_CLASS } from '@/components/ui/tabs-variants';
 import { IDLE_TX_STAGE } from '@/lib/txStage';
 
 import { render, screen, within, checkA11y } from '@/test-utils';
@@ -145,13 +146,16 @@ describe('GesturePanel', () => {
     expect(screen.getByTestId('panel-method-randomWalk-cost')).toHaveTextContent(/^0\.05105 ETH$/);
   });
 
-  it('draws the selection as a straight bar inset from the rounded corners', () => {
+  it('marks the selection as the system segmented control does, never with a bent rule', () => {
     render(<GesturePanel {...baseProps} form={makeForm()} />);
     const eth = screen.getByTestId('panel-method-eth');
-    const bar = eth.querySelector('[data-slot="method-selected-bar"]');
-    expect(bar).toHaveClass('absolute', 'rounded-pill', 'bg-primary');
-    expect(eth.className).not.toMatch(/shadow-\[inset/);
-    expect(screen.getByTestId('panel-method-cst').querySelector('[data-slot]')).toBeNull();
+    // The shared selected segment (raised, edged by the 3:1 control boundary)…
+    expect(eth).toHaveClass(...SEGMENT_SELECTED_CLASS.split(' '));
+    // …and no --primary rule, inset shadow or bar, that would follow the
+    // rounded corners into a curve.
+    expect(eth.className).not.toMatch(/primary/);
+    expect(eth.querySelector('.bg-primary')).toBeNull();
+    expect(screen.getByTestId('panel-method-cst')).not.toHaveClass('bg-surface-raised');
   });
 
   it('moves and selects with the arrow keys, from one tab stop', async () => {
