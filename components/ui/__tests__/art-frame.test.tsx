@@ -302,11 +302,18 @@ describe('WallLabel', () => {
     expect(screen.getByText('Anchored')).toBeInTheDocument();
   });
 
-  it('trails each dot after its fact, so a wrapped line never starts with one', () => {
-    render(<WallLabelMeta items={['#000027', '3.5397 ETH', '1,000 CST']} />);
-    const facts = Array.from(screen.getByText('#000027').closest('p')?.children ?? []);
-    // Regression: the dot led each item, so a phone line read "· 1,000 CST".
-    expect(facts.map((fact) => fact.textContent)).toEqual(['#000027·', '3.5397 ETH·', '1,000 CST']);
+  it('draws a dot only between facts, inside a clipped row, so a wrapped line neither ends nor starts with one', () => {
+    const { container } = render(<WallLabelMeta items={['#000027', '3.5397 ETH', '1,000 CST']} />);
+    const facts = Array.from(container.querySelectorAll('[data-slot="wall-label-fact"]'));
+    // Regressions: a leading dot started a phone line ("· 1,000 CST"); a trailing
+    // one ended it ("3.5397 ETH ·"). Each dot leads its fact in the fact's start
+    // padding, which the clipped row hides for a fact that starts a line.
+    expect(facts.map((fact) => fact.textContent)).toEqual(['#000027', '·3.5397 ETH', '·1,000 CST']);
+    for (const fact of facts) expect(fact).toHaveClass('ps-4');
+    expect(facts[0]!.parentElement).toHaveClass('-ms-4');
+    expect(container.querySelector('p')).toHaveClass('overflow-hidden', 'p-1', '-m-1');
+    for (const dot of container.querySelectorAll('[aria-hidden]'))
+      expect(dot).toHaveTextContent('·');
   });
 
   it('renders nothing for a caption line without facts', () => {

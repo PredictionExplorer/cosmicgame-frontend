@@ -584,27 +584,35 @@ function isPresent(item: ReactNode): boolean {
 }
 
 /**
- * The caption line of a wall label: short facts separated by middle dots.
- * Each dot trails the fact before it, so when the line wraps on a phone the
- * dot stays at the end of the line it belongs to and no line starts with one.
+ * The caption line of a wall label: short facts separated by middle dots,
+ * with a dot only between two facts on the same line. Each dot leads its
+ * fact inside the fact's own start padding, and the row is pulled back by
+ * that padding inside a clipped box, so when the line wraps on a phone the
+ * dot of the fact that starts the next line falls outside the box: no line
+ * ends or starts with a dangling "·". The clip leaves 4px of room on every
+ * side, so a focused link's outline in a caption is never cut.
  */
 export function WallLabelMeta({ items, className }: WallLabelMetaProps) {
   const present = items.filter(isPresent);
   if (present.length === 0) return null;
-  const last = present.length - 1;
   return (
-    <p
-      className={cn(
-        'flex flex-wrap items-baseline gap-x-2 gap-y-0.5 type-caption text-subtle',
-        className,
-      )}
-    >
-      {present.map((item, index) => (
-        <span key={index} className="inline-flex items-baseline gap-2">
-          {item}
-          {index < last ? <span aria-hidden>·</span> : null}
-        </span>
-      ))}
+    <p className={cn('-m-1 overflow-hidden p-1 type-caption text-subtle', className)}>
+      <span className="-ms-4 flex flex-wrap items-baseline gap-y-0.5">
+        {present.map((item, index) => (
+          <span
+            key={index}
+            data-slot="wall-label-fact"
+            className="relative inline-flex min-w-0 items-baseline ps-4"
+          >
+            {index > 0 ? (
+              <span aria-hidden className="absolute start-[0.3125rem]">
+                ·
+              </span>
+            ) : null}
+            {item}
+          </span>
+        ))}
+      </span>
     </p>
   );
 }

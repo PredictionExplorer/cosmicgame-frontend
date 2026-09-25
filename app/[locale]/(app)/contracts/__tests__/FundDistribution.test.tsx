@@ -34,7 +34,7 @@ describe('FundDistribution', () => {
       'Stellar Selection',
       'Anchor Distribution',
       'Public Goods',
-      'Next cycle',
+      'Compounding Cycle Reserve',
     ]) {
       expect(screen.getByText(label)).toBeInTheDocument();
     }
@@ -104,7 +104,7 @@ describe('FundDistribution definitions', () => {
       definition: /ETH Anchor Distributions to Cosmic Signature NFT anchor-holders/,
     },
     { label: 'Public Goods', definition: /Forwarded to the Public Goods Beneficiary/ },
-    { label: 'Next cycle', definition: /roll forward into the next cycle/ },
+    { label: 'Compounding Cycle Reserve', definition: /roll forward into the next cycle/ },
   ];
 
   it.each(SEGMENT_DEFINITIONS)(

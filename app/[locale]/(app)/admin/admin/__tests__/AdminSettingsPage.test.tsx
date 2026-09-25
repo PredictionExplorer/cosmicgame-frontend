@@ -119,10 +119,10 @@ describe('AdminSettingsPage', () => {
       'Stellar Selection',
       'Anchor Distribution',
       'Public Goods',
-      'Next cycle',
+      'Compounding Cycle Reserve',
     ]);
     expect(valueOf('Chrono-Warrior')).toHaveTextContent('8%');
-    expect(valueOf('Next cycle')).toHaveTextContent('50%');
+    expect(valueOf('Compounding Cycle Reserve')).toHaveTextContent('50%');
   });
 
   it('builds shares that add up to 100%', () => {

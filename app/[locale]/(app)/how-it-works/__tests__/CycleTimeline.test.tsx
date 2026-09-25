@@ -84,7 +84,7 @@ describe('CycleTimeline', () => {
       `Public Goods${protocolFacts.publicGoodsPercentage}%`,
     );
     expect(track('nextCycle')).toHaveTextContent(
-      `Next cycle${protocolFacts.compoundingReservePercentage}%`,
+      `Compounding Cycle Reserve${protocolFacts.compoundingReservePercentage}%`,
     );
   });
 

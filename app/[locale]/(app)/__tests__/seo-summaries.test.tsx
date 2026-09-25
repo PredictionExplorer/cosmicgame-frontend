@@ -448,10 +448,11 @@ describe('server-rendered page headers', () => {
     expect(document.querySelector('[data-figure="cycle"]')).toBeNull();
     expect(figureValue('gestures')).toHaveTextContent('17');
     expect(figureValue('signatureAllocation')).toHaveTextContent('5.5000 ETH');
-    // The opening date is set a size down, with its zone (D082, D275).
-    expect(document.querySelector('[data-figure="opened"]')).toHaveTextContent(
-      /formats\.dateTime\.timeZone\(zone=UTC/,
-    );
+    // The opening date is set a size down and names its zone inline, once
+    // (D082, D275): no second "Time zone" caption under it.
+    const opened = document.querySelector('[data-figure="opened"]');
+    expect(opened).toHaveTextContent(/UTC$/);
+    expect(opened).not.toHaveTextContent(/formats\.dateTime\.timeZone/);
     // One explanation pattern per screen (D079): the figures are plain labels,
     // the coined words below explain themselves in place.
     const cards = seoMessages.currentCycleSummary.cards;
