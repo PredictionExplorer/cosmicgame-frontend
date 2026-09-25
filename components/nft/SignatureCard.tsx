@@ -28,6 +28,8 @@ export interface SignatureCardSelect {
    * as a tag in its label; `null` when it can be.
    */
   unavailable?: string | null;
+  /** `attention` for a reason that may pass on its own (the owner changed). */
+  unavailableTone?: 'neutral' | 'attention';
   /** Choosing is paused (a send is running). */
   disabled?: boolean;
 }
@@ -144,7 +146,7 @@ export function SignatureCard({
   // In select mode a reason not to choose it outranks the anchored tag it
   // usually is ("Anchored"); otherwise an anchored card shows the word from `sm`.
   const tag = select?.unavailable ? (
-    <ArtTag>{select.unavailable}</ArtTag>
+    <ArtTag tone={select.unavailableTone}>{select.unavailable}</ArtTag>
   ) : anchored ? (
     <ArtTag className="max-sm:hidden">
       <AnchoringIcon aria-hidden className="size-3 shrink-0" />
@@ -163,8 +165,10 @@ export function SignatureCard({
         unavailableDetail={id}
         className={cn(
           'group-hover:after:shadow-[var(--art-edge-active)]',
+          // A chosen card draws its print edge in the accent, at rest and on
+          // hover: the plate's own edge variables, so no shadow class competes.
           select?.checked &&
-            'after:shadow-[inset_0_0_0_2px_var(--color-primary)] group-hover:after:shadow-[inset_0_0_0_2px_var(--color-primary)] hover:after:shadow-[inset_0_0_0_2px_var(--color-primary)]',
+            '[--art-edge-active:inset_0_0_0_2px_var(--color-primary)] [--art-edge:inset_0_0_0_2px_var(--color-primary)]',
         )}
       />
       <div className="mt-3 flex min-w-0 items-start gap-2">

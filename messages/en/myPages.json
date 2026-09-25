@@ -226,14 +226,13 @@
   "tokens": {
     "page": {
       "title": "My NFTs",
-      "subtitle": "Cosmic Signature NFTs in your connected wallet",
-      "marketplace": "Buy or sell NFTs",
+      "subtitle": "The Cosmic Signature NFTs held by the wallet you connect",
+      "newestCaption": "The newest Signatures. Yours will hang here too.",
       "anchorLink": "Anchor NFTs",
       "loadErrorTitle": "Failed to load tokens",
       "loadErrorMessage": "Failed to load Cosmic Signature NFTs.",
       "ownedTitle": "Cosmic Signature NFTs I own",
       "transferTitle": "Transfer NFTs",
-      "transferSubtitle": "Optional: send selected Cosmic Signature NFTs to another wallet.",
       "figures": {
         "owned": "In this wallet",
         "anchored": "Anchored"
@@ -261,16 +260,10 @@
     }
   },
   "nftTransfer": {
-    "empty": "You do not have any Cosmic Signature NFTs in this wallet.",
     "pickerTitle": "Choose NFTs to transfer",
     "pickerSummary": "{selected} selected of {total} transferable NFTs.",
     "selectAll": "Select all transferable",
-    "selectPage": "Select current page",
-    "clear": "Clear selection",
-    "listAria": "Cosmic Signature NFTs",
     "selectAria": "Select NFT {id}",
-    "cycle": "Cycle {cycle}",
-    "cycleUnavailable": "Cycle data not available",
     "statusLabels": {
       "anchored": "Anchored: release it to send",
       "ownerChanged": "Owner changed: refresh the page"

@@ -226,14 +226,13 @@
   "tokens": {
     "page": {
       "title": "我的 NFT",
-      "subtitle": "已連接錢包中的 Cosmic Signature NFT",
-      "marketplace": "買賣 NFT",
+      "subtitle": "所連接錢包中的 Cosmic Signature NFT",
+      "newestCaption": "最新的簽名作品。你的簽名也會在這裏展出。",
       "anchorLink": "錨定 NFT",
       "loadErrorTitle": "未能載入代幣",
       "loadErrorMessage": "未能載入 Cosmic Signature NFT。",
       "ownedTitle": "持有的 Cosmic Signature NFT",
       "transferTitle": "轉移 NFT",
-      "transferSubtitle": "可選：將選中的 Cosmic Signature NFT 發送至其他錢包。",
       "figures": {
         "owned": "此錢包中",
         "anchored": "已錨定"
@@ -261,16 +260,10 @@
     }
   },
   "nftTransfer": {
-    "empty": "此錢包中沒有 Cosmic Signature NFT。",
     "pickerTitle": "選擇要轉移的 NFT",
     "pickerSummary": "可轉移 {total} 枚，已選擇 {selected} 枚。",
     "selectAll": "選擇全部可轉移項",
-    "selectPage": "選擇目前頁",
-    "clear": "清除選擇",
-    "listAria": "Cosmic Signature NFT",
     "selectAria": "選擇 NFT {id}",
-    "cycle": "第 {cycle} 個週期",
-    "cycleUnavailable": "暫無週期數據",
     "statusLabels": {
       "anchored": "已錨定，請先解錨再轉移",
       "ownerChanged": "持有者已變更，請重新整理後再轉移"

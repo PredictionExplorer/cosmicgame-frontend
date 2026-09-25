@@ -226,14 +226,13 @@
   "tokens": {
     "page": {
       "title": "Мої NFT",
-      "subtitle": "Cosmic Signature NFT у під’єднаному гаманці",
-      "marketplace": "Купити або продати NFT",
+      "subtitle": "Cosmic Signature NFT у гаманці, який ви під’єднуєте",
+      "newestCaption": "Найновіші Сигнатури. Тут висітимуть і ваші.",
       "anchorLink": "Закріпити NFT",
       "loadErrorTitle": "Не вдалося завантажити токени",
       "loadErrorMessage": "Не вдалося завантажити Cosmic Signature NFT.",
       "ownedTitle": "Мої Cosmic Signature NFT",
       "transferTitle": "Передати NFT",
-      "transferSubtitle": "За бажанням: надішліть вибрані Cosmic Signature NFT в інший гаманець.",
       "figures": {
         "owned": "У цьому гаманці",
         "anchored": "Закріплені"
@@ -261,16 +260,10 @@
     }
   },
   "nftTransfer": {
-    "empty": "У цьому гаманці немає Cosmic Signature NFT.",
     "pickerTitle": "Виберіть NFT для передачі",
     "pickerSummary": "Вибрано {selected} з {total} NFT, доступних для передачі.",
     "selectAll": "Вибрати всі доступні",
-    "selectPage": "Вибрати сторінку",
-    "clear": "Зняти вибір",
-    "listAria": "Cosmic Signature NFT",
     "selectAria": "Вибрати NFT {id}",
-    "cycle": "Цикл {cycle}",
-    "cycleUnavailable": "Дані циклу недоступні",
     "statusLabels": {
       "anchored": "Закріплено — відкріпіть перед передачею",
       "ownerChanged": "Власник змінився — оновіть перед передачею"

@@ -119,7 +119,11 @@ describe('SignatureCard', () => {
         />,
       );
       const plate = screen.getByTestId('art-frame');
-      expect(plate.className).toContain('after:shadow-[inset_0_0_0_2px_var(--color-primary)]');
+      // Through the plate's own edge variables: a competing after:shadow
+      // class lost to the plate's edge in the stylesheet (regression).
+      expect(plate.className).toContain('[--art-edge:inset_0_0_0_2px_var(--color-primary)]');
+      expect(plate.className).toContain('[--art-edge-active:inset_0_0_0_2px_var(--color-primary)]');
+      expect(plate.className).not.toContain('after:shadow-[inset');
       expect(plate.className).not.toMatch(/opacity-/);
       expect(screen.getByTestId('signature-card')).toHaveAttribute('data-selected', 'true');
     });

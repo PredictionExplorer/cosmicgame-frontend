@@ -226,14 +226,13 @@
   "tokens": {
     "page": {
       "title": "내 NFT",
-      "subtitle": "연결된 지갑에 있는 Cosmic Signature NFT",
-      "marketplace": "NFT 구매 또는 판매",
+      "subtitle": "연결하는 지갑에 있는 Cosmic Signature NFT",
+      "newestCaption": "가장 최근의 시그니처입니다. 소장한 시그니처도 이곳에 전시됩니다.",
       "anchorLink": "NFT 앵커링",
       "loadErrorTitle": "토큰을 불러오지 못했습니다",
       "loadErrorMessage": "Cosmic Signature NFT를 불러오지 못했습니다.",
       "ownedTitle": "내가 보유한 Cosmic Signature NFT",
       "transferTitle": "NFT 전송",
-      "transferSubtitle": "선택 사항: 원하는 Cosmic Signature NFT를 골라 다른 지갑으로 보냅니다.",
       "figures": {
         "owned": "이 지갑의 NFT",
         "anchored": "앵커링됨"
@@ -261,16 +260,10 @@
     }
   },
   "nftTransfer": {
-    "empty": "이 지갑에는 Cosmic Signature NFT가 없습니다.",
     "pickerTitle": "전송할 NFT 선택",
     "pickerSummary": "전송 가능한 NFT {total}개 중 {selected}개 선택됨",
     "selectAll": "전송 가능한 NFT 모두 선택",
-    "selectPage": "현재 페이지 선택",
-    "clear": "선택 해제",
-    "listAria": "Cosmic Signature NFT 목록",
     "selectAria": "NFT {id} 선택",
-    "cycle": "사이클 {cycle}",
-    "cycleUnavailable": "사이클 데이터 없음",
     "statusLabels": {
       "anchored": "앵커링됨 · 전송 전 해제 필요",
       "ownerChanged": "소유자 변경됨 · 전송 전 새로 고침 필요"
