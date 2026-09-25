@@ -38,7 +38,13 @@
       "nfts": "Attached NFTs",
       "erc20": "Attached ERC-20 tokens"
     },
-    "retrieveAll": "Retrieve all"
+    "retrieveAll": "Retrieve all",
+    "lookup": {
+      "label": "Look up any address",
+      "hint": "Allocations are public: see what any address has received.",
+      "submit": "Look up",
+      "invalid": "Enter a full address: 0x followed by 40 letters and digits."
+    }
   },
   "anchors": {
     "title": "My Anchors",

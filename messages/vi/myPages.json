@@ -38,7 +38,13 @@
       "nfts": "NFT đính kèm",
       "erc20": "Token ERC-20 đính kèm"
     },
-    "retrieveAll": "Nhận về tất cả"
+    "retrieveAll": "Nhận về tất cả",
+    "lookup": {
+      "label": "Tra cứu một địa chỉ bất kỳ",
+      "hint": "Các phân bổ đều công khai: xem một địa chỉ bất kỳ đã nhận những gì.",
+      "submit": "Tra cứu",
+      "invalid": "Hãy nhập địa chỉ đầy đủ: 0x và 40 chữ cái, chữ số theo sau."
+    }
   },
   "anchors": {
     "title": "Neo giữ của tôi",

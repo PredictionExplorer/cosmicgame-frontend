@@ -13,6 +13,7 @@ import { ErrorState } from '@/components/ui/error-state';
 import { PageShell } from '@/components/ui/page-shell';
 import RecipientHistoryTable from '@/components/tables/RecipientHistoryTable';
 import { WalletRequiredState } from '@/components/wallet/WalletRequiredState';
+import { AddressLookup } from '@/components/winnings/AddressLookup';
 import { useClaimHistoryByUser } from '@/hooks/useApiQuery';
 import { useActiveWeb3React } from '@/hooks/web3';
 import { AllocationIcon } from '@/lib/conceptIcons';
@@ -44,7 +45,10 @@ function WinningHistory() {
           title={tWallet('required.history.title')}
           description={tWallet('required.history.description')}
           publicLink={{ href: '/allocation', label: tWallet('required.history.publicLink') }}
-        />
+        >
+          {/* Allocations are public: without a wallet, any address can still be looked up. */}
+          <AddressLookup className="mt-8" />
+        </WalletRequiredState>
       </PageShell>
     );
   }

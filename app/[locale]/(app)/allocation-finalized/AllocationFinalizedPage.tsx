@@ -350,7 +350,9 @@ function FinalizedSignature({
             </SpecRow>
           ) : null}
           <SpecRow label={t('finalized.result.recipient')}>
-            <AddressChip address={allocation.WinnerAddr} variant="plain" display="responsive" />
+            {/* The short form keeps the sheet one line a row beside the plate; the chip copies
+                the full address. */}
+            <AddressChip address={allocation.WinnerAddr} variant="plain" />
           </SpecRow>
           {allocation.TimeStamp ? (
             <SpecRow label={t('finalized.result.finalized')}>

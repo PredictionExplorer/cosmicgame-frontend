@@ -38,7 +38,13 @@
       "nfts": "已附加 NFT",
       "erc20": "已附加 ERC-20 代币"
     },
-    "retrieveAll": "全部取回"
+    "retrieveAll": "全部取回",
+    "lookup": {
+      "label": "查询任意地址",
+      "hint": "分配记录是公开的：可查看任意地址获得的分配。",
+      "submit": "查询",
+      "invalid": "请输入完整地址：0x 加 40 位字母和数字。"
+    }
   },
   "anchors": {
     "title": "我的锚定",

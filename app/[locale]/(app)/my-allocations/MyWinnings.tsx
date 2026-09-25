@@ -13,6 +13,7 @@ import { ErrorState } from '@/components/ui/error-state';
 import { PageShell } from '@/components/ui/page-shell';
 import { SectionHeader } from '@/components/ui/section-header';
 import { WalletRequiredState } from '@/components/wallet/WalletRequiredState';
+import { AddressLookup } from '@/components/winnings/AddressLookup';
 import { UnretrievedCSTAnchorDistributionsTable } from '@/components/anchoring/UnretrievedCSTAnchorDistributionsTable';
 import {
   AttachedNftRetrievalTable,
@@ -163,7 +164,10 @@ export default function MyWinnings() {
           title={tWallet('required.allocations.title')}
           description={tWallet('required.allocations.description')}
           publicLink={{ href: '/allocation', label: tWallet('required.allocations.publicLink') }}
-        />
+        >
+          {/* Allocations are public: without a wallet, any address can still be looked up. */}
+          <AddressLookup className="mt-8" />
+        </WalletRequiredState>
       </PageShell>
     );
   }
