@@ -51,6 +51,21 @@ describe('AllocationTracksBoard', () => {
     expect(visibleText(row)).toContain('home.allocation.amounts.ethEach(amount=0.4306)');
   });
 
+  it('says "each" where a CST and NFT track has several recipients', () => {
+    render(<AllocationTracksBoard data={makeDashboard({ NumRaffleNFTWinnersStakingRWalk: 1 })} />);
+
+    // Ten recipients each receive the whole 1,000 CST and an NFT.
+    const stellar = screen.getByTestId('track-row-stellar-nft');
+    expect(visibleText(stellar)).toContain('home.deck.board.cstPlusNftEach');
+    expect(visibleText(stellar)).toContain('home.allocation.recipientCount(count=10)');
+    // A single recipient reads the plain allocation.
+    for (const key of ['endurance', 'final-cst', 'rwlk-anchor']) {
+      const row = screen.getByTestId(`track-row-${key}`);
+      expect(visibleText(row)).toContain('home.deck.board.cstPlusNft');
+      expect(visibleText(row)).not.toContain('cstPlusNftEach');
+    }
+  });
+
   it('shows each ETH track’s share of the Cycle Reserve, down to the next-cycle seed', () => {
     render(<AllocationTracksBoard data={makeDashboard()} />);
 

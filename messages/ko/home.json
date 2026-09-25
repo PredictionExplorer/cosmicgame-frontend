@@ -548,6 +548,7 @@
       "title": "배분 경로",
       "subtitle": "이 사이클의 마감 시 배분 내역",
       "cstPlusNft": "1,000 CST + NFT",
+      "cstPlusNftEach": "각 1,000 CST + NFT",
       "stellarStatus": "제스처 하나가 자격 하나",
       "ethGroup": "사이클 준비금의 ETH",
       "fixedGroup": "CST 및 NFT 배분"

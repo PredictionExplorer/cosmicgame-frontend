@@ -236,6 +236,8 @@ export function GestureConsole({
       label: t('form.method.randomWalk.label'),
       price: ethPriceLabel('RandomWalk'),
       note: t('deck.console.randomWalkNote'),
+      // Under the whole track the note names its method, as the Observatory's does.
+      trackNote: t('form.method.randomWalk.desc'),
     },
     { value: 'CST', label: t('form.method.cst.label'), price: cstPriceLabel },
   ];

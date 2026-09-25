@@ -548,6 +548,7 @@
       "title": "配分トラック",
       "subtitle": "このサイクルの確定時に配分されるもの",
       "cstPlusNft": "1,000 CST + NFT",
+      "cstPlusNftEach": "各1,000 CST + NFT",
       "stellarStatus": "一筆はすべて対象になります",
       "ethGroup": "サイクル準備金のETH",
       "fixedGroup": "CSTとNFTの配分"

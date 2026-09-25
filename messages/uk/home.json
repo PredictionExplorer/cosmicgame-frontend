@@ -548,6 +548,7 @@
       "title": "Напрями розподілу",
       "subtitle": "Усе, що цей цикл розподілить під час завершення",
       "cstPlusNft": "1 000 CST + NFT",
+      "cstPlusNftEach": "по 1 000 CST + NFT",
       "stellarStatus": "кожен жест — це запис",
       "ethGroup": "ETH із резерву циклу",
       "fixedGroup": "Розподіли CST і NFT"

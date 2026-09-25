@@ -13,6 +13,13 @@ export interface MethodOption {
   price: ReactNode;
   /** A short qualifier under the price ("Half price with …"), a few words at most. */
   note?: string;
+  /**
+   * The note as one sentence that names its method ("ETH + Random Walk halves
+   * the ETH cost …"), for the line under the track when the segments sit side
+   * by side: there it starts under the first segment, so a bare qualifier
+   * would read as a note on that one. Defaults to `note`.
+   */
+  trackNote?: string;
 }
 
 interface MethodSelectorProps {
@@ -27,10 +34,16 @@ interface MethodSelectorProps {
 const NEXT_KEYS = new Set(['ArrowRight', 'ArrowDown']);
 const PREVIOUS_KEYS = new Set(['ArrowLeft', 'ArrowUp']);
 
+/**
+ * Side by side, each segment is as wide as its content asks and the rest of
+ * the track is shared out evenly, so "ETH + Random Walk" keeps one line
+ * where there is room; where there is not, the segments shrink evenly and a
+ * label wraps rather than overflow.
+ */
 const COLUMNS: Record<number, string> = {
   1: '@min-[21rem]:grid-cols-1',
-  2: '@min-[21rem]:grid-cols-2',
-  3: '@min-[21rem]:grid-cols-3',
+  2: '@min-[21rem]:grid-cols-[repeat(2,auto)]',
+  3: '@min-[21rem]:grid-cols-[repeat(3,auto)]',
 };
 
 /**
@@ -39,12 +52,13 @@ const COLUMNS: Record<number, string> = {
  * so the choice and its cost are read together. Side by side, the segments
  * share their label and price rows, so the prices sit on one line even when
  * a label wraps, and the chosen one carries a 2px primary rule along its
- * foot; a method's note reads once under the track, because inside a
- * segment it would open an empty row under every other one. Where the
- * column is narrow (a phone, the bottom sheet) the segments stack as rows
- * with the price at the end, so a price never wraps, each note runs the full
- * row under them, and the chosen row is marked along its start edge and
- * ringed, never with a rule that could read as a row divider.
+ * foot; a method's note reads once under the track as a sentence that names
+ * its method, because inside a segment it would open an empty row under
+ * every other one. Where the column is narrow (a phone, the bottom sheet) the
+ * segments stack as rows with the price at the end, so a price never wraps,
+ * each note runs the full row under them, and the chosen row is marked along
+ * its start edge and ringed, never with a rule that could read as a row
+ * divider.
  *
  * It is a radio group: one tab stop, arrow keys move the selection (and
  * wrap), Home and End jump to the ends.
@@ -139,11 +153,11 @@ export function MethodSelector({
             <p
               key={option.value}
               className={cn(
-                'type-caption',
+                'type-caption text-pretty',
                 option.value === value ? 'text-muted-foreground' : 'text-subtle',
               )}
             >
-              {option.note}
+              {option.trackNote ?? option.note}
             </p>
           ))}
         </div>
