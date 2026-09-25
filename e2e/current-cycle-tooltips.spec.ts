@@ -44,8 +44,8 @@ test.describe('/current-cycle tooltips', () => {
     await term.scrollIntoViewIfNeeded();
     await openTooltip(term);
 
-    await expectTooltipFullyVisible(page, /The ETH held for the current Cycle/);
-    await expectTooltipPortaledOutOfMain(page, /The ETH held for the current Cycle/);
+    await expectTooltipFullyVisible(page, /The ETH held for the current cycle/);
+    await expectTooltipPortaledOutOfMain(page, /The ETH held for the current cycle/);
   });
 
   test('explains every allocation in one disclosure instead of ten hover cards', async ({
