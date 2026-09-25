@@ -25,6 +25,9 @@ const ANCHORING_QUERY_KEYS = [
   'stakingRewardsByUser',
   'stakingRWLKActionsByUser',
   'stakingRWLKMintsByUser',
+  // The wallet's anchorable Random Walk NFTs, read from the chain
+  // (RWLK_ANCHORABLE_QUERY_KEY in components/anchoring/randomWalkAnchorable).
+  'rwlkAnchorable',
   // The unretrieved-distribution reads and the header's notice, which a
   // release changes as much as the anchored lists.
   'stakingCSTRewardsToClaim',

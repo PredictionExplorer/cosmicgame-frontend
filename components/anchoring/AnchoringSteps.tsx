@@ -8,7 +8,10 @@ import { cn } from '@/lib/utils';
 const STEPS = ['anchor', 'receive', 'release'] as const;
 
 interface AnchoringStepsProps {
-  /** Rendered on My Anchors itself: the first step names the page without linking to it. */
+  /**
+   * Rendered on My Anchors itself: the first step says what to do here
+   * instead of sending the reader to the page they are on.
+   */
   onMyAnchors?: boolean;
   className?: string;
 }
@@ -35,17 +38,16 @@ export function AnchoringSteps({ onMyAnchors = false, className }: AnchoringStep
           <div className="min-w-0 space-y-1.5">
             <h3 className="type-title text-foreground">{t(`steps.${step}.title`)}</h3>
             <p className="type-body-sm leading-relaxed text-muted-foreground">
-              {t.rich(`steps.${step}.body`, {
-                ...values,
-                link: (chunks) =>
-                  onMyAnchors ? (
-                    <span className="text-foreground">{chunks}</span>
-                  ) : (
-                    <Link href="/my-anchors" className="link">
-                      {chunks}
-                    </Link>
-                  ),
-              })}
+              {onMyAnchors && step === 'anchor'
+                ? t('steps.anchor.bodyHere')
+                : t.rich(`steps.${step}.body`, {
+                    ...values,
+                    link: (chunks) => (
+                      <Link href="/my-anchors" className="link">
+                        {chunks}
+                      </Link>
+                    ),
+                  })}
             </p>
           </div>
         </li>

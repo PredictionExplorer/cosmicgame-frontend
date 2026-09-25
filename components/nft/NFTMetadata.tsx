@@ -12,6 +12,7 @@ import { cn } from '@/lib/utils';
 import { TOUCH_TARGET_ICON_CLASS } from '@/lib/touch-target';
 import { useCopyFeedback } from '@/hooks/useCopyFeedback';
 import { useNow } from '@/hooks/useNow';
+import { isAnchorable } from '@/utils/anchoringStats';
 import { formatCount } from '@/utils/format';
 import { AddressChip } from '@/components/ui/address-chip';
 import { DateTime } from '@/components/ui/date-time';
@@ -118,7 +119,7 @@ export function NFTSpecList({ nft, entry, rarity, rarityTotal = 0, className }: 
       ? t(recordTypeKey)
       : null;
 
-  const anchoringEligible = nft != null && !nft.Staked && !nft.WasUnstaked;
+  const anchoringEligible = isAnchorable(nft);
 
   return (
     <dl

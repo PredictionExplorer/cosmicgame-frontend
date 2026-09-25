@@ -54,7 +54,8 @@
   "steps": {
     "anchor": {
       "title": "NFTを係留する",
-      "body": "<link>自分の係留</link>で、ウォレットにあるCosmic SignatureまたはRandom Walk NFTを選びます。初回は、ウォレットがまずそのコレクションの係留コントラクトの承認を求め、次に係留の確認を求めます。"
+      "body": "<link>自分の係留</link>で、ウォレットにあるCosmic SignatureまたはRandom Walk NFTを選びます。初回は、ウォレットがまずそのコレクションの係留コントラクトの承認を求め、次に係留の確認を求めます。",
+      "bodyHere": "ウォレットを接続し、係留するCosmic SignatureまたはRandom Walk NFTを選びます。初回は、ウォレットがまずそのコレクションの係留コントラクトの承認を求め、次に係留の確認を求めます。"
     },
     "receive": {
       "title": "毎サイクル受け取る",
@@ -159,6 +160,10 @@
     "accrued": "{amount}を積立済み",
     "cycle": "サイクル{cycle}",
     "open": "{title}を開く",
+    "loadError": {
+      "title": "これらのNFTを読み込めませんでした",
+      "message": "一覧を一時的に取得できません。しばらくしてからもう一度お試しください。"
+    },
     "settled": {
       "anchored": "係留済み・更新中",
       "released": "解除済み・更新中"

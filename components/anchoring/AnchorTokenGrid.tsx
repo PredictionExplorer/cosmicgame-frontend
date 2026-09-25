@@ -15,6 +15,7 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
 import { EmptyState } from '@/components/ui/empty-state';
+import { ErrorState } from '@/components/ui/error-state';
 import { TablePagination } from '@/components/ui/pagination';
 import { SectionHeader } from '@/components/ui/section-header';
 import { SkeletonArtPlate, Skeleton } from '@/components/ui/skeleton';
@@ -82,6 +83,12 @@ export interface AnchorTokenGridProps {
   /** A wallet flow is running anywhere on the page: selection and actions wait for it. */
   walletBusy: boolean;
   loading?: boolean;
+  /**
+   * The list could not be read: the grid says so with a retry, never "nothing
+   * to anchor", which would read as an empty wallet.
+   */
+  failed?: boolean;
+  onRetry?: () => void;
 }
 
 /**
@@ -108,6 +115,8 @@ export function AnchorTokenGrid({
   stage,
   walletBusy,
   loading = false,
+  failed = false,
+  onRetry,
 }: AnchorTokenGridProps) {
   const t = useTranslations('anchoring');
   const tTables = useTranslations('tables');
@@ -171,7 +180,7 @@ export function AnchorTokenGrid({
         title={title}
         description={description}
         actions={
-          items.length > 1 && !loading ? (
+          items.length > 1 && !loading && !failed ? (
             <Button
               variant="quiet"
               size="sm"
@@ -188,6 +197,14 @@ export function AnchorTokenGrid({
 
       {loading ? (
         <AnchorGridSkeleton />
+      ) : failed ? (
+        <ErrorState
+          variant="panel"
+          headingLevel={3}
+          title={t('picker.loadError.title')}
+          message={t('picker.loadError.message')}
+          onRetry={onRetry}
+        />
       ) : items.length === 0 ? (
         <EmptyState
           variant="panel"

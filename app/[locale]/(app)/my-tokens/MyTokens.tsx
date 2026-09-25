@@ -4,6 +4,7 @@ import { useId, useState, useMemo, type ReactNode } from 'react';
 import { ArrowRight, ChevronDown } from 'lucide-react';
 import { useLocale, useTranslations } from 'next-intl';
 
+import { isAnchorable } from '@/utils/anchoringStats';
 import { formatCount } from '@/utils/format';
 import { useCSTTokensByUser } from '@/hooks/useApiQuery';
 import { useCollectionTraits } from '@/hooks/useNftTraits';
@@ -70,9 +71,8 @@ export default function MyTokens() {
 
   const loaded = connected && !isLoading && !isError;
   const anchoredCount = tokens.filter((token) => token.Staked).length;
-  // The ledger's rule: an NFT can be anchored only once, so a released one
-  // cannot be anchored again.
-  const anchorableCount = tokens.filter((token) => !token.Staked && !token.WasUnstaked).length;
+  // The anchoring rule: not anchored now, and never released (each NFT is anchored once, ever).
+  const anchorableCount = tokens.filter(isAnchorable).length;
 
   return (
     <PageShell variant="data" backdrop="signature">

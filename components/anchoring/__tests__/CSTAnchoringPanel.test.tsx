@@ -117,6 +117,29 @@ describe('CSTAnchoringPanel', () => {
     ]);
   });
 
+  it('never offers an NFT that is anchored now or was released', () => {
+    // Regression: the wallet's list includes its anchored NFTs (`Staked`); offering them let
+    // "Select all" build a batch the contract reverts whole.
+    renderPanel({
+      availableTokens: [
+        available(47, 2),
+        { ...available(9, 1), Staked: true },
+        { ...available(5, 0), WasUnstaked: true },
+      ],
+    });
+    expect(keys(grids[CST_GRIDS.available]!.items)).toEqual([47]);
+  });
+
+  it('gives each grid its own read, so one failed list never empties the others', () => {
+    const onRetry = jest.fn();
+    renderPanel({
+      anchoredRead: { loading: true },
+      availableRead: { failed: true, onRetry },
+    });
+    expect(grids[CST_GRIDS.anchored]).toMatchObject({ loading: true, failed: undefined });
+    expect(grids[CST_GRIDS.available]).toMatchObject({ loading: undefined, failed: true, onRetry });
+  });
+
   it('wires the grids to their own actions and stages', () => {
     const running: TxStage = { status: 'pending', hash: '0x1' };
     const stageFor = jest.fn((id: string) => (id === CST_GRIDS.anchored ? running : IDLE));

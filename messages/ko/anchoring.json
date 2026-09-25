@@ -54,7 +54,8 @@
   "steps": {
     "anchor": {
       "title": "NFT 앵커링",
-      "body": "<link>내 앵커링</link>에서 지갑에 있는 Cosmic Signature 또는 Random Walk NFT를 선택합니다. 처음에는 지갑이 해당 컬렉션의 앵커링 컨트랙트 승인을 먼저 요청하고, 그다음 앵커링을 요청합니다."
+      "body": "<link>내 앵커링</link>에서 지갑에 있는 Cosmic Signature 또는 Random Walk NFT를 선택합니다. 처음에는 지갑이 해당 컬렉션의 앵커링 컨트랙트 승인을 먼저 요청하고, 그다음 앵커링을 요청합니다.",
+      "bodyHere": "지갑을 연결한 다음 앵커링할 Cosmic Signature 또는 Random Walk NFT를 선택합니다. 처음에는 지갑이 해당 컬렉션의 앵커링 컨트랙트 승인을 먼저 요청하고, 그다음 앵커링을 요청합니다."
     },
     "receive": {
       "title": "매 사이클 지급",
@@ -159,6 +160,10 @@
     "accrued": "적립 {amount}",
     "cycle": "사이클 {cycle}",
     "open": "{title} 열기",
+    "loadError": {
+      "title": "이 NFT 목록을 불러오지 못했습니다",
+      "message": "목록을 일시적으로 불러올 수 없습니다. 잠시 후 다시 시도해 주세요."
+    },
     "settled": {
       "anchored": "앵커링됨 · 업데이트 중",
       "released": "해제됨 · 업데이트 중"

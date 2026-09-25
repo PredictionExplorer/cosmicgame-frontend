@@ -54,7 +54,8 @@
   "steps": {
     "anchor": {
       "title": "Anchor your NFTs",
-      "body": "On <link>My Anchors</link>, choose Cosmic Signature or Random Walk NFTs from your wallet. The first time, your wallet asks you to approve the anchoring contract for that collection, then to anchor."
+      "body": "On <link>My Anchors</link>, choose Cosmic Signature or Random Walk NFTs from your wallet. The first time, your wallet asks you to approve the anchoring contract for that collection, then to anchor.",
+      "bodyHere": "Connect your wallet, then choose which of its Cosmic Signature or Random Walk NFTs to anchor. The first time, your wallet asks you to approve the anchoring contract for that collection, then to anchor."
     },
     "receive": {
       "title": "Receive every cycle",
@@ -159,6 +160,10 @@
     "accrued": "{amount} accrued",
     "cycle": "Cycle #{cycle}",
     "open": "Open {title}",
+    "loadError": {
+      "title": "These NFTs could not be loaded",
+      "message": "The list is temporarily unavailable. Try again in a moment."
+    },
     "settled": {
       "anchored": "Anchored · updating",
       "released": "Released · updating"

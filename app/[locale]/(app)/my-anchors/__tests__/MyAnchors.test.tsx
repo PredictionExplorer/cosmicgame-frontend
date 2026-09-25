@@ -4,7 +4,7 @@ import type { CSTAnchoringPanelProps } from '@/components/anchoring/CSTAnchoring
 import type { RWLKAnchoringPanelProps } from '@/components/anchoring/RWLKAnchoringPanel';
 import type { TxStage } from '@/lib/txStage';
 
-import { act, render, screen, waitFor } from '@/test-utils';
+import { act, render, screen } from '@/test-utils';
 
 import MyAnchors from '../MyAnchors';
 
@@ -13,12 +13,15 @@ let mockAccount: string | null = ACCOUNT;
 let mockStage: TxStage = { status: 'idle' };
 const mockAnchor = jest.fn();
 const mockRelease = jest.fn();
-const mockWalletOfOwner = jest.fn();
-// The real hook hands out a stable contract and error handler; so does the mock, or the
-// wallet read would re-run on every render.
-const mockRwalkContract = { read: { walletOfOwner: mockWalletOfOwner } };
-const mockHandleError = jest.fn();
-const mockQueries: Record<string, { data?: unknown; isLoading: boolean }> = {};
+interface MockQuery {
+  data?: unknown;
+  isLoading: boolean;
+  isError?: boolean;
+  refetch?: jest.Mock;
+}
+const mockQueries: Record<string, MockQuery> = {};
+/** The chain read of anchorable Random Walk NFTs, per account. */
+const mockAnchorable: Record<string, MockQuery> = {};
 
 jest.mock('@/hooks/web3', () => ({
   useActiveWeb3React: () => ({ account: mockAccount }),
@@ -27,8 +30,6 @@ jest.mock('@/hooks/useAnchorActions', () => ({
   useAnchorActions: () => ({
     anchor: mockAnchor,
     release: mockRelease,
-    handleError: mockHandleError,
-    rwalkContract: mockRwalkContract,
     txStage: mockStage,
   }),
 }));
@@ -40,6 +41,11 @@ jest.mock('@/hooks/useApiQuery', () => ({
   useRWLKAnchorActionsByUser: () => mockQueries.rwlkActions,
   useRWLKAnchorImprintsByUser: () => mockQueries.imprints,
 }));
+jest.mock('@/components/anchoring/useRandomWalkAnchorable', () => ({
+  useRandomWalkAnchorable: (account: string) =>
+    mockAnchorable[account] ?? { data: undefined, isLoading: true, isError: false },
+}));
+const mockRefetchAnchored = jest.fn();
 const mockAnchored = {
   cstokens: [{ StakeActionId: 3, StakedTokenId: 0, StakeTimeStamp: 1, TokenInfo: { TokenId: 9 } }],
   rwlktokens: [
@@ -47,6 +53,9 @@ const mockAnchored = {
     { StakeActionId: 31, StakedTokenId: 1827, StakeTimeStamp: 2 },
   ],
   isLoading: false,
+  cstFailed: false,
+  rwlkFailed: false,
+  fetchData: mockRefetchAnchored,
 };
 jest.mock('@/contexts/AnchoredTokenContext', () => ({
   useAnchoredToken: () => mockAnchored,
@@ -80,7 +89,10 @@ beforeEach(() => {
   mockStage = { status: 'idle' };
   cstProps = null;
   rwlkProps = null;
-  mockWalletOfOwner.mockResolvedValue([BigInt(1826), BigInt(1900), BigInt(12)]);
+  mockAnchored.cstFailed = false;
+  mockAnchored.rwlkFailed = false;
+  for (const key of Object.keys(mockAnchorable)) delete mockAnchorable[key];
+  mockAnchorable[ACCOUNT] = { data: [12, 1900], isLoading: false, isError: false };
   Object.assign(mockQueries, {
     dashboard: {
       data: {
@@ -170,30 +182,64 @@ describe('MyAnchors', () => {
     expect(screen.getByTestId('rwlk-panel')).toBeInTheDocument();
   });
 
-  it('offers only NFTs that were never released for anchoring', () => {
+  it('hands the panel the wallet’s NFTs as listed, which offers only the anchorable ones', () => {
     render(<MyAnchors />);
-    expect(cstProps?.availableTokens.map((token) => token.TokenId)).toEqual([47]);
+    expect(cstProps?.availableTokens).toBe(mockQueries.cstTokens!.data);
     expect(cstProps?.anchoredTokens).toBe(mockAnchored.cstokens);
   });
 
-  it('offers only Random Walk NFTs that were never anchored', async () => {
+  it('offers the Random Walk NFTs the anchoring contract can still take', async () => {
     const user = userEvent.setup();
     render(<MyAnchors />);
     await user.click(screen.getByRole('tab', { name: /randomWalk/ }));
-    await waitFor(() => expect(rwlkProps?.availableTokenIds).toEqual([12, 1900]));
-    expect(mockWalletOfOwner).toHaveBeenCalledWith([ACCOUNT]);
+    expect(rwlkProps?.availableTokenIds).toEqual([12, 1900]);
+    expect(rwlkProps?.availableRead).toMatchObject({ loading: false, failed: false });
   });
 
   it('never shows the previous wallet’s Random Walk NFTs after switching accounts', async () => {
     const user = userEvent.setup();
     const { rerender } = render(<MyAnchors />);
     await user.click(screen.getByRole('tab', { name: /randomWalk/ }));
-    await waitFor(() => expect(rwlkProps?.availableTokenIds).toEqual([12, 1900]));
+    expect(rwlkProps?.availableTokenIds).toEqual([12, 1900]);
 
     mockAccount = '0xabcdefabcdefabcdefabcdefabcdefabcdefabcd';
-    mockWalletOfOwner.mockReturnValue(new Promise(() => {}));
     rerender(<MyAnchors />);
     expect(rwlkProps?.availableTokenIds).toBeNull();
+  });
+
+  it('shows a failed read as a failure with a retry, never as an empty collection', async () => {
+    const user = userEvent.setup();
+    const refetchTokens = jest.fn();
+    mockQueries.cstTokens = { isLoading: false, isError: true, refetch: refetchTokens };
+    mockQueries.cstActions = { isLoading: false, isError: true, refetch: jest.fn() };
+    mockAnchored.cstFailed = true;
+    mockAnchorable[ACCOUNT] = { isLoading: false, isError: true, refetch: jest.fn() };
+    render(<MyAnchors />);
+
+    expect(cstProps?.availableRead).toMatchObject({ failed: true });
+    expect(cstProps?.anchoredRead).toMatchObject({ failed: true });
+    expect(cstProps?.historyRead).toMatchObject({ failed: true });
+    cstProps?.availableRead?.onRetry?.();
+    expect(refetchTokens).toHaveBeenCalled();
+    cstProps?.anchoredRead?.onRetry?.();
+    expect(mockRefetchAnchored).toHaveBeenCalled();
+
+    await user.click(screen.getByRole('tab', { name: /randomWalk/ }));
+    expect(rwlkProps?.availableRead).toMatchObject({ failed: true });
+    expect(rwlkProps?.availableTokenIds).toBeNull();
+  });
+
+  it('gives an unread collection no count on its tab, never a confident 0', () => {
+    mockAnchored.cstFailed = true;
+    render(<MyAnchors />);
+    const tab = screen.getByRole('tab', { name: 'myPages.anchors.tabs.cosmicSignature' });
+    expect(tab.textContent).toBe('myPages.anchors.tabs.cosmicSignature');
+  });
+
+  it('keeps showing a list whose background refresh failed', () => {
+    mockQueries.cstTokens = { data: [{ TokenId: 47 }], isLoading: false, isError: true };
+    render(<MyAnchors />);
+    expect(cstProps?.availableRead).toMatchObject({ failed: false });
   });
 
   it('routes each grid’s action to the anchoring hook and gives it the stage it started', async () => {

@@ -54,7 +54,8 @@
   "steps": {
     "anchor": {
       "title": "Neo giữ NFT của bạn",
-      "body": "Trong <link>Neo giữ của tôi</link>, hãy chọn Cosmic Signature NFT hoặc Random Walk NFT trong ví. Lần đầu, ví sẽ yêu cầu bạn cấp quyền cho hợp đồng neo giữ của bộ sưu tập đó, sau đó mới xác nhận neo giữ."
+      "body": "Trong <link>Neo giữ của tôi</link>, hãy chọn Cosmic Signature NFT hoặc Random Walk NFT trong ví. Lần đầu, ví sẽ yêu cầu bạn cấp quyền cho hợp đồng neo giữ của bộ sưu tập đó, sau đó mới xác nhận neo giữ.",
+      "bodyHere": "Hãy kết nối ví, sau đó chọn Cosmic Signature NFT hoặc Random Walk NFT cần neo giữ. Lần đầu, ví sẽ yêu cầu bạn cấp quyền cho hợp đồng neo giữ của bộ sưu tập đó, sau đó mới xác nhận neo giữ."
     },
     "receive": {
       "title": "Nhận mỗi chu kỳ",
@@ -159,6 +160,10 @@
     "accrued": "Đã tích lũy {amount}",
     "cycle": "Chu kỳ #{cycle}",
     "open": "Mở {title}",
+    "loadError": {
+      "title": "Không tải được các NFT này",
+      "message": "Danh sách tạm thời không khả dụng. Hãy thử lại sau giây lát."
+    },
     "settled": {
       "anchored": "Đã neo giữ · đang cập nhật",
       "released": "Đã gỡ neo · đang cập nhật"

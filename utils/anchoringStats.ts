@@ -54,3 +54,22 @@ export function countActiveAnchorHolders(
   }
   return active.size;
 }
+
+/** The two flags of a Cosmic Signature NFT record that decide whether it can be anchored. */
+export interface AnchorEligibilityFlags {
+  /** Anchored right now. */
+  Staked?: boolean;
+  /** Anchored once and released: the contract never takes it again. */
+  WasUnstaked?: boolean;
+}
+
+/**
+ * Whether a Cosmic Signature NFT can be anchored: it is not anchored now and
+ * has never been released (the anchoring contract takes each NFT once, ever).
+ * The wallet's NFT list (`cst/list/by_user`) includes anchored NFTs, so every
+ * page that offers anchoring filters through this one rule; an ineligible NFT
+ * in a batch would revert the whole `stakeMany`.
+ */
+export function isAnchorable(token: AnchorEligibilityFlags | null | undefined): boolean {
+  return token != null && !token.Staked && !token.WasUnstaked;
+}

@@ -54,7 +54,8 @@
   "steps": {
     "anchor": {
       "title": "锚定你的 NFT",
-      "body": "在<link>我的锚定</link>中，从钱包里选择 Cosmic Signature 或 Random Walk NFT。第一次操作时，钱包会先请你授权该系列的锚定合约，然后再确认锚定。"
+      "body": "在<link>我的锚定</link>中，从钱包里选择 Cosmic Signature 或 Random Walk NFT。第一次操作时，钱包会先请你授权该系列的锚定合约，然后再确认锚定。",
+      "bodyHere": "连接钱包，然后选择要锚定的 Cosmic Signature 或 Random Walk NFT。第一次操作时，钱包会先请你授权该系列的锚定合约，然后再确认锚定。"
     },
     "receive": {
       "title": "每个周期获得派发",
@@ -159,6 +160,10 @@
     "accrued": "已累计 {amount}",
     "cycle": "第 {cycle} 个周期",
     "open": "打开 {title}",
+    "loadError": {
+      "title": "无法加载这些 NFT",
+      "message": "列表暂时无法获取，请稍后重试。"
+    },
     "settled": {
       "anchored": "已锚定 · 更新中",
       "released": "已解锚 · 更新中"
