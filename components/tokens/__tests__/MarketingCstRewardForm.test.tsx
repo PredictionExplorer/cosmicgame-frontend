@@ -239,7 +239,7 @@ describe('MarketingCstRewardForm', () => {
     mockReadContract.mockImplementation(() => Promise.reject(err));
     renderForm();
     expect(
-      await screen.findByText("The reserve's CST balance could not be read."),
+      await screen.findByText('The reserve’s CST balance could not be read.'),
     ).toBeInTheDocument();
 
     const user = userEvent.setup();

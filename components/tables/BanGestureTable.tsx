@@ -472,7 +472,10 @@ const BanGestureTable = ({
 
   return (
     <DataTable
-      data={loading ? [] : rows}
+      // Without the hidden list every message would read as visible, so none
+      // shows: the table's error replaces it. (A failed refresh of the
+      // messages alone keeps the rows already on screen.)
+      data={loading || hidden.failed ? [] : rows}
       columns={columns}
       ariaLabel={t('names.gestureMessages')}
       description={description}

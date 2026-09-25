@@ -45,7 +45,7 @@
       "acknowledge": "I’ve checked this address and want to send to it.",
       "acknowledgeRequired": "Confirm that you’ve checked the address to continue.",
       "checking": "Checking the address…",
-      "balanceUnchecked": "The balance couldn't be read, so this amount hasn't been checked against it."
+      "balanceUnchecked": "The balance couldn’t be read, so this amount hasn’t been checked against it."
     }
   }
 }

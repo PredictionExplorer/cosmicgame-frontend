@@ -294,8 +294,7 @@
       "shortLabel": "CST 거래"
     },
     "geckoTerminal": {
-      "ariaLabel": "GeckoTerminal에서 CST 풀 보기",
-      "shortLabel": "CST 풀 보기"
+      "ariaLabel": "GeckoTerminal에서 CST 풀 보기"
     },
     "axiomZero": {
       "label": "Axiom Zero에서 구매 또는 판매"

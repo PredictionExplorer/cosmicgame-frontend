@@ -294,8 +294,7 @@
       "shortLabel": "CSTを取引"
     },
     "geckoTerminal": {
-      "ariaLabel": "GeckoTerminalでCSTプールを見る",
-      "shortLabel": "CSTプールを見る"
+      "ariaLabel": "GeckoTerminalでCSTプールを見る"
     },
     "axiomZero": {
       "label": "Axiom Zeroで売買する"

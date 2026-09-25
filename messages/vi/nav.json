@@ -294,8 +294,7 @@
       "shortLabel": "Giao dịch CST"
     },
     "geckoTerminal": {
-      "ariaLabel": "Xem pool CST trên GeckoTerminal",
-      "shortLabel": "Xem pool CST"
+      "ariaLabel": "Xem pool CST trên GeckoTerminal"
     },
     "axiomZero": {
       "label": "Mua hoặc bán trên Axiom Zero"

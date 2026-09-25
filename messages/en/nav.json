@@ -294,8 +294,7 @@
       "shortLabel": "Trade CST"
     },
     "geckoTerminal": {
-      "ariaLabel": "View the CST pool on GeckoTerminal",
-      "shortLabel": "View CST pool"
+      "ariaLabel": "View the CST pool on GeckoTerminal"
     },
     "axiomZero": {
       "label": "Buy or sell on Axiom Zero"

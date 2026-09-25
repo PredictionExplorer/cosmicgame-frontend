@@ -294,8 +294,7 @@
       "shortLabel": "兑换 CST"
     },
     "geckoTerminal": {
-      "ariaLabel": "在 GeckoTerminal 查看 CST 流动性池",
-      "shortLabel": "查看 CST 池"
+      "ariaLabel": "在 GeckoTerminal 查看 CST 流动性池"
     },
     "axiomZero": {
       "label": "在 Axiom Zero 买卖"
