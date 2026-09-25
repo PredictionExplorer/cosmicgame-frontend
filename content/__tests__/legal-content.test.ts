@@ -51,6 +51,20 @@ function strings(value: unknown, path = ''): [string, string][] {
   return [];
 }
 
+/** Every `id` in a copy object, with its path: the page's anchors. */
+function anchorIds(value: unknown, path = ''): [string, string][] {
+  if (Array.isArray(value))
+    return value.flatMap((item, index) => anchorIds(item, `${path}[${index}]`));
+  if (value && typeof value === 'object') {
+    return Object.entries(value).flatMap(([key, item]) =>
+      key === 'id' && typeof item === 'string'
+        ? [[path, item] as [string, string]]
+        : anchorIds(item, `${path}.${key}`),
+    );
+  }
+  return [];
+}
+
 /** The shape of a copy object: every path, without its text. */
 function shape(value: unknown): string[] {
   return strings(value)
@@ -102,6 +116,20 @@ describe('localized legal content', () => {
             tags: [...richTextLinks(english.get(path) ?? '')].sort(),
           });
         }
+      }
+    },
+  );
+
+  // Every section and clause id is an anchor (/terms#allocations-retrieval),
+  // and the links to it do not carry a locale's own spelling. Security and
+  // Audits name their sections in the page component, not in the copy.
+  it.each(Object.entries({ risk: getRiskCopy, terms: getTermsCopy, privacy: getPrivacyCopy }))(
+    '%s: every locale uses the English section and clause ids',
+    (_page, getCopy) => {
+      const english = anchorIds(getCopy('en'));
+      expect(english.length).toBeGreaterThan(0);
+      for (const locale of TRANSLATED) {
+        expect({ locale, ids: anchorIds(getCopy(locale)) }).toEqual({ locale, ids: english });
       }
     },
   );

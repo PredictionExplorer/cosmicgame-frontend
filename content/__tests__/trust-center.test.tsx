@@ -11,6 +11,7 @@ import {
 import { AuditsContent } from '@/content/legal/AuditsContent';
 import { AUDIT_FINDINGS_TOTAL, HACKEN_AUDIT } from '@/content/legal/audit';
 import type { LegalDocumentLabels } from '@/content/legal/labels';
+import { LEGAL_LINKS } from '@/content/legal/links';
 import {
   OFFICIAL_CONTRACTS,
   sourcifyContractUrl,
@@ -38,7 +39,7 @@ function labelsFor(locale: string): LegalDocumentLabels {
     contents: legal.document.contents ?? '',
     backToTop: legal.document.backToTop ?? '',
     backToContents: legal.document.backToContents ?? '',
-    sectionLink: legal.document.sectionLink ?? '',
+    sectionLink: (section) => (legal.document.sectionLink ?? '').replace('{section}', section),
     revisionHistory: legal.document.revisionHistory ?? '',
     tabs: Object.fromEntries(
       TRUST_CENTER_TABS.map(({ id }) => [id, legal.breadcrumbs[id] ?? id]),
@@ -370,22 +371,48 @@ describe('Risk disclosures', () => {
   });
 });
 
-describe('Terms of Service', () => {
-  it('gives every clause the anchor the risk disclosures link to', () => {
-    render(PAGES.terms('en'));
-    for (const id of [
-      'mechanics',
-      'mechanics-random-walk',
-      'mechanics-cst-window',
-      'allocations-retrieval',
-      'allocations-no-guarantee',
-      'eligibility',
-      'risks',
-    ]) {
-      expect(document.getElementById(id)).not.toBeNull();
-    }
+/** The Trust Center page each app path renders. */
+const PAGE_BY_PATH: Record<string, keyof typeof PAGES> = {
+  '/security': 'security',
+  '/audits': 'audits',
+  '/risk-disclosures': 'risk',
+  '/terms': 'terms',
+  '/privacy': 'privacy',
+};
+
+/** Every deep link the copy may name (`LEGAL_LINKS`) into a Trust Center page, by page. */
+const DEEP_LINKS = Object.values(LEGAL_LINKS).flatMap((target) => {
+  const [path = '', fragment] = target.href.split('#');
+  const page = target.kind === 'app' ? PAGE_BY_PATH[path] : undefined;
+  return page && fragment ? [{ page, fragment }] : [];
+});
+
+describe('Trust Center deep links', () => {
+  it('covers the clauses the risk disclosures cite', () => {
+    expect(DEEP_LINKS.map(({ fragment }) => fragment)).toEqual(
+      expect.arrayContaining(['mechanics-cst-window', 'allocations-retrieval', 'services']),
+    );
   });
 
+  // The anchors are locale-agnostic (/uk/terms#allocations-retrieval), so a
+  // translator's typo in one locale's clause id would break the links there.
+  it.each(routing.locales)('%s: every deep link lands on an anchor', (locale) => {
+    for (const page of new Set(DEEP_LINKS.map((link) => link.page))) {
+      const { unmount } = render(PAGES[page](locale));
+      for (const { fragment } of DEEP_LINKS.filter((link) => link.page === page)) {
+        expect({
+          locale,
+          page,
+          fragment,
+          found: document.getElementById(fragment) !== null,
+        }).toEqual({ locale, page, fragment, found: true });
+      }
+      unmount();
+    }
+  });
+});
+
+describe('Terms of Service', () => {
   it('lists the prohibited activities as a real list', () => {
     render(PAGES.terms('en'));
     const items = document.querySelectorAll('#prohibited ul > li');

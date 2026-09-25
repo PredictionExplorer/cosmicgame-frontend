@@ -13,8 +13,8 @@ export interface LegalDocumentLabels {
   readonly contents: string;
   readonly backToTop: string;
   readonly backToContents: string;
-  /** The heading anchor's name; `{section}` is the heading. */
-  readonly sectionLink: string;
+  /** The accessible name of a heading's anchor link, formatted through ICU. */
+  readonly sectionLink: (section: string) => string;
   readonly revisionHistory: string;
   /** The Trust Center tab labels; a document's is also its title. */
   readonly tabs: Readonly<Record<TrustCenterTab, string>>;
@@ -36,7 +36,7 @@ export async function getLegalDocumentLabels(locale: string): Promise<LegalDocum
     contents: t('document.contents'),
     backToTop: t('document.backToTop'),
     backToContents: t('document.backToContents'),
-    sectionLink: t('document.sectionLink', { section: '{section}' }),
+    sectionLink: (section) => t('document.sectionLink', { section }),
     revisionHistory: t('document.revisionHistory'),
     tabs: await getTrustCenterTabLabels(locale),
   };

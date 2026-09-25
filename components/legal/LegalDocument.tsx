@@ -155,7 +155,7 @@ export function LegalDocument({
                 heading={section.heading}
                 first={index === 0 && !summary}
                 density={density}
-                anchorLabel={labels.sectionLink.replace('{section}', section.heading)}
+                anchorLabel={labels.sectionLink(section.heading)}
                 backLabel={density === 'compact' ? null : labels.backToContents}
               >
                 {section.content}
