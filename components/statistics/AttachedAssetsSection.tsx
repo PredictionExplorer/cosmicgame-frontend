@@ -20,6 +20,9 @@ import { StatsSection } from './StatsSection';
 const ITEMS_PER_PAGE = 12;
 
 type NftScope = 'all' | 'current';
+type AssetKind = 'nfts' | 'erc20';
+
+const isAssetKind = (value: string): value is AssetKind => value === 'nfts' || value === 'erc20';
 
 function nftKey(nft: AttachedNFTRecord, index: number): string {
   if (nft.RecordId != null) return `record-${nft.RecordId}`;
@@ -39,10 +42,13 @@ export interface AttachedAssetsSectionProps {
 
 /**
  * Assets attached to gestures: an ERC-721 grid that can be scoped to all
- * cycles or the current one, and the current cycle's attached ERC-20 tokens,
- * one underline tab each. What depends on the live cycle waits for it: a
- * skeleton while the dashboard loads, an error with a retry when it failed,
- * never an empty "nothing attached" for a cycle that was not read.
+ * cycles or the current one, and the current cycle's attached ERC-20 tokens.
+ * The two are views of one thing, so they switch in a segmented control,
+ * never a second underline row under the statistics sub-navigation; the
+ * grid's scope sits at the end of the same row. What depends on the live
+ * cycle waits for it: a skeleton while the dashboard loads, an error with a
+ * retry when it failed, never an empty "nothing attached" for a cycle that
+ * was not read.
  */
 export function AttachedAssetsSection({
   currentCycle,
@@ -66,6 +72,7 @@ export function AttachedAssetsSection({
       />
     ) : null;
 
+  const [kind, setKind] = useState<AssetKind>('nfts');
   const [nftScope, setNftScope] = useState<NftScope>('all');
   const [page, setPage] = useState(1);
 
@@ -91,23 +98,27 @@ export function AttachedAssetsSection({
 
   return (
     <StatsSection title={t('tokens.sections.attachedAssets')}>
-      <Tabs defaultValue="nfts">
-        <TabsList variant="underline" scroll className="min-w-full">
-          <TabsTrigger value="nfts">{t('attachedAssets.nftTab')}</TabsTrigger>
-          <TabsTrigger value="erc20">{t('attachedAssets.erc20Tab')}</TabsTrigger>
-        </TabsList>
+      <Tabs value={kind} onValueChange={(value) => isAssetKind(value) && setKind(value)}>
+        <div className="flex flex-wrap items-center justify-between gap-x-6 gap-y-3">
+          <TabsList aria-label={t('tokens.sections.attachedAssets')}>
+            <TabsTrigger value="nfts">{t('attachedAssets.nftTab')}</TabsTrigger>
+            <TabsTrigger value="erc20">{t('attachedAssets.erc20Tab')}</TabsTrigger>
+          </TabsList>
+          {kind === 'nfts' ? (
+            <SegmentedControl
+              label={t('attachedAssets.scopeAria')}
+              hideLabel
+              value={nftScope}
+              onValueChange={setScope}
+              options={[
+                { value: 'all', label: t('attachedAssets.scopeAll') },
+                { value: 'current', label: t('attachedAssets.scopeCurrent') },
+              ]}
+            />
+          ) : null}
+        </div>
 
         <TabsContent value="nfts" className="mt-6 space-y-6">
-          <SegmentedControl
-            label={t('attachedAssets.scopeAria')}
-            hideLabel
-            value={nftScope}
-            onValueChange={setScope}
-            options={[
-              { value: 'all', label: t('attachedAssets.scopeAll') },
-              { value: 'current', label: t('attachedAssets.scopeCurrent') },
-            ]}
-          />
           {nftScope === 'current' && cycleState ? (
             cycleState
           ) : nftQuery.isLoading ? (
