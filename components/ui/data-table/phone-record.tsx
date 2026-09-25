@@ -65,7 +65,11 @@ export function PhoneRecord({
       <span className="flex items-center justify-between gap-x-4">
         <span className="min-w-0">{title}</span>
         {present(titleEnd) ? (
-          <span className="shrink-0 text-end font-medium text-foreground">{titleEnd}</span>
+          // A figure leads in medium weight; a shortened address keeps its
+          // own, since bold monospace hex reads heavier than the words beside it.
+          <span className="shrink-0 text-end font-medium text-foreground [&_.font-mono]:font-normal">
+            {titleEnd}
+          </span>
         ) : null}
       </span>
       {facts.length > 0 ? (

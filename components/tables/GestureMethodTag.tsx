@@ -38,6 +38,33 @@ export function GestureMethodTag({
   );
 }
 
+/**
+ * The method's series dot alone, named for assistive tech, where the unit
+ * beside it already says the currency (a gesture's phone record): the dot
+ * tells ETH from ETH with a Random Walk NFT, as it does in every chart.
+ */
+export function GestureMethodDot({
+  gestureType,
+  unknownLabel,
+}: {
+  gestureType: number | undefined;
+  unknownLabel: string;
+}) {
+  const method = gestureType === undefined ? undefined : METHODS[gestureType];
+  return (
+    <span className="inline-flex items-center self-center">
+      <span
+        aria-hidden
+        className={cn(
+          'size-1.5 shrink-0 rounded-full',
+          method ? GESTURE_METHOD_BG_CLASS[method.method] : 'bg-subtle-foreground',
+        )}
+      />
+      <span className="sr-only">{method?.label ?? unknownLabel}</span>
+    </span>
+  );
+}
+
 /** A gesture's type from either the current field or the backend's legacy `BidType`. */
 export function resolveGestureType(gesture: {
   GestureType?: number;

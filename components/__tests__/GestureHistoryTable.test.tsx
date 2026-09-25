@@ -10,6 +10,20 @@ import GestureHistoryTable, { holdDurations } from '@/components/tables/GestureH
 
 import { render, screen, checkA11y, within } from '@/test-utils';
 
+/**
+ * The ledger as a wide screen reads it. jsdom applies no media queries, so
+ * each row holds both layouts: its cells and, in the date's cell, the phone
+ * record CSS shows below `sm` only. The copy leaves the records out.
+ */
+function wideLedger(container: HTMLElement): HTMLElement {
+  const copy = container.cloneNode(true) as HTMLElement;
+  copy.querySelectorAll('[data-slot="phone-record"]').forEach((record) => record.remove());
+  return copy;
+}
+
+const phoneRecords = (container: HTMLElement) =>
+  Array.from(container.querySelectorAll<HTMLElement>('[data-slot="phone-record"]'));
+
 describe('GestureHistoryTable', () => {
   test('with no records', () => {
     render(<GestureHistoryTable gestureHistory={[]} />);
@@ -41,27 +55,28 @@ describe('GestureHistoryTable', () => {
         Message: 'RANDOMWALKNFTS(consistent joe)',
       },
     ];
-    render(<GestureHistoryTable gestureHistory={mockData} />);
+    const { container } = render(<GestureHistoryTable gestureHistory={mockData} />);
+    const wide = within(wideLedger(container));
     // The date with seconds, in UTC (as on the server).
-    expect(screen.getByText('Nov 30, 2023, 12:18:38')).toBeInTheDocument();
+    expect(wide.getAllByText('Nov 30, 2023, 12:18:38')).toHaveLength(1);
     expect(document.querySelector('time[datetime="2023-11-30T12:18:38.000Z"]')).toBeInTheDocument();
-    expect(screen.getByText(formatAddress(mockData[0]!.BidderAddr))).toBeInTheDocument();
+    expect(wide.getAllByText(formatAddress(mockData[0]!.BidderAddr))).toHaveLength(1);
     // The cost reads at the ledger precision with its unit, never "Ξ".
-    expect(screen.getByText('0.1004').textContent).toBe('0.1004\u00a0ETH');
+    expect(wide.getByText('0.1004').textContent).toBe('0.1004\u00a0ETH');
     // The cycle reads "Cycle 4" and links to its allocation page (the live
     // cycle is not known here, so every cycle leads to its record).
-    expect(screen.getByRole('link', { name: 'tables.allocation.cycle(cycle=4)' })).toHaveAttribute(
+    expect(wide.getByRole('link', { name: 'tables.allocation.cycle(cycle=4)' })).toHaveAttribute(
       'href',
       '/allocation/4',
     );
     expect(screen.getByText(mockData[0]!.Message)).toBeInTheDocument();
-    // The method is a tag, not a row tint.
-    expect(screen.getAllByText('ETH').length).toBeGreaterThanOrEqual(2);
+    // The method is a tag beside the cost's unit, not a row tint.
+    expect(wide.getAllByText('ETH')).toHaveLength(2);
     expect(document.querySelector('tbody tr')).not.toHaveAttribute('style');
   });
 
   test('shows CST cost and gesture type for CST bids', () => {
-    render(
+    const { container } = render(
       <GestureHistoryTable
         gestureHistory={[
           {
@@ -79,8 +94,9 @@ describe('GestureHistoryTable', () => {
       />,
     );
 
-    expect(screen.getByText('25.50').textContent).toBe('25.50\u00a0CST');
-    expect(screen.getAllByText('CST').length).toBeGreaterThanOrEqual(1);
+    const wide = within(wideLedger(container));
+    expect(wide.getByText('25.50').textContent).toBe('25.50\u00a0CST');
+    expect(wide.getAllByText('CST').length).toBeGreaterThanOrEqual(1);
   });
 
   test('drops the info and message columns when no gesture has either', () => {
@@ -117,16 +133,20 @@ describe('GestureHistoryTable', () => {
     }));
     const { container } = render(<GestureHistoryTable gestureHistory={list} showRound={false} />);
     expect(container.querySelectorAll('tbody tr')).toHaveLength(20);
-    // WCAG 2.5.3: the link's name starts with the date it shows (plus the
-    // method tag that rides on the date line on phones; CSS hides it from
-    // sm, jsdom does not), then names the gesture by the number its own
-    // page carries in its title.
+    // WCAG 2.5.3: the link's name starts with the date it shows, then names
+    // the gesture by the number its own page carries in its title. The
+    // ledger's cell and the phone record (one of them hidden by CSS) say
+    // the same.
     const date = 'Nov 30, 2023, 12:18:38';
-    const link = screen.getByRole('link', {
-      name: `${date} ETH tables.gestureHistory.viewGesture(position=25)`,
+    const links = screen.getAllByRole('link', {
+      name: `${date} tables.gestureHistory.viewGesture(position=25)`,
     });
-    expect(link).toHaveAttribute('href', '/gesture/1000');
-    expect(link).not.toHaveAttribute('aria-label');
+    expect(links).toHaveLength(2);
+    expect(phoneRecords(container)[0]).toContainElement(links[1]!);
+    for (const link of links) {
+      expect(link).toHaveAttribute('href', '/gesture/1000');
+      expect(link).not.toHaveAttribute('aria-label');
+    }
   });
 
   test('names a gesture link by its date alone when its position is unknown', () => {
@@ -144,11 +164,10 @@ describe('GestureHistoryTable', () => {
         showRound={false}
       />,
     );
-    // The date and the phone-only method tag on its line, nothing after them.
-    expect(screen.getByRole('link', { name: `Nov 30, 2023, 12:18:38 ETH` })).toHaveAttribute(
-      'href',
-      '/gesture/77',
-    );
+    // The date, nothing after it.
+    for (const link of screen.getAllByRole('link', { name: 'Nov 30, 2023, 12:18:38' })) {
+      expect(link).toHaveAttribute('href', '/gesture/77');
+    }
   });
 
   test("drops who and how long on a participant's own page", () => {
@@ -274,7 +293,73 @@ describe('GestureHistoryTable', () => {
     expect(screen.queryByRole('tooltip')).not.toBeInTheDocument();
   });
 
-  test('reads as lines on a phone: the method on the date line, the cycle only when it varies', () => {
+  test('reads each gesture as a two-line record on a phone', () => {
+    // V230: when and who on the first line; the cost with its method's dot
+    // and the hold on the second, at the end edge, with no label repeated.
+    const { container } = render(
+      <GestureHistoryTable
+        gestureHistory={[
+          {
+            EvtLogId: 12,
+            BidPosition: 3,
+            TimeStamp: 1_700_000_600,
+            BidderAddr: '0x555eced709352759Ed0f1317dfC0a5FEf1310e60',
+            GestureType: 2,
+            CstPriceEth: 25.5,
+            RoundNum: 2,
+          },
+          {
+            EvtLogId: 11,
+            BidPosition: 2,
+            TimeStamp: 1_700_000_000,
+            BidderAddr: '0x555eced709352759Ed0f1317dfC0a5FEf1310e60',
+            GestureType: 1,
+            EthPriceEth: 0.1,
+            RoundNum: 2,
+          },
+        ]}
+        heldUntil={1_700_004_239}
+      />,
+    );
+    const [first, second] = phoneRecords(container);
+    const [line1, line2] = Array.from(first!.children);
+
+    // Line 1: the date is the row link; the participant is its own link.
+    const dateLink = within(line1 as HTMLElement).getByRole('link', {
+      name: /tables\.gestureHistory\.viewGesture\(position=3\)$/,
+    });
+    expect(dateLink).toHaveAttribute('href', '/gesture/12');
+    expect(
+      within(line1 as HTMLElement)
+        .getByRole('link', { name: /0x555e/ })
+        .getAttribute('href'),
+    ).toMatch(/^\/user\/0x555e/i);
+    expect(container.querySelector('tbody a a')).toBeNull();
+
+    // Line 2, at the end edge: the method named for a screen reader, the
+    // cost with its unit, the hold after its spoken name.
+    expect(line2).toHaveClass('justify-end');
+    expect(line2).toHaveTextContent(
+      /^CST\s*25\.50\sCST\s*·\s*tables\.columns\.gestureDuration\s*01:00:39$/,
+    );
+    expect(second).toHaveTextContent(/ETH \+ RWLK\s*0\.1000\sETH/);
+
+    // One cycle in the list: no record repeats it. Every column the record
+    // says leaves the phone.
+    expect(first).not.toHaveTextContent('tables.allocation.cycle');
+    const omitted = Array.from(container.querySelectorAll('tbody tr:first-child td'))
+      .filter((cell) => cell.getAttribute('data-phone') === 'omit')
+      .map((cell) => cell.getAttribute('data-label'));
+    expect(omitted).toEqual([
+      'tables.columns.participant',
+      'tables.columns.gestureCost',
+      'tables.columns.cycle',
+      'tables.columns.gestureType',
+      'tables.columns.gestureDuration',
+    ]);
+  });
+
+  test("leads a participant's record with the cost, and names the cycle only when it varies", () => {
     const gesture = (id: number, round: number) => ({
       EvtLogId: id,
       TimeStamp: 1_700_000_000 + id,
@@ -283,24 +368,21 @@ describe('GestureHistoryTable', () => {
       CstPriceEth: 25.5,
       RoundNum: round,
     });
-    const cellOf = (container: HTMLElement, kind: string) =>
-      container.querySelector(`tbody tr td[data-kind="${kind}"]`);
 
-    const { container, unmount } = render(
+    const oneCycle = render(
       <GestureHistoryTable
         gestureHistory={[gesture(2, 2), gesture(1, 2)]}
         showParticipant={false}
         showHold={false}
       />,
     );
-    // The type column is dropped on phones; its tag rides on the date line.
-    const typeHeader = screen.getByRole('columnheader', { name: /tables.columns.gestureType/ });
-    expect(typeHeader).toHaveAttribute('data-priority', 'secondary');
-    const dateTag = cellOf(container, 'datetime')?.querySelector('.sm\\:hidden');
-    expect(dateTag).toHaveTextContent('CST');
-    // One cycle in the list: each record would repeat it, so phones drop it.
-    expect(cellOf(container, 'link')).toHaveAttribute('data-priority', 'secondary');
-    unmount();
+    const [record] = phoneRecords(oneCycle.container);
+    // Every gesture is theirs: the cost takes the first line's end.
+    expect(record!.firstElementChild).toHaveTextContent(/25\.50\sCST$/);
+    expect(record).not.toHaveTextContent('0x555e');
+    // One line: nothing to say under it.
+    expect(record!.children).toHaveLength(1);
+    oneCycle.unmount();
 
     const spanning = render(
       <GestureHistoryTable
@@ -309,7 +391,11 @@ describe('GestureHistoryTable', () => {
         showHold={false}
       />,
     );
-    expect(cellOf(spanning.container, 'link')).toHaveAttribute('data-priority', 'primary');
+    const line2 = phoneRecords(spanning.container)[0]!.children[1] as HTMLElement;
+    expect(
+      within(line2).getByRole('link', { name: 'tables.allocation.cycle(cycle=3)' }),
+    ).toHaveAttribute('href', '/allocation/3');
+    expect(line2).not.toHaveClass('justify-end');
   });
 
   // Regression: each hold was measured to the row before it in the list, so
@@ -351,6 +437,10 @@ describe('GestureHistoryTable', () => {
     await user.click(within(date).getByRole('button'));
     expect(date).toHaveAttribute('aria-sort', 'ascending');
     expect(container.querySelector('tbody tr a')).toHaveAttribute('href', '/gesture/1');
+    expect(within(phoneRecords(container)[0]!).getAllByRole('link')[0]).toHaveAttribute(
+      'href',
+      '/gesture/1',
+    );
   });
 
   it('has no accessibility violations', async () => {

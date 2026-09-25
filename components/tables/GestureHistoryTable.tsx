@@ -1,6 +1,6 @@
 'use client';
 
-import { useMemo } from 'react';
+import { useCallback, useMemo } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { usePublicClient } from 'wagmi';
 import { formatUnits } from 'viem';
@@ -15,13 +15,19 @@ import { Amount } from '@/components/ui/amount';
 import {
   DataTable,
   ExternalTableLink,
+  KindValue,
   TableLink,
   type DataTableColumn,
+  type PhoneRecordContent,
 } from '@/components/ui/data-table';
 import { Duration } from '@/components/ui/duration';
 import { Skeleton } from '@/components/ui/skeleton';
 import { ClampedText } from '@/components/tables/ClampedText';
-import { GestureMethodTag, resolveGestureType } from '@/components/tables/GestureMethodTag';
+import {
+  GestureMethodDot,
+  GestureMethodTag,
+  resolveGestureType,
+} from '@/components/tables/GestureMethodTag';
 import type { LedgerStateProps } from '@/components/tables/ledger-props';
 import { useCycleHref } from '@/components/tables/useCycleHref';
 import { useBannedGestures } from '@/hooks/useApiQuery';
@@ -212,12 +218,30 @@ function GrowingDuration({ since }: { since: number }) {
   return <Duration seconds={Math.floor(nowMs / 1000) - since} variant="clock" />;
 }
 
+/** What a gesture cost, in the currency it was paid in; `null` when the API has no figure. */
+function costOf(gesture: GestureHistory): number | null {
+  const amount =
+    resolveGestureType(gesture) === CST_GESTURE ? gesture.CstPriceEth : gesture.EthPriceEth;
+  return amount != null && amount >= 0 ? amount : null;
+}
+
+const costUnit = (gesture: GestureHistory): AmountUnit =>
+  resolveGestureType(gesture) === CST_GESTURE ? 'CST' : 'ETH';
+
 /**
  * A cycle's (or a participant's) gestures, newest first: when (leading to the
  * gesture's page), who, what it cost and how, how long it held the lead,
  * and what it carried. The info and message columns appear only when some
  * gesture has one. A participant's page passes `showParticipant={false}` and
  * `showHold={false}`.
+ *
+ * On a phone a gesture is a two-line record, read like a feed: when and who
+ * on the first line; what it cost, with its method's dot, and how long it
+ * held the lead on the second, at the end edge under the figures. On a
+ * participant's own page, where every gesture is theirs, the cost takes the
+ * first line's end, and the cycle follows under the date when the list
+ * spans several. What a gesture carried and its message follow on lines of
+ * their own.
  */
 const GestureHistoryTable = ({
   gestureHistory,
@@ -241,12 +265,14 @@ const GestureHistoryTable = ({
     [gestureHistory, heldUntil],
   );
 
-  const columns = useMemo<DataTableColumn<GestureHistory>[]>(() => {
-    const cost = (gesture: GestureHistory) =>
-      resolveGestureType(gesture) === CST_GESTURE ? gesture.CstPriceEth : gesture.EthPriceEth;
-    const costUnit = (gesture: GestureHistory): AmountUnit =>
-      resolveGestureType(gesture) === CST_GESTURE ? 'CST' : 'ETH';
+  // A list inside one cycle does not repeat "Cycle 2" on every phone record.
+  const spansCycles = useMemo(
+    () => new Set(gestureHistory.map((gesture) => gesture.RoundNum)).size > 1,
+    [gestureHistory],
+  );
 
+  const columns = useMemo<DataTableColumn<GestureHistory>[]>(() => {
+    // Everything but the date and what the gesture carried is in its phone record.
     const all: (DataTableColumn<GestureHistory> | false)[] = [
       {
         id: 'datetime',
@@ -255,7 +281,6 @@ const GestureHistoryTable = ({
         value: (gesture) => gesture.TimeStamp,
         seconds: true,
         sortable: true,
-        // A phone record opens on when the gesture was made, with its method.
         phone: 'title',
       },
       showParticipant && {
@@ -263,15 +288,13 @@ const GestureHistoryTable = ({
         kind: 'address',
         header: t('columns.participant'),
         value: (gesture) => gesture.BidderAddr,
+        phone: 'omit',
       },
       {
         id: 'cost',
         kind: 'amount',
         header: t('columns.gestureCost'),
-        value: (gesture) => {
-          const amount = cost(gesture);
-          return amount != null && amount >= 0 ? amount : null;
-        },
+        value: costOf,
         cell: (gesture, { value }) =>
           value == null ? null : (
             <Amount
@@ -282,6 +305,7 @@ const GestureHistoryTable = ({
             />
           ),
         sortable: true,
+        phone: 'omit',
       },
       showRound && {
         id: 'cycle',
@@ -296,6 +320,7 @@ const GestureHistoryTable = ({
             </TableLink>
           ),
         nowrap: true,
+        phone: 'omit',
       },
       {
         id: 'type',
@@ -308,23 +333,18 @@ const GestureHistoryTable = ({
             unknownLabel={t('status.unknown')}
           />
         ),
+        phone: 'omit',
       },
       showHold && {
         id: 'hold',
         kind: 'duration',
         header: t('columns.gestureDuration'),
         value: (gesture) => holds.get(gesture.EvtLogId) ?? Number.POSITIVE_INFINITY,
-        cell: (gesture) => {
-          const hold = holds.get(gesture.EvtLogId);
-          return hold == null ? (
-            <GrowingDuration since={gesture.TimeStamp} />
-          ) : (
-            // Fixed fields ("04:10:00", "1d 04:16:52"), so the right-aligned
-            // column lines up instead of dropping trailing zero units.
-            <Duration seconds={hold} variant="clock" />
-          );
-        },
+        cell: (gesture) => (
+          <HoldDuration hold={holds.get(gesture.EvtLogId)} since={gesture.TimeStamp} />
+        ),
         sortable: true,
+        phone: 'omit',
       },
       {
         id: 'info',
@@ -350,15 +370,61 @@ const GestureHistoryTable = ({
     return all.filter((column): column is DataTableColumn<GestureHistory> => Boolean(column));
   }, [t, showRound, showParticipant, showHold, holds, banned, cycleHref]);
 
-  const phoneColumns = useMemo(
-    () => withPhoneLines(columns, gestureHistory, t('status.unknown')),
-    [columns, gestureHistory, t],
+  const phoneRecord = useCallback(
+    (gesture: GestureHistory): PhoneRecordContent => {
+      const amount = costOf(gesture);
+      const cost = (
+        <span className="inline-flex items-baseline gap-1.5">
+          <GestureMethodDot
+            gestureType={resolveGestureType(gesture)}
+            unknownLabel={t('status.unknown')}
+          />
+          {amount == null ? null : (
+            <Amount
+              value={amount}
+              unit={costUnit(gesture)}
+              context="table"
+              unitClassName="text-subtle"
+            />
+          )}
+        </span>
+      );
+      const cycle =
+        showRound && spansCycles && gesture.RoundNum != null ? (
+          <TableLink href={cycleHref(gesture.RoundNum)}>
+            {t('allocation.cycle', { cycle: gesture.RoundNum })}
+          </TableLink>
+        ) : null;
+      const hold = showHold ? (
+        <span>
+          <span className="sr-only">{`${t('columns.gestureDuration')} `}</span>
+          <HoldDuration hold={holds.get(gesture.EvtLogId)} since={gesture.TimeStamp} />
+        </span>
+      ) : null;
+      // The row link wraps the date, with the gesture's number after it for a screen reader.
+      const title = <DateTime timestamp={gesture.TimeStamp} seconds />;
+
+      if (!showParticipant) {
+        // A participant's own page: when and what it cost, like every
+        // activity ledger; the cycle (when the list spans several) under it.
+        return { title, titleEnd: cost, details: [cycle, hold] };
+      }
+      return {
+        title,
+        titleEnd: <KindValue kind="address" value={gesture.BidderAddr} />,
+        details: [cycle, cost, hold],
+        // The figures keep to the end edge, as their columns do on a wide screen.
+        detailsAlign: 'end',
+      };
+    },
+    [t, showRound, showParticipant, showHold, spansCycles, holds, cycleHref],
   );
 
   return (
     <DataTable
       data={gestureHistory}
-      columns={phoneColumns}
+      columns={columns}
+      phoneRecord={phoneRecord}
       ariaLabel={t('gestureHistory.tableLabel')}
       getRowKey={(gesture) => gesture.EvtLogId}
       // The list arrives newest first: the date header says so, and a first
@@ -382,6 +448,20 @@ const GestureHistoryTable = ({
 };
 
 /**
+ * How long a gesture held the lead: fixed fields ("04:10:00", "1d 04:16:52")
+ * once the next gesture came or the cycle ended, so the right-aligned column
+ * lines up instead of dropping trailing zero units; for the latest gesture
+ * of a running cycle, a clock that keeps growing.
+ */
+function HoldDuration({ hold, since }: { hold: number | null | undefined; since: number }) {
+  return hold == null ? (
+    <GrowingDuration since={since} />
+  ) : (
+    <Duration seconds={hold} variant="clock" />
+  );
+}
+
+/**
  * How long each gesture stayed the latest one, by `EvtLogId`: until the next
  * gesture of the list in time, whatever order the list arrives in. The
  * newest holds until `heldUntil` (a finished cycle's end), or is still
@@ -401,42 +481,6 @@ export function holdDurations(
     byId.set(gesture.EvtLogId, until == null ? null : Math.max(0, until - gesture.TimeStamp));
   });
   return byId;
-}
-
-/**
- * On a phone a gesture reads as lines rather than a spec sheet: its method
- * rides on the date line (the method column is hidden there, the tag beside
- * a unit that already says CST was a line of its own), and the cycle shows
- * only when the list spans more than one, so a participant's gestures in
- * one cycle do not each repeat "Cycle 2". Wider screens keep every column.
- */
-function withPhoneLines(
-  columns: DataTableColumn<GestureHistory>[],
-  gestures: readonly GestureHistory[],
-  unknownLabel: string,
-): DataTableColumn<GestureHistory>[] {
-  const spansCycles = new Set(gestures.map((gesture) => gesture.RoundNum)).size > 1;
-  return columns.map((column): DataTableColumn<GestureHistory> => {
-    if (column.id === 'type' || (column.id === 'cycle' && !spansCycles)) {
-      return { ...column, priority: 'secondary' };
-    }
-    if (column.id !== 'datetime') return column;
-    return {
-      ...column,
-      // The date stays inline, so the row link's underline still reaches it.
-      cell: (gesture, { value }) => (
-        <>
-          <DateTime timestamp={typeof value === 'number' ? value : null} seconds />
-          <span className="ms-2 inline-block align-middle sm:hidden">
-            <GestureMethodTag
-              gestureType={resolveGestureType(gesture)}
-              unknownLabel={unknownLabel}
-            />
-          </span>
-        </>
-      ),
-    };
-  });
 }
 
 export default GestureHistoryTable;
