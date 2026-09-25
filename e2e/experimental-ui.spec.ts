@@ -100,18 +100,25 @@ test.describe('experimental UI', () => {
   test('draws a Signature only when the viewer asks', async ({ page, isMobile }) => {
     test.skip(Boolean(isMobile), 'the reel is offered on wide screens');
     await page.setViewportSize({ width: 1440, height: 1000 });
+    const clipRequests: string[] = [];
+    page.on('request', (request) => {
+      if (new URL(request.url()).pathname.endsWith('.mp4')) clipRequests.push(request.url());
+    });
     await openExperiment(page);
 
-    // The finished still is the plate; no clip loads unasked.
-    await expect(page.locator('[data-testid="deck-art-reel"]')).toHaveCount(0);
+    // The finished still is the plate; no clip mounts or downloads unasked.
     const toggle = page.getByTestId('art-reel-toggle');
     await expect(toggle).toHaveAccessibleName('Watch it take shape');
-    await toggle.click();
-    // The clip mounts on request (or, where it cannot load, the still stays
-    // and the wall label says so).
-    await expect(
-      page.locator('[data-testid="deck-art-reel"], [data-testid="art-reel-error"]'),
-    ).toHaveCount(1);
+    await expect(page.locator('[data-testid="deck-art-reel"]')).toHaveCount(0);
+    expect(clipRequests).toEqual([]);
+
+    // Asked, the clip loads. (This test mode has no artwork files, so the
+    // plate may still be skipping unavailable stills: a request that a skip
+    // swallowed is asked again.)
+    await expect(async () => {
+      if (clipRequests.length === 0) await toggle.click();
+      expect(clipRequests.length).toBeGreaterThan(0);
+    }).toPass({ intervals: [1_000, 2_000], timeout: 15_000 });
   });
 
   test('prices every method in its segment and opens Advanced inside the console', async ({
