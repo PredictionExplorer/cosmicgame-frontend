@@ -1,5 +1,6 @@
-import { ABOUT_RESOURCE_HREFS } from '@/content/about/types';
 import { CODE_REPOSITORIES } from '@/content/code/structure';
+
+import { OUTBOUND_LINKS, type OutboundLinkId } from '@/config/siteNav';
 
 /**
  * The verifiable artifacts the Trust Center documents point at, once, for
@@ -20,8 +21,16 @@ export interface LegalLinkTarget {
   readonly href: string;
 }
 
+/**
+ * The project's own accounts and venues by id, as the footer links them:
+ * config/siteNav `OUTBOUND_LINKS` is the one source of these addresses.
+ */
+export const OUTBOUND_HREFS = Object.fromEntries(
+  OUTBOUND_LINKS.map((link) => [link.id, link.href]),
+) as Readonly<Record<OutboundLinkId, string>>;
+
 const repository = (id: (typeof CODE_REPOSITORIES)[number]['id']): string =>
-  CODE_REPOSITORIES.find((repo) => repo.id === id)?.href ?? ABOUT_RESOURCE_HREFS.github;
+  CODE_REPOSITORIES.find((repo) => repo.id === id)?.href ?? OUTBOUND_HREFS.github;
 
 const FRONTEND_REPOSITORY = repository('frontend');
 const CONTRACTS_REPOSITORY = repository('contracts');
@@ -73,15 +82,15 @@ export const LEGAL_LINKS = {
   hacken: { kind: 'external', href: HACKEN_REPORT_URL },
   contractsRepository: { kind: 'external', href: CONTRACTS_REPOSITORY },
   frontendRepository: { kind: 'external', href: FRONTEND_REPOSITORY },
-  github: { kind: 'external', href: ABOUT_RESOURCE_HREFS.github },
+  github: { kind: 'external', href: OUTBOUND_HREFS.github },
   license: { kind: 'external', href: `${FRONTEND_REPOSITORY}/blob/main/LICENSE` },
   notices: { kind: 'external', href: `${FRONTEND_REPOSITORY}/blob/main/THIRD_PARTY_NOTICES.md` },
   certora: { kind: 'external', href: contractsRepositoryPath('certora') },
   smtchecker: { kind: 'external', href: contractsRepositoryPath('smtchecker') },
   slither: { kind: 'external', href: contractsRepositoryPath('slither') },
   tests: { kind: 'external', href: contractsRepositoryPath('test') },
-  discord: { kind: 'external', href: ABOUT_RESOURCE_HREFS.discord },
-  x: { kind: 'external', href: ABOUT_RESOURCE_HREFS.x },
+  discord: { kind: 'external', href: OUTBOUND_HREFS.discord },
+  x: { kind: 'external', href: OUTBOUND_HREFS.x },
   privacyHistory: {
     kind: 'external',
     href: frontendFileHistory('content/legal/PrivacyContent.en.ts'),

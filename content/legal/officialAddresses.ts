@@ -1,5 +1,6 @@
 import { protocolFacts } from '@/content/protocol-facts';
-import { ABOUT_RESOURCE_HREFS } from '@/content/about/types';
+
+import { OUTBOUND_HREFS } from './links';
 
 /**
  * The official addresses the Security page lists, locale-independent. The
@@ -15,8 +16,8 @@ export const OFFICIAL_WEBSITES = [
 export type OfficialWebsiteId = (typeof OFFICIAL_WEBSITES)[number]['id'];
 
 export const OFFICIAL_COMMUNITY = [
-  { id: 'x', handle: '@CosmicSignature', href: ABOUT_RESOURCE_HREFS.x },
-  { id: 'discord', handle: 'discord.gg/bGnPn96Qwt', href: ABOUT_RESOURCE_HREFS.discord },
+  { id: 'x', handle: '@CosmicSignature', href: OUTBOUND_HREFS.x },
+  { id: 'discord', handle: 'discord.gg/bGnPn96Qwt', href: OUTBOUND_HREFS.discord },
 ] as const;
 
 export type OfficialCommunityId = (typeof OFFICIAL_COMMUNITY)[number]['id'];

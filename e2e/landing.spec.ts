@@ -1,5 +1,6 @@
 import { expect, test, type Page } from '@playwright/test';
 
+import { getAboutContent } from '../content/about';
 import { getLandingContent } from '../content/landing';
 
 import { LOCALE_CHROME, LOCALE_SEO, TRANSLATED_LOCALES, routing } from './locale-fixtures';
@@ -258,7 +259,7 @@ test.describe('Landing page @ cosmicsignature.com', () => {
       });
 
       for (const route of [
-        { path: '/zh/about', heading: '关于 Cosmic Signature' },
+        { path: '/zh/about', heading: getAboutContent('zh').heading },
         { path: '/zh/learn', heading: '了解 Cosmic Signature' },
         {
           path: '/zh/learn/what-is-cosmic-signature',

@@ -34,8 +34,13 @@ const QUIZ_PLATE = 40;
 const WHITE_PAPER_PLATE = 24;
 
 export function aboutReadingCard(locale: string): ReadingCard {
-  const { eyebrow, heading } = getAboutContent(locale);
-  return { copy: { eyebrow, title: heading }, plate: ABOUT_PLATE_TOKEN_ID, alt: heading };
+  // The card's wordmark already names Cosmic Signature: the eyebrow is the page's short name.
+  const { breadcrumbLabel, heading } = getAboutContent(locale);
+  return {
+    copy: { eyebrow: breadcrumbLabel, title: heading },
+    plate: ABOUT_PLATE_TOKEN_ID,
+    alt: heading,
+  };
 }
 
 export function quizReadingCard(locale: string): ReadingCard {

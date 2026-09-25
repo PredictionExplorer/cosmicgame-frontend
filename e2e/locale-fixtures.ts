@@ -6,6 +6,7 @@
  * `scripts/__tests__/locale-e2e-fixtures.test.ts` asserts that each
  * translated locale also has its chrome fixture here.
  */
+import { getAboutContent } from '../content/about';
 import { getLandingContent } from '../content/landing';
 import { LOCALE_LABELS, routing, TRANSLATED_LOCALES } from '../i18n/routing';
 import { SCRIPT_PATTERNS } from '../test-utils/locale-expectations';
@@ -497,7 +498,7 @@ export const LOCALE_SEO: Record<TranslatedLocale, LocaleSeoFixture> = {
     ogLocale: 'zh_CN',
     landingPages: [
       { path: '/zh', h1: getLandingContent('zh').hero.headlineLead },
-      { path: '/zh/about', h1: '关于 Cosmic Signature' },
+      { path: '/zh/about', h1: getAboutContent('zh').heading },
       { path: '/zh/learn', h1: '了解 Cosmic Signature' },
       { path: '/zh/learn/what-is-cosmic-signature', h1: '什么是 Cosmic Signature？' },
     ],
@@ -514,7 +515,7 @@ export const LOCALE_SEO: Record<TranslatedLocale, LocaleSeoFixture> = {
     ogLocale: 'zh_TW',
     landingPages: [
       { path: '/zh-TW', h1: getLandingContent('zh-TW').hero.headlineLead },
-      { path: '/zh-TW/about', h1: '關於 Cosmic Signature' },
+      { path: '/zh-TW/about', h1: getAboutContent('zh-TW').heading },
       { path: '/zh-TW/learn', h1: '了解 Cosmic Signature' },
       { path: '/zh-TW/learn/what-is-cosmic-signature', h1: '什麼是 Cosmic Signature？' },
     ],
@@ -531,7 +532,7 @@ export const LOCALE_SEO: Record<TranslatedLocale, LocaleSeoFixture> = {
     ogLocale: 'zh_HK',
     landingPages: [
       { path: '/zh-HK', h1: getLandingContent('zh-HK').hero.headlineLead },
-      { path: '/zh-HK/about', h1: '關於 Cosmic Signature' },
+      { path: '/zh-HK/about', h1: getAboutContent('zh-HK').heading },
       { path: '/zh-HK/learn', h1: '了解 Cosmic Signature' },
       { path: '/zh-HK/learn/what-is-cosmic-signature', h1: '什麼是 Cosmic Signature？' },
     ],
@@ -548,7 +549,7 @@ export const LOCALE_SEO: Record<TranslatedLocale, LocaleSeoFixture> = {
     ogLocale: 'uk_UA',
     landingPages: [
       { path: '/uk', h1: getLandingContent('uk').hero.headlineLead },
-      { path: '/uk/about', h1: 'Про Cosmic Signature' },
+      { path: '/uk/about', h1: getAboutContent('uk').heading },
       { path: '/uk/learn', h1: 'Дізнайтеся, як працює Cosmic Signature' },
       { path: '/uk/learn/what-is-cosmic-signature', h1: 'Що таке Cosmic Signature?' },
     ],
@@ -565,7 +566,7 @@ export const LOCALE_SEO: Record<TranslatedLocale, LocaleSeoFixture> = {
     ogLocale: 'ko_KR',
     landingPages: [
       { path: '/ko', h1: getLandingContent('ko').hero.headlineLead },
-      { path: '/ko/about', h1: 'Cosmic Signature 소개' },
+      { path: '/ko/about', h1: getAboutContent('ko').heading },
       { path: '/ko/learn', h1: 'Cosmic Signature 알아보기' },
       { path: '/ko/learn/what-is-cosmic-signature', h1: 'Cosmic Signature란 무엇인가요?' },
     ],
@@ -582,7 +583,7 @@ export const LOCALE_SEO: Record<TranslatedLocale, LocaleSeoFixture> = {
     ogLocale: 'ja_JP',
     landingPages: [
       { path: '/ja', h1: getLandingContent('ja').hero.headlineLead },
-      { path: '/ja/about', h1: 'Cosmic Signatureについて' },
+      { path: '/ja/about', h1: getAboutContent('ja').heading },
       { path: '/ja/learn', h1: 'Cosmic Signatureを知る' },
       { path: '/ja/learn/what-is-cosmic-signature', h1: 'Cosmic Signatureとは？' },
     ],
@@ -599,7 +600,7 @@ export const LOCALE_SEO: Record<TranslatedLocale, LocaleSeoFixture> = {
     ogLocale: 'vi_VN',
     landingPages: [
       { path: '/vi', h1: getLandingContent('vi').hero.headlineLead },
-      { path: '/vi/about', h1: 'Về Cosmic Signature' },
+      { path: '/vi/about', h1: getAboutContent('vi').heading },
       { path: '/vi/learn', h1: 'Tìm hiểu Cosmic Signature' },
       { path: '/vi/learn/what-is-cosmic-signature', h1: 'Cosmic Signature là gì?' },
     ],
