@@ -796,6 +796,23 @@ body:has([data-maintenance-banner]) .home-control-shell {
 }
 
 /*
+ * The glass of a bar that floats over content with its own figures (the
+ * observatory's action dock): nearly opaque on the raised surface, so the
+ * form or ledger underneath never ghosts through behind the countdown.
+ */
+@utility glass-solid {
+  background-color: var(--glass-fill-solid);
+  -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(1.5);
+  backdrop-filter: blur(var(--glass-blur)) saturate(1.5);
+
+  @media (prefers-reduced-transparency: reduce) {
+    background-color: hsl(var(--popover));
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+  }
+}
+
+/*
  * Text links. A link inside running text must not rely on hue alone: it
  * carries a quiet underline that strengthens on hover. `link` is the inline
  * style; `link-quiet` is for link lists and navigation that already read as

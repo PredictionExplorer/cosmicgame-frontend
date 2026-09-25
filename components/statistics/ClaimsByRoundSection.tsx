@@ -197,7 +197,7 @@ const CycleDetailDialog = ({ round, onClose }: { round: number | null; onClose: 
     <Dialog open={round != null} onOpenChange={(open) => !open && onClose()}>
       <DialogContent className="max-w-4xl">
         <DialogHeader className={DIALOG_HEADER_CLASS}>
-          {/* The title repeats the button that opened it ("Cycle 12 details"). */}
+          {/* The title repeats the button that opened it ("Cycle #12 details"). */}
           <DialogTitle>{t('performance.claims.cycleDetails', { cycle: round ?? 0 })}</DialogTitle>
           <DialogDescription>{t('performance.claims.dialog.exploreDescription')}</DialogDescription>
         </DialogHeader>
@@ -327,7 +327,7 @@ export const ClaimsByRoundSection = () => {
         header: t('performance.claims.columns.details'),
         align: 'right',
         cell: (row) => (
-          // The visible words name the cycle ("Cycle 12 details"), so every
+          // The visible words name the cycle ("Cycle #12 details"), so every
           // row's button says what it opens without an aria-label.
           <Button variant="ghost" size="sm" onClick={() => setExploreRound(row.RoundNum)}>
             {t('performance.claims.cycleDetails', { cycle: row.RoundNum })}

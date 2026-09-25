@@ -263,7 +263,11 @@ describe('CurrentRoundPage', () => {
     const badge = screen.getByTestId('live-badge');
     expect(badge).toHaveTextContent('home.chrono.phase.live.label');
     expect(badge).toHaveAttribute('data-tone', 'live');
-    expect(screen.getByRole('timer')).toHaveTextContent(/\d+:\d\d:\d\d/);
+    // The one Cycle clock: padded groups, as on the app home and the landing.
+    const clock = screen.getByTestId('cycle-status-clock');
+    expect(
+      Array.from(clock.querySelectorAll('[data-testid="countdown-value"]'), (n) => n.textContent),
+    ).toEqual(['20', '00', '00']);
     expect(screen.getByText('home.chrono.phase.live.status')).toBeInTheDocument();
   });
 

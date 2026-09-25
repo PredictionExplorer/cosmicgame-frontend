@@ -165,7 +165,7 @@ export function ActionDock({
         aria-label={t('observatory.dock.aria')}
         data-testid="action-dock"
         data-phase={cycleState.phase}
-        className="glass mx-auto flex min-h-16 max-w-2xl items-center justify-between gap-3 rounded-surface border border-rule px-3.5 py-2 shadow-float md:px-4"
+        className="glass-solid mx-auto flex min-h-16 max-w-2xl items-center justify-between gap-3 rounded-surface border border-rule px-3.5 py-2 shadow-float md:px-4"
       >
         <div
           data-testid="action-dock-status"

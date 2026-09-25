@@ -173,6 +173,9 @@
    * prefers-reduced-transparency.
    */
   --glass-fill: hsl(var(--background) / 0.78);
+  /* A bar that lies over figures and fields (the dock): nearly opaque, so
+   * nothing reads through behind its own figures. */
+  --glass-fill-solid: hsl(var(--popover) / 0.94);
   --glass-blur: 16px;
 
   /*

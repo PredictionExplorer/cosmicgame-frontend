@@ -308,7 +308,9 @@ export function PageHeader({
         ) : null}
       </div>
 
-      {figures && figures.length > 0 ? <PageHeaderFigures figures={figures} /> : null}
+      {figures && figures.length > 0 ? (
+        <PageHeaderFigures figures={figures} placement="header" />
+      ) : null}
 
       {meta ? (
         <div
@@ -425,9 +427,22 @@ export function figurePhoneLayout(figures: readonly PageHeaderFigure[]): 'grid' 
 
 /** The phone columns of the figure row, by layout. */
 const PHONE_FIGURE_LAYOUT_CLASS: Record<ReturnType<typeof figurePhoneLayout>, string> = {
-  grid: 'grid-cols-2 max-sm:-mb-3',
-  strip: 'grid-cols-3 max-sm:-mb-3',
+  grid: 'grid-cols-2',
+  strip: 'grid-cols-3',
   rows: 'grid-cols-1 max-sm:flex max-sm:flex-col max-sm:divide-y max-sm:divide-rule',
+};
+
+/**
+ * In a page header the row tucks into the header's closing rule: a negative
+ * bottom margin hands back each figure's bottom padding. In a section there
+ * is no rule to tuck into, and the margin would override the section's own
+ * spacing (a parent's `space-y-*` puts its gap on this margin at zero
+ * specificity), landing a caption on the next heading.
+ */
+const HEADER_PLACEMENT_CLASS: Record<ReturnType<typeof figurePhoneLayout>, string> = {
+  grid: 'max-sm:-mb-3 sm:-mb-5 lg:mb-0',
+  strip: 'max-sm:-mb-3 sm:-mb-5 lg:mb-0',
+  rows: 'sm:-mb-5 lg:mb-0',
 };
 
 /**
@@ -444,9 +459,12 @@ const PHONE_FIGURE_LAYOUT_CLASS: Record<ReturnType<typeof figurePhoneLayout>, st
  */
 export function PageHeaderFigures({
   figures,
+  placement = 'section',
   className,
 }: {
   figures: readonly PageHeaderFigure[];
+  /** `header` inside a PageHeader (tucks into its rule); `section` everywhere else. */
+  placement?: 'header' | 'section';
   className?: string;
 }) {
   const t = useTranslations('common');
@@ -464,8 +482,8 @@ export function PageHeaderFigures({
         'mt-4 grid gap-x-4 gap-y-1 sm:mt-8 sm:gap-x-6',
         PHONE_FIGURE_LAYOUT_CLASS[layout],
         FIGURE_COLUMNS[Math.min(figures.length, 4)],
-        'sm:-mb-5',
-        'lg:mb-0 lg:grid-flow-col lg:grid-cols-none lg:grid-rows-[auto_auto_auto] lg:auto-cols-[minmax(0,max-content)] lg:justify-start lg:gap-x-0 lg:divide-x lg:divide-rule',
+        placement === 'header' && HEADER_PLACEMENT_CLASS[layout],
+        'lg:grid-flow-col lg:grid-cols-none lg:grid-rows-[auto_auto_auto] lg:auto-cols-[minmax(0,max-content)] lg:justify-start lg:gap-x-0 lg:divide-x lg:divide-rule',
         className,
       )}
     >
