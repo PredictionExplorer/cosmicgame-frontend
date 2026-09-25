@@ -48,20 +48,22 @@ jest.mock('../ApiDataContext', () => {
   };
 });
 
+/** Every state the page has read, in order. */
+const mockReads = jest.fn();
+
 function Probe() {
-  const { cstokens } = useAnchoredToken();
-  const { apiData } = useApiData();
-  return (
-    <p>
-      anchored {cstokens.length} · retrievable {apiData.ETHRaffleToClaim}
-    </p>
-  );
+  const { cstokens, isLoading: anchoredLoading } = useAnchoredToken();
+  const { apiData, isLoading: apiLoading } = useApiData();
+  const state = `anchored ${cstokens.length} · retrievable ${apiData.ETHRaffleToClaim}`;
+  mockReads(anchoredLoading || apiLoading ? `${state} · loading` : state);
+  return <p>{state}</p>;
 }
 
 beforeAll(() => flushDynamicImports());
 beforeEach(() => {
   mockAccount = null;
   mockProviderRenders.mockClear();
+  mockReads.mockClear();
 });
 
 describe('AccountDataProvider', () => {
@@ -91,6 +93,22 @@ describe('AccountDataProvider', () => {
       );
     });
     expect(screen.getByText('anchored 1 · retrievable 0.5')).toBe(page);
+  });
+
+  it('reads as loading, not empty, until the connected wallet’s reads report', async () => {
+    mockAccount = '0xabc';
+    render(
+      <AccountDataProvider>
+        <Probe />
+      </AccountDataProvider>,
+    );
+    await act(async () => {});
+    // Before the reader's first effect relays its values, the page reads
+    // "loading", never an empty wallet.
+    expect(mockReads.mock.calls.map(([state]) => state)).toEqual([
+      'anchored 0 · retrievable 0 · loading',
+      'anchored 1 · retrievable 0.5',
+    ]);
   });
 
   it('forgets a wallet’s data once it disconnects', async () => {

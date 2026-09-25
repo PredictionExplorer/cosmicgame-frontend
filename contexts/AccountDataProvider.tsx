@@ -24,6 +24,16 @@ const DISCONNECTED: AccountData = {
   api: DISCONNECTED_API_DATA,
 };
 
+/**
+ * A wallet is connected and its reads have not reported yet (the chunk is
+ * still downloading, or its first render is pending): loading, never "loaded
+ * and empty", so a page cannot show a connected wallet an empty state.
+ */
+const SYNCING: AccountData = {
+  anchored: { ...DISCONNECTED_ANCHORED_TOKENS, isLoading: true },
+  api: { ...DISCONNECTED_API_DATA, isLoading: true },
+};
+
 /** The wallet's reads (anchored NFTs, retrieval status), loaded while a wallet is connected. */
 const AccountDataSync = dynamic(() => import('./AccountDataSync'), { ssr: false });
 
@@ -43,7 +53,7 @@ export function AccountDataProvider({ children }: { children: ReactNode }) {
     [],
   );
   // Values from a previous wallet never outlive it.
-  const data = account && synced?.account === account ? synced.data : DISCONNECTED;
+  const data = !account ? DISCONNECTED : synced?.account === account ? synced.data : SYNCING;
   // One element per wallet: the provider's own updates never re-render the sync.
   const sync = useMemo(
     () => (account ? <AccountDataSync key={account} account={account} onSync={onSync} /> : null),
