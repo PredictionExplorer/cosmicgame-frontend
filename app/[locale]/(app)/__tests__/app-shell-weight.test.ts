@@ -1,5 +1,5 @@
-import { existsSync, readFileSync } from 'node:fs';
-import { dirname, relative, resolve } from 'node:path';
+import { existsSync, readdirSync, readFileSync } from 'node:fs';
+import { dirname, join, relative, resolve } from 'node:path';
 
 /**
  * What every app page downloads before its own code: the provider tree and
@@ -8,7 +8,9 @@ import { dirname, relative, resolve } from 'node:path';
  * The legal pages, the FAQ and the site map once shipped about 540 KB of
  * gzipped JavaScript, as much as the dApp itself: the API client with its
  * schemas, every contract ABI, the chain-event polling, the account menu and
- * the command palette all sat in the shell. They now load when a page needs
+ * the command palette all sat in the shell, and framer-motion's animation
+ * runtime rode in on the shells' MotionConfig and the route templates'
+ * `motion.div`. They now load when a page needs
  * them (next/dynamic or a dynamic `import()`), and this test keeps them out
  * of the shell's static import graph. Dynamic imports are deliberately not
  * followed: they are exactly how the shell defers these modules.
@@ -16,6 +18,9 @@ import { dirname, relative, resolve } from 'node:path';
 
 const REPO_ROOT = resolve(__dirname, '..', '..', '..', '..');
 const APP_PROVIDERS = resolve(REPO_ROOT, 'app/[locale]/(app)/providers.tsx');
+const LANDING_SHELL = resolve(REPO_ROOT, 'app/[locale]/(landing)/landing-shell.tsx');
+const APP_TEMPLATE = resolve(REPO_ROOT, 'app/[locale]/(app)/template.tsx');
+const LANDING_TEMPLATE = resolve(REPO_ROOT, 'app/[locale]/(landing)/template.tsx');
 
 const RESOLVE_EXTENSIONS = ['.ts', '.tsx', '/index.ts', '/index.tsx'] as const;
 
@@ -65,6 +70,22 @@ function walk(entry: string): { files: Set<string>; packages: Set<string> } {
 
 const shell = walk(APP_PROVIDERS);
 const shellFiles = [...shell.files].map((file) => relative(REPO_ROOT, file));
+const landingShell = walk(LANDING_SHELL);
+
+/** Every source file under a directory, tests excluded. */
+function sourceFiles(directory: string): string[] {
+  return readdirSync(directory, { withFileTypes: true }).flatMap((entry) => {
+    const path = join(directory, entry.name);
+    if (entry.isDirectory()) return entry.name === '__tests__' ? [] : sourceFiles(path);
+    return /\.tsx?$/.test(entry.name) ? [path] : [];
+  });
+}
+
+/** A value import from framer-motion (`import type` brings no code). */
+const FRAMER_VALUE_IMPORT = /^\s*import\s+(?!type\b)[^;]*?from\s+'framer-motion'/m;
+/** A value import of framer's animated components. */
+const FRAMER_COMPONENT_IMPORT =
+  /^\s*import\s*\{[^}]*\b(motion|m)\b[^}]*\}\s*from\s+'framer-motion'/m;
 
 describe('app shell weight', () => {
   it.each([
@@ -96,6 +117,32 @@ describe('app shell weight', () => {
       expect([...shell.packages].filter((spec) => pattern.test(spec))).toEqual([]);
     },
   );
+
+  it.each([
+    ['app shell', [...shell.files]],
+    ['landing shell', [...landingShell.files]],
+    ['route templates', [...walk(APP_TEMPLATE).files, ...walk(LANDING_TEMPLATE).files]],
+  ])('keeps framer-motion out of the %s', (_part, files) => {
+    // A MotionConfig in the shells and a motion.div in the templates put
+    // framer's whole animation runtime (about 43 KB gzip) into every page.
+    const importers = files
+      .filter((file) => FRAMER_VALUE_IMPORT.test(readFileSync(file, 'utf-8')))
+      .map((file) => relative(REPO_ROOT, file));
+    expect(importers).toEqual([]);
+  });
+
+  it('leaves reduced motion to each animated component, since no shell sets a MotionConfig', () => {
+    const animated = ['app', 'components']
+      .flatMap((directory) => sourceFiles(join(REPO_ROOT, directory)))
+      .filter((file) => FRAMER_COMPONENT_IMPORT.test(readFileSync(file, 'utf-8')));
+    expect(animated.length).toBeGreaterThan(0);
+    for (const file of animated) {
+      expect([relative(REPO_ROOT, file), readFileSync(file, 'utf-8')]).toEqual([
+        relative(REPO_ROOT, file),
+        expect.stringMatching(/useMotionVariants|useReducedMotion|MotionConfig/),
+      ]);
+    }
+  });
 
   it('still ships the wallet connection itself (positive control)', () => {
     expect(shell.packages.has('wagmi')).toBe(true);

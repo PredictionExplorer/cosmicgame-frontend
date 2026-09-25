@@ -7,7 +7,6 @@ import { WagmiProvider } from 'wagmi';
 import { QueryClientProvider } from '@tanstack/react-query';
 import { useTranslations } from 'next-intl';
 import { CookiesProvider } from 'react-cookie';
-import { MotionConfig } from 'framer-motion';
 
 import { wagmiConfig } from '@/config/wagmi';
 import { networkConfig, getEnvValidation } from '@/config/networks';
@@ -25,7 +24,6 @@ import { WalletUiProvider } from '@/contexts/WalletUiContext';
 import { installGlobalErrorHandlers } from '@/utils/globalErrorHandlers';
 import { getClientBuildInfo } from '@/lib/buildInfo';
 import { makeQueryClient } from '@/lib/queryClient';
-import { baseTransition } from '@/lib/motion';
 import { getApiBase, getApiOrigin, getRpcUrl } from '@/lib/serverRotation';
 
 // NOTE: what every app page downloads is kept to the wallet connection
@@ -39,7 +37,11 @@ import { getApiBase, getApiOrigin, getRpcUrl } from '@/lib/serverRotation';
 //     (ContractAddressesProvider);
 //   - the chain-event refresh (RPC client, ABI): once the page observes live
 //     data (LiveGameDataRefreshGate);
-//   - the command palette: on idle, or when opened.
+//   - the command palette: on idle, or when opened;
+//   - framer-motion: only with a page that animates. The route templates
+//     fade with the Web Animations API (components/layout/RouteEntrance), and
+//     each animated component honours reduced motion itself (lib/motion's
+//     useMotionVariants), so the shell sets no MotionConfig.
 // The legal pages, the FAQ and the site map download none of these.
 
 // Viem's `call()` dynamically imports CCIP helpers on revert paths; that async chunk
@@ -170,32 +172,26 @@ export function Providers({
         <ContractAddressesProvider>
           <LiveGameDataRefreshGate />
           <WalletUiProvider>
-            {/* Framer Motion defaults for the app host: honour the OS "reduce
-                motion" setting (transforms and layout animations are skipped;
-                opacity still fades) and use the shared transition token
-                wherever a component sets none. The landing shell does the same. */}
-            <MotionConfig reducedMotion="user" transition={baseTransition}>
-              <ErrorBoundary>
-                <CookiesProvider>
-                  <AccountDataProvider>
-                    <SystemModeProvider>
-                      <NotificationProvider>
-                        <TooltipProvider delayDuration={200} skipDelayDuration={300}>
-                          <div className="site-shell flex min-h-screen flex-col">
-                            <SkipLink />
-                            <Header />
-                            <div className="min-w-0 flex-1">
-                              <ErrorBoundary>{children}</ErrorBoundary>
-                            </div>
-                            {footer}
+            <ErrorBoundary>
+              <CookiesProvider>
+                <AccountDataProvider>
+                  <SystemModeProvider>
+                    <NotificationProvider>
+                      <TooltipProvider delayDuration={200} skipDelayDuration={300}>
+                        <div className="site-shell flex min-h-screen flex-col">
+                          <SkipLink />
+                          <Header />
+                          <div className="min-w-0 flex-1">
+                            <ErrorBoundary>{children}</ErrorBoundary>
                           </div>
-                        </TooltipProvider>
-                      </NotificationProvider>
-                    </SystemModeProvider>
-                  </AccountDataProvider>
-                </CookiesProvider>
-              </ErrorBoundary>
-            </MotionConfig>
+                          {footer}
+                        </div>
+                      </TooltipProvider>
+                    </NotificationProvider>
+                  </SystemModeProvider>
+                </AccountDataProvider>
+              </CookiesProvider>
+            </ErrorBoundary>
             {HarnessPanel ? <HarnessPanel /> : null}
             <AppToaster />
           </WalletUiProvider>
