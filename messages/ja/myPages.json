@@ -106,7 +106,7 @@
       "entry": "{title} · {count, plural, other {サイクル{cycles}}}"
     },
     "selection": {
-      "title": "星選プール · サイクル{cycle}",
+      "title": "星選の割合 · サイクル{cycle}",
       "share": "{total}件の一筆のうち{mine}件",
       "caption": "サイクルの確定時に、このサイクルのすべての一筆からETHの星選{eth}件とNFTの星選{nft}件が復元抽出で選ばれます。一筆ごとに1回として数えられます。",
       "captionGeneric": "サイクルの確定時に、このサイクルのすべての一筆から星選が復元抽出で行われます。一筆ごとに1回として数えられます。"

@@ -144,7 +144,7 @@
     "actions": "Actions",
     "selected": "Selected",
     "gesturesThisCycle": "Gestures this cycle",
-    "shareOfPool": "Share of pool"
+    "shareOfPool": "Share of entries"
   },
   "names": {
     "participants": "Unique participants",
@@ -282,7 +282,7 @@
     "removed": "Token name was removed."
   },
   "stellarSelection": {
-    "draws": "At finalization, {eth} ETH and {nft} NFT selections are drawn from this pool."
+    "draws": "At finalization, {eth} ETH and {nft} NFT Stellar Selections are made from these entries."
   },
   "recipientHistory": {
     "sources": {

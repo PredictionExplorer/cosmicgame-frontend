@@ -38,11 +38,11 @@ export const howItWorksTextEn = {
       },
       {
         title: 'Stellar Selection entry',
-        description: `Each gesture records one entry. When the cycle finalizes, three entries are drawn at random to share ${protocolFacts.stellarSelectionEthPercentage}% of the Cycle Reserve in ETH.`,
+        description: `Each gesture records one entry. When the cycle finalizes, three entries are selected at random to share ${protocolFacts.stellarSelectionEthPercentage}% of the Cycle Reserve in ETH.`,
       },
       {
         title: 'Cosmic Signature NFT selection',
-        description: `Ten more entries are drawn to receive ${cst} CST and a Cosmic Signature NFT each. The same address can be drawn more than once, and no number of entries guarantees a selection.`,
+        description: `Ten more entries are selected to receive ${cst} CST and a Cosmic Signature NFT each. The same address can be selected more than once, and no number of entries guarantees a selection.`,
       },
       {
         title: 'Signature Allocation',
@@ -97,7 +97,7 @@ export const howItWorksTextEn = {
       },
       {
         label: 'Stellar Selections',
-        description: `Three ETH Stellar Selection recipients share ${protocolFacts.stellarSelectionEthPercentage}% of the Cycle Reserve. Ten NFT Stellar Selection recipients, and ten Anchored-NFT Stellar Selection recipients drawn from anchored Random Walk NFTs, each receive ${cst} CST and a Cosmic Signature NFT. Each gesture adds one entry, and every selection is drawn from all of the cycle’s entries, with replacement.`,
+        description: `Three ETH Stellar Selection recipients share ${protocolFacts.stellarSelectionEthPercentage}% of the Cycle Reserve. Ten NFT Stellar Selection recipients, and ten Anchored-NFT Stellar Selection recipients chosen among anchored Random Walk NFTs, each receive ${cst} CST and a Cosmic Signature NFT. Each gesture adds one entry, and every selection is made from all of the cycle’s entries, so one entry can be selected more than once.`,
       },
       {
         label: 'The next cycle begins',

@@ -305,15 +305,6 @@ const UserStatisticsView = ({ address, isOwnProfile }: UserStatisticsViewProps) 
         <div className="space-y-10 sm:space-y-12">
           {isOwnProfile ? <QuickActions address={address} /> : null}
 
-          {selectionShare && currentCycle !== null ? (
-            <SelectionShare
-              share={selectionShare}
-              cycle={currentCycle}
-              ethSelections={toFiniteNumber(dashboardData?.NumRaffleEthWinnersBidding)}
-              nftSelections={toFiniteNumber(dashboardData?.NumRaffleNFTWinnersBidding)}
-            />
-          ) : null}
-
           {/* The figures come from the profile record; an address without one skips them. */}
           {userInfo && gestureSummary ? (
             <ProfileOverview
@@ -324,6 +315,17 @@ const UserStatisticsView = ({ address, isOwnProfile }: UserStatisticsViewProps) 
               anchoredNow={anchoredNow}
               anchorActions={anchorActions}
               anchorDistributionsEth={totalAnchorDistributionEth}
+            />
+          ) : null}
+
+          {/* After the profile's own figures, never ahead of them: a share of the
+              cycle's entries is context, and leading with it read like odds. */}
+          {selectionShare && currentCycle !== null ? (
+            <SelectionShare
+              share={selectionShare}
+              cycle={currentCycle}
+              ethSelections={toFiniteNumber(dashboardData?.NumRaffleEthWinnersBidding)}
+              nftSelections={toFiniteNumber(dashboardData?.NumRaffleNFTWinnersBidding)}
             />
           ) : null}
 

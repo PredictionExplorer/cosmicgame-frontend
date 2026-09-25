@@ -282,7 +282,7 @@
     "removed": "Tên token đã bị xóa."
   },
   "stellarSelection": {
-    "draws": "Khi chu kỳ được chốt, {eth} lượt chọn ETH và {nft} lượt chọn NFT được thực hiện trong nhóm này."
+    "draws": "Khi chu kỳ hoàn tất, {eth} lượt chọn ETH và {nft} lượt chọn NFT được thực hiện trong nhóm này."
   },
   "recipientHistory": {
     "sources": {

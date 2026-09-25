@@ -109,7 +109,7 @@
     },
     "stellarSelectionEntries": {
       "title": "Stellar Selection entries",
-      "tooltip": "Each gesture adds one entry to this cycle’s Stellar Selection pool, and every selection at finalization is drawn from the whole pool, with replacement. The table shows each participant’s share of the pool."
+      "tooltip": "Each gesture adds one entry to this cycle’s Stellar Selection, and every selection at finalization is made from all of the entries, so one entry can be selected more than once. The table shows each participant’s share of the entries."
     },
     "topEthSpenders": {
       "title": "Top ETH spenders",

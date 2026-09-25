@@ -251,7 +251,7 @@
   },
   "quiz": {
     "title": "Quiz: test your protocol knowledge",
-    "description": "One hundred questions across three tiers, drawn from the Cosmic Signature white paper: Performance Cycles, gestures, allocations, the art pipeline, and the edge cases only careful readers catch.",
+    "description": "One hundred questions across three tiers, based on the Cosmic Signature white paper: Performance Cycles, gestures, allocations, the art pipeline, and the edge cases only careful readers catch.",
     "tiers": {
       "basic": {
         "title": "Basic quiz",

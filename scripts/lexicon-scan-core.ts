@@ -75,6 +75,18 @@ export const DEFAULT_BANNED_TERMS: readonly string[] = [
   // Stellar Selection / lottery triggers
   'raffle',
   'raffles',
+  // "Draw" in its lottery sense only: "draws a line", "the drawing" (a
+  // diagram) and "drawn as the table" stay legal in code and copy.
+  'draw from',
+  'draws from',
+  'drawn from',
+  'drawn at random',
+  'randomly drawn',
+  'random draw',
+  'drawn with replacement',
+  'draws with replacement',
+  'drawn to receive',
+  'drawn more than once',
   'lottery',
   'lotteries',
   'sweepstakes',

@@ -106,10 +106,10 @@
       "entry": "{title} · {count, plural, other {第 {cycles} 個週期}}"
     },
     "selection": {
-      "title": "星選池 · 第 {cycle} 個週期",
+      "title": "星選佔比 · 第 {cycle} 個週期",
       "share": "{total} 次落筆中的 {mine} 次",
-      "caption": "週期確定時，協議會從本週期的全部落筆中選取 {eth} 次 ETH 星選與 {nft} 次 NFT 星選，同一筆落筆可再次獲選。每次落筆計為一次。",
-      "captionGeneric": "週期確定時，協議會從本週期的全部落筆中進行星選，同一筆落筆可再次獲選。每次落筆計為一次。"
+      "caption": "週期收官時，協議會從本週期的全部落筆中選取 {eth} 次 ETH 星選與 {nft} 次 NFT 星選，同一筆落筆可再次獲選。每次落筆計為一次。",
+      "captionGeneric": "週期收官時，協議會從本週期的全部落筆中進行星選，同一筆落筆可再次獲選。每次落筆計為一次。"
     },
     "overview": {
       "title": "概覽",

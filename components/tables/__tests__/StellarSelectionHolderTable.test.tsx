@@ -76,7 +76,7 @@ describe('StellarSelectionHolderTable', () => {
     expect(screen.queryByText('100.0%')).not.toBeInTheDocument();
   });
 
-  it('says how many selections finalization draws from the pool', () => {
+  it('says how many selections finalization makes from the entries', () => {
     render(
       <StellarSelectionHolderTable
         list={[createGesture()]}

@@ -109,7 +109,7 @@
     },
     "stellarSelectionEntries": {
       "title": "Lượt Tinh tuyển",
-      "tooltip": "Mỗi nét bút thêm một lượt vào nhóm Tinh tuyển của chu kỳ này, và khi chu kỳ được chốt, mỗi lượt chọn được thực hiện trong toàn bộ nhóm, có hoàn lại. Bảng cho thấy tỷ lệ của từng người tham gia trong nhóm."
+      "tooltip": "Mỗi nét bút thêm một lượt vào nhóm Tinh tuyển của chu kỳ này, và khi chu kỳ hoàn tất, mỗi lượt chọn được thực hiện trong toàn bộ nhóm, có hoàn lại. Bảng cho thấy tỷ lệ của từng người tham gia trong nhóm."
     },
     "topEthSpenders": {
       "title": "Người chi ETH nhiều nhất",

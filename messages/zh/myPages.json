@@ -106,10 +106,10 @@
       "entry": "{title} · {count, plural, other {第 {cycles} 个周期}}"
     },
     "selection": {
-      "title": "星选池 · 第 {cycle} 个周期",
+      "title": "星选占比 · 第 {cycle} 个周期",
       "share": "{total} 次落笔中的 {mine} 次",
-      "caption": "周期确定时，协议会从本周期的全部落笔中选取 {eth} 次 ETH 星选与 {nft} 次 NFT 星选，同一笔落笔可再次获选。每次落笔计为一次。",
-      "captionGeneric": "周期确定时，协议会从本周期的全部落笔中进行星选，同一笔落笔可再次获选。每次落笔计为一次。"
+      "caption": "周期收官时，协议会从本周期的全部落笔中选取 {eth} 次 ETH 星选与 {nft} 次 NFT 星选，同一笔落笔可再次获选。每次落笔计为一次。",
+      "captionGeneric": "周期收官时，协议会从本周期的全部落笔中进行星选，同一笔落笔可再次获选。每次落笔计为一次。"
     },
     "overview": {
       "title": "概览",

@@ -106,10 +106,10 @@
       "entry": "{title} · {count, plural, one {Cycle {cycles}} other {Cycles {cycles}}}"
     },
     "selection": {
-      "title": "Stellar Selection pool · Cycle {cycle}",
+      "title": "Stellar Selection share · Cycle {cycle}",
       "share": "{mine} of {total} gestures",
-      "caption": "At finalization, {eth} ETH and {nft} NFT selections are drawn from all of this cycle’s gestures, with replacement. Each gesture counts once.",
-      "captionGeneric": "At finalization, Stellar Selections are drawn from all of this cycle’s gestures, with replacement. Each gesture counts once."
+      "caption": "At finalization, {eth} ETH and {nft} NFT Stellar Selections are made from all of this cycle’s gestures. Each gesture is one entry and can be selected more than once.",
+      "captionGeneric": "At finalization, Stellar Selections are made from all of this cycle’s gestures. Each gesture is one entry and can be selected more than once."
     },
     "overview": {
       "title": "At a glance",

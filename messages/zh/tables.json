@@ -282,7 +282,7 @@
     "removed": "代币名称已移除。"
   },
   "stellarSelection": {
-    "draws": "周期确定时，协议会从本池中选取 {eth} 次 ETH 星选与 {nft} 次 NFT 星选。"
+    "draws": "周期收官时，协议会从本池中选取 {eth} 次 ETH 星选与 {nft} 次 NFT 星选。"
   },
   "recipientHistory": {
     "sources": {

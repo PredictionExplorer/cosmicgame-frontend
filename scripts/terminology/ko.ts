@@ -40,7 +40,9 @@ export const KO_TERMINOLOGY_RULES: readonly TerminologyRule[] = [
   {
     concept: 'Finalize / Finalization',
     canonical: '마감 / 마감하다',
-    variants: ['파이널라이즈', '정산'],
+    // 확정 alone stays legal (a confirmed transaction, a settled result);
+    // only the cycle's finalization must read 마감.
+    variants: ['파이널라이즈', '정산', '사이클이 확정', '사이클 확정'],
   },
   {
     concept: 'Final Gesture',
