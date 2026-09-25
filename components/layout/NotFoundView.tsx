@@ -63,7 +63,8 @@ export function NotFoundView({ host }: { host: SiteHost }) {
           prefetch="intent"
           className={cn(buttonVariants({ variant: 'default', size: 'lg' }), 'px-5 no-underline')}
         >
-          {t('notFound.primaryCta')}
+          {/* The landing calls the app "the app" everywhere, as its header does. */}
+          {host === 'landing' ? navT('cta.openApp') : t('notFound.primaryCta')}
           <ArrowRight aria-hidden className="rtl:-scale-x-100" />
         </SiteLink>
         <SiteLink

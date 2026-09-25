@@ -112,10 +112,12 @@ describe('landing 404 page', () => {
     render(<LandingNotFound />);
     expect(screen.getByRole('main')).toBeInTheDocument();
     expect(screen.getByRole('heading', { level: 1 })).toHaveTextContent('errors.notFound.title');
-    expect(screen.getByRole('link', { name: 'errors.notFound.primaryCta' })).toHaveAttribute(
+    // Named as every landing button names the app, not "Observatory".
+    expect(screen.getByRole('link', { name: 'nav.cta.openApp' })).toHaveAttribute(
       'href',
       localeHref(APP_ORIGIN, '/', 'en'),
     );
+    expect(screen.queryByRole('link', { name: 'errors.notFound.primaryCta' })).toBeNull();
     expect(screen.queryByRole('button', { name: 'nav.search.triggerLabel' })).toBeNull();
   });
 
