@@ -109,9 +109,15 @@ export const rootMetadata: Metadata = createRootMetadata(englishRootMetadataCopy
  * `themeColor` is the default palette's page colour. The theme bootstrap
  * (lib/theme/config.ts) rewrites it before first paint for the visitor's
  * palette, so mobile browser chrome always blends into the page.
+ *
+ * `viewportFit: 'cover'` lets iOS report the safe-area insets: without it
+ * `env(safe-area-inset-*)` is 0, and the dock, the gesture sheet's submit
+ * row and the floating pills sat in the home-indicator zone. The content
+ * edge (`--gutter`, styles/tokens.css) keeps clear of the notch in landscape.
  */
 export const rootViewport: Viewport = {
   width: 'device-width',
   initialScale: 1,
+  viewportFit: 'cover',
   themeColor: THEME_CHROME[DEFAULT_SITE_THEME],
 };

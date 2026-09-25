@@ -281,7 +281,8 @@ export function ArtLightbox({
               onPointerUp={handlePointerUp}
               onPointerCancel={handlePointerUp}
               className={cn(
-                'relative flex min-h-0 flex-1 focus-ring-inset',
+                // A press here starts a pan: no iOS callout sheet over the drag.
+                'relative flex min-h-0 flex-1 focus-ring-inset [-webkit-touch-callout:none]',
                 zoomed
                   ? 'cursor-grab overflow-auto overscroll-contain active:cursor-grabbing'
                   : 'cursor-zoom-in overflow-hidden',

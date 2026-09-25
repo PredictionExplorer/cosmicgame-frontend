@@ -1,6 +1,6 @@
 'use client';
 
-import { useCallback, useState } from 'react';
+import { useCallback, useRef, useState } from 'react';
 import { Menu, Search } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 
@@ -10,6 +10,7 @@ import ConnectWalletButton from '@/components/common/ConnectWalletButton';
 import { ThemeSwitcher } from '@/components/theme/ThemeSwitcher';
 import { WrongNetworkChip } from '@/components/wallet/NetworkGuard';
 import { useSystemMode } from '@/contexts/SystemModeContext';
+import { useBannerClearance } from '@/hooks/useStickyClearance';
 
 import {
   CommandPalette,
@@ -25,8 +26,12 @@ import { Wordmark } from './Wordmark';
 
 function MaintenanceBanner({ mode }: { mode: number }) {
   const t = useTranslations('nav');
+  const ref = useRef<HTMLDivElement>(null);
+  // The page shell and scroll padding make room for it: it never covers an H1.
+  useBannerClearance(ref);
   return (
     <div
+      ref={ref}
       data-maintenance-banner
       role="status"
       className="fixed inset-x-0 top-[var(--header-height)] z-40 border-b border-rule bg-attention-surface px-6 py-2.5 text-foreground backdrop-blur-sm"

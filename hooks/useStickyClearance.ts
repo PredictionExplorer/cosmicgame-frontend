@@ -80,3 +80,37 @@ export function useStickyClearance(
     };
   }, [ref, media]);
 }
+
+/** The custom property the maintenance banner publishes its height in. */
+export const BANNER_CLEARANCE_PROPERTY = '--banner-clearance';
+
+/**
+ * Publishes the height of a bar fixed under the site header (the maintenance
+ * banner) as `--banner-clearance`, which the page shell adds to its top
+ * padding and `html { scroll-padding-top }` to its offset: the banner never
+ * covers a page's H1, and focus or an anchor jump stops below it (WCAG
+ * 2.4.11). Follows the bar's size (its copy wraps on a phone) and is removed
+ * with the bar.
+ */
+export function useBannerClearance(ref: RefObject<HTMLElement | null>): void {
+  useEffect(() => {
+    const bar = ref.current;
+    if (!bar || typeof window === 'undefined') return;
+    const root = document.documentElement;
+    const update = () => {
+      root.style.setProperty(
+        BANNER_CLEARANCE_PROPERTY,
+        `${Math.ceil(bar.getBoundingClientRect().height)}px`,
+      );
+    };
+    update();
+    const observer = typeof ResizeObserver === 'undefined' ? null : new ResizeObserver(update);
+    observer?.observe(bar);
+    window.addEventListener('resize', update);
+    return () => {
+      observer?.disconnect();
+      window.removeEventListener('resize', update);
+      root.style.removeProperty(BANNER_CLEARANCE_PROPERTY);
+    };
+  }, [ref]);
+}

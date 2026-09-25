@@ -467,17 +467,12 @@ html:lang(vi) {
 
 /*
  * The home control desk uses a tighter header offset than generic inner
- * pages. When maintenance copy adds a second fixed bar, restore enough
- * clearance without making every normal visit pay for an absent banner.
+ * pages. When maintenance copy adds a second fixed bar, it clears the bar's
+ * measured height (`--banner-clearance`, published by the banner), as every
+ * PageShell does, without making a normal visit pay for an absent banner.
  */
 body:has([data-maintenance-banner]) .home-control-shell {
-  padding-top: calc(var(--header-height) + 3.75rem);
-}
-
-@media (max-width: 639px) {
-  body:has([data-maintenance-banner]) .home-control-shell {
-    padding-top: calc(var(--header-height) + 5rem);
-  }
+  padding-top: calc(var(--header-height) + 1.5rem + var(--banner-clearance, 3.5rem));
 }
 
 /*
@@ -520,7 +515,9 @@ body:has([data-maintenance-banner]) .home-control-shell {
     color-scheme: dark;
     scroll-behavior: smooth;
     /* A sticky bar under the header publishes its reach (useStickyClearance, WCAG 2.4.11). */
-    scroll-padding-top: calc(var(--sticky-offset) + var(--sticky-bar-clearance, 0px));
+    scroll-padding-top: calc(
+      var(--sticky-offset) + var(--sticky-bar-clearance, 0px) + var(--banner-clearance, 0px)
+    );
     /* Focus scrolled into view clears a fixed bottom bar (WCAG 2.4.11). */
     scroll-padding-bottom: calc(var(--dock-clearance) + env(safe-area-inset-bottom, 0px));
   }
@@ -532,7 +529,9 @@ body:has([data-maintenance-banner]) .home-control-shell {
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     -webkit-tap-highlight-color: transparent;
-    -webkit-touch-callout: none;
+    /* No -webkit-touch-callout: a long press keeps Open in New Tab, Copy Link,
+     * link previews and Save Image on every link and Signature. Only the
+     * lightbox's pan surface, where a press starts a drag, turns it off. */
   }
 
   /*

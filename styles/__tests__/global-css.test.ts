@@ -323,6 +323,20 @@ describe('Korean display punctuation', () => {
   });
 });
 
+describe('platform affordances', () => {
+  it('leaves the iOS long-press callout on every link and artwork', () => {
+    // Regression: body { -webkit-touch-callout: none } took Open in New Tab,
+    // Copy Link and Save Image from every link and Signature.
+    expect(ruleBody(globalCss, 'body {')).not.toMatch(/touch-callout/);
+  });
+
+  it('keeps the content edge clear of the notch once the page covers the viewport', () => {
+    const tokens = readFileSync(resolve(STYLES, 'tokens.css'), 'utf8');
+    const gutter = tokens.slice(tokens.indexOf('--gutter:'));
+    expect(gutter.slice(0, gutter.indexOf(';'))).toMatch(/env\(safe-area-inset-left/);
+  });
+});
+
 describe('Latin display figures', () => {
   it('sets every digit in a Clash heading in Inter, never in Clash', () => {
     // Regression: "Cycle #12" and "Signature #000025" as H1s set their zeros in

@@ -349,7 +349,12 @@ a page's H1 starts on the header's edge at every width, which
 `e2e/content-edge.desktop.spec.ts` checks at 820, 1280, 1366 and 1600px. The header is
 `--header-height` tall (56px below `sm`, where each of its controls is a 44px target, and 72px
 from `sm`), and everything pinned under it (`--sticky-offset`, sticky sub-navigation, the
-maintenance banner, page tops) derives from that one value. The other tokens are `--section-gap`
+maintenance banner, page tops) derives from that one value. The maintenance banner
+publishes its measured height as `--banner-clearance` (`useBannerClearance`), which the page
+shells add to their top and `html { scroll-padding-top }` to its offset, so it never covers
+an H1 or a focused element. The page opts into `viewport-fit=cover`, so bottom bars'
+`env(safe-area-inset-bottom)` takes effect on iPhones, and `--gutter` is never narrower
+than the notch's inset in landscape. The other tokens are `--section-gap`
 (landing and long-form sections), `--block-gap` (data-page blocks), `--stack-gap`,
 `--row-h` (48px ledger rows), `--row-h-dense` (44px), `--measure-prose` (36em, about 66
 characters of 17px Inter; `ch` is the width of a zero and ran 81–91 characters) and

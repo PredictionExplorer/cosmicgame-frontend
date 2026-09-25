@@ -89,7 +89,12 @@
    * landing and long-form pages are --section-gap apart, blocks on data pages
    * --block-gap, stacked items --stack-gap. --row-h is a ledger row.
    */
-  --gutter: clamp(1rem, 4vw, 5rem);
+  /* Never under the notch: the page opts into viewport-fit=cover (root-metadata). */
+  --gutter: max(
+    clamp(1rem, 4vw, 5rem),
+    env(safe-area-inset-left, 0px),
+    env(safe-area-inset-right, 0px)
+  );
   --section-gap: clamp(4rem, 3rem + 5vw, 8rem);
   --block-gap: 3rem;
   --stack-gap: 1.5rem;

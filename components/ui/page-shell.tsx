@@ -14,7 +14,9 @@ import { AmbientBackdrop, type AmbientBackdropProps } from '@/components/ui/ambi
  * the same one the header and footer draw with `site-container`, so a page's
  * H1 starts under the header's wordmark at every width. `data` and
  * `marketing` pages are the full 80rem column; `form` (48rem) and `detail`
- * (72rem) are narrower measures centred on the same gutters. The width is a
+ * (72rem) are narrower measures centred on the same gutters. The top clears
+ * the header and, during maintenance, the banner's measured height
+ * (`--banner-clearance`), so the banner never covers the H1. The width is a
  * max-width plus gutter padding rather than `site-container`'s `width`, so a
  * caller's `max-w-none px-0` still opens a full-bleed page.
  */
@@ -26,10 +28,10 @@ const EDGE = 'px-[var(--gutter)]';
 const shellVariants = cva('relative z-[1] mx-auto w-full leading-normal', {
   variants: {
     variant: {
-      data: `max-w-[calc(80rem+2*var(--gutter))] ${EDGE} pt-[calc(var(--header-height)+3.5rem)] pb-16 max-sm:pt-[calc(var(--header-height)+2rem)] max-sm:pb-12`,
-      marketing: `max-w-[calc(80rem+2*var(--gutter))] ${EDGE} pt-[calc(var(--header-height)+3.5rem)] pb-20 max-sm:pt-[calc(var(--header-height)+2rem)] max-sm:pb-16`,
-      form: `max-w-[calc(48rem+2*var(--gutter))] ${EDGE} pt-[calc(var(--header-height)+3.5rem)] pb-16 max-sm:pt-[calc(var(--header-height)+2rem)] max-sm:pb-12`,
-      detail: `max-w-[calc(72rem+2*var(--gutter))] ${EDGE} pt-[calc(var(--header-height)+3.5rem)] pb-16 max-sm:pt-[calc(var(--header-height)+2rem)] max-sm:pb-12`,
+      data: `max-w-[calc(80rem+2*var(--gutter))] ${EDGE} pt-[calc(var(--header-height)+3.5rem+var(--banner-clearance,0px))] pb-16 max-sm:pt-[calc(var(--header-height)+2rem+var(--banner-clearance,0px))] max-sm:pb-12`,
+      marketing: `max-w-[calc(80rem+2*var(--gutter))] ${EDGE} pt-[calc(var(--header-height)+3.5rem+var(--banner-clearance,0px))] pb-20 max-sm:pt-[calc(var(--header-height)+2rem+var(--banner-clearance,0px))] max-sm:pb-16`,
+      form: `max-w-[calc(48rem+2*var(--gutter))] ${EDGE} pt-[calc(var(--header-height)+3.5rem+var(--banner-clearance,0px))] pb-16 max-sm:pt-[calc(var(--header-height)+2rem+var(--banner-clearance,0px))] max-sm:pb-12`,
+      detail: `max-w-[calc(72rem+2*var(--gutter))] ${EDGE} pt-[calc(var(--header-height)+3.5rem+var(--banner-clearance,0px))] pb-16 max-sm:pt-[calc(var(--header-height)+2rem+var(--banner-clearance,0px))] max-sm:pb-12`,
       bare: 'max-w-none px-0 pt-0 pb-0 min-h-0 overflow-visible',
     },
   },
