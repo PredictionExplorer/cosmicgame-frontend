@@ -1,6 +1,5 @@
 'use client';
 
-import type { ReactNode } from 'react';
 import { ArrowRight, ArrowUpRight, Link2Off, SearchX } from 'lucide-react';
 import { useLocale, useTranslations } from 'next-intl';
 
@@ -12,6 +11,7 @@ import { LedgerPage } from '@/components/ledger/LedgerPage';
 import { PageHeader, type PageHeaderFigure } from '@/components/layout/PageHeader';
 import { AddressChip } from '@/components/ui/address-chip';
 import { Amount } from '@/components/ui/amount';
+import { RecordRow } from '@/components/detail-page/RecordRow';
 import { TxProofLink } from '@/components/ui/data-table';
 import { DateTime } from '@/components/ui/date-time';
 import { EmptyState } from '@/components/ui/empty-state';
@@ -21,16 +21,6 @@ import { Skeleton, SkeletonDetailRows } from '@/components/ui/skeleton';
 
 interface EthDonationDetailPageProps {
   id: number;
-}
-
-/** A label and its value on one hairline row; the value wraps under the label on phones. */
-function SpecRow({ label, children }: { label: string; children: ReactNode }) {
-  return (
-    <div className="grid gap-1 py-3.5 sm:grid-cols-[12rem_minmax(0,1fr)] sm:items-baseline sm:gap-6">
-      <dt className="type-label text-subtle">{label}</dt>
-      <dd className="min-w-0 type-body-sm text-foreground">{children}</dd>
-    </div>
-  );
 }
 
 /** The way back to the ledger: a 44px row on phones, a text link from `sm`. */
@@ -216,14 +206,14 @@ const EthDonationDetailPage = ({ id }: EthDonationDetailPageProps) => {
       <section aria-labelledby="contribution-record">
         <SectionHeader headingId="contribution-record" title={t('recordTitle')} />
         <dl className="divide-y divide-rule-faint border-y border-rule-faint">
-          <SpecRow label={t('transactionLabel')}>
+          <RecordRow label={t('transactionLabel')}>
             <TxProofLink hash={data.TxHash} className="type-hash">
               {formatAddress(data.TxHash)}
             </TxProofLink>
-          </SpecRow>
-          <SpecRow label={t('recordLabel')}>
+          </RecordRow>
+          <RecordRow label={t('recordLabel')}>
             <span className="type-mono">{t('recordValue', { id })}</span>
-          </SpecRow>
+          </RecordRow>
         </dl>
       </section>
     </LedgerPage>

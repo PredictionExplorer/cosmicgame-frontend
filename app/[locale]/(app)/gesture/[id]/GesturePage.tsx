@@ -8,6 +8,7 @@ import { Link } from '@/i18n/navigation';
 import { GESTURE_METHOD_BG_CLASS, type GestureMethod } from '@/lib/theme/dataColors';
 import { TOUCH_TARGET_EXTENDED_CLASS } from '@/lib/touch-target';
 import { cn } from '@/lib/utils';
+import { RecordRow } from '@/components/detail-page/RecordRow';
 import { PageHeader } from '@/components/layout/PageHeader';
 import { AddressChip } from '@/components/ui/address-chip';
 import { Amount } from '@/components/ui/amount';
@@ -268,16 +269,6 @@ function TransactionHash({ hash }: { hash: string }) {
  * label column. The participant's message keeps the narrower reading measure.
  */
 const RECORD_WIDTH_CLASS = 'max-w-4xl';
-
-/** One label / value line of the record. */
-function RecordRow({ label, children }: { label: ReactNode; children: ReactNode }) {
-  return (
-    <div className="grid gap-1 py-3.5 sm:grid-cols-[minmax(0,13rem)_minmax(0,1fr)] sm:items-baseline sm:gap-8">
-      <dt className="type-label text-subtle">{label}</dt>
-      <dd className="min-w-0 type-body-sm text-foreground">{children}</dd>
-    </div>
-  );
-}
 
 /**
  * One gesture as a record people can cite, richer than the ledger row that
