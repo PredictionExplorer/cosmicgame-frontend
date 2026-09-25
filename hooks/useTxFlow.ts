@@ -269,9 +269,14 @@ export function useTxFlow(): UseTxFlowResult {
       let currentHash: Hash | undefined;
       const ctx: TxContext = {
         account: address,
+        // Signed by the account the flow started with: arguments built from
+        // ctx.account (transferFrom(ctx.account, …)) never go out under
+        // another account the wallet switched to meanwhile; wagmi refuses
+        // instead (ConnectorAccountNotFoundError → wallet-not-connected).
         writeContract: (request) =>
           writeContract(config, {
             ...request,
+            account: address,
             chainId: activeChain.id,
           } as unknown as WriteContractParameters),
       };
