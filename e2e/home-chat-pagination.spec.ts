@@ -24,9 +24,14 @@ test('loads older message pages only on request and keeps the current reading po
   await revealLoadedMessages(chat);
 
   // Older history comes on request, under what is already read: the row being
-  // read stays where it is on screen.
+  // read stays where it is on screen. Positions are read with the web fonts in
+  // (`domcontentloaded` does not wait for them, and a swap re-wraps the rows),
+  // and from where the click lands: a trial click scrolls there first, so the
+  // click itself never moves the page (on phones the fixed dock can cover the
+  // button, and a covered click scrolls on its own).
   const older = chat.getByRole('button', { name: 'Load older', exact: true });
-  await older.scrollIntoViewIfNeeded();
+  await page.evaluate(() => document.fonts.ready);
+  await older.click({ trial: true });
   const readingRow = chat.locator('[data-chat-row]').last();
   const readingKey = await readingRow.getAttribute('data-chat-row');
   const reading = chat.locator(`[data-chat-row="${readingKey}"]`);
@@ -94,6 +99,9 @@ test('polls only new messages, preserves older reading position, and resets corr
   const chat = page.getByTestId('gesture-message-chat');
   await expect(chat.getByTestId('gesture-message-meta')).toHaveCount(50);
   await revealLoadedMessages(chat);
+  // Read positions with the web fonts in: a swap between the two readings
+  // would re-wrap the rows and move the one being read.
+  await page.evaluate(() => document.fonts.ready);
   await chat.scrollIntoViewIfNeeded();
   const reading = chat.locator('[data-chat-row="message:220"]');
   await reading.scrollIntoViewIfNeeded();
