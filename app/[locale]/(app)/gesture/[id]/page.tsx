@@ -2,6 +2,7 @@ import { cache } from 'react';
 import type { Metadata } from 'next';
 import { getTranslations, setRequestLocale } from 'next-intl/server';
 
+import { capCacheWindow, type CacheWindow } from '@/lib/cacheWindow';
 import api from '@/services/api';
 import { isRecordNotFound } from '@/services/api/readError';
 import type { GestureInfo } from '@/services/api/types';
@@ -61,9 +62,31 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   });
 }
 
-// A gesture record never changes once indexed; the window only bounds how
-// long a record requested before the indexer caught up stays "not found".
-export const revalidate = 300;
+/**
+ * No gesture renders at build time: each record renders on its first visit
+ * and is then served from the cache. A gesture never changes once indexed,
+ * and a gesture of a finalized cycle is final down to its trail, so its
+ * render is kept for a day (`CACHE_WINDOW.final`). One of the live cycle
+ * keeps five minutes (its trail leads to the live cycle until it
+ * finalizes), and a record the API does not hold yet, or could not be read,
+ * a minute.
+ */
+export function generateStaticParams() {
+  return [];
+}
+
+export const revalidate = 86400;
+
+/** How long this render may be served, from what it shows. */
+function gestureCacheWindow(
+  gesture: GestureInfo | null | undefined,
+  liveCycle: number | null | undefined,
+): CacheWindow {
+  if (!gesture) return 'pending';
+  const cycle = gesture.RoundNum;
+  if (typeof liveCycle !== 'number' || typeof cycle !== 'number') return 'live';
+  return cycle < liveCycle ? 'final' : 'live';
+}
 
 export default async function Page({ params }: PageProps) {
   const { locale, id } = await params;
@@ -74,6 +97,7 @@ export default async function Page({ params }: PageProps) {
     gestureId >= 0 ? readGesture(gestureId) : null,
     seedsDisabled() ? null : readDashboard(),
   ]);
+  await capCacheWindow(gestureCacheWindow(gesture?.data, dashboard?.data?.CurRoundNum));
   return (
     <PageMessages namespaces={['detail', 'gesture', 'tables']}>
       {/* The live cycle decides the record's trail and cycle link; the record is its own seed. */}

@@ -2,6 +2,7 @@ import type { Metadata, ResolvingMetadata } from 'next';
 import { notFound } from 'next/navigation';
 import { getTranslations, setRequestLocale } from 'next-intl/server';
 
+import { capCacheWindow } from '@/lib/cacheWindow';
 import { createPageMetadata } from '@/utils/seo';
 import { PageMessages } from '@/components/i18n/PageMessages';
 
@@ -36,9 +37,17 @@ export async function generateMetadata(
   );
 }
 
-// Dynamic-param pages render on demand; revalidate keeps live protocol data
-// fresh instead of freezing the first render forever (see route-group refactor).
-export const revalidate = 300;
+/**
+ * No action renders at build time: each record renders on its first visit
+ * and is then served from the cache. A released anchor's record is final
+ * and keeps a day (`CACHE_WINDOW.final`); one still held keeps five minutes,
+ * and a missing record or a failed read a minute (`readAnchorActionSeeds`).
+ */
+export function generateStaticParams() {
+  return [];
+}
+
+export const revalidate = 86400;
 
 /**
  * One anchor action's public record. The segments are validated first (the
@@ -50,9 +59,11 @@ export default async function Page({ params }: PageProps) {
   setRequestLocale(locale);
   const parsed = parseAnchorActionParams(IsRwalk, actionId);
   if (parsed === null) notFound();
+  const { seeds, cacheWindow } = await readAnchorActionSeeds(parsed);
+  await capCacheWindow(cacheWindow);
   return (
     <PageMessages namespaces={['anchoring', 'tables', 'traits']}>
-      <QuerySeed seeds={await readAnchorActionSeeds(parsed)}>
+      <QuerySeed seeds={seeds}>
         <AnchorActionDetailPage IsRwalk={parsed.isRwalk} actionId={parsed.actionId} />
       </QuerySeed>
     </PageMessages>

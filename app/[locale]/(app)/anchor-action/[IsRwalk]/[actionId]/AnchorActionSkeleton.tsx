@@ -3,10 +3,10 @@ import { useTranslations } from 'next-intl';
 import { Skeleton, SkeletonArtPlate } from '@/components/ui/skeleton';
 
 /**
- * An anchor action's record while it loads: the plate and its wall label at
+ * An anchor action's record while the browser reads it (the server's read
+ * failed, or the e2e harness mocks the API): the plate and its wall label at
  * the start (7 of 12 columns from `lg`), the spec rows and the timeline
- * beside it. The route's `loading.tsx` and the page's own loading state draw
- * this same shape, so a navigation fills in without moving.
+ * beside it, the record's own shape, so it fills in without moving.
  */
 export function AnchorActionSkeleton() {
   const t = useTranslations('common');

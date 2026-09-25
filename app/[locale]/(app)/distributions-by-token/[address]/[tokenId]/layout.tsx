@@ -10,8 +10,7 @@ interface LayoutProps {
 
 /**
  * Rejects a segment that is not an address or a canonical token id before
- * the page's loading boundary starts streaming: a `notFound()` thrown under
- * `loading.tsx` arrives after the 200 status, a soft 404.
+ * the page renders, so it is a 404 and never a page for a made-up token.
  */
 export default async function TokenDistributionGuard({ children, params }: LayoutProps) {
   const { address, tokenId } = await params;

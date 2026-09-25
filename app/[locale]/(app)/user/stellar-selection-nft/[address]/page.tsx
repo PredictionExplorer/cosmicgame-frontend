@@ -2,6 +2,7 @@ import { Suspense } from 'react';
 import type { Metadata, ResolvingMetadata } from 'next';
 import { getTranslations, setRequestLocale } from 'next-intl/server';
 
+import { capCacheWindow } from '@/lib/cacheWindow';
 import { createPageMetadata } from '@/utils/seo';
 import { get_raffle_nft_winnings_by_user } from '@/services/api/stellarSelection';
 import { PageMessages } from '@/components/i18n/PageMessages';
@@ -30,8 +31,15 @@ export async function generateMetadata(
   );
 }
 
-// Dynamic-param pages render on demand; revalidate keeps live protocol data
-// fresh instead of freezing the first render forever (see route-group refactor).
+/**
+ * No participant's page renders at build time: each renders on its first visit and is
+ * then served from the cache for five minutes (`CACHE_WINDOW.live`: each cycle may add a selection),
+ * or a minute when its reads failed.
+ */
+export function generateStaticParams() {
+  return [];
+}
+
 export const revalidate = 300;
 
 /**
@@ -69,6 +77,7 @@ export default async function Page({
   setRequestLocale(locale);
   const address = participantAddress(rawAddress);
   const { seeds, artSeeds } = await readSelections(address);
+  if (seeds.length === 0) await capCacheWindow('pending');
   return (
     <PageMessages namespaces={['detail', 'glossary', 'myPages', 'statistics', 'tables', 'traits']}>
       <QuerySeed seeds={seeds}>

@@ -1,6 +1,7 @@
 import type { Metadata, ResolvingMetadata } from 'next';
 import { getTranslations, setRequestLocale } from 'next-intl/server';
 
+import { capCacheWindow } from '@/lib/cacheWindow';
 import { createPageMetadata } from '@/utils/seo';
 import { PageMessages } from '@/components/i18n/PageMessages';
 import {
@@ -34,8 +35,16 @@ export async function generateMetadata(
   );
 }
 
-// Dynamic-param pages render on demand; revalidate keeps live protocol data
-// fresh instead of freezing the first render forever (see route-group refactor).
+/**
+ * No history renders at build time: each address's renders on its first
+ * visit and is then served from the cache for five minutes
+ * (`CACHE_WINDOW.live`: a history grows with every transfer), or a minute
+ * when its read failed.
+ */
+export function generateStaticParams() {
+  return [];
+}
+
 export const revalidate = 300;
 
 export default async function Page({ params }: PageProps) {
@@ -43,6 +52,7 @@ export default async function Page({ params }: PageProps) {
   setRequestLocale(locale);
   // The history's first read, so the ledger is in the HTML (no layout shift).
   const seeds = seedsDisabled() ? [] : await readTransferHistorySeed('nft', address);
+  if (seeds.length === 0) await capCacheWindow('pending');
   return (
     <PageMessages namespaces={['myPages', 'tables']}>
       <QuerySeed seeds={seeds}>

@@ -18,6 +18,11 @@ jest.mock('../../publicDataReads', () => ({
   readDashboard: () => mockDashboardRead(),
 }));
 
+const mockCapCacheWindow = jest.fn();
+jest.mock('@/lib/cacheWindow', () => ({
+  capCacheWindow: (window: string) => mockCapCacheWindow(window),
+}));
+
 jest.mock('../[id]/GesturePage', () => ({
   __esModule: true,
   default: function GesturePage() {
@@ -136,7 +141,7 @@ describe('gesture/[id] page', () => {
 });
 
 describe('gesture/[id] layout', () => {
-  // Before the loading boundary streams, so the response is a real 404.
+  // Before the page renders, so the response is a real 404.
   it.each(['abc', '12abc', '-3', '1.5'])('answers %s with not found', async (id) => {
     await expect(
       GestureLayout({ children: 'page', params: Promise.resolve({ id }) }),
@@ -163,5 +168,42 @@ describe('gesture/[id] seed', () => {
     mockGestureRead.mockRejectedValue(new Error('offline'));
     const seeds = renderedSeeds(await Page(props('40001')));
     expect(seeds?.[0]?.absent).toBe(false);
+  });
+});
+
+describe('gesture/[id] cache window', () => {
+  beforeEach(() => {
+    mockGestureRead.mockReset();
+    mockCapCacheWindow.mockReset();
+    mockDashboardRead.mockReset();
+    mockDashboardRead.mockResolvedValue({ data: { CurRoundNum: 3 }, at: 0 });
+  });
+
+  it('keeps a gesture of a finalized cycle for a day: nothing on it changes', async () => {
+    mockGestureRead.mockResolvedValue({ BidPosition: 1135, RoundNum: 2 });
+    await Page(props('29434'));
+    expect(mockCapCacheWindow).toHaveBeenCalledWith('final');
+  });
+
+  it('keeps a gesture of the live cycle five minutes: its trail changes when it finalizes', async () => {
+    mockGestureRead.mockResolvedValue({ BidPosition: 12, RoundNum: 3 });
+    await Page(props('29500'));
+    expect(mockCapCacheWindow).toHaveBeenCalledWith('live');
+  });
+
+  it('keeps five minutes when the live cycle could not be read', async () => {
+    mockDashboardRead.mockResolvedValue({ data: null, at: 0 });
+    mockGestureRead.mockResolvedValue({ BidPosition: 1135, RoundNum: 2 });
+    await Page(props('29434'));
+    expect(mockCapCacheWindow).toHaveBeenCalledWith('live');
+  });
+
+  it.each([
+    ['a record the API does not hold yet', new ApiReadError('Network response was not OK', 400)],
+    ['a read that failed', new Error('offline')],
+  ])('keeps %s a minute', async (_case, error) => {
+    mockGestureRead.mockRejectedValue(error);
+    await Page(props('40000'));
+    expect(mockCapCacheWindow).toHaveBeenCalledWith('pending');
   });
 });

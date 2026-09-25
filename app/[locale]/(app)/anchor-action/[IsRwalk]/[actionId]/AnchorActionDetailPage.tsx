@@ -31,11 +31,7 @@ import {
 } from '@/components/anchoring/anchorLinks';
 
 import { AnchorActionSkeleton } from './AnchorActionSkeleton';
-
-/** A release record exists once the indexer has seen its event. */
-function isReleased(release: AnchorAction | null | undefined): release is AnchorAction {
-  return Boolean(release?.EvtLogId);
-}
+import { isReleased } from './anchorRelease';
 
 /**
  * The public record of one anchor action: its status under the title, the

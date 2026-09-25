@@ -4,6 +4,7 @@ import { getTranslations, setRequestLocale } from 'next-intl/server';
 
 import { parseCanonicalNonNegativeSafeInteger } from '@/utils';
 
+import { capCacheWindow } from '@/lib/cacheWindow';
 import { createMetadata } from '@/utils/seo';
 import { PageMessages } from '@/components/i18n/PageMessages';
 
@@ -31,9 +32,18 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   );
 }
 
-// Dynamic-param pages render on demand; revalidate keeps live protocol data
-// fresh instead of freezing the first render forever (see route-group refactor).
-export const revalidate = 300;
+/**
+ * No cycle renders at build time: each record renders on its first visit and
+ * is then served from the cache. A finalized cycle's record never changes,
+ * so its render keeps a day (`CACHE_WINDOW.final`); the newest one keeps
+ * five minutes (its pager gains the next cycle when that finalizes), and a
+ * cycle with no record yet, or a failed read, a minute (`readCycleRecord`).
+ */
+export function generateStaticParams() {
+  return [];
+}
+
+export const revalidate = 86400;
 
 /**
  * A finalized cycle's record. The server reads the record, the cycle list and
@@ -47,7 +57,8 @@ export default async function Page({ params }: PageProps) {
   if (cycleId === null) notFound();
 
   setRequestLocale(locale);
-  const { seeds, roleSeeds } = await readCycleRecord(cycleId);
+  const { seeds, roleSeeds, cacheWindow } = await readCycleRecord(cycleId);
+  await capCacheWindow(cacheWindow);
   return (
     <PageMessages
       namespaces={[

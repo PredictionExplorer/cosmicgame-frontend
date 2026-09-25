@@ -10,8 +10,7 @@ interface LayoutProps {
 
 /**
  * Rejects a collection flag or action id that is not canonical before the
- * page's loading boundary starts streaming: a `notFound()` thrown under
- * `loading.tsx` arrives after the 200 status, a soft 404.
+ * page renders, so it is a 404 and never a record page for a made-up id.
  */
 export default async function AnchorActionGuard({ children, params }: LayoutProps) {
   const { IsRwalk, actionId } = await params;

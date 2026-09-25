@@ -46,7 +46,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
  * The route has no loading boundary: a `loading.tsx` gets no params, so any
  * translated copy in it reads the locale from the request headers, and a
  * route rendered on demand for the cache cannot read headers (every profile
- * answered 500). See `isrLoadingBoundaries.test.ts`.
+ * answered 500). See `record-route-caching.test.ts`.
  */
 export function generateStaticParams() {
   return [];

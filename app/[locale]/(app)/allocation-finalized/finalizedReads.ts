@@ -2,10 +2,11 @@ import { cache } from 'react';
 import { unstable_cache } from 'next/cache';
 
 import { ApiReadError, isRecordNotFound } from '@/services/api/readError';
-import { get_round_info } from '@/services/api/rounds';
+import { get_round_info, get_round_list } from '@/services/api/rounds';
 import { get_cst_info } from '@/services/api/tokens';
+import type { CSTTokenInfo, RoundInfo } from '@/services/api/types';
 
-import { readRoundList } from '../publicDataReads';
+import { readRoundList, type TimedRead } from '../publicDataReads';
 import { seedsDisabled, type QuerySeedEntry } from '../QuerySeed';
 
 /** A finalized cycle's record never changes. */
@@ -13,27 +14,61 @@ const RECORD_SECONDS = 300;
 /** A Signature may be named after its cycle, so its token read is kept for a minute. */
 const TOKEN_SECONDS = 60;
 
+/** A read that answered, and when (epoch ms). */
+interface Timed<T> {
+  data: T;
+  at: number;
+}
+
 /**
- * A finalized cycle's record, shared across requests (the route is dynamic, so
- * every visit would otherwise read it again). No record is not an answer to
+ * The reads behind one cycle's record. `record` rejects with a not-found
+ * `ApiReadError` for a cycle the API holds no record of.
+ */
+export interface CycleRecordReaders {
+  record: (cycle: number) => Promise<Timed<RoundInfo>>;
+  token: (tokenId: number) => Promise<Timed<CSTTokenInfo | null>>;
+  rounds: () => Promise<TimedRead<RoundInfo[]>>;
+}
+
+async function readRecordNow(cycle: number): Promise<Timed<RoundInfo>> {
+  const round = await get_round_info(cycle);
+  if (!round) throw new ApiReadError('No record for this cycle', 404);
+  return { data: round, at: Date.now() };
+}
+
+/**
+ * The reads made at the moment of the render, for a page that is itself
+ * cached (ISR): its render is the cache, and a cached read inside it would
+ * only cut its cache window to the read's own.
+ */
+export const directCycleReaders: CycleRecordReaders = {
+  record: readRecordNow,
+  token: async (tokenId) => ({ data: await get_cst_info(tokenId), at: Date.now() }),
+  // Once per render: the missing-cycle seeds and the page's neighbours share it.
+  rounds: cache(async () => {
+    try {
+      return { data: await get_round_list(), at: Date.now() };
+    } catch {
+      return { data: null, at: Date.now() };
+    }
+  }),
+};
+
+/**
+ * The reads shared across requests, for a page rendered on every request
+ * (the query decides /allocation-finalized): every visit within the window
+ * shares one answer instead of reading again. No record is not an answer to
  * keep: the cycle may be finalized, or indexed, a moment from now.
  */
-const readRecord = unstable_cache(
-  async (cycle: number) => {
-    const round = await get_round_info(cycle);
-    if (!round) throw new ApiReadError('No record for this cycle', 404);
-    return { data: round, at: Date.now() };
-  },
-  ['allocation-finalized', 'record'],
-  { revalidate: RECORD_SECONDS },
-);
-
-/** The cycle's Signature (its name and seed), shared across requests. */
-const readToken = unstable_cache(
-  async (tokenId: number) => ({ data: await get_cst_info(tokenId), at: Date.now() }),
-  ['allocation-finalized', 'token'],
-  { revalidate: TOKEN_SECONDS },
-);
+const sharedCycleReaders: CycleRecordReaders = {
+  record: unstable_cache(readRecordNow, ['allocation-finalized', 'record'], {
+    revalidate: RECORD_SECONDS,
+  }),
+  token: unstable_cache(directCycleReaders.token, ['allocation-finalized', 'token'], {
+    revalidate: TOKEN_SECONDS,
+  }),
+  rounds: readRoundList,
+};
 
 /**
  * The server reads behind one finalized cycle's page, keyed like the client
@@ -52,14 +87,17 @@ const readToken = unstable_cache(
  * Nothing is read under the e2e harness, whose seeds are off (the browser
  * mocks win there).
  */
-export const readFinalizedCycleSeeds = cache(async (cycle: number): Promise<QuerySeedEntry[]> => {
+export async function cycleRecordSeeds(
+  cycle: number,
+  readers: CycleRecordReaders,
+): Promise<QuerySeedEntry[]> {
   if (seedsDisabled()) return [];
-  let record: Awaited<ReturnType<typeof readRecord>>;
+  let record: Timed<RoundInfo>;
   try {
-    record = await readRecord(cycle);
+    record = await readers.record(cycle);
   } catch (error) {
     if (!isRecordNotFound(error)) return [];
-    const rounds = await readRoundList();
+    const rounds = await readers.rounds();
     return [
       { queryKey: ['roundInfo', cycle], data: null, at: Date.now(), absent: true },
       { queryKey: ['roundList'], data: rounds.data, at: rounds.at },
@@ -71,11 +109,16 @@ export const readFinalizedCycleSeeds = cache(async (cycle: number): Promise<Quer
   const tokenId = record.data.TokenId;
   if (typeof tokenId === 'number' && tokenId >= 0) {
     try {
-      const token = await readToken(tokenId);
+      const token = await readers.token(tokenId);
       seeds.push({ queryKey: ['cstInfo', tokenId], data: token.data, at: token.at });
     } catch {
       // The plate draws from the record's own seed; the client reads the name.
     }
   }
   return seeds;
-});
+}
+
+/** {@link cycleRecordSeeds} with the reads shared across requests, once per render. */
+export const readFinalizedCycleSeeds = cache(
+  (cycle: number): Promise<QuerySeedEntry[]> => cycleRecordSeeds(cycle, sharedCycleReaders),
+);

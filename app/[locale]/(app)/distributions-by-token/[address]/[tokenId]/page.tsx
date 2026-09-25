@@ -3,6 +3,7 @@ import { notFound } from 'next/navigation';
 import { getTranslations, setRequestLocale } from 'next-intl/server';
 
 import { formatId } from '@/utils/format/ids';
+import { capCacheWindow } from '@/lib/cacheWindow';
 import { createPageMetadata } from '@/utils/seo';
 import { PageMessages } from '@/components/i18n/PageMessages';
 
@@ -37,8 +38,15 @@ export async function generateMetadata(
   );
 }
 
-// Dynamic-param pages render on demand; revalidate keeps live protocol data
-// fresh instead of freezing the first render forever (see route-group refactor).
+/**
+ * No token's page renders at build time: each renders on its first visit and is
+ * then served from the cache for five minutes (`CACHE_WINDOW.live`: an anchored NFT gains a distribution each cycle),
+ * or a minute when its reads failed.
+ */
+export function generateStaticParams() {
+  return [];
+}
+
 export const revalidate = 300;
 
 /**
@@ -53,9 +61,13 @@ export default async function Page({ params }: PageProps) {
   const parsed = parseTokenDistributionParams(rawAddress, rawTokenId);
   if (parsed === null) notFound();
   const { address, tokenId } = parsed;
+  const seeds = await readTokenDistributionSeeds(address, tokenId);
+  if (seeds.length === 0 || seeds.some((seed) => seed.data === null)) {
+    await capCacheWindow('pending');
+  }
   return (
     <PageMessages namespaces={['anchoring', 'tables']}>
-      <QuerySeed seeds={await readTokenDistributionSeeds(address, tokenId)}>
+      <QuerySeed seeds={seeds}>
         <RewardsByTokenPage address={address} tokenId={tokenId} />
       </QuerySeed>
     </PageMessages>

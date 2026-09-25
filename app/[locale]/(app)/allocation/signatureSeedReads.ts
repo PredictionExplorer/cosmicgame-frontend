@@ -1,4 +1,4 @@
-import { unstable_cache } from 'next/cache';
+import { cache } from 'react';
 
 import { get_cst_list } from '@/services/api/tokens';
 
@@ -13,31 +13,29 @@ export interface SignatureSeedEntry {
 export type SignatureSeedMap = Readonly<Record<string, SignatureSeedEntry>>;
 
 /**
- * Every imprinted Signature's seed and name by token id, shared across
- * requests for a minute: one collection read serves every page that draws a
- * handful of Signatures on the server (a cycle's recipients, a participant's
- * Stellar Selection NFTs), instead of a token read per plate, each of which
- * embeds its cycle's whole record.
+ * Every imprinted Signature's seed and name by token id, read once per
+ * render: one collection read serves a page that draws a handful of
+ * Signatures on the server (a cycle's recipients, a participant's Stellar
+ * Selection NFTs), instead of a token read per plate, each of which embeds
+ * its cycle's whole record. Those pages are cached renders (ISR), so the read
+ * is not cached again across requests: a cached read would cut the page's
+ * cache window to its own (`lib/cacheWindow`).
  */
-const readAllSignatureSeeds = unstable_cache(
-  async (): Promise<Record<string, SignatureSeedEntry>> => {
-    const entries: Record<string, SignatureSeedEntry> = {};
-    for (const token of await get_cst_list()) {
-      const seed = token.Seed;
-      if (
-        typeof token.TokenId !== 'number' ||
-        (typeof seed !== 'string' && typeof seed !== 'number')
-      ) {
-        continue;
-      }
-      const name = typeof token.TokenName === 'string' ? token.TokenName.trim() : '';
-      entries[String(token.TokenId)] = name ? { seed, name } : { seed };
+const readAllSignatureSeeds = cache(async (): Promise<Record<string, SignatureSeedEntry>> => {
+  const entries: Record<string, SignatureSeedEntry> = {};
+  for (const token of await get_cst_list()) {
+    const seed = token.Seed;
+    if (
+      typeof token.TokenId !== 'number' ||
+      (typeof seed !== 'string' && typeof seed !== 'number')
+    ) {
+      continue;
     }
-    return entries;
-  },
-  ['signature-seeds'],
-  { revalidate: 60 },
-);
+    const name = typeof token.TokenName === 'string' ? token.TokenName.trim() : '';
+    entries[String(token.TokenId)] = name ? { seed, name } : { seed };
+  }
+  return entries;
+});
 
 /**
  * The seeds (and names) of the given Signatures, for a page's first HTML:

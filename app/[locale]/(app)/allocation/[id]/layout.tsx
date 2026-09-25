@@ -10,9 +10,9 @@ interface LayoutProps {
 
 /**
  * Rejects a cycle id that is not canonical (`-1`, `01`, `1.5`) before the
- * page's loading boundary starts streaming: a `notFound()` thrown under
- * `loading.tsx` arrives after the 200 status has been sent, which makes a
- * soft 404 with an indexable self-canonical.
+ * page renders, so it is never a soft 404 with an indexable self-canonical.
+ * proxy.ts answers the same ids first, with the server-rendered global 404
+ * (lib/paramRoutes.ts mirrors this test).
  */
 export default async function CycleIdGuard({ children, params }: LayoutProps) {
   const { id } = await params;

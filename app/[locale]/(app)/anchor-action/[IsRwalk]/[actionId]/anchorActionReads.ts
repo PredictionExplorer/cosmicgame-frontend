@@ -1,5 +1,6 @@
 import { cache } from 'react';
 
+import type { CacheWindow } from '@/lib/cacheWindow';
 import {
   get_staking_cst_actions_info,
   get_staking_rwalk_actions_info,
@@ -8,11 +9,23 @@ import { get_cst_info } from '@/services/api/tokens';
 
 import { seedsDisabled, type QuerySeedEntry } from '../../../QuerySeed';
 
+import { isReleased } from './anchorRelease';
 import type { AnchorActionParams } from './params';
 
 /** The client hook's query key for one action's record, by collection. */
 export function anchorActionQueryKey({ isRwalk, actionId }: AnchorActionParams) {
   return [isRwalk ? 'stakingRWLKActionsInfo' : 'stakingCSTActionsInfo', actionId] as const;
+}
+
+export interface AnchorActionRead {
+  /** The client queries the first HTML renders from. */
+  seeds: QuerySeedEntry[];
+  /**
+   * How long the render may be served (`lib/cacheWindow`): a released
+   * anchor's record is final, one still held changes when it is released,
+   * and a missing record or a failed read may be answered a minute from now.
+   */
+  cacheWindow: CacheWindow;
 }
 
 /**
@@ -26,14 +39,14 @@ export function anchorActionQueryKey({ isRwalk, actionId }: AnchorActionParams) 
  * too. A failed read seeds nothing; nothing is read under the e2e harness.
  */
 export const readAnchorActionSeeds = cache(
-  async (params: AnchorActionParams): Promise<QuerySeedEntry[]> => {
-    if (seedsDisabled()) return [];
+  async (params: AnchorActionParams): Promise<AnchorActionRead> => {
+    if (seedsDisabled()) return { seeds: [], cacheWindow: 'pending' };
     const read = params.isRwalk ? get_staking_rwalk_actions_info : get_staking_cst_actions_info;
     let info: Awaited<ReturnType<typeof read>>;
     try {
       info = await read(params.actionId);
     } catch {
-      return [];
+      return { seeds: [], cacheWindow: 'pending' };
     }
     const seeds: QuerySeedEntry[] = [
       { queryKey: [...anchorActionQueryKey(params)], data: info, at: Date.now(), absent: !info },
@@ -47,6 +60,11 @@ export const readAnchorActionSeeds = cache(
         // The plate reads its seed on the client.
       }
     }
-    return seeds;
+    const cacheWindow: CacheWindow = !info?.Stake
+      ? 'pending'
+      : isReleased(info.Unstake)
+        ? 'final'
+        : 'live';
+    return { seeds, cacheWindow };
   },
 );
