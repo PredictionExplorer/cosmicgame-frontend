@@ -341,10 +341,21 @@ describe('ExperimentalHomePage', () => {
 
     const header = screen.getByTestId('home-deck-header');
     expect(
-      within(header).getByRole('heading', { level: 1, name: 'home.deck.title' }),
+      within(header).getByRole('heading', { level: 1, name: 'home.deck.artViewTitle' }),
     ).toBeInTheDocument();
+    expect(within(header).getByText('home.deck.artViewIntro')).toBeInTheDocument();
     expect(within(header).getByText('home.hero.cycleNumber(number=5)')).toBeInTheDocument();
-    expect(within(header).getByTestId('experimental-ui-return')).toHaveAttribute('href', '/');
+    // V214: a preview names itself, says so beside the cycle, and offers a
+    // way back and a way to send feedback.
+    expect(within(header).getByTestId('experimental-ui-preview')).toHaveTextContent(
+      'home.deck.previewBadge',
+    );
+    const back = within(header).getByTestId('experimental-ui-return');
+    expect(back).toHaveAttribute('href', '/');
+    expect(back).toHaveTextContent('home.deck.backToObservatory');
+    const feedback = within(header).getByTestId('experimental-ui-feedback');
+    expect(feedback).toHaveAttribute('href', expect.stringMatching(/^https:\/\/discord\.gg\//));
+    expect(feedback).toHaveAttribute('target', '_blank');
     // One link in the phone action row, one in the related row from sm; CSS
     // shows exactly one of them at every width.
     const newHere = within(header).getAllByRole('link', { name: /home\.deck\.newHere/ });
@@ -354,7 +365,7 @@ describe('ExperimentalHomePage', () => {
     expect(screen.getAllByRole('heading', { level: 1 })).toHaveLength(1);
   });
 
-  it('draws the bell in the same control shape as "Return to current UI"', () => {
+  it('draws the bell in the same control shape as "Back to the Observatory"', () => {
     renderPage();
 
     // The menu's own round shape and faint edge give way to the control

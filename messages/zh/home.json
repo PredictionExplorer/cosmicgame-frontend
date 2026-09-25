@@ -496,8 +496,11 @@
     "intro": "用 ETH 或 CST 落笔，成为最新落笔者。倒计时归零后，最新落笔者可收官并获得签名分配。",
     "newHere": "初来乍到？了解运作方式",
     "howItWorks": "了解运作方式",
-    "experimentalUi": "实验界面",
-    "returnToCurrent": "返回当前界面",
+    "artViewTitle": "观测台艺术视图",
+    "artViewIntro": "这是观测台的预览版，以艺术为先：一枚签名作品在时钟旁动态呈现，所有分配轨道逐一列出。时钟、实时席位与落笔表单使用同样的实时数据。",
+    "previewBadge": "预览",
+    "backToObservatory": "返回观测台",
+    "shareFeedback": "提交反馈",
     "monument": {
       "reserveLabel": "签名分配",
       "extras": {

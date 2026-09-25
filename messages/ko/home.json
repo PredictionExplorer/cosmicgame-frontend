@@ -496,8 +496,11 @@
     "intro": "ETH 또는 CST로 제스처를 남기면 가장 최근 참여자가 됩니다. 시간이 끝나면 최근 참여자가 사이클을 마감하고 시그니처 배분을 받을 수 있습니다.",
     "newHere": "처음이신가요? 작동 원리",
     "howItWorks": "작동 원리",
-    "experimentalUi": "실험적 UI",
-    "returnToCurrent": "기존 UI로 돌아가기",
+    "artViewTitle": "관측소 아트 뷰",
+    "artViewIntro": "예술을 앞세운 관측소 미리 보기입니다. 시계 옆에서 시그니처 작품이 움직이고, 모든 배분 경로가 목록으로 표시됩니다. 시계, 실시간 현황, 제스처 양식은 같은 실시간 데이터로 동작합니다.",
+    "previewBadge": "미리 보기",
+    "backToObservatory": "관측소로 돌아가기",
+    "shareFeedback": "의견 보내기",
     "monument": {
       "reserveLabel": "시그니처 배분",
       "extras": {

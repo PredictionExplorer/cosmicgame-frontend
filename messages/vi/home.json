@@ -496,8 +496,11 @@
     "intro": "Đặt nét bút bằng ETH hoặc CST để trở thành người tham gia gần nhất. Khi đếm ngược về 0, người tham gia gần nhất có thể hoàn tất chu kỳ và nhận phân bổ Signature.",
     "newHere": "Mới đến đây? Cách hoạt động",
     "howItWorks": "Cách hoạt động",
-    "experimentalUi": "Giao diện thử nghiệm",
-    "returnToCurrent": "Quay về giao diện hiện tại",
+    "artViewTitle": "Chế độ nghệ thuật của Đài quan sát",
+    "artViewIntro": "Bản xem trước của Đài quan sát, đặt nghệ thuật lên hàng đầu: một tác phẩm Signature chuyển động bên cạnh đồng hồ, và mọi luồng phân bổ được liệt kê. Đồng hồ, thứ hạng trực tiếp và biểu mẫu nét bút dùng cùng dữ liệu trực tiếp.",
+    "previewBadge": "Bản xem trước",
+    "backToObservatory": "Quay về Đài quan sát",
+    "shareFeedback": "Gửi góp ý",
     "monument": {
       "reserveLabel": "Phân bổ Signature",
       "extras": {

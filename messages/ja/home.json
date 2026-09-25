@@ -496,8 +496,11 @@
     "intro": "ETHまたはCSTで一筆を入れると最新の参加者になります。時計がゼロになると、最新の参加者がサイクルを確定してシグネチャー配分を受け取れます。",
     "newHere": "初めてですか？仕組みを見る",
     "howItWorks": "仕組みを見る",
-    "experimentalUi": "実験的なUI",
-    "returnToCurrent": "現在のUIに戻る",
+    "artViewTitle": "観測所のアートビュー",
+    "artViewIntro": "アートを主役にした観測所のプレビューです。時計の隣でシグネチャー作品が動き、すべての配分トラックが一覧で表示されます。時計、ライブ順位、一筆のフォームは同じライブデータで動作します。",
+    "previewBadge": "プレビュー",
+    "backToObservatory": "観測所に戻る",
+    "shareFeedback": "フィードバックを送る",
     "monument": {
       "reserveLabel": "シグネチャー配分",
       "extras": {

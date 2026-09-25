@@ -11,8 +11,10 @@ import { Link } from '@/i18n/navigation';
 import { reportError } from '@/utils/errors';
 import { useNotify } from '@/hooks/useNotify';
 import { PageHeader } from '@/components/layout/PageHeader';
+import { SiteLink } from '@/components/layout/SiteLink';
 import { useSiteNavCopy } from '@/components/layout/siteNavCopy';
 import { AttentionMenu } from '@/components/ui/attention-menu';
+import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Container } from '@/components/ui/container';
 import { ErrorState } from '@/components/ui/error-state';
@@ -72,6 +74,7 @@ import {
 } from '@/hooks/useApiQuery';
 import { deriveAllocationTrackAmounts } from '@/lib/allocationTracks';
 import { AllocationIcon } from '@/lib/conceptIcons';
+import { OUTBOUND_LINKS } from '@/config/siteNav';
 import { SITE_ROUTE_ICONS } from '@/config/siteNavIcons';
 import { getCycleState, getDashboardActivationTime } from '@/lib/cycleState';
 import { resolveLatestGesture, type LatestParticipantEvidence } from '@/lib/latestGesture';
@@ -106,6 +109,9 @@ const MAX_UNAVAILABLE_SKIPS = 3;
 
 /** Roughly the sticky header: a region counts as gone once it passed under it. */
 const HEADER_ROOT_MARGIN = '-96px 0px 0px 0px';
+
+/** Feedback on the preview goes to the community's Discord. */
+const FEEDBACK_HREF = OUTBOUND_LINKS.find((link) => link.id === 'discord')!.href;
 
 /** The sheet's console heading is the dialog's title: one visible name, not two. */
 function renderSheetTitle({ className, children }: { className: string; children: ReactNode }) {
@@ -776,15 +782,23 @@ const ExperimentalHomePage = ({
           )}
 
           <div data-testid="home-deck-header">
+            {/* A preview of the Observatory, not a second one: its own name, a
+                Preview mark beside the cycle, one lede on what differs, and a
+                way back and a way to say what works. */}
             <PageHeader
               eyebrow={
-                cycleNumber == null
-                  ? t('hero.cycleFallback')
-                  : t('hero.cycleNumber', { number: String(cycleNumber) })
+                <span className="inline-flex flex-wrap items-center gap-x-3 gap-y-1">
+                  {cycleNumber == null
+                    ? t('hero.cycleFallback')
+                    : t('hero.cycleNumber', { number: String(cycleNumber) })}
+                  <Badge tone="accent" size="sm" overline data-testid="experimental-ui-preview">
+                    {t('deck.previewBadge')}
+                  </Badge>
+                </span>
               }
-              title={t('deck.title')}
+              title={t('deck.artViewTitle')}
               titleId="home-deck-title"
-              subtitle={t('deck.intro')}
+              subtitle={t('deck.artViewIntro')}
               // Two sentences: a "Read more" line would hide just one line.
               clampLede={false}
               actions={
@@ -815,10 +829,18 @@ const ExperimentalHomePage = ({
                       className="min-w-0 max-sm:h-auto max-sm:whitespace-normal max-sm:py-2 max-sm:text-center"
                     >
                       <Link href="/" data-testid="experimental-ui-return">
-                        {t('deck.returnToCurrent')}
+                        {t('deck.backToObservatory')}
                       </Link>
                     </Button>
                   </div>
+                  <SiteLink
+                    href={FEEDBACK_HREF}
+                    kind="external"
+                    data-testid="experimental-ui-feedback"
+                    className={`${TOUCH_TARGET_TEXT_LINK_CLASS} link inline-flex items-center gap-1.5 type-body-sm`}
+                  >
+                    {t('deck.shareFeedback')}
+                  </SiteLink>
                 </div>
               }
               // From sm the related link sits in the header's own row.

@@ -21,7 +21,7 @@ const routes = [
   { path: '/', label: 'Home' },
   {
     path: '/experimental-ui?uxScenario=live-mid-cycle',
-    label: 'Experimental UI',
+    label: 'Observatory art view',
   },
   { path: '/allocation', label: 'Allocation' },
   { path: '/gallery', label: 'Gallery' },

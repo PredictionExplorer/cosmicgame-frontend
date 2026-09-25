@@ -10,8 +10,8 @@
     "descriptionWithReserve": "Cosmic Signature는 Arbitrum 위의 절차적 온체인 아트 프로토콜입니다. 퍼포먼스 사이클 동안 제스처를 남기면, 사이클이 마감될 때 {reserve} 규모의 사이클 준비금이 Protocol Guild를 포함한 여러 배분 경로로 배분됩니다."
   },
   "experimentalUi": {
-    "title": "실험적 UI",
-    "description": "같은 실시간 프로토콜 데이터와 작업을 담은 Cosmic Signature 사이클의 실험적 인터페이스를 살펴볼 수 있습니다."
+    "title": "관측소 아트 뷰",
+    "description": "예술을 앞세운 Cosmic Signature 관측소 미리 보기로, 같은 실시간 사이클 데이터와 기능을 제공합니다."
   },
   "gallery": {
     "title": "갤러리: 결정론적 삼체 NFT 아트",

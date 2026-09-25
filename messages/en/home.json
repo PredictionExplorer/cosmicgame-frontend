@@ -496,8 +496,11 @@
     "intro": "Make a gesture with ETH or CST to become the latest participant. After the clock reaches zero, the latest participant can finalize and receive the Signature Allocation.",
     "newHere": "New here? How it works",
     "howItWorks": "How it works",
-    "experimentalUi": "Experimental UI",
-    "returnToCurrent": "Return to current UI",
+    "artViewTitle": "Observatory art view",
+    "artViewIntro": "A preview of the Observatory that puts the art first: a Signature plays beside the clock, and every allocation track is listed. The clock, standings and gesture form run on the same live data.",
+    "previewBadge": "Preview",
+    "backToObservatory": "Back to the Observatory",
+    "shareFeedback": "Share feedback",
     "monument": {
       "reserveLabel": "Signature Allocation",
       "extras": {
