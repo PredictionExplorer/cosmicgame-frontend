@@ -66,6 +66,13 @@ jobs:
       - name: Build
         run: npm run build
 
+      # The resolved <head> of every prerendered page: og:image, og:url,
+      # twitter:site and the other fields a shallow metadata merge can drop.
+      # The pre-push hook runs it too, but a push with --no-verify or a PR
+      # from a machine without husky reaches only this job.
+      - name: Enforce share metadata
+        run: npm run seo:share-check
+
       - name: Enforce app-home bundle budget
         run: npm run bundle:budget
 
