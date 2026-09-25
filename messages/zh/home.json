@@ -274,6 +274,7 @@
       "title": "你的 Random Walk NFT",
       "connect": "连接钱包后，即可列出其中的 Random Walk NFT。",
       "error": "未能读取此钱包的 Random Walk NFT，请稍后重试。",
+      "linkedUnavailable": "Random Walk NFT #{tokenId} 不在此钱包中，或已用于落笔，因此未被选中。",
       "tooltip": "ETH 落笔附加一枚 Random Walk NFT，落笔价格即减半。每枚 NFT 仅可使用一次。"
     },
     "cstTrade": "缺少 CST？可通过 Uniswap 在 Arbitrum 上用 ETH 兑换 CST。",
@@ -298,7 +299,7 @@
     "advanced": {
       "title": "高级选项",
       "messageLabel": "留言",
-      "messageOptionalHint": "（选填，至多 {maxLength} 字符）",
+      "messageOptionalHint": "（选填，至多 {maxLength} 字节）",
       "messageTooltip": "留言会出现在落笔留言板中，与这一笔一同记录在链上，并永久保存。",
       "messagePlaceholder": "为这一笔留下一句话…",
       "attachIntro": "可为这一笔附加代币或 NFT，也可调整落笔价格的防碰撞设置。",
@@ -454,6 +455,7 @@
       "showing": "最近 {messages, plural, other {# 条留言}}和 {events, plural, other {# 条周期事件}}",
       "showMore": "显示更多"
     },
+    "invite": "留言随落笔一同上链。",
     "empty": {
       "title": "暂无留言或事件",
       "description": "留言和周期重要事件会显示在这里，最新的排在最前。",
@@ -661,7 +663,6 @@
       "waitingNothing": "无",
       "waitingNfts": "{count, plural, other {# 个 NFT}}",
       "retrieveHint": "在“我的分配”中取回",
-      "connectBody": "连接钱包后，可查看你的位置、本周期你写下了多少笔，以及待取回的分配。",
       "spent": "你本周期已花费",
       "landed": "你的落笔已确认，最新一笔由你写下。"
     }
@@ -704,6 +705,7 @@
     "allocationsTitle": "周期储备如何分配",
     "allocationsDescription": "查看全部分配，包括星选与公共物品。",
     "storyTitle": "周期背后的艺术",
+    "storyDescription": "落笔如何塑造签名、CST 记录的内容，以及分配如何资助公共物品。",
     "methods": {
       "eth": "用 ETH 支付当前落笔价格。",
       "cst": "使用钱包中已有的 CST。实时价格会随时间变化。",

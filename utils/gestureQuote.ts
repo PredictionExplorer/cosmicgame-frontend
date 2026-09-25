@@ -36,6 +36,32 @@ export function ethGestureBaseCost(ethPrice: number, gestureType: string): numbe
     : ethPrice;
 }
 
+/** Fraction digits that give an ETH amount its quote's five significant digits. */
+function quoteFractionDigits(eth: number): number {
+  if (!Number.isFinite(eth) || eth <= 0) return 0;
+  const magnitude = Math.floor(Math.log10(eth));
+  return Math.min(18, Math.max(0, QUOTE_SIGNIFICANT_DIGITS - 1 - magnitude));
+}
+
+/**
+ * A gesture method's ETH cost at the ETH method's precision: the full price
+ * keeps its five significant digits and ETH + Random Walk stops at the same
+ * decimal ("0.10211" beside "0.05105", never "0.051053"), so the two prices
+ * line up wherever they sit together (the method choice, the submit label,
+ * the dock). A round price drops its trailing zeros ("0.01", "0.005"). The
+ * wallet prompt still carries the exact value.
+ */
+export function formatEthMethodQuote(
+  ethPrice: number,
+  gestureType: string,
+  locale: string = 'en',
+): string {
+  return formatNumber(ethGestureBaseCost(ethPrice, gestureType), locale, {
+    maximumFractionDigits: quoteFractionDigits(ethPrice),
+    useGrouping: false,
+  });
+}
+
 /**
  * The ETH the form sends: the Gesture Cost plus the collision buffer. Mirrors the wei math in
  * `useGestureForm` (base × (100 + buffer) / 100, then the RandomWalk reduction).

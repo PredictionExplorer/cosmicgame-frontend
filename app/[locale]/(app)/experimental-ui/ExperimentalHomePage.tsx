@@ -40,7 +40,6 @@ import {
 import { GestureConsole } from '@/components/home/experimental/GestureConsole';
 import { StageArtwork, type StageToken } from '@/components/home/experimental/StageArtwork';
 import { useArtMotionPreference } from '@/components/home/experimental/useArtMotionPreference';
-import { useFocusClearOfDock } from '@/components/home/experimental/useFocusClearOfDock';
 import { AttachedNFTAllocationShowcase } from '@/components/attachments/DonatedNFTPrizeShowcase';
 import type { ArtStatus } from '@/components/ui/art-frame';
 import { useContractAddresses } from '@/contexts/ContractAddressesContext';
@@ -357,7 +356,9 @@ const ExperimentalHomePage = ({
   );
 
   // ── Cycle state ──────────────────────────────────────────────────────
-  const gestureForm = useGestureForm();
+  // Before the cycle's first Gesture the form holds ETH, the only method the
+  // contract accepts then, even if CST was chosen in the previous cycle.
+  const gestureForm = useGestureForm({ firstGesture: data?.LastBidderAddr === zeroAddress });
   const hasCurrentGesture = !!data && data.LastBidderAddr !== zeroAddress;
   // The one champions derivation of the app, seeded with the page clock, so
   // the server HTML and the hydration render show the hold as of the sampled
@@ -638,9 +639,6 @@ const ExperimentalHomePage = ({
     }
     el.focus({ preventScroll: true });
   }, []);
-
-  // Keyboard focus never lands under the dock.
-  useFocusClearOfDock();
 
   // The action dock steps aside while the console itself is on screen; from
   // 1024px it also waits until the monument has scrolled past.

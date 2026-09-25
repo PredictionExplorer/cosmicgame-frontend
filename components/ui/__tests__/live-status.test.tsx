@@ -87,6 +87,35 @@ describe('LiveStatusView', () => {
     ).toBeInTheDocument();
   });
 
+  it.each(['live', 'connecting'] as const)(
+    'keeps a quiet region stamp out of sight while %s',
+    (state) => {
+      const { container } = render(
+        <LiveStatusView state={state} variant="inline" still quietWhenFresh />,
+      );
+      expect(container).toBeEmptyDOMElement();
+    },
+  );
+
+  it.each(['reconnecting', 'delayed', 'offline'] as const)(
+    'shows a quiet region stamp when %s',
+    (state) => {
+      render(<LiveStatusView state={state} ageMs={90_000} variant="inline" still quietWhenFresh />);
+      expect(document.querySelector('[data-live-state]')).toHaveAttribute('data-live-state', state);
+    },
+  );
+
+  it('leaves announcing to the page’s primary indicator when told to', () => {
+    render(<LiveStatusView state="reconnecting" variant="inline" still announce={false} />);
+    // One change, announced once: a secondary stamp owns no live region…
+    expect(screen.queryByRole('status')).not.toBeInTheDocument();
+    expect(document.querySelector('[aria-live]')).toBeNull();
+    // …but still says its state in words to a reader who reaches it.
+    expect(
+      screen.getByText('common.liveStatus.reconnecting', { selector: '.sr-only' }),
+    ).toBeTruthy();
+  });
+
   it('never adds the caveat while the data is live', () => {
     render(<LiveStatusView state="live" variant="chip" clockCaveat />);
     expect(

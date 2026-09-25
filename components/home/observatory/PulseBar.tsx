@@ -33,6 +33,29 @@ export interface PulseBarProps {
 /** Which intro sentence a phase reads: the standing one, or the moment it explains. */
 export type PulseIntro = 'default' | 'openingSoon' | 'waitingFirstGesture' | 'zero';
 
+const BRAND = 'Cosmic Signature';
+
+/**
+ * The title with the brand name kept on one line: a narrow screen breaks
+ * "The Cosmic Signature / Observatory", never "The Cosmic / Signature
+ * Observatory", in every locale that writes the name in Latin letters. The
+ * text (and so the heading's name) is unchanged.
+ */
+export function keepBrandTogether(title: string): ReactNode {
+  const parts = title.split(BRAND);
+  if (parts.length === 1) return title;
+  return parts.flatMap((part, index) =>
+    index === 0
+      ? [part]
+      : [
+          <span key={index} className="whitespace-nowrap">
+            {BRAND}
+          </span>,
+          part,
+        ],
+  );
+}
+
 /**
  * The intro follows the phase: while Gestures run it is the standing
  * sentence (how to take part); before the cycle opens, before its first
@@ -128,8 +151,8 @@ export function PulseBar({
       {/* The H1 and the facts share a line where there is room; the facts
           wrap under the H1 where there is not. */}
       <div className="flex min-w-0 flex-wrap items-center gap-x-6 gap-y-3">
-        <h1 id="home-deck-title" className="type-display-sm min-w-0 text-foreground">
-          {t('deck.title')}
+        <h1 id="home-deck-title" className="type-display-sm min-w-0 text-balance text-foreground">
+          {keepBrandTogether(t('deck.title'))}
         </h1>
         {/* The facts wrap as a list whose dot separators hang in a clipped
             gutter: a dot that would start a wrapped line is cut away, so no

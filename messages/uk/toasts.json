@@ -31,6 +31,7 @@
     "confirmed": "Жест записано. Час завершення циклу подовжено.",
     "validation": {
       "notNftOwner": "Ви не власник цього токена.",
+      "chooseRandomWalkNft": "Виберіть невикористаний Random Walk NFT із цього гаманця.",
       "tokenDecimalsWarning": "Токен не реалізує decimals(); припускаємо 18 знаків після коми.",
       "invalidContractAddress": "Указана адреса не є дійсною адресою контракту.",
       "notErc721": "Долучений NFT-контракт не є контрактом токена ERC-721.",

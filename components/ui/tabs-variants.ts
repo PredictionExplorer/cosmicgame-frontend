@@ -24,10 +24,10 @@ export const tabsListVariants = cva('min-w-0 items-center text-muted-foreground'
 
 /**
  * The segmented control's selected segment as plain classes, for a picker
- * that marks its choice itself (`aria-pressed`, a boolean) rather than
- * through `data-state` or `aria-current`: the raised surface edged by
- * --input, never a --primary rule. The same classes the segmented variant
- * applies (a test keeps them equal).
+ * that marks its choice itself (`aria-pressed` or `aria-checked`, a boolean)
+ * rather than through `data-state="active"` or `aria-current`: the raised
+ * surface edged by --input, never a --primary rule. The same classes the
+ * segmented variant applies (a test keeps them equal).
  */
 export const SEGMENT_SELECTED_CLASS =
   'bg-surface-raised text-foreground shadow-[inset_0_0_0_1px_hsl(var(--input))]';

@@ -274,6 +274,7 @@
       "title": "自分のRandom Walk NFT",
       "connect": "ウォレットを接続すると、保有しているRandom Walk NFTが一覧表示されます。",
       "error": "このウォレットのRandom Walk NFTを読み込めませんでした。しばらくしてからもう一度お試しください。",
+      "linkedUnavailable": "Random Walk NFT #{tokenId}は、このウォレットにないか、すでに一筆に使われているため、選択されていません。",
       "tooltip": "Random Walk NFTをETH一筆に添付すると、一筆の費用が50%引き下げられます。各NFTは一度しか使えません。"
     },
     "cstTrade": "この方法で一筆を入れるにはCSTが必要ですか？Uniswapを通じてArbitrum上でETHをCSTに交換できます。",
@@ -298,7 +299,7 @@
     "advanced": {
       "title": "詳細設定",
       "messageLabel": "メッセージ",
-      "messageOptionalHint": "（任意、{maxLength}文字）",
+      "messageOptionalHint": "（任意、最大{maxLength}バイト）",
       "messageTooltip": "一筆チャットに表示されるメッセージを添えられます。メッセージは一筆とともにオンチェーンに記録され、ブロックチェーン上に永久に残ります。",
       "messagePlaceholder": "一筆に添えるメッセージ…",
       "attachIntro": "一筆にトークンやNFTを添付したり、費用の上乗せ幅を設定したりできます。",
@@ -454,6 +455,7 @@
       "showing": "最新のメッセージ{messages, plural, other {#件}}とサイクルのイベント{events, plural, other {#件}}",
       "showMore": "さらに表示"
     },
+    "invite": "メッセージは一筆と一緒に送られます。",
     "empty": {
       "title": "メッセージやイベントはまだありません",
       "description": "メッセージとサイクルの節目が、新しいものから順にここに表示されます。",
@@ -661,7 +663,6 @@
       "waitingNothing": "なし",
       "waitingNfts": "{count, plural, other {#点のNFT}}",
       "retrieveHint": "「自分の配分」で受け取れます",
-      "connectBody": "ウォレットを接続すると、現在の位置、このサイクルで入れた一筆の数、受け取り待ちの配分を確認できます。",
       "spent": "このサイクルで使った額",
       "landed": "一筆が確定しました。最新の一筆を保持しています。"
     }
@@ -704,6 +705,7 @@
     "allocationsTitle": "サイクルの準備金の行き先",
     "allocationsDescription": "星選と公共財を含むすべての配分を確認できます。",
     "storyTitle": "サイクルから生まれるアート",
+    "storyDescription": "一筆がシグネチャーを形づくる仕組み、CSTが記録するもの、配分が公共財を支える流れを紹介します。",
     "methods": {
       "eth": "現在の一筆の費用をETHで支払います。",
       "cst": "ウォレット内のCSTを使います。現在のコストは時間とともに変わります。",

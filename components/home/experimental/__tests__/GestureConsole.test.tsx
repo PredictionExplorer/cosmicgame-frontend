@@ -146,13 +146,29 @@ describe('GestureConsole', () => {
     expect(onSelectGestureType).toHaveBeenCalledWith('CST');
   });
 
-  it('keeps the message field visible and counts its characters', () => {
+  it('keeps the message field visible and counts its bytes', () => {
     renderConsole({ form: makeForm({ message: 'hello' }) });
 
     const input = screen.getByTestId('gesture-message-input');
     expect(input).toHaveValue('hello');
     expect(screen.getByTestId('gesture-message-char-count')).toHaveTextContent('5/280');
     expect(input).toHaveAccessibleDescription(/home\.deck\.console\.messageHint/);
+  });
+
+  it('counts a CJK message in UTF-8 bytes against the live cap, as the contract does', () => {
+    // Three bytes per character: 93 of them take 279 of the 280 bytes.
+    renderConsole({ form: makeForm({ message: '字'.repeat(93), messageMaxBytes: 280 }) });
+
+    const counter = screen.getByTestId('gesture-message-char-count');
+    expect(counter).toHaveTextContent('279/280');
+    expect(counter).toHaveClass('text-attention');
+  });
+
+  it("names the contract's live cap once it is read", () => {
+    renderConsole({ form: makeForm({ message: 'hi', messageMaxBytes: 300 }) });
+
+    expect(screen.getByTestId('gesture-message-char-count')).toHaveTextContent('2/300');
+    expect(screen.getByTestId('gesture-message-input')).toHaveAttribute('maxLength', '300');
   });
 
   it('previews the Participation CST as spec rows, explained on the label', () => {

@@ -1,6 +1,6 @@
 'use client';
 
-import { useId, type ReactNode } from 'react';
+import { useId, useRef, type ReactNode } from 'react';
 import { ArrowRight } from 'lucide-react';
 import { useLocale, useTranslations } from 'next-intl';
 
@@ -9,6 +9,7 @@ import { CountdownFigures, countdownGroups } from '@/components/ui/countdown-fig
 import { Amount } from '@/components/ui/amount';
 import { Button } from '@/components/ui/button';
 import { Duration } from '@/components/ui/duration';
+import { ConnectWalletAction } from '@/components/wallet/ConnectWalletAction';
 import type { PositionMoment } from '@/hooks/usePositionMoment';
 import { useTxStageLabel, type TxStage } from '@/hooks/useTxFlow';
 import { SignatureAllocationIcon } from '@/lib/conceptIcons';
@@ -18,17 +19,24 @@ import type { DashboardInfo } from '@/services/api';
 import { sameAddress } from '@/utils/format';
 import { toFiniteNumber } from '@/utils/finiteNumber';
 
+import { countdownSeconds, countdownUnits } from './countdown';
 import type { GestureSubmitParts } from './gestureSubmitLabel';
 import { PHASE_TEXT_CLASS, viewForPhase } from './phaseView';
+import { useFocusClearOfDock } from './useFocusClearOfDock';
+
+/**
+ * `true`: the in-page form's own action is on screen or someone is working in
+ * the form, so the dock steps aside and leaves the tab order; it never
+ * duplicates the form's action or lies over a field being filled. `false`:
+ * the dock is shown. `'from-lg'`: the page has not measured yet (the server
+ * HTML and the first paint): shown below 1024px, where the form's action
+ * starts below the first viewport, and kept aside (invisible, out of the tab
+ * order) from 1024px, where the form's action is in it.
+ */
+export type ActionDockPlacement = boolean | 'from-lg';
 
 export interface ActionDockProps {
-  /**
-   * The in-page form's own action is on screen, someone is working in the
-   * form, or (from 1024px) any of the form is on screen. The dock then steps
-   * aside and leaves the tab order, so it never duplicates the form's action
-   * or lies over a field being filled.
-   */
-  stepAside: boolean;
+  stepAside: ActionDockPlacement;
   data: DashboardInfo | null;
   loading: boolean;
   allocationTime: number;
@@ -56,14 +64,17 @@ export interface ActionDockProps {
 }
 
 /**
- * The one persistent quick action: a single raised line with the clock, the
- * Signature Allocation (or the wallet's own position when it changes) and one
- * commit button. It never submits a gesture itself: on phones it opens the
- * bottom sheet with the gesture panel, from tablets up it returns to the
- * panel, so the price shown and the price paid come from the same place. It
+ * The one persistent quick action: a single opaque line on the raised
+ * surface with the clock, the Signature Allocation (or the wallet's own
+ * position when it changes) and one commit button. It never submits a
+ * gesture itself: on phones it opens the bottom sheet with the gesture panel,
+ * from tablets up it returns to the panel, so the price shown and the price
+ * paid come from the same place. Without a wallet its action is the same
+ * "Connect wallet" the form offers, opening the wallet list directly. It
  * shows the live transaction stage while a Gesture is in flight, and at zero
  * it turns into Finalize for whoever may finalize. It steps aside while the
- * in-page form's own action is on screen, so the two never show together.
+ * in-page form's own action is on screen, so the two never show together,
+ * and it keeps keyboard focus from landing under it.
  */
 export function ActionDock({
   stepAside,
@@ -90,6 +101,9 @@ export function ActionDock({
   const locale = useLocale();
   const stageLabel = useTxStageLabel();
   const describedById = useId();
+  // Keyboard focus never lands under the dock, on any page that mounts it.
+  const dockRef = useRef<HTMLDivElement>(null);
+  useFocusClearOfDock(dockRef);
 
   const cycleState = getCycleState({
     data,
@@ -108,12 +122,14 @@ export function ActionDock({
     cycleState.isGestureOpen || cycleState.isReadyToFinalize || cycleState.isConfirmingFinalization;
   const reserveEth = toFiniteNumber(data?.PrizeAmountEth ?? data?.CurPrizeAmountEth);
   const isHolder = sameAddress(account, data?.LastBidderAddr);
+  const rendered = !loading && isRoundActive;
 
-  if (loading || !isRoundActive) return null;
+  if (!rendered) return null;
 
   const finalizeMode =
     cycleState.isReadyToFinalize && !!account && canClaim && (isHolder || claimWait <= now);
-  const hidden = stepAside;
+  const hidden = stepAside === true;
+  const hiddenFromLg = stepAside === 'from-lg';
 
   // The line under the clock: the wallet's own moment when there is one,
   // otherwise what the cycle is for. Who may finalize and from when stays
@@ -151,11 +167,17 @@ export function ActionDock({
 
   return (
     <div
+      ref={dockRef}
       data-action-dock
+      data-state={hidden ? 'aside' : hiddenFromLg ? 'unmeasured' : 'shown'}
       className={cn(
         'fixed inset-x-3 bottom-[max(0.75rem,env(safe-area-inset-bottom))] z-40 md:inset-x-0 md:bottom-4 md:px-4 print:hidden',
-        'transition-[transform,opacity] duration-[var(--duration-base)] ease-[var(--ease-out-expo)] motion-reduce:transition-none',
+        'transition-[transform,opacity,visibility] duration-[var(--duration-base)] ease-[var(--ease-out-expo)] motion-reduce:transition-none',
         hidden && 'pointer-events-none translate-y-[calc(100%+1.5rem)] opacity-0',
+        // Until the page measures: shown on phones and tablets from the first
+        // paint, and out of sight and out of the tab order from 1024px.
+        hiddenFromLg &&
+          'lg:pointer-events-none lg:invisible lg:translate-y-[calc(100%+1.5rem)] lg:opacity-0',
         className,
       )}
       aria-hidden={hidden || undefined}
@@ -165,6 +187,8 @@ export function ActionDock({
         aria-label={t('observatory.dock.aria')}
         data-testid="action-dock"
         data-phase={cycleState.phase}
+        // Opaque: the form scrolling underneath never shows through the one
+        // surface that carries the commit action.
         className="mx-auto flex min-h-16 max-w-2xl items-center justify-between gap-3 rounded-surface border border-rule bg-surface-raised px-3.5 py-2 shadow-float md:px-4"
       >
         <div
@@ -183,12 +207,12 @@ export function ActionDock({
                   // decorative; the spelled-out time is for screen readers.
                   <>
                     <CountdownFigures
-                      groups={countdownGroups(parts, locale)}
+                      groups={countdownGroups(countdownUnits(parts.total), locale)}
                       size="inline"
                       align="start"
                       data-testid="dock-clock"
                     />
-                    <Duration seconds={Math.ceil(parts.total / 1000)} className="sr-only" />
+                    <Duration seconds={countdownSeconds(parts.total)} className="sr-only" />
                   </>
                 )}
                 intervalMs={1000}
@@ -218,6 +242,16 @@ export function ActionDock({
             {t('form.finalize')}
             <ArrowRight aria-hidden />
           </Button>
+        ) : !account ? (
+          // Without a wallet the dock's action is the one the form offers:
+          // connect, straight to the wallet list, never a priced Gesture that
+          // opens a sheet only to ask for a wallet.
+          <ConnectWalletAction
+            variant="commit"
+            data-testid="dock-connect"
+            label={t('form.connect.ctaShort')}
+            className="min-h-12 min-w-0 flex-1 px-4 md:flex-none md:px-5"
+          />
         ) : (
           <>
             <Button

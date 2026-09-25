@@ -274,6 +274,7 @@
       "title": "你的 Random Walk NFT",
       "connect": "連接錢包後，即可列出其中的 Random Walk NFT。",
       "error": "無法讀取此錢包的 Random Walk NFT，請稍後再試。",
+      "linkedUnavailable": "Random Walk NFT #{tokenId} 不在此錢包中，或已用於落筆，因此未被選取。",
       "tooltip": "ETH 落筆附加一枚 Random Walk NFT，落筆價格即減半。每枚 NFT 僅可使用一次。"
     },
     "cstTrade": "缺少 CST？可透過 Uniswap 在 Arbitrum 上用 ETH 兌換 CST。",
@@ -298,7 +299,7 @@
     "advanced": {
       "title": "高級選項",
       "messageLabel": "留言",
-      "messageOptionalHint": "（選填，至多 {maxLength} 字符）",
+      "messageOptionalHint": "（選填，至多 {maxLength} 字節）",
       "messageTooltip": "留言會出現在落筆留言板中，與這一筆一同記錄在鏈上，並永久保存。",
       "messagePlaceholder": "為這一筆留下一句話…",
       "attachIntro": "可為這一筆附加代幣或 NFT，也可調整落筆價格的防碰撞設定。",
@@ -454,6 +455,7 @@
       "showing": "最近 {messages, plural, other {# 條留言}}和 {events, plural, other {# 項週期事件}}",
       "showMore": "顯示更多"
     },
+    "invite": "留言隨落筆一同上鏈。",
     "empty": {
       "title": "暫無留言或事件",
       "description": "留言和週期重要事件會顯示在這裏，最新的排在最前。",
@@ -661,7 +663,6 @@
       "waitingNothing": "無",
       "waitingNfts": "{count, plural, other {# 個 NFT}}",
       "retrieveHint": "在「我的分配」中取回",
-      "connectBody": "連接錢包後，可查看你的位置、本週期你寫下了多少筆，以及待取回的分配。",
       "spent": "你本週期已花費",
       "landed": "你的落筆已確認，最新一筆由你寫下。"
     }
@@ -704,6 +705,7 @@
     "allocationsTitle": "週期儲備如何分配",
     "allocationsDescription": "查看全部分配，包括星選與公共物品。",
     "storyTitle": "週期背後的藝術",
+    "storyDescription": "落筆如何塑造簽名、CST 記錄的內容，以及分配如何資助公共物品。",
     "methods": {
       "eth": "用 ETH 支付目前落筆價格。",
       "cst": "使用錢包中已有的 CST。即時價格會隨時間變化。",

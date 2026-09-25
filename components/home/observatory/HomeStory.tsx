@@ -1,4 +1,4 @@
-import { ArrowRight } from 'lucide-react';
+import { ArrowRight, Images } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 
 import { SiteLink } from '@/components/layout/SiteLink';
@@ -37,11 +37,10 @@ export function HomeStory({ className }: HomeStoryProps) {
     <DeskDisclosure
       testId="home-story-section"
       className={className}
-      summary={
-        <span className="type-heading-3 min-w-0 text-foreground">
-          {t('orientation.storyTitle')}
-        </span>
-      }
+      // The collection's glyph: the notes are about the art the cycle leaves.
+      icon={Images}
+      title={t('orientation.storyTitle')}
+      description={t('orientation.storyDescription')}
     >
       <div className="py-5">
         {/* The summary is a control, not a heading: the notes' section heading

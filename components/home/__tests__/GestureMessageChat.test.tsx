@@ -3,9 +3,9 @@ import userEvent from '@testing-library/user-event';
 import type { GestureFeedSystemEvent } from '@/components/home/deck/feedSystemEvents';
 import type { GestureInfo } from '@/services/api';
 
-import { render, screen, within, act, checkA11y, fireEvent } from '@/test-utils';
+import { render, screen, within, act, checkA11y } from '@/test-utils';
 
-import { GestureMessageChat, buildFeedRows, phoneVisibleRows } from '../GestureMessageChat';
+import { GestureMessageChat, buildFeedRows, visibleFeedRows } from '../GestureMessageChat';
 
 const mockUseBannedGestures = jest.fn().mockReturnValue({ data: [] });
 
@@ -70,13 +70,15 @@ describe('GestureMessageChat', () => {
     ).toBeInTheDocument();
   });
 
-  it('carries its freshness stamp instead of a hand-built live pill', () => {
+  it('keeps its freshness stamp quiet while the feed is fresh, with no hand-built live pill', () => {
     const { container } = render(<GestureMessageChat gestures={[makeGesture({})]} />);
     const header = screen.getByRole('heading', { name: 'home.chat.title' }).closest('header')!;
-    expect(header.querySelector('[data-live-state]')).not.toBeNull();
+    // Fresh (or still connecting): the page's own indicator speaks; the
+    // region's stamp appears only when its feed stops updating.
+    expect(header.querySelector('[data-live-state]')).toBeNull();
     expect(container).not.toHaveTextContent('home.chat.liveFeed');
-    // The stamp holds still: the page's one breathing dot is the Cycle pill.
     expect(container.querySelector('.animate-live-dot')).toBeNull();
+    expect(header.querySelector('[aria-live]')).toBeNull();
   });
 
   it('explains how to join the chat once, beside its title', () => {
@@ -310,6 +312,30 @@ describe('GestureMessageChat', () => {
     expect(screen.queryByTestId('chat-no-messages')).not.toBeInTheDocument();
   });
 
+  it('closes a history read to its end on the message invite, and only while the cycle takes gestures', async () => {
+    const user = userEvent.setup();
+    const onJoinCta = jest.fn();
+    const few = [makeGesture({ EvtLogId: 1, Message: 'only one' })];
+    const { rerender } = render(<GestureMessageChat gestures={few} onJoinCta={onJoinCta} />);
+    const invite = screen.getByTestId('chat-invite');
+    expect(invite).toHaveTextContent('home.chat.invite');
+    await user.click(within(invite).getByRole('button', { name: 'home.form.message.add' }));
+    expect(onJoinCta).toHaveBeenCalledTimes(1);
+
+    // Between cycles there is nothing to add a message to.
+    rerender(<GestureMessageChat gestures={few} />);
+    expect(screen.queryByTestId('chat-invite')).not.toBeInTheDocument();
+
+    // More history waits: "Show more" closes the feed, not the invite.
+    const many = Array.from({ length: 8 }, (_, index) =>
+      makeGesture({ EvtLogId: index + 1, TimeStamp: 1_700_000_000 + index, Message: `m${index}` }),
+    );
+    rerender(<GestureMessageChat gestures={many} onJoinCta={onJoinCta} />);
+    expect(screen.queryByTestId('chat-invite')).not.toBeInTheDocument();
+    await user.click(screen.getByRole('button', { name: 'home.chat.history.showMore' }));
+    expect(screen.getByTestId('chat-invite')).toBeVisible();
+  });
+
   it('shows loading and a first-read failure without presenting either as an empty chat', async () => {
     const user = userEvent.setup();
     const onRetry = jest.fn();
@@ -362,7 +388,7 @@ describe('GestureMessageChat', () => {
     expect(onLoadMore).toHaveBeenCalledTimes(2);
   });
 
-  it('shows the newest messages on phones and reveals more on demand, never scrolling inside the page', async () => {
+  it('shows the newest messages and reveals more on demand, never scrolling inside the page', async () => {
     const user = userEvent.setup();
     const gestures = Array.from({ length: 20 }, (_, index) =>
       makeGesture({ EvtLogId: index + 1, TimeStamp: 1_700_000_000 + index, Message: `m${index}` }),
@@ -371,42 +397,38 @@ describe('GestureMessageChat', () => {
     const rows = screen
       .getAllByRole('listitem')
       .filter((item) => item.hasAttribute('data-chat-row'));
-    // Six messages lead on a phone; the rest wait behind "Show more".
-    expect(rows.filter((row) => row.classList.contains('max-lg:hidden'))).toHaveLength(14);
-    // The inner scroller exists only from 1024px.
-    const scroll = screen.getByTestId('gesture-message-chat-scroll');
-    expect(scroll.className).toMatch(/lg:overflow-y-auto/);
-    expect(scroll.className).not.toMatch(/(?:^|\s)overflow-y-auto/);
+    // Six messages lead at every width; the rest wait behind "Show more".
+    expect(rows.filter((row) => row.classList.contains('hidden'))).toHaveLength(14);
+    // No scroll box anywhere, so the wheel always moves the page, and no
+    // extra tab stop for a region that does not scroll.
+    const feed = screen.getByTestId('gesture-message-chat-scroll');
+    expect(feed.className).not.toMatch(/overflow-y-auto|overscroll/);
+    expect(feed).not.toHaveAttribute('tabindex');
 
     await user.click(screen.getByRole('button', { name: 'home.chat.history.showMore' }));
     const after = screen
       .getAllByRole('listitem')
       .filter((item) => item.hasAttribute('data-chat-row'));
-    expect(after.filter((row) => row.classList.contains('max-lg:hidden'))).toHaveLength(4);
+    expect(after.filter((row) => row.classList.contains('hidden'))).toHaveLength(4);
     await user.click(screen.getByRole('button', { name: 'home.chat.history.showMore' }));
     expect(screen.queryByRole('button', { name: 'home.chat.history.showMore' })).toBeNull();
   });
 
-  it('fades the desktop feed at an edge only while there is more to scroll that way', () => {
-    const gestures = Array.from({ length: 12 }, (_, index) =>
-      makeGesture({ EvtLogId: index + 1, TimeStamp: 1_700_000_000 + index, Message: `m${index}` }),
+  it('sets a message in two lines: who, how and when, then the message', () => {
+    render(
+      <GestureMessageChat
+        gestures={[makeGesture({ EvtLogId: 42, BidPosition: 7, Message: 'One line' })]}
+      />,
     );
-    render(<GestureMessageChat gestures={gestures} />);
-    const scroll = screen.getByTestId('gesture-message-chat-scroll');
-    // jsdom lays nothing out: a feed that fits shows no fade.
-    expect(scroll.style.maskImage).toBe('');
-
-    Object.defineProperty(scroll, 'scrollHeight', { configurable: true, value: 1200 });
-    Object.defineProperty(scroll, 'clientHeight', { configurable: true, value: 500 });
-    fireEvent.scroll(scroll);
-    expect(scroll).toHaveAttribute('data-overflow-bottom', 'true');
-    expect(scroll).not.toHaveAttribute('data-overflow-top');
-    expect(scroll.style.maskImage).toContain('calc(100% - 3rem)');
-
-    scroll.scrollTop = 700;
-    fireEvent.scroll(scroll);
-    expect(scroll).toHaveAttribute('data-overflow-top', 'true');
-    expect(scroll).not.toHaveAttribute('data-overflow-bottom');
+    const meta = screen.getByTestId('gesture-message-meta');
+    // The method and the position share the author's line.
+    expect(meta).toContainElement(screen.getByTestId('gesture-method-badge'));
+    expect(within(meta).getByRole('link', { name: /home\.chat\.openPositionAria/ })).toBeVisible();
+    // The author links to their page; no copy icon repeats down the feed.
+    expect(within(meta).getByRole('link', { name: /0x/ })).toBeVisible();
+    expect(
+      within(meta).queryByRole('button', { name: 'common.actions.copyAddress' }),
+    ).not.toBeInTheDocument();
   });
 
   it('pages an event-only history and resets its window for corrected history or a new cycle', async () => {
@@ -417,9 +439,18 @@ describe('GestureMessageChat', () => {
     );
     await user.click(screen.getByRole('button', { name: 'home.chat.view.all' }));
     expect(screen.getAllByTestId('chat-system-event')).toHaveLength(50);
-    await user.click(screen.getByRole('button', { name: 'home.chat.history.loadOlder' }));
+    // What is already here shows first; older history once all of it does.
+    const loadOlderAfterShowingAll = async () => {
+      let showMore = screen.queryByRole('button', { name: 'home.chat.history.showMore' });
+      while (showMore) {
+        await user.click(showMore);
+        showMore = screen.queryByRole('button', { name: 'home.chat.history.showMore' });
+      }
+      await user.click(screen.getByRole('button', { name: 'home.chat.history.loadOlder' }));
+    };
+    await loadOlderAfterShowingAll();
     expect(screen.getAllByTestId('chat-system-event')).toHaveLength(100);
-    await user.click(screen.getByRole('button', { name: 'home.chat.history.loadOlder' }));
+    await loadOlderAfterShowingAll();
     expect(screen.getAllByTestId('chat-system-event')).toHaveLength(120);
     expect(screen.queryByRole('button', { name: 'home.chat.history.loadOlder' })).toBeNull();
 
@@ -521,22 +552,22 @@ describe('GestureMessageChat', () => {
   });
 });
 
-describe('phoneVisibleRows', () => {
+describe('visibleFeedRows', () => {
   const rows = (types: string) =>
     types.split('').map((c) => ({ type: c === 'm' ? 'message' : 'event' }));
 
   it('shows every row up to the limit-th message, events between them included', () => {
-    expect(phoneVisibleRows(rows('memeem'), 0, 2)).toBe(3);
-    expect(phoneVisibleRows(rows('memeem'), 1, 2)).toBe(2);
+    expect(visibleFeedRows(rows('memeem'), 0, 2)).toBe(3);
+    expect(visibleFeedRows(rows('memeem'), 1, 2)).toBe(2);
   });
 
   it('shows a feed with fewer messages than the limit in full', () => {
-    expect(phoneVisibleRows(rows('meee'), 0, 6)).toBe(4);
+    expect(visibleFeedRows(rows('meee'), 0, 6)).toBe(4);
   });
 
   it('limits an event-only feed by rows', () => {
-    expect(phoneVisibleRows(rows('e'.repeat(30)), 0, 6)).toBe(8);
-    expect(phoneVisibleRows(rows('e'.repeat(30)), 0, 16)).toBe(18);
+    expect(visibleFeedRows(rows('e'.repeat(30)), 0, 6)).toBe(8);
+    expect(visibleFeedRows(rows('e'.repeat(30)), 0, 16)).toBe(18);
   });
 });
 

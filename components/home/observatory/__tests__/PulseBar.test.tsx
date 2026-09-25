@@ -1,6 +1,6 @@
 import { render, screen, within, checkA11y } from '@/test-utils';
 
-import { PulseBar, introForPhase } from '../PulseBar';
+import { PulseBar, introForPhase, keepBrandTogether } from '../PulseBar';
 
 const baseProps = {
   cycleNumber: 7,
@@ -8,6 +8,25 @@ const baseProps = {
   gestureCount: 42,
   lastGestureAge: 'home.ticker.age.seconds(count=12)',
 };
+
+describe('keepBrandTogether', () => {
+  it('keeps the brand name on one line, leaving the words and the name unchanged', () => {
+    for (const title of [
+      'The Cosmic Signature Observatory',
+      'Обсерваторія Cosmic Signature',
+      'Cosmic Signature観測所',
+    ]) {
+      const { container, unmount } = render(<h1>{keepBrandTogether(title)}</h1>);
+      expect(container.textContent).toBe(title);
+      expect(container.querySelector('.whitespace-nowrap')).toHaveTextContent(/^Cosmic Signature$/);
+      unmount();
+    }
+  });
+
+  it('passes a title without the name through as it is', () => {
+    expect(keepBrandTogether('Observatory')).toBe('Observatory');
+  });
+});
 
 describe('PulseBar', () => {
   it('carries the page H1 with the live cycle pulse in one compact band', () => {

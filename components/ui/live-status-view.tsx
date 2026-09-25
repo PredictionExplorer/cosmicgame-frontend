@@ -38,10 +38,18 @@ export interface LiveStatusViewProps {
    */
   still?: boolean;
   /**
+   * Render nothing while the data is live or still connecting: a region's
+   * own stamp that appears only when something is wrong ("Reconnecting",
+   * "Updates delayed", "Offline"), on a page whose one page-level indicator
+   * says the rest. Four "Updated just now" stamps in a row are noise.
+   */
+  quietWhenFresh?: boolean;
+  /**
    * Whether the stamp speaks its state changes (a polite status region).
    * Defaults to `!still`: a secondary stamp stays silent, so a page with
    * four stamps says "Reconnecting" once, from its primary one, not four
-   * times over the announcements that matter.
+   * times over the announcements that matter. A silent stamp still says its
+   * state in words to a reader who reaches it.
    */
   announce?: boolean;
   className?: string;
@@ -68,11 +76,13 @@ export function LiveStatusView({
   variant = 'chip',
   clockCaveat = false,
   still = false,
+  quietWhenFresh = false,
   announce = !still,
   className,
 }: LiveStatusViewProps) {
   const t = useTranslations('common');
   const age = useAgeLabel(ageMs);
+  if (quietWhenFresh && (state === 'live' || state === 'connecting')) return null;
 
   const stateLabel: Record<LiveFreshness, string> = {
     connecting: t('liveStatus.connecting'),
@@ -121,16 +131,14 @@ export function LiveStatusView({
       )}
     >
       {dot}
-      {announce ? (
-        <span role="status" aria-live="polite" className="sr-only">
-          {state === 'delayed' ? t('liveStatus.delayedShort') : t(`liveStatus.${state}`)}
-        </span>
-      ) : variant === 'dot' ? (
-        // A silent dot still names its state to a reader who reaches it.
-        <span className="sr-only">
-          {state === 'delayed' ? t('liveStatus.delayedShort') : t(`liveStatus.${state}`)}
-        </span>
-      ) : null}
+      {/* A silent stamp still says its state in words to a reader who reaches it. */}
+      <span
+        role={announce ? 'status' : undefined}
+        aria-live={announce ? 'polite' : undefined}
+        className="sr-only"
+      >
+        {state === 'delayed' ? t('liveStatus.delayedShort') : t(`liveStatus.${state}`)}
+      </span>
       {variant !== 'dot' && (
         <span aria-hidden className="min-w-0 truncate">
           {visibleLabel}

@@ -5,6 +5,9 @@ import { IDLE_TX_STAGE } from '@/lib/txStage';
 import { render, screen, within, checkA11y } from '@/test-utils';
 
 import { ActionDock } from '../ActionDock';
+import { CycleClock } from '../CycleClock';
+
+jest.mock('@rainbow-me/rainbowkit');
 
 const HOLDER = '0x1111111111111111111111111111111111111111';
 const OTHER = '0x2222222222222222222222222222222222222222';
@@ -91,7 +94,70 @@ describe('ActionDock', () => {
     expect(layer).toHaveAttribute('aria-hidden', 'true');
     expect(layer).toHaveAttribute('inert');
     expect(layer).toHaveClass('pointer-events-none', 'opacity-0');
+    expect(layer).toHaveAttribute('data-state', 'aside');
   });
+
+  it('is there from the first paint below 1024px, before the page measures anything', () => {
+    const { container } = render(<ActionDock {...baseProps} stepAside="from-lg" />);
+    const layer = container.querySelector('[data-action-dock]');
+    // On a phone the form's action starts below the first viewport.
+    expect(layer).not.toHaveAttribute('aria-hidden');
+    expect(layer).not.toHaveAttribute('inert');
+    expect(layer).not.toHaveClass('opacity-0');
+    // From 1024px the form's action is in the first viewport: out of sight
+    // and, being invisible, out of the tab order too.
+    expect(layer).toHaveClass('lg:invisible', 'lg:opacity-0', 'lg:pointer-events-none');
+    expect(layer).toHaveAttribute('data-state', 'unmeasured');
+  });
+
+  it('sits on an opaque raised surface, so the form never shows through it', () => {
+    render(<ActionDock {...baseProps} />);
+    const dock = screen.getByTestId('action-dock');
+    expect(dock).toHaveClass('bg-surface-raised', 'shadow-float');
+    expect(dock).not.toHaveClass('glass');
+  });
+
+  it('offers the form’s own connect action to a visitor without a wallet', () => {
+    render(<ActionDock {...baseProps} account={null} />);
+    const connect = screen.getByTestId('dock-connect');
+    expect(connect).toHaveTextContent('home.form.connect.ctaShort');
+    expect(connect).toHaveClass('bg-signature-gradient');
+    // Never a priced Gesture that opens a sheet only to ask for a wallet.
+    expect(screen.queryByTestId('dock-open-sheet')).not.toBeInTheDocument();
+    expect(screen.queryByTestId('dock-jump-to-panel')).not.toBeInTheDocument();
+  });
+
+  it.each([0, 1, 400, 999])(
+    'reads the same second as the clock (%p ms past a whole second)',
+    (fraction) => {
+      // 5d 10:55:18 plus a fraction: both round up to the same second.
+      const remaining = ((5 * 24 + 10) * 3600 + 55 * 60 + 18) * 1000 + fraction;
+      const allocationTime = NOW + remaining;
+      const props = { ...baseProps, allocationTime, now: NOW };
+      render(
+        <>
+          <CycleClock
+            data={props.data}
+            loading={false}
+            allocationTime={allocationTime}
+            activationTime={0}
+            now={NOW}
+            finalizationConfirmed
+            canClaim={false}
+            isClaiming={false}
+            claimWait={0}
+            onFinalize={jest.fn()}
+          />
+          <ActionDock {...props} />
+        </>,
+      );
+      const clockSeconds = screen
+        .getByTestId('clock-figures')
+        .querySelector('[data-unit="seconds"]')!.textContent;
+      const dockReading = within(screen.getByTestId('action-dock')).getByRole('timer').textContent!;
+      expect(dockReading.endsWith(`:${clockSeconds}`)).toBe(true);
+    },
+  );
 
   it('shows the transaction stage while a Gesture is in flight', () => {
     render(
@@ -155,6 +221,31 @@ describe('ActionDock', () => {
     );
     expect(screen.queryByTestId('dock-finalize')).not.toBeInTheDocument();
     expect(screen.getByTestId('dock-open-sheet')).toBeInTheDocument();
+  });
+
+  it('lifts a keyboard-focused control of the page out from under itself', () => {
+    // The dock carries the fix itself, so every page that mounts it gets it
+    // (WCAG 2.4.11): a control already in the viewport but under the dock
+    // receives focus without the browser scrolling.
+    const scrollBy = jest.spyOn(window, 'scrollBy').mockImplementation(() => undefined);
+    render(
+      <>
+        <a href="/allocation/6">standings link</a>
+        <ActionDock {...baseProps} />
+      </>,
+    );
+    const layer = document.querySelector<HTMLElement>('[data-action-dock]')!;
+    const link = screen.getByRole('link', { name: 'standings link' });
+    const rect = (top: number, bottom: number) =>
+      ({ top, bottom, height: bottom - top, left: 0, right: 390, width: 390 }) as DOMRect;
+    jest.spyOn(layer, 'getBoundingClientRect').mockReturnValue(rect(763, 827));
+    jest.spyOn(link, 'getBoundingClientRect').mockReturnValue(rect(790, 814));
+    jest.spyOn(link, 'matches').mockImplementation((selector) => selector === ':focus-visible');
+
+    link.focus();
+
+    expect(scrollBy).toHaveBeenCalledWith({ top: 814 + 12 - 763, behavior: 'instant' });
+    scrollBy.mockRestore();
   });
 
   it('renders nothing between cycles', () => {

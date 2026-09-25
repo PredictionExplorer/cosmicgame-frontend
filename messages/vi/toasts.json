@@ -31,6 +31,7 @@
     "confirmed": "Nét bút đã được ghi nhận. Thời điểm hoàn tất chu kỳ đã được kéo dài.",
     "validation": {
       "notNftOwner": "Ví đang kết nối không sở hữu token này.",
+      "chooseRandomWalkNft": "Hãy chọn một Random Walk NFT chưa dùng trong ví này.",
       "tokenDecimalsWarning": "Token không triển khai decimals(); giả định 18 chữ số thập phân.",
       "invalidContractAddress": "Địa chỉ hợp đồng không hợp lệ.",
       "notErc721": "Hợp đồng NFT đính kèm không phải là hợp đồng token ERC721.",

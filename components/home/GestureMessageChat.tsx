@@ -1,11 +1,12 @@
 'use client';
 
-import { useCallback, useEffect, useId, useLayoutEffect, useMemo, useRef, useState } from 'react';
+import { useEffect, useId, useMemo, useState } from 'react';
 import { flushSync } from 'react-dom';
 import {
   CircleCheck,
   Clock3,
   MessageCircle,
+  PenLine,
   Radio,
   Sparkles,
   TimerReset,
@@ -87,7 +88,11 @@ interface GestureMessageChatProps {
   className?: string;
   /** Changes when a Gesture lands: the newest message settles in. */
   pulseKey?: number;
-  /** When provided, the empty state offers a "Make a Gesture" call to action. */
+  /**
+   * While the cycle takes Gestures: the empty states offer "Make a gesture",
+   * and a history read to its end closes on "Add a message", where a
+   * composer would sit.
+   */
   onJoinCta?: () => void;
   /** Derived cycle moments interleaved with participant messages by timestamp. */
   systemEvents?: GestureFeedSystemEvent[];
@@ -112,21 +117,23 @@ interface GestureMessageChatProps {
 }
 
 const SYSTEM_EVENTS_PER_PAGE = 50;
-/** Messages a phone shows before "Show more"; the feed never scrolls inside the page. */
-const PHONE_MESSAGES = 6;
-const PHONE_MESSAGES_STEP = 10;
-/** Height of the fade at an edge of the desktop feed with more to scroll that way. */
-const SCROLL_FADE = '3rem';
+/**
+ * Messages the feed shows before "Show more", at every width: the feed is
+ * part of the page and never scrolls inside it, so the wheel always moves
+ * the page.
+ */
+const VISIBLE_MESSAGES = 6;
+const VISIBLE_MESSAGES_STEP = 10;
 /** An event-only feed is limited by rows instead. */
-const PHONE_EVENT_ROWS = 8;
+const VISIBLE_EVENT_ROWS = 8;
 
 /**
- * How many leading rows a phone shows: every row up to and including the
+ * How many leading rows the feed shows: every row up to and including the
  * `messageLimit`-th message (pending rows count as messages), so messages
  * lead and the events between them come along; an event-only feed shows its
  * first rows.
  */
-export function phoneVisibleRows(
+export function visibleFeedRows(
   rows: readonly { type: string }[],
   pendingCount: number,
   messageLimit: number,
@@ -141,7 +148,9 @@ export function phoneVisibleRows(
   const total = pendingCount + rows.length;
   // Fewer messages than the limit: all of it, unless the feed is events alone,
   // which grows by rows as "Show more" raises the limit.
-  return messages > 0 ? total : Math.min(total, PHONE_EVENT_ROWS + messageLimit - PHONE_MESSAGES);
+  return messages > 0
+    ? total
+    : Math.min(total, VISIBLE_EVENT_ROWS + messageLimit - VISIBLE_MESSAGES);
 }
 
 interface GestureChatMessage {
@@ -313,22 +322,27 @@ function MessageRow({
       data-settling={settling || undefined}
       aria-label={t('chat.messageAria', { address: formatAddress(gesture.BidderAddr) })}
       className={cn(
-        'relative py-3.5',
+        'relative py-3',
         // The newest message settles in with the live rule for 900ms.
-        "before:absolute before:inset-y-3 before:-start-3 before:w-0.5 before:rounded-full before:bg-live before:opacity-0 before:transition-opacity before:duration-[var(--duration-settle)] before:content-['']",
+        "before:absolute before:inset-y-2.5 before:-start-3 before:w-0.5 before:rounded-full before:bg-live before:opacity-0 before:transition-opacity before:duration-[var(--duration-settle)] before:content-['']",
         settling && 'before:opacity-100',
       )}
     >
+      {/* One line of metadata, then the message: who, how the Gesture was
+          made and its place in the cycle, with when at the end. */}
       <div
         data-testid="gesture-message-meta"
-        className="flex min-w-0 items-center justify-between gap-3"
+        className="flex min-w-0 items-baseline justify-between gap-3"
       >
-        <span className="flex min-w-0 items-center gap-2">
-          {/* Authorship recedes so the message leads, as the ledger sets addresses. */}
+        <span className="flex min-w-0 flex-wrap items-center gap-x-2 gap-y-0.5">
+          {/* Authorship recedes so the message leads, as the ledger sets
+              addresses: a link to the participant's page (which copies it),
+              with no copy icon repeating down the feed. */}
           <AddressChip
             address={gesture.BidderAddr}
             variant="plain"
             label={false}
+            showCopy={false}
             className="type-hash text-muted-foreground"
           />
           {isOwn && (
@@ -336,6 +350,29 @@ function MessageRow({
               {t('chat.you')}
             </Badge>
           )}
+          <span className="type-caption flex items-center gap-x-2 text-subtle">
+            <span aria-hidden>·</span>
+            <span data-testid="gesture-method-badge">{methodTag}</span>
+            {gestureId != null && (
+              <>
+                <span aria-hidden>·</span>
+                <Link
+                  href={`/gesture/${gestureId}`}
+                  data-touch-target="extended"
+                  className={cn(
+                    'link-quiet tabular-nums text-subtle hover:text-foreground',
+                    // A 44px hit area on phones without growing the line.
+                    TOUCH_TARGET_EXTENDED_CLASS,
+                  )}
+                  aria-label={t('chat.openPositionAria', {
+                    position: String(position ?? gestureId),
+                  })}
+                >
+                  #{position ?? gestureId}
+                </Link>
+              </>
+            )}
+          </span>
         </span>
         <DateTime
           timestamp={gesture.TimeStamp}
@@ -343,29 +380,8 @@ function MessageRow({
           className="type-caption shrink-0 text-subtle"
         />
       </div>
-      <p className="type-body-sm mt-1.5 whitespace-pre-wrap text-foreground [overflow-wrap:anywhere]">
+      <p className="type-body-sm mt-1 whitespace-pre-wrap text-foreground [overflow-wrap:anywhere]">
         <LinkifiedText text={message} />
-      </p>
-      {/* How the Gesture was made: the method and cost, and its place in the cycle. */}
-      <p className="type-caption mt-1.5 flex flex-wrap items-center gap-x-2 text-subtle">
-        <span data-testid="gesture-method-badge">{methodTag}</span>
-        {gestureId != null && (
-          <>
-            <span aria-hidden>·</span>
-            <Link
-              href={`/gesture/${gestureId}`}
-              data-touch-target="extended"
-              className={cn(
-                'link-quiet tabular-nums text-subtle hover:text-foreground',
-                // A 44px hit area on phones without growing the line.
-                TOUCH_TARGET_EXTENDED_CLASS,
-              )}
-              aria-label={t('chat.openPositionAria', { position: String(position ?? gestureId) })}
-            >
-              #{position ?? gestureId}
-            </Link>
-          </>
-        )}
       </p>
     </article>
   );
@@ -413,11 +429,11 @@ function PendingMessageRow({ pending }: { pending: PendingChatMessage }) {
  * The cycle's Gesture Chat: participants' messages, newest first, as ruled
  * rows on the page ground under one hairline (no box, like the ledger beside
  * it). "Messages" lists only messages; "All activity" adds every cycle
- * event, each as one compact row. On phones the feed is part of the page
- * (the newest rows, then "Show more"); from 1024px it scrolls inside its
- * region, fading at an edge with more to read. Its freshness stamp says when the feed last updated and
- * turns to "Reconnecting" or "Updates delayed" when refreshes fail, while
- * the history already on screen stays.
+ * event, each as one compact row. At every width the feed is part of the
+ * page: the newest rows, then "Show more" and "Load older", never a scroll
+ * box that catches the wheel. Its freshness stamp appears only when
+ * refreshes fail ("Reconnecting", "Updates delayed"), while the history
+ * already on screen stays.
  */
 export function GestureMessageChat({
   gestures,
@@ -450,8 +466,9 @@ export function GestureMessageChat({
   const [view, setView] = useState<ChatView>('messages');
   const [eventWindow, setEventWindow] = useState({ key: resetKey, limit: SYSTEM_EVENTS_PER_PAGE });
   const eventLimit = eventWindow.key === resetKey ? eventWindow.limit : SYSTEM_EVENTS_PER_PAGE;
-  const [phoneWindow, setPhoneWindow] = useState({ key: resetKey, messages: PHONE_MESSAGES });
-  const phoneMessages = phoneWindow.key === resetKey ? phoneWindow.messages : PHONE_MESSAGES;
+  const [messageWindow, setMessageWindow] = useState({ key: resetKey, messages: VISIBLE_MESSAGES });
+  const visibleMessages =
+    messageWindow.key === resetKey ? messageWindow.messages : VISIBLE_MESSAGES;
   const [isPrinting, setIsPrinting] = useState(false);
   const visibleEvents = useMemo(() => {
     const newestFirst = [...(systemEvents ?? [])].sort((a, b) => b.timestamp - a.timestamp);
@@ -475,78 +492,21 @@ export function GestureMessageChat({
   const hasOlderContent = hasMoreEvents || Boolean(pagination?.hasMore);
   // "Messages" windows no event rows, so it counts every event on record.
   const countedEvents = view === 'all' ? visibleEvents.length : knownEvents;
-  const phoneRows = phoneVisibleRows(rows, pending.length, phoneMessages);
-  const hiddenOnPhones = !isPrinting && rows.length + pending.length > phoneRows;
+  const shownRows = visibleFeedRows(rows, pending.length, visibleMessages);
+  const hasHiddenRows = !isPrinting && rows.length + pending.length > shownRows;
   const newestMessage = messages[0] ?? null;
+  // A history read to its end closes where a composer would sit: messages
+  // ride on Gestures, so the invite opens the form's message editor.
+  const showInvite =
+    !!onJoinCta &&
+    !isLoading &&
+    !error &&
+    hasFeedContent &&
+    !noMessagesYet &&
+    !hasHiddenRows &&
+    !hasOlderContent &&
+    !pagination?.error;
   const isSettling = useLivePulse(pulseKey);
-
-  const scrollRef = useRef<HTMLDivElement>(null);
-  const previousResetKey = useRef(resetKey);
-  const readingAnchor = useRef<{ key: string | null; offset: number } | null>(null);
-  const rememberReadingPosition = useCallback(() => {
-    const scroll = scrollRef.current;
-    if (!scroll) return;
-    if (scroll.scrollTop <= 2) {
-      readingAnchor.current = { key: null, offset: 0 };
-      return;
-    }
-    const top = scroll.getBoundingClientRect().top;
-    const row = Array.from(scroll.querySelectorAll<HTMLElement>('[data-chat-row]')).find(
-      (element) => element.getBoundingClientRect().bottom > top,
-    );
-    if (row) {
-      readingAnchor.current = {
-        key: row.dataset.chatRow ?? null,
-        offset: row.getBoundingClientRect().top - top,
-      };
-    }
-  }, []);
-
-  // From 1024px the feed scrolls inside its frame: each edge fades while there
-  // is more to read that way, so the last visible row never ends at a hard cut.
-  const [scrollEdges, setScrollEdges] = useState({ top: false, bottom: false });
-  const measureScrollEdges = useCallback(() => {
-    const scroll = scrollRef.current;
-    if (!scroll) return;
-    const max = scroll.scrollHeight - scroll.clientHeight;
-    const next = { top: scroll.scrollTop > 1, bottom: max - scroll.scrollTop > 1 };
-    setScrollEdges((current) =>
-      current.top === next.top && current.bottom === next.bottom ? current : next,
-    );
-  }, []);
-  useEffect(() => {
-    const scroll = scrollRef.current;
-    if (!scroll || typeof ResizeObserver === 'undefined') return undefined;
-    const resize = new ResizeObserver(measureScrollEdges);
-    resize.observe(scroll);
-    return () => resize.disconnect();
-  }, [measureScrollEdges]);
-  const handleScroll = useCallback(() => {
-    rememberReadingPosition();
-    measureScrollEdges();
-  }, [measureScrollEdges, rememberReadingPosition]);
-
-  // Keep the row being read at the same position when fresh messages arrive or
-  // older history is appended. This also covers browsers without scroll anchoring.
-  useLayoutEffect(() => {
-    const scroll = scrollRef.current;
-    if (!scroll || isPrinting) return;
-    const anchor = readingAnchor.current;
-    if (previousResetKey.current !== resetKey || anchor?.key === null) {
-      scroll.scrollTop = 0;
-    } else if (anchor?.key) {
-      const row = Array.from(scroll.querySelectorAll<HTMLElement>('[data-chat-row]')).find(
-        (element) => element.dataset.chatRow === anchor.key,
-      );
-      if (row) {
-        scroll.scrollTop +=
-          row.getBoundingClientRect().top - scroll.getBoundingClientRect().top - anchor.offset;
-      }
-    }
-    previousResetKey.current = resetKey;
-    rememberReadingPosition();
-    measureScrollEdges();
-  }, [rows, pendingMessages, isPrinting, resetKey, rememberReadingPosition, measureScrollEdges]);
 
   // Printing renders known history only; it never starts a network request.
   useEffect(() => {
@@ -566,20 +526,14 @@ export function GestureMessageChat({
 
   const loadOlder = () => {
     if (pagination?.isLoading) return;
-    rememberReadingPosition();
     // Only in "All activity", the one view that lists events.
     if (hasMoreEvents && !pagination?.error) {
       setEventWindow({ key: resetKey, limit: eventLimit + SYSTEM_EVENTS_PER_PAGE });
     }
     if (pagination?.hasMore || pagination?.error) void pagination.onLoadMore();
   };
-  const showMoreOnPhones = () =>
-    setPhoneWindow({ key: resetKey, messages: phoneMessages + PHONE_MESSAGES_STEP });
-
-  const scrollMask =
-    !isPrinting && (scrollEdges.top || scrollEdges.bottom)
-      ? `linear-gradient(to bottom, transparent 0, #000 ${scrollEdges.top ? SCROLL_FADE : '0px'}, #000 calc(100% - ${scrollEdges.bottom ? SCROLL_FADE : '0px'}), transparent 100%)`
-      : undefined;
+  const showMore = () =>
+    setMessageWindow({ key: resetKey, messages: visibleMessages + VISIBLE_MESSAGES_STEP });
 
   const summary =
     cycleNumber != null
@@ -621,6 +575,8 @@ export function GestureMessageChat({
         <LiveStatus
           variant="inline"
           still
+          quietWhenFresh
+          announce={false}
           queryKeys={[['homeGestureFeed']]}
           // Its own line on phones, whatever the count line's length, so the
           // header keeps one shape as the history grows.
@@ -651,153 +607,155 @@ export function GestureMessageChat({
         </div>
       )}
 
-      {/* From 1024px the feed scrolls inside its region; below it is part of the page. */}
-      <div className="relative min-h-0 lg:min-h-[24rem] lg:flex-1 print:min-h-0">
-        <div
-          ref={scrollRef}
-          data-testid="gesture-message-chat-scroll"
-          role="region"
-          aria-labelledby={titleId}
-          tabIndex={0}
-          onScroll={isPrinting ? undefined : handleScroll}
-          data-overflow-top={(!isPrinting && scrollEdges.top) || undefined}
-          data-overflow-bottom={(!isPrinting && scrollEdges.bottom) || undefined}
-          // From 1024px the region starts 0.75rem before the text column, so
-          // the newest message's settle rule is not clipped by the scroller.
-          className="focus-ring-inset lg:absolute lg:inset-y-0 lg:-start-3 lg:end-0 lg:overflow-y-auto lg:overscroll-y-contain lg:ps-3 lg:[scrollbar-gutter:stable] print:static print:overflow-visible"
-          style={scrollMask ? { maskImage: scrollMask, WebkitMaskImage: scrollMask } : undefined}
-        >
-          {isLoading ? (
-            // The feed's own shape waits: message rows in skeleton, so nothing
-            // jumps when the history lands. The status is spoken once.
-            <div
-              role="status"
-              data-testid="chat-loading"
-              className="divide-y divide-rule-faint print:hidden"
-            >
-              <span className="sr-only">{t('chat.history.loading')}</span>
-              {CHAT_SKELETON_ROWS.map((width) => (
-                <div key={width} aria-hidden className="py-3.5">
-                  <Skeleton className="h-3.5 w-28" />
-                  <Skeleton className="mt-2.5 h-4" style={{ width }} />
-                  <Skeleton className="mt-2.5 h-3 w-20" />
-                </div>
-              ))}
-            </div>
-          ) : error ? (
-            <div role="status" className="space-y-3 py-4 print:hidden">
-              <p className="type-body-sm text-muted-foreground">{t('chat.history.error')}</p>
-              {onRetry ? (
-                <Button variant="secondary" size="sm" onClick={onRetry}>
-                  {t('chat.history.retry')}
-                </Button>
-              ) : null}
-            </div>
-          ) : null}
+      {/* The feed is part of the page at every width: it never scrolls inside it. */}
+      <div
+        data-testid="gesture-message-chat-scroll"
+        role="region"
+        aria-labelledby={titleId}
+        className="min-w-0"
+      >
+        {isLoading ? (
+          // The feed's own shape waits: message rows in skeleton, so nothing
+          // jumps when the history lands. The status is spoken once.
+          <div
+            role="status"
+            data-testid="chat-loading"
+            className="divide-y divide-rule-faint print:hidden"
+          >
+            <span className="sr-only">{t('chat.history.loading')}</span>
+            {CHAT_SKELETON_ROWS.map((width) => (
+              <div key={width} aria-hidden className="py-3.5">
+                <Skeleton className="h-3.5 w-28" />
+                <Skeleton className="mt-2.5 h-4" style={{ width }} />
+                <Skeleton className="mt-2.5 h-3 w-20" />
+              </div>
+            ))}
+          </div>
+        ) : error ? (
+          <div role="status" className="space-y-3 py-4 print:hidden">
+            <p className="type-body-sm text-muted-foreground">{t('chat.history.error')}</p>
+            {onRetry ? (
+              <Button variant="secondary" size="sm" onClick={onRetry}>
+                {t('chat.history.retry')}
+              </Button>
+            ) : null}
+          </div>
+        ) : null}
 
-          {!isLoading && !error && hasAnyContent && noMessagesYet ? (
-            <div
-              data-testid="chat-no-messages"
-              className={cn(
-                'flex flex-wrap items-center justify-between gap-3 py-3',
-                hasFeedContent && 'border-b border-rule-faint',
-              )}
-            >
-              <p className="type-body-sm text-muted-foreground">{t('chat.empty.messagesFirst')}</p>
-              {onJoinCta ? (
+        {!isLoading && !error && hasAnyContent && noMessagesYet ? (
+          <div
+            data-testid="chat-no-messages"
+            className={cn(
+              'flex flex-wrap items-center justify-between gap-3 py-3',
+              hasFeedContent && 'border-b border-rule-faint',
+            )}
+          >
+            <p className="type-body-sm text-muted-foreground">{t('chat.empty.messagesFirst')}</p>
+            {onJoinCta ? (
+              <Button variant="secondary" size="sm" onClick={onJoinCta}>
+                {t('chat.empty.cta')}
+              </Button>
+            ) : null}
+          </div>
+        ) : null}
+
+        {hasFeedContent && !isLoading && !error ? (
+          <ol role="list" className="divide-y divide-rule-faint">
+            {pending.map((entry, index) => (
+              <li
+                key={entry.id}
+                data-chat-row={`pending:${entry.id}`}
+                className={cn(!isPrinting && index >= shownRows && 'hidden')}
+              >
+                <PendingMessageRow pending={entry} />
+              </li>
+            ))}
+            {rows.map((row, index) => (
+              <li
+                key={row.key}
+                data-chat-row={row.key}
+                className={cn(!isPrinting && pending.length + index >= shownRows && 'hidden')}
+              >
+                {row.type === 'message' ? (
+                  <MessageRow
+                    entry={row.entry}
+                    isOwn={sameAddress(row.entry.gesture.BidderAddr, account)}
+                    settling={isSettling && row.entry === newestMessage}
+                    methodTag={methodTag(row.entry.gesture)}
+                  />
+                ) : (
+                  <SystemEventRow event={row.event} />
+                )}
+              </li>
+            ))}
+          </ol>
+        ) : !isLoading && !error && !hasAnyContent ? (
+          <EmptyState
+            variant="inline"
+            headingLevel={3}
+            icon={<MessageCircle className="size-6 text-subtle" aria-hidden />}
+            title={t('chat.empty.title')}
+            description={t('chat.empty.description')}
+            action={
+              onJoinCta ? (
                 <Button variant="secondary" size="sm" onClick={onJoinCta}>
                   {t('chat.empty.cta')}
                 </Button>
-              ) : null}
-            </div>
-          ) : null}
+              ) : undefined
+            }
+            className="py-10"
+          />
+        ) : null}
 
-          {hasFeedContent && !isLoading && !error ? (
-            <ol role="list" className="divide-y divide-rule-faint">
-              {pending.map((entry, index) => (
-                <li
-                  key={entry.id}
-                  data-chat-row={`pending:${entry.id}`}
-                  className={cn(!isPrinting && index >= phoneRows && 'max-lg:hidden')}
-                >
-                  <PendingMessageRow pending={entry} />
-                </li>
-              ))}
-              {rows.map((row, index) => (
-                <li
-                  key={row.key}
-                  data-chat-row={row.key}
-                  className={cn(
-                    !isPrinting && pending.length + index >= phoneRows && 'max-lg:hidden',
-                  )}
-                >
-                  {row.type === 'message' ? (
-                    <MessageRow
-                      entry={row.entry}
-                      isOwn={sameAddress(row.entry.gesture.BidderAddr, account)}
-                      settling={isSettling && row.entry === newestMessage}
-                      methodTag={methodTag(row.entry.gesture)}
-                    />
-                  ) : (
-                    <SystemEventRow event={row.event} />
-                  )}
-                </li>
-              ))}
-            </ol>
-          ) : !isLoading && !error && !hasAnyContent ? (
-            <EmptyState
-              variant="inline"
-              headingLevel={3}
-              icon={<MessageCircle className="size-6 text-subtle" aria-hidden />}
-              title={t('chat.empty.title')}
-              description={t('chat.empty.description')}
-              action={
-                onJoinCta ? (
-                  <Button variant="secondary" size="sm" onClick={onJoinCta}>
-                    {t('chat.empty.cta')}
-                  </Button>
-                ) : undefined
-              }
-              className="py-10"
-            />
-          ) : null}
+        {showInvite ? (
+          <div
+            data-testid="chat-invite"
+            className="flex flex-wrap items-center justify-between gap-x-4 gap-y-2 border-t border-rule-faint py-4 print:hidden"
+          >
+            <p className="type-body-sm flex min-w-0 items-center gap-2 text-muted-foreground">
+              <PenLine className="size-4 shrink-0 text-subtle" aria-hidden />
+              {t('chat.invite')}
+            </p>
+            <Button variant="secondary" size="sm" onClick={onJoinCta}>
+              {t('form.message.add')}
+            </Button>
+          </div>
+        ) : null}
 
-          {!isLoading && !error && (hiddenOnPhones || hasOlderContent || pagination?.error) ? (
-            // A gap, not a margin: a button hidden at this width leaves no space.
-            <div className="flex flex-col gap-2 border-t border-rule-faint py-4 print:hidden">
-              {pagination?.error ? (
-                <p role="status" className="type-body-sm text-muted-foreground">
-                  {t('chat.history.olderError')}
-                </p>
-              ) : null}
-              {hiddenOnPhones ? (
-                <Button
-                  type="button"
-                  variant="secondary"
-                  className="w-full whitespace-normal lg:hidden"
-                  onClick={showMoreOnPhones}
-                >
-                  {t('chat.history.showMore')}
-                </Button>
-              ) : null}
-              {hasOlderContent || pagination?.error ? (
-                <Button
-                  type="button"
-                  variant="secondary"
-                  loading={pagination?.isLoading}
-                  className={cn('w-full whitespace-normal', hiddenOnPhones && 'max-lg:hidden')}
-                  onClick={loadOlder}
-                >
-                  {pagination?.isLoading
-                    ? t('chat.history.loadingOlder')
-                    : pagination?.error
-                      ? t('chat.history.retry')
-                      : t('chat.history.loadOlder')}
-                </Button>
-              ) : null}
-            </div>
-          ) : null}
-        </div>
+        {!isLoading && !error && (hasHiddenRows || hasOlderContent || pagination?.error) ? (
+          <div className="flex flex-col gap-2 border-t border-rule-faint py-4 print:hidden">
+            {pagination?.error ? (
+              <p role="status" className="type-body-sm text-muted-foreground">
+                {t('chat.history.olderError')}
+              </p>
+            ) : null}
+            {/* What is already here first; older history once all of it shows. */}
+            {hasHiddenRows ? (
+              <Button
+                type="button"
+                variant="secondary"
+                className="w-full whitespace-normal"
+                onClick={showMore}
+              >
+                {t('chat.history.showMore')}
+              </Button>
+            ) : hasOlderContent || pagination?.error ? (
+              <Button
+                type="button"
+                variant="secondary"
+                loading={pagination?.isLoading}
+                className="w-full whitespace-normal"
+                onClick={loadOlder}
+              >
+                {pagination?.isLoading
+                  ? t('chat.history.loadingOlder')
+                  : pagination?.error
+                    ? t('chat.history.retry')
+                    : t('chat.history.loadOlder')}
+              </Button>
+            ) : null}
+          </div>
+        ) : null}
       </div>
     </div>
   );

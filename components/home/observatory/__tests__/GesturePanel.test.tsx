@@ -1,3 +1,4 @@
+import { fireEvent } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { createRef } from 'react';
 
@@ -122,9 +123,65 @@ describe('GesturePanel', () => {
       for (const part of cost.querySelectorAll('span'))
         expect(part).toHaveClass('whitespace-nowrap');
     }
+    // One choice of three: a radio group with the selection checked.
+    expect(within(tabs.parentElement!).getByRole('radiogroup')).toBe(tabs);
     expect(
-      within(tabs).getByRole('button', { name: /home\.form\.method\.eth\.label/ }),
-    ).toHaveAttribute('aria-pressed', 'true');
+      within(tabs).getByRole('radio', { name: /home\.form\.method\.eth\.label/ }),
+    ).toHaveAttribute('aria-checked', 'true');
+    expect(within(tabs).getAllByRole('radio', { checked: false })).toHaveLength(2);
+  });
+
+  it('prints both ETH methods at one precision, so their prices line up', () => {
+    render(
+      <GesturePanel
+        {...baseProps}
+        form={makeForm({
+          ethGestureInfo: { AuctionDuration: 3600, ETHPrice: 0.10210695, SecondsElapsed: 1800 },
+        })}
+      />,
+    );
+    expect(screen.getByTestId('panel-method-eth-cost')).toHaveTextContent(/^0\.10211 ETH$/);
+    // Five decimals like the price beside it, never "0.051053".
+    expect(screen.getByTestId('panel-method-randomWalk-cost')).toHaveTextContent(/^0\.05105 ETH$/);
+  });
+
+  it('draws the selection as a straight bar inset from the rounded corners', () => {
+    render(<GesturePanel {...baseProps} form={makeForm()} />);
+    const eth = screen.getByTestId('panel-method-eth');
+    const bar = eth.querySelector('[data-slot="method-selected-bar"]');
+    expect(bar).toHaveClass('absolute', 'rounded-pill', 'bg-primary');
+    expect(eth.className).not.toMatch(/shadow-\[inset/);
+    expect(screen.getByTestId('panel-method-cst').querySelector('[data-slot]')).toBeNull();
+  });
+
+  it('moves and selects with the arrow keys, from one tab stop', async () => {
+    const user = userEvent.setup();
+    render(<GesturePanel {...baseProps} form={makeForm()} />);
+    const radios = within(screen.getByTestId('panel-method-tabs')).getAllByRole('radio');
+    expect(radios.map((radio) => radio.tabIndex)).toEqual([0, -1, -1]);
+
+    radios[0]!.focus();
+    await user.keyboard('{ArrowRight}');
+    expect(baseProps.onSelectGestureType).toHaveBeenLastCalledWith('RandomWalk');
+    expect(radios[1]).toHaveFocus();
+    await user.keyboard('{End}');
+    expect(baseProps.onSelectGestureType).toHaveBeenLastCalledWith('CST');
+    await user.keyboard('{ArrowRight}');
+    // Wraps around to the first.
+    expect(baseProps.onSelectGestureType).toHaveBeenLastCalledWith('ETH');
+  });
+
+  it('reads each method with the condition that decides whether it is usable', () => {
+    render(<GesturePanel {...baseProps} form={makeForm({ rwlknftIds: [] })} />);
+    expect(screen.getByTestId('panel-method-eth')).toHaveAccessibleDescription(
+      'home.orientation.methods.eth',
+    );
+    expect(screen.getByTestId('panel-method-randomWalk')).toHaveAccessibleDescription(
+      'home.form.method.randomWalk.desc',
+    );
+    expect(screen.getByTestId('panel-method-cst')).toHaveAccessibleDescription(
+      'home.orientation.methods.cst',
+    );
   });
 
   it('prices a confirmed zero CST quote as 0 CST, never as free of every cost', () => {
@@ -192,6 +249,21 @@ describe('GesturePanel', () => {
     expect(screen.queryByTestId('panel-cst-reward')).not.toBeInTheDocument();
   });
 
+  it.each(['CST', 'RandomWalk'])(
+    'never arms the submit for %s, a method the first Gesture cannot use',
+    (gestureType) => {
+      render(
+        <GesturePanel
+          {...baseProps}
+          data={makeData({ LastBidderAddr: '0x0000000000000000000000000000000000000000' })}
+          form={makeForm({ gestureType, rwlkId: 3, rwlknftIds: [3] })}
+          submit={{ action: 'home.form.submit.action.cst', cost: `12.50${NBSP}CST` }}
+        />,
+      );
+      expect(submitButton()).toBeDisabled();
+    },
+  );
+
   it('says what ETH + Random Walk needs before anyone mistakes it for the best deal', () => {
     render(<GesturePanel {...baseProps} form={makeForm({ rwlknftIds: [] })} />);
 
@@ -209,7 +281,9 @@ describe('GesturePanel', () => {
   it('treats ETH + Random Walk as a peer when the wallet holds an eligible NFT', () => {
     render(<GesturePanel {...baseProps} form={makeForm({ rwlknftIds: [7] })} />);
     expect(screen.getByTestId('panel-method-randomWalk-cost')).toHaveClass('text-muted-foreground');
-    expect(screen.getByTestId('panel-method-randomWalk')).not.toHaveAccessibleDescription();
+    expect(screen.getByTestId('panel-method-randomWalk')).toHaveAccessibleDescription(
+      'home.orientation.methods.randomWalk',
+    );
     expect(screen.getByTestId('panel-method-explanation')).toHaveTextContent(
       'home.orientation.methods.eth',
     );
@@ -217,16 +291,45 @@ describe('GesturePanel', () => {
 
   it('labels the Random Walk picker by its heading and blocks submit until a token is chosen', () => {
     const { rerender } = render(
-      <GesturePanel {...baseProps} form={makeForm({ gestureType: 'RandomWalk' })} />,
+      <GesturePanel
+        {...baseProps}
+        form={makeForm({ gestureType: 'RandomWalk', rwlknftIds: [42] })}
+      />,
     );
     const heading = screen.getByRole('heading', { name: 'home.form.rwlk.title' });
     expect(screen.getByTestId('rwlk-grid')).toHaveAttribute('data-labelledby', heading.id);
     expect(submitButton()).toBeDisabled();
 
     rerender(
-      <GesturePanel {...baseProps} form={makeForm({ gestureType: 'RandomWalk', rwlkId: 42 })} />,
+      <GesturePanel
+        {...baseProps}
+        form={makeForm({ gestureType: 'RandomWalk', rwlkId: 42, rwlknftIds: [42] })}
+      />,
     );
     expect(submitButton()).toBeEnabled();
+  });
+
+  it.each([
+    ['not one of the wallet’s unused NFTs', { rwlkId: 42, rwlknftIds: [7] }],
+    ['still being read', { rwlkId: 42, rwlknftIds: [42], rwlkListStatus: 'loading' as const }],
+    ['from a list that could not be read', { rwlkId: 42, rwlkListStatus: 'error' as const }],
+  ])('never arms a Random Walk Gesture with a token %s', (_case, overrides) => {
+    render(
+      <GesturePanel {...baseProps} form={makeForm({ gestureType: 'RandomWalk', ...overrides })} />,
+    );
+    expect(submitButton()).toBeDisabled();
+  });
+
+  it('says once why a linked token was not selected', () => {
+    render(
+      <GesturePanel
+        {...baseProps}
+        form={makeForm({ gestureType: 'RandomWalk', rwlknftIds: [3], rwlkRejectedId: 7 })}
+      />,
+    );
+    const note = screen.getByTestId('panel-rwlk-rejected');
+    expect(note).toHaveAttribute('role', 'status');
+    expect(note).toHaveTextContent('home.form.rwlk.linkedUnavailable(tokenId=7)');
   });
 
   it('asks a visitor without a wallet to connect one instead of offering an empty search', () => {
@@ -269,19 +372,44 @@ describe('GesturePanel', () => {
   it('states the Participation CST and the minimum accepted as spec rows', () => {
     render(<GesturePanel {...baseProps} form={makeForm()} />);
     const rows = screen.getByTestId('panel-cst-reward');
+    // Live figures keep two decimals, so a ticking value never jumps between 141 and 141.01.
     expect(within(rows).getByTestId('panel-cst-metric-reward')).toHaveTextContent(
-      /home\.form\.reward\.previewTitle.*100 CST/,
+      /home\.form\.reward\.previewTitle.*100\.00 CST/,
     );
     expect(within(rows).getByTestId('panel-cst-min-accepted')).toHaveTextContent(
-      /home\.form\.reward\.minAcceptedLabel.*99 CST/,
+      /home\.form\.reward\.minAcceptedLabel.*99\.00 CST/,
     );
   });
 
   it('shows the CST economics as reward, cost and a signed net', () => {
     render(<GesturePanel {...baseProps} form={makeForm({ gestureType: 'CST' })} />);
-    expect(screen.getByTestId('panel-cst-metric-reward')).toHaveTextContent('100 CST');
+    expect(screen.getByTestId('panel-cst-metric-reward')).toHaveTextContent('100.00 CST');
     expect(screen.getByTestId('panel-cst-metric-cost')).toHaveTextContent('12.50 CST');
     expect(screen.getByTestId('panel-cst-metric-net')).toHaveTextContent('+87.50 CST');
+  });
+
+  it('shows the dashboard’s Participation CST, marked approximate, until the live preview lands', () => {
+    const { rerender } = render(
+      <GesturePanel
+        {...baseProps}
+        data={makeData({ ParticipationCstReward: 141.2 })}
+        form={makeForm({ gestureCstRewardAmount: null, gestureCstRewardAmountMin: null })}
+      />,
+    );
+    const reward = () => screen.getByTestId('panel-cst-metric-reward');
+    expect(reward().textContent).toContain(`≈${NBSP}141.20${NBSP}CST`);
+    // The minimum the transaction accepts waits for the live read.
+    expect(screen.getByTestId('panel-cst-min-accepted')).not.toHaveTextContent(/\d/);
+
+    rerender(
+      <GesturePanel
+        {...baseProps}
+        data={makeData({ ParticipationCstReward: 141.2 })}
+        form={makeForm({ gestureCstRewardAmount: 140.5 })}
+      />,
+    );
+    expect(reward()).toHaveTextContent('140.50 CST');
+    expect(reward()).not.toHaveTextContent('≈');
   });
 
   it('keeps figures pending, not zero, while the reward loads', () => {
@@ -414,6 +542,44 @@ describe('GesturePanel', () => {
   it('counts the drafted characters against the on-chain limit', () => {
     render(<GesturePanel {...baseProps} form={makeForm({ message: 'Hello' })} />);
     expect(screen.getByTestId('gesture-message-char-count')).toHaveTextContent('5/280');
+  });
+
+  it('counts UTF-8 bytes, as the contract does, against its live cap', () => {
+    render(
+      <GesturePanel {...baseProps} form={makeForm({ message: '落笔', messageMaxBytes: 100 })} />,
+    );
+    // Two Chinese characters take six bytes.
+    expect(screen.getByTestId('gesture-message-char-count')).toHaveTextContent('6/100');
+    expect(screen.getByTestId('gesture-message-toggle')).toHaveTextContent(
+      'home.form.advanced.messageOptionalHint(maxLength=100)',
+    );
+  });
+
+  it('cuts a pasted Chinese message at the byte cap, after a whole character', () => {
+    const form = makeForm({ message: 'x' });
+    render(<GesturePanel {...baseProps} form={form} />);
+    fireEvent.change(screen.getByTestId('gesture-message-input'), {
+      target: { value: '落'.repeat(100) },
+    });
+    expect(form.setMessage).toHaveBeenLastCalledWith('落'.repeat(93));
+  });
+
+  it('closes the editor from its toggle even while a draft exists', async () => {
+    const user = userEvent.setup();
+    const { rerender } = render(<GesturePanel {...baseProps} form={makeForm({ message: 'Hi' })} />);
+    const toggle = screen.getByTestId('gesture-message-toggle');
+    expect(toggle).toHaveAttribute('aria-expanded', 'true');
+
+    await user.click(toggle);
+    expect(toggle).toHaveAttribute('aria-expanded', 'false');
+    // Editing the kept draft elsewhere does not force it open again…
+    rerender(<GesturePanel {...baseProps} form={makeForm({ message: 'Hi there' })} />);
+    expect(toggle).toHaveAttribute('aria-expanded', 'false');
+
+    // …but a new draft arriving from the other surface does.
+    rerender(<GesturePanel {...baseProps} form={makeForm({ message: '' })} />);
+    rerender(<GesturePanel {...baseProps} form={makeForm({ message: 'New' })} />);
+    expect(toggle).toHaveAttribute('aria-expanded', 'true');
   });
 
   /* ── Advanced options ────────────────────────────────────────── */
@@ -641,7 +807,7 @@ describe('GesturePanel', () => {
     anchor.focus();
     expect(anchor).toHaveFocus();
     await user.tab();
-    expect(screen.getByRole('button', { name: /home\.form\.method\.eth\.label/ })).toHaveFocus();
+    expect(screen.getByRole('radio', { name: /home\.form\.method\.eth\.label/ })).toHaveFocus();
   });
 
   it.each([

@@ -1377,3 +1377,329 @@ describe('useGestureForm', () => {
     );
   });
 });
+
+/** The first write's arguments (the gesture call), whatever the V1/V2 shape appends. */
+function firstWriteArgs(): readonly unknown[] {
+  const call = mockTx.writeContract.mock.calls[0];
+  return ((call?.[0] as { args?: unknown[] } | undefined)?.args ?? []) as readonly unknown[];
+}
+
+describe('useGestureForm message cap (UTF-8 bytes, as the contract counts)', () => {
+  afterEach(() => {
+    delete (mockContractObj.read as Record<string, unknown>).bidMessageLengthMaxLimit;
+  });
+
+  it('cuts a long Chinese message at 280 bytes, after the last whole character', async () => {
+    const { result } = renderHook(() => useGestureForm());
+    await flushAsyncWork();
+
+    // 100 characters of three bytes each: 300 bytes, over the default cap.
+    act(() => result.current.setMessage('落'.repeat(100)));
+
+    expect(result.current.messageMaxBytes).toBe(280);
+    expect(result.current.message).toBe('落'.repeat(93));
+    expect(new TextEncoder().encode(result.current.message).length).toBeLessThanOrEqual(280);
+  });
+
+  it('never splits an emoji at the cap', async () => {
+    const { result } = renderHook(() => useGestureForm());
+    await flushAsyncWork();
+
+    act(() => result.current.setMessage(`${'a'.repeat(278)}😀`));
+
+    expect(result.current.message).toBe('a'.repeat(278));
+  });
+
+  it("reads the contract's live cap and applies it", async () => {
+    (mockContractObj.read as Record<string, unknown>).bidMessageLengthMaxLimit = jest
+      .fn()
+      .mockResolvedValue(10n);
+    const { result } = renderHook(() => useGestureForm());
+    await waitFor(() => expect(result.current.messageMaxBytes).toBe(10));
+
+    act(() => result.current.setMessage('abcdefghijklmnop'));
+
+    expect(result.current.message).toBe('abcdefghij');
+  });
+
+  it('refuses a message that no longer fits before the wallet prompt', async () => {
+    let resolveCap!: (value: bigint) => void;
+    (mockContractObj.read as Record<string, unknown>).bidMessageLengthMaxLimit = jest.fn(
+      () =>
+        new Promise<bigint>((resolve) => {
+          resolveCap = resolve;
+        }),
+    );
+    const { result } = renderHook(() => useGestureForm());
+    await flushAsyncWork();
+    act(() => result.current.setMessage('a'.repeat(50)));
+    // The owner lowered the cap after the message was typed.
+    resolveCap(20n);
+    await waitFor(() => expect(result.current.messageMaxBytes).toBe(20));
+
+    const ok = await result.current.onGesture();
+
+    expect(ok).toBe(false);
+    expect(mockNotify).toHaveBeenCalledWith(
+      'error',
+      'toasts.gesture.contractErrors.tooLongBidMessage',
+    );
+    expect(mockTx.writeContract).not.toHaveBeenCalled();
+  });
+});
+
+describe('useGestureForm first Gesture of a cycle', () => {
+  it('holds ETH once the cycle has no Gesture, whatever was chosen before', async () => {
+    const { result, rerender } = renderHook(
+      ({ firstGesture }: { firstGesture: boolean }) => useGestureForm({ firstGesture }),
+      { initialProps: { firstGesture: false } },
+    );
+    await flushAsyncWork();
+    act(() => result.current.setBidType('CST'));
+    expect(result.current.gestureType).toBe('CST');
+
+    // The page stays open into the next cycle, which opens with no Gesture.
+    rerender({ firstGesture: true });
+
+    expect(result.current.gestureType).toBe('ETH');
+    expect(result.current.rwlkId).toBe(-1);
+  });
+
+  it('lets a Random Walk deep link go before the first Gesture', async () => {
+    const { result } = renderHook(() => useGestureForm({ firstGesture: true }));
+    await flushAsyncWork();
+
+    act(() => {
+      result.current.setBidType('RandomWalk');
+      result.current.setRwlkId(3);
+    });
+
+    expect(result.current.gestureType).toBe('ETH');
+    expect(result.current.rwlkId).toBe(-1);
+  });
+
+  it('refuses a CST first Gesture instead of sending one that reverts', async () => {
+    const { result } = renderHook(() => useGestureForm({ firstGesture: true }));
+    await flushAsyncWork();
+
+    const ok = await result.current.onGestureWithCST();
+
+    expect(ok).toBe(false);
+    expect(mockNotify).toHaveBeenCalledWith('error', 'toasts.gesture.contractErrors.wrongBidType');
+    expect(mockTx.writeContract).not.toHaveBeenCalled();
+  });
+});
+
+describe('useGestureForm Random Walk token', () => {
+  it("lets go of a token that is not one of this wallet's unused NFTs, and says which", async () => {
+    const { result } = renderHook(() => useGestureForm());
+    act(() => {
+      result.current.setBidType('RandomWalk');
+      // A deep link to another wallet's token (the wallet holds 1, 2 and 3; 2 is used).
+      result.current.setRwlkId(7);
+    });
+    // Kept while the list is still being read.
+    expect(result.current.rwlkId).toBe(7);
+
+    await waitFor(() => expect(result.current.rwlkListStatus).toBe('ready'));
+
+    expect(result.current.rwlkId).toBe(-1);
+    expect(result.current.rwlkRejectedId).toBe(7);
+
+    // A new pick clears the note.
+    act(() => result.current.setRwlkId(3));
+    expect(result.current.rwlkId).toBe(3);
+    expect(result.current.rwlkRejectedId).toBeNull();
+  });
+
+  it('lets go of a used token', async () => {
+    const { result } = renderHook(() => useGestureForm());
+    act(() => {
+      result.current.setBidType('RandomWalk');
+      result.current.setRwlkId(2);
+    });
+    await waitFor(() => expect(result.current.rwlkListStatus).toBe('ready'));
+    expect(result.current.rwlkId).toBe(-1);
+  });
+
+  it('lets go of a token picked for another wallet once the new list is read', async () => {
+    const web3 = jest.requireMock('../../hooks/web3') as { useActiveWeb3React: jest.Mock };
+    const { result, rerender } = renderHook(() => useGestureForm());
+    await waitFor(() => expect(result.current.rwlknftIds).toEqual([3, 1]));
+    act(() => {
+      result.current.setBidType('RandomWalk');
+      result.current.setRwlkId(3);
+    });
+    expect(result.current.rwlkId).toBe(3);
+
+    web3.useActiveWeb3React.mockReturnValue({ account: '0xOther', chainId: 1, active: true });
+    mockRWLKContract.read.walletOfOwner.mockResolvedValue([BigInt(9)]);
+    try {
+      rerender();
+      await waitFor(() => expect(result.current.rwlknftIds).toEqual([9]));
+      expect(result.current.rwlkId).toBe(-1);
+    } finally {
+      web3.useActiveWeb3React.mockReturnValue({ account: '0xUser', chainId: 1, active: true });
+    }
+  });
+
+  it('sends the chosen token, then lets it go once it is used', async () => {
+    mockReadContract.mockImplementation(async ({ functionName }: { functionName: string }) => {
+      if (functionName === 'ownerOf') return '0xUser';
+      if (functionName === 'usedRandomWalkNfts') return 0n;
+      return true;
+    });
+    const { result } = renderHook(() => useGestureForm());
+    await waitFor(() => expect(result.current.rwlknftIds).toEqual([3, 1]));
+    act(() => {
+      result.current.setBidType('RandomWalk');
+      result.current.setRwlkId(3);
+    });
+
+    // The page ticks between these renders, so the call runs outside act()
+    // like the other submit tests.
+    const ok = await result.current.onGesture();
+
+    expect(ok).toBe(true);
+    expect(firstWriteArgs()[0]).toBe(3n);
+    await waitFor(() => expect(result.current.rwlkId).toBe(-1));
+    expect(result.current.rwlknftIds).toEqual([1]);
+  });
+
+  it('checks ownership on-chain before the wallet prompt', async () => {
+    mockReadContract.mockImplementation(async ({ functionName }: { functionName: string }) => {
+      if (functionName === 'ownerOf') return '0xSomeoneElse';
+      if (functionName === 'usedRandomWalkNfts') return 0n;
+      return true;
+    });
+    const { result } = renderHook(() => useGestureForm());
+    await waitFor(() => expect(result.current.rwlknftIds).toEqual([3, 1]));
+    act(() => {
+      result.current.setBidType('RandomWalk');
+      result.current.setRwlkId(3);
+    });
+
+    const ok = await result.current.onGesture();
+
+    expect(ok).toBe(false);
+    expect(mockNotify).toHaveBeenCalledWith(
+      'error',
+      'toasts.gesture.contractErrors.callerIsNotNftOwner',
+    );
+    expect(mockTx.writeContract).not.toHaveBeenCalled();
+  });
+
+  it('refuses a token the contract already counts as used', async () => {
+    mockReadContract.mockImplementation(async ({ functionName }: { functionName: string }) => {
+      if (functionName === 'ownerOf') return '0xUser';
+      if (functionName === 'usedRandomWalkNfts') return 1n;
+      return true;
+    });
+    const { result } = renderHook(() => useGestureForm());
+    await waitFor(() => expect(result.current.rwlknftIds).toEqual([3, 1]));
+    act(() => {
+      result.current.setBidType('RandomWalk');
+      result.current.setRwlkId(3);
+    });
+
+    const ok = await result.current.onGesture();
+
+    expect(ok).toBe(false);
+    expect(mockNotify).toHaveBeenCalledWith(
+      'error',
+      'toasts.gesture.contractErrors.usedRandomWalkNft',
+    );
+    expect(mockTx.writeContract).not.toHaveBeenCalled();
+  });
+
+  it("asks for one of the wallet's unused tokens when none is chosen", async () => {
+    const { result } = renderHook(() => useGestureForm());
+    await waitFor(() => expect(result.current.rwlknftIds).toEqual([3, 1]));
+    act(() => result.current.setBidType('RandomWalk'));
+
+    const ok = await result.current.onGesture();
+
+    expect(ok).toBe(false);
+    expect(mockNotify).toHaveBeenCalledWith(
+      'error',
+      'toasts.gesture.validation.chooseRandomWalkNft',
+    );
+    expect(mockNotify).not.toHaveBeenCalledWith(
+      'error',
+      'toasts.gesture.contractErrors.usedRandomWalkNft',
+    );
+    expect(mockTx.writeContract).not.toHaveBeenCalled();
+  });
+
+  describe("with a token the wallet's list has not confirmed", () => {
+    // The list is still being read, so the token (a deep link, say) is kept
+    // and only the chain can say what is wrong with it.
+    const submitUnlistedToken = async () => {
+      mockRWLKContract.read.walletOfOwner.mockReturnValue(new Promise(() => undefined));
+      const { result } = renderHook(() => useGestureForm());
+      act(() => {
+        result.current.setBidType('RandomWalk');
+        result.current.setRwlkId(7);
+      });
+      expect(result.current.rwlkListStatus).toBe('loading');
+      return result.current.onGesture();
+    };
+
+    it("names another wallet's token as not owned, not as used", async () => {
+      mockReadContract.mockImplementation(async ({ functionName }: { functionName: string }) => {
+        if (functionName === 'ownerOf') return '0xSomeoneElse';
+        if (functionName === 'usedRandomWalkNfts') return 0n;
+        return true;
+      });
+
+      expect(await submitUnlistedToken()).toBe(false);
+      expect(mockNotify).toHaveBeenCalledWith(
+        'error',
+        'toasts.gesture.contractErrors.callerIsNotNftOwner',
+      );
+      expect(mockNotify).not.toHaveBeenCalledWith(
+        'error',
+        'toasts.gesture.contractErrors.usedRandomWalkNft',
+      );
+      expect(mockTx.writeContract).not.toHaveBeenCalled();
+    });
+
+    it('lets the chain vouch for a token it confirms as owned and unused', async () => {
+      mockReadContract.mockImplementation(async ({ functionName }: { functionName: string }) => {
+        if (functionName === 'ownerOf') return '0xUser';
+        if (functionName === 'usedRandomWalkNfts') return 0n;
+        return true;
+      });
+
+      expect(await submitUnlistedToken()).toBe(true);
+      expect(firstWriteArgs()[0]).toBe(7n);
+    });
+
+    it('asks for a listed token when the chain cannot be read', async () => {
+      mockReadContract.mockImplementation(async ({ functionName }: { functionName: string }) => {
+        if (functionName === 'ownerOf' || functionName === 'usedRandomWalkNfts') {
+          throw new Error('RPC unavailable');
+        }
+        return true;
+      });
+
+      expect(await submitUnlistedToken()).toBe(false);
+      expect(mockNotify).toHaveBeenCalledWith(
+        'error',
+        'toasts.gesture.validation.chooseRandomWalkNft',
+      );
+      expect(mockTx.writeContract).not.toHaveBeenCalled();
+    });
+  });
+
+  it('never sends a token with a plain ETH Gesture', async () => {
+    const { result } = renderHook(() => useGestureForm());
+    await waitFor(() => expect(result.current.rwlknftIds).toEqual([3, 1]));
+    act(() => result.current.setRwlkId(3));
+    expect(result.current.gestureType).toBe('ETH');
+
+    await result.current.onGesture();
+
+    expect(firstWriteArgs()[0]).toBe(-1n);
+  });
+});

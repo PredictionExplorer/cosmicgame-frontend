@@ -27,6 +27,7 @@ import {
 import { cn } from '@/lib/utils';
 import type { GestureInfo } from '@/services/api';
 import { sameAddress } from '@/utils/format';
+import { QUIET_TERM_CLASS } from '@/components/home/quietTerm';
 import {
   formatGestureMethod,
   formatAttachedAssets,
@@ -49,7 +50,8 @@ const SETTLE_MS = 900;
  * durations and allocations line up down the ledger at every width where the
  * ledger is a table, and the cells of a row share one baseline: the small
  * mono holder sits on the line of the larger figures beside it. Below 30rem
- * of ledger width each row reads as a record.
+ * of ledger width each row reads as a short record: the role with its
+ * allocation on one line, then the holder and the time held.
  */
 const ROW_GRID =
   '@[30rem]/ledger:grid @[30rem]/ledger:grid-cols-[minmax(0,1.25fr)_minmax(0,1.1fr)_minmax(0,1fr)_minmax(0,0.95fr)] @[30rem]/ledger:items-baseline @[30rem]/ledger:gap-x-4';
@@ -172,11 +174,19 @@ function LedgerRow({
     >
       <div className={ROW_GRID}>
         <div className="min-w-0">
-          <RoleHeading className="flex min-w-0 items-start gap-2 type-label font-medium text-foreground">
-            <Icon className="mt-px size-4 shrink-0 text-subtle" aria-hidden />
-            {/* The role's text, not the icon, gives the row its baseline. */}
-            <span className="min-w-0 self-baseline">{role}</span>
-          </RoleHeading>
+          <div className="flex min-w-0 items-baseline justify-between gap-3">
+            <RoleHeading className="flex min-w-0 items-start gap-2 type-label font-medium text-foreground">
+              <Icon className="mt-px size-4 shrink-0 text-subtle" aria-hidden />
+              {/* The role's text, not the icon, gives the row its baseline. */}
+              <span className="min-w-0 self-baseline">{role}</span>
+            </RoleHeading>
+            {/* In a narrow ledger the allocation shares the role's line, so a
+                record takes two lines, not three. Screen readers hear it,
+                labelled, in the list below. */}
+            <span aria-hidden className="shrink-0 text-end @[30rem]/ledger:hidden">
+              {allocation}
+            </span>
+          </div>
           {!holder && (
             <p data-testid={`${testId}-empty`} className="type-caption mt-1 ps-6 text-subtle">
               {emptyText}
@@ -215,10 +225,8 @@ function LedgerRow({
               {holder ? time : <NoValue />}
             </dd>
           </div>
-          <div className="flex min-w-0 items-baseline justify-between gap-3 @[30rem]/ledger:block">
-            <dt className="type-label text-subtle @[30rem]/ledger:sr-only">
-              {t('columns.allocation')}
-            </dt>
+          <div className="sr-only @[30rem]/ledger:not-sr-only @[30rem]/ledger:block">
+            <dt className="@[30rem]/ledger:sr-only">{t('columns.allocation')}</dt>
             <dd className="min-w-0 text-end">{allocation}</dd>
           </div>
         </dl>
@@ -249,8 +257,11 @@ function TimeHeld({
       {pending ? (
         <ValuePending ch={9} className="type-figure-sm" />
       ) : (
+        // Every duration in the ledger reads as a clock, held, growing or a
+        // record: one quantity, one format, digits aligned down the column.
         <Duration
           seconds={seconds}
+          variant="clock"
           className={cn('type-figure-sm', live ? 'text-live' : 'text-foreground')}
         />
       )}
@@ -608,7 +619,17 @@ export function StandingsLedger({
         headingId={headingId}
         title={t('standings.title')}
         description={description}
-        actions={<LiveStatus variant="inline" still queryKeys={[['currentSpecialWinners']]} />}
+        // The page's live indicator speaks for the ledger; its own stamp
+        // appears only when the holders stop updating.
+        actions={
+          <LiveStatus
+            variant="inline"
+            still
+            quietWhenFresh
+            announce={false}
+            queryKeys={[['currentSpecialWinners']]}
+          />
+        }
         className="mb-0 flex-row flex-wrap items-baseline justify-between gap-y-1 sm:items-baseline"
       />
 
@@ -633,7 +654,10 @@ export function StandingsLedger({
               testId="latest-participant-intel"
               icon={GestureIcon}
               role={
-                <ExplainedTerm definition={t('standings.latestTooltip')}>
+                <ExplainedTerm
+                  definition={t('standings.latestTooltip')}
+                  className={QUIET_TERM_CLASS}
+                >
                   {tTables('specialAllocation.lastGesture')}
                 </ExplainedTerm>
               }
@@ -710,7 +734,9 @@ export function StandingsLedger({
               testId="control-desk-endurance"
               icon={EnduranceChampionIcon}
               role={
-                <Term id="enduranceChampion">{tTables('specialAllocation.enduranceChampion')}</Term>
+                <Term id="enduranceChampion" className={QUIET_TERM_CLASS}>
+                  {tTables('specialAllocation.enduranceChampion')}
+                </Term>
               }
               holder={endurance.address}
               emptyText={t('ledger.empty.endurance')}
@@ -732,7 +758,11 @@ export function StandingsLedger({
               headingAs={roleHeading}
               testId="chrono-role-summary"
               icon={ChronoWarriorIcon}
-              role={<Term id="chronoWarrior">{tTables('specialAllocation.chronoWarrior')}</Term>}
+              role={
+                <Term id="chronoWarrior" className={QUIET_TERM_CLASS}>
+                  {tTables('specialAllocation.chronoWarrior')}
+                </Term>
+              }
               holder={chrono.address}
               emptyText={t('ledger.empty.chrono')}
               account={account}
@@ -790,7 +820,9 @@ export function StandingsLedger({
               testId="final-cst-role-summary"
               icon={FinalCstGestureIcon}
               role={
-                <Term id="finalCstGesture">{tTables('specialAllocation.finalCstGesture')}</Term>
+                <Term id="finalCstGesture" className={QUIET_TERM_CLASS}>
+                  {tTables('specialAllocation.finalCstGesture')}
+                </Term>
               }
               holder={lastCst.address}
               emptyText={t('ledger.empty.finalCst')}

@@ -5,9 +5,8 @@ import { parseEther, zeroAddress } from 'viem';
 import { ChevronDown, Settings2 } from 'lucide-react';
 import { useLocale, useTranslations } from 'next-intl';
 
-import { protocolFacts } from '@/content/protocol-facts';
-
 import { UniswapTradeButton } from '@/components/common/UniswapTradeButton';
+import { GESTURE_MESSAGE_MAX_BYTES, gestureMessageBytes } from '@/components/home/gestureInput';
 import PaginationRWLKGrid from '@/components/nft/PaginationRWLKGrid';
 import { Button } from '@/components/ui/button';
 import { ExplainedTerm } from '@/components/ui/explain-popover';
@@ -30,8 +29,8 @@ import { CalibrationWindow } from './CalibrationWindow';
 import { GestureAdvancedFields } from './GestureAdvancedFields';
 import { MethodSelector, type GestureMethod, type MethodOption } from './MethodSelector';
 
-const MESSAGE_MAX_LENGTH = protocolFacts.gestureMessageMaxLength;
-const MESSAGE_COUNTER_WARN_AT = MESSAGE_MAX_LENGTH - 20;
+/** The message counter turns to attention this many bytes before the cap. */
+const MESSAGE_COUNTER_WARN_BYTES = 20;
 
 /** The holder's exclusive finalization window turns to attention in its last ten minutes. */
 const HOLDER_WINDOW_ATTENTION_MS = 10 * 60 * 1000;
@@ -71,7 +70,9 @@ export type ConsoleFormState = Pick<
   | 'setAcceptAnyCstReward'
   | 'isGesturing'
   | 'gestureTxStage'
->;
+> &
+  // The contract's live message cap in UTF-8 bytes; the documented default until read.
+  Partial<Pick<GestureFormState, 'messageMaxBytes'>>;
 
 /** Finalization, once the clock has reached zero. */
 export interface ConsoleFinalize {
@@ -279,16 +280,22 @@ export function GestureConsole({
       ? gestureCstRewardAmount - currentCstCost
       : null;
 
+  // Bytes, as the contract counts them (a CJK character takes three), against
+  // the cap the hint names; the shared form cuts a message at that cap.
+  const messageMaxBytes = form.messageMaxBytes ?? GESTURE_MESSAGE_MAX_BYTES;
+  const messageBytes = gestureMessageBytes(message);
   const messageCount = (
     <span
       id={`${ids.message}-count`}
       data-testid="gesture-message-char-count"
       className={cn(
         'shrink-0 type-caption tabular-nums',
-        message.length >= MESSAGE_COUNTER_WARN_AT ? 'text-attention' : 'text-subtle',
+        messageBytes >= messageMaxBytes - MESSAGE_COUNTER_WARN_BYTES
+          ? 'text-attention'
+          : 'text-subtle',
       )}
     >
-      {message.length}/{MESSAGE_MAX_LENGTH}
+      {messageBytes}/{messageMaxBytes}
     </span>
   );
 
@@ -374,7 +381,7 @@ export function GestureConsole({
                 {t('form.advanced.messageLabel')}{' '}
                 <span className="type-caption text-subtle">
                   {t('form.advanced.messageOptionalHint', {
-                    maxLength: String(MESSAGE_MAX_LENGTH),
+                    maxLength: String(messageMaxBytes),
                   })}
                 </span>
               </Label>
@@ -387,7 +394,9 @@ export function GestureConsole({
               aria-describedby={`${ids.message}-hint ${ids.message}-count`}
               placeholder={t('form.advanced.messagePlaceholder')}
               value={message}
-              maxLength={MESSAGE_MAX_LENGTH}
+              // UTF-8 never takes fewer bytes than UTF-16 units, so this native
+              // cap never cuts early; the byte cap itself applies on change.
+              maxLength={messageMaxBytes}
               rows={3}
               onChange={(e) => setMessage(e.target.value)}
             />

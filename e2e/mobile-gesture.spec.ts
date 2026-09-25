@@ -76,7 +76,7 @@ test.describe('Mobile gesture touch handling', () => {
     if (await ethOption.isVisible({ timeout: 5_000 }).catch(() => false)) {
       await ethOption.tap();
       await expect(ethOption).toBeVisible();
-      await expect(ethOption).toHaveAttribute('aria-pressed', 'true');
+      await expect(ethOption).toHaveAttribute('aria-checked', 'true');
     }
   });
 });

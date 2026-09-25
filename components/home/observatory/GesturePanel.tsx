@@ -19,6 +19,12 @@ import { UnknownValue } from '@/components/ui/unknown-value';
 import { ConnectWalletAction } from '@/components/wallet/ConnectWalletAction';
 import { FundingNotice } from '@/components/wallet/FundingNotice';
 import { ChainGuard } from '@/components/wallet/NetworkGuard';
+import {
+  GESTURE_MESSAGE_MAX_BYTES,
+  fitGestureMessage,
+  gestureMessageBytes,
+  isUsableRandomWalkToken,
+} from '@/components/home/gestureInput';
 import type { EthGestureInfo, RwlkListStatus } from '@/hooks/useGestureForm';
 import { useTxStageLabel, type TxStage } from '@/hooks/useTxFlow';
 import { cn } from '@/lib/utils';
@@ -26,7 +32,7 @@ import type { DashboardInfo } from '@/services/api/types';
 import { toFiniteNumber } from '@/utils/finiteNumber';
 import { formatAmountParts, formatDuration } from '@/utils/format';
 import type { CstGestureData } from '@/utils/cstGesture';
-import { ethGestureBaseCost, ethGestureSendAmount, formatEthQuote } from '@/utils/gestureQuote';
+import { ethGestureSendAmount, formatEthMethodQuote, formatEthQuote } from '@/utils/gestureQuote';
 
 import { GestureAdvanced } from './GestureAdvanced';
 import { ValuePending } from './ValuePending';
@@ -38,15 +44,14 @@ import {
 } from './GestureMethodControl';
 import type { GestureSubmitParts } from './gestureSubmitLabel';
 
-const MESSAGE_MAX_LENGTH = protocolFacts.gestureMessageMaxLength;
-
 /**
  * The 56px commit button at full width, allowed to take a second line: a
  * long label ("Під’єднати гаманець для жесту") wraps at 320px instead of
  * running past the button's edge.
  */
 const COMMIT_WRAP = 'h-auto w-full whitespace-normal py-2.5 text-balance @container/commit';
-const MESSAGE_COUNTER_WARN_AT = MESSAGE_MAX_LENGTH - 20;
+/** The message counter turns to --attention this many bytes before the cap. */
+const MESSAGE_COUNTER_WARN_BYTES = 20;
 
 /**
  * The shared gesture-form state the panel renders. Matches the shape of
@@ -60,6 +65,8 @@ export interface GesturePanelFormState {
   setContributionType: (value: string) => void;
   message: string;
   setMessage: (value: string) => void;
+  /** The contract's cap on the message, in UTF-8 bytes; the documented default when absent. */
+  messageMaxBytes?: number;
   nftDonateAddress: string;
   setNftDonateAddress: (value: string) => void;
   nftId: string;
@@ -70,6 +77,8 @@ export interface GesturePanelFormState {
   setTokenAmount: (value: string) => void;
   rwlkId: number;
   setRwlkId: (value: number) => void;
+  /** A token the form let go because it is not one of this wallet's unused Random Walk NFTs. */
+  rwlkRejectedId?: number | null;
   gestureCostPlus: number;
   setBidPricePlus: (value: number) => void;
   advancedExpanded: boolean;
@@ -204,8 +213,10 @@ export function GesturePanel({
     gestureType,
     message,
     setMessage,
+    messageMaxBytes = GESTURE_MESSAGE_MAX_BYTES,
     rwlkId,
     setRwlkId,
+    rwlkRejectedId = null,
     gestureCostPlus,
     advancedExpanded,
     setAdvancedExpanded,
@@ -219,15 +230,21 @@ export function GesturePanel({
     acceptAnyCstReward = false,
   } = form;
 
-  // The message recedes in the page form and opens in the sheet; a shared
-  // draft (typed in the other surface) keeps it open.
+  // The message recedes in the page form and opens in the sheet. A draft
+  // that arrives from the other surface opens it once, when it arrives; the
+  // toggle still closes it afterwards (the draft stays).
   const [messageOpen, setMessageOpen] = useState(isSheet || message !== '');
   const [handledFocusRequest, setHandledFocusRequest] = useState(messageFocusRequest);
   if (messageFocusRequest !== handledFocusRequest) {
     setHandledFocusRequest(messageFocusRequest);
     if (messageFocusRequest > 0) setMessageOpen(true);
   }
-  if (!messageOpen && message !== '') setMessageOpen(true);
+  const [seenMessage, setSeenMessage] = useState(message);
+  if (message !== seenMessage) {
+    setSeenMessage(message);
+    if (seenMessage === '' && message !== '') setMessageOpen(true);
+  }
+  const messageBytes = gestureMessageBytes(message);
   useEffect(() => {
     if (messageFocusRequest <= 0) return undefined;
     const id = window.requestAnimationFrame(() =>
@@ -264,11 +281,12 @@ export function GesturePanel({
         locale,
       })
     : null;
+  // Both ETH methods at one precision, so their prices line up (0.10211 beside 0.05105).
   const costs: Record<GestureMethodValue, MethodCost | null> = {
     ETH:
       methodEthPrice != null
         ? {
-            value: formatEthQuote(ethGestureBaseCost(methodEthPrice, 'ETH'), locale),
+            value: formatEthMethodQuote(methodEthPrice, 'ETH', locale),
             unit: 'ETH',
             approximate: !hasEthQuote,
           }
@@ -276,7 +294,7 @@ export function GesturePanel({
     RandomWalk:
       methodEthPrice != null
         ? {
-            value: formatEthQuote(ethGestureBaseCost(methodEthPrice, 'RandomWalk'), locale),
+            value: formatEthMethodQuote(methodEthPrice, 'RandomWalk', locale),
             unit: 'ETH',
             approximate: !hasEthQuote,
           }
@@ -290,9 +308,15 @@ export function GesturePanel({
   const hasCstCost = hasCstQuote && Number.isFinite(currentCstCost) && currentCstCost >= 0;
   const netCst = hasCstReward && hasCstCost ? gestureCstRewardAmount - currentCstCost : null;
 
-  const needsRwlkToken = gestureType === 'RandomWalk' && rwlkId === -1;
+  // A Random Walk Gesture needs one of this wallet's unused NFTs, confirmed
+  // by the list read for this wallet: a deep-linked, stale or used token
+  // never enables the submit.
+  const needsRwlkToken =
+    gestureType === 'RandomWalk' && !isUsableRandomWalkToken(rwlkId, rwlkListStatus, rwlknftIds);
+  // Only a method this phase offers can be submitted (only ETH before the first Gesture).
+  const methodOffered = methods.some((method) => method.value === gestureType);
   const hasSelectedQuote = gestureType === 'CST' ? hasCstQuote : hasEthQuote;
-  const submitUnavailable = needsRwlkToken || gestureType === '' || !hasSelectedQuote;
+  const submitUnavailable = needsRwlkToken || !methodOffered || !hasSelectedQuote;
   const busyLabel = isGesturing ? stageLabel(txStage) : null;
 
   const priceWei = ethGestureInfo?.ETHPriceWei;
@@ -315,8 +339,23 @@ export function GesturePanel({
   ) : (
     pendingValue
   );
+  // Live CST figures keep two decimals, so a ticking value never switches
+  // between "141" and "141.01" and the column's decimals line up.
   const cstAmount = (value: number | null) =>
-    value == null ? missingValue : <Amount value={value} unit="CST" context="card" />;
+    value == null ? missingValue : <Amount value={value} unit="CST" context="table" />;
+  // Until the contract's live preview arrives, the dashboard's own reading
+  // (already in the server HTML) stands in, marked approximate like the
+  // method prices, so the first paint shows a figure rather than a skeleton.
+  const seededCstReward = toFiniteNumber(data?.ParticipationCstReward);
+  const cstRewardValue = (live: number | null) =>
+    live == null && !cstRewardReadFailed && seededCstReward != null ? (
+      <span data-approximate className="whitespace-nowrap">
+        {'≈ '}
+        <Amount value={seededCstReward} unit="CST" context="table" />
+      </span>
+    ) : (
+      cstAmount(live)
+    );
 
   if (!loading && !isRoundActive) return null;
 
@@ -362,14 +401,25 @@ export function GesturePanel({
               {t('form.rwlk.error')}
             </p>
           ) : (
-            <PaginationRWLKGrid
-              compact={!isSheet}
-              loading={rwlkListStatus === 'loading'}
-              data={rwlknftIds}
-              selectedToken={rwlkId}
-              setSelectedToken={setRwlkId}
-              labelledBy={`rwlk-picker-title-${variant}`}
-            />
+            <>
+              {rwlkRejectedId != null && rwlkListStatus === 'ready' && (
+                <p
+                  data-testid="panel-rwlk-rejected"
+                  role="status"
+                  className="type-caption mt-1 text-muted-foreground"
+                >
+                  {t('form.rwlk.linkedUnavailable', { tokenId: String(rwlkRejectedId) })}
+                </p>
+              )}
+              <PaginationRWLKGrid
+                compact={!isSheet}
+                loading={rwlkListStatus === 'loading'}
+                data={rwlknftIds}
+                selectedToken={rwlkId}
+                setSelectedToken={setRwlkId}
+                labelledBy={`rwlk-picker-title-${variant}`}
+              />
+            </>
           )}
         </div>
       )}
@@ -389,7 +439,7 @@ export function GesturePanel({
                     {t('form.reward.rewardLabel')}
                   </ExplainedTerm>
                 }
-                value={cstAmount(isCstRewardLoading ? null : gestureCstRewardAmount)}
+                value={cstRewardValue(isCstRewardLoading ? null : gestureCstRewardAmount)}
               />
               <SpecRow
                 testId="panel-cst-metric-cost"
@@ -403,7 +453,7 @@ export function GesturePanel({
                   netCst == null || isCstRewardLoading ? (
                     missingValue
                   ) : (
-                    <Amount value={netCst} unit="CST" context="card" signDisplay="exceptZero" />
+                    <Amount value={netCst} unit="CST" context="table" signDisplay="exceptZero" />
                   )
                 }
               />
@@ -416,7 +466,7 @@ export function GesturePanel({
                   {t('form.reward.previewTitle')}
                 </ExplainedTerm>
               }
-              value={cstAmount(isCstRewardLoading ? null : gestureCstRewardAmount)}
+              value={cstRewardValue(isCstRewardLoading ? null : gestureCstRewardAmount)}
             />
           )}
           <SpecRow
@@ -468,11 +518,14 @@ export function GesturePanel({
             className="group inline-flex min-h-11 items-center gap-2 rounded-control text-start text-sm font-medium text-foreground sm:min-h-9"
           >
             <PenLine className="size-4 shrink-0 text-subtle" aria-hidden />
-            <span>
-              {t('form.message.add')}{' '}
-              {/* The hint moves to its own line whole rather than breaking inside. */}
-              <span className="type-caption font-normal whitespace-nowrap text-subtle">
-                {t('form.advanced.messageOptionalHint', { maxLength: String(MESSAGE_MAX_LENGTH) })}
+            {/* The hint moves to its own line whole rather than breaking
+                inside, and breaks only where a whole line is too narrow. A
+                wrapping row, not a no-wrap span: WebKit keeps a no-wrap
+                inline on the line it overflows. */}
+            <span className="flex min-w-0 flex-wrap items-baseline gap-x-1">
+              <span>{t('form.message.add')}</span>{' '}
+              <span className="type-caption font-normal text-subtle">
+                {t('form.advanced.messageOptionalHint', { maxLength: String(messageMaxBytes) })}
               </span>
             </span>
             <ChevronDown
@@ -490,21 +543,25 @@ export function GesturePanel({
                   {' '}
                   <span className="type-caption text-subtle">
                     {t('form.advanced.messageOptionalHint', {
-                      maxLength: String(MESSAGE_MAX_LENGTH),
+                      maxLength: String(messageMaxBytes),
                     })}
                   </span>
                 </>
               )}
             </label>
+            {/* Bytes, as the contract counts them (a CJK character takes three),
+                against the cap the hint names. */}
             <span
               id={`${messageId}-count`}
               data-testid="gesture-message-char-count"
               className={cn(
                 'type-caption shrink-0 tabular-nums',
-                message.length >= MESSAGE_COUNTER_WARN_AT ? 'text-attention' : 'text-subtle',
+                messageBytes >= messageMaxBytes - MESSAGE_COUNTER_WARN_BYTES
+                  ? 'text-attention'
+                  : 'text-subtle',
               )}
             >
-              {message.length}/{MESSAGE_MAX_LENGTH}
+              {messageBytes}/{messageMaxBytes}
             </span>
           </div>
           <MessageTextarea
@@ -514,9 +571,11 @@ export function GesturePanel({
             aria-describedby={`${messageId}-count ${messageId}-note`}
             placeholder={t('form.advanced.messagePlaceholder')}
             value={message}
-            maxLength={MESSAGE_MAX_LENGTH}
+            // UTF-8 never takes fewer bytes than UTF-16 units, so this native
+            // cap never cuts early; the byte cap itself applies on change.
+            maxLength={messageMaxBytes}
             rows={3}
-            onChange={(event) => setMessage(event.target.value)}
+            onChange={(event) => setMessage(fitGestureMessage(event.target.value, messageMaxBytes))}
             className="mt-1.5"
           />
           <p id={`${messageId}-note`} className="type-caption mt-1.5 text-subtle">

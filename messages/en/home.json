@@ -274,6 +274,7 @@
       "title": "Your Random Walk NFTs",
       "connect": "Connect a wallet to list the Random Walk NFTs it holds.",
       "error": "Could not read this wallet’s Random Walk NFTs. Try again in a moment.",
+      "linkedUnavailable": "Random Walk NFT #{tokenId} is not in this wallet or was already used, so it was not selected.",
       "tooltip": "Attach a Random Walk NFT to an ETH gesture to receive a 50% Gesture Cost reduction. Each NFT can only be used once."
     },
     "cstTrade": "Need CST for this gesture method? Trade ETH for CST on Arbitrum through Uniswap.",
@@ -298,7 +299,7 @@
     "advanced": {
       "title": "Advanced options",
       "messageLabel": "Message",
-      "messageOptionalHint": "(optional, {maxLength} chars)",
+      "messageOptionalHint": "(optional, up to {maxLength} bytes)",
       "messageTooltip": "Leave a message to appear in Gesture Chat. Your message is recorded on-chain with your gesture and remains on the blockchain permanently.",
       "messagePlaceholder": "Leave a message with your gesture…",
       "attachIntro": "Attach tokens or NFTs to your gesture, or adjust Gesture Cost collision prevention.",
@@ -454,6 +455,7 @@
       "showing": "Latest {messages, plural, one {# message} other {# messages}} and {events, plural, one {# cycle event} other {# cycle events}}",
       "showMore": "Show more"
     },
+    "invite": "A message travels with a gesture.",
     "empty": {
       "title": "No messages or events yet",
       "description": "Messages and cycle milestones will appear here, newest first.",
@@ -661,7 +663,6 @@
       "waitingNothing": "Nothing",
       "waitingNfts": "{count, plural, one {# NFT} other {# NFTs}}",
       "retrieveHint": "Retrieve it on My allocations",
-      "connectBody": "Connect a wallet to see where you stand, how many of this cycle’s gestures are yours and anything waiting to retrieve.",
       "spent": "You spent this cycle",
       "landed": "Your gesture landed. You hold the Last Gesture."
     }
@@ -704,6 +705,7 @@
     "allocationsTitle": "Where the Cycle Reserve goes",
     "allocationsDescription": "See every allocation, including Stellar Selection and Public Goods.",
     "storyTitle": "The art behind the cycle",
+    "storyDescription": "How gestures shape the Signature, what CST records and how allocations fund public goods.",
     "methods": {
       "eth": "Pay the current Gesture Cost in ETH.",
       "cst": "Use CST already in your wallet. The live cost changes over time.",

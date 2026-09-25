@@ -31,6 +31,7 @@
     "confirmed": "落筆已記錄，週期收官時間已延長。",
     "validation": {
       "notNftOwner": "目前錢包並未持有這枚 NFT。",
+      "chooseRandomWalkNft": "請選擇此錢包中一枚未使用過的 Random Walk NFT。",
       "tokenDecimalsWarning": "此代幣未提供 decimals()；將按 18 位小數處理。",
       "invalidContractAddress": "請輸入有效的合約地址。",
       "notErc721": "所選合約不符合 ERC-721 標準。",

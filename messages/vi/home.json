@@ -274,6 +274,7 @@
       "title": "Random Walk NFT của bạn",
       "connect": "Kết nối ví để xem danh sách Random Walk NFT trong ví.",
       "error": "Không đọc được Random Walk NFT của ví này. Hãy thử lại sau ít phút.",
+      "linkedUnavailable": "Random Walk NFT #{tokenId} không có trong ví này hoặc đã được dùng cho một nét bút, nên chưa được chọn.",
       "tooltip": "Đính kèm một Random Walk NFT vào nét bút ETH để được giảm 50% chi phí nét bút. Mỗi NFT chỉ dùng được một lần."
     },
     "cstTrade": "Cần CST cho phương thức nét bút này? Hoán đổi ETH sang CST trên Arbitrum qua Uniswap.",
@@ -298,7 +299,7 @@
     "advanced": {
       "title": "Nâng cao",
       "messageLabel": "Lời nhắn",
-      "messageOptionalHint": "(tùy chọn, {maxLength} ký tự)",
+      "messageOptionalHint": "(tùy chọn, tối đa {maxLength} byte)",
       "messageTooltip": "Để lại lời nhắn để hiển thị trong Trò chuyện nét bút. Lời nhắn được ghi trên chuỗi cùng nét bút và tồn tại vĩnh viễn trên blockchain.",
       "messagePlaceholder": "Để lại lời nhắn cùng nét bút của bạn…",
       "attachIntro": "Đính kèm token hoặc NFT, hoặc điều chỉnh giới hạn chi phí để xử lý trường hợp có nét bút khác được ghi nhận trước.",
@@ -454,6 +455,7 @@
       "showing": "{messages, plural, other {# lời nhắn}} và {events, plural, other {# sự kiện chu kỳ}} gần nhất",
       "showMore": "Xem thêm"
     },
+    "invite": "Lời nhắn được gửi cùng nét bút.",
     "empty": {
       "title": "Chưa có lời nhắn hay sự kiện",
       "description": "Lời nhắn và các cột mốc của chu kỳ sẽ xuất hiện ở đây, mới nhất trước.",
@@ -661,7 +663,6 @@
       "waitingNothing": "Không có",
       "waitingNfts": "{count, plural, other {# NFT}}",
       "retrieveHint": "Nhận về tại Phân bổ của tôi",
-      "connectBody": "Kết nối ví để xem vị thế của bạn, số nét bút của bạn trong chu kỳ này và những gì đang chờ nhận về.",
       "spent": "Bạn đã chi trong chu kỳ này",
       "landed": "Nét bút của bạn đã được ghi nhận. Bạn đang giữ Nét bút gần nhất."
     }
@@ -704,6 +705,7 @@
     "allocationsTitle": "Dự trữ chu kỳ được phân bổ ra sao",
     "allocationsDescription": "Xem mọi phân bổ, bao gồm Tinh tuyển và Hàng hóa công.",
     "storyTitle": "Nghệ thuật phía sau chu kỳ",
+    "storyDescription": "Cách nét bút định hình Signature, điều CST ghi lại và cách phân bổ hỗ trợ Hàng hóa công.",
     "methods": {
       "eth": "Thanh toán chi phí nét bút hiện tại bằng ETH.",
       "cst": "Dùng CST sẵn có trong ví. Chi phí trực tiếp thay đổi theo thời gian.",

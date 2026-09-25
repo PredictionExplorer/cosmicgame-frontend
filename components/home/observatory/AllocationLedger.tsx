@@ -4,6 +4,8 @@ import type { ComponentType, ReactNode, SVGProps } from 'react';
 import { ArrowRight, ImageIcon } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 
+import { protocolFacts } from '@/content/protocol-facts';
+
 import {
   AnchorDistributionIcon,
   AnchoringIcon,
@@ -21,6 +23,7 @@ import { deriveAllocationTrackAmounts } from '@/lib/allocationTracks';
 import { TOUCH_TARGET_TEXT_LINK_CLASS } from '@/lib/touch-target';
 import { cn } from '@/lib/utils';
 import type { DashboardInfo } from '@/services/api';
+import { toFiniteNumber } from '@/utils/finiteNumber';
 
 import { ValuePending } from './ValuePending';
 
@@ -129,8 +132,12 @@ export function AllocationLedger({ data, className }: AllocationLedgerProps) {
       key: 'public-goods',
       icon: PublicGoodsIcon,
       name: t('allocation.cards.publicGoods.name'),
+      // The live share once the dashboard reports it, the documented one
+      // until then: a pending share never reads as 0%.
       tooltip: t('allocation.cards.publicGoods.tooltip', {
-        percent: String(data?.CharityPercentage ?? 0),
+        percent: String(
+          toFiniteNumber(data?.CharityPercentage) ?? protocolFacts.publicGoodsPercentage,
+        ),
       }),
       amount: { eth: amounts.publicGoodsEth },
       detail: t('allocation.cards.publicGoods.recipientLabel'),

@@ -115,8 +115,12 @@ const mockGestureForm = {
   getLastGestureHash: jest.fn(() => '0xfeed'),
 };
 
+const mockUseGestureFormOptions = jest.fn();
 jest.mock('../../../../hooks/useGestureForm', () => ({
-  useGestureForm: () => mockGestureForm,
+  useGestureForm: (options: unknown) => {
+    mockUseGestureFormOptions(options);
+    return mockGestureForm;
+  },
 }));
 
 /* ── useChampions ─────────────────────────────────────────────────── */
@@ -820,7 +824,8 @@ describe('HomePage', () => {
     const challenge = within(chrono).getByTestId('chrono-active-challenge');
     expect(challenge).toHaveTextContent(/challenge\.reign\s*00:20:00/);
     expect(challenge).toHaveTextContent(/challenge\.passesIn\s*00:10:01/);
-    expect(chrono).toHaveTextContent('30m');
+    // The record itself reads as a clock too, like every duration in the ledger.
+    expect(chrono).toHaveTextContent('00:30:00');
     // The holder is named once, on the Endurance row, not again here.
     expect(within(challenge).queryByRole('link')).not.toBeInTheDocument();
     expect(chrono).toHaveTextContent('0.8000 ETH');
@@ -1112,7 +1117,8 @@ describe('HomePage', () => {
     rerender(<HomePage />);
     expect(screen.queryByTestId('cycle-standing')).not.toBeInTheDocument();
     expect(screen.queryByTestId('personal-spent')).not.toBeInTheDocument();
-    expect(screen.getByTestId('cycle-standing-preview')).toBeInTheDocument();
+    // No placeholder region: the form's own connect action says what connecting adds.
+    expect(screen.queryByTestId('control-desk-standing')).not.toBeInTheDocument();
   });
 
   it('never reports a confident zero while the wallet history is unknown', () => {
@@ -1277,13 +1283,24 @@ describe('HomePage', () => {
 
     const tabs = screen.getByTestId('panel-method-tabs');
     expect(
-      within(tabs).getByRole('button', { name: /home\.form\.method\.eth\.label/ }),
-    ).toHaveAttribute('aria-pressed', 'true');
+      within(tabs).getByRole('radio', { name: /home\.form\.method\.eth\.label/ }),
+    ).toHaveAttribute('aria-checked', 'true');
 
-    await user.click(within(tabs).getByRole('button', { name: /home\.form\.method\.cst\.label/ }));
+    await user.click(within(tabs).getByRole('radio', { name: /home\.form\.method\.cst\.label/ }));
 
     expect(mockGestureForm.setRwlkId).toHaveBeenCalledWith(-1);
     expect(mockGestureForm.setBidType).toHaveBeenCalledWith('CST');
+  });
+
+  it('asks the form to hold ETH before the cycle has its first Gesture', () => {
+    mockUseDashboardInfo.mockReturnValue({
+      data: makeDashboardData({ LastBidderAddr: '0x0000000000000000000000000000000000000000' }),
+      isLoading: false,
+    });
+
+    render(<HomePage />);
+
+    expect(mockUseGestureFormOptions).toHaveBeenLastCalledWith({ firstGesture: true });
   });
 
   it('submits an ETH gesture and refreshes live data optimistically', async () => {
@@ -1359,6 +1376,7 @@ describe('HomePage', () => {
     const user = userEvent.setup();
     mockGestureForm.gestureType = 'RandomWalk';
     mockGestureForm.rwlkId = -1;
+    Object.assign(mockGestureForm, { rwlknftIds: [3], rwlkListStatus: 'ready' });
     mockUseDashboardInfo.mockReturnValue({
       data: makeDashboardData(),
       isLoading: false,
@@ -1404,6 +1422,20 @@ describe('HomePage', () => {
     expect(mockGestureForm.setBidType).toHaveBeenCalledWith('RandomWalk');
   });
 
+  it.each(['?randomwalk=1', '?randomwalk=1&tokenId=abc', '?randomwalk=1&tokenId=-1'])(
+    'chooses the method but never guesses a token from %s',
+    (search) => {
+      window.history.pushState({}, '', `/${search}`);
+      mockUseDashboardInfo.mockReturnValue({ data: makeDashboardData(), isLoading: false });
+
+      render(<HomePage />);
+
+      expect(mockGestureForm.setBidType).toHaveBeenCalledWith('RandomWalk');
+      // Never token #0 or NaN: the participant picks one from their own list.
+      expect(mockGestureForm.setRwlkId).not.toHaveBeenCalled();
+    },
+  );
+
   /* ── Finalize (the clock's action) ──────────────────────────── */
 
   it('lets the eligible wallet finalize straight from the clock', async () => {
@@ -1424,6 +1456,30 @@ describe('HomePage', () => {
     await user.click(screen.getByTestId('clock-finalize'));
 
     expect(mockAllocationFinalize.onFinalize).toHaveBeenCalledTimes(1);
+    // During rollover the backend refuses the current recipients read: it is
+    // cleared, never refetched into an error.
+    await waitFor(() =>
+      expect(mockSetQueryData).toHaveBeenCalledWith(['currentSpecialWinners'], null),
+    );
+    expect(mockCancelQueries).toHaveBeenCalledWith({ queryKey: ['currentSpecialWinners'] });
+  });
+
+  it('points the Last Gesture holder to Finalize whatever case the wallet reports its address in', () => {
+    const checksummed = '0xAbCdEf0123456789aBcDeF0123456789AbCdEf01';
+    // The wallet reports lowercase; the API returns the checksummed form.
+    mockAccount = checksummed.toLowerCase();
+    mockAllocationFinalize.allocationTime = Date.now() - 60 * 60_000;
+    mockAllocationFinalize.timeoutFinalize = 0;
+    mockUseDashboardInfo.mockReturnValue({
+      data: makeDashboardData({ LastBidderAddr: checksummed }),
+      isLoading: false,
+    });
+
+    render(<HomePage />);
+
+    // Never nudged to pay for another Gesture instead of finalizing.
+    expect(screen.getByTestId('gesture-finalize-pointer')).toBeInTheDocument();
+    expect(document.getElementById('gesture-submit')).toBeNull();
   });
 
   it('holds the clock in the confirming phase until the zero-cross is verified on-chain', () => {
@@ -1619,6 +1675,12 @@ describe('HomePage', () => {
         .getAllByTestId('chat-system-event')
         .some((event) => event.dataset.kind === 'enduranceRecord'),
     ).toBe(true);
+    // The feed reveals what it holds first, then fetches older history.
+    let showMore = within(chat).queryByRole('button', { name: 'home.chat.history.showMore' });
+    while (showMore) {
+      await user.click(showMore);
+      showMore = within(chat).queryByRole('button', { name: 'home.chat.history.showMore' });
+    }
     await user.click(within(chat).getByRole('button', { name: 'home.chat.history.loadOlder' }));
     expect(mockLoadOlder).toHaveBeenCalledTimes(1);
   });
@@ -1975,6 +2037,90 @@ describe('HomePage', () => {
     } finally {
       if (original) Object.defineProperty(window, 'IntersectionObserver', original);
       else Reflect.deleteProperty(window, 'IntersectionObserver');
+    }
+  });
+
+  it('shows the dock from the first paint on phones, before any observer reports', () => {
+    // No observer yet: the state of the server HTML and the first paint.
+    const original = Object.getOwnPropertyDescriptor(window, 'IntersectionObserver');
+    Object.defineProperty(window, 'IntersectionObserver', {
+      configurable: true,
+      writable: true,
+      value: undefined,
+    });
+    try {
+      mockUseDashboardInfo.mockReturnValue({ data: makeDashboardData(), isLoading: false });
+      render(<HomePage />);
+      const layer = screen.getByTestId('action-dock').parentElement!;
+      expect(layer).toHaveAttribute('data-state', 'unmeasured');
+      expect(layer).not.toHaveAttribute('aria-hidden');
+      // From 1024px, where the form's action is in the first viewport, it waits.
+      expect(layer).toHaveClass('lg:invisible');
+    } finally {
+      if (original) Object.defineProperty(window, 'IntersectionObserver', original);
+      else Reflect.deleteProperty(window, 'IntersectionObserver');
+    }
+  });
+
+  it('closes the sheet when the viewport grows past 768px and returns to the in-page form', async () => {
+    const user = userEvent.setup();
+    const WIDE = '(min-width: 48rem)';
+    const listeners = new Set<(event: { matches: boolean }) => void>();
+    let wide = false;
+    const originalMatchMedia = Object.getOwnPropertyDescriptor(window, 'matchMedia');
+    const scrollIntoView = jest.fn();
+    const originalScroll = Object.getOwnPropertyDescriptor(
+      window.HTMLElement.prototype,
+      'scrollIntoView',
+    );
+    Object.defineProperty(window.HTMLElement.prototype, 'scrollIntoView', {
+      configurable: true,
+      writable: true,
+      value: scrollIntoView,
+    });
+    Object.defineProperty(window, 'matchMedia', {
+      configurable: true,
+      writable: true,
+      value: jest.fn((query: string) => ({
+        get matches() {
+          return query === WIDE && wide;
+        },
+        media: query,
+        onchange: null,
+        addListener: jest.fn(),
+        removeListener: jest.fn(),
+        addEventListener: (_type: string, callback: (event: { matches: boolean }) => void) => {
+          if (query === WIDE) listeners.add(callback);
+        },
+        removeEventListener: (_type: string, callback: (event: { matches: boolean }) => void) => {
+          listeners.delete(callback);
+        },
+        dispatchEvent: jest.fn(),
+      })),
+    });
+    try {
+      mockUseDashboardInfo.mockReturnValue({ data: makeDashboardData(), isLoading: false });
+      render(<HomePage />);
+      await user.click(screen.getByTestId('dock-open-sheet'));
+      expect(screen.getAllByTestId('gesture-panel')).toHaveLength(2);
+
+      // The phone turns to landscape: the sheet (and its overlay) goes.
+      act(() => {
+        wide = true;
+        listeners.forEach((callback) => callback({ matches: true }));
+      });
+
+      await waitFor(() => expect(screen.getAllByTestId('gesture-panel')).toHaveLength(1));
+      expect(document.querySelector('[role="dialog"]')).toBeNull();
+      await waitFor(() => expect(document.getElementById('make-gesture')).toHaveFocus());
+    } finally {
+      if (originalMatchMedia) Object.defineProperty(window, 'matchMedia', originalMatchMedia);
+      else Reflect.deleteProperty(window, 'matchMedia');
+      if (originalScroll) {
+        Object.defineProperty(window.HTMLElement.prototype, 'scrollIntoView', originalScroll);
+      } else {
+        Reflect.deleteProperty(window.HTMLElement.prototype, 'scrollIntoView');
+      }
     }
   });
 
