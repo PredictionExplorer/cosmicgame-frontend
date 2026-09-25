@@ -149,7 +149,7 @@ describe('ActivityPanel', () => {
       'Gesture type distribution',
       'Endurance & Chrono timeline',
       'CST Calibration Window timeline',
-      'CST gesture cost over time',
+      'CST Gesture Cost over time',
       'Cycle activations',
     ]);
     expect(within(definitions).getByText(/first hour after each cycle opens/)).toBeInTheDocument();
