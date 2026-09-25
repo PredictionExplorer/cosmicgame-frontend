@@ -515,14 +515,15 @@ async function getRouteFigures(
       // The live contract share, or the documented one when the dashboard read failed.
       const share =
         toFiniteNumber(dashboard.data?.CharityPercentage) ?? protocolFacts.publicGoodsPercentage;
-      // The ETH total is the vault section's flow (contributed, in the vault,
-      // retrieved) below; the header does not repeat it.
+      // The money leads, as on the other two tabs: what the cycles have
+      // forwarded so far. The vault section below follows it on (due from
+      // the live cycle, in the vault, retrieved); the ledger dates each row.
       return {
         reads: [deposits],
         figures: [
+          { key: 'totalEth', value: rows && eth(sumAmountEth(rows)) },
           { key: 'records', value: rows && count(rows.length) },
           { key: 'share', value: formatPercent(share, locale), hasTooltip: true },
-          { key: 'latest', value: latestDate(rows), size: 'md', date: true },
         ],
       };
     }
@@ -534,8 +535,8 @@ async function getRouteFigures(
       return {
         reads: [deposits],
         figures: [
-          { key: 'records', value: rows && count(rows.length) },
           { key: 'totalEth', value: rows && eth(sumAmountEth(rows)) },
+          { key: 'records', value: rows && count(rows.length) },
           {
             key: 'contributors',
             value: rows && count(countDistinctAddresses(rows.map((row) => row.DonorAddr))),
@@ -557,8 +558,8 @@ async function getRouteFigures(
       return {
         reads: [withdrawals],
         figures: [
-          { key: 'records', value: rows && count(rows.length) },
           { key: 'totalEth', value: rows && eth(sumAmountEth(rows)) },
+          { key: 'records', value: rows && count(rows.length) },
           { key: 'latest', value: latestDate(rows), size: 'md', date: true },
           {
             key: 'beneficiary',
@@ -597,7 +598,7 @@ export interface PublicDataRouteSeoSummaryProps {
   note?: ReactNode;
   /** Right-aligned actions, from the page. */
   actions?: ReactNode;
-  /** Sibling pages as `PageHeaderTabs` on the header's bottom rule (e.g. `RouteGroupNav`). */
+  /** Sibling pages as `PageHeaderTabs`, opening the header (e.g. `RouteGroupNav`). */
   tabs?: ReactNode;
 }
 

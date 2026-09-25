@@ -228,8 +228,8 @@
             "label": "Tỷ lệ mỗi chu kỳ",
             "tooltip": "Tỷ lệ của mỗi Dự trữ chu kỳ đã hoàn tất mà giao thức chuyển vào Kho Hàng hóa công."
           },
-          "latest": {
-            "label": "Gần nhất"
+          "totalEth": {
+            "label": "ETH đã đóng góp"
           }
         }
       },

@@ -132,8 +132,11 @@ export interface PageHeaderProps {
   /** Extra header content, rendered after the related pages (an address chip, a network badge). */
   children?: ReactNode;
   /**
-   * Sub-navigation between sibling pages (`PageHeaderTabs`), set on the
-   * header's bottom rule, e.g. the Trust Center pages.
+   * Sub-navigation between sibling pages (`PageHeaderTabs`), e.g. the Trust
+   * Center pages or the three Public Goods ledgers. It opens the header,
+   * under the eyebrow that names the group, on a rule of its own: switching
+   * pages replaces the title, lede and figures below it, so the row itself
+   * never moves, and on phones it is in the first screen.
    */
   tabs?: ReactNode;
   /** `id` of the H1, for an `aria-labelledby` elsewhere on the page. */
@@ -246,8 +249,7 @@ export function PageHeader({
   return (
     <header
       className={cn(
-        'relative mb-8 border-b border-rule print:relative print:z-[2] print:text-foreground sm:mb-10',
-        tabs ? 'pb-0' : 'pb-6 sm:pb-10',
+        'relative mb-8 border-b border-rule pb-6 print:relative print:z-[2] print:text-foreground sm:mb-10 sm:pb-10',
         centered && 'text-center',
         className,
       )}
@@ -267,6 +269,11 @@ export function PageHeader({
           )}
         >
           {eyebrowContent}
+        </div>
+      ) : null}
+      {tabs ? (
+        <div data-slot="page-header-tabs" className="mb-6 border-b border-rule sm:mb-8">
+          {tabs}
         </div>
       ) : null}
 
@@ -372,8 +379,6 @@ export function PageHeader({
       ) : null}
 
       {children}
-
-      {tabs ? <div className="mt-6 sm:mt-8">{tabs}</div> : null}
     </header>
   );
 }
@@ -386,9 +391,9 @@ export interface PageHeaderTab {
 }
 
 /**
- * Underline tabs between sibling pages, for `PageHeader`'s `tabs` slot: they
- * sit on the header's bottom rule, the current page marked with a 2px primary
- * rule and `aria-current="page"`. A row wider than the screen scrolls on a
+ * Underline tabs between sibling pages, for `PageHeader`'s `tabs` slot: a row
+ * on its own rule at the top of the header, the current page marked with a
+ * 2px primary rule and `aria-current="page"`. A row wider than the screen scrolls on a
  * ScrollRail, fading only at an edge with more to see and keeping the current
  * page in view. Links, not ARIA tabs: each one is its own page.
  */

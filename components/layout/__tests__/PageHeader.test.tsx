@@ -1,6 +1,6 @@
 import '@testing-library/jest-dom';
 
-import { PageHeader, PageHeaderFigures } from '@/components/layout/PageHeader';
+import { PageHeader, PageHeaderFigures, PageHeaderTabs } from '@/components/layout/PageHeader';
 import { PAGE_SECTIONS } from '@/components/layout/pageSections';
 
 import { render, screen, within, checkA11y } from '@/test-utils';
@@ -451,6 +451,37 @@ describe('PageHeader', () => {
     rerender(<PageHeader title="Risk" variant="reading" subtitle="The disclosure." />);
     expect(screen.getByText('The disclosure.')).not.toHaveAttribute('data-lede-fit');
     expect(screen.queryByRole('button', { name: 'common.pageHeader.readMore' })).toBeNull();
+  });
+
+  it('opens the header with the sibling tabs, above the title, so switching never moves them', () => {
+    render(
+      <PageHeader
+        section="records"
+        title="Voluntary contributions"
+        subtitle="A lede that is longer on one tab than on another."
+        figures={[{ id: 'records', label: 'Contributions', value: '0' }]}
+        tabs={
+          <PageHeaderTabs
+            label="Public Goods"
+            items={[
+              { href: '/protocol', label: 'Protocol' },
+              { href: '/voluntary', label: 'Voluntary', current: true },
+            ]}
+          />
+        }
+      />,
+    );
+    const tabs = screen.getByRole('navigation', { name: 'Public Goods' });
+    const heading = screen.getByRole('heading', { level: 1 });
+    // Before the H1 in document order, on a rule of its own.
+    expect(tabs.compareDocumentPosition(heading) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+    expect(tabs.parentElement).toHaveClass('border-b', 'border-rule');
+    expect(within(tabs).getByRole('link', { name: 'Voluntary' })).toHaveAttribute(
+      'aria-current',
+      'page',
+    );
+    // The header keeps its own foot and bottom rule.
+    expect(screen.getByRole('banner')).toHaveClass('pb-6', 'border-b');
   });
 
   it('gives the H1 an id for aria-labelledby', () => {

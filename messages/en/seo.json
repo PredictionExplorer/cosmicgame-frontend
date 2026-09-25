@@ -228,8 +228,8 @@
             "label": "Share per cycle",
             "tooltip": "The share of each finalized Cycle Reserve that the protocol forwards to the Public Goods Vault."
           },
-          "latest": {
-            "label": "Latest"
+          "totalEth": {
+            "label": "ETH contributed"
           }
         }
       },

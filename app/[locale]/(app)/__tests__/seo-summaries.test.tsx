@@ -740,17 +740,11 @@ describe('server-rendered page headers', () => {
     });
 
     it('shows "None yet" for the latest record of an empty but successful read', async () => {
-      const cg = render(
-        await PublicDataRouteSeoSummary({ route: 'public-goods-contributions-cg' }),
-      );
-      expect(figureValue('latest')).toHaveTextContent('None yet');
-      expect(figureValue('latest')).not.toHaveTextContent(COMMON.unavailable);
-      cg.unmount();
-
       const retrievals = render(
         await PublicDataRouteSeoSummary({ route: 'public-goods-retrievals' }),
       );
       expect(figureValue('latest')).toHaveTextContent('None yet');
+      expect(figureValue('latest')).not.toHaveTextContent(COMMON.unavailable);
       expect(figureValue('beneficiary')).toHaveTextContent('None yet');
       retrievals.unmount();
 
@@ -776,10 +770,28 @@ describe('server-rendered page headers', () => {
       expect(screen.getByText(COMMON.snapshot)).toBeInTheDocument();
     });
 
-    it('leaves the protocol ETH total to the vault flow below the header', async () => {
+    it('leads every Public Goods tab with its ETH, not a count or a date', async () => {
+      mockPublicGoodsDeposits.mockResolvedValue([
+        { AmountEth: 1.5, TimeStamp: 1_786_100_000 },
+        { AmountEth: 0.25, TimeStamp: 1_786_200_000 },
+      ] as Rows<typeof get_charity_cg_deposits>);
+      for (const route of [
+        'public-goods-contributions-cg',
+        'public-goods-contributions-voluntary',
+        'public-goods-retrievals',
+      ] as const) {
+        const view = render(await PublicDataRouteSeoSummary({ route }));
+        const figures = [...document.querySelectorAll('[data-figure]')].map((figure) =>
+          figure.getAttribute('data-figure'),
+        );
+        expect(figures[0]).toBe('totalEth');
+        view.unmount();
+      }
       render(await PublicDataRouteSeoSummary({ route: 'public-goods-contributions-cg' }));
-      expect(document.querySelector('[data-figure="totalEth"]')).toBeNull();
-      expect(figureValue('share')).toBeInTheDocument();
+      expect(figureValue('totalEth')).toHaveTextContent(/^1\.75\d*\sETH$/);
+      expect(figureValue('records')).toHaveTextContent(/^2$/);
+      // The ledger below dates each forward; the header keeps to the flow.
+      expect(document.querySelector('[data-figure="latest"]')).toBeNull();
     });
 
     it('links Public Goods pages where their tabs do not go', async () => {
@@ -807,10 +819,10 @@ describe('server-rendered page headers', () => {
     });
 
     it('dates the latest record with its year, as the ledger below does', async () => {
-      mockPublicGoodsDeposits.mockResolvedValue([
+      mockPublicGoodsRetrievals.mockResolvedValue([
         { AmountEth: 1, TimeStamp: 1_786_100_000 },
-      ] as Rows<typeof get_charity_cg_deposits>);
-      render(await PublicDataRouteSeoSummary({ route: 'public-goods-contributions-cg' }));
+      ] as Rows<typeof get_charity_withdrawals>);
+      render(await PublicDataRouteSeoSummary({ route: 'public-goods-retrievals' }));
       expect(figureValue('latest')).toHaveTextContent(/2026/);
     });
 
