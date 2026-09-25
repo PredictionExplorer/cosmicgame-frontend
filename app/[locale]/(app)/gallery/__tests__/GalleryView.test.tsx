@@ -164,6 +164,49 @@ describe('GalleryView', () => {
     }
   });
 
+  // V071: router.replace commits after a transition and a server round-trip,
+  // so the second choice made before the URL updates must keep the first.
+  it('keeps both of two choices made before the URL catches up', () => {
+    render(<GalleryView search="" />);
+    fireEvent.click(screen.getByRole('radio', { name: 'gallery.filters.named.label' }));
+    fireEvent.click(screen.getByTestId('facets-toggle'));
+    const dna = screen.getByTestId('dna-fate');
+    fireEvent.click(within(dna).getByRole('button', { name: /^Ejection: 1\sNFTs/ }));
+    expect(mockReplace).toHaveBeenLastCalledWith('/gallery?show=named&fate=Ejection', {
+      scroll: false,
+    });
+  });
+
+  it('never lets a late debounced search undo a choice made meanwhile', () => {
+    jest.useFakeTimers();
+    try {
+      render(<GalleryView search="" />);
+      fireEvent.change(screen.getByLabelText('search.gallery.ariaLabel'), {
+        target: { value: 'numba' },
+      });
+      fireEvent.click(screen.getByRole('radio', { name: 'gallery.filters.named.label' }));
+      act(() => {
+        jest.advanceTimersByTime(300);
+      });
+      expect(mockReplace).toHaveBeenLastCalledWith('/gallery?show=named&q=numba', {
+        scroll: false,
+      });
+    } finally {
+      jest.useRealTimers();
+    }
+  });
+
+  it('starts over from the URL after Back or a link', () => {
+    const { rerender } = render(<GalleryView search="" />);
+    fireEvent.click(screen.getByRole('radio', { name: 'gallery.filters.named.label' }));
+    // Back to a URL this view never wrote.
+    rerender(<GalleryView search="sort=rarity" />);
+    fireEvent.click(screen.getByRole('radio', { name: 'gallery.filters.anchored.label' }));
+    expect(mockReplace).toHaveBeenLastCalledWith('/gallery?sort=rarity&show=anchored', {
+      scroll: false,
+    });
+  });
+
   it('pages with a history entry and keeps the scroll where it is', () => {
     const many = Array.from({ length: 30 }, (_, i) => ({
       TokenId: i,

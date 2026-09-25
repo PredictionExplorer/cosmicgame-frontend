@@ -1,6 +1,6 @@
 'use client';
 
-import { useCallback, useMemo, useRef, useState, type ReactNode } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
 import { ChevronDown, Dna } from 'lucide-react';
 import { useLocale, useTranslations } from 'next-intl';
 
@@ -175,12 +175,47 @@ export function GalleryView({ search, snapshotCount = null }: GalleryViewProps) 
   // stops below it rather than under it.
   useStickyClearance(toolbarRef);
 
+  // The query string as last written. router.replace and push commit in a
+  // transition after a server round-trip, so a second choice made inside that
+  // window (two facet toggles, a search and then a status) builds on the
+  // first instead of on the `search` this render received, and a debounced
+  // search that lands late cannot undo a choice made meanwhile.
+  const latestSearchRef = useRef(search);
+  const pendingSearchesRef = useRef<string[]>([]);
+  useEffect(() => {
+    const pending = pendingSearchesRef.current;
+    const landed = pending.indexOf(search);
+    if (landed === -1) {
+      // Not one of ours (Back, a link): the URL is the latest query.
+      latestSearchRef.current = search;
+      pendingSearchesRef.current = [];
+    } else {
+      // One of our writes landed; any later ones are still on their way.
+      pendingSearchesRef.current = pending.slice(landed + 1);
+    }
+  }, [search]);
+
+  /** The latest query: the URL plus every change still on its way to it. */
+  const latestQuery = useCallback(
+    () => parseGalleryQuery(new URLSearchParams(latestSearchRef.current)),
+    [],
+  );
+
+  const navigate = useCallback(
+    (patch: Record<string, string>, method: 'replace' | 'push') => {
+      const next = patchSearch(latestSearchRef.current, patch);
+      const nextSearch = next.replace(/^\?/, '');
+      latestSearchRef.current = nextSearch;
+      pendingSearchesRef.current.push(nextSearch);
+      router[method](`${pathname}${next}`, { scroll: false });
+    },
+    [router, pathname],
+  );
+
   /** Replaces the URL: a filter, sort or view change is not a new history entry. */
   const update = useCallback(
-    (patch: Record<string, string>) => {
-      router.replace(`${pathname}${patchSearch(search, patch)}`, { scroll: false });
-    },
-    [router, pathname, search],
+    (patch: Record<string, string>) => navigate(patch, 'replace'),
+    [navigate],
   );
 
   const sorted = useMemo(
@@ -237,33 +272,32 @@ export function GalleryView({ search, snapshotCount = null }: GalleryViewProps) 
   /** A page is a place: it gets a history entry, and the grid's top comes back into view. */
   const onPageChange = useCallback(
     (next: number) => {
-      router.push(`${pathname}${patchSearch(search, { [GALLERY_PARAMS.page]: pageParam(next) })}`, {
-        scroll: false,
-      });
+      navigate({ [GALLERY_PARAMS.page]: pageParam(next) }, 'push');
       const reduce = matchesMedia('(prefers-reduced-motion: reduce)');
       resultsRef.current?.scrollIntoView?.({
         block: 'start',
         behavior: reduce ? 'auto' : 'smooth',
       });
     },
-    [router, pathname, search],
+    [navigate],
   );
 
   const onToggleTrait = useCallback(
     (key: CategoricalTraitKey, value: string) => {
-      const next = toggleTraitValue(query.traits, key, value);
+      const next = toggleTraitValue(latestQuery().traits, key, value);
       update({ [key]: serializeTraitValues(next[key]), page: '' });
     },
-    [query.traits, update],
+    [latestQuery, update],
   );
   // Selecting from the DNA legend narrows that trait to one value ("show me
   // these"); selecting it again clears it.
   const onSelectTrait = useCallback(
     (key: CategoricalTraitKey, value: string) => {
-      const only = query.traits[key]?.length === 1 && query.traits[key]?.[0] === value;
+      const selected = latestQuery().traits[key];
+      const only = selected?.length === 1 && selected[0] === value;
       update({ [key]: only ? '' : value, page: '' });
     },
-    [query.traits, update],
+    [latestQuery, update],
   );
   const onClearTraitKey = useCallback(
     (key: CategoricalTraitKey) => update({ [key]: '', page: '' }),
@@ -276,9 +310,9 @@ export function GalleryView({ search, snapshotCount = null }: GalleryViewProps) 
   );
   const onClearTraits = useCallback(() => {
     const cleared: Record<string, string> = { [GALLERY_PARAMS.chaos]: '', page: '' };
-    for (const key of Object.keys(query.traits)) cleared[key] = '';
+    for (const key of Object.keys(latestQuery().traits)) cleared[key] = '';
     update(cleared);
-  }, [query.traits, update]);
+  }, [latestQuery, update]);
   const onClearAll = useCallback(() => {
     const cleared: Record<string, string> = {
       [GALLERY_PARAMS.status]: '',
@@ -286,9 +320,9 @@ export function GalleryView({ search, snapshotCount = null }: GalleryViewProps) 
       [GALLERY_PARAMS.chaos]: '',
       page: '',
     };
-    for (const key of Object.keys(query.traits)) cleared[key] = '';
+    for (const key of Object.keys(latestQuery().traits)) cleared[key] = '';
     update(cleared);
-  }, [query.traits, update]);
+  }, [latestQuery, update]);
 
   const onToggleFilters = useCallback(() => {
     if (matchesMedia(RAIL_MEDIA_QUERY)) setRailOpen((open) => !open);
