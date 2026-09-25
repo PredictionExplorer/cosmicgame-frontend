@@ -1,6 +1,6 @@
 'use client';
 
-import { useId, type ReactNode } from 'react';
+import { useId, useRef, type ReactNode } from 'react';
 import type { CountdownRenderProps } from 'react-countdown';
 import { ArrowRight } from 'lucide-react';
 import { useTranslations } from 'next-intl';
@@ -20,6 +20,7 @@ import { toFiniteNumber } from '@/utils/finiteNumber';
 
 import type { GestureSubmitParts } from './gestureSubmitLabel';
 import { PHASE_TEXT_CLASS, viewForPhase } from './phaseView';
+import { useFocusClearOfDock } from './useFocusClearOfDock';
 
 export interface ActionDockProps {
   /**
@@ -99,6 +100,9 @@ export function ActionDock({
   const t = useTranslations('home');
   const stageLabel = useTxStageLabel();
   const describedById = useId();
+  // Keyboard focus never lands under the dock, on any page that mounts it.
+  const dockRef = useRef<HTMLDivElement>(null);
+  useFocusClearOfDock(dockRef);
 
   const cycleState = getCycleState({
     data,
@@ -160,6 +164,7 @@ export function ActionDock({
 
   return (
     <div
+      ref={dockRef}
       data-action-dock
       className={cn(
         'fixed inset-x-3 bottom-[max(0.75rem,env(safe-area-inset-bottom))] z-40 md:inset-x-0 md:bottom-4 md:px-4 print:hidden',

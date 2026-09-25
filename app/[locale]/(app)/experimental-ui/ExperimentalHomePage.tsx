@@ -38,7 +38,6 @@ import {
 import { GestureConsole } from '@/components/home/experimental/GestureConsole';
 import { StageArtwork, type StageToken } from '@/components/home/experimental/StageArtwork';
 import { useArtMotionPreference } from '@/components/home/experimental/useArtMotionPreference';
-import { useFocusClearOfDock } from '@/components/home/experimental/useFocusClearOfDock';
 import { AttachedNFTAllocationShowcase } from '@/components/attachments/DonatedNFTPrizeShowcase';
 import type { ArtStatus } from '@/components/ui/art-frame';
 import { useContractAddresses } from '@/contexts/ContractAddressesContext';
@@ -632,9 +631,6 @@ const ExperimentalHomePage = ({
     }
     el.focus({ preventScroll: true });
   }, []);
-
-  // Keyboard focus never lands under the dock.
-  useFocusClearOfDock();
 
   // The action dock steps aside while the console itself is on screen; from
   // 1024px it also waits until the monument has scrolled past.

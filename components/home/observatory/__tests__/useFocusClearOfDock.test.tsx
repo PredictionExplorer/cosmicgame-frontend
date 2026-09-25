@@ -38,8 +38,9 @@ function setup({ targetBottom, dockHeight = 64, keyboard = true }: Setup) {
   jest
     .spyOn(target, 'matches')
     .mockImplementation((selector: string) => selector === ':focus-visible' && keyboard);
-  const hook = renderHook(() => useFocusClearOfDock());
-  return { target, dockButton: document.getElementById('dock-button')!, ...hook };
+  const dockRef: { current: HTMLElement | null } = { current: dock };
+  const hook = renderHook(() => useFocusClearOfDock(dockRef));
+  return { target, dock, dockRef, dockButton: document.getElementById('dock-button')!, ...hook };
 }
 
 let scrollBy: jest.SpyInstance;
@@ -81,6 +82,26 @@ describe('useFocusClearOfDock', () => {
 
   it('ignores a dock that is not displayed', () => {
     const { target } = setup({ targetBottom: 819, dockHeight: 0 });
+
+    target.focus();
+
+    expect(scrollBy).not.toHaveBeenCalled();
+  });
+
+  it('ignores a dock that has stepped aside, even mid-slide', () => {
+    // A stepped-aside dock is inert while it slides out of view; its box
+    // still overlaps the control for the length of the transition.
+    const { target, dock } = setup({ targetBottom: 819 });
+    dock.setAttribute('inert', '');
+
+    target.focus();
+
+    expect(scrollBy).not.toHaveBeenCalled();
+  });
+
+  it('ignores a page whose dock is not rendered', () => {
+    const { target, dockRef } = setup({ targetBottom: 819 });
+    dockRef.current = null;
 
     target.focus();
 
