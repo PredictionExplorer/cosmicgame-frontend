@@ -339,8 +339,10 @@ surface, the rule hairline, and a 40% state edge plus a state-coloured icon in t
 palette's own positive, critical, attention or primary.
 
 **Glass.** `--glass-fill` and `--glass-blur`, through the `glass` utility, are only for the
-sticky header, the mobile dock, sheets and menus. Visitors who prefer reduced transparency
-get the opaque page colour.
+sticky header and sub-navigation bars, sheets and menus. Visitors who prefer reduced
+transparency get the opaque page colour. A bar that floats over figures and fields (the
+Observatory's action dock) is not glass: it sits on the opaque `bg-surface-raised`, so no
+form text reads through behind its own figures.
 
 **Layout rhythm.** `--gutter` (16–80px) is the one content edge. `site-container` is
 `min(100% - 2 × gutter, 80rem)` on both hosts, and `PageShell` draws the same edge

@@ -129,14 +129,11 @@
     0 12px 24px -8px rgb(0 0 0 / 0.45), 0 4px 8px -2px rgb(0 0 0 / 0.25);
 
   /*
-   * Glass: only the sticky header, the mobile dock, sheets and menus. The
-   * `glass` utility (global.css) falls back to an opaque fill under
+   * Glass: only the sticky header and sub-navigation bars, sheets and menus.
+   * The `glass` utility (global.css) falls back to an opaque fill under
    * prefers-reduced-transparency.
    */
   --glass-fill: hsl(var(--background) / 0.78);
-  /* A bar that lies over figures and fields (the dock): nearly opaque, so
-   * nothing reads through behind its own figures. */
-  --glass-fill-solid: hsl(var(--popover) / 0.94);
   --glass-blur: 16px;
 
   /*
