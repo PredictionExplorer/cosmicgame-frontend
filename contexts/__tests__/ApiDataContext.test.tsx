@@ -86,6 +86,35 @@ describe('ApiDataContext', () => {
       expect(result.current.unretrievedAnchorEth).toBe(0.25);
     });
 
+    it('is 0 for a wallet the indexer has not seen yet, never unknown', () => {
+      // notify_red_box maps the production `Winnings: []` answer to a notice of zeros.
+      mockUseNotifyRedBox.mockReturnValue({
+        data: {
+          ETHRaffleToClaim: 0,
+          ETHRaffleToClaimWei: 0,
+          NumDonatedNFTToClaim: 0,
+          UnretrievedAnchorDistribution: 0,
+        },
+        refetch: mockRefetchRedBox,
+      });
+      mockUseCSTAnchorDistributionsToRetrieveByUser.mockReturnValue({
+        data: [],
+        refetch: mockRefetchRewards,
+      });
+      const { result } = renderHook(() => useApiData(), { wrapper });
+      expect(result.current.unretrievedAnchorEth).toBe(0);
+    });
+
+    it('is null when the read returned no notice at all', () => {
+      mockUseNotifyRedBox.mockReturnValue({ data: null, refetch: mockRefetchRedBox });
+      mockUseCSTAnchorDistributionsToRetrieveByUser.mockReturnValue({
+        data: [],
+        refetch: mockRefetchRewards,
+      });
+      const { result } = renderHook(() => useApiData(), { wrapper });
+      expect(result.current.unretrievedAnchorEth).toBeNull();
+    });
+
     it('is null when the notice or the reward list could not be read, and retries both', () => {
       mockUseCSTAnchorDistributionsToRetrieveByUser.mockReturnValue({
         isError: true,

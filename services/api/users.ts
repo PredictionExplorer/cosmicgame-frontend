@@ -103,11 +103,24 @@ export function get_user_balance(
   }, null);
 }
 
+/** The notice of a wallet with nothing waiting: every figure a confident zero. */
+const EMPTY_RED_BOX: Readonly<NotifyRedBoxResult> = {
+  ETHRaffleToClaim: 0,
+  ETHRaffleToClaimWei: 0,
+  NumDonatedNFTToClaim: 0,
+  UnretrievedAnchorDistribution: 0,
+};
+
 /**
  * Fetches red-box notification data (unretrieved allocations) for a wallet address. The wire
  * names the unretrieved Anchor Distribution `UnclaimedStakingReward`; it is mapped onto the
  * UI's `UnretrievedAnchorDistribution` here, since reading the UI name off the wire left the
  * retrieval prompt permanently hidden.
+ *
+ * A wallet the indexer has not seen yet (a new visitor, `UserAid: 0`) is answered with
+ * `Winnings: []`. That is a successful read with nothing waiting, so it maps to zeros:
+ * spreading the empty array left `UnretrievedAnchorDistribution` undefined, which pages read
+ * as a failed read. `null` stays reserved for a payload that carries no notice at all.
  */
 export function notify_red_box(
   address: string,
@@ -115,8 +128,10 @@ export function notify_red_box(
 ): Promise<NotifyRedBoxResult | null> {
   return apiCall(async () => {
     const { data } = await apiGet(getAPIUrl(`user/notif_red_box/${address}`), opts);
-    const winnings = data?.Winnings as Record<string, unknown> | null | undefined;
-    if (!winnings || typeof winnings !== 'object') return null;
+    const raw: unknown = data?.Winnings;
+    if (Array.isArray(raw)) return raw.length === 0 ? { ...EMPTY_RED_BOX } : null;
+    if (!raw || typeof raw !== 'object') return null;
+    const winnings = raw as Record<string, unknown>;
     const unretrieved = winnings.UnretrievedAnchorDistribution ?? winnings.UnclaimedStakingReward;
     return {
       ...winnings,

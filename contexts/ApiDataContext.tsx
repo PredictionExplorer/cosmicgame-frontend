@@ -52,8 +52,10 @@ interface ApiDataContextValue {
    * The wallet's unretrieved Anchor Distribution ETH, straight from its read
    * rather than from `apiData` (which holds 0 until processing finishes):
    * `undefined` while the notice or the reward list is loading, `null` when
-   * either could not be read, so a page never shows a confident 0 or says
-   * "nothing waiting" on a guess.
+   * either could not be read (a failed request, no notice in the payload, or a
+   * notice without the figure), so a page never shows a confident 0 or says
+   * "nothing waiting" on a guess. A wallet the indexer has not seen yet gets a
+   * notice of zeros from `notify_red_box`, so it reads as 0, not as unknown.
    */
   unretrievedAnchorEth: number | null | undefined;
   /** Reads the notice and the reward list again. */
@@ -201,12 +203,14 @@ export const ApiDataProvider = ({ children }: ApiDataProviderProps) => {
 
   const isLoading = redBoxLoading || rewardsLoading;
   const anchorReadFailed =
-    (redBoxFailed && redBoxData === undefined) || (rewardsFailed && rewardsData === undefined);
+    (redBoxFailed && redBoxData === undefined) ||
+    (rewardsFailed && rewardsData === undefined) ||
+    redBoxData === null;
   const unretrievedAnchorEth = anchorReadFailed
     ? null
     : isLoading || redBoxData === undefined
       ? undefined
-      : toFiniteNumber(redBoxData?.UnretrievedAnchorDistribution);
+      : toFiniteNumber(redBoxData.UnretrievedAnchorDistribution);
   const retryAnchorRead = useCallback(() => {
     void refetchRedBox();
     void refetchRewards();

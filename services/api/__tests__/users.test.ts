@@ -205,8 +205,42 @@ describe('users API', () => {
       expect(result?.UnretrievedAnchorDistribution).toBe(1.4054718307649714);
     });
 
+    it('reads a wallet the indexer has not seen yet (Winnings: []) as nothing waiting', async () => {
+      // Regression: the production answer for a new wallet spread an empty array, so
+      // UnretrievedAnchorDistribution came back undefined and My Allocations showed a
+      // permanent "could not be loaded" error instead of "Nothing waiting".
+      mockedAxios.get.mockResolvedValue({
+        data: {
+          UserAddr: '0x1234567890123456789012345678901234567890',
+          UserAid: 0,
+          Winnings: [],
+          error: '',
+          status: 1,
+        },
+      });
+
+      expect(await notify_red_box('0x1234567890123456789012345678901234567890')).toEqual({
+        ETHRaffleToClaim: 0,
+        ETHRaffleToClaimWei: 0,
+        NumDonatedNFTToClaim: 0,
+        UnretrievedAnchorDistribution: 0,
+      });
+    });
+
+    it('keeps the anchor figure unknown when a notice lacks it', async () => {
+      mockedAxios.get.mockResolvedValue({ data: { Winnings: { ETHRaffleToClaim: 0 } } });
+      const result = await notify_red_box('0xuser');
+      expect(result).not.toBeNull();
+      expect(result?.UnretrievedAnchorDistribution).toBeUndefined();
+    });
+
     it('returns null when the payload has no Winnings', async () => {
       mockedAxios.get.mockResolvedValue({ data: {} });
+      expect(await notify_red_box('0xuser')).toBeNull();
+    });
+
+    it('returns null for a Winnings list it cannot read as a notice', async () => {
+      mockedAxios.get.mockResolvedValue({ data: { Winnings: [{ Amount: 1 }] } });
       expect(await notify_red_box('0xuser')).toBeNull();
     });
 
