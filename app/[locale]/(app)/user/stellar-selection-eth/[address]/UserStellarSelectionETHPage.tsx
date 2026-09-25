@@ -20,8 +20,8 @@ import {
   InvalidParticipantState,
   STELLAR_SELECTION_FAQ_HREF,
   StellarSelectionHeader,
-  participantAddress,
 } from '@/components/winnings/StellarSelectionHeader';
+import { participantAddress } from '@/components/winnings/participantAddress';
 import { useStellarSelectionDepositsByUser } from '@/hooks/useApiQuery';
 import { useClaimAllocations } from '@/hooks/useClaimAllocations';
 import { useFormat } from '@/hooks/useFormat';

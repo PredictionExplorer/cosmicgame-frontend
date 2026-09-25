@@ -7,6 +7,8 @@ jest.mock('@/services/api/anchoring', () => ({
   get_staking_rewards_by_user_by_token_details: jest.fn(),
 }));
 jest.mock('@/services/api/tokens', () => ({ get_cst_info: jest.fn() }));
+// The real checksum (the shared viem mock returns addresses unchanged).
+jest.mock('viem', () => jest.requireActual('viem'));
 
 const mockDetails = get_staking_rewards_by_user_by_token_details as jest.MockedFunction<
   typeof get_staking_rewards_by_user_by_token_details
@@ -46,6 +48,20 @@ describe('readTokenDistributionSeeds', () => {
     mockDetails.mockRejectedValue(new Error('Network response was not OK'));
     const seeds = await readTokenDistributionSeeds(HOLDER, 47);
     expect(seeds[0]).toMatchObject({ data: null });
+  });
+
+  it('reads with the checksummed address, never the raw segment', async () => {
+    mockDetails.mockResolvedValue({});
+    const seeds = await readTokenDistributionSeeds(HOLDER.toLowerCase(), 47);
+    expect(mockDetails).toHaveBeenCalledWith(HOLDER, 47);
+    expect(seeds[0]).toMatchObject({ queryKey: ['stakingRewardsByUserByToken', HOLDER, 47] });
+  });
+
+  it('reads nothing for a segment that is not an address', async () => {
+    for (const raw of ['0x12/../../dashboard', `${HOLDER}?x=1`, 'not-an-address', '']) {
+      await expect(readTokenDistributionSeeds(raw, 47)).resolves.toEqual([]);
+    }
+    expect(mockDetails).not.toHaveBeenCalled();
   });
 
   it('reads nothing for a token id that is not one, or under the e2e harness', async () => {

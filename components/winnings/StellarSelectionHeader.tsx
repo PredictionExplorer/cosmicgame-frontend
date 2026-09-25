@@ -2,7 +2,6 @@
 
 import type { ReactNode } from 'react';
 import { useTranslations } from 'next-intl';
-import { getAddress, isAddress } from 'viem';
 
 import { PageHeader, type PageHeaderFigure } from '@/components/layout/PageHeader';
 import { useParticipantTrail } from '@/components/layout/participantTrail';
@@ -20,12 +19,6 @@ const SIBLING: Record<StellarSelectionKind, StellarSelectionKind> = { eth: 'nft'
 
 /** The FAQ answer that explains Stellar Selection. */
 export const STELLAR_SELECTION_FAQ_HREF = '/faq#how-does-the-stellarSelection-work';
-
-/** The checksummed address of a route parameter, or `null` when it is not an address. */
-export function participantAddress(raw: string | null | undefined): `0x${string}` | null {
-  const value = raw?.trim().toLowerCase() ?? '';
-  return isAddress(value) ? getAddress(value) : null;
-}
 
 interface StellarSelectionHeaderProps {
   kind: StellarSelectionKind;

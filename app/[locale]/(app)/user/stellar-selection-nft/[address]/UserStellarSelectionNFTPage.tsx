@@ -19,8 +19,8 @@ import {
   InvalidParticipantState,
   STELLAR_SELECTION_FAQ_HREF,
   StellarSelectionHeader,
-  participantAddress,
 } from '@/components/winnings/StellarSelectionHeader';
+import { participantAddress } from '@/components/winnings/participantAddress';
 import { useSignatureIndex } from '@/components/winnings/useSignatureIndex';
 import { useStellarSelectionNFTAllocationsByUser } from '@/hooks/useApiQuery';
 import { useFormat } from '@/hooks/useFormat';

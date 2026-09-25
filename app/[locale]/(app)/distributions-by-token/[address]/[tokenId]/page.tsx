@@ -1,4 +1,5 @@
 import type { Metadata, ResolvingMetadata } from 'next';
+import { notFound } from 'next/navigation';
 import { getTranslations, setRequestLocale } from 'next-intl/server';
 
 import { formatId } from '@/utils/format/ids';
@@ -7,6 +8,7 @@ import { PageMessages } from '@/components/i18n/PageMessages';
 
 import { QuerySeed } from '../../../QuerySeed';
 
+import { parseTokenDistributionParams } from './params';
 import RewardsByTokenPage from './RewardsByTokenPage';
 import { readTokenDistributionSeeds } from './tokenDistributionReads';
 
@@ -18,16 +20,16 @@ export async function generateMetadata(
   { params }: PageProps,
   parent: ResolvingMetadata,
 ): Promise<Metadata> {
-  const { locale, address, tokenId } = await params;
+  const { locale, address: rawAddress, tokenId: rawTokenId } = await params;
+  const parsed = parseTokenDistributionParams(rawAddress, rawTokenId);
+  if (parsed === null) notFound();
+  const { address, tokenId } = parsed;
   const t = await getTranslations({ locale, namespace: 'meta' });
   const tAnchoring = await getTranslations({ locale, namespace: 'anchoring' });
-  const id = Number(tokenId);
   return createPageMetadata(
     parent,
     // Titled like its H1 ("Anchor Distributions for Cosmic Signature #000045").
-    Number.isSafeInteger(id) && id >= 0
-      ? tAnchoring('distributionsByToken.title', { id: formatId(id) })
-      : tAnchoring('overview.title'),
+    tAnchoring('distributionsByToken.title', { id: formatId(tokenId) }),
     t('distributionsByToken.description'),
     undefined,
     `/distributions-by-token/${address}/${tokenId}`,
@@ -40,19 +42,21 @@ export async function generateMetadata(
 export const revalidate = 300;
 
 /**
- * The server reads the NFT's deposits and the NFT, so the first HTML is the
- * page with its data: an NFT with no deposit yet renders without the figure
- * strip from the start, instead of dropping it (and moving everything under
- * it) once the browser has read it.
+ * The segments are validated first (the layout already answered a bad one
+ * with a 404). The server then reads the NFT's deposits and the NFT with the
+ * checksummed address, so the first HTML is the page with its data and the
+ * client's query keys match the seeds exactly.
  */
 export default async function Page({ params }: PageProps) {
-  const { locale, address, tokenId } = await params;
+  const { locale, address: rawAddress, tokenId: rawTokenId } = await params;
   setRequestLocale(locale);
-  const id = Number(tokenId);
+  const parsed = parseTokenDistributionParams(rawAddress, rawTokenId);
+  if (parsed === null) notFound();
+  const { address, tokenId } = parsed;
   return (
     <PageMessages namespaces={['anchoring', 'tables']}>
-      <QuerySeed seeds={await readTokenDistributionSeeds(address, id)}>
-        <RewardsByTokenPage address={address} tokenId={id} />
+      <QuerySeed seeds={await readTokenDistributionSeeds(address, tokenId)}>
+        <RewardsByTokenPage address={address} tokenId={tokenId} />
       </QuerySeed>
     </PageMessages>
   );
