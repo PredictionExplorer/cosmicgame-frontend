@@ -24,6 +24,7 @@ import {
 // pulled axios + the full schema module (~90 KB gzip) into the marketing
 // host's bundle for three display-only reads.
 import {
+  LANDING_FETCH_TIMEOUT_MS,
   fetchLandingCurrentTimeSec,
   fetchLandingDashboardSnapshot,
   fetchLandingFinalizationTimeSec,
@@ -34,13 +35,17 @@ import styles from './EventHorizonCountdown.module.css';
 /** The base cadence; it quickens near the deadline (lib/pollingCadence). */
 export const POLL_INTERVAL_MS = 12_000;
 
-/** One poll of the three reads; each helper answers null on failure and never throws. */
-async function pollLandingCycle(): Promise<LandingCyclePoll> {
+/**
+ * One poll of the three reads; each helper answers null on failure (a
+ * timeout included) and never throws, so a hung read never holds the loop
+ * past the next poll's time.
+ */
+async function pollLandingCycle(timeoutMs: number): Promise<LandingCyclePoll> {
   const sampledAtMs = Date.now();
   const [targetServerTimeSec, currentServerTimeSec, dashboard] = await Promise.all([
-    fetchLandingFinalizationTimeSec(),
-    fetchLandingCurrentTimeSec(),
-    fetchLandingDashboardSnapshot(),
+    fetchLandingFinalizationTimeSec(timeoutMs),
+    fetchLandingCurrentTimeSec(timeoutMs),
+    fetchLandingDashboardSnapshot(timeoutMs),
   ]);
   return { targetServerTimeSec, currentServerTimeSec, dashboard, sampledAtMs };
 }
@@ -61,7 +66,9 @@ function readOnline(): boolean {
 /**
  * Polls the three clock reads and keeps the last good value of each
  * (`mergeLandingCyclePoll`), so one failed request never blanks the clock;
- * ticks once a second; and follows the browser's online state.
+ * ticks once a second; and follows the browser's online state. Polling
+ * stops while the tab is hidden and resumes with a fresh read when it is
+ * shown again, as the app's queries do.
  */
 function useLandingCycleReading() {
   const [reading, setReading] = useState<LandingCycleReading | null>(null);
@@ -72,9 +79,10 @@ function useLandingCycleReading() {
   useEffect(() => {
     let cancelled = false;
     let pollId: number | undefined;
+    let inFlight = false;
 
     const refresh = async () => {
-      const poll = await pollLandingCycle();
+      const poll = await pollLandingCycle(Math.min(LANDING_FETCH_TIMEOUT_MS, nextDelayMs()));
       if (cancelled) return;
       const next = mergeLandingCyclePoll(readingRef.current, poll);
       readingRef.current = next;
@@ -98,15 +106,32 @@ function useLandingCycleReading() {
     };
 
     const loop = async () => {
+      pollId = undefined;
+      inFlight = true;
       await refresh();
-      if (!cancelled) pollId = window.setTimeout(loop, nextDelayMs());
+      inFlight = false;
+      if (!cancelled && document.visibilityState !== 'hidden') {
+        pollId = window.setTimeout(loop, nextDelayMs());
+      }
     };
 
+    // A hidden tab reads nothing; showing it again reads at once.
+    const onVisibilityChange = () => {
+      if (document.visibilityState === 'hidden') {
+        if (pollId !== undefined) window.clearTimeout(pollId);
+        pollId = undefined;
+      } else if (!inFlight && pollId === undefined) {
+        void loop();
+      }
+    };
+
+    document.addEventListener('visibilitychange', onVisibilityChange);
     void loop();
     const tickId = window.setInterval(() => setNowMs(Date.now()), 1000);
 
     return () => {
       cancelled = true;
+      document.removeEventListener('visibilitychange', onVisibilityChange);
       if (pollId !== undefined) window.clearTimeout(pollId);
       window.clearInterval(tickId);
     };

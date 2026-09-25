@@ -1,6 +1,7 @@
 import { render, renderHook, screen, waitFor } from '@testing-library/react';
 
 import {
+  SHOWCASE_TTL_MS,
   imprintedCount,
   resetLandingShowcaseCache,
   useLandingShowcaseTokens,
@@ -54,6 +55,40 @@ describe('useLandingShowcaseTokens', () => {
     const { result } = renderHook(() => useLandingShowcaseTokens());
     await waitFor(() => expect(result.current.status).toBe('ready'));
     expect(result.current.tokens.map((token) => token.TokenId)).toEqual([3]);
+  });
+
+  it('asks again on the next mount after a failure, never keeping it for the session (V044)', async () => {
+    (global.fetch as jest.Mock).mockRejectedValueOnce(new Error('down'));
+    const first = renderHook(() => useLandingShowcaseTokens());
+    await waitFor(() => expect(first.result.current.status).toBe('failed'));
+    first.unmount();
+
+    respond({ CosmicSignatureTokenList: [{ TokenId: 3, Seed: 'cc' }] });
+    const second = renderHook(() => useLandingShowcaseTokens());
+    await waitFor(() => expect(second.result.current.status).toBe('ready'));
+    expect(global.fetch).toHaveBeenCalledTimes(2);
+    // Each read is bounded by a timeout signal where the browser has one.
+    const init = (global.fetch as jest.Mock).mock.calls[1]?.[1] as RequestInit | undefined;
+    expect(init).toEqual(expect.objectContaining({ signal: expect.anything() }));
+  });
+
+  it('reuses a good answer for a while, then reads the collection again', async () => {
+    const now = jest.spyOn(Date, 'now').mockReturnValue(1_000_000);
+    try {
+      respond({ CosmicSignatureTokenList: [{ TokenId: 3, Seed: 'cc' }] });
+      const first = renderHook(() => useLandingShowcaseTokens());
+      await waitFor(() => expect(first.result.current.status).toBe('ready'));
+      first.unmount();
+      renderHook(() => useLandingShowcaseTokens()).unmount();
+      expect(global.fetch).toHaveBeenCalledTimes(1);
+
+      now.mockReturnValue(1_000_000 + SHOWCASE_TTL_MS + 1);
+      const later = renderHook(() => useLandingShowcaseTokens());
+      await waitFor(() => expect(global.fetch).toHaveBeenCalledTimes(2));
+      await waitFor(() => expect(later.result.current.status).toBe('ready'));
+    } finally {
+      now.mockRestore();
+    }
   });
 
   it.each([

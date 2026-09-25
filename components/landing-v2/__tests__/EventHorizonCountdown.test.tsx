@@ -17,6 +17,7 @@ import { EventHorizonCountdown, POLL_INTERVAL_MS } from '../EventHorizonCountdow
 // The countdown reads through the zod-free landing-cycle-data module (NOT
 // the services/api barrel — that would drag axios+zod into the landing).
 jest.mock('../landing-cycle-data', () => ({
+  LANDING_FETCH_TIMEOUT_MS: 8_000,
   fetchLandingFinalizationTimeSec: jest.fn(),
   fetchLandingCurrentTimeSec: jest.fn(),
   fetchLandingDashboardSnapshot: jest.fn(),
@@ -102,6 +103,36 @@ describe('<EventHorizonCountdown />', () => {
 
     expect(clockValues()).toEqual(['00', '02', '01', '04']);
     expect(timer).toHaveAccessibleName(/landing\.timer\.duration\.seconds\(count=4\)/);
+  });
+
+  it('stops polling while the tab is hidden and reads at once when it is shown (V045)', async () => {
+    jest.useFakeTimers({ doNotFake: ['Date'] });
+    mockFetchDashboard.mockClear();
+    let visibility: DocumentVisibilityState = 'visible';
+    const visibilitySpy = jest
+      .spyOn(document, 'visibilityState', 'get')
+      .mockImplementation(() => visibility);
+    try {
+      render(<EventHorizonCountdown />);
+      await waitFor(() => expect(mockFetchDashboard).toHaveBeenCalledTimes(1));
+      // Every read carries a timeout, so a hung request never holds the loop.
+      expect(mockFetchDashboard).toHaveBeenLastCalledWith(8_000);
+
+      visibility = 'hidden';
+      await act(async () => {
+        document.dispatchEvent(new Event('visibilitychange'));
+        jest.advanceTimersByTime(POLL_INTERVAL_MS * 5);
+      });
+      expect(mockFetchDashboard).toHaveBeenCalledTimes(1);
+
+      visibility = 'visible';
+      await act(async () => {
+        document.dispatchEvent(new Event('visibilitychange'));
+      });
+      await waitFor(() => expect(mockFetchDashboard).toHaveBeenCalledTimes(2));
+    } finally {
+      visibilitySpy.mockRestore();
+    }
   });
 
   it('never discards its last good reading when a poll fails', async () => {
