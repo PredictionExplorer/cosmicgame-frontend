@@ -143,7 +143,8 @@
     },
     "imprints": {
       "title": "Закарбування зоряного відбору закріплених NFT",
-      "description": "Щоциклу обирається {count} закріплених Random Walk NFT. Кожне обрання закарбовує власнику закріплення Cosmic Signature NFT і {cst, number} CST."
+      "description": "Щоциклу обирається {count} закріплених Random Walk NFT. Кожне обрання закарбовує власнику закріплення Cosmic Signature NFT і {cst, number} CST.",
+      "selections": "{count, plural, one {# відбір} few {# відбори} many {# відборів} other {# відбору}}"
     }
   },
   "picker": {
@@ -322,8 +323,7 @@
         "depositDatetime": "Внесено",
         "totalAnchoredTokens": "Закріплені NFT",
         "totalDepositedEth": "Внесено (ETH)",
-        "pendingEth": "Не забрано (ETH)",
-        "fullyRetrieved": "Забрано повністю"
+        "pendingEth": "Не забрано (ETH)"
       }
     },
     "randomWalkImprints": {

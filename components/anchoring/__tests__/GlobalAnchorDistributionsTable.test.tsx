@@ -51,7 +51,10 @@ describe('GlobalAnchorDistributionsTable', () => {
     );
     expect(screen.getByText('17')).toBeInTheDocument();
     expect(screen.getAllByText('2.6548')).toHaveLength(2);
-    expect(screen.getByText('anchoring.common.no')).toBeInTheDocument();
+    // Unretrieved (ETH) reading 0.0000 already says "fully retrieved": no second column.
+    expect(
+      screen.queryByText('anchoring.tables.globalDistributions.columns.fullyRetrieved'),
+    ).not.toBeInTheDocument();
   });
 
   it('opens a cycle onto its anchor-holders with a stateful, named toggle', async () => {

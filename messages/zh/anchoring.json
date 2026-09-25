@@ -143,7 +143,8 @@
     },
     "imprints": {
       "title": "锚定 NFT 星选铭刻",
-      "description": "每个周期选出 {count} 枚已锚定的 Random Walk NFT。每次星选都会向其锚定者铭刻一枚 Cosmic Signature NFT 和 {cst, number} CST。"
+      "description": "每个周期选出 {count} 枚已锚定的 Random Walk NFT。每次星选都会向其锚定者铭刻一枚 Cosmic Signature NFT 和 {cst, number} CST。",
+      "selections": "{count, plural, other {# 次星选}}"
     }
   },
   "picker": {
@@ -322,8 +323,7 @@
         "depositDatetime": "存入时间",
         "totalAnchoredTokens": "已锚定 NFT",
         "totalDepositedEth": "存入总额（ETH）",
-        "pendingEth": "未取回（ETH）",
-        "fullyRetrieved": "是否全部取回"
+        "pendingEth": "未取回（ETH）"
       }
     },
     "randomWalkImprints": {

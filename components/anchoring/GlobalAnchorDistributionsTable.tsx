@@ -76,19 +76,12 @@ export const GlobalAnchorDistributionsTable = ({
         sortable: true,
       },
       {
+        // "Fully retrieved" follows from this column reading 0.0000: no second column says it.
         id: 'pending',
         kind: 'amount',
         header: t('tables.globalDistributions.columns.pendingEth'),
         value: (row) => row.PendingToCollectEth,
         showUnit: false,
-      },
-      {
-        id: 'fullyRetrieved',
-        kind: 'text',
-        header: t('tables.globalDistributions.columns.fullyRetrieved'),
-        value: (row) => (row.FullyClaimed ? t('common.yes') : t('common.no')),
-        nowrap: true,
-        priority: 'secondary',
       },
     ],
     [cycleCell, t],

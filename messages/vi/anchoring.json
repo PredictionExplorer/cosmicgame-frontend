@@ -143,7 +143,8 @@
     },
     "imprints": {
       "title": "Lượt khắc từ Tinh tuyển NFT neo giữ",
-      "description": "Mỗi chu kỳ chọn ra {count} Random Walk NFT đang neo giữ. Mỗi lượt được chọn khắc một Cosmic Signature NFT và {cst, number} CST cho người neo giữ."
+      "description": "Mỗi chu kỳ chọn ra {count} Random Walk NFT đang neo giữ. Mỗi lượt được chọn khắc một Cosmic Signature NFT và {cst, number} CST cho người neo giữ.",
+      "selections": "{count, plural, other {# lượt Tinh tuyển}}"
     }
   },
   "picker": {
@@ -322,8 +323,7 @@
         "depositDatetime": "Thời điểm nạp",
         "totalAnchoredTokens": "NFT đang neo giữ",
         "totalDepositedEth": "Tổng đã nạp (ETH)",
-        "pendingEth": "Chưa nhận về (ETH)",
-        "fullyRetrieved": "Đã nhận về toàn bộ"
+        "pendingEth": "Chưa nhận về (ETH)"
       }
     },
     "randomWalkImprints": {

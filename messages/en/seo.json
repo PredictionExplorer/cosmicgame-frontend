@@ -34,7 +34,7 @@
       },
       "anchoring": {
         "heading": "Anchor Distributions",
-        "description": "Every anchored NFT, every ETH Anchor Distribution and every Stellar Selection imprint, as recorded on-chain.",
+        "description": "Every ETH Anchor Distribution and every Anchored-NFT Stellar Selection imprint, as recorded on-chain, and how anchoring works.",
         "source": "Cosmic Signature public anchoring APIs",
         "links": {
           "statistics": "View anchoring statistics",

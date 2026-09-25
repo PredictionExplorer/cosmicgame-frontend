@@ -18,7 +18,6 @@ import type { UniqueAnchorHolderCST } from '@/components/tables/UniqueAnchorHold
 import type { UniqueAnchorHolderRWLK } from '@/components/tables/UniqueAnchorHoldersRWLKTable';
 import type { AnchorAction, AnchoredTokenInfo } from '@/services/api';
 
-import { DefinitionsDisclosure } from './DefinitionsDisclosure';
 import { StatsSection } from './StatsSection';
 
 /** Query-state bundle for one anchoring dataset. */
@@ -86,11 +85,19 @@ function AnchoringTableSection<T>({
 }
 
 /**
- * A tab's figure strip: a label that wraps pushes nothing, every value sits
- * on the row's bottom line.
+ * A tab's figure strip, a level under the page's "Anchoring now" figures:
+ * values at the inline-readout size (`type-figure-md`, never the strip's
+ * 32px), so "this collection" reads under "all anchoring". A label that wraps
+ * pushes nothing: each figure is a column whose label grows, so every value
+ * sits on the row's bottom line. The label stretches across its column
+ * (`self-stretch`): the header's `self-end` means "bottom" in its subgrid but
+ * "right" in a flex column, which pushed a one-line label to the far edge
+ * while its value stayed at the start.
  */
-const FIGURES_LAYOUT =
-  'mt-0 sm:mt-0 sm:[&>div]:flex sm:[&>div]:flex-col sm:[&>div>dt]:grow lg:[&>div]:px-6';
+const FIGURES_LAYOUT = cn(
+  'mt-0 sm:mt-0 sm:[&>div]:flex sm:[&>div]:flex-col sm:[&>div>dt]:grow sm:[&>div>dt]:self-stretch',
+  '[&>div>dd:first-of-type]:type-figure-md lg:[&>div]:px-6',
+);
 
 /**
  * The Cosmic Signature strip's four figures: 2 + 2 on a tablet, then one row
@@ -106,9 +113,10 @@ const CST_FIGURES_LAYOUT = cn(
 );
 
 /**
- * The anchoring statistics, one underline tab per NFT kind: the kind's own
- * figures (the anchored counts of both kinds lead the page above the tabs),
- * its Definitions disclosure, then the actions, anchored NFTs and
+ * The anchoring statistics, one segmented view per NFT kind (a view of one
+ * thing, not a second navigation row under the Statistics tabs): the kind's
+ * own figures, each label explaining itself (the anchored counts of both
+ * kinds lead the page above), then the actions, anchored NFTs and
  * anchor-holders ledgers as sections. While the dashboard loads each figure
  * holds a skeleton; one it could not read is the Unavailable dash.
  */
@@ -131,25 +139,31 @@ export function AnchoringSection({
   const eth = (value: number | undefined) =>
     statsLoading ? pending : typeof value === 'number' ? <Amount value={value} unit="ETH" /> : null;
 
+  // Each label explains itself (the one definition mechanism of the page's figures), so the
+  // tabs need no separate Definitions disclosure.
   const cstFigures: PageHeaderFigure[] = [
     {
       id: 'activeHolders',
       label: t('anchoringPage.stats.activeHoldersCosmicSignature'),
+      info: t('anchoringTooltips.cstActiveAnchorHolders'),
       value: count(cstStats?.NumActiveStakers),
     },
     {
       id: 'deposits',
       label: t('anchoringPage.stats.distributionDeposits'),
+      info: t('anchoringTooltips.cstAnchorDistributionDeposits'),
       value: count(cstStats?.NumDeposits),
     },
     {
       id: 'totalDistributions',
       label: t('anchoringPage.stats.totalDistributions'),
+      info: t('anchoringTooltips.cstTotalAnchorDistributions'),
       value: eth(cstStats?.TotalRewardEth),
     },
     {
       id: 'unretrieved',
       label: t('anchoringPage.stats.unretrievedDistributions'),
+      info: t('anchoringTooltips.cstUnretrievedAnchorDistributions'),
       value: eth(cstStats?.UnclaimedRewardEth),
     },
   ];
@@ -158,52 +172,28 @@ export function AnchoringSection({
     {
       id: 'activeHolders',
       label: t('anchoringPage.stats.activeHoldersRandomWalk'),
+      info: t('anchoringTooltips.rwlkActiveAnchorHolders'),
       value: count(rwlkStats?.NumActiveStakers),
     },
     {
       id: 'tokensImprinted',
       label: t('anchoringPage.stats.tokensImprinted'),
+      info: t('anchoringTooltips.rwlkTotalTokensImprinted'),
       value: count(rwlkStats?.TotalTokensMinted),
     },
   ];
 
   return (
-    <Tabs defaultValue="cst" className="mt-8">
-      <TabsList
-        variant="underline"
-        scroll
-        className="min-w-full"
-        aria-label={t('anchoringPage.tabs.label')}
-      >
+    <Tabs defaultValue="cst" className="mt-10">
+      <TabsList aria-label={t('anchoringPage.tabs.label')}>
         <TabsTrigger value="cst">{t('anchoringPage.tabs.cosmicSignature')}</TabsTrigger>
         <TabsTrigger value="rwlk">{t('anchoringPage.tabs.randomWalk')}</TabsTrigger>
       </TabsList>
 
       <TabsContent value="cst" className="mt-8 space-y-12 sm:space-y-16">
+        {/* A wrapper takes the tab's rhythm: the strip's own negative margin would cancel it. */}
         <div>
           <PageHeaderFigures figures={cstFigures} className={CST_FIGURES_LAYOUT} />
-          <DefinitionsDisclosure
-            className="mt-6"
-            label={t('shared.definitions')}
-            items={[
-              {
-                term: t('anchoringPage.stats.activeHoldersCosmicSignature'),
-                definition: t('anchoringTooltips.cstActiveAnchorHolders'),
-              },
-              {
-                term: t('anchoringPage.stats.distributionDeposits'),
-                definition: t('anchoringTooltips.cstAnchorDistributionDeposits'),
-              },
-              {
-                term: t('anchoringPage.stats.totalDistributions'),
-                definition: t('anchoringTooltips.cstTotalAnchorDistributions'),
-              },
-              {
-                term: t('anchoringPage.stats.unretrievedDistributions'),
-                definition: t('anchoringTooltips.cstUnretrievedAnchorDistributions'),
-              },
-            ]}
-          />
         </div>
 
         <AnchoringTableSection
@@ -237,20 +227,6 @@ export function AnchoringSection({
       <TabsContent value="rwlk" className="mt-8 space-y-12 sm:space-y-16">
         <div>
           <PageHeaderFigures figures={rwlkFigures} className={FIGURES_LAYOUT} />
-          <DefinitionsDisclosure
-            className="mt-6"
-            label={t('shared.definitions')}
-            items={[
-              {
-                term: t('anchoringPage.stats.activeHoldersRandomWalk'),
-                definition: t('anchoringTooltips.rwlkActiveAnchorHolders'),
-              },
-              {
-                term: t('anchoringPage.stats.tokensImprinted'),
-                definition: t('anchoringTooltips.rwlkTotalTokensImprinted'),
-              },
-            ]}
-          />
         </div>
 
         <AnchoringTableSection

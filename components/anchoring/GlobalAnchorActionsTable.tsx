@@ -5,6 +5,8 @@ import { useTranslations } from 'next-intl';
 
 import { TOUCH_TARGET_TEXT_LINK_CLASS } from '@/lib/touch-target';
 import { DataTable, TableLink, TableTag, type DataTableColumn } from '@/components/ui/data-table';
+import { DateTime } from '@/components/ui/date-time';
+import { useSignatureIndex } from '@/components/winnings/useSignatureIndex';
 
 import { TokenCell } from './TokenCell';
 import { anchorActionHref } from './anchorLinks';
@@ -26,12 +28,20 @@ interface GlobalAnchorActionsTableProps extends AnchoringLedgerProps {
   IsRWLK: boolean;
 }
 
+/** A release, the exception: anchoring is what nearly every row records. */
+function isRelease(action: GlobalAnchorAction): boolean {
+  return action.ActionType === 1;
+}
+
 /**
- * Every anchor and release across all anchor-holders for one collection. The
- * links say where they go, as in the anchored-NFT ledger below it: "Action
- * #34" (tagged Anchor or Release) opens the action's record, and the date,
- * with its up-right arrow, is the transaction's proof on the explorer. Only
- * the one non-obvious column, the running total, carries a definition.
+ * Every anchor and release across all anchor-holders for one collection,
+ * shown by the NFT's artwork, like the anchored-NFT ledger beside it: the
+ * NFT, "Action #34" (only a release carries a tag, since nearly every row
+ * is an anchor) leading to the action's record, the date as the
+ * transaction's proof, and the anchor-holder. A dense ledger of several
+ * links a row, so its links keep their ink until hover. On a phone each
+ * record is one media object: the art and its number, "Action #34 · Sep 23"
+ * beside it, then the holder.
  */
 export const GlobalAnchorActionsTable = ({
   list,
@@ -41,28 +51,59 @@ export const GlobalAnchorActionsTable = ({
 }: GlobalAnchorActionsTableProps) => {
   const t = useTranslations('anchoring');
   const collection = IsRWLK ? 'randomWalk' : 'cosmicSignature';
+  // The rows carry no seed: one collection read serves every Cosmic Signature thumbnail.
+  const signatures = useSignatureIndex({ enabled: !IsRWLK && list.length > 0 });
+  const seedsPending = signatures.state === 'loading';
+  const { seedFor } = signatures;
 
-  const columns = useMemo<DataTableColumn<GlobalAnchorAction>[]>(
-    () => [
+  const columns = useMemo<DataTableColumn<GlobalAnchorAction>[]>(() => {
+    const actionLink = (row: GlobalAnchorAction) => (
+      <span className="inline-flex flex-wrap items-center gap-x-2 gap-y-1">
+        {/* Beside its tag the link is not the whole value: it takes the 24px line itself. */}
+        <TableLink
+          href={anchorActionHref(collection, row.ActionId)}
+          className={TOUCH_TARGET_TEXT_LINK_CLASS}
+        >
+          {t('anchorActionDetail.breadcrumbs.action', { id: row.ActionId })}
+        </TableLink>
+        {isRelease(row) ? <TableTag>{t('common.release')}</TableTag> : null}
+      </span>
+    );
+    return [
+      {
+        id: 'token',
+        kind: 'link',
+        header: t('tables.globalAnchorActions.headers.tokenId.desktop'),
+        // The record's media object (the art and its number) heads a phone record unlabelled.
+        label: '',
+        value: (row) => row.TokenId,
+        stack: true,
+        cell: (row) => (
+          <TokenCell
+            collection={collection}
+            tokenId={row.TokenId}
+            seed={IsRWLK ? undefined : seedFor(row.TokenId)}
+            seedPending={!IsRWLK && seedsPending}
+            thumbnail
+            phoneCaption={
+              <>
+                {actionLink(row)}
+                {' · '}
+                <DateTime timestamp={row.TimeStamp} />
+              </>
+            }
+          />
+        ),
+      },
       {
         id: 'action',
         kind: 'link',
         header: t('tables.globalAnchorActions.headers.actionType.desktop'),
-        label: t('tables.globalAnchorActions.headers.actionType.desktop'),
         value: (row) => row.ActionId,
-        cell: (row) => (
-          <span className="inline-flex flex-wrap items-center justify-end gap-x-2 gap-y-1 sm:justify-start">
-            {/* Beside its tag the link is not the whole value: it takes the 24px line itself. */}
-            <TableLink
-              href={anchorActionHref(collection, row.ActionId)}
-              className={TOUCH_TARGET_TEXT_LINK_CLASS}
-            >
-              {t('anchorActionDetail.breadcrumbs.action', { id: row.ActionId })}
-            </TableLink>
-            <TableTag>{row.ActionType === 1 ? t('common.release') : t('common.anchor')}</TableTag>
-          </span>
-        ),
+        cell: actionLink,
         nowrap: true,
+        // On a phone the token's caption carries the action and the date.
+        priority: 'secondary',
       },
       {
         id: 'datetime',
@@ -71,14 +112,7 @@ export const GlobalAnchorActionsTable = ({
         label: t('tables.globalAnchorActions.headers.anchorDatetime.mobile'),
         value: (row) => row.TimeStamp,
         txHash: (row) => row.TxHash,
-      },
-      {
-        id: 'token',
-        kind: 'link',
-        header: t('tables.globalAnchorActions.headers.tokenId.desktop'),
-        label: t('tables.globalAnchorActions.headers.tokenId.mobile'),
-        value: (row) => row.TokenId,
-        cell: (row) => <TokenCell collection={collection} tokenId={row.TokenId} />,
+        priority: 'secondary',
       },
       {
         id: 'holder',
@@ -94,12 +128,11 @@ export const GlobalAnchorActionsTable = ({
         label: t('tables.globalAnchorActions.headers.nftCount.mobile'),
         help: t('tables.globalAnchorActions.headers.nftCount.tooltip'),
         value: (row) => row.NumStakedNFTs,
-        // A running total: the record's action, date, token and holder come first on a phone.
+        // A running total: the record's NFT, action and holder come first on a phone.
         priority: 'secondary',
       },
-    ],
-    [collection, t],
-  );
+    ];
+  }, [IsRWLK, collection, seedFor, seedsPending, t]);
 
   return (
     <DataTable
@@ -111,6 +144,8 @@ export const GlobalAnchorActionsTable = ({
       emptyDescription={t('common.empty.actions.description')}
       tableClassName="sm:min-w-[44rem] lg:min-w-0"
       headingLevel={headingLevel}
+      layout="cards"
+      links="quiet"
       {...state}
     />
   );

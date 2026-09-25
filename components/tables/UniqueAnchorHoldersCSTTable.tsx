@@ -40,6 +40,7 @@ export const UniqueAnchorHoldersCSTTable = ({
         header: t('uniqueAnchorHolders.anchors'),
         value: (row) => row.NumStakeActions,
         sortable: true,
+        priority: 'secondary',
       },
       {
         id: 'releases',
@@ -47,6 +48,7 @@ export const UniqueAnchorHoldersCSTTable = ({
         header: t('uniqueAnchorHolders.releases'),
         value: (row) => row.NumUnstakeActions,
         sortable: true,
+        priority: 'secondary',
       },
       {
         id: 'imprinted',
@@ -81,6 +83,7 @@ export const UniqueAnchorHoldersCSTTable = ({
         value: (row) => row.UnclaimedRewardEth,
         showUnit: false,
         sortable: true,
+        priority: 'secondary',
       },
     ],
     [t],
@@ -95,6 +98,8 @@ export const UniqueAnchorHoldersCSTTable = ({
       emptyTitle={t('empty.anchorHolders')}
       initialSort={{ id: 'anchored', direction: 'desc' }}
       tableClassName="sm:min-w-[44rem] xl:min-w-0"
+      // The ledgers above it keep their links quiet: one calm register for the page.
+      links="quiet"
       {...state}
     />
   );

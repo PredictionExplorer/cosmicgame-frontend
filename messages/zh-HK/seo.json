@@ -34,7 +34,7 @@
       },
       "anchoring": {
         "heading": "錨定派發",
-        "description": "鏈上可查的每一次錨定、每一筆 ETH 錨定派發與每一次星選銘刻。",
+        "description": "鏈上可查的每一筆 ETH 錨定派發與每一次錨定 NFT 星選銘刻，以及錨定的運作方式。",
         "source": "Cosmic Signature 公開錨定 API",
         "links": {
           "statistics": "查看錨定統計",

@@ -143,7 +143,8 @@
     },
     "imprints": {
       "title": "Anchored-NFT Stellar Selection imprints",
-      "description": "Each cycle selects {count} anchored Random Walk NFTs. Every selection imprints a Cosmic Signature NFT and {cst, number} CST to its anchor-holder."
+      "description": "Each cycle selects {count} anchored Random Walk NFTs. Every selection imprints a Cosmic Signature NFT and {cst, number} CST to its anchor-holder.",
+      "selections": "{count, plural, one {# selection} other {# selections}}"
     }
   },
   "picker": {
@@ -322,8 +323,7 @@
         "depositDatetime": "Deposited",
         "totalAnchoredTokens": "Anchored NFTs",
         "totalDepositedEth": "Deposited (ETH)",
-        "pendingEth": "Unretrieved (ETH)",
-        "fullyRetrieved": "Fully retrieved"
+        "pendingEth": "Unretrieved (ETH)"
       }
     },
     "randomWalkImprints": {

@@ -75,8 +75,9 @@ jest.mock('../../../../services/api/tokens', () => ({
 }));
 // lexicon-allow-end
 /**
- * The anchoring header's counts read the page's seeded client queries
- * (AnchoringHeaderCount): each list's state as the browser holds it.
+ * The anchoring header's counts come from the server's reads; a count the
+ * server could not read is read again in the browser (AnchoringHeaderCount):
+ * each list's state as the browser holds it.
  */
 type MockAnchorList = { data: unknown[] | undefined; isLoading: boolean };
 type MockAnchorListId = 'cstActions' | 'rwlkActions' | 'deposits' | 'imprints';
@@ -863,15 +864,16 @@ describe('server-rendered page headers', () => {
       mockRwalkImprints.mockResolvedValue(
         Array.from({ length: 20 }, () => ({})) as Rows<typeof get_staking_rwalk_mints_global>,
       );
-      // The page seeds its client queries from the same reads, and the counts render from them.
-      mockAnchorLists.cstActions = { data: [{}], isLoading: false };
-      mockAnchorLists.rwlkActions = { data: [{}], isLoading: false };
-      mockAnchorLists.deposits = { data: [{}], isLoading: false };
-      mockAnchorLists.imprints = { data: Array.from({ length: 20 }, () => ({})), isLoading: false };
+      // The server counts what it read and sends no list: the browser's reads never start.
+      setAnchorLists({ data: undefined, isLoading: true });
 
       render(await PublicDataRouteSeoSummary({ route: 'anchoring' }));
 
       expect(figureValue('actions')).toHaveTextContent('2');
+      // The actions are listed on the anchoring statistics, and the count leads there.
+      expect(
+        within(figureValue('actions') as HTMLElement).getByRole('link', { name: '2' }),
+      ).toHaveAttribute('href', '/statistics/anchoring');
       expect(figureValue('ethDeposits')).toHaveTextContent('1');
       expect(figureValue('stellarImprints')).toHaveTextContent('20');
       expect(document.querySelector('[data-figure="tokens"]')).toBeNull();

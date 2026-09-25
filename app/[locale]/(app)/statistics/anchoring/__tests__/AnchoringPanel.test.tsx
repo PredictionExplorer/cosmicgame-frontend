@@ -131,7 +131,8 @@ describe('AnchoringPanel', () => {
     expect(strip.querySelector('[data-figure="activeHolders"] dd')).toHaveTextContent(/^3$/);
     // The per-kind counts below keep their own, per-kind label.
     // (The figure's label, and again as its term under Definitions.)
-    expect(screen.getAllByText('Active Cosmic Signature NFT anchor-holders')[0]).toBeVisible();
+    // A non-breaking hyphen keeps the coined term on one line when the label wraps.
+    expect(screen.getAllByText('Active Cosmic Signature NFT anchor\u2011holders')[0]).toBeVisible();
   });
 
   it('renders CST/RWLK anchoring tabs', () => {

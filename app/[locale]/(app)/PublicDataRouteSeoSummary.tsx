@@ -1,12 +1,14 @@
 import type { ReactNode } from 'react';
+import { ArrowRight, ArrowUpRight } from 'lucide-react';
 import { getLocale, getTranslations } from 'next-intl/server';
 import { isAddress, zeroAddress } from 'viem';
 
 import { protocolFacts } from '@/content/protocol-facts';
 
-import { OUTBOUND_LINKS } from '@/config/siteNav';
+import { OUTBOUND_LINKS, classifyHref } from '@/config/siteNav';
 import { PageHeader, type PageHeaderFigure } from '@/components/layout/PageHeader';
 import type { PageSectionId } from '@/components/layout/pageSections';
+import { SiteLink } from '@/components/layout/SiteLink';
 import { SnapshotStamp } from '@/components/layout/SnapshotStamp';
 import { AnchoringHeaderCount } from '@/components/anchoring/AnchoringHeaderCount';
 import { AddressChip } from '@/components/ui/address-chip';
@@ -14,6 +16,7 @@ import { Amount } from '@/components/ui/amount';
 import { Badge } from '@/components/ui/badge';
 import { DateTime } from '@/components/ui/date-time';
 import { LANDING_ORIGIN, localizeCrossHostHref } from '@/lib/hostRouting';
+import { cn } from '@/lib/utils';
 import { sumAllocatedEth } from '@/utils/allocationRecords';
 import { toFiniteNumber } from '@/utils/finiteNumber';
 import { formatCount, formatPercent, sameAddress } from '@/utils/format';
@@ -307,28 +310,49 @@ async function getRouteFigures(
         readAnchorEthDeposits(),
         readAnchorStellarImprints(),
       ]);
-      // The counts render from the page's seeded client queries (anchoring/page.tsx), so a
-      // read that failed here is read again in the browser instead of cached as a dash, and
-      // the header never contradicts the ledgers.
+      // The server counts what it read: the action lists (every anchor and release ever) are
+      // counted here and never sent to the page. A read that failed here is read again in the
+      // browser (AnchoringHeaderCount) instead of cached as a dash.
+      const actions =
+        cstActions.data && rwalkActions.data
+          ? cstActions.data.length + rwalkActions.data.length
+          : null;
       return {
         reads: [cstActions, rwalkActions, ethDeposits, stellarImprints],
         // Three short counts: one row on phones.
         figures: [
           {
             key: 'actions',
-            value: <AnchoringHeaderCount metric="actions" />,
+            // The actions are listed on the anchoring statistics, one link away.
+            value: (
+              <AnchoringHeaderCount
+                metric="actions"
+                serverCount={actions}
+                href="/statistics/anchoring"
+              />
+            ),
             hasTooltip: true,
             compact: true,
           },
           {
             key: 'ethDeposits',
-            value: <AnchoringHeaderCount metric="ethDeposits" />,
+            value: (
+              <AnchoringHeaderCount
+                metric="ethDeposits"
+                serverCount={ethDeposits.data?.length ?? null}
+              />
+            ),
             hasTooltip: true,
             compact: true,
           },
           {
             key: 'stellarImprints',
-            value: <AnchoringHeaderCount metric="stellarImprints" />,
+            value: (
+              <AnchoringHeaderCount
+                metric="stellarImprints"
+                serverCount={stellarImprints.data?.length ?? null}
+              />
+            ),
             hasTooltip: true,
             compact: true,
           },
@@ -656,5 +680,53 @@ export async function PublicDataRouteSeoSummary({
       }))}
       relatedLabel={t('publicData.common.relatedPagesAria', { heading })}
     />
+  );
+}
+
+/**
+ * The header's related pages again, for phones, where the header hides its
+ * chips: a compact list the page puts after its last section, one 44px row
+ * per link, with the header's links, order and labels.
+ */
+export async function PublicDataRelatedPages({
+  route,
+  className,
+}: {
+  route: SeoSummaryRoute;
+  className?: string;
+}) {
+  const locale = await getLocale();
+  const t = await getTranslations({ locale, namespace: 'seo' });
+  const tCommon = await getTranslations({ locale, namespace: 'common' });
+  const headingId = `${route}-related-pages`;
+  return (
+    <nav
+      aria-labelledby={headingId}
+      className={cn('border-t border-rule-faint pt-6 sm:hidden', className)}
+    >
+      <h2 id={headingId} className="type-label text-subtle">
+        {tCommon('pageHeader.relatedPages')}
+      </h2>
+      <ul className="mt-2 divide-y divide-rule-faint">
+        {routeDefinitions[route].links.map((link) => {
+          const href = localizeCrossHostHref(link.href, locale);
+          const kind = classifyHref(href, 'app');
+          const Icon = kind === 'external' ? ArrowUpRight : ArrowRight;
+          return (
+            <li key={link.key}>
+              <SiteLink
+                href={href}
+                kind={kind}
+                externalIcon={false}
+                className="flex min-h-11 items-center justify-between gap-4 type-body-sm text-foreground no-underline"
+              >
+                {t(`publicData.routes.${route}.links.${link.key}`)}
+                <Icon aria-hidden className="size-4 shrink-0 text-subtle" />
+              </SiteLink>
+            </li>
+          );
+        })}
+      </ul>
+    </nav>
   );
 }

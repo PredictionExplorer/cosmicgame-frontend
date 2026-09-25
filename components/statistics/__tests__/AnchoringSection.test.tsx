@@ -117,12 +117,24 @@ describe('AnchoringSection', () => {
     );
   });
 
-  it('keeps the figure definitions in one disclosure instead of an icon per label', () => {
+  it('explains each figure by its own label, the one definition mechanism', () => {
     render(<AnchoringSection {...defaultProps} />);
     const panel = screen.getByRole('tabpanel', { name: 'Cosmic Signature NFT' });
-    const disclosure = within(panel).getByText('Definitions').closest('details')!;
-    expect(disclosure).not.toHaveAttribute('open');
-    expect(within(disclosure).getAllByRole('term')).toHaveLength(4);
+    // No separate Definitions disclosure: each label is its own explained term.
+    expect(panel.querySelector('details')).toBeNull();
+    const terms = within(panel.querySelector('dl')!).getAllByRole('button', {
+      name: /more information about/i,
+    });
+    expect(terms).toHaveLength(4);
+  });
+
+  it('switches collections with a segmented control, not a second underline row', () => {
+    render(<AnchoringSection {...defaultProps} />);
+    // The Statistics sub-navigation is the page's one underline row.
+    expect(screen.getByRole('tablist', { name: 'NFT collection' })).not.toHaveClass('border-b');
+    expect(screen.getByRole('tablist', { name: 'NFT collection' })).toHaveClass(
+      'bg-surface-sunken',
+    );
   });
 
   it('gives each ledger its own H2 section', () => {
@@ -139,7 +151,11 @@ describe('AnchoringSection', () => {
     render(
       <AnchoringSection {...defaultProps} cstAnchorActions={dataState([createAnchorAction()])} />,
     );
-    expect(screen.getAllByText('anchoring.common.anchor').length).toBeGreaterThanOrEqual(1);
+    expect(
+      screen.getAllByRole('link', {
+        name: 'anchoring.anchorActionDetail.breadcrumbs.action(id=10)',
+      }).length,
+    ).toBeGreaterThanOrEqual(1);
   });
 
   it('shows a loading skeleton while anchor actions load', () => {
@@ -170,7 +186,7 @@ describe('AnchoringSection', () => {
     expect(screen.getAllByText('No anchor actions yet').length).toBeGreaterThan(0);
   });
 
-  it('switches collections with named underline tabs', async () => {
+  it('switches collections with named tabs', async () => {
     const user = userEvent.setup();
     render(<AnchoringSection {...defaultProps} />);
     expect(screen.getByRole('tablist', { name: 'NFT collection' })).toBeInTheDocument();

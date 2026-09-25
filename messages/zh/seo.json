@@ -34,7 +34,7 @@
       },
       "anchoring": {
         "heading": "锚定派发",
-        "description": "链上可查的每一次锚定、每一笔 ETH 锚定派发与每一次星选铭刻。",
+        "description": "链上可查的每一笔 ETH 锚定派发与每一次锚定 NFT 星选铭刻，以及锚定的运作方式。",
         "source": "Cosmic Signature 公开锚定 API",
         "links": {
           "statistics": "查看锚定统计",

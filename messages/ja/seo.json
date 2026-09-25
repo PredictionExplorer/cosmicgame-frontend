@@ -34,7 +34,7 @@
       },
       "anchoring": {
         "heading": "係留配分",
-        "description": "オンチェーンに記録された、すべてのNFT係留、ETH係留配分、星選による刻印を確認できます。",
+        "description": "オンチェーンに記録された、すべてのETH係留配分と係留NFT星選による刻印、そして係留の仕組みを確認できます。",
         "source": "Cosmic Signature公開係留API",
         "links": {
           "statistics": "係留統計を見る",

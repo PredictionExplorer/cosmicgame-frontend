@@ -28,6 +28,7 @@ import {
 } from '@/components/statistics/AnchoringSection';
 import type { UniqueAnchorHolderCST } from '@/components/tables/UniqueAnchorHoldersCSTTable';
 import type { UniqueAnchorHolderRWLK } from '@/components/tables/UniqueAnchorHoldersRWLKTable';
+import type { DashboardInfo } from '@/services/api/types';
 
 function toDataState<T>(query: UseQueryResult<T[], Error>): AnchoringDataState<T> {
   return {
@@ -46,13 +47,21 @@ function toDataState<T>(query: UseQueryResult<T[], Error>): AnchoringDataState<T
  * each, named as the hub names them), then each collection's own figures and
  * its anchor and release, anchored-NFT and anchor-holder ledgers. A figure
  * waits as a skeleton while the dashboard loads and reads Unavailable when it
- * fails; it is never a confident zero.
+ * fails; it is never a confident zero. The route reads the dashboard and the
+ * lists on the server, so the first HTML already holds the figures (from
+ * `initialDashboard`, until the browser's own read replaces it) and the
+ * ledgers (seeded).
  */
-const AnchoringPanel = () => {
+const AnchoringPanel = ({ initialDashboard }: { initialDashboard?: DashboardInfo | null }) => {
   const t = useTranslations('statistics');
   const tAnchoring = useTranslations('anchoring');
   const format = useFormat();
-  const dashboard = useDashboardInfo(undefined, { poll: false });
+  const dashboardQuery = useDashboardInfo(undefined, { poll: false });
+  const dashboardData = dashboardQuery.data ?? initialDashboard ?? undefined;
+  const dashboard = {
+    data: dashboardData,
+    isLoading: dashboardQuery.isLoading && !dashboardData,
+  };
   const cstAnchorActionsQuery = useCSTAnchorActions();
   const rwlkAnchorActionsQuery = useRWLKAnchorActions();
   const anchoredCSTokensQuery = useGlobalAnchoredCSTokens();

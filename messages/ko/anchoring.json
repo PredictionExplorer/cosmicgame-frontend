@@ -143,7 +143,8 @@
     },
     "imprints": {
       "title": "앵커링 NFT 별빛 선정 각인",
-      "description": "매 사이클 앵커링된 Random Walk NFT 중 {count}개가 선정됩니다. 선정 1건마다 해당 앵커링 보유자에게 Cosmic Signature NFT 1개와 {cst, number} CST가 각인됩니다."
+      "description": "매 사이클 앵커링된 Random Walk NFT 중 {count}개가 선정됩니다. 선정 1건마다 해당 앵커링 보유자에게 Cosmic Signature NFT 1개와 {cst, number} CST가 각인됩니다.",
+      "selections": "{count, plural, other {별빛 선정 #회}}"
     }
   },
   "picker": {
@@ -322,8 +323,7 @@
         "depositDatetime": "적립 일시",
         "totalAnchoredTokens": "앵커링된 NFT",
         "totalDepositedEth": "총 적립(ETH)",
-        "pendingEth": "미회수(ETH)",
-        "fullyRetrieved": "전액 회수 여부"
+        "pendingEth": "미회수(ETH)"
       }
     },
     "randomWalkImprints": {

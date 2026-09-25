@@ -127,6 +127,8 @@ export const GlobalAnchoredTokensTable = ({
       tableClassName="sm:min-w-[40rem] lg:min-w-0"
       headingLevel={headingLevel}
       layout="cards"
+      // Three links a row (the NFT, the action and the holder): ink until hover.
+      links="quiet"
       {...state}
     />
   );

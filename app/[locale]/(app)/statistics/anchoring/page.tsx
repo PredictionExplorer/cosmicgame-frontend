@@ -5,11 +5,14 @@ import { APP_ORIGIN, localeHref } from '@/lib/hostRouting';
 import { JsonLd, breadcrumbJsonLd, jsonLdInLanguage, webPageJsonLd } from '@/utils/jsonLd';
 import { createPageMetadata } from '@/utils/seo';
 import { PageMessages } from '@/components/i18n/PageMessages';
+import { SnapshotStamp } from '@/components/layout/SnapshotStamp';
 
+import { QuerySeed } from '../../QuerySeed';
 import { STATISTICS_SECTIONS } from '../statistics-sections';
 import { StatisticsPageIntro } from '../StatisticsPageIntro';
 
 import AnchoringPanel from './AnchoringPanel';
+import { readAnchoringStatistics } from './anchoringStatisticsReads';
 
 const section = STATISTICS_SECTIONS.find((s) => s.slug === 'anchoring')!;
 
@@ -42,6 +45,8 @@ export default async function Page({ params }: PageProps) {
   const title = t(`navigation.${section.messageKey}.title`);
   const description = t(`navigation.${section.messageKey}.description`);
   const inLanguage = jsonLdInLanguage(locale);
+  // Read on the server, so the figures and ledgers are the first HTML, dated by the stamp.
+  const { dashboard, seeds, at } = await readAnchoringStatistics();
 
   return (
     <PageMessages namespaces={['anchoring', 'marketing', 'statistics', 'tables']}>
@@ -63,8 +68,14 @@ export default async function Page({ params }: PageProps) {
             ),
           ]}
         />
-        <StatisticsPageIntro title={title} description={description} />
-        <AnchoringPanel />
+        <StatisticsPageIntro
+          title={title}
+          description={description}
+          meta={at !== null ? <SnapshotStamp at={at} /> : undefined}
+        />
+        <QuerySeed seeds={seeds}>
+          <AnchoringPanel initialDashboard={dashboard.data} />
+        </QuerySeed>
       </>
     </PageMessages>
   );
