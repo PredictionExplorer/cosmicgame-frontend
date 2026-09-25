@@ -441,7 +441,7 @@ const GesturePage = ({
           ) : null}
 
           <section aria-labelledby="gesture-record-heading">
-            <h2 id="gesture-record-heading" className="mb-2 type-heading-3 text-foreground">
+            <h2 id="gesture-record-heading" className="mb-3 type-section text-foreground">
               {t('sections.details.title')}
             </h2>
             <dl className="divide-y divide-rule-faint border-y border-rule">
@@ -481,7 +481,7 @@ const GesturePage = ({
 
           {rwlkId !== null ? (
             <section aria-labelledby="gesture-rwlk-heading">
-              <h2 id="gesture-rwlk-heading" className="mb-4 type-heading-3 text-foreground">
+              <h2 id="gesture-rwlk-heading" className="mb-4 type-section text-foreground">
                 {t('randomWalk.heading')}
               </h2>
               {/* The header's method badge already names the token number. */}
@@ -495,7 +495,7 @@ const GesturePage = ({
 
           {hasNft ? (
             <section aria-labelledby="gesture-nft-heading">
-              <h2 id="gesture-nft-heading" className="mb-4 type-heading-3 text-foreground">
+              <h2 id="gesture-nft-heading" className="mb-4 type-section text-foreground">
                 {t('sections.nft.title')}
               </h2>
               <div className="grid gap-8 sm:grid-cols-[minmax(0,15rem)_minmax(0,1fr)]">

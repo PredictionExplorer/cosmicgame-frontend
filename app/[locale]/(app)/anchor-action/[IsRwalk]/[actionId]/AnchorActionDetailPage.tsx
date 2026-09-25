@@ -170,7 +170,7 @@ function AnchorActionBody({
 
       <div className="min-w-0 space-y-10 lg:col-span-5">
         <section aria-labelledby="anchor-action-record">
-          <h2 id="anchor-action-record" className="type-heading-3 text-foreground">
+          <h2 id="anchor-action-record" className="type-section text-foreground">
             {t('anchorActionDetail.record.title')}
           </h2>
           <dl className="mt-3 divide-y divide-rule-faint border-y border-rule-faint">
@@ -199,7 +199,7 @@ function AnchorActionBody({
         </section>
 
         <section aria-labelledby="anchor-action-timeline">
-          <h2 id="anchor-action-timeline" className="type-heading-3 text-foreground">
+          <h2 id="anchor-action-timeline" className="type-section text-foreground">
             {t('anchorActionDetail.timeline.title')}
           </h2>
           <AnchorTimeline

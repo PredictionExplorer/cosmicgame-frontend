@@ -359,6 +359,12 @@ view exists for keeps a surface (the gesture form: `bg-surface`, no border). Dis
 read as a list of hairline rows (`DeskDisclosure`), never as boxed accordions. Every region
 heading on one page uses one style (`type-heading-3`).
 
+**Heading tiers.** Sibling headings in one row share one tier. On a record page (a
+gesture, a cycle, an anchor action) and any data page body, a first-level section heading
+is `type-section`; `type-heading-3` is for a heading inside a panel or bordered group and
+for the regions of the app-home desk, where every region is a panel. A component reused
+across both (the standings ledger) takes its tier from the page (`headingSize`).
+
 **The Cycle clock.** The Cycle Finalization Time has one presentation on both hosts:
 `CountdownFigures` (`components/ui/countdown-figures`), padded groups built by
 `countdownGroups` (DD:HH:MM:SS while days remain, then HH:MM:SS, so the width never

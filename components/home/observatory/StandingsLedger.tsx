@@ -80,6 +80,12 @@ export interface StandingsLedgerProps {
    * home desk, 3 inside the cycle page's status section.
    */
   headingLevel?: 2 | 3;
+  /**
+   * The heading's tier: `panel` (type-heading-3) on the home desk, where every
+   * region heading is a panel; `section` (type-section) where the ledger is a
+   * column of a page body beside a section-tier peer (the cycle page's status).
+   */
+  headingSize?: 'panel' | 'section';
   /** Id of the ledger's heading (it labels the section). */
   headingId?: string;
   /** A line under the heading that says what the ledger holds, where a page introduces it. */
@@ -504,6 +510,7 @@ export function StandingsLedger({
   signatureEth,
   moment = null,
   headingLevel = 2,
+  headingSize = 'panel',
   headingId = 'standings-ledger-title',
   description,
   className,
@@ -597,7 +604,7 @@ export function StandingsLedger({
     >
       <SectionHeader
         as={Heading}
-        size="panel"
+        size={headingSize === 'section' ? 'page' : 'panel'}
         headingId={headingId}
         title={t('standings.title')}
         description={description}
