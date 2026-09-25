@@ -219,7 +219,8 @@
   "userProfile": {
     "title": "Participant {address}",
     "description": "Gestures, allocations and anchors of participant {address}.",
-    "invalidAddress": "Invalid Address"
+    "invalidAddress": "Invalid address",
+    "invalidDescription": "The address in this link is not a valid Ethereum address."
   },
   "admin": {
     "title": "Message moderation",

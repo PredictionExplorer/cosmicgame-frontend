@@ -223,7 +223,8 @@ const UserStatisticsView = ({ address, isOwnProfile }: UserStatisticsViewProps) 
     );
   };
 
-  if (!address || address === 'Invalid Address') {
+  // The route passes null when its URL does not hold an address.
+  if (!address) {
     return (
       <PageShell variant="data" className={SHELL_CLASS}>
         <PageHeader

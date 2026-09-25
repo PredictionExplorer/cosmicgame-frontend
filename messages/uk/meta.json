@@ -219,7 +219,8 @@
   "userProfile": {
     "title": "Інформація про учасника {address}",
     "description": "Жести, розподіли та закріплення учасника {address}.",
-    "invalidAddress": "Недійсна адреса"
+    "invalidAddress": "Недійсна адреса",
+    "invalidDescription": "Адреса в цьому посиланні не є дійсною адресою Ethereum."
   },
   "admin": {
     "title": "Модерація повідомлень",
