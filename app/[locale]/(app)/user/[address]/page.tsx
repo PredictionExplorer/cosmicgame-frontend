@@ -2,11 +2,15 @@ import type { Metadata } from 'next';
 import { getTranslations, setRequestLocale } from 'next-intl/server';
 
 import { formatAddress } from '@/utils/format';
+import { capCacheWindow } from '@/lib/cacheWindow';
 import { createMetadata } from '@/utils/seo';
 import { PageMessages } from '@/components/i18n/PageMessages';
 
+import { DashboardQuerySeed, QuerySeed } from '../../QuerySeed';
+
 import UserPage from './UserPage';
 import { profileAddress } from './profileAddress';
+import { readProfile } from './profileReads';
 
 interface PageProps {
   params: Promise<{ locale: string; address: string }>;
@@ -38,10 +42,11 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 
 /**
  * No profile renders at build time: each one renders on its first visit and
- * is then served from the cache, refreshed every five minutes. The page shell
- * reads nothing on the server (the profile's ledgers load in the browser), so
- * the cached HTML never holds stale figures, and it is the profile's own
- * loading state (its header, contents rail and body placeholders).
+ * is then served from the cache for five minutes (`CACHE_WINDOW.live`), or a
+ * minute when one of its reads failed. The server reads the whole profile
+ * (`readProfile`), so its figures, NFTs and ledgers are the first HTML; the
+ * browser refreshes any read older than its hook allows right after
+ * hydration, so a cached page never shows old figures for long.
  *
  * The route has no loading boundary: a `loading.tsx` gets no params, so any
  * translated copy in it reads the locale from the request headers, and a
@@ -57,10 +62,20 @@ export const revalidate = 300;
 export default async function Page({ params }: PageProps) {
   const { locale, address: rawAddress } = await params;
   setRequestLocale(locale);
+  const address = profileAddress(rawAddress);
+  // A malformed address reads nothing: its page says so, and that never changes.
+  const { seeds, cacheWindow } = address
+    ? await readProfile(address)
+    : { seeds: [], cacheWindow: 'live' as const };
+  await capCacheWindow(cacheWindow);
 
   return (
     <PageMessages namespaces={['anchoring', 'detail', 'marketing', 'myPages', 'tables', 'traits']}>
-      <UserPage address={profileAddress(rawAddress)} />
+      <DashboardQuerySeed>
+        <QuerySeed seeds={seeds}>
+          <UserPage address={address} />
+        </QuerySeed>
+      </DashboardQuerySeed>
     </PageMessages>
   );
 }
