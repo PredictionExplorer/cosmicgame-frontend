@@ -1,17 +1,19 @@
 'use client';
 
-import { useMemo, useRef, useState, type ReactNode } from 'react';
-import { ArrowUpRight } from 'lucide-react';
+import { useMemo, type ReactNode } from 'react';
 import { useLocale, useTranslations } from 'next-intl';
 
 import { SITE_ROUTE_ICONS } from '@/config/siteNavIcons';
-import { getRWLKImageUrl } from '@/utils/urls';
+import { randomWalkImageUrl, randomWalkTokenUrl } from '@/utils/urls';
 import { formatCount } from '@/utils/format';
 import { formatId } from '@/utils/format/ids';
 import { toFiniteNumber } from '@/utils/finiteNumber';
 import { useUsedRWLKNFTs } from '@/hooks/useApiQuery';
 import type { UsedRWLKNFT } from '@/services/api/types';
 import { PageHeader } from '@/components/layout/PageHeader';
+import { SiteLink } from '@/components/layout/SiteLink';
+import { PagedWall, wallReadFailed } from '@/components/nft/PagedWall';
+import { TitleWithArrow } from '@/components/nft/TitleWithArrow';
 import { useWallPage } from '@/components/nft/useWallPage';
 import { AddressChip } from '@/components/ui/address-chip';
 import { ArtFrame } from '@/components/ui/art-frame';
@@ -20,7 +22,6 @@ import { DateTime } from '@/components/ui/date-time';
 import { EmptyState } from '@/components/ui/empty-state';
 import { ErrorState } from '@/components/ui/error-state';
 import { PageShell } from '@/components/ui/page-shell';
-import { TablePagination } from '@/components/ui/pagination';
 import { SIGNATURE_GRID_CLASS, SignatureGridSkeleton } from '@/components/nft/SignatureGrid';
 import { cn } from '@/lib/utils';
 
@@ -49,16 +50,6 @@ export function toUsedRwlkNftRecords(rows: readonly UsedRWLKNFT[]): UsedRwlkNftR
 /** Newest use first; records without a time keep their order at the end. */
 export function newestFirst(records: readonly UsedRwlkNftRecord[]): UsedRwlkNftRecord[] {
   return [...records].sort((a, b) => (b.TimeStamp ?? -1) - (a.TimeStamp ?? -1));
-}
-
-/** The RandomWalk project's page for one token. */
-function randomWalkHref(tokenId: number): string {
-  return `https://www.randomwalknft.com/detail/${tokenId}`;
-}
-
-/** The token's black-ground thumbnail (files are named by the zero-padded id). */
-function randomWalkThumb(tokenId: number): string {
-  return getRWLKImageUrl(String(tokenId).padStart(6, '0'), 'black_thumb.jpg');
 }
 
 const PAGE_SIZE = 12;
@@ -96,17 +87,12 @@ export interface UsedRwlkNftsPageProps {
 const UsedRwlkNftsPage = ({
   seoSummary,
   snapshotCount = null,
-  page: controlledPage,
+  page,
   onPageChange,
 }: UsedRwlkNftsPageProps) => {
   const t = useTranslations('statistics');
   const { data, isLoading, isError, refetch } = useUsedRWLKNFTs();
   const records = useMemo(() => newestFirst(toUsedRwlkNftRecords(data ?? [])), [data]);
-  const [localPage, setLocalPage] = useState(1);
-  const wallRef = useRef<HTMLDivElement>(null);
-  const pageCount = Math.max(1, Math.ceil(records.length / PAGE_SIZE));
-  const current = Math.min(controlledPage ?? localPage, pageCount);
-  const visible = records.slice((current - 1) * PAGE_SIZE, current * PAGE_SIZE);
   // The header counted uses a moment ago: an empty refresh failed.
   const refreshFailed = !isLoading && records.length === 0 && (snapshotCount ?? 0) > 0;
 
@@ -120,60 +106,48 @@ const UsedRwlkNftsPage = ({
         />
       )}
 
-      {isError || refreshFailed ? (
-        <ErrorState
-          title={t('usedRwlkNfts.loadErrorTitle')}
-          message={t('usedRwlkNfts.loadError')}
-          headingLevel={2}
-          onRetry={() => void refetch()}
-        />
-      ) : isLoading ? (
-        <SignatureGridSkeleton count={8} className={COLUMNS_CLASS} />
-      ) : records.length === 0 ? (
-        <EmptyState
-          icon={<UsedRwlkIcon aria-hidden />}
-          title={t('usedRwlkNfts.emptyTitle')}
-          description={t('usedRwlkNfts.emptyDescription')}
-          headingLevel={2}
-          variant="page"
-        />
-      ) : (
-        <div ref={wallRef} className="scroll-mt-[var(--sticky-offset)]">
-          <ul
-            className={cn(SIGNATURE_GRID_CLASS, COLUMNS_CLASS)}
-            aria-label={t('usedRwlkNfts.title')}
-          >
-            {visible.map((record, index) => (
-              <li key={`${record.TxHash ?? 'record'}-${record.RWalkTokenId}`} className="min-w-0">
-                <UsedRandomWalkCard
-                  record={record}
-                  priority={current === 1 && index < EAGER_CARDS}
-                />
-              </li>
-            ))}
-          </ul>
-          <TablePagination
-            page={current}
-            pageSize={PAGE_SIZE}
-            total={records.length}
-            onPageChange={(next) => {
-              if (onPageChange) onPageChange(next);
-              else setLocalPage(next);
-              wallRef.current?.scrollIntoView?.({ block: 'start' });
-            }}
-            className="mt-10 border-t border-rule-faint pt-5 sm:pl-0"
+      <PagedWall
+        items={records}
+        itemKey={(record) => `${record.TxHash ?? 'record'}-${record.RWalkTokenId}`}
+        renderItem={(record, { eager }) => <UsedRandomWalkCard record={record} priority={eager} />}
+        pageSize={PAGE_SIZE}
+        page={page}
+        onPageChange={onPageChange}
+        gridClassName={cn(SIGNATURE_GRID_CLASS, COLUMNS_CLASS)}
+        ariaLabel={t('usedRwlkNfts.title')}
+        eagerCount={EAGER_CARDS}
+        loading={isLoading}
+        loadingState={<SignatureGridSkeleton count={8} className={COLUMNS_CLASS} />}
+        error={
+          wallReadFailed({ isError, data }, refreshFailed) ? (
+            <ErrorState
+              title={t('usedRwlkNfts.loadErrorTitle')}
+              message={t('usedRwlkNfts.loadError')}
+              headingLevel={2}
+              onRetry={() => void refetch()}
+            />
+          ) : null
+        }
+        empty={
+          <EmptyState
+            icon={<UsedRwlkIcon aria-hidden />}
+            title={t('usedRwlkNfts.emptyTitle')}
+            description={t('usedRwlkNfts.emptyDescription')}
+            headingLevel={2}
+            variant="page"
           />
-        </div>
-      )}
+        }
+      />
     </PageShell>
   );
 };
 
 /**
- * One used RandomWalk NFT: the plate and its number link to the token on the
- * RandomWalk site (a new tab); the caption names the cycle (linked to its
- * allocation), when the gesture landed and the participant, as the attached
- * NFTs' labels do.
+ * One used Random Walk NFT: the plate and its title ("Random Walk #004079",
+ * the project's own name for it, so the number never reads as a Cosmic
+ * Signature's) link to the token on the Random Walk site in a new tab; the
+ * caption names the cycle (linked to its allocation), when the gesture landed
+ * and the participant, as the attached NFTs' labels do.
  */
 function UsedRandomWalkCard({
   record,
@@ -183,38 +157,40 @@ function UsedRandomWalkCard({
   priority: boolean;
 }) {
   const t = useTranslations('statistics');
-  const tTables = useTranslations('tables');
   const tDetail = useTranslations('detail');
   const locale = useLocale();
-  const id = formatId(record.RWalkTokenId);
+  // "004079": the project's own names pad the number to six digits.
+  const number = formatId(record.RWalkTokenId).slice(1);
 
   return (
     <article className="min-w-0" data-testid="used-rwlk-nft">
-      <a
-        href={randomWalkHref(record.RWalkTokenId)}
-        target="_blank"
-        rel="noopener noreferrer"
+      <SiteLink
+        kind="external"
+        href={randomWalkTokenUrl(record.RWalkTokenId)}
+        externalIcon={false}
         className="group block rounded-edge"
       >
         <ArtFrame
-          sources={[randomWalkThumb(record.RWalkTokenId)]}
-          alt={t('usedRwlkNfts.artAlt', { id })}
+          sources={[
+            randomWalkImageUrl(record.RWalkTokenId),
+            randomWalkImageUrl(record.RWalkTokenId, 'black.png'),
+          ]}
+          alt={t('usedRwlkNfts.artAlt', { id: number })}
           sizes={SIZES}
           priority={priority}
           unavailableLabel={tDetail('image.artworkUnavailable')}
-          unavailableDetail={id}
+          unavailableDetail={`#${number}`}
           className="group-hover:after:shadow-[var(--art-edge-active)]"
         />
         {/* The plate's alt text already names the token. */}
+        {/* The title as the attached NFTs' labels set theirs. */}
         <p
           aria-hidden
-          className="mt-3 flex items-center gap-1 type-body-md font-medium tabular-nums text-foreground"
+          className="mt-3 line-clamp-2 type-body-sm font-medium text-foreground decoration-rule underline-offset-4 group-hover:underline"
         >
-          <span className="decoration-rule underline-offset-4 group-hover:underline">{id}</span>
-          <ArrowUpRight className="size-3.5 shrink-0 text-subtle" />
+          <TitleWithArrow text={t('usedRwlkNfts.card.title', { id: number })} />
         </p>
-        <span className="sr-only">{tTables('links.newTab')}</span>
-      </a>
+      </SiteLink>
       {/* The space before each dot does not break, so a wrapped line ends with the dot. */}
       <p className="mt-1.5 type-caption text-subtle">
         <TableLink href={`/allocation/${record.RoundNum}`}>

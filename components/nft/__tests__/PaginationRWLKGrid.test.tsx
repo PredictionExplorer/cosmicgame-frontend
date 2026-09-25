@@ -31,7 +31,7 @@ describe('PaginationRWLKGrid', () => {
     expect(status).toHaveTextContent('home.rwlkGrid.loading');
     // The grid's own shape waits in skeleton cards, not a spinner and a caption.
     expect(within(status).getByText('home.rwlkGrid.loading')).toHaveClass('sr-only');
-    expect(status.querySelectorAll('.animate-pulse')).toHaveLength(6);
+    expect(status.querySelectorAll('.aspect-art')).toHaveLength(6);
     expect(screen.queryByRole('searchbox')).not.toBeInTheDocument();
     expect(screen.queryByText('home.rwlkGrid.empty')).not.toBeInTheDocument();
   });

@@ -47,11 +47,6 @@ const RANDOM_WALK_ALLOWLIST = new Set([
   'contracts:entries.randomWalk.description',
   'statistics:anchoringTooltips.rwlkActiveAnchorHolders',
   'statistics:anchoringTooltips.rwlkTotalTokensImprinted',
-  'statistics:usedRwlkNfts.artAlt',
-  'statistics:usedRwlkNfts.emptyDescription',
-  'statistics:usedRwlkNfts.emptyTitle',
-  'statistics:usedRwlkNfts.loadError',
-  'statistics:usedRwlkNfts.loadErrorTitle',
 ]);
 
 const CAPITALISED_GESTURE_ALLOWLIST = new Set([

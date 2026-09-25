@@ -14,7 +14,7 @@ describe('anchorLinks', () => {
 
   it('links a Cosmic Signature to the gallery and a Random Walk NFT to its own site', () => {
     expect(anchorTokenHref('cosmicSignature', 25)).toBe('/detail/25');
-    expect(anchorTokenHref('randomWalk', 1826)).toBe('https://randomwalknft.com/detail/1826');
+    expect(anchorTokenHref('randomWalk', 1826)).toBe('https://www.randomwalknft.com/detail/1826');
   });
 
   it('builds the anchor-action record route with the collection flag', () => {

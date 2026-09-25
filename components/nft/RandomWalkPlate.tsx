@@ -1,14 +1,9 @@
-import { getRWLKImageUrl } from '@/utils';
-
+import { randomWalkImageUrl, randomWalkTokenUrl } from '@/utils/urls';
 import { cn } from '@/lib/utils';
 import { SiteLink } from '@/components/layout/SiteLink';
 import { MEDIA_PLATE_CLASS } from '@/components/ui/art-frame';
 
 import NFTImage from './NFTImage';
-
-/** The token's own page on the Random Walk NFT site. */
-export const randomWalkTokenUrl = (tokenId: number) =>
-  `https://www.randomwalknft.com/detail/${tokenId}`;
 
 export interface RandomWalkPlateProps {
   tokenId: number;
@@ -32,7 +27,6 @@ export function RandomWalkPlate({
   sizes = '(max-width: 640px) 50vw, 240px',
   className,
 }: RandomWalkPlateProps) {
-  const file = String(tokenId).padStart(6, '0');
   return (
     <SiteLink
       kind="external"
@@ -41,8 +35,8 @@ export function RandomWalkPlate({
       className={cn(MEDIA_PLATE_CLASS, className)}
     >
       <NFTImage
-        src={getRWLKImageUrl(file, 'black_thumb.jpg')}
-        fallbackSrc={getRWLKImageUrl(file, 'black.png')}
+        src={randomWalkImageUrl(tokenId)}
+        fallbackSrc={randomWalkImageUrl(tokenId, 'black.png')}
         alt={alt}
         sizes={sizes}
         density="compact"

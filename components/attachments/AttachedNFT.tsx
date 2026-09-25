@@ -1,7 +1,6 @@
 'use client';
 
 import { Fragment, type ReactNode } from 'react';
-import { ArrowUpRight } from 'lucide-react';
 import { useLocale, useTranslations } from 'next-intl';
 
 import { formatCount } from '@/utils/format';
@@ -12,6 +11,7 @@ import { AddressChip } from '@/components/ui/address-chip';
 import { MEDIA_PLATE_CLASS } from '@/components/ui/art-frame';
 import { DateTime } from '@/components/ui/date-time';
 import NFTImage from '@/components/nft/NFTImage';
+import { TitleWithArrow } from '@/components/nft/TitleWithArrow';
 import { TableLink } from '@/components/ui/data-table';
 
 import {
@@ -57,25 +57,6 @@ function Caption({ facts, className }: { facts: readonly ReactNode[]; className?
         </Fragment>
       ))}
     </p>
-  );
-}
-
-/**
- * The title with the external-link arrow bound to its last word, so a
- * wrapped title keeps the arrow at the end of its text, never alone at the
- * far edge of the card.
- */
-function TitleWithArrow({ text, arrow }: { text: string; arrow: boolean }) {
-  if (!arrow) return <>{text}</>;
-  const cut = text.lastIndexOf(' ') + 1;
-  return (
-    <>
-      {text.slice(0, cut)}
-      <span className="whitespace-nowrap">
-        {text.slice(cut)}
-        <ArrowUpRight aria-hidden className="ms-1 inline size-3.5 align-[-0.125em] text-subtle" />
-      </span>
-    </>
   );
 }
 

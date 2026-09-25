@@ -68,17 +68,20 @@ describe('UsedRwlkNftsPage', () => {
     expect(screen.getByRole('heading', { level: 1, name: 'Used Random Walk NFTs' })).toBeVisible();
   });
 
-  it('hangs each used RandomWalk NFT on a plate, with its page, cycle and participant', () => {
+  it('hangs each used Random Walk NFT on a plate, with its page, cycle and participant', () => {
     mockUseUsedRWLKNFTs.mockReturnValue(state({ data: [record()] }));
     render(<UsedRwlkNftsPage />);
     const wall = screen.getByRole('list', { name: 'Used Random Walk NFTs' });
     const card = within(wall).getByTestId('used-rwlk-nft');
-    expect(within(card).getByAltText('RandomWalk NFT #000215')).toHaveAttribute(
+    expect(within(card).getByAltText('Random Walk NFT #000215')).toHaveAttribute(
       'src',
       expect.stringContaining('000215_black_thumb.jpg'),
     );
-    // The plate and its number are one link, named by the plate's alt text.
-    const tokenLink = within(card).getByRole('link', { name: /RandomWalk NFT #000215/ });
+    // Titled by its own collection's name, so the number never reads as a
+    // Cosmic Signature's.
+    expect(card).toHaveTextContent('Random Walk #000215');
+    // The plate and its title are one link, named by the plate's alt text.
+    const tokenLink = within(card).getByRole('link', { name: /Random Walk NFT #000215/ });
     expect(tokenLink).toHaveAttribute('href', 'https://www.randomwalknft.com/detail/215');
     expect(tokenLink).toHaveAttribute('target', '_blank');
     expect(within(card).getByRole('link', { name: 'Cycle #1' })).toHaveAttribute(
@@ -104,7 +107,7 @@ describe('UsedRwlkNftsPage', () => {
     render(<UsedRwlkNftsPage />);
     const cards = screen.getAllByTestId('used-rwlk-nft');
     expect(cards).toHaveLength(12);
-    expect(within(cards[0]!).getByAltText('RandomWalk NFT #000013')).toBeInTheDocument();
+    expect(within(cards[0]!).getByAltText('Random Walk NFT #000013')).toBeInTheDocument();
     fireEvent.click(screen.getByRole('button', { name: 'tables.pagination.nextAria' }));
     expect(screen.getAllByTestId('used-rwlk-nft')).toHaveLength(2);
   });
@@ -119,27 +122,37 @@ describe('UsedRwlkNftsPage', () => {
     mockUseUsedRWLKNFTs.mockReturnValue(state());
     render(<UsedRwlkNftsPage />);
     expect(
-      screen.getByRole('heading', { level: 2, name: 'No RandomWalk NFTs used yet' }),
+      screen.getByRole('heading', { level: 2, name: 'No Random Walk NFTs used yet' }),
     ).toBeInTheDocument();
   });
 
   it('offers a retry when the records cannot be read', () => {
     const refetch = jest.fn();
-    mockUseUsedRWLKNFTs.mockReturnValue(state({ isError: true, refetch }));
+    mockUseUsedRWLKNFTs.mockReturnValue(state({ data: undefined, isError: true, refetch }));
     render(<UsedRwlkNftsPage />);
     expect(
-      screen.getByRole('heading', { level: 2, name: 'Used RandomWalk NFTs could not be loaded' }),
+      screen.getByRole('heading', { level: 2, name: 'Used Random Walk NFTs could not be loaded' }),
     ).toBeInTheDocument();
     fireEvent.click(screen.getByRole('button', { name: /Try again/ }));
     expect(refetch).toHaveBeenCalled();
   });
 
+  // A failed background refetch keeps the data it had (TanStack sets isError).
+  it('keeps the wall when a refetch fails after a load', () => {
+    mockUseUsedRWLKNFTs.mockReturnValue(state({ data: [record()], isError: true }));
+    render(<UsedRwlkNftsPage />);
+    expect(screen.getAllByTestId('used-rwlk-nft')).toHaveLength(1);
+    expect(
+      screen.queryByRole('heading', { name: 'Used Random Walk NFTs could not be loaded' }),
+    ).toBeNull();
+  });
+
   it('never says nothing was used under a header that counted uses', () => {
     mockUseUsedRWLKNFTs.mockReturnValue(state());
     render(<UsedRwlkNftsPage snapshotCount={3} />);
-    expect(screen.queryByRole('heading', { name: 'No RandomWalk NFTs used yet' })).toBeNull();
+    expect(screen.queryByRole('heading', { name: 'No Random Walk NFTs used yet' })).toBeNull();
     expect(
-      screen.getByRole('heading', { level: 2, name: 'Used RandomWalk NFTs could not be loaded' }),
+      screen.getByRole('heading', { level: 2, name: 'Used Random Walk NFTs could not be loaded' }),
     ).toBeInTheDocument();
   });
 

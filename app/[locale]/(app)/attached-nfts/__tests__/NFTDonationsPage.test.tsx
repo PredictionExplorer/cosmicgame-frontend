@@ -96,6 +96,14 @@ describe('NFTDonationsPage', () => {
     expect(refetch).toHaveBeenCalled();
   });
 
+  // A failed background refetch keeps the data it had (TanStack sets isError).
+  it('keeps the wall when a refetch fails after a load', () => {
+    mockUseDonationsNFTList.mockReturnValue(state({ data: [record(1, 100)], isError: true }));
+    render(<NFTDonationsPage />);
+    expect(screen.getAllByTestId('attached-nft')).toHaveLength(1);
+    expect(screen.queryByRole('heading', { name: /could not be loaded/ })).toBeNull();
+  });
+
   it('follows the page it is given and reports a page change', () => {
     const onPageChange = jest.fn();
     mockUseDonationsNFTList.mockReturnValue(

@@ -32,37 +32,36 @@ describe('RandomWalkNFT', () => {
     expect(screen.getByText('#000042')).toBeInTheDocument();
   });
 
-  it('renders link to detail page when not selectable', () => {
-    render(<RandomWalkNFT tokenId={99} selectable={false} />);
-    const link = screen.getByRole('link');
-    expect(link).toHaveAttribute('href', 'https://www.randomwalknft.com/detail/99');
-  });
-
-  it('renders as div (no link) when selectable', () => {
-    render(<RandomWalkNFT tokenId={99} selectable={true} />);
+  it('is plain content for the picker button around it, never a link', () => {
+    render(<RandomWalkNFT tokenId={99} />);
     expect(screen.queryByRole('link')).not.toBeInTheDocument();
   });
 
-  it('marks the selected card with the primary border and a check, not colour alone', () => {
+  // Nothing is drawn over the art: the number and the check sit in the label row.
+  it('marks the chosen card in its label and on the plate edge, not over the art', () => {
     const { container } = render(<RandomWalkNFT tokenId={1} selected={true} />);
-    expect(container.firstChild).toHaveClass('border-primary');
-    expect(container.querySelector('svg')).toHaveAttribute('aria-hidden', 'true');
+    const card = container.firstChild as HTMLElement;
+    expect(card).toHaveAttribute('data-selected', 'true');
+    const plate = card.firstChild as HTMLElement;
+    expect(plate.className).toContain('after:shadow-[inset_0_0_0_2px_var(--color-primary)]');
+    expect(plate.querySelector('svg')).toBeNull();
+    expect(screen.getByText('#000001').parentElement?.querySelector('svg')).toHaveAttribute(
+      'aria-hidden',
+      'true',
+    );
+  });
+
+  it('draws no check and no accent edge when not chosen', () => {
+    const { container } = render(<RandomWalkNFT tokenId={1} selected={false} />);
+    const card = container.firstChild as HTMLElement;
+    expect(card).not.toHaveAttribute('data-selected');
+    expect(container.querySelector('svg')).toBeNull();
   });
 
   it('hides its image and number from assistive tech when decorative', () => {
     render(<RandomWalkNFT tokenId={7} decorative />);
     expect(screen.getByTestId('nft-image')).toHaveAttribute('alt', '');
-    expect(screen.getByText('#000007')).toHaveAttribute('aria-hidden', 'true');
-  });
-
-  it('names its link by the image and the token number', () => {
-    render(<RandomWalkNFT tokenId={99} selectable={false} />);
-    expect(screen.getByRole('link')).toHaveAccessibleName('nft #000099');
-  });
-
-  it('uses the palette border when not selected', () => {
-    const { container } = render(<RandomWalkNFT tokenId={1} selected={false} />);
-    expect(container.firstChild).toHaveClass('border-border');
+    expect(screen.getByText('#000007').parentElement).toHaveAttribute('aria-hidden', 'true');
   });
 
   it('has no accessibility violations', async () => {

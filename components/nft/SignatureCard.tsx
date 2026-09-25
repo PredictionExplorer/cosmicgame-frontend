@@ -9,12 +9,28 @@ import type { NftTraitEntry } from '@/lib/nftMetadata';
 import { AnchoringIcon } from '@/lib/conceptIcons';
 import { cn } from '@/lib/utils';
 import { Link } from '@/i18n/navigation';
-import { ArtFrame, type ArtSource } from '@/components/ui/art-frame';
+import { ArtFrame, ArtTag, type ArtSource } from '@/components/ui/art-frame';
+import { Checkbox } from '@/components/ui/checkbox';
 import { Skeleton } from '@/components/ui/skeleton';
 
 import { signatureMedia, useSignatureAlt } from './signatureArt';
 import { useSignatureArtLabel } from './useSignatureArtLabel';
 import { useTraitLabels } from './traits/useTraitLabels';
+
+/** A card on a wall in select mode (choosing Signatures to send). */
+export interface SignatureCardSelect {
+  checked: boolean;
+  onCheckedChange: (checked: boolean) => void;
+  /** The checkbox's name ("Select #000025"). */
+  label: string;
+  /**
+   * Why the Signature cannot be chosen ("Anchored", "Owner changed"), shown
+   * as a tag in its label; `null` when it can be.
+   */
+  unavailable?: string | null;
+  /** Choosing is paused (a send is running). */
+  disabled?: boolean;
+}
 
 export interface SignatureCardProps {
   tokenId: number;
@@ -42,6 +58,18 @@ export interface SignatureCardProps {
   extraMeta?: readonly ReactNode[];
   /** Opens the quick view; the button shows to a mouse on hover and focus. */
   onQuickView?: (tokenId: number) => void;
+  /**
+   * Select mode: the card becomes a checkbox's label (a click anywhere
+   * chooses it) instead of a link, the checkbox sits in the label row and a
+   * chosen card draws its plate edge in the accent. Nothing covers or dims
+   * the art; a Signature that cannot be chosen says why in a tag.
+   */
+  select?: SignatureCardSelect;
+  /**
+   * Caption lines after the card's link, for facts that carry links of
+   * their own (who named it and when, with the proof).
+   */
+  after?: ReactNode;
   className?: string;
 }
 
@@ -69,10 +97,11 @@ export function signatureCardSources(
  * native ratio with nothing over it, and a quiet wall label under it. The
  * title is the token's name, or its number when it has none; the caption
  * carries the number (for a named token), then structure and palette from
- * `sm` (a phone's two-across label keeps to the name and number). The whole
- * card is one link to the detail page, named by the plate's alt text (composed
- * from the traits); the visible label repeats part of it, so it is hidden
- * from assistive technology rather than read twice.
+ * `sm` (a phone's two-across label keeps to the name and number). An anchored
+ * Signature says so in a word tag from `sm` and with the anchor alone on a
+ * phone. The whole card is one link to the detail page, named by the plate's
+ * alt text (composed from the traits); the visible label repeats part of it,
+ * so it is hidden from assistive technology rather than read twice.
  */
 export function SignatureCard({
   tokenId,
@@ -85,6 +114,8 @@ export function SignatureCard({
   priority = false,
   extraMeta,
   onQuickView,
+  select,
+  after,
   className,
 }: SignatureCardProps) {
   const tTraits = useTranslations('traits');
@@ -108,83 +139,135 @@ export function SignatureCard({
     : traitsLoading
       ? null
       : tTraits('card.traitsPending');
+  const anchoredState = tTraits('card.anchoredState');
+  const selectable = Boolean(select && !select.unavailable);
+  // In select mode a reason not to choose it outranks the anchored tag it
+  // usually is ("Anchored"); otherwise an anchored card shows the word from `sm`.
+  const tag = select?.unavailable ? (
+    <ArtTag>{select.unavailable}</ArtTag>
+  ) : anchored ? (
+    <ArtTag className="max-sm:hidden">
+      <AnchoringIcon aria-hidden className="size-3 shrink-0" />
+      {anchoredState}
+    </ArtTag>
+  ) : null;
+
+  const content = (
+    <>
+      <ArtFrame
+        sources={signatureCardSources(seed)}
+        alt={alt}
+        sizes={sizes}
+        priority={priority}
+        unavailableLabel={unavailableLabel}
+        unavailableDetail={id}
+        className={cn(
+          'group-hover:after:shadow-[var(--art-edge-active)]',
+          select?.checked &&
+            'after:shadow-[inset_0_0_0_2px_var(--color-primary)] group-hover:after:shadow-[inset_0_0_0_2px_var(--color-primary)] hover:after:shadow-[inset_0_0_0_2px_var(--color-primary)]',
+        )}
+      />
+      <div className="mt-3 flex min-w-0 items-start gap-2">
+        {select ? (
+          <span className="mt-0.5 inline-flex shrink-0">
+            <Checkbox
+              checked={select.checked}
+              disabled={!selectable || select.disabled}
+              aria-label={select.label}
+              onChange={(event) => select.onCheckedChange(event.target.checked)}
+            />
+          </span>
+        ) : null}
+        <div className="min-w-0 flex-1">
+          {/* The alt text above already says all of this. */}
+          <div aria-hidden>
+            <p
+              className={cn(
+                'line-clamp-2 type-body-md font-medium text-foreground [overflow-wrap:anywhere]',
+                'decoration-rule underline-offset-4',
+                !select && 'group-hover:underline',
+                !trimmedName && 'tabular-nums',
+              )}
+            >
+              {trimmedName ?? id}
+            </p>
+            {traitsLoading ? (
+              <>
+                <CaptionLine facts={[idFact]} />
+                <Skeleton className="mt-1.5 h-3 w-2/3 max-sm:hidden" data-testid="trait-skeleton" />
+              </>
+            ) : (
+              <CaptionLine
+                facts={[
+                  idFact,
+                  traitSummary ? { key: 'traits', node: traitSummary, fromSm: true } : null,
+                ]}
+              />
+            )}
+          </div>
+          {extraMeta && extraMeta.length > 0 ? (
+            <CaptionLine
+              facts={extraMeta.map((node, index) => ({ key: `extra-${index}`, node }))}
+            />
+          ) : null}
+          {tag ? (
+            <div aria-hidden className="mt-1.5 flex" data-testid="card-tag">
+              {tag}
+            </div>
+          ) : null}
+        </div>
+        {/*
+         * The status slot: the anchor on a phone, and (to a mouse, on hover
+         * or focus) the quick-view button in its place, so the label never
+         * gains a gap for a control that is not showing.
+         */}
+        {!select && (anchored || onQuickView) ? (
+          <span
+            aria-hidden
+            className={cn(
+              '-mt-1 flex size-8 shrink-0 items-center justify-center transition-opacity duration-[var(--duration-fast)]',
+              !anchored && 'pointer-coarse:hidden',
+              anchored && !onQuickView && 'sm:hidden',
+              onQuickView &&
+                'pointer-fine:group-hover:opacity-0 pointer-fine:group-focus-within:opacity-0',
+            )}
+          >
+            {anchored ? (
+              <AnchoringIcon className="size-4 text-subtle sm:hidden" data-testid="anchored-mark" />
+            ) : null}
+          </span>
+        ) : null}
+        {anchored ? <span className="sr-only">{anchoredState}</span> : null}
+        {select?.unavailable && !anchored ? (
+          <span className="sr-only">{select.unavailable}</span>
+        ) : null}
+      </div>
+    </>
+  );
 
   return (
     <article
       className={cn('group relative min-w-0 @container', className)}
       data-testid="signature-card"
       data-token-id={tokenId}
+      data-selected={select?.checked || undefined}
     >
-      <Link href={`/detail/${tokenId}`} className="block rounded-edge">
-        <ArtFrame
-          sources={signatureCardSources(seed)}
-          alt={alt}
-          sizes={sizes}
-          priority={priority}
-          unavailableLabel={unavailableLabel}
-          unavailableDetail={id}
-          className="group-hover:after:shadow-[var(--art-edge-active)]"
-        />
-        <div className="mt-3 flex min-w-0 items-start gap-2">
-          <div className="min-w-0 flex-1">
-            {/* The alt text above already says all of this. */}
-            <div aria-hidden>
-              <p
-                className={cn(
-                  'line-clamp-2 type-body-md font-medium text-foreground [overflow-wrap:anywhere]',
-                  'decoration-rule underline-offset-4 group-hover:underline',
-                  !trimmedName && 'tabular-nums',
-                )}
-              >
-                {trimmedName ?? id}
-              </p>
-              {traitsLoading ? (
-                <>
-                  <CaptionLine facts={[idFact]} />
-                  <Skeleton
-                    className="mt-1.5 h-3 w-2/3 max-sm:hidden"
-                    data-testid="trait-skeleton"
-                  />
-                </>
-              ) : (
-                <CaptionLine
-                  facts={[
-                    idFact,
-                    traitSummary ? { key: 'traits', node: traitSummary, fromSm: true } : null,
-                  ]}
-                />
-              )}
-            </div>
-            {extraMeta && extraMeta.length > 0 ? (
-              <CaptionLine
-                facts={extraMeta.map((node, index) => ({ key: `extra-${index}`, node }))}
-              />
-            ) : null}
-          </div>
-          {/*
-           * The status slot: the anchor, and (to a mouse, on hover or focus)
-           * the quick-view button in its place, so the label never gains a
-           * gap for a control that is not showing.
-           */}
-          {anchored || onQuickView ? (
-            <span
-              aria-hidden
-              className={cn(
-                '-mt-1 flex size-8 shrink-0 items-center justify-center transition-opacity duration-[var(--duration-fast)]',
-                !anchored && 'pointer-coarse:hidden',
-                onQuickView &&
-                  'pointer-fine:group-hover:opacity-0 pointer-fine:group-focus-within:opacity-0',
-              )}
-            >
-              {anchored ? (
-                <AnchoringIcon className="size-4 text-subtle" data-testid="anchored-mark" />
-              ) : null}
-            </span>
-          ) : null}
-          {anchored ? <span className="sr-only">{tTraits('card.anchoredState')}</span> : null}
-        </div>
-      </Link>
-      {onQuickView ? (
+      {select ? (
+        <label
+          className={cn(
+            'block rounded-edge',
+            selectable && !select.disabled ? 'cursor-pointer' : 'cursor-not-allowed',
+          )}
+        >
+          {content}
+        </label>
+      ) : (
+        <Link href={`/detail/${tokenId}`} className="block rounded-edge">
+          {content}
+        </Link>
+      )}
+      {after}
+      {onQuickView && !select ? (
         <button
           type="button"
           onClick={() => onQuickView(tokenId)}
