@@ -91,6 +91,9 @@ export function SegmentedChoice<T extends string>({
       aria-describedby={caption ? hintId : undefined}
       className={cn(
         tabsListVariants({ variant: 'segmented' }),
+        // The same 3:1 control edge as the search field and the buttons
+        // beside it in the toolbar, not a fill alone at about 1.1:1.
+        'border border-input',
         block && 'flex w-full',
         'shrink-0',
         caption ? undefined : className,

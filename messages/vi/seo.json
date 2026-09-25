@@ -300,12 +300,17 @@
   },
   "gallerySummary": {
     "heading": "Phòng trưng bày Cosmic Signature",
-    "description": "Khám phá tác phẩm Cosmic Signature NFT được tạo từ vật lý ba vật thể tất định, seed trên chuỗi, kết xuất quang phổ và dữ liệu chu kỳ trình diễn.",
+    "description": "Mỗi Signature đều được vật lý ba vật thể vẽ nên từ một seed trên chuỗi.",
     "cards": {
       "imprinted": "NFT đã khắc",
       "anchored": "NFT đang neo giữ",
       "named": "NFT đã đặt tên",
       "cycles": "Chu kỳ đã hoàn tất"
+    },
+    "cardsShort": {
+      "imprinted": "Đã khắc",
+      "anchored": "Đang neo giữ",
+      "named": "Đã đặt tên"
     },
     "relatedAria": "Các trang liên quan đến phòng trưng bày",
     "links": {

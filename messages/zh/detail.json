@@ -23,7 +23,8 @@
     "trigger": "分享",
     "copyVideoLink": "复制视频链接",
     "copyImageLink": "复制图片链接",
-    "copyPageLink": "复制页面链接"
+    "copyPageLink": "复制页面链接",
+    "copyFailed": "无法复制链接。"
   },
   "actions": {
     "buyOrSellNfts": "买卖 NFT"

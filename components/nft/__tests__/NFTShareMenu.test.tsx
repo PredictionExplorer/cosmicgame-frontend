@@ -2,7 +2,7 @@ import { render, screen, fireEvent, waitFor, checkA11y } from '@/test-utils';
 
 import { NFTShareMenu } from '../NFTShareMenu';
 
-const mockCopy = jest.fn().mockResolvedValue(undefined);
+const mockCopy = jest.fn().mockResolvedValue(true);
 jest.mock('../../../hooks/useClipboard', () => ({
   useClipboard: () => ({ copy: mockCopy }),
 }));
@@ -30,6 +30,24 @@ describe('NFTShareMenu', () => {
       type: 'success',
       visible: true,
     });
+  });
+
+  // useClipboard resolves false when the browser refused the write.
+  it('never confirms a copy that failed', async () => {
+    mockCopy.mockResolvedValueOnce(false);
+    render(<NFTShareMenu imageUrl="https://media/0xabc.png" />);
+    openMenu();
+    fireEvent.click(await screen.findByRole('menuitem', { name: 'detail.share.copyImageLink' }));
+    await waitFor(() =>
+      expect(mockSetNotification).toHaveBeenCalledWith({
+        text: 'detail.share.copyFailed',
+        type: 'error',
+        visible: true,
+      }),
+    );
+    expect(mockSetNotification).not.toHaveBeenCalledWith(
+      expect.objectContaining({ text: 'common.actions.copied' }),
+    );
   });
 
   it('copies the page link', async () => {

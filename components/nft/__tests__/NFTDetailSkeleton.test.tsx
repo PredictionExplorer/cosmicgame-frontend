@@ -17,7 +17,9 @@ describe('NFTDetailSkeleton', () => {
 
   it('reserves the rows of the provenance ledger', () => {
     render(<NFTDetailSkeleton />);
-    expect(screen.getAllByTestId('spec-row-skeleton')).toHaveLength(6);
+    expect(screen.getAllByTestId('spec-row-skeleton')).toHaveLength(7);
+    // Imprinted and rarity carry a caption line under the value.
+    expect(screen.getAllByTestId('spec-caption-skeleton')).toHaveLength(2);
   });
 
   it('has no accessibility violations', async () => {

@@ -433,7 +433,13 @@ describe('server-rendered page headers', () => {
       within(related)
         .getAllByRole('link')
         .map((link) => link.getAttribute('href')),
-    ).toEqual(['/how-it-works', '/code', '/statistics']);
+    ).toEqual([
+      '/how-it-works',
+      '/code',
+      '/statistics',
+      // The marketplace waits here on a phone, where the header drops its button.
+      'https://www.axiomzero.market/cosmic-signature',
+    ]);
   });
 
   it('renders the current-cycle header with live cycle figures', async () => {

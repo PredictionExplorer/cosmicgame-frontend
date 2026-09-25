@@ -109,7 +109,11 @@ export default async function Page({ params }: PageProps) {
           ]}
         />
         <PageShell variant="data" backdrop="signature">
-          <GallerySeoSummary actions={<NftMarketplaceButton variant="secondary" />} />
+          {/* On a phone the marketplace waits in "About the collection", after
+              the art, so the first plates arrive in the first screen. */}
+          <GallerySeoSummary
+            actions={<NftMarketplaceButton variant="secondary" data-marketplace-action />}
+          />
           {/*
            * The collection read seeds the client's list query, so the first
            * page of plates is in the static HTML. The body reads the URL, which

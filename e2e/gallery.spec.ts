@@ -23,8 +23,12 @@ test.describe('Gallery page', () => {
     }
   });
 
+  // The header's button from `sm`; on a phone, the row in "About the collection".
   test('links to the Cosmic Signature marketplace', async ({ page }) => {
-    const marketplaceLink = page.getByRole('link', { name: 'Axiom Zero NFT marketplace' }).first();
+    const marketplaceLink = page
+      .locator(`a[href="${COSMIC_SIGNATURE_MARKETPLACE_URL}"]`)
+      .filter({ visible: true })
+      .first();
     await ensureVisible(marketplaceLink);
     await expect(marketplaceLink).toBeVisible();
     await expect(marketplaceLink).toHaveAttribute('href', COSMIC_SIGNATURE_MARKETPLACE_URL);
@@ -81,6 +85,19 @@ test.describe('Gallery page', () => {
 
 test.describe('Gallery on a phone', () => {
   test.use({ viewport: { width: 390, height: 844 }, isMobile: true, hasTouch: true });
+
+  // The art arrives almost at once: a one-line lede and fact row, and no
+  // marketplace button, put the first plates in the top half of the screen.
+  test('starts the first row of plates in the top half of the first screen', async ({ page }) => {
+    await page.goto('/gallery', { waitUntil: 'networkidle' });
+    const firstPlate = page.getByTestId('signature-card').first();
+    await expect(firstPlate).toBeVisible();
+    const box = await firstPlate.boundingBox();
+    expect(box?.y ?? Number.POSITIVE_INFINITY).toBeLessThanOrEqual(380);
+    const facts = await page.getByTestId('gallery-facts').boundingBox();
+    // One line of facts ("Imprinted 48 · Anchored 33 · Named 3").
+    expect(facts?.height ?? Number.POSITIVE_INFINITY).toBeLessThanOrEqual(24);
+  });
 
   test('keeps the toolbar out of the way and opens the filter sheet', async ({ page }) => {
     await page.goto('/gallery', { waitUntil: 'networkidle' });

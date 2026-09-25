@@ -35,7 +35,8 @@ export interface GalleryToolbarProps {
 /**
  * The gallery's one control row. From `lg` it holds everything: search, the
  * status filter, Filters, sort and view, and stays under the header while the
- * grid scrolls. Below `lg` it is the search and the Filters button only (the
+ * grid scrolls. From `md` the sort order is in the row too, since a tablet has
+ * the room; below `md` it is the search and the Filters button only (the
  * sheet holds the rest), and it scrolls away with the page, so the art gets
  * the screen.
  */
@@ -79,13 +80,13 @@ export const GalleryToolbar = forwardRef<HTMLDivElement, GalleryToolbarProps>(
           pressed={filtersOpen}
           onClick={onToggleFilters}
         />
-        <div className="flex items-center gap-3 max-lg:hidden">
+        <div className="flex items-center gap-3 max-md:hidden">
           <GallerySortSelect
             value={sort}
             onChange={onSortChange}
             traitSortsAvailable={traitSortsAvailable}
           />
-          <GalleryViewToggle value={view} onChange={onViewChange} />
+          <GalleryViewToggle value={view} onChange={onViewChange} className="max-lg:hidden" />
         </div>
       </div>
     </div>

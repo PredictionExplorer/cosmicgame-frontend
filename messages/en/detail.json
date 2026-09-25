@@ -23,7 +23,8 @@
     "trigger": "Share",
     "copyVideoLink": "Copy Video Link",
     "copyImageLink": "Copy Image Link",
-    "copyPageLink": "Copy Page Link"
+    "copyPageLink": "Copy Page Link",
+    "copyFailed": "The link could not be copied."
   },
   "actions": {
     "buyOrSellNfts": "Buy or sell NFTs"

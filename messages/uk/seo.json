@@ -300,12 +300,17 @@
   },
   "gallerySummary": {
     "heading": "Галерея Cosmic Signature",
-    "description": "Перегляньте NFT-твори Cosmic Signature, породжені детермінованою фізикою трьох тіл, ончейн-сідами, спектральним рендерингом і даними перформанс-циклів.",
+    "description": "Кожну Сигнатуру малює фізика трьох тіл з ончейн-сіду.",
     "cards": {
       "imprinted": "Закарбовані NFT",
       "anchored": "Закріплені NFT",
       "named": "Іменовані NFT",
       "cycles": "Завершені цикли"
+    },
+    "cardsShort": {
+      "imprinted": "Закарбовано",
+      "anchored": "Закріплено",
+      "named": "Іменовано"
     },
     "relatedAria": "Пов’язані сторінки галереї",
     "links": {

@@ -1,8 +1,16 @@
-import { ArrowRight } from 'lucide-react';
+import { ArrowRight, ArrowUpRight } from 'lucide-react';
 import { getTranslations } from 'next-intl/server';
 
+import { COSMIC_SIGNATURE_MARKETPLACE_URL } from '@/config/marketplace';
 import { Link } from '@/i18n/navigation';
+import { SiteLink } from '@/components/layout/SiteLink';
 import { SectionHeader } from '@/components/ui/section-header';
+
+/** The row look every related link shares. */
+const ROW_CLASS =
+  'group flex min-h-12 items-center justify-between gap-4 py-2 type-body-sm text-muted-foreground transition-colors duration-[var(--duration-fast)] hover:text-foreground';
+const ICON_CLASS =
+  'size-4 shrink-0 text-subtle transition-[color,translate] duration-[var(--duration-fast)] group-hover:text-foreground motion-reduce:transition-none';
 
 /** The pages a reader goes on to from the collection: how it works, the renderer, the figures. */
 const RELATED = [
@@ -18,10 +26,11 @@ const RELATED = [
  * screen; it renders on the server, so crawlers read it with the header.
  */
 export async function GalleryAbout({ locale }: { locale: string }) {
-  const [t, seo, common] = await Promise.all([
+  const [t, seo, common, nav] = await Promise.all([
     getTranslations({ locale, namespace: 'gallery' }),
     getTranslations({ locale, namespace: 'seo' }),
     getTranslations({ locale, namespace: 'common' }),
+    getTranslations({ locale, namespace: 'nav' }),
   ]);
 
   return (
@@ -39,18 +48,27 @@ export async function GalleryAbout({ locale }: { locale: string }) {
         <ul className="mt-3 divide-y divide-rule-faint border-y border-rule-faint">
           {RELATED.map(({ href, key }) => (
             <li key={href}>
-              <Link
-                href={href}
-                className="group flex min-h-12 items-center justify-between gap-4 py-2 type-body-sm text-muted-foreground transition-colors duration-[var(--duration-fast)] hover:text-foreground"
-              >
+              <Link href={href} className={ROW_CLASS}>
                 {seo(`gallerySummary.links.${key}`)}
                 <ArrowRight
                   aria-hidden
-                  className="size-4 shrink-0 text-subtle transition-[color,translate] duration-[var(--duration-fast)] group-hover:translate-x-0.5 group-hover:text-foreground motion-reduce:transition-none rtl:-scale-x-100"
+                  className={`${ICON_CLASS} group-hover:translate-x-0.5 rtl:-scale-x-100`}
                 />
               </Link>
             </li>
           ))}
+          {/* The marketplace, off the site: the phone header leaves it here. */}
+          <li>
+            <SiteLink
+              kind="external"
+              href={COSMIC_SIGNATURE_MARKETPLACE_URL}
+              externalIcon={false}
+              className={ROW_CLASS}
+            >
+              {nav('ecosystem.axiomZero.defaultLabel')}
+              <ArrowUpRight aria-hidden className={ICON_CLASS} />
+            </SiteLink>
+          </li>
         </ul>
       </nav>
     </section>

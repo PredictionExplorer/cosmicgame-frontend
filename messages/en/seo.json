@@ -300,12 +300,17 @@
   },
   "gallerySummary": {
     "heading": "Cosmic Signature Gallery",
-    "description": "Explore Cosmic Signature NFT artwork generated from deterministic three-body physics, on-chain seeds, spectral rendering, and Performance Cycle data.",
+    "description": "Every Signature, drawn by three-body physics from an on-chain seed.",
     "cards": {
       "imprinted": "Imprinted NFTs",
       "anchored": "Anchored NFTs",
       "named": "Named NFTs",
       "cycles": "Finalized cycles"
+    },
+    "cardsShort": {
+      "imprinted": "Imprinted",
+      "anchored": "Anchored",
+      "named": "Named"
     },
     "relatedAria": "Gallery related pages",
     "links": {

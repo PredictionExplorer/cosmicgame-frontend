@@ -1,7 +1,7 @@
 'use client';
 
 import { useId, type ReactNode } from 'react';
-import { ArrowRight, ArrowUpRight, Check, Copy } from 'lucide-react';
+import { ArrowRight, ArrowUpRight } from 'lucide-react';
 import { useLocale, useTranslations } from 'next-intl';
 
 import { getExplorerUrl, getRelativeTime } from '@/utils';
@@ -9,11 +9,11 @@ import { getExplorerUrl, getRelativeTime } from '@/utils';
 import type { NftTraitEntry, RarityInfo } from '@/lib/nftMetadata';
 import { Link } from '@/i18n/navigation';
 import { cn } from '@/lib/utils';
-import { TOUCH_TARGET_ICON_CLASS } from '@/lib/touch-target';
-import { useCopyFeedback } from '@/hooks/useCopyFeedback';
 import { useNow } from '@/hooks/useNow';
 import { formatCount } from '@/utils/format';
+import { RecordRow } from '@/components/detail-page/RecordRow';
 import { AddressChip } from '@/components/ui/address-chip';
+import { CopyButton } from '@/components/ui/copy-button';
 import { DateTime } from '@/components/ui/date-time';
 import { InfoTooltip } from '@/components/ui/info-tooltip';
 import { UnknownValue } from '@/components/ui/unknown-value';
@@ -40,14 +40,6 @@ const RECORD_TYPE_LABEL_KEYS: Readonly<Record<number, string>> = {
   4: 'badges.enduranceChampion',
 };
 
-interface SpecRowProps {
-  label: ReactNode;
-  children: ReactNode;
-  /** A caption line under the value. */
-  caption?: ReactNode;
-  testId?: string;
-}
-
 /** An internal link in the ledger: quiet text with a trailing arrow, so it reads as a way on. */
 function LedgerLink({ href, children }: { href: string; children: ReactNode }) {
   return (
@@ -58,22 +50,6 @@ function LedgerLink({ href, children }: { href: string; children: ReactNode }) {
         className="size-3.5 shrink-0 text-subtle transition-colors duration-[var(--duration-fast)] group-hover:text-foreground"
       />
     </Link>
-  );
-}
-
-/** One label / value row of the spec-sheet ledger. */
-function SpecRow({ label, children, caption, testId }: SpecRowProps) {
-  return (
-    <div
-      className="grid grid-cols-[minmax(0,7.5rem)_minmax(0,1fr)] items-baseline gap-x-4 py-3"
-      data-testid={testId}
-    >
-      <dt className="flex min-w-0 items-center gap-1 type-label text-subtle">{label}</dt>
-      <dd className="min-w-0 type-body-sm text-foreground">
-        <div className="flex min-w-0 flex-wrap items-center gap-x-2 gap-y-1">{children}</div>
-        {caption ? <p className="mt-0.5 type-caption text-subtle">{caption}</p> : null}
-      </dd>
-    </div>
   );
 }
 
@@ -125,7 +101,7 @@ export function NFTSpecList({ nft, entry, rarity, rarityTotal = 0, className }: 
       className={cn('divide-y divide-rule-faint border-y border-rule-faint', className)}
       data-testid="nft-spec-list"
     >
-      <SpecRow label={t('metadata.cycle')} testId="spec-cycle">
+      <RecordRow labelWidth="narrow" label={t('metadata.cycle')} testId="spec-cycle">
         {nft?.RoundNum != null ? (
           <LedgerLink href={`/allocation/${nft.RoundNum}`}>
             {t('metadata.roundNumber', { round: nft.RoundNum })}
@@ -133,15 +109,18 @@ export function NFTSpecList({ nft, entry, rarity, rarityTotal = 0, className }: 
         ) : (
           unknown
         )}
-      </SpecRow>
+      </RecordRow>
 
-      <SpecRow
+      <RecordRow
+        labelWidth="narrow"
         label={t('metadata.imprinted')}
         caption={nft?.TimeStamp ? <ImprintAge timestamp={nft.TimeStamp} /> : null}
         testId="spec-imprinted"
       >
-        {/* The full date may break between date and time: the value column is
-            about 150px wide on a 320px phone. */}
+        {/* The date stands alone on the page, so it says its zone ("Aug 11,
+            2026, 18:38 UTC-5"); the seconds are in its hover title. It may
+            break between date and time: the value column is about 150px wide
+            on a 320px phone. */}
         {nft?.TimeStamp ? (
           nft.TxHash ? (
             <a
@@ -150,43 +129,54 @@ export function NFTSpecList({ nft, entry, rarity, rarityTotal = 0, className }: 
               rel="noopener noreferrer"
               className="link-quiet inline-flex min-h-6 items-center gap-1"
             >
-              <DateTime timestamp={nft.TimeStamp} variant="full" className="whitespace-normal" />
+              <DateTime
+                timestamp={nft.TimeStamp}
+                year="always"
+                showZone
+                className="whitespace-normal"
+              />
               <ArrowUpRight aria-hidden className="size-3.5 shrink-0 text-subtle" />
             </a>
           ) : (
-            <DateTime timestamp={nft.TimeStamp} variant="full" className="whitespace-normal" />
+            <DateTime
+              timestamp={nft.TimeStamp}
+              year="always"
+              showZone
+              className="whitespace-normal"
+            />
           )
         ) : (
           unknown
         )}
-      </SpecRow>
+      </RecordRow>
 
       {allocation ? (
-        <SpecRow label={typeLabel('allocation')} testId="spec-allocation">
+        <RecordRow labelWidth="narrow" label={typeLabel('allocation')} testId="spec-allocation">
           {allocation}
-        </SpecRow>
+        </RecordRow>
       ) : null}
 
       {/* A protocol contract's name ("Cosmic Signature NFT Anchoring Wallet")
           wraps here: the ledger is the one place its full name should read. */}
-      <SpecRow label={t('metadata.recipient')} testId="spec-recipient">
+      <RecordRow labelWidth="narrow" label={t('metadata.recipient')} testId="spec-recipient">
         {nft?.WinnerAddr ? (
           <AddressChip address={nft.WinnerAddr} variant="plain" wrapLabel />
         ) : (
           unknown
         )}
-      </SpecRow>
+      </RecordRow>
 
-      <SpecRow label={t('metadata.owner')} testId="spec-owner">
+      <RecordRow labelWidth="narrow" label={t('metadata.owner')} testId="spec-owner">
         {nft?.CurOwnerAddr ? (
           <AddressChip address={nft.CurOwnerAddr} variant="plain" wrapLabel />
         ) : (
           unknown
         )}
-      </SpecRow>
+      </RecordRow>
 
       {rarity && rarityTotal > 0 ? (
-        <SpecRow
+        <RecordRow
+          labelWidth="narrow"
           label={tTraits('rarity.rankLabel')}
           caption={
             rarity.rarest
@@ -199,11 +189,12 @@ export function NFTSpecList({ nft, entry, rarity, rarityTotal = 0, className }: 
             rank: formatCount(rarity.rank, locale),
             total: formatCount(rarityTotal, locale),
           })}
-        </SpecRow>
+        </RecordRow>
       ) : null}
 
       {nft ? (
-        <SpecRow
+        <RecordRow
+          labelWidth="narrow"
           label={
             <>
               {t('metadata.anchoring')}
@@ -225,7 +216,7 @@ export function NFTSpecList({ nft, entry, rarity, rarityTotal = 0, className }: 
           ) : (
             <span>{t('badges.alreadyAnchored')}</span>
           )}
-        </SpecRow>
+        </RecordRow>
       ) : null}
     </dl>
   );
@@ -246,14 +237,10 @@ export function NFTSeed({ seed, headingLevel = 2, className }: NFTSeedProps) {
   const Heading = headingLevel === 3 ? 'h3' : 'h2';
   const t = useTranslations('detail');
   const tCommon = useTranslations('common');
-  // The check shows only when the clipboard write succeeded.
-  const { copied, copy } = useCopyFeedback();
   const headingId = useId();
   const seedText = String(seed ?? '');
 
   if (!seedText) return null;
-
-  const handleCopy = () => void copy(seedText);
 
   return (
     <section aria-labelledby={headingId} className={className} data-testid="nft-seed">
@@ -267,22 +254,13 @@ export function NFTSeed({ seed, headingLevel = 2, className }: NFTSeedProps) {
         <p className="min-w-0 flex-1 py-1 type-hash text-foreground" data-testid="seed-value">
           {seedText}
         </p>
-        <button
-          type="button"
-          onClick={handleCopy}
-          className={cn(
-            'shrink-0 rounded-control p-2 text-subtle transition-colors hover:bg-surface hover:text-foreground',
-            TOUCH_TARGET_ICON_CLASS,
-          )}
-          aria-label={copied ? tCommon('actions.copied') : t('metadata.copySeed')}
-          data-testid="copy-seed-button"
-        >
-          {copied ? (
-            <Check aria-hidden className="size-4 text-positive" />
-          ) : (
-            <Copy aria-hidden className="size-4" />
-          )}
-        </button>
+        {/* The check shows only when the clipboard write succeeded. */}
+        <CopyButton
+          value={seedText}
+          label={t('metadata.copySeed')}
+          copiedLabel={tCommon('actions.copied')}
+          className="size-9"
+        />
       </div>
     </section>
   );

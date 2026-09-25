@@ -23,7 +23,8 @@
     "trigger": "共有",
     "copyVideoLink": "動画リンクをコピー",
     "copyImageLink": "画像リンクをコピー",
-    "copyPageLink": "ページリンクをコピー"
+    "copyPageLink": "ページリンクをコピー",
+    "copyFailed": "リンクをコピーできませんでした。"
   },
   "actions": {
     "buyOrSellNfts": "NFTを売買する"

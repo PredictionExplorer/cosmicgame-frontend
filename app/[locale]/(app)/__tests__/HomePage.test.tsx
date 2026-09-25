@@ -314,11 +314,6 @@ jest.mock('../../../../components/attachments/DonatedNFTPrizeShowcase', () => ({
   },
 }));
 
-jest.mock('../../../../components/nft/LatestNFTs', () => ({
-  __esModule: true,
-  default: () => <div data-testid="latest-nfts">LatestNFTs</div>,
-}));
-
 jest.mock('../../../../components/nft/NFTImage', () => ({
   __esModule: true,
   default: ({ src, alt = 'NFT' }: { src: string; alt?: string }) => (

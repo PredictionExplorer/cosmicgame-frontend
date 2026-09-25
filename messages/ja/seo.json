@@ -300,12 +300,17 @@
   },
   "gallerySummary": {
     "heading": "Cosmic Signatureギャラリー",
-    "description": "オンチェーンのシードと三体問題の物理計算から生まれたCosmic Signature NFTを紹介します。",
+    "description": "すべてのシグネチャーは、オンチェーンのシードから三体物理で描かれます。",
     "cards": {
       "imprinted": "刻印済みNFT",
       "anchored": "係留中のNFT",
       "named": "名前付きNFT",
       "cycles": "確定したサイクル"
+    },
+    "cardsShort": {
+      "imprinted": "刻印済み",
+      "anchored": "係留中",
+      "named": "名前付き"
     },
     "relatedAria": "ギャラリーの関連ページ",
     "links": {

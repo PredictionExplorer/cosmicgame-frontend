@@ -300,12 +300,17 @@
   },
   "gallerySummary": {
     "heading": "Cosmic Signature 갤러리",
-    "description": "결정론적 삼체 물리, 온체인 시드, 스펙트럼 렌더링, 퍼포먼스 사이클 데이터로 생성된 Cosmic Signature NFT 작품을 감상할 수 있습니다.",
+    "description": "모든 시그니처는 온체인 시드에서 삼체 물리로 그려집니다.",
     "cards": {
       "imprinted": "각인된 NFT",
       "anchored": "앵커링된 NFT",
       "named": "이름 붙인 NFT",
       "cycles": "마감된 사이클"
+    },
+    "cardsShort": {
+      "imprinted": "각인됨",
+      "anchored": "앵커링됨",
+      "named": "이름 붙음"
     },
     "relatedAria": "갤러리 관련 페이지",
     "links": {

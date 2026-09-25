@@ -487,14 +487,17 @@ export function GalleryView({ search, snapshotCount = null }: GalleryViewProps) 
             <SheetField label={t('toolbar.show')}>
               <GalleryStatusFilter value={query.status} onChange={onStatusChange} block />
             </SheetField>
-            <SheetField label={t('sort.ariaLabel')}>
-              <GallerySortSelect
-                value={query.sort}
-                onChange={onSortChange}
-                traitSortsAvailable={traitSortsAvailable}
-                block
-              />
-            </SheetField>
+            {/* From `md` the toolbar holds the sort order. */}
+            <div className="md:hidden">
+              <SheetField label={t('sort.ariaLabel')}>
+                <GallerySortSelect
+                  value={query.sort}
+                  onChange={onSortChange}
+                  traitSortsAvailable={traitSortsAvailable}
+                  block
+                />
+              </SheetField>
+            </div>
             <SheetField label={t('view.ariaLabel')}>
               <GalleryViewToggle value={query.view} onChange={onViewChange} block />
             </SheetField>
