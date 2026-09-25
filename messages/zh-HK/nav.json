@@ -298,10 +298,7 @@
       "shortLabel": "查看 CST 池"
     },
     "axiomZero": {
-      "ariaLabel": "Axiom Zero NFT 市場",
-      "defaultLabel": "Axiom Zero 上的 NFT",
-      "menuLabel": "Axiom Zero 市場",
-      "shortLabel": "Axiom Zero"
+      "label": "在 Axiom Zero 買賣"
     }
   },
   "maintenance": {

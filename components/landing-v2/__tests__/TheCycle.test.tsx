@@ -36,7 +36,10 @@ describe('<TheCycle />', () => {
     const gesture = screen.getByRole('link', { name: 'Make a gesture' });
     expect(gesture).toHaveAttribute('href', 'https://app.cosmicsignature.com#make-gesture');
     expect(gesture).not.toHaveAttribute('target');
-    expect(gesture.className).toMatch(/bg-signature-gradient/);
+    // A section's call to action is navigation: the solid default at lg. The
+    // commit gradient marks a transaction, or the one hero call to action.
+    expect(gesture.className).not.toMatch(/bg-signature-gradient/);
+    expect(gesture.className).toMatch(/\bbg-primary\b/);
     expect(screen.getByRole('link', { name: cycle.guideCta.label })).toHaveAttribute(
       'href',
       'https://app.cosmicsignature.com/how-it-works',

@@ -298,10 +298,7 @@
       "shortLabel": "Xem pool CST"
     },
     "axiomZero": {
-      "ariaLabel": "Sàn NFT Axiom Zero",
-      "defaultLabel": "NFT trên Axiom Zero",
-      "menuLabel": "Sàn Axiom Zero",
-      "shortLabel": "Axiom Zero"
+      "label": "Mua hoặc bán trên Axiom Zero"
     }
   },
   "maintenance": {

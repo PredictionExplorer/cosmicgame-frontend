@@ -226,7 +226,6 @@
     "page": {
       "title": "NFT của tôi",
       "subtitle": "Các Cosmic Signature NFT trong ví đang kết nối",
-      "marketplace": "Mua hoặc bán NFT",
       "anchorLink": "Neo giữ NFT",
       "loadErrorTitle": "Không tải được token",
       "loadErrorMessage": "Không tải được Cosmic Signature NFT.",

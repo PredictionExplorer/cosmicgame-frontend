@@ -298,10 +298,7 @@
       "shortLabel": "CST 풀 보기"
     },
     "axiomZero": {
-      "ariaLabel": "Axiom Zero NFT 마켓플레이스",
-      "defaultLabel": "Axiom Zero의 NFT",
-      "menuLabel": "Axiom Zero 마켓플레이스",
-      "shortLabel": "Axiom Zero"
+      "label": "Axiom Zero에서 구매 또는 판매"
     }
   },
   "maintenance": {

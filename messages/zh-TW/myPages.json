@@ -226,7 +226,6 @@
     "page": {
       "title": "我的 NFT",
       "subtitle": "已連接錢包中的 Cosmic Signature NFT",
-      "marketplace": "買賣 NFT",
       "anchorLink": "錨定 NFT",
       "loadErrorTitle": "未能載入代幣",
       "loadErrorMessage": "未能載入 Cosmic Signature NFT。",

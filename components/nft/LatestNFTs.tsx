@@ -22,7 +22,7 @@ const LatestNFTs = () => {
       <div className="container mx-auto px-2.5 py-20 md:pb-[150px]">
         <div className="flex items-center justify-center flex-wrap gap-3">
           <h2 className="text-2xl font-semibold text-foreground">{t('latestNfts.title')}</h2>
-          <NftMarketplaceButton variant="compact" />
+          <NftMarketplaceButton />
         </div>
         <div className="text-center mb-14">
           {/* A decorative rule: announcing "divider" would only add noise. */}

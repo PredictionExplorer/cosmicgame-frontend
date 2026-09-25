@@ -21,9 +21,6 @@
     "copyImageLink": "画像リンクをコピー",
     "copyPageLink": "ページリンクをコピー"
   },
-  "actions": {
-    "buyOrSellNfts": "NFTを売買する"
-  },
   "navigation": {
     "label": "前後のシグネチャー"
   },

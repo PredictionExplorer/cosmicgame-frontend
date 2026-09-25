@@ -298,10 +298,7 @@
       "shortLabel": "View CST pool"
     },
     "axiomZero": {
-      "ariaLabel": "Axiom Zero NFT marketplace",
-      "defaultLabel": "NFTs on Axiom Zero",
-      "menuLabel": "Axiom Zero Marketplace",
-      "shortLabel": "Axiom Zero"
+      "label": "Buy or sell on Axiom Zero"
     }
   },
   "maintenance": {

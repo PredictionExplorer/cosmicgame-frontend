@@ -226,7 +226,6 @@
     "page": {
       "title": "自分のNFT",
       "subtitle": "接続中のウォレットにあるCosmic Signature NFT",
-      "marketplace": "NFTを売買する",
       "anchorLink": "NFTを係留する",
       "loadErrorTitle": "トークンを読み込めませんでした",
       "loadErrorMessage": "Cosmic Signature NFTを読み込めませんでした。",

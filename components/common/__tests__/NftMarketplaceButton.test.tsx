@@ -8,7 +8,7 @@ describe('NftMarketplaceButton', () => {
   it('links to the Axiom Zero marketplace with safe external attributes', () => {
     render(<NftMarketplaceButton />);
 
-    const link = screen.getByRole('link', { name: 'nav.ecosystem.axiomZero.ariaLabel' });
+    const link = screen.getByRole('link', { name: /nav\.ecosystem\.axiomZero\.label/ });
     expect(link).toHaveAttribute('href', COSMIC_SIGNATURE_MARKETPLACE_URL);
     expect(link).toHaveAttribute('target', '_blank');
     expect(link).toHaveAttribute('rel', 'noopener noreferrer');
@@ -18,26 +18,20 @@ describe('NftMarketplaceButton', () => {
     expect(url.pathname).toBe('/cosmic-signature');
   });
 
-  it('names Axiom Zero in the default label', () => {
+  it('has one label, and its name starts with the words it shows (WCAG 2.5.3)', () => {
     render(<NftMarketplaceButton />);
-
-    expect(
-      screen.getByRole('link', { name: 'nav.ecosystem.axiomZero.ariaLabel' }),
-    ).toHaveTextContent('nav.ecosystem.axiomZero.defaultLabel');
+    const link = screen.getByRole('link', { name: /nav\.ecosystem\.axiomZero\.label/ });
+    expect(link).not.toHaveAttribute('aria-label');
+    expect(link).toHaveTextContent(/^nav\.ecosystem\.axiomZero\.label/);
+    // A new tab is announced, as on every external link.
+    expect(link).toHaveTextContent('nav.link.newTab');
   });
 
-  it('supports compact visual copy while keeping the full accessible name', () => {
-    render(<NftMarketplaceButton variant="compact" />);
-
-    const link = screen.getByRole('link', { name: 'nav.ecosystem.axiomZero.ariaLabel' });
-    expect(link).toHaveTextContent('nav.ecosystem.axiomZero.shortLabel');
-  });
-
-  it('names Axiom Zero in the menu variant', () => {
-    render(<NftMarketplaceButton variant="menu" />);
-
-    const link = screen.getByRole('link', { name: 'nav.ecosystem.axiomZero.ariaLabel' });
-    expect(link).toHaveTextContent('nav.ecosystem.axiomZero.menuLabel');
+  it('has one look: an outline button, never the commit gradient or a hand-set radius', () => {
+    render(<NftMarketplaceButton size="sm" />);
+    const link = screen.getByRole('link', { name: /nav\.ecosystem\.axiomZero\.label/ });
+    expect(link.className).not.toMatch(/rounded-full|rounded-md|text-white|gradient/);
+    expect(link).toHaveClass('border-input');
   });
 
   it('has no accessibility violations', async () => {

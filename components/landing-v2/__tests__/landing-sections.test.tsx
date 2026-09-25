@@ -241,7 +241,7 @@ describe('landing sections', () => {
   });
 
   describe('<ClosingBand />', () => {
-    it('ends the page with the newest Signatures and a gesture as its commit action', () => {
+    it('ends the page with the newest Signatures and a way to make a gesture', () => {
       mockShowcase.mockReturnValue(collection(8));
       render(<ClosingBand closing={content.closing} showcase={content.art.showcase} />);
       expect(plateIds(screen.getByTestId('collection-recent'))).toEqual([
@@ -256,7 +256,10 @@ describe('landing sections', () => {
       expect(screen.queryByRole('link', { name: 'nav.cta.openApp' })).not.toBeInTheDocument();
       const gesture = screen.getByRole('link', { name: content.cycle.gestureCta.label });
       expect(gesture).toHaveAttribute('href', 'https://app.cosmicsignature.com#make-gesture');
-      expect(gesture.className).toMatch(/bg-signature-gradient/);
+      // Navigation, not a transaction: the section call to action's solid lg,
+      // the same size as The Cycle's (the hero alone takes the gradient at xl).
+      expect(gesture.className).not.toMatch(/bg-signature-gradient/);
+      expect(gesture.className).not.toMatch(/\bh-14\b/);
       expect(screen.getByRole('link', { name: content.closing.galleryCta.label })).toHaveAttribute(
         'href',
         'https://app.cosmicsignature.com/gallery',
