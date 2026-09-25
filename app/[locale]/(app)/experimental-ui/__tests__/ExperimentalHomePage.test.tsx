@@ -124,6 +124,7 @@ const mockGestureForm = {
   rwlknftIds: [],
   onGesture: jest.fn().mockResolvedValue(true),
   onGestureWithCST: jest.fn().mockResolvedValue(true),
+  getLastGestureHash: jest.fn(() => '0xtxhash'),
 };
 
 jest.mock('@/hooks/useGestureForm', () => ({
@@ -171,11 +172,18 @@ jest.mock('@/hooks/useMediaQuery', () => ({
 }));
 
 const mockSetQueryData = jest.fn();
+const mockInvalidateQueries = jest.fn();
+const mockCancelQueries = jest.fn();
+// When the deadline was last read; the return resync compares it with now.
+let mockDeadlineUpdatedAt = Date.now();
 jest.mock('@tanstack/react-query', () => ({
   ...jest.requireActual('@tanstack/react-query'),
   useQueryClient: () => ({
-    invalidateQueries: jest.fn(),
+    invalidateQueries: mockInvalidateQueries,
+    cancelQueries: mockCancelQueries,
+    refetchQueries: jest.fn(),
     setQueryData: mockSetQueryData,
+    getQueryState: () => ({ dataUpdatedAt: mockDeadlineUpdatedAt }),
     getQueryCache: () => ({
       subscribe: () => () => undefined,
       findAll: () => [],
@@ -184,8 +192,14 @@ jest.mock('@tanstack/react-query', () => ({
   }),
 }));
 
+let mockFreshness: { state: string; ageMs: number } = { state: 'live', ageMs: 0 };
 jest.mock('@/hooks/useLiveFreshness', () => ({
-  useLiveFreshness: () => ({ state: 'live', ageMs: 0 }),
+  useLiveFreshness: () => mockFreshness,
+}));
+
+const mockTabTitleCountdown = jest.fn();
+jest.mock('@/hooks/useTabTitleCountdown', () => ({
+  useTabTitleCountdown: (options: unknown) => mockTabTitleCountdown(options),
 }));
 
 jest.mock('@/contexts/ApiDataContext', () => ({
@@ -317,6 +331,8 @@ beforeEach(() => {
   mockFetchEndgameChainSample.mockReturnValue(new Promise(() => undefined));
   mockSpecialSnapshot.mockReturnValue({ snapshot: null, isLoading: false });
   mockTickingNow = null;
+  mockDeadlineUpdatedAt = Date.now();
+  mockFreshness = { state: 'live', ageMs: 0 };
   Object.assign(mockGestureForm, {
     gestureType: 'ETH',
     message: '',
@@ -517,6 +533,129 @@ describe('ExperimentalHomePage', () => {
     expect(current).toHaveAttribute('href', '/current-cycle');
     expect(previous).toHaveAttribute('href', '/allocation/4');
     expect(previous.className).toBe(current.className);
+  });
+
+  it('links the allocations of Cycle 0 from Cycle 1', () => {
+    mockUseDashboardInfo.mockReturnValue({
+      data: makeDashboard({ CurRoundNum: 1 }),
+      isLoading: false,
+    });
+    renderPage();
+
+    expect(screen.getByTestId('previous-cycle-link-card')).toHaveAttribute('href', '/allocation/0');
+  });
+
+  it('holds Finalize on a tab that returns with a stale deadline until a fresh read lands', () => {
+    mockAccount = LATEST;
+    Object.assign(mockAllocationFinalize, { allocationTime: Date.now() - 1000 });
+    renderPage();
+    expect(screen.getByTestId('finalize-submit')).toBeEnabled();
+
+    // The tab was hidden for a minute: a Gesture may have moved the deadline,
+    // and a Finalize sent on the old reading would revert and still cost gas.
+    mockDeadlineUpdatedAt = Date.now() - 60_000;
+    act(() => {
+      document.dispatchEvent(new Event('visibilitychange'));
+    });
+
+    expect(screen.queryByTestId('finalize-submit')).not.toBeInTheDocument();
+    expect(mockActionDock).toHaveBeenLastCalledWith(
+      expect.objectContaining({ canClaim: false, finalizationConfirmed: false }),
+    );
+  });
+
+  it('drops the current special recipients after finalizing instead of refetching them', async () => {
+    mockAccount = LATEST;
+    Object.assign(mockAllocationFinalize, { allocationTime: Date.now() - 1000 });
+    renderPage();
+
+    await userEvent.click(screen.getByTestId('finalize-submit'));
+    await waitFor(() => expect(mockAllocationFinalize.onFinalize).toHaveBeenCalledTimes(1));
+
+    // During the rollover the backend answers that read with an error.
+    expect(mockCancelQueries).toHaveBeenCalledWith({ queryKey: ['currentSpecialWinners'] });
+    expect(mockSetQueryData).toHaveBeenCalledWith(['currentSpecialWinners'], null);
+    expect(mockInvalidateQueries).not.toHaveBeenCalledWith({
+      queryKey: ['currentSpecialWinners'],
+    });
+    expect(mockInvalidateQueries).toHaveBeenCalledWith({ queryKey: ['dashboardInfo'] });
+  });
+
+  it('still refreshes the current special recipients after a Gesture', async () => {
+    mockAccount = '0xUser';
+    renderPage();
+
+    await userEvent.click(document.getElementById('gesture-submit') as HTMLButtonElement);
+    await waitFor(() => expect(mockGestureForm.onGesture).toHaveBeenCalledTimes(1));
+
+    expect(mockInvalidateQueries).toHaveBeenCalledWith({ queryKey: ['currentSpecialWinners'] });
+    expect(mockCancelQueries).not.toHaveBeenCalled();
+  });
+
+  it('never lets the tab title count toward a deadline that stopped updating', () => {
+    mockFreshness = { state: 'delayed', ageMs: 180_000 };
+    renderPage();
+
+    expect(mockTabTitleCountdown).toHaveBeenLastCalledWith(
+      expect.objectContaining({ stale: true }),
+    );
+  });
+
+  it('keeps the transaction with the optimistic chat row', async () => {
+    mockAccount = '0xUser';
+    mockGestureForm.message = 'hello';
+    renderPage();
+
+    await userEvent.click(document.getElementById('gesture-submit') as HTMLButtonElement);
+    await waitFor(() => expect(mockGestureForm.onGesture).toHaveBeenCalledTimes(1));
+
+    const pending = mockChat.mock.calls.at(-1)![0].pendingMessages as { txHash: string }[];
+    expect(pending).toEqual([expect.objectContaining({ message: 'hello', txHash: '0xtxhash' })]);
+  });
+
+  it('steps the dock aside while the monument is on screen, at every width', () => {
+    const observers: { callback: IntersectionObserverCallback; target: Element }[] = [];
+    const original = global.IntersectionObserver;
+    global.IntersectionObserver = class {
+      private readonly callback: IntersectionObserverCallback;
+      constructor(callback: IntersectionObserverCallback) {
+        this.callback = callback;
+      }
+      observe(target: Element) {
+        observers.push({ callback: this.callback, target });
+      }
+      unobserve() {}
+      disconnect() {}
+      takeRecords() {
+        return [];
+      }
+    } as unknown as typeof IntersectionObserver;
+    try {
+      renderPage();
+      const monument = screen.getByTestId('home-deck-monument');
+      const report = (isIntersecting: boolean) =>
+        act(() => {
+          observers
+            .filter((observer) => observer.target === monument)
+            .forEach(({ callback }) =>
+              callback(
+                [{ isIntersecting, target: monument } as unknown as IntersectionObserverEntry],
+                {} as IntersectionObserver,
+              ),
+            );
+        });
+
+      // Over the header and the art the dock offers the clock and the action.
+      report(false);
+      expect(mockActionDock).toHaveBeenLastCalledWith(
+        expect.objectContaining({ stepAside: false }),
+      );
+      // The clock and the console are on screen: the dock never repeats them.
+      report(true);
+      expect(mockActionDock).toHaveBeenLastCalledWith(expect.objectContaining({ stepAside: true }));
+    } finally {
+      global.IntersectionObserver = original;
+    }
   });
 
   it('routes the phone dock to the same console in a sheet', async () => {

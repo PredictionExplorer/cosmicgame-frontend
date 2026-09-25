@@ -20,7 +20,7 @@ import { PageShell } from '@/components/ui/page-shell';
 import { Sheet, SheetContent } from '@/components/ui/sheet';
 import { Surface } from '@/components/ui/surface';
 import { useActiveWeb3React } from '@/hooks/web3';
-import { GestureMessageChat, type PendingChatMessage } from '@/components/home/GestureMessageChat';
+import { GestureMessageChat } from '@/components/home/GestureMessageChat';
 import { deriveFeedSystemEvents } from '@/components/home/deck/feedSystemEvents';
 import { ActionDock } from '@/components/home/observatory/ActionDock';
 import {
@@ -41,20 +41,23 @@ import { useArtMotionPreference } from '@/components/home/experimental/useArtMot
 import { AttachedNFTAllocationShowcase } from '@/components/attachments/DonatedNFTPrizeShowcase';
 import type { ArtStatus } from '@/components/ui/art-frame';
 import { useContractAddresses } from '@/contexts/ContractAddressesContext';
+import { useAttentionPreferences } from '@/hooks/useAttentionPreferences';
 import { useChampions } from '@/hooks/useChampions';
+import { useBackgroundDeadlineRefresh, useReturnResync } from '@/hooks/useDeadlineWatch';
 import { useGestureForm } from '@/hooks/useGestureForm';
 import { useHomeGestureFeed } from '@/hooks/useHomeGestureFeed';
 import { useAllocationFinalize } from '@/hooks/useAllocationFinalize';
 import { useEndgameChainSync } from '@/hooks/useEndgameChainSync';
 import { useGestureChime } from '@/hooks/useGestureChime';
+import { useLiveFreshness } from '@/hooks/useLiveFreshness';
 import { useOwnGestureOverlay } from '@/hooks/useOwnGestureOverlay';
+import { usePendingChatMessages } from '@/hooks/usePendingChatMessages';
 import { usePositionMoment } from '@/hooks/usePositionMoment';
 import { useVerifiedFinalizationAlert } from '@/hooks/useVerifiedFinalizationAlert';
 import { invalidateLiveGameQueries } from '@/hooks/useLiveGameDataRefresh';
 import { useNow } from '@/hooks/useNow';
 import { useRotatingIndex } from '@/hooks/useRotatingIndex';
 import { useTabTitleCountdown } from '@/hooks/useTabTitleCountdown';
-import { useMediaQuery } from '@/hooks/useMediaQuery';
 import {
   trackChatJoinCtaClicked,
   trackFinalizeSubmitted,
@@ -73,6 +76,7 @@ import { deriveAllocationTrackAmounts } from '@/lib/allocationTracks';
 import { AllocationIcon } from '@/lib/conceptIcons';
 import { SITE_ROUTE_ICONS } from '@/config/siteNavIcons';
 import { getCycleState, getDashboardActivationTime } from '@/lib/cycleState';
+import { headerRootMargin } from '@/lib/headerOffset';
 import { resolveLatestGesture, type LatestParticipantEvidence } from '@/lib/latestGesture';
 import { fetchEndgameChainSample, type EndgameChainSample } from '@/lib/rpcRace';
 import { TOUCH_TARGET_TEXT_LINK_CLASS } from '@/lib/touch-target';
@@ -97,14 +101,11 @@ const MemoAttachedNFTAllocationShowcase = memo(AttachedNFTAllocationShowcase);
 const MemoStageArtwork = memo(StageArtwork);
 const MemoAllocationTracksBoard = memo(AllocationTracksBoard);
 
-/** Pending optimistic chat rows expire if the indexer never echoes them. */
-const PENDING_MESSAGE_EXPIRY_MS = 90_000;
-
 /** Consecutive artworks that may fail to load before the plate stops skipping. */
 const MAX_UNAVAILABLE_SKIPS = 3;
 
-/** Roughly the sticky header: a region counts as gone once it passed under it. */
-const HEADER_ROOT_MARGIN = '-96px 0px 0px 0px';
+/** The deadline read whose freshness the opted-in tab-title countdown follows. */
+const DEADLINE_FRESHNESS_KEYS = [['allocationTime']] as const;
 
 /** The sheet's console heading is the dialog's title: one visible name, not two. */
 function renderSheetTitle({ className, children }: { className: string; children: ReactNode }) {
@@ -402,14 +403,32 @@ const ExperimentalHomePage = ({
 
   // Final-minute synchronizer: direct-chain reads around the zero-cross.
   const endgame = useEndgameChainSync({ targetMs: allocationTime });
-  const finalizationConfirmed = !endgame.isConfirmationPending;
+  // A tab that returns with a stale deadline holds "ready" until a fresh
+  // reading lands: a Gesture may have moved it while the tab was hidden, and
+  // a Finalize sent on the stale reading would revert and still cost gas.
+  const returnResync = useReturnResync();
+  const finalizationConfirmed = !endgame.isConfirmationPending && !returnResync;
 
+  /**
+   * Refreshes the live reads after a confirmed transaction. A finalization
+   * leaves the current special recipients out: during the rollover the
+   * backend answers that read with an error, so its stale value is dropped
+   * rather than refetched.
+   */
   const withPostTxRefresh = useCallback(
-    (retryMs = 1500, activationMs = 3000) => {
-      void invalidateLiveGameQueries(queryClient).catch((e) => reportError(e, 'refresh live data'));
+    (retryMs = 1500, activationMs = 3000, includeCurrentSpecialRecipients = true) => {
+      if (!includeCurrentSpecialRecipients) {
+        void queryClient.cancelQueries({ queryKey: ['currentSpecialWinners'] });
+        queryClient.setQueryData(['currentSpecialWinners'], null);
+      }
+      void invalidateLiveGameQueries(queryClient, { includeCurrentSpecialRecipients }).catch((e) =>
+        reportError(e, 'refresh live data'),
+      );
       setMessage('');
       setTimeout(() => {
-        void invalidateLiveGameQueries(queryClient).catch((e) => reportError(e, 'retry live data'));
+        void invalidateLiveGameQueries(queryClient, { includeCurrentSpecialRecipients }).catch(
+          (e) => reportError(e, 'retry live data'),
+        );
       }, retryMs);
       setTimeout(() => {
         fetchActivationTime().catch((e) => reportError(e, 'fetchActivationTime'));
@@ -424,43 +443,11 @@ const ExperimentalHomePage = ({
     if (account) recordOwnGesture(account, offset);
   }, [account, offset, recordOwnGesture]);
 
-  // Optimistic chat rows: a just-sent message shows instantly and is removed
-  // once the indexer echoes the real gesture (or after a safety timeout).
-  const [pendingMessages, setPendingMessages] = useState<PendingChatMessage[]>([]);
-  const pendingExpiryTimersRef = useRef<ReturnType<typeof setTimeout>[]>([]);
-  useEffect(() => {
-    const timers = pendingExpiryTimersRef.current;
-    return () => timers.forEach(clearTimeout);
-  }, []);
-
-  const recordPendingMessage = useCallback((address: string, message: string) => {
-    const id = `pending-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
-    setPendingMessages((prev) => [
-      ...prev,
-      { id, address, message, timestamp: Math.floor(Date.now() / 1000) },
-    ]);
-    pendingExpiryTimersRef.current.push(
-      setTimeout(() => {
-        setPendingMessages((prev) => prev.filter((entry) => entry.id !== id));
-      }, PENDING_MESSAGE_EXPIRY_MS),
-    );
-  }, []);
-
-  useEffect(() => {
-    setPendingMessages((prev) => {
-      if (prev.length === 0) return prev;
-      const next = prev.filter(
-        (entry) =>
-          !chatGestures.some(
-            (gesture) =>
-              gesture.BidderAddr?.toLowerCase() === entry.address.toLowerCase() &&
-              typeof gesture.Message === 'string' &&
-              gesture.Message.trim() === entry.message,
-          ),
-      );
-      return next.length === prev.length ? prev : next;
-    });
-  }, [chatGestures]);
+  // Optimistic chat rows until the indexer echoes them (F221), the app's one
+  // implementation: each keeps its transaction, and a slow echo says so.
+  const { pending: pendingMessages, record: recordPendingMessage } =
+    usePendingChatMessages(chatGestures);
+  const { getLastGestureHash } = gestureForm;
 
   /** Resolves `true` once the Gesture is confirmed (or simulated). */
   const handleGesture = useCallback(
@@ -485,7 +472,7 @@ const ExperimentalHomePage = ({
       if (!(await (gestureType === 'CST' ? onGestureWithCST() : onGesture()))) return false;
       trackGestureSubmitted({ source, method: gestureType, hasMessage: trimmedMessage !== '' });
       if (trimmedMessage && account) {
-        recordPendingMessage(account, trimmedMessage);
+        recordPendingMessage(account, trimmedMessage, getLastGestureHash());
       }
       recordConfirmedGesture();
       withPostTxRefresh();
@@ -495,6 +482,7 @@ const ExperimentalHomePage = ({
       account,
       gestureForm.message,
       gestureType,
+      getLastGestureHash,
       notify,
       onGesture,
       onGestureWithCST,
@@ -511,7 +499,7 @@ const ExperimentalHomePage = ({
     async (source: GestureSurface = 'console'): Promise<boolean> => {
       if (!(await onFinalize())) return false;
       trackFinalizeSubmitted(source);
-      withPostTxRefresh(1000, 3000);
+      withPostTxRefresh(1000, 3000, false);
       return true;
     },
     [onFinalize, withPostTxRefresh],
@@ -563,7 +551,22 @@ const ExperimentalHomePage = ({
   const showConsole = loading || isRoundActive;
 
   // The tab title ticks in the final window only when the viewer opted in.
-  useTabTitleCountdown({ enabled: isFinalWindow, targetMs: allocationTime });
+  // An armed alert or countdown keeps the deadline fresh while the tab is
+  // hidden, and the title never counts toward a deadline that stopped
+  // updating.
+  const { preferences: attention } = useAttentionPreferences();
+  useBackgroundDeadlineRefresh(
+    attention.finalizationAlert || (attention.tabTitle && isFinalWindow),
+  );
+  const deadlineFreshness = useLiveFreshness({
+    queryKeys: DEADLINE_FRESHNESS_KEYS,
+    pollIntervalMs: 60_000,
+  });
+  useTabTitleCountdown({
+    enabled: isFinalWindow,
+    targetMs: allocationTime,
+    stale: deadlineFreshness.state === 'delayed' || deadlineFreshness.state === 'offline',
+  });
 
   // The one quote behind every gesture submit (console, sheet and dock), so
   // the cost shown can never drift between them. The shared dock sets the
@@ -615,41 +618,22 @@ const ExperimentalHomePage = ({
     el.focus({ preventScroll: true });
   }, []);
 
-  // The action dock steps aside while the console itself is on screen; from
-  // 1024px it also waits until the monument has scrolled past.
-  const isDesktop = useMediaQuery('(min-width: 64rem)');
-  const monumentRef = useRef<HTMLDivElement | null>(null);
-  const consoleRef = useRef<HTMLDivElement | null>(null);
-  const [monumentOutOfView, setMonumentOutOfView] = useState(false);
-  const [consoleInView, setConsoleInView] = useState(false);
+  // The action dock repeats the clock and the priced action, so it steps
+  // aside at every width while the monument (the clock, the Signature
+  // Allocation and the console under them) is on screen: it shows over the
+  // header and the art, and again once the console has scrolled past.
+  // A callback ref: the monument mounts only once the dashboard read landed.
+  const [monumentEl, setMonumentEl] = useState<HTMLDivElement | null>(null);
+  const [monumentInView, setMonumentInView] = useState(false);
   useEffect(() => {
-    const el = monumentRef.current;
-    if (!el || typeof IntersectionObserver === 'undefined') return undefined;
+    if (!monumentEl || typeof IntersectionObserver === 'undefined') return undefined;
     const observer = new IntersectionObserver(
-      ([entry]) => {
-        if (!entry) return;
-        const rootTop = entry.rootBounds?.top ?? 0;
-        const bottom = entry.boundingClientRect?.bottom ?? Number.POSITIVE_INFINITY;
-        setMonumentOutOfView(!entry.isIntersecting && bottom <= rootTop);
-      },
-      { rootMargin: HEADER_ROOT_MARGIN },
+      ([entry]) => setMonumentInView(entry?.isIntersecting ?? false),
+      { rootMargin: headerRootMargin() },
     );
-    observer.observe(el);
+    observer.observe(monumentEl);
     return () => observer.disconnect();
-  }, []);
-  useEffect(() => {
-    const el = consoleRef.current;
-    if (!el || typeof IntersectionObserver === 'undefined') {
-      setConsoleInView(false);
-      return undefined;
-    }
-    const observer = new IntersectionObserver(
-      ([entry]) => setConsoleInView(entry?.isIntersecting ?? false),
-      { rootMargin: HEADER_ROOT_MARGIN },
-    );
-    observer.observe(el);
-    return () => observer.disconnect();
-  }, [showConsole]);
+  }, [monumentEl]);
 
   // The source-aligned clock discovers milestones even between Gestures. A
   // 30-second bucket keeps this timeline out of the one-second render path.
@@ -698,8 +682,9 @@ const ExperimentalHomePage = ({
 
   const hasAttachedAssets = donatedNFTs.length > 0 || donatedERC20Tokens.length > 0;
   const cycleNumber = data?.CurRoundNum;
+  // Cycles count from 0, so Cycle 1 links the allocations of Cycle 0.
   const previousCycle = (cycleNumber ?? 0) - 1;
-  const hasPreviousCycle = previousCycle > 0;
+  const hasPreviousCycle = previousCycle >= 0;
   const CurrentCycleIcon = SITE_ROUTE_ICONS.currentCycle;
 
   // Without the dashboard read there is no cycle number, countdown or
@@ -822,7 +807,7 @@ const ExperimentalHomePage = ({
             />
 
             <div
-              ref={monumentRef}
+              ref={setMonumentEl}
               data-testid="home-deck-monument"
               className="min-w-0 lg:col-span-5 lg:col-start-8 lg:row-span-2 lg:row-start-1"
             >
@@ -837,7 +822,7 @@ const ExperimentalHomePage = ({
                 attachedERC20Count={donatedERC20Tokens.length}
               >
                 {showConsole ? (
-                  <div ref={consoleRef} className="mt-8">
+                  <div className="mt-8">
                     <Surface variant="quiet" className="p-5 sm:p-6">
                       <GestureConsole
                         variant="page"
@@ -983,7 +968,7 @@ const ExperimentalHomePage = ({
       {/* The one persistent quick action: it routes to the console (the sheet
           on phones, a scroll on desktop) and never submits by itself. */}
       <ActionDock
-        stepAside={consoleInView || (isDesktop && !monumentOutOfView)}
+        stepAside={sheetOpen || monumentInView}
         data={data}
         loading={loading}
         allocationTime={allocationTime}
@@ -1006,6 +991,8 @@ const ExperimentalHomePage = ({
       <Sheet open={sheetOpen} onOpenChange={setSheetOpen}>
         <SheetContent
           side="bottom"
+          // The console's heading names the dialog; there is no separate description.
+          aria-describedby={undefined}
           className="max-h-[85dvh] overflow-y-auto rounded-t-surface border-rule bg-surface-raised p-5 pb-8 lg:hidden"
         >
           <GestureConsole
