@@ -5,7 +5,7 @@ import { useEffect, useState } from 'react';
 import { jumpToSection } from '@/lib/jumpToSection';
 import { useStickyClearance } from '@/hooks/useStickyClearance';
 import { cn } from '@/lib/utils';
-import { TimeZoneNote } from '@/components/ui/date-time';
+import { TimeZoneNote, useTimeZoneLabel } from '@/components/ui/date-time';
 import { ScrollRail } from '@/components/ui/scroll-rail';
 import { tabsListVariants, tabsTriggerVariants } from '@/components/ui/tabs';
 import { useStuck } from '@/components/statistics/useStuck';
@@ -94,6 +94,7 @@ export function ProfileSectionNav({
   // Focus moved into a section stops below the bar, not under it.
   useStickyClearance(stickyRef);
   const [current, setCurrent] = useCurrentSection(sections.map((section) => section.id));
+  const zone = useTimeZoneLabel();
 
   return (
     <>
@@ -140,9 +141,14 @@ export function ProfileSectionNav({
               ))}
             </ul>
           </ScrollRail>
-          {/* On the row's rule too, so the rule runs under the zone as under the links. */}
+          {/* On the row's rule too, so the rule runs under the zone as under the links. A
+              phone shows the zone alone ("UTC-5"), leaving the row to the links; the whole
+              note is still what a screen reader hears. */}
           <p className="shrink-0 border-b border-rule pb-3 ps-4 type-caption text-subtle sm:ps-6">
-            <TimeZoneNote />
+            <TimeZoneNote className="max-sm:sr-only" />
+            <span aria-hidden className="sm:hidden">
+              {zone}
+            </span>
           </p>
         </div>
       </nav>

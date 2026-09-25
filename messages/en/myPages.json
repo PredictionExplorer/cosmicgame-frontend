@@ -149,7 +149,7 @@
         "anchoredNow": "Anchored now",
         "actions": "Anchor and release actions",
         "distributions": "Anchor Distributions",
-        "byKind": "{cosmicSignature, number} Cosmic Signature · {randomWalk, number} Random Walk"
+        "byKind": "{cosmicSignature, number} Cosmic Signature · {randomWalk, number} Random Walk"
       },
       "definitions": {
         "label": "Definitions",

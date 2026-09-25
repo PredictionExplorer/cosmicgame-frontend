@@ -149,7 +149,7 @@
         "anchoredNow": "係留中",
         "actions": "係留 / 解除の操作",
         "distributions": "係留配分",
-        "byKind": "Cosmic Signature {cosmicSignature, number}・Random Walk {randomWalk, number}"
+        "byKind": "Cosmic Signature {cosmicSignature, number}・Random Walk {randomWalk, number}"
       },
       "definitions": {
         "label": "定義",

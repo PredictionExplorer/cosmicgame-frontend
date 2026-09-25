@@ -149,7 +149,7 @@
         "anchoredNow": "Đang neo giữ",
         "actions": "Thao tác neo giữ và gỡ neo",
         "distributions": "Phân phối neo giữ",
-        "byKind": "{cosmicSignature, number} Cosmic Signature · {randomWalk, number} Random Walk"
+        "byKind": "{cosmicSignature, number} Cosmic Signature · {randomWalk, number} Random Walk"
       },
       "definitions": {
         "label": "Định nghĩa",

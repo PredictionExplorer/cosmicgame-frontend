@@ -149,7 +149,7 @@
         "anchoredNow": "Закріплено зараз",
         "actions": "Дії закріплення та відкріплення",
         "distributions": "Надходження за закріплення",
-        "byKind": "Cosmic Signature {cosmicSignature, number} · Random Walk {randomWalk, number}"
+        "byKind": "Cosmic Signature {cosmicSignature, number} · Random Walk {randomWalk, number}"
       },
       "definitions": {
         "label": "Визначення",

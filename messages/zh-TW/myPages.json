@@ -149,7 +149,7 @@
         "anchoredNow": "目前錨定",
         "actions": "錨定與解錨操作",
         "distributions": "錨定配發",
-        "byKind": "Cosmic Signature {cosmicSignature, number} · Random Walk {randomWalk, number}"
+        "byKind": "Cosmic Signature {cosmicSignature, number} · Random Walk {randomWalk, number}"
       },
       "definitions": {
         "label": "定義",
