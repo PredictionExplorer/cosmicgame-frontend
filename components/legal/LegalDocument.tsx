@@ -14,7 +14,7 @@ import { frontendFileHistory } from '@/content/legal/links';
 import { PageHeader } from '@/components/layout/PageHeader';
 import { ReviewedStamp } from '@/components/layout/ReviewedStamp';
 import { SiteLink } from '@/components/layout/SiteLink';
-import { ReadingRail } from '@/components/reading/ContentsNav';
+import { ReadingRail } from '@/components/reading/ContentsRail';
 import { PageShell } from '@/components/ui/page-shell';
 import { cn } from '@/lib/utils';
 

@@ -1,6 +1,7 @@
 import { render, screen, within } from '@/test-utils';
 
-import { ReadingContents, ReadingRail } from '../ContentsNav';
+import { ReadingContents } from '../ContentsNav';
+import { ReadingRail } from '../ContentsRail';
 import type { ContentsEntry } from '../contents';
 
 const mockPosition = { activeId: 'costs-cst' as string | null, progress: 0.4, pastAnchor: true };
