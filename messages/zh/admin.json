@@ -73,9 +73,6 @@
     "form": {
       "title": "转出 CST",
       "description": "一笔交易即把该数额从推广储备转给接收方，且无法撤销。",
-      "amount": "数额",
-      "amountHint": "小数可用小数点或逗号。",
-      "sends": "将转出 {amount}",
       "submit": "转出 CST",
       "reserveHeading": "推广储备",
       "reserve": "储备地址",
@@ -84,12 +81,7 @@
       "balanceError": "未能读取推广储备的 CST 余额。",
       "confirmed": "已从推广储备转出 CST。",
       "failed": "CST 未能转出。请检查钱包后重试。",
-      "errors": {
-        "amount": "请输入大于零的数额。",
-        "precision": "{decimals, plural, other {最多使用 # 位小数。}}",
-        "grouping": "请勿使用千位分隔符：输入 1000，而非 1,000。",
-        "insufficient": "推广储备的 CST 少于此数额。"
-      }
+      "sendAmount": "转出 {amount}"
     }
   }
 }

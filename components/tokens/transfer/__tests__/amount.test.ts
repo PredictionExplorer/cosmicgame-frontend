@@ -1,4 +1,7 @@
-import { commaIsDecimal, parseTokenAmount, toPlainDecimal } from '../amount';
+import { routing } from '@/i18n/routing';
+import { formatCount, formatNumber } from '@/utils/format';
+
+import { amountMarks, parseTokenAmount, toPlainDecimal } from '../amount';
 
 const WEI = 1_000_000_000_000_000_000n;
 
@@ -15,10 +18,13 @@ describe('parseTokenAmount', () => {
     });
   });
 
-  it('accepts digits grouped with spaces, including no-break ones', () => {
+  it('accepts digits grouped in threes with spaces, including no-break ones', () => {
     expect(parseTokenAmount('1 000').wei).toBe(1000n * WEI);
     expect(parseTokenAmount('1 000 000').wei).toBe(1_000_000n * WEI);
     expect(parseTokenAmount('  12  ').wei).toBe(12n * WEI);
+    // A space that does not group thousands is a typo, not a number to guess.
+    expect(parseTokenAmount('12 34').error).toBe('format');
+    expect(parseTokenAmount('1 0.5').error).toBe('format');
   });
 
   it('names the reason an amount cannot be sent', () => {
@@ -41,36 +47,62 @@ describe('parseTokenAmount', () => {
     expect(parseTokenAmount('11', { max: null }).error).toBeNull();
   });
 
-  it('refuses a comma where it could group thousands, rather than guess', () => {
-    // "1,000" is one thousand to an English reader and one to a Ukrainian one.
-    expect(parseTokenAmount('1,000').error).toBe('format');
-    expect(parseTokenAmount('0,5').error).toBe('format');
+  // The transfers cannot be undone: an English operator typing "1,000" once sent 1 CST.
+  it("refuses the locale's thousands mark instead of reading it as a decimal point", () => {
+    for (const locale of ['en', 'zh', 'zh-TW', 'zh-HK', 'ko', 'ja']) {
+      expect(parseTokenAmount('1,000', { locale }).error).toBe('grouping');
+      expect(parseTokenAmount('1,000.5', { locale }).error).toBe('grouping');
+      expect(parseTokenAmount('12,500,000', { locale }).error).toBe('grouping');
+      // Not a thousands group either, and never guessed as a decimal comma.
+      expect(parseTokenAmount('2,5', { locale }).error).toBe('format');
+    }
   });
 
-  it('reads a comma or a dot as the decimal mark where a comma cannot group', () => {
-    expect(parseTokenAmount('0,5', { decimalComma: true }).wei).toBe(WEI / 2n);
-    expect(parseTokenAmount('0.5', { decimalComma: true }).wei).toBe(WEI / 2n);
-    expect(parseTokenAmount('1 000,25', { decimalComma: true }).wei).toBe(
-      1_000_250_000_000_000_000_000n,
-    );
-    expect(parseTokenAmount('1.000,5', { decimalComma: true }).error).toBe('format');
+  // Regression: vi prints one thousand as "1.000" and the shared parser read it as 1.
+  it('reads Vietnamese amounts the way the app prints them', () => {
+    const vi = { locale: 'vi' };
+    expect(formatCount(1000, 'vi')).toBe('1.000');
+    expect(parseTokenAmount('1.000', vi)).toEqual({ wei: null, error: 'grouping' });
+    expect(parseTokenAmount('1.500', vi).error).toBe('grouping');
+    expect(parseTokenAmount('1.000,5', vi).error).toBe('grouping');
+    expect(parseTokenAmount('1,5', vi).wei).toBe((3n * WEI) / 2n);
+    expect(parseTokenAmount('0,125', vi).wei).toBe(125_000_000_000_000_000n);
+    expect(parseTokenAmount('1000', vi).wei).toBe(1000n * WEI);
+    // A dot is vi's thousands mark: never a decimal point, even before one digit.
+    expect(parseTokenAmount('0.5', vi).error).toBe('format');
+  });
+
+  it('reads both marks as the decimal point in Ukrainian, which groups with spaces', () => {
+    const uk = { locale: 'uk' };
+    expect(parseTokenAmount('1,5', uk).wei).toBe((3n * WEI) / 2n);
+    expect(parseTokenAmount('1.5', uk).wei).toBe((3n * WEI) / 2n);
+    expect(parseTokenAmount('1 000,25', uk).wei).toBe(1_000_250_000_000_000_000_000n);
+    expect(parseTokenAmount('1.000,5', uk).error).toBe('format');
+  });
+
+  it('reads back every amount the app prints, in every locale', () => {
+    for (const locale of routing.locales) {
+      const printed = formatNumber(1234.5, locale, { useGrouping: false });
+      expect(parseTokenAmount(printed, { locale }).wei).toBe(1_234_500_000_000_000_000_000n);
+      const { group } = amountMarks(locale);
+      if (group === ' ') {
+        expect(parseTokenAmount(formatCount(1000, locale), { locale }).wei).toBe(1000n * WEI);
+      } else {
+        expect(parseTokenAmount(formatCount(1000, locale), { locale }).error).toBe('grouping');
+      }
+    }
   });
 });
 
-describe('commaIsDecimal', () => {
-  it('accepts a decimal comma in every locale that groups digits another way', () => {
-    // Regression: uk prints a dot decimal, so "1,5" on /uk/transfer-cst was
-    // refused, although a Ukrainian groups with spaces and writes 1,5 by hand.
-    expect(commaIsDecimal('uk')).toBe(true);
-    expect(commaIsDecimal('vi')).toBe(true);
-    expect(parseTokenAmount('1,5', { decimalComma: commaIsDecimal('uk') }).wei).toBe(
-      (3n * WEI) / 2n,
-    );
-  });
-
-  it('refuses it where a comma groups thousands', () => {
-    for (const locale of ['en', 'zh', 'zh-TW', 'zh-HK', 'ko', 'ja']) {
-      expect(commaIsDecimal(locale)).toBe(false);
+describe('amountMarks', () => {
+  it('takes the thousands mark from the locale and never reads it as a decimal', () => {
+    expect(amountMarks('en')).toEqual({ group: ',', decimals: ['.'] });
+    expect(amountMarks('vi')).toEqual({ group: '.', decimals: [','] });
+    expect(amountMarks('uk')).toEqual({ group: ' ', decimals: ['.', ','] });
+    for (const locale of routing.locales) {
+      const { group, decimals } = amountMarks(locale);
+      expect(decimals).not.toContain(group);
+      expect(decimals.length).toBeGreaterThan(0);
     }
   });
 });
@@ -84,8 +116,11 @@ describe('toPlainDecimal', () => {
     expect(toPlainDecimal(150n, 2)).toBe('1.5');
   });
 
-  it('round-trips through parseTokenAmount', () => {
+  it("uses the locale's decimal mark, so a Max fill reads back in every locale", () => {
+    expect(toPlainDecimal(1_234_567n * 10n ** 15n, 18, 'vi')).toBe('1234,567');
     const wei = 987_654_321_012_345_678n;
-    expect(parseTokenAmount(toPlainDecimal(wei)).wei).toBe(wei);
+    for (const locale of routing.locales) {
+      expect(parseTokenAmount(toPlainDecimal(wei, 18, locale), { locale }).wei).toBe(wei);
+    }
   });
 });

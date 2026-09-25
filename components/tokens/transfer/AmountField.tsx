@@ -5,7 +5,7 @@ import { useLocale, useTranslations } from 'next-intl';
 
 import { cn } from '@/lib/utils';
 import { TOUCH_TARGET_EXTENDED_CLASS } from '@/lib/touch-target';
-import { formatAmount, formatNumber, type AmountUnit } from '@/utils/format';
+import { formatAmount, formatCount, formatNumber, type AmountUnit } from '@/utils/format';
 import { FormField } from '@/components/ui/form-field';
 import { Input } from '@/components/ui/input';
 
@@ -61,16 +61,26 @@ export function AmountField({
   const availableText =
     available == null ? null : formatAmount(available, { unit, locale, decimals });
 
-  const errorText =
-    error === 'format'
-      ? t('errors.format', { example: formatNumber(0.5, locale) })
-      : error === 'precision'
-        ? t('errors.precision', { decimals })
-        : error === 'exceedsBalance'
-          ? t('errors.exceedsBalance', { amount: availableText ?? '' })
-          : error
-            ? t(`errors.${error}`)
-            : null;
+  const errorText = (() => {
+    switch (error) {
+      case null:
+        return null;
+      case 'format':
+        return t('errors.format', { example: formatNumber(0.5, locale) });
+      case 'grouping':
+        // "type 1000, not 1,000" in the reader's own thousands mark (vi "1.000").
+        return t('errors.grouping', {
+          plain: formatNumber(1000, locale, { useGrouping: false }),
+          grouped: formatCount(1000, locale),
+        });
+      case 'precision':
+        return t('errors.precision', { decimals });
+      case 'exceedsBalance':
+        return t('errors.exceedsBalance', { amount: availableText ?? '' });
+      default:
+        return t(`errors.${error}`);
+    }
+  })();
 
   // The balance arrives within a moment of the wallet connecting; until then
   // the label row stays empty rather than claiming a figure.

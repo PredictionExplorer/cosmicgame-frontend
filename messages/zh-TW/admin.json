@@ -73,9 +73,6 @@
     "form": {
       "title": "轉出 CST",
       "description": "一筆交易即把該數額從推廣儲備轉給接收方，且無法撤銷。",
-      "amount": "數額",
-      "amountHint": "小數可用小數點或逗號。",
-      "sends": "將轉出 {amount}",
       "submit": "轉出 CST",
       "reserveHeading": "推廣儲備",
       "reserve": "儲備地址",
@@ -84,12 +81,7 @@
       "balanceError": "無法讀取推廣儲備的 CST 餘額。",
       "confirmed": "已從推廣儲備轉出 CST。",
       "failed": "CST 未能轉出。請檢查錢包後再試一次。",
-      "errors": {
-        "amount": "請輸入大於零的數額。",
-        "precision": "{decimals, plural, other {最多使用 # 位小數。}}",
-        "grouping": "請勿使用千分位符號：輸入 1000，而非 1,000。",
-        "insufficient": "推廣儲備的 CST 少於此數額。"
-      }
+      "sendAmount": "轉出 {amount}"
     }
   }
 }

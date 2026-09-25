@@ -32,8 +32,10 @@
         "format": "請輸入數字，例如 {example}。",
         "precision": "最多保留 {decimals} 位小數。",
         "zero": "請輸入大於 0 的數量。",
-        "exceedsBalance": "超過了可用的 {amount}。"
-      }
+        "exceedsBalance": "超過了可用的 {amount}。",
+        "grouping": "請勿使用千位分隔符：輸入 {plain}，而非 {grouped}。"
+      },
+      "checkingBalance": "正在讀取餘額…"
     },
     "review": {
       "title": "核對",
@@ -42,7 +44,8 @@
       "final": "發送後無法撤銷：發送到錯誤地址的資產無法找回。",
       "acknowledge": "我已核對該地址，確認發送。",
       "acknowledgeRequired": "請先確認已核對地址。",
-      "checking": "正在核查地址…"
+      "checking": "正在核查地址…",
+      "balanceUnchecked": "暫時無法讀取餘額，此數量尚未與餘額核對。"
     }
   }
 }

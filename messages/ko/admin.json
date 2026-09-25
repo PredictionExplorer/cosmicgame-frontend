@@ -73,9 +73,6 @@
     "form": {
       "title": "CST 보내기",
       "description": "한 번의 트랜잭션으로 금액이 홍보 준비금에서 수령자에게 이동합니다. 되돌릴 수 없습니다.",
-      "amount": "금액",
-      "amountHint": "소수점은 마침표나 쉼표로 입력합니다.",
-      "sends": "보낼 금액: {amount}",
       "submit": "CST 보내기",
       "reserveHeading": "홍보 준비금",
       "reserve": "준비금 주소",
@@ -84,12 +81,7 @@
       "balanceError": "준비금의 CST 잔액을 읽을 수 없습니다.",
       "confirmed": "홍보 준비금에서 CST를 보냈습니다.",
       "failed": "CST를 보내지 못했습니다. 지갑을 확인한 뒤 다시 시도하십시오.",
-      "errors": {
-        "amount": "0보다 큰 금액을 입력하십시오.",
-        "precision": "{decimals, plural, other {소수점 이하 최대 #자리까지 입력합니다.}}",
-        "grouping": "천 단위 구분 기호 없이 1000처럼 입력하십시오.",
-        "insufficient": "준비금의 CST가 이 금액보다 적습니다."
-      }
+      "sendAmount": "{amount} 보내기"
     }
   }
 }

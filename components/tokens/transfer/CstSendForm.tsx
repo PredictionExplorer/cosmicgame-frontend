@@ -16,7 +16,7 @@ import { ChainGuard } from '@/components/wallet/NetworkGuard';
 import { AmountField } from './AmountField';
 import { RecipientField } from './RecipientField';
 import { TransferReview, transferGate } from './TransferReview';
-import { commaIsDecimal, parseTokenAmount, toPlainDecimal } from './amount';
+import { parseTokenAmount, toPlainDecimal } from './amount';
 import { parseRecipient } from './recipient';
 import { CST_BALANCE_QUERY_KEY, CST_DECIMALS, useCstBalance } from './useCstBalance';
 import { useRecipientFacts } from './useRecipientFacts';
@@ -46,6 +46,8 @@ export interface CstSendFormProps {
   errorContext: string;
   /** Extra query keys to refresh once the transfer confirms. */
   invalidateKeys?: readonly (readonly unknown[])[];
+  /** Nothing can be sent yet (a role or address the send needs is unknown). */
+  disabled?: boolean;
   /** Content under the send button (a history link). */
   footer?: ReactNode;
   className?: string;
@@ -62,12 +64,16 @@ const CST_TRANSFER_KEYS = [
 
 /**
  * Sends CST from one address: the recipient (checked on-chain as it is typed),
- * the amount (capped by the live balance, with Max), then a review of both
- * before the one commit button opens the wallet. Errors appear under their
- * field once it has been left or the form submitted, and a submit with an
- * error moves focus to the first field that needs fixing. The transaction
- * runs through `useTxFlow`: chain guard, one lifecycle toast, and the stage
- * under the button.
+ * the amount (read in the reader's number style and capped by the live
+ * balance, with Max), then a review of both before the one commit button
+ * opens the wallet. Errors appear under their field once it has been left or
+ * the form submitted, and a submit with an error moves focus to the first
+ * field that needs fixing. A send waits for the balance as it waits for the
+ * recipient check; a balance that cannot be read is said in the review. The
+ * transaction runs through `useTxFlow`: chain guard, one lifecycle toast,
+ * and the stage under the button. Every CST send uses it: the wallet's
+ * `transfer` (CstTransferForm) and the Outreach Reserve's `payReward`
+ * (MarketingCstRewardForm).
  */
 export function CstSendForm({
   source,
@@ -79,11 +85,13 @@ export function CstSendForm({
   failureMessage,
   errorContext,
   invalidateKeys = [],
+  disabled = false,
   footer,
   className,
 }: CstSendFormProps) {
   const locale = useLocale();
   const tReview = useTranslations('forms.transfer.review');
+  const tAmount = useTranslations('forms.transfer.amount');
   const queryClient = useQueryClient();
   const { run, stage, isBusy } = useTxFlow();
   const stageLabel = useTxStageLabel();
@@ -101,11 +109,9 @@ export function CstSendForm({
   const balance = useCstBalance(source);
   const available = balance.data ?? null;
   const recipient = parseRecipient(recipientText, { from: source });
-  const amount = parseTokenAmount(amountText, {
-    decimals: CST_DECIMALS,
-    max: available,
-    decimalComma: commaIsDecimal(locale),
-  });
+  // Still reading: the amount cannot be checked against the balance yet.
+  const balanceLoading = balance.isLoading;
+  const amount = parseTokenAmount(amountText, { decimals: CST_DECIMALS, max: available, locale });
   const check = useRecipientFacts(recipient.address);
   const gate = transferGate(check, acknowledged);
   const sendable = amount.error === null ? amount.wei : null;
@@ -124,7 +130,7 @@ export function CstSendForm({
 
   const fillMax = () => {
     if (available === null) return;
-    setAmountText(toPlainDecimal(available, CST_DECIMALS));
+    setAmountText(toPlainDecimal(available, CST_DECIMALS, locale));
     setTouched((current) => ({ ...current, amount: true }));
   };
 
@@ -139,7 +145,10 @@ export function CstSendForm({
       amountRef.current?.focus();
       return;
     }
-    if (!transfer) return;
+    if (!transfer || disabled) return;
+    // Never send before the balance is known: an amount above it would open
+    // the wallet on a transfer that reverts. The button says it is reading.
+    if (balanceLoading) return;
     // Never race the recipient check: its answer decides whether the send
     // needs an acknowledgement. The button says it is checking meanwhile.
     if (gate === 'checking') return;
@@ -171,7 +180,9 @@ export function CstSendForm({
   };
 
   const busyLabel = isBusy ? stageLabel(stage) : null;
-  const checkingRecipient = !isBusy && recipient.address !== null && gate === 'checking';
+  const readingBalance = !isBusy && transfer !== null && balanceLoading;
+  const checkingRecipient =
+    !isBusy && !readingBalance && recipient.address !== null && gate === 'checking';
 
   return (
     <form noValidate onSubmit={handleSubmit} className={cn('flex flex-col gap-6', className)}>
@@ -212,6 +223,7 @@ export function CstSendForm({
           }}
           acknowledgementMissing={acknowledgementMissing}
           acknowledgementRef={acknowledgementRef}
+          note={balance.isError ? tReview('balanceUnchecked') : null}
         />
       ) : null}
 
@@ -221,15 +233,18 @@ export function CstSendForm({
             type="submit"
             variant="commit"
             size="lg"
-            loading={isBusy || checkingRecipient}
+            loading={isBusy || checkingRecipient || readingBalance}
+            disabled={disabled}
             className="w-full sm:w-auto sm:self-start"
           >
             {busyLabel ??
-              (checkingRecipient
-                ? tReview('checking')
-                : amountLabel
-                  ? submitLabel(amountLabel)
-                  : idleLabel)}
+              (readingBalance
+                ? tAmount('checkingBalance')
+                : checkingRecipient
+                  ? tReview('checking')
+                  : amountLabel
+                    ? submitLabel(amountLabel)
+                    : idleLabel)}
           </Button>
         </ChainGuard>
         <TxStatus stage={stage} />

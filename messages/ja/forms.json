@@ -32,8 +32,10 @@
         "format": "{example}のように数字で入力してください。",
         "precision": "小数点以下は{decimals}桁までです。",
         "zero": "0より大きい数量を入力してください。",
-        "exceedsBalance": "利用可能な{amount}を超えています。"
-      }
+        "exceedsBalance": "利用可能な{amount}を超えています。",
+        "grouping": "桁区切りの記号を使わず、{grouped}ではなく{plain}のように入力してください。"
+      },
+      "checkingBalance": "残高を取得中…"
     },
     "review": {
       "title": "確認",
@@ -42,7 +44,8 @@
       "final": "送付は取り消せません。誤ったアドレスに送ったトークンは取り戻せません。",
       "acknowledge": "アドレスを確認済みで、このアドレスに送ります。",
       "acknowledgeRequired": "続けるには、アドレスを確認したことをチェックしてください。",
-      "checking": "アドレスを確認中…"
+      "checking": "アドレスを確認中…",
+      "balanceUnchecked": "残高を取得できないため、この数量は残高と照合されていません。"
     }
   }
 }

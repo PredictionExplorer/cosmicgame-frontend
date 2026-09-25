@@ -17,7 +17,10 @@ const WEI = 1_000_000_000_000_000_000n;
 const mockTx = createFakeTxFlow(SOURCE);
 const mockInvalidateQueries = jest.fn();
 const mockNotify = jest.fn();
-let mockBalance: { data?: bigint; isError: boolean } = { data: 100n * WEI, isError: false };
+let mockBalance: { data?: bigint; isError: boolean; isLoading?: boolean } = {
+  data: 100n * WEI,
+  isError: false,
+};
 let mockCheck: RecipientCheck = { status: 'idle' };
 
 jest.mock('@tanstack/react-query', () => ({
@@ -251,6 +254,42 @@ describe('CstTransferForm', () => {
 
     expect(screen.getByText('forms.transfer.amount.availableUnknown')).toBeInTheDocument();
     expect(screen.queryByRole('button', { name: /maxAria/ })).not.toBeInTheDocument();
+  });
+
+  it('holds the send while the balance is still being read (regression)', async () => {
+    // A fast submit above the balance opened the wallet on a transfer that reverts.
+    mockBalance = { data: undefined, isError: false, isLoading: true };
+    const { container } = render(<CstTransferForm source={SOURCE} />);
+    fill(RECIPIENT, '500');
+
+    const button = screen.getByRole('button', { name: /forms\.transfer\.amount\.checkingBalance/ });
+    expect(button).toHaveAttribute('aria-busy', 'true');
+    fireEvent.submit(container.querySelector('form')!);
+    await Promise.resolve();
+    expect(mockTx.writeContract).not.toHaveBeenCalled();
+  });
+
+  it('sends without a balance cap only with the caveat in the review', async () => {
+    mockBalance = { data: undefined, isError: true };
+    render(<CstTransferForm source={SOURCE} />);
+    fill(RECIPIENT, '5');
+
+    expect(screen.getByTestId('transfer-review')).toHaveTextContent(
+      'forms.transfer.review.balanceUnchecked',
+    );
+    fireEvent.click(sendButton());
+    await waitFor(() => expect(mockTx.writeContract).toHaveBeenCalledTimes(1));
+  });
+
+  it('refuses a thousands separator rather than sending a thousandth of it', () => {
+    render(<CstTransferForm source={SOURCE} />);
+    fill(RECIPIENT, '1,000');
+    fireEvent.blur(amountField());
+
+    expect(
+      screen.getByText('forms.transfer.amount.errors.grouping(plain=1000,grouped=1,000)'),
+    ).toBeInTheDocument();
+    expect(screen.queryByTestId('transfer-review')).not.toBeInTheDocument();
   });
 
   it('has no accessibility violations', async () => {

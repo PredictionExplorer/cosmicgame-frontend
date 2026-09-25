@@ -73,9 +73,6 @@
     "form": {
       "title": "Gửi CST",
       "description": "Một giao dịch chuyển số lượng này từ Dự trữ truyền thông đến người nhận. Không thể hoàn tác.",
-      "amount": "Số lượng",
-      "amountHint": "Dùng dấu chấm hoặc dấu phẩy cho phần thập phân.",
-      "sends": "Sẽ gửi {amount}",
       "submit": "Gửi CST",
       "reserveHeading": "Dự trữ truyền thông",
       "reserve": "Địa chỉ quỹ dự trữ",
@@ -84,12 +81,7 @@
       "balanceError": "Không đọc được số dư CST của quỹ dự trữ.",
       "confirmed": "Đã gửi CST từ Dự trữ truyền thông.",
       "failed": "Không gửi được CST. Hãy kiểm tra ví rồi thử lại.",
-      "errors": {
-        "amount": "Nhập số lượng lớn hơn 0.",
-        "precision": "{decimals, plural, other {Dùng tối đa # chữ số thập phân.}}",
-        "grouping": "Không dùng dấu phân cách hàng nghìn: nhập 1000, không phải 1.000.",
-        "insufficient": "Quỹ dự trữ có ít CST hơn số lượng này."
-      }
+      "sendAmount": "Gửi {amount}"
     }
   }
 }

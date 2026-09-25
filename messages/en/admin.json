@@ -73,9 +73,6 @@
     "form": {
       "title": "Send CST",
       "description": "One transaction moves the amount from the Outreach Reserve to the recipient. It cannot be undone.",
-      "amount": "Amount",
-      "amountHint": "Use a dot or a comma for decimals.",
-      "sends": "Sends {amount}",
       "submit": "Send CST",
       "reserveHeading": "Outreach Reserve",
       "reserve": "Reserve address",
@@ -84,12 +81,7 @@
       "balanceError": "The reserve's CST balance could not be read.",
       "confirmed": "CST sent from the Outreach Reserve.",
       "failed": "The CST could not be sent. Check the wallet and try again.",
-      "errors": {
-        "amount": "Enter an amount greater than zero.",
-        "precision": "{decimals, plural, one {Use at most # decimal place.} other {Use at most # decimal places.}}",
-        "grouping": "Leave out thousands separators: type 1000, not 1,000.",
-        "insufficient": "The reserve holds less CST than this."
-      }
+      "sendAmount": "Send {amount}"
     }
   }
 }

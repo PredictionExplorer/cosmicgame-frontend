@@ -17,7 +17,7 @@ import { REQUIRED_CHAIN_NAME } from '@/lib/chainGuard';
 import { cn } from '@/lib/utils';
 import { formatAmount } from '@/utils/format';
 import { AmountField } from '@/components/tokens/transfer/AmountField';
-import { commaIsDecimal, parseTokenAmount } from '@/components/tokens/transfer/amount';
+import { parseTokenAmount } from '@/components/tokens/transfer/amount';
 import { Button } from '@/components/ui/button';
 import { FormField } from '@/components/ui/form-field';
 import { Input } from '@/components/ui/input';
@@ -73,10 +73,7 @@ export function EthContributionForm({ id, onSuccess, className }: EthContributio
   const amountRef = useRef<HTMLInputElement>(null);
   const urlRef = useRef<HTMLInputElement>(null);
 
-  const amount = parseTokenAmount(amountText, {
-    max: balance?.value ?? null,
-    decimalComma: commaIsDecimal(locale),
-  });
+  const amount = parseTokenAmount(amountText, { max: balance?.value ?? null, locale });
   const urlValid = isNoteUrl(note.url);
   const sendable = amount.error === null ? amount.wei : null;
   const amountLabel =
