@@ -155,6 +155,24 @@ html:is(:lang(zh), :lang(ja)) .headline {
   }
 }
 
+/*
+ * Wide screens: the exhibit grows. From 100rem the hero and its clock reach
+ * into the right gutter (up to 20rem past the container, never into the
+ * page's own gutter) and the art column takes all of it, while the copy
+ * keeps the header's edge and the width it has at 80rem. PLATE_SIZES
+ * (HeroArtShowcase) follows this width.
+ */
+@media (width >= 100rem) {
+  .heroGrid,
+  .clockBand {
+    margin-inline-end: calc(-1 * min(50vw - 40rem - var(--gutter), 20rem));
+  }
+
+  .heroGrid {
+    grid-template-columns: minmax(0, 31.25rem) minmax(0, 1fr);
+  }
+}
+
 /* ── Art plates and wall labels ───────────────────────────────────────── */
 
 .showcase,
