@@ -58,7 +58,7 @@ function ContentsList({ entries, activeId, expand, onNavigate, depth = 0 }: Cont
               )}
             >
               {depth === 0 && numbered ? (
-                <span aria-hidden className="w-5 shrink-0 tabular-nums text-subtle">
+                <span aria-hidden className="min-w-5 shrink-0 tabular-nums text-subtle">
                   {entry.number}
                 </span>
               ) : null}
@@ -85,9 +85,12 @@ function ContentsList({ entries, activeId, expand, onNavigate, depth = 0 }: Cont
   );
 }
 
+/** The words the rail itself needs: its label and its way back to the top. */
+type RailCopy = Pick<ContentsCopy, 'railLabel' | 'backToTopLabel'>;
+
 interface RailProps {
   entries: readonly ContentsEntry[];
-  copy: ContentsCopy;
+  copy: RailCopy;
   position: ReadingPosition;
   topId: string;
   footer?: ReactNode;
@@ -303,5 +306,28 @@ export function ReadingContents({
       />
       <ContentsSheet entries={entries} copy={copy} position={position} />
     </>
+  );
+}
+
+export interface ReadingRailProps {
+  entries: readonly ContentsEntry[];
+  copy: RailCopy;
+  /** The id of the article whose position and progress the rail follows. */
+  articleId: string;
+  /** Where "Back to top" goes: usually the H1's id. */
+  topId: string;
+  footer?: ReactNode;
+}
+
+/**
+ * The same sticky rail alone, for a reading page whose phones find their
+ * way through an in-flow contents list of their own (the Trust Center
+ * documents' "On this page" disclosure) rather than the floating sheet.
+ * Place it in the reading grid's rail column.
+ */
+export function ReadingRail({ entries, copy, articleId, topId, footer }: ReadingRailProps) {
+  const position = useReadingPosition(flattenContents(entries), articleId);
+  return (
+    <ContentsRail entries={entries} copy={copy} position={position} topId={topId} footer={footer} />
   );
 }

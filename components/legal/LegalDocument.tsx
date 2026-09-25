@@ -14,11 +14,11 @@ import { frontendFileHistory } from '@/content/legal/links';
 import { PageHeader } from '@/components/layout/PageHeader';
 import { ReviewedStamp } from '@/components/layout/ReviewedStamp';
 import { SiteLink } from '@/components/layout/SiteLink';
+import { ReadingRail } from '@/components/reading/ContentsNav';
 import { PageShell } from '@/components/ui/page-shell';
 import { cn } from '@/lib/utils';
 
 import { BackToContentsLink } from './BackToContentsLink';
-import { LegalContentsRail } from './LegalContentsRail';
 import { HeadingAnchor, NUMBERED_SECTION_CLASS, SECTION_NUMBER_CLASS } from './LegalProse';
 
 /** The H1's id: "Back to top" returns to the title, and the skip link keeps `#main`. */
@@ -26,6 +26,9 @@ const DOCUMENT_TITLE_ID = 'document-title';
 
 /** The phone contents disclosure, which "Back to contents" opens. */
 export const CONTENTS_ID = 'contents';
+
+/** The sections, whose reading progress the rail's hairline follows. */
+const DOCUMENT_BODY_ID = 'document-body';
 
 export interface LegalDocumentSection {
   /** The anchor: stable across locales, so `/terms#allocations` works in every language. */
@@ -68,8 +71,10 @@ export interface LegalDocumentProps {
  * (`--measure-document`), so every section rule, ledger, table, list and
  * callout ends on the same edge while paragraphs keep the prose measure
  * inside it. Every section is an anchor with its own link; the contents
- * follow the reader in a sticky rail from `lg` and fold into an "On this
- * page" disclosure on phones, which each section's way back reopens.
+ * follow the reader in the reading pages' one sticky rail from `lg`
+ * (`ReadingRail`: the section being read, the progress hairline, the way
+ * back to the top) and fold into an "On this page" disclosure on phones,
+ * which each section's way back reopens.
  *
  * Renders on the server; only the rail's scroll tracking and the way back
  * to the contents run on the client.
@@ -122,12 +127,15 @@ export function LegalDocument({
       />
 
       <div className="reading-grid">
-        <LegalContentsRail
-          items={items}
-          title={labels.contents}
-          backToTop={labels.backToTop}
-          topId={DOCUMENT_TITLE_ID}
-        />
+        {/* The grid cell runs the document's height, so the rail can stick inside it. */}
+        <div>
+          <ReadingRail
+            entries={items}
+            copy={{ railLabel: labels.contents, backToTopLabel: labels.backToTop }}
+            articleId={DOCUMENT_BODY_ID}
+            topId={DOCUMENT_TITLE_ID}
+          />
+        </div>
 
         <div className="min-w-0 max-w-[var(--measure-document)]">
           {summary ? <div className="mb-10 sm:mb-14">{summary}</div> : null}
@@ -164,6 +172,7 @@ export function LegalDocument({
           </details>
 
           <div
+            id={DOCUMENT_BODY_ID}
             data-numbered={numbered ? 'true' : undefined}
             className={cn(
               'group/legal',

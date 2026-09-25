@@ -29,6 +29,27 @@ function stickyOffset(): number {
 }
 
 /**
+ * The section being read: the last one whose heading has passed the reading
+ * `line` (px from the top of the viewport). Above the first heading nothing
+ * is. At the very bottom of the page the last one is, however short it is:
+ * a closing section too short to reach the line would otherwise never be.
+ */
+export function activeSectionId(
+  sections: readonly { id: string; top: number }[],
+  line: number,
+  atBottom: boolean,
+): string | null {
+  if (sections.length === 0) return null;
+  if (atBottom) return sections.at(-1)?.id ?? null;
+  let active: string | null = null;
+  for (const section of sections) {
+    if (section.top <= line) active = section.id;
+    else break;
+  }
+  return active;
+}
+
+/**
  * Scroll-spy for a long read: which section heading the reader is on (the
  * last one above the upper quarter of the screen, clear of the sticky
  * header), the share of the article already read, and whether an anchor
@@ -53,13 +74,13 @@ export function useReadingPosition(
     const measure = () => {
       frame = 0;
       const line = Math.max(offset + 16, window.innerHeight * 0.25);
-      let activeId: string | null = null;
-      for (const id of targets) {
+      const sections = targets.flatMap((id) => {
         const element = document.getElementById(id);
-        if (!element) continue;
-        if (element.getBoundingClientRect().top <= line) activeId = id;
-        else break;
-      }
+        return element ? [{ id, top: element.getBoundingClientRect().top }] : [];
+      });
+      const root = document.documentElement;
+      const atBottom = window.innerHeight + window.scrollY >= root.scrollHeight - 2;
+      const activeId = activeSectionId(sections, line, atBottom);
       const article = document.getElementById(articleId);
       let progress = 0;
       if (article) {
