@@ -17,6 +17,16 @@ import { TOUCH_TARGET_EXTENDED_CLASS } from '@/lib/touch-target';
 import { useCopyFeedback } from '@/hooks/useCopyFeedback';
 import { useContractAddresses } from '@/contexts/ContractAddressesContext';
 
+/**
+ * A shortened address ("0x1Ec1…⁠E990") is one word: the word joiner after the
+ * ellipsis leaves it no break opportunity, but the base `.font-mono` rule's
+ * `overflow-wrap: anywhere` would still split it between any two characters.
+ * Opting out keeps it whole, so a compact table that cannot fit it reports
+ * the overflow and becomes records instead of printing "0x360E…FB3 / 2".
+ * The full 42-character form keeps `anywhere`: it is wider than a phone.
+ */
+const SHORT_ADDRESS_CLASS = '[overflow-wrap:normal]';
+
 /** The zero address in a transfer: a token came into being, or was consumed. */
 const ZERO_ADDRESS_LABELS = {
   from: 'address.imprinted',
@@ -117,13 +127,15 @@ export function AddressChip({
   } else if (display === 'responsive') {
     content = (
       <span className="font-mono">
-        <span className="sm:hidden">{formatAddress(address)}</span>
+        <span className={cn('sm:hidden', SHORT_ADDRESS_CLASS)}>{formatAddress(address)}</span>
         <span className="hidden sm:inline">{full}</span>
       </span>
     );
+  } else if (display === 'full') {
+    content = <span className="font-mono">{full}</span>;
   } else {
     content = (
-      <span className="font-mono">{display === 'full' ? full : formatAddress(address)}</span>
+      <span className={cn('font-mono', SHORT_ADDRESS_CLASS)}>{formatAddress(address)}</span>
     );
   }
 

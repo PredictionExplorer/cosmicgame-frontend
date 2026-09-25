@@ -127,4 +127,18 @@ describe('AddressChip', () => {
     expect(link.querySelector('.sm\\:hidden')?.textContent).toMatch(SHORT);
     expect(link.querySelector('.sm\\:inline')?.textContent?.toLowerCase()).toBe(ADDRESS);
   });
+
+  it('keeps a short address one unbreakable word, even inside a table cell', () => {
+    // Regression: `.font-mono { overflow-wrap: anywhere }` split "0x360E…FB32"
+    // across two lines in compact tables, which then never became records.
+    const { rerender } = render(<AddressChip address={ADDRESS} variant="plain" />);
+    expect(screen.getByText(SHORT)).toHaveClass('[overflow-wrap:normal]');
+    rerender(<AddressChip address={ADDRESS} display="responsive" />);
+    expect(screen.getByText(SHORT)).toHaveClass('[overflow-wrap:normal]');
+    // The full form still wraps: 42 characters are wider than a phone.
+    rerender(<AddressChip address={ADDRESS} display="full" />);
+    expect(screen.getByRole('link').querySelector('.font-mono')).not.toHaveClass(
+      '[overflow-wrap:normal]',
+    );
+  });
 });
