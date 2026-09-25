@@ -377,7 +377,7 @@
     "leaderboard": {
       "description": "Mỗi người tham gia đạt số nét bút tối thiểu đã chọn đã chi bao nhiêu cho nét bút và được phân bổ bao nhiêu ETH, trên mọi chu kỳ. Số liệu tính bằng ETH; CST đã chi cùng phân bổ NFT và CST hiển thị bên dưới.",
       "minimumGestures": "Số nét bút tối thiểu",
-      "loadErrorTitle": "Không tải được bảng xếp hạng thành tích",
+      "loadErrorTitle": "Không tải được dữ liệu đã chi và đã nhận",
       "loadErrorMessage": "Dịch vụ thống kê không phản hồi. Hãy thử lại sau ít phút.",
       "empty": "Chưa có người tham gia nào khớp với bộ lọc này.",
       "columns": {
@@ -386,7 +386,6 @@
         "gestures": "Nét bút",
         "spent": "Đã chi (ETH)",
         "received": "Đã nhận (ETH)",
-        "net": "Ròng (ETH)",
         "allocations": "Phân bổ"
       }
     },
@@ -435,9 +434,6 @@
       "participants": "Người tham gia có từ {min} nét bút",
       "spent": "ETH đã chi cho nét bút",
       "received": "ETH nhận qua phân bổ",
-      "receivedMore": "Nhận nhiều ETH hơn đã chi",
-      "ofParticipants": "{part} trên {whole}",
-      "netHelp": "ETH nhận qua phân bổ trừ ETH đã chi cho nét bút. Không tính CST.",
       "cyclesHelp": "Số chu kỳ người này tham gia mà có nhận ít nhất một phân bổ.",
       "cycles": "{part} trên {whole, number} chu kỳ"
     }

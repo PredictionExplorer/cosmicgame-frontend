@@ -145,13 +145,13 @@ describe('CST supply series', () => {
 });
 
 describe('participant outcomes', () => {
-  it('totals spending beside what came back, and counts who received more', () => {
+  it('totals spending beside what came back, and nothing that compares them', () => {
     const totals = outcomeTotals([
       { TotalEthSpentEth: 2, EthWonEth: 5 },
       { TotalEthSpentEth: 3, EthWonEth: 0 },
       { TotalEthSpentEth: 1, EthWonEth: 1 },
     ] as never);
-    expect(totals).toEqual({ spent: 6, received: 6, receivedMore: 1 });
+    expect(totals).toEqual({ spent: 6, received: 6 });
   });
 
   it('reads a cycle’s retrieved share, and none when nothing was allocated', () => {

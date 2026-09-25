@@ -377,7 +377,7 @@
     "leaderboard": {
       "description": "選んだ筆数以上の参加者ごとに、すべてのサイクルで一筆に支払った額と、ETHの配分として受け取った額を示します。数値はETH建てで、支払ったCSTとNFT・CSTの配分はその下に表示します。",
       "minimumGestures": "最小筆数",
-      "loadErrorTitle": "実績の順位表を読み込めませんでした",
+      "loadErrorTitle": "支出と受領の記録を読み込めませんでした",
       "loadErrorMessage": "統計サービスから応答がありませんでした。しばらくしてからもう一度お試しください。",
       "empty": "この絞り込みに一致する参加者はまだいません。",
       "columns": {
@@ -386,7 +386,6 @@
         "gestures": "筆数",
         "spent": "支出（ETH）",
         "received": "受領（ETH）",
-        "net": "純額（ETH）",
         "allocations": "配分"
       }
     },
@@ -435,9 +434,6 @@
       "participants": "{min}筆以上の参加者",
       "spent": "一筆に支払ったETH",
       "received": "配分で受け取ったETH",
-      "receivedMore": "支払いより多くのETHを受け取った参加者",
-      "ofParticipants": "{whole}人中{part}人",
-      "netHelp": "配分で受け取ったETHから、一筆に支払ったETHを引いた額です。CSTは含みません。",
       "cyclesHelp": "この参加者が参加したサイクルのうち、少なくとも一つの配分を受け取ったサイクルの数です。",
       "cycles": "{whole, number}サイクル中{part}"
     }

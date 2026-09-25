@@ -377,7 +377,7 @@
     "leaderboard": {
       "description": "선택한 최소 제스처 수 이상인 참여자별로 모든 사이클에서 제스처에 지출한 금액과 ETH 배분으로 받은 금액입니다. 수치는 ETH 기준이며, 지출한 CST와 NFT·CST 배분은 그 아래에 표시됩니다.",
       "minimumGestures": "최소 제스처 수",
-      "loadErrorTitle": "성과 순위표를 불러오지 못했습니다",
+      "loadErrorTitle": "지출과 수령 내역을 불러오지 못했습니다",
       "loadErrorMessage": "통계 서비스가 응답하지 않았습니다. 잠시 후 다시 시도해 주세요.",
       "empty": "이 필터에 해당하는 참여자가 아직 없습니다.",
       "columns": {
@@ -386,7 +386,6 @@
         "gestures": "제스처",
         "spent": "지출(ETH)",
         "received": "수령(ETH)",
-        "net": "순액(ETH)",
         "allocations": "배분"
       }
     },
@@ -435,9 +434,6 @@
       "participants": "제스처 {min}회 이상 참여자",
       "spent": "제스처에 지출한 ETH",
       "received": "배분으로 받은 ETH",
-      "receivedMore": "지출보다 많은 ETH를 받은 참여자",
-      "ofParticipants": "{whole}명 중 {part}명",
-      "netHelp": "배분으로 받은 ETH에서 제스처에 지출한 ETH를 뺀 값입니다. CST는 포함하지 않습니다.",
       "cyclesHelp": "이 참여자가 참여한 사이클 중 배분을 한 번 이상 받은 사이클의 수입니다.",
       "cycles": "사이클 {whole, number}개 중 {part}개"
     }

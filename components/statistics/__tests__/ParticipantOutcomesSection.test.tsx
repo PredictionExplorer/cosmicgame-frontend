@@ -52,33 +52,38 @@ describe('ParticipantOutcomesSection', () => {
     expect(rows[3]).toHaveTextContent('7');
   });
 
-  it('totals spending beside what came back, and who received more', () => {
+  it('totals spending beside what came back, and nothing more', () => {
     render(<ParticipantOutcomesSection />);
     expect(screen.getByText(/^7(\.0+)? ETH$/)).toBeInTheDocument();
     expect(screen.getByText(/^6(\.0+)? ETH$/)).toBeInTheDocument();
-    expect(screen.getByText('1 of 3')).toBeInTheDocument();
   });
 
-  it('prints net figures signed and in the same ink, with no P&L sorts', () => {
+  // V307: a signed Net column and a "received more ETH than spent" count made the
+  // page a profit-and-loss board, and the ETH-only net read CST gestures as free.
+  it('shows no difference between spent and received, in figures or columns', () => {
     render(<ParticipantOutcomesSection />);
     const table = screen.getByRole('table');
-    expect(within(table).getByText(/^\+3(\.0+)?$/)).toBeInTheDocument();
-    expect(within(table).getAllByText(/^[-−]3(\.0+)?$/)).toHaveLength(1);
+    expect(screen.queryByText(/Received more|of 3$/)).not.toBeInTheDocument();
+    expect(
+      within(table)
+        .getAllByRole('columnheader')
+        .map((cell) => cell.textContent),
+    ).not.toContainEqual(expect.stringMatching(/^Net/));
+    expect(within(table).queryByText(/^[+−-]\d/)).toBeNull();
     expect(table.querySelector('[class*="emerald"], [class*="red-"]')).toBeNull();
     expect(screen.queryByText(/Biggest Spender|Net %/)).not.toBeInTheDocument();
   });
 
-  it('cannot be re-ranked by the difference or by cycles with an allocation', () => {
-    // Regression: sorting by Net or by the allocation rate, with a "#" column counting
-    // the rows, turned the table into a gain board or a hit-rate ranking.
+  it('cannot be re-ranked by cycles with an allocation', () => {
+    // Regression: sorting by the allocation rate, with a "#" column counting the
+    // rows, turned the table into a hit-rate ranking.
     render(<ParticipantOutcomesSection />);
     const table = screen.getByRole('table');
     const header = (name: RegExp) =>
       within(table)
         .getAllByRole('columnheader')
         .find((cell) => name.test(cell.textContent ?? ''))!;
-    // A sortable header carries aria-sort; these two carry none.
-    expect(header(/^Net/)).not.toHaveAttribute('aria-sort');
+    // A sortable header carries aria-sort; this one carries none.
     expect(header(/^Cycles with an allocation/)).not.toHaveAttribute('aria-sort');
     expect(header(/Gestures/)).toHaveAttribute('aria-sort');
     expect(within(table).queryByRole('columnheader', { name: '#' })).toBeNull();
@@ -96,7 +101,7 @@ describe('ParticipantOutcomesSection', () => {
   });
 
   it('prints a zero spend at the table precision of the figures beside it', () => {
-    // Regression: a bare "0" under Spent beside "0.0000" under Received and Net.
+    // Regression: a bare "0" under Spent beside "0.0000" under Received.
     mockUseOutcomes.mockReturnValue(
       ok([entry('0x4444444444444444444444444444444444444444', 3, 0, 0)]),
     );
@@ -105,12 +110,8 @@ describe('ParticipantOutcomesSection', () => {
     const figures = within(row!)
       .getAllByRole('cell')
       .map((cell) => cell.textContent);
-    // Participant, gestures, then Spent (with its CST caption), Received and Net.
-    expect(figures.slice(2, 5).map((text) => text?.slice(0, 6))).toEqual([
-      '0.0000',
-      '0.0000',
-      '0.0000',
-    ]);
+    // Participant, gestures, then Spent (with its CST caption) and Received.
+    expect(figures.slice(2, 4).map((text) => text?.slice(0, 6))).toEqual(['0.0000', '0.0000']);
   });
 
   it('refetches with the gesture floor a reader picks', async () => {

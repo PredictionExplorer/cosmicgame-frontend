@@ -377,7 +377,7 @@
     "leaderboard": {
       "description": "所有週期中，每位達到所選落筆次數的參與者在落筆上的支出，以及以 ETH 分配形式獲配的金額。數值以 ETH 計；CST 支出以及 NFT 與 CST 分配顯示在其下方。",
       "minimumGestures": "最低落筆次數",
-      "loadErrorTitle": "未能載入參與者表現榜",
+      "loadErrorTitle": "未能載入支出與獲配資料",
       "loadErrorMessage": "統計服務暫未回應，請稍後再試。",
       "empty": "暫無符合篩選條件的參與者。",
       "columns": {
@@ -386,7 +386,6 @@
         "gestures": "落筆次數",
         "spent": "支出（ETH）",
         "received": "獲配（ETH）",
-        "net": "淨值（ETH）",
         "allocations": "分配"
       }
     },
@@ -435,9 +434,6 @@
       "participants": "落筆 {min} 次以上的參與者",
       "spent": "落筆支出的 ETH",
       "received": "以分配獲配的 ETH",
-      "receivedMore": "獲配 ETH 多於支出",
-      "ofParticipants": "{whole} 位中的 {part} 位",
-      "netHelp": "以分配獲配的 ETH 減去落筆支出的 ETH，不含 CST。",
       "cyclesHelp": "該參與者參與的週期中，至少獲配一次分配的週期數。",
       "cycles": "{whole, number} 個週期中的 {part} 個"
     }

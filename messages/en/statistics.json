@@ -377,7 +377,7 @@
     "leaderboard": {
       "description": "What each participant with at least the chosen number of gestures spent on gestures, and what came back as ETH allocations, across every cycle. Figures are in ETH; CST spent and NFT and CST allocations are shown beneath them.",
       "minimumGestures": "Minimum gestures",
-      "loadErrorTitle": "Failed to load the performance leaderboard",
+      "loadErrorTitle": "Failed to load spending and allocations",
       "loadErrorMessage": "The statistics service did not respond. Try again in a moment.",
       "empty": "No participants match this filter yet.",
       "columns": {
@@ -386,7 +386,6 @@
         "gestures": "Gestures",
         "spent": "Spent (ETH)",
         "received": "Received (ETH)",
-        "net": "Net (ETH)",
         "allocations": "Allocations"
       }
     },
@@ -435,9 +434,6 @@
       "participants": "Participants with {min}+ gestures",
       "spent": "ETH spent on gestures",
       "received": "ETH received in allocations",
-      "receivedMore": "Received more ETH than spent",
-      "ofParticipants": "{part} of {whole}",
-      "netHelp": "ETH received in allocations minus ETH spent on gestures. CST is not included.",
       "cyclesHelp": "How many of the cycles this participant took part in brought them at least one allocation.",
       "cycles": "{part} of {whole, plural, one {# cycle} other {# cycles}}"
     }
