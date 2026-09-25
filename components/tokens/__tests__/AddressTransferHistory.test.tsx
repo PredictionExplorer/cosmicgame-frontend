@@ -135,6 +135,40 @@ describe('AddressTransferHistory — filters', () => {
   });
 });
 
+// Phone records repeated "Date", "Activity" and "Amount (CST)" on every row,
+// three lines a transfer: the activity cell is now each record's title, with
+// what moved and when, and the other columns leave the phone.
+describe('AddressTransferHistory — phone records', () => {
+  it('reads each CST transfer as one two-line record', () => {
+    render(<AddressTransferHistory asset="cst" address={ME} />);
+    const [first] = within(table()).getAllByRole('row').slice(1);
+    const cells = within(first!).getAllByRole('cell');
+    const activity = cells.find((cell) => cell.getAttribute('data-phone') === 'title');
+    expect(activity).toHaveTextContent('myPages.transferHistory.activity.imprinted');
+    expect(activity).toHaveTextContent('+176.00');
+    expect(within(activity!).getByRole('link', { name: /Sep|Oct/ })).toHaveAttribute(
+      'href',
+      expect.stringContaining('/tx/0x4'),
+    );
+    const secondary = cells.filter((cell) => cell.getAttribute('data-priority') === 'secondary');
+    expect(secondary).toHaveLength(cells.length - 1);
+  });
+
+  it('puts the artwork and its number on the first line of an NFT record', () => {
+    render(<AddressTransferHistory asset="nft" address={ME} />);
+    const [first] = within(table()).getAllByRole('row').slice(1);
+    const activity = within(first!)
+      .getAllByRole('cell')
+      .find((cell) => cell.getAttribute('data-phone') === 'title');
+    expect(within(activity!).getByRole('link', { name: /#000024/ })).toHaveAttribute(
+      'href',
+      '/detail/24',
+    );
+    // A transfer's other side, under the activity.
+    expect(within(activity!).getByRole('link', { name: /0x1Ec1/ })).toBeInTheDocument();
+  });
+});
+
 describe('AddressTransferHistory — CST', () => {
   it('leads with the totals: received, sent and the signed net change', () => {
     render(<AddressTransferHistory asset="cst" address={ME} />);

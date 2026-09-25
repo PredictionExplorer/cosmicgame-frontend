@@ -126,6 +126,22 @@ describe('DataTable column kinds', () => {
     expect(screen.getByText('None')).toBeInTheDocument();
   });
 
+  it('marks each cell with its column’s part in a phone record', () => {
+    render(
+      <DataTable
+        data={rows}
+        columns={[
+          { ...columns[0]!, phone: 'title' },
+          { ...columns[1]!, phone: 'omit' },
+          columns[2]!,
+        ]}
+        ariaLabel="Participants"
+      />,
+    );
+    const cells = within(bodyRows()[0]!).getAllByRole('cell');
+    expect(cells.map((cell) => cell.getAttribute('data-phone'))).toEqual(['title', 'omit', null]);
+  });
+
   it('drops a column no row has a value for', () => {
     render(
       <DataTable

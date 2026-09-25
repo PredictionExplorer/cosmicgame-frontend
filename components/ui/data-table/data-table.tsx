@@ -128,6 +128,14 @@ export interface DataTableColumn<T> {
 
   /** `secondary`: dropped from phone records. */
   priority?: ColumnPriority;
+  /**
+   * The column's part in a phone record: `title` opens each record with its
+   * value alone, unlabelled, at the start and in the foreground tier (the
+   * row's identity: an address, a cycle, a date), so the reader scans the
+   * records by it; `omit` leaves the value out of the record. A table that
+   * stays a table on a phone (`compact`) ignores it.
+   */
+  phone?: 'title' | 'omit';
   /** In a phone record, put the value under its label (long text). */
   stack?: boolean;
   /** Drop the column on a page where no row has a value, instead of an empty column. */
@@ -803,6 +811,7 @@ export function DataTable<T>({
                               nowrap={col.nowrap}
                               stack={col.column.stack}
                               priority={col.priority}
+                              data-phone={col.column.phone}
                               data-kind={col.kind}
                               className={cn(
                                 cellPadding,
