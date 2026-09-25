@@ -1,5 +1,6 @@
 'use client';
 
+import { useRef } from 'react';
 import * as DialogPrimitive from '@radix-ui/react-dialog';
 import { OctagonAlert } from 'lucide-react';
 import { useTranslations } from 'next-intl';
@@ -55,7 +56,13 @@ export interface ReleaseConfirmDialogProps {
  * the NFT (and, for a Cosmic Signature, its accumulated ETH), and it is
  * permanent: an NFT can be anchored only once. The dialog names the NFTs,
  * estimates the ETH, states the permanence in a critical callout, puts the
- * count on the destructive button, and focuses "Keep anchored" first.
+ * count on the destructive button, and focuses "Keep anchored" when it
+ * opens, so Enter never releases by accident. Once the release is running
+ * (the wallet's prompt is open, or the transaction is on its way) the
+ * dialog cannot be dismissed: "Keep anchored", the close control, Escape
+ * and a click outside all wait, so nobody closes it believing they
+ * cancelled a release the wallet can still sign. Declining in the wallet
+ * ends the wait.
  */
 export function ReleaseConfirmDialog({
   open,
@@ -72,12 +79,30 @@ export function ReleaseConfirmDialog({
   const listed = tokens?.slice(0, LISTED_TOKENS) ?? [];
   const hidden = (tokens?.length ?? 0) - listed.length;
   const isSignature = collection === 'cosmicSignature';
+  const keepRef = useRef<HTMLButtonElement>(null);
 
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
+    <Dialog
+      open={open}
+      onOpenChange={(next) => {
+        if (!next && busy) return;
+        onOpenChange(next);
+      }}
+    >
       <DialogContent
         className="w-[calc(100vw-2rem)] max-w-md gap-5 rounded-surface border-rule bg-surface-raised p-5 shadow-float sm:p-6"
         data-testid="release-confirm-dialog"
+        closeDisabled={busy}
+        onOpenAutoFocus={(event) => {
+          event.preventDefault();
+          keepRef.current?.focus();
+        }}
+        onEscapeKeyDown={(event) => {
+          if (busy) event.preventDefault();
+        }}
+        onInteractOutside={(event) => {
+          if (busy) event.preventDefault();
+        }}
       >
         <DialogHeader className="space-y-2 pr-8 text-left">
           <DialogPrimitive.Title className="type-heading-3 text-foreground">
@@ -147,7 +172,9 @@ export function ReleaseConfirmDialog({
 
         <DialogFooter className="gap-2 sm:space-x-0">
           <DialogClose asChild>
-            <Button variant="outline">{t('release.keep')}</Button>
+            <Button ref={keepRef} variant="outline" disabled={busy}>
+              {t('release.keep')}
+            </Button>
           </DialogClose>
           <Button variant="destructive" loading={busy} onClick={onConfirm}>
             {t('release.confirm', { count })}
