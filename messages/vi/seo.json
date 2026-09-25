@@ -316,7 +316,6 @@
     "description": "Đồng hồ, thứ hạng, phân bổ và mọi nét bút của chu kỳ đang diễn ra, cập nhật trực tiếp.",
     "cards": {
       "gestures": "Tổng số nét bút",
-      "signatureAllocation": "Phân bổ Signature",
       "opened": "Ngày mở"
     },
     "relatedAria": "Các trang liên quan đến chu kỳ hiện tại",

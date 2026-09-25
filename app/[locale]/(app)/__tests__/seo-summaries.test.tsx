@@ -447,17 +447,22 @@ describe('server-rendered page headers', () => {
     // The H1 names the cycle; no figure repeats its number.
     expect(document.querySelector('[data-figure="cycle"]')).toBeNull();
     expect(figureValue('gestures')).toHaveTextContent('17');
-    expect(figureValue('signatureAllocation')).toHaveTextContent('5.5000 ETH');
-    // The opening date is set a size down, with its zone (D082, D275).
-    expect(document.querySelector('[data-figure="opened"]')).toHaveTextContent(
-      /formats\.dateTime\.timeZone\(zone=UTC/,
+    // The Signature Allocation is the Last Gesture's figure in the standings, shown once (V227).
+    expect(document.querySelector('[data-figure="signatureAllocation"]')).toBeNull();
+    // The opening date is set a size down and names its zone itself, with no
+    // second zone caption under it (D082, D275, V237).
+    expect(figureValue('opened')).toHaveTextContent(/UTC/);
+    expect(document.querySelector('[data-figure="opened"]')).not.toHaveTextContent(
+      /formats\.dateTime\.timeZone/,
     );
     // One explanation pattern per screen (D079): the figures are plain labels,
     // the coined words below explain themselves in place.
     const cards = seoMessages.currentCycleSummary.cards;
-    for (const label of [cards.gestures, cards.signatureAllocation]) {
+    for (const label of [cards.gestures, cards.opened]) {
       expect(screen.getByText(label, { exact: true })).toBeInTheDocument();
     }
+    // The related pages close the page, after the rules (CurrentCycleRelated).
+    expect(screen.queryByText(seoMessages.currentCycleSummary.links.learn)).not.toBeInTheDocument();
     expect(screen.queryByRole('button')).not.toBeInTheDocument();
     // The page's one freshness stamp is in the body, which follows the live cycle.
     expect(screen.queryByRole('status')).not.toBeInTheDocument();
@@ -472,7 +477,6 @@ describe('server-rendered page headers', () => {
     // The status block names the cycle; the header does not repeat its number.
     expect(document.querySelector('[data-figure="cycle"]')).toBeNull();
     expect(figureValue('gestures')).toHaveTextContent('17');
-    expect(figureValue('signatureAllocation')).toHaveTextContent('5.5000 ETH');
   });
 
   it('prefers the client read over the server read', async () => {

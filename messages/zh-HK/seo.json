@@ -316,7 +316,6 @@
     "description": "正在進行的週期：倒數、席位、分配與每一次落筆，即時更新。",
     "cards": {
       "gestures": "落筆總次數",
-      "signatureAllocation": "簽名分配",
       "opened": "開啟時間"
     },
     "relatedAria": "目前週期相關頁面",

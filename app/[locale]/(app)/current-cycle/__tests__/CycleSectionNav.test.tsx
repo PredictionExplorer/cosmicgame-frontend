@@ -75,11 +75,22 @@ describe('CycleSectionNav', () => {
     expect(current()).toEqual(['#participants']);
   });
 
-  it('marks nothing once the reader is back above the first section, at the page header', () => {
-    spy([{ id: 'allocations', isIntersecting: true }]);
+  it('marks the first section from the top of the page, where the bar leads (V229)', () => {
+    // On load, before any section crosses the reading band.
+    expect(current()).toEqual(['#allocations']);
+    spy([{ id: 'participants', isIntersecting: true }]);
     placeFirstSection(window.innerHeight);
-    spy([{ id: 'allocations', isIntersecting: false }]);
-    expect(current()).toEqual([]);
+    spy([{ id: 'participants', isIntersecting: false }]);
+    expect(current()).toEqual(['#allocations']);
+  });
+
+  it('reads as an "On this page" bar of anchors, not a row of tabs (V229)', () => {
+    const nav = screen.getByRole('navigation', { name: 'currentCycle.sectionNav.aria' });
+    expect(nav.querySelector('[role="tablist"], [role="tab"]')).toBeNull();
+    for (const link of screen.getAllByRole('link')) {
+      expect(link.className).not.toMatch(/shadow-\[inset/);
+      expect(link).toHaveClass('type-label');
+    }
   });
 
   it('lands a jump just under the bar: the margin clears only the bar, not the header twice', () => {

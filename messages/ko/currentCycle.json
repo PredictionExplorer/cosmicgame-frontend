@@ -5,7 +5,8 @@
   },
   "status": {
     "notStarted": "시작 전",
-    "heading": "사이클 상태"
+    "heading": "사이클 상태",
+    "figuresHeading": "지금까지의 사이클"
   },
   "sectionNav": {
     "aria": "이 페이지의 내용",

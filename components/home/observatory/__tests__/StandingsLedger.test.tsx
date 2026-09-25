@@ -146,11 +146,11 @@ describe('StandingsLedger', () => {
     });
     expect(progress).toHaveAttribute('aria-valuenow', '24');
     expect(progress).toHaveClass('h-0.5');
-    // The time left reads as a clock in its own column, beside a label that
-    // never changes, so the row keeps its height while it ticks.
+    // The time left reads in the fixed grammar in its own column, beside a label
+    // that never changes, so the row keeps its height while it ticks.
     const countdown = screen.getByTestId('latest-endurance-countdown');
     expect(countdown).toHaveTextContent('home.observatory.ledger.passesRecordIn');
-    expect(within(countdown).getByText('00:45:01')).toHaveClass('whitespace-nowrap');
+    expect(within(countdown).getByText('45m 01s')).toHaveClass('whitespace-nowrap');
   });
 
   it('gives every line that ticks a fixed shape, never a wrapping flex row', () => {
@@ -219,12 +219,12 @@ describe('StandingsLedger', () => {
     render(<StandingsLedger {...baseProps} />);
     const chrono = screen.getByTestId('chrono-role-summary');
     const challenge = within(chrono).getByTestId('chrono-active-challenge');
-    // Both lines read as clocks, so the stacked figures share one format.
+    // Both lines read in the fixed grammar, so the stacked figures share one format.
     expect(within(challenge).getByTestId('chrono-challenge-segment')).toHaveTextContent(
-      /home\.observatory\.ledger\.challenge\.reign\s*00:50:00/,
+      /home\.observatory\.ledger\.challenge\.reign\s*50m 00s/,
     );
     expect(within(challenge).getByTestId('chrono-challenge-next-change')).toHaveTextContent(
-      /home\.observatory\.ledger\.challenge\.passesIn\s*01:10:01/,
+      /home\.observatory\.ledger\.challenge\.passesIn\s*1h 10m 01s/,
     );
     // The reign against the record on the row's own 2px rule: 3000s of 7201s.
     expect(

@@ -316,7 +316,6 @@
     "description": "正在进行的周期：倒计时、席位、分配与每一次落笔，实时更新。",
     "cards": {
       "gestures": "落笔总次数",
-      "signatureAllocation": "签名分配",
       "opened": "开启时间"
     },
     "relatedAria": "当前周期相关页面",

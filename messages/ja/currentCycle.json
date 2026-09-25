@@ -5,7 +5,8 @@
   },
   "status": {
     "notStarted": "未開始",
-    "heading": "サイクルの状況"
+    "heading": "サイクルの状況",
+    "figuresHeading": "これまでのサイクル"
   },
   "sectionNav": {
     "aria": "このページの内容",

@@ -316,7 +316,6 @@
     "description": "The clock, standings, allocations and every gesture of the cycle in progress, updated live.",
     "cards": {
       "gestures": "Total gestures",
-      "signatureAllocation": "Signature Allocation",
       "opened": "Opened"
     },
     "relatedAria": "Current cycle related pages",

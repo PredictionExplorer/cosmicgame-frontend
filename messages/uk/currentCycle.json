@@ -5,7 +5,8 @@
   },
   "status": {
     "notStarted": "Не розпочато",
-    "heading": "Стан циклу"
+    "heading": "Стан циклу",
+    "figuresHeading": "Цикл на цю мить"
   },
   "sectionNav": {
     "aria": "На цій сторінці",

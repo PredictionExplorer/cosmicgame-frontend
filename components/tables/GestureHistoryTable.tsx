@@ -211,7 +211,7 @@ function GestureInfo({ gesture }: { gesture: GestureHistory }) {
 function GrowingDuration({ since }: { since: number }) {
   const nowMs = useNow(1000);
   if (nowMs <= 0) return null;
-  return <Duration seconds={Math.floor(nowMs / 1000) - since} variant="clock" />;
+  return <Duration seconds={Math.floor(nowMs / 1000) - since} variant="fixed" />;
 }
 
 /**
@@ -327,9 +327,10 @@ const GestureHistoryTable = ({
           return hold == null ? (
             <GrowingDuration since={gesture.TimeStamp} />
           ) : (
-            // Fixed fields ("04:10:00", "1d 04:16:52"), so the right-aligned
-            // column lines up instead of dropping trailing zero units.
-            <Duration seconds={hold} variant="clock" />
+            // The page's one grammar for held times, in fixed fields ("4h 10m 00s",
+            // "1d 04h 16m"), so the right-aligned column lines up and the live hold
+            // reads as the standings' "Time held" does.
+            <Duration seconds={hold} variant="fixed" />
           );
         },
         sortable: true,

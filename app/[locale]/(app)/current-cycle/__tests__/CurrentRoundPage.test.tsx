@@ -1,4 +1,4 @@
-import { act, render, screen, checkA11y, fireEvent } from '@/test-utils';
+import { act, render, screen, checkA11y, fireEvent, within } from '@/test-utils';
 
 import CurrentRoundPage from '../CurrentRoundPage';
 
@@ -154,9 +154,63 @@ describe('CurrentRoundPage', () => {
   it('draws the header’s bottom rule while the body loads, before the section bar can', () => {
     mockUseDashboardInfo.mockReturnValue({ data: undefined, isLoading: true, isError: false });
     render(<CurrentRoundPage seoSummary={<header data-testid="summary" />} />);
-    const standIn = screen.getByTestId('summary').nextElementSibling;
+    const standIn = screen.getByTestId('header-rule-stand-in');
     expect(standIn).toHaveClass('border-b', 'border-rule');
     expect(standIn).toHaveAttribute('aria-hidden');
+    // The rule runs under the whole hero row: the header and the clock's place beside it.
+    const hero = standIn.previousElementSibling!;
+    expect(hero).toContainElement(screen.getByTestId('summary'));
+  });
+
+  it('sets the clock and its commit action beside the header, in the first screen (V227)', () => {
+    setupLoaded();
+    render(<CurrentRoundPage seoSummary={<header data-testid="summary" />} />);
+    const hero = screen.getByTestId('summary').closest('.grid')!;
+    const clock = screen.getByTestId('cycle-clock');
+    expect(hero).toContainElement(clock);
+    expect(within(clock).getByRole('timer')).toBeInTheDocument();
+    expect(
+      within(clock).getByRole('link', { name: /currentCycle\.hero\.cta\.makeGesture/ }),
+    ).toBeInTheDocument();
+    // The section bar follows the hero row.
+    expect(
+      hero.nextElementSibling?.nextElementSibling?.getAttribute('aria-labelledby'),
+    ).toBeTruthy();
+  });
+
+  it('heads the figures and the standings as two peer panels under one section (V228)', () => {
+    setupLoaded();
+    render(<CurrentRoundPage />);
+    const section = screen.getByRole('heading', { level: 2 }).closest('section')!;
+    const figures = within(section).getByRole('heading', {
+      level: 3,
+      name: 'currentCycle.status.figuresHeading',
+    });
+    expect(figures).toHaveClass('type-heading-3');
+    // The ledger is told to use the same panel level beside it.
+    expect(within(section).getByTestId('special-allocation-recipients')).toHaveAttribute(
+      'data-heading-level',
+      '3',
+    );
+  });
+
+  it('closes on the related pages after the rules', () => {
+    setupLoaded();
+    render(<CurrentRoundPage relatedPages={<nav data-testid="related" />} />);
+    const related = screen.getByTestId('related');
+    expect(
+      screen.getByTestId('cycle-details').compareDocumentPosition(related) &
+        Node.DOCUMENT_POSITION_FOLLOWING,
+    ).toBeTruthy();
+  });
+
+  it('reads how long the cycle has run in the page’s grammar for elapsed times (V224)', () => {
+    setupLoaded();
+    const { container } = render(<CurrentRoundPage />);
+    // Two hours in, as "2h 00m 00s", not a truncated "2h".
+    expect(container.querySelector('[data-figure="running"] dd')?.textContent).toMatch(
+      /^2h\s0\dm\s\d\ds$/,
+    );
   });
 
   it('carries one freshness stamp, on the status column only while there are no standings', () => {

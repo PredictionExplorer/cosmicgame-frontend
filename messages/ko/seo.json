@@ -316,7 +316,6 @@
     "description": "진행 중인 사이클의 카운트다운, 현황, 배분, 모든 제스처를 실시간으로 보여 줍니다.",
     "cards": {
       "gestures": "총 제스처 수",
-      "signatureAllocation": "시그니처 배분",
       "opened": "시작 시각"
     },
     "relatedAria": "현재 사이클 관련 페이지",

@@ -70,7 +70,9 @@ export function CycleParticipants({
           />
         }
       />
-      <Tabs defaultValue={VIEWS[0]}>
+      {/* Three short ledgers: the view row, its note and the ledger share the ledgers'
+          reading width, so the section reads as one deliberate narrower block. */}
+      <Tabs defaultValue={VIEWS[0]} className="max-w-4xl">
         <TabsList variant="underline" scroll aria-labelledby={headingId} className="min-w-full">
           {VIEWS.map((view) => (
             <TabsTrigger key={view} value={view}>

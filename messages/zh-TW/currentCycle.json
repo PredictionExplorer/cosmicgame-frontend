@@ -5,7 +5,8 @@
   },
   "status": {
     "notStarted": "尚未開始",
-    "heading": "週期狀態"
+    "heading": "週期狀態",
+    "figuresHeading": "本週期至今"
   },
   "sectionNav": {
     "aria": "本頁內容",

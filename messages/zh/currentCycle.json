@@ -5,7 +5,8 @@
   },
   "status": {
     "notStarted": "尚未开始",
-    "heading": "周期状态"
+    "heading": "周期状态",
+    "figuresHeading": "本周期至今"
   },
   "sectionNav": {
     "aria": "本页内容",

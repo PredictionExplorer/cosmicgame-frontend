@@ -316,7 +316,6 @@
     "description": "進行中のサイクルのカウントダウン、順位、配分、すべての一筆をリアルタイムで表示します。",
     "cards": {
       "gestures": "一筆の総数",
-      "signatureAllocation": "シグネチャー配分",
       "opened": "開始日時"
     },
     "relatedAria": "現在のサイクルの関連ページ",

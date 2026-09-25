@@ -245,6 +245,7 @@ function TimeHeld({
       ) : (
         <Duration
           seconds={seconds}
+          variant="fixed"
           className={cn('type-figure-sm', live ? 'text-live' : 'text-foreground')}
         />
       )}
@@ -298,9 +299,11 @@ interface LedgerFact {
  * What changes a row next, as label and figure lines: the label wraps and
  * the figure sits in its own column and never does, so a ticking figure can
  * never re-wrap the line and move the desk (the ledger is measured against
- * the rows of the page, not its own content). Every figure reads as a clock
- * ("1d 01:12:05" over "8d 00:24:38"), so stacked lines share one format,
- * their digits align, and a width holds while it ticks.
+ * the rows of the page, not its own content). Every figure is a held or
+ * elapsed time, or how long until one is passed, so it reads in the fixed
+ * grammar the "Time held" column and the gesture log use ("1d 01h 12m" over
+ * "8d 00h 24m"): stacked lines share one format, their digits align, and a
+ * width holds while it ticks. Only the finalization clock reads as a clock.
  */
 function LedgerFacts({ facts }: { facts: LedgerFact[] }) {
   return (
@@ -313,7 +316,7 @@ function LedgerFacts({ facts }: { facts: LedgerFact[] }) {
         >
           <dt className="type-caption min-w-0 text-muted-foreground">{fact.label}</dt>
           <dd className="type-caption min-w-0 text-end text-foreground">
-            <Duration seconds={fact.seconds} variant="clock" />
+            <Duration seconds={fact.seconds} variant="fixed" />
           </dd>
         </div>
       ))}

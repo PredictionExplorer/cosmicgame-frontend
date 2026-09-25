@@ -5,7 +5,8 @@
   },
   "status": {
     "notStarted": "Chưa bắt đầu",
-    "heading": "Trạng thái chu kỳ"
+    "heading": "Trạng thái chu kỳ",
+    "figuresHeading": "Chu kỳ đến nay"
   },
   "sectionNav": {
     "aria": "Trên trang này",

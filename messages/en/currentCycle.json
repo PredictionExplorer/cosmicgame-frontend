@@ -5,7 +5,8 @@
   },
   "status": {
     "notStarted": "Not started",
-    "heading": "Cycle status"
+    "heading": "Cycle status",
+    "figuresHeading": "The cycle so far"
   },
   "sectionNav": {
     "aria": "On this page",
