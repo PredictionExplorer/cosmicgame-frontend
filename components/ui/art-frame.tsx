@@ -13,6 +13,7 @@ import Image from 'next/image';
 import { ImageOff } from 'lucide-react';
 
 import { cn } from '@/lib/utils';
+import { mediaFailoverUrl, mediaPathKey } from '@/utils/urls';
 
 /*
  * The art plate. Every Signature hangs on its own pure-black plate at the
@@ -80,10 +81,15 @@ function isUsable(source: ArtSource | null | undefined): source is ArtSource {
   return Array.isArray(source) && source.some((rendition) => rendition.src.length > 0);
 }
 
+/**
+ * A source's identity for the chain. Media URLs compare by path, so the same
+ * files on another media server are the same artwork: a painted plate is not
+ * reset to its placeholder when only the server changes.
+ */
 function sourceKey(source: ArtSource): string {
   return typeof source === 'string'
-    ? source
-    : source.map((rendition) => `${rendition.src} ${rendition.width}w`).join(',');
+    ? mediaPathKey(source)
+    : source.map((rendition) => `${mediaPathKey(rendition.src)} ${rendition.width}w`).join(',');
 }
 
 /** Renditions with a URL, narrowest first. */
@@ -114,6 +120,12 @@ interface ChainState {
   step: number;
   /** URLs that failed, so a later fallback equal to one of them is skipped. */
   failed: readonly string[];
+  /**
+   * The failed file of this step on the next media server, tried once
+   * before the chain moves on (a media server that is down, not a file that
+   * is missing, is what this recovers from).
+   */
+  mirror: string | null;
   loaded: boolean;
 }
 
@@ -132,41 +144,51 @@ export interface ArtSourceChain {
  * to the next, and the chain ends in `unavailable`; new sources start over.
  * A fallback equal to a URL that already failed (the rendition the browser
  * picked from a responsive set) is skipped rather than requested twice.
+ * A file that fails on one media server is tried once on the next before
+ * the chain moves on: the only place media fails over, never during render,
+ * so server and client always agree on every URL.
  */
 export function useArtSourceChain(
   sources: readonly (ArtSource | null | undefined)[],
 ): ArtSourceChain {
   const usable = sources.filter(isUsable);
   const key = usable.map(sourceKey).join('|');
-  const [state, setState] = useState<ChainState>({ key, step: 0, failed: [], loaded: false });
+  const [state, setState] = useState<ChainState>({
+    key,
+    step: 0,
+    failed: [],
+    mirror: null,
+    loaded: false,
+  });
 
   let current = state;
   if (state.key !== key) {
-    current = { key, step: 0, failed: [], loaded: false };
+    current = { key, step: 0, failed: [], mirror: null, loaded: false };
     setState(current);
   }
 
+  // While a step's copy on the next media server is showing, the step stays
+  // put (its own URL has failed, so the skip below would pass it).
   let index = current.step;
-  while (index < usable.length) {
+  while (current.mirror === null && index < usable.length) {
     const candidate = usable[index];
     if (typeof candidate !== 'string' || !current.failed.includes(candidate)) break;
     index += 1;
   }
-  const source = usable[index] ?? null;
+  const source = current.mirror ?? usable[index] ?? null;
 
   const onError = (event: SyntheticEvent<HTMLImageElement>) => {
     const image = event.currentTarget;
     const failedUrl = image.currentSrc || image.getAttribute('src') || '';
-    setState((previous) =>
-      previous.key !== key || previous.step > index
-        ? previous
-        : {
-            key,
-            step: index + 1,
-            failed: failedUrl ? [...previous.failed, failedUrl] : previous.failed,
-            loaded: false,
-          },
-    );
+    setState((previous) => {
+      if (previous.key !== key || previous.step > index) return previous;
+      const failed = failedUrl ? [...previous.failed, failedUrl] : previous.failed;
+      const mirror = previous.mirror === null && failedUrl ? mediaFailoverUrl(failedUrl) : null;
+      if (mirror && !failed.includes(mirror)) {
+        return { key, step: index, failed, mirror, loaded: false };
+      }
+      return { key, step: index + 1, failed, mirror: null, loaded: false };
+    });
   };
 
   const onLoad = () => {

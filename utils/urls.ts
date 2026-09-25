@@ -1,19 +1,63 @@
 import { networkConfig } from '@/config/networks';
 import { LANDING_ORIGIN } from '@/lib/hostRouting';
 import { BRAND_ICON_PATHS } from '@/lib/og/brandIcons';
-import { getApiOrigin } from '@/lib/serverRotation';
+import { apiBaseUrls } from '@/lib/serverRotation';
 
 const EXPLORER_BASE = networkConfig.explorerUrl.replace(/\/$/, '');
 
+function originOf(url: string): string | null {
+  try {
+    return new URL(url).origin;
+  } catch {
+    return null;
+  }
+}
+
 /**
- * NFT media origin (no path). The rotated API servers serve the media too
- * (`/images/...`), so media follows the same hourly rotation and failover as
- * API calls instead of pinning a dedicated single-server media host.
- * Falls back to the per-environment `nftApiUrl` when no API base is
- * configured.
+ * Every server that serves the NFT media (`/images/...`, `/metadata/...`):
+ * the configured API servers, which serve both, in their configured order.
  */
+export const MEDIA_ORIGINS: readonly string[] = [
+  ...new Set(apiBaseUrls.map(originOf).filter((origin): origin is string => !!origin)),
+];
+
+/**
+ * The one origin media URLs are built on: the first media server, else the
+ * per-environment `nftApiUrl`. Deliberately not the API's hourly rotation
+ * pick. A media URL is rendered on the server and again while hydrating, and
+ * a page cached in one hour and hydrated in the next would swap every
+ * image's host after it painted, blanking the whole gallery while each file
+ * downloaded a second time; a rotating host also defeats the browser cache
+ * every hour. Failover happens only when an image actually fails, in the
+ * art frame's source chain ({@link mediaFailoverUrl}).
+ */
+export const MEDIA_ORIGIN: string =
+  MEDIA_ORIGINS[0] ?? (networkConfig.nftApiUrl || '').replace(/\/+$/, '');
+
 function nftCdnOrigin(): string {
-  return getApiOrigin() || (networkConfig.nftApiUrl || '').replace(/\/+$/, '');
+  return MEDIA_ORIGIN;
+}
+
+/**
+ * The same media file on the next media server in the list, for an image
+ * that failed to load (the art frame tries it once before its next source).
+ * Null when the URL is not on a media server or there is no other server.
+ */
+export function mediaFailoverUrl(url: string): string | null {
+  const index = MEDIA_ORIGINS.findIndex((origin) => url.startsWith(`${origin}/`));
+  if (index === -1 || MEDIA_ORIGINS.length < 2) return null;
+  const failed = MEDIA_ORIGINS[index]!;
+  const next = MEDIA_ORIGINS[(index + 1) % MEDIA_ORIGINS.length]!;
+  return `${next}${url.slice(failed.length)}`;
+}
+
+/**
+ * A media URL without its server's origin (`/images/new/…`), so two copies of
+ * one file on different media servers compare equal. Other URLs unchanged.
+ */
+export function mediaPathKey(url: string): string {
+  const origin = MEDIA_ORIGINS.find((candidate) => url.startsWith(`${candidate}/`));
+  return origin ? url.slice(origin.length) : url;
 }
 
 /** Returns a block-explorer URL for a tx hash, address, or token. */

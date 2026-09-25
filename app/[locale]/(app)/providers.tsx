@@ -28,7 +28,8 @@ import { installGlobalErrorHandlers } from '@/utils/globalErrorHandlers';
 import { getClientBuildInfo } from '@/lib/buildInfo';
 import { makeQueryClient } from '@/lib/queryClient';
 import { baseTransition } from '@/lib/motion';
-import { getApiBase, getApiOrigin, getRpcUrl } from '@/lib/serverRotation';
+import { getApiBase, getRpcUrl } from '@/lib/serverRotation';
+import { MEDIA_ORIGIN } from '@/utils/urls';
 
 // NOTE: RainbowKit (provider, modal, stylesheet) is intentionally NOT
 // imported here. It lives behind WalletUiProvider's dynamic import so the
@@ -143,7 +144,7 @@ export function Providers({
         `  Chain ID: ${networkConfig.chainId}\n` +
         `  RPC URL: ${rpcDisplay}\n` +
         `  API URL: ${networkConfig.apiUrl}\n` +
-        `  NFT media: ${getApiOrigin() || networkConfig.nftApiUrl} (follows API rotation)` +
+        `  NFT media: ${MEDIA_ORIGIN} (fixed; an image that fails retries the next server)` +
         buildLines,
     );
   }, []);
