@@ -223,6 +223,25 @@ describe('DataTable header help', () => {
     );
     expect(plain!.firstElementChild).not.toHaveClass('pointer-coarse:gap-5');
   });
+
+  // Regression: the header was named by its label and its help button
+  // together ("Gestures Explain column: Gestures"), which a screen reader
+  // repeated every time the reader moved into the column.
+  it('names a header with help by its words alone, keeping the help button operable', () => {
+    const withHelp: DataTableColumn<Row>[] = [columns[0]!, { ...columns[1]!, help: 'Made.' }];
+    render(
+      <DataTable ariaLabel="Holders" data={rows} columns={withHelp} getRowKey={(r) => r.id} />,
+    );
+    const header = screen.getByRole('columnheader', { name: 'Gestures' });
+    expect(header).toHaveAttribute('aria-label', 'Gestures');
+    expect(
+      within(header).getByRole('button', {
+        name: 'tables.tableHeaderHelp.explainColumn(column=Gestures)',
+      }),
+    ).toBeInTheDocument();
+    // A header without help keeps its name from its content.
+    expect(screen.getByRole('columnheader', { name: 'Owner' })).not.toHaveAttribute('aria-label');
+  });
 });
 
 describe('nextSort', () => {
@@ -402,6 +421,74 @@ describe('DataTable rows', () => {
     expect(mockPush).toHaveBeenCalledWith('/records/2');
   });
 
+  it('leaves a modified click on a row to the browser', async () => {
+    const user = userEvent.setup();
+    render(
+      <DataTable
+        ariaLabel="Holders"
+        data={rows}
+        columns={columns}
+        getRowKey={(r) => r.id}
+        getRowHref={(r) => `/records/${r.id}`}
+      />,
+    );
+    await user.keyboard('{Meta>}');
+    await user.click(screen.getByText('1,200'));
+    await user.keyboard('{/Meta}');
+    expect(mockPush).not.toHaveBeenCalled();
+  });
+
+  // Regression: an address (or a proof-linked date) in the row-link column
+  // rendered its own link inside the row link, an <a> in an <a>.
+  it('drops a kind’s own link where the row link already wraps the value', () => {
+    const { container } = render(
+      <DataTable
+        ariaLabel="Holders"
+        data={rows}
+        columns={columns}
+        getRowKey={(r) => r.id}
+        getRowHref={(r) => `/records/${r.id}`}
+      />,
+    );
+    expect(container.querySelector('a a')).toBeNull();
+    const firstCell = container.querySelector('tbody tr:first-child td');
+    expect(firstCell?.querySelectorAll('a')).toHaveLength(1);
+    expect(firstCell?.querySelector('a')).toHaveAttribute('href', '/records/1');
+
+    // Without a row link the address keeps its own profile link.
+    const plain = render(
+      <DataTable ariaLabel="Owners" data={rows} columns={columns} getRowKey={(r) => r.id} />,
+    );
+    expect(plain.container.querySelector('tbody tr:first-child td a')).toHaveAttribute(
+      'href',
+      `/user/${address(1)}`,
+    );
+  });
+
+  it('warns in development when a custom cell nests a link in the row link', () => {
+    const error = jest.spyOn(console, 'error').mockImplementation(() => undefined);
+    render(
+      <DataTable
+        ariaLabel="Holders"
+        data={rows}
+        columns={[
+          {
+            id: 'owner',
+            kind: 'text',
+            header: 'Owner',
+            value: (r) => r.owner,
+            cell: (r) => <a href={`/elsewhere/${r.id}`}>Elsewhere</a>,
+          },
+          ...columns.slice(1),
+        ]}
+        getRowKey={(r) => r.id}
+        getRowHref={(r) => `/records/${r.id}`}
+      />,
+    );
+    expect(error).toHaveBeenCalledWith(expect.stringMatching(/link inside the row link/));
+    error.mockRestore();
+  });
+
   it('marks the connected wallet row in place and offers to jump to its page', async () => {
     const user = userEvent.setup();
     const data = manyRows(25);
@@ -424,6 +511,49 @@ describe('DataTable rows', () => {
     expect(
       screen.queryByRole('button', { name: 'tables.currentRow.show' }),
     ).not.toBeInTheDocument();
+  });
+
+  it('moves focus to the connected wallet row after "Show my row", whose button is gone', async () => {
+    // Regression: the button unmounted under the reader's focus, which fell
+    // to the document body, far from the row it had just revealed.
+    const user = userEvent.setup();
+    render(
+      <DataTable
+        ariaLabel="Holders"
+        data={manyRows(25)}
+        columns={columns}
+        getRowKey={(r) => r.id}
+        isCurrentRow={(r) => r.id === 23}
+      />,
+    );
+
+    screen.getByRole('button', { name: 'tables.currentRow.show' }).focus();
+    await user.keyboard('{Enter}');
+
+    const current = bodyRows().find((row) => row.getAttribute('data-current') === 'true');
+    // Its first link: the owner's address.
+    expect(current).toContainElement(document.activeElement as HTMLElement);
+    expect(document.activeElement?.tagName).toBe('A');
+  });
+
+  it('focuses the row itself after "Show my row" when it holds no link', async () => {
+    const user = userEvent.setup();
+    render(
+      <DataTable
+        ariaLabel="Holders"
+        data={manyRows(25)}
+        columns={columns.slice(1)}
+        getRowKey={(r) => r.id}
+        isCurrentRow={(r) => r.id === 23}
+      />,
+    );
+
+    await user.click(screen.getByRole('button', { name: 'tables.currentRow.show' }));
+
+    const current = bodyRows().find((row) => row.getAttribute('data-current') === 'true');
+    expect(document.activeElement).toBe(current);
+    // Focusable from script only: the row is never a tab stop.
+    expect(current).toHaveAttribute('tabindex', '-1');
   });
 
   it('expands a row to its details', async () => {
@@ -598,6 +728,104 @@ describe('DataTable layout and naming', () => {
   it('is named by its aria label without a title', () => {
     render(<DataTable ariaLabel="Holders" data={rows} columns={columns} />);
     expect(screen.getByRole('table', { name: 'Holders' })).toBeInTheDocument();
+  });
+
+  // Regression: a ledger's intro was 14px set 4px under its H2 while every
+  // other section's was 16px at the section header's gap.
+  it('heads a ledger with the site’s section header, so its intro matches every section', () => {
+    render(
+      <DataTable
+        ariaLabel="Holders"
+        title="Holders"
+        description="Everyone who holds one."
+        data={rows}
+        columns={columns}
+      />,
+    );
+    const heading = screen.getByRole('heading', { level: 2, name: 'Holders' });
+    expect(heading).toHaveClass('type-section');
+    const intro = screen.getByText('Everyone who holds one.');
+    expect(intro).toHaveClass('type-body-md', 'mt-2');
+    expect(heading.closest('header')).toContainElement(intro);
+  });
+
+  it('sets an intro inside a panel at the panel size', () => {
+    render(
+      <DataTable
+        ariaLabel="Holders"
+        title="Holders"
+        headingLevel={3}
+        description="Everyone who holds one."
+        data={rows}
+        columns={columns}
+      />,
+    );
+    expect(screen.getByRole('heading', { level: 3, name: 'Holders' })).toHaveClass(
+      'type-heading-3',
+    );
+    expect(screen.getByText('Everyone who holds one.')).toHaveClass('type-body-sm');
+  });
+
+  // Regression: a column with a JSX header and no label printed its
+  // developer id ("quickView") beside the value in every phone record.
+  it('never labels a phone record with a column id', () => {
+    const warn = jest.spyOn(console, 'warn').mockImplementation(() => undefined);
+    const { container } = render(
+      <DataTable
+        ariaLabel="Holders"
+        data={rows}
+        columns={[
+          columns[0]!,
+          {
+            id: 'quickView',
+            kind: 'text',
+            header: <span className="sr-only">Quick view</span>,
+            value: () => 'Open',
+          },
+        ]}
+      />,
+    );
+    const cell = container.querySelector('tbody tr:first-child td:nth-child(2)');
+    expect(cell).toHaveAttribute('data-label', '');
+    expect(warn).toHaveBeenCalledWith(expect.stringMatching(/"quickView".*needs a `label`/));
+    warn.mockRestore();
+  });
+
+  it('opens each phone record on the column that names it', () => {
+    const { container } = render(
+      <DataTable
+        ariaLabel="Holders"
+        data={rows}
+        columns={[{ ...columns[0]!, phone: 'title' }, ...columns.slice(1)]}
+        layout="cards"
+      />,
+    );
+    expect(container.querySelector('tbody tr:first-child td')).toHaveAttribute(
+      'data-phone',
+      'title',
+    );
+  });
+
+  it('shows a true "none" as a dash named None, and leaves it out of a phone record', () => {
+    const { container } = render(
+      <DataTable
+        ariaLabel="Holders"
+        data={rows}
+        columns={[
+          columns[0]!,
+          { ...columns[2]!, whenBlank: 'none' },
+          { ...columns[1]!, whenBlank: 'unknown' },
+        ]}
+        getRowKey={(r) => r.id}
+        layout="cards"
+      />,
+    );
+    const [, none, unknown] = [...container.querySelectorAll('tbody tr:nth-child(3) td')];
+    expect(none).toHaveTextContent('tables.status.none');
+    expect(none).toHaveAttribute('data-phone', 'omit');
+    // A value that could not be read stays in the record, as unavailable.
+    expect(unknown).toHaveTextContent('tables.status.unavailable');
+    expect(unknown).not.toHaveAttribute('data-phone');
   });
 });
 

@@ -419,23 +419,29 @@ table is wider than its column.
 wrapping, figures, renderer and first sort direction. Alignment reaches the header and
 its cells as one `data-align`, so the two cannot disagree.
 
-| Kind                                     | Align  | Renders with                          |
-| ---------------------------------------- | ------ | ------------------------------------- |
-| `text`, `link`                           | start  | text, or a same-tab `Link`            |
-| `address`                                | start  | `<AddressChip variant="plain">`       |
-| `datetime`                               | start  | `<DateTime>`, linked to its tx proof  |
-| `amount`, `count`, `percent`, `duration` | end    | the wave-1 formatters, tabular        |
-| `status`                                 | center | a status icon (the only centred kind) |
+| Kind                                     | Align  | Renders with                                                       |
+| ---------------------------------------- | ------ | ------------------------------------------------------------------ |
+| `text`, `link`                           | start  | text, or a same-tab `Link`                                         |
+| `address`                                | start  | `<AddressChip variant="plain">`                                    |
+| `datetime`                               | start  | `<DateTime>`, linked to its tx proof                               |
+| `amount`, `count`, `percent`, `duration` | end    | the wave-1 formatters, tabular                                     |
+| `status`                                 | center | its value as text (the only centred kind); give `cell` for an icon |
 
 `cell` replaces the renderer while the kind keeps the alignment. `value` is what sorts,
 and blank values sort last in both directions. Give `align` only to an unusual column.
+A blank value shows nothing (`whenBlank: 'empty'`, not applicable), an "Unavailable"
+dash (`'unknown'`, could not be read; the numeric kinds' default) or a "None" dash
+(`'none'`, truly none, such as a largest Signature Allocation for a wallet that never
+received one), which a phone record leaves out.
 
 **Headers.** A header says what its column holds in a few sentence-case words
 ("Anchored now", "Distributed (ETH)"), and the same words label the value in a phone
-record: give `label` only when the header is not a string or sits under a group. Keep
-`help` for a derived figure whose header cannot say how it is computed ("ETH received",
-"Largest Signature Allocation"); a column that names an address or a plain count needs
-none. Consecutive columns that share a word or a unit take a `group` heading, a row
+record: give `label` only when the header is not a string or sits under a group (a
+header that is not a string without one gets an empty label and a development
+warning, never its id). Keep `help` for a derived figure whose header cannot say how it
+is computed ("ETH received", "Largest Signature Allocation"); a column that names an
+address or a plain count needs none. A header with help is named by its words alone,
+so a screen reader does not repeat "Explain column" with every cell. Consecutive columns that share a word or a unit take a `group` heading, a row
 above that spans them ("ETH by track" over Signature Allocation, Chrono-Warrior, …), so
 each sub-header stays on one or two lines; give each grouped column a `label` that reads
 alone ("Chrono-Warrior (ETH)") for its phone record.
@@ -445,9 +451,13 @@ at one reading width, 56rem, so a row is not a 1,200px scan from its address to 
 figure and short ledgers stacked on a page share a right edge. `width="fill"` runs the
 full width (a moderation list whose message takes what is left). A page that stacks
 short and wide ledgers sets one width for all of them with `<DataTableWidth value="fill">`
-(the anchoring tabs); a table's own `width` still wins. Only the table stops at the
-reading width: its empty and error states take the section's full width, so they stay
-centred on it.
+(the anchoring tabs, a participant's profile); a table's own `width` still wins. Only the
+table stops at the reading width: its empty and error states take the section's full
+width, so they stay centred on it.
+
+**Title.** `title`, `description` and `actions` render through `SectionHeader` (the page
+tier for an `h2`, the panel tier inside a section), so a ledger's heading, intro and
+spacing match every other section on its page.
 
 **Amounts.** An amount column prints the table precision (ETH 4 digits, CST 2), zero
 included ("0.0000" under "0.1562"). Dust too small for it reads as a bound ("<0.0001")
@@ -462,9 +472,15 @@ spaces never widens its column. Never hide the rest of a value behind a hover to
 by one `--rule`, with no box, fill or rule inside them. The label (the column header in
 sentence case, 13px, `text-subtle`) sits at the start and the 14px value at the end, and
 anything inside a value wraps between words rather than push the record past the
-screen. `stack` puts long text under its label. Blank cells and `priority: 'secondary'`
-columns drop out, so no empty labelled line is left behind. The connected wallet's
-record carries its 2px accent rule down the start edge.
+screen. `stack` puts long text under its label. Blank cells, "None" dashes and
+`priority: 'secondary'` columns drop out, so no empty labelled line is left behind.
+`phone: 'title'` opens each record with the column that names the row (an address, a
+cycle, a date, the allocation a record is), unlabelled and in the foreground tier, so a
+reader scans records by it; `phone: 'omit'` leaves a column out of records only. Keep a
+wide ledger's phone record to its essentials with `priority: 'secondary'` (the cycle
+index shows the cycle, its date, recipient, Signature Allocation and gestures; the
+per-track breakdown is one tap away). The connected wallet's record carries its 2px
+accent rule down the start edge.
 
 The records keep table semantics: every part of `ResponsiveTable` and the static `Table`
 states its role (`table`, `rowgroup`, `row`, `columnheader`, `cell`), because WebKit drops
@@ -495,7 +511,10 @@ line.
 with the range ("1–20 of 1,140") and hides itself when everything fits on one page. The
 visible range is not a live region, because a live table's total changes on its own; a
 screen reader hears the new range once, after the reader pages. "Go to page" commits on
-Enter or when the field is left, never per keystroke.
+Enter or when the field is left, never per keystroke; it joins the page numbers from 30
+pages, and on a phone, which shows no page numbers, from 5. Keyboard focus never falls
+out of the pager: page buttons are keyed by page, and Previous and Next stay focusable
+(`aria-disabled`) at the ends, named by their visible words.
 
 **Sorting.** A header click cycles its column through the kind's first direction, the
 other direction, and back to the table's own order (`initialSort`). When the table's
@@ -507,7 +526,10 @@ order (newest first, most anchored first) declares it with `initialSort`, so its
 shows the arrow and the reader knows the order.
 
 **Links.** `getRowHref` makes the first column's value (or `rowLinkColumn`'s) a real
-same-tab link, and a click anywhere else on the row follows it too. `getRowLabel` adds
+same-tab link, and a plain click anywhere else on the row follows it too; a modified
+click (Cmd, Ctrl, Shift, Alt), the end of a text selection and a click inside a popover
+a cell opened do not. The kind's own link in that column (an address's profile, a
+date's proof) is dropped rather than nested inside the row link. `getRowLabel` adds
 the words a screen reader hears after the link's visible text ("Sep 24, 07:31:51" then
 "Gesture #1143", the number the destination shows); it never replaces them, so the name
 always starts with what a voice user sees (WCAG 2.5.3). Leave it out when the visible
@@ -529,9 +551,9 @@ allocations of less than 0.01 CST"); keep it to one line of `type-caption`.
 
 **The connected wallet.** `isCurrentRow` marks the wallet's row with a 2px accent rule
 and a "You" tag, and the row keeps its ranked place. A line above the table gives the
-position ("#3 of 37") and a "Show my row" button that jumps to its page.
-`currentRowSummary` adds figures to that line. Never append "(You)" to the address
-text.
+position ("#3 of 37") and a "Show my row" button that jumps to its page and moves
+keyboard focus to the row. `currentRowSummary` adds figures to that line. Never append
+"(You)" to the address text.
 
 ## Copy
 

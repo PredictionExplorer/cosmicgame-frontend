@@ -178,6 +178,43 @@ describe('styles/tables.css', () => {
     expect(secondaryIndex).toBeGreaterThan(recordIndex);
   });
 
+  // Regression: every shortened address in the CST holders ledger broke
+  // before its last character at 390px ("0x360E…FB3" / "2"), because the
+  // wrap rules and the global `.font-mono { overflow-wrap: anywhere }` both
+  // reached the hex, so the compact table never measured as too wide.
+  it('never splits a shortened address, at any width or in either phone layout', () => {
+    const hex =
+      ".cs-table tbody td[data-kind='address'] > [data-slot='value'] :is(.font-mono, .font-mono *)";
+    expect(declaration(topRules, hex, 'text-wrap-mode')).toBe('nowrap');
+    expect(declaration(topRules, hex, 'overflow-wrap')).toBe('normal');
+    // It follows the phone block that turns wrapping back on, so equal
+    // specificity would still resolve to it; it outranks both wrap rules too.
+    const hexIndex = root.nodes.findIndex((node) => node.type === 'rule' && node.selector === hex);
+    expect(hexIndex).toBeGreaterThan(root.nodes.indexOf(phone!));
+  });
+
+  it('sets a record label as words, not tabular figures', () => {
+    const label = `${RECORD} tbody td::before`;
+    expect(declaration(phoneRules, label, 'font-variant-numeric')).toBe('normal');
+    expect(declaration(phoneRules, label, 'font-feature-settings')).toBe('normal');
+  });
+
+  it('opens a record on its title line, an address or a date in its own weight', () => {
+    expect(declaration(phoneRules, `${RECORD} tbody td[data-phone='title']`, 'font-weight')).toBe(
+      '600',
+    );
+    expect(
+      declaration(
+        phoneRules,
+        `${RECORD} tbody td[data-phone='title']:is([data-kind='address'], [data-kind='datetime'])`,
+        'font-weight',
+      ),
+    ).toBe('400');
+    expect(declaration(phoneRules, `${RECORD} tbody td[data-phone='omit']`, 'display')).toBe(
+      'none',
+    );
+  });
+
   it('keeps values at a readable size on phones', () => {
     // Values inherit the cell's 14px; nothing in the phone block shrinks them.
     expect(phone?.toString()).not.toMatch(/font-size:\s*0\.75rem/);

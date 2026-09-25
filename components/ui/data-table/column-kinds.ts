@@ -16,7 +16,7 @@ import type { LogicalAlign } from '@/components/ui/responsive-table';
  * | `count`    | end    | `formatCount`                         | largest    |
  * | `percent`  | end    | `formatPercent`                       | largest    |
  * | `duration` | end    | `<Duration>`                          | longest    |
- * | `status`   | center | a status icon (the only centred kind) | A to Z     |
+ * | `status`   | center | its value as text; `cell` draws icons | A to Z     |
  *
  * On phones, `link`, `address`, `amount`, `count`, `percent` and `status`
  * are compact kinds: up to three of them stay a real table. See
