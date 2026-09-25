@@ -5,6 +5,8 @@ import { withSentryConfig } from '@sentry/nextjs';
 import withBundleAnalyzer from '@next/bundle-analyzer';
 import createNextIntlPlugin from 'next-intl/plugin';
 
+import { securityHeaders } from './config/securityHeaders';
+
 function resolveGitSha(): string {
   if (process.env.VERCEL_GIT_COMMIT_SHA?.trim()) return process.env.VERCEL_GIT_COMMIT_SHA.trim();
   if (process.env.GITHUB_SHA?.trim()) return process.env.GITHUB_SHA.trim();
@@ -189,17 +191,23 @@ const nextConfig: NextConfig = {
     config.externals = [...(config.externals ?? []), 'pino-pretty'];
     return config;
   },
+  // Framing, sniffing, referrer and permission policy, and the Content
+  // Security Policy: enforced baseline plus a report-only allowlist
+  // (config/securityHeaders.ts).
   async headers() {
     return [
       {
         source: '/(.*)',
-        headers: [
-          { key: 'X-Frame-Options', value: 'SAMEORIGIN' },
-          { key: 'X-Content-Type-Options', value: 'nosniff' },
-          { key: 'Referrer-Policy', value: 'strict-origin-when-cross-origin' },
-          { key: 'Permissions-Policy', value: 'camera=(), microphone=(), geolocation=()' },
-          { key: 'Cross-Origin-Opener-Policy', value: 'unsafe-none' },
-        ],
+        headers: securityHeaders({
+          development: process.env.NODE_ENV === 'development',
+          sentryDsn: process.env.NEXT_PUBLIC_SENTRY_DSN,
+          dataEndpoints: [
+            process.env.NEXT_PUBLIC_API_URLS,
+            process.env.NEXT_PUBLIC_API_URL,
+            process.env.NEXT_PUBLIC_RPC_URLS,
+            process.env.NEXT_PUBLIC_RPC_URL,
+          ].flatMap((value) => value?.split(',') ?? []),
+        }),
       },
     ];
   },

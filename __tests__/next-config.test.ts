@@ -143,6 +143,18 @@ describe('next.config', () => {
       const headerValues = headers[0]?.headers;
       expect(headerValues).toContainEqual({ key, value });
     });
+
+    it('enforces the CSP baseline and reports against the full allowlist', () => {
+      const value = (key: string) =>
+        headers[0]?.headers.find((header) => header.key === key)?.value;
+      expect(value('Content-Security-Policy')).toBe(
+        "object-src 'none'; base-uri 'self'; frame-ancestors 'self'; form-action 'self'",
+      );
+      const reportOnly = value('Content-Security-Policy-Report-Only');
+      expect(reportOnly).toMatch(/^default-src 'self'; script-src 'self' 'unsafe-inline' /);
+      // jest.setup.ts points the API at a plain-http origin, which is named.
+      expect(reportOnly).toContain("connect-src 'self' https: wss: http://test-api.example");
+    });
   });
 
   describe('Sentry integration', () => {
