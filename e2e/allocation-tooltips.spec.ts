@@ -12,10 +12,6 @@ const ALLOCATION_LIST_TOOLTIPS = [
     label: 'Finalized cycle records only',
     expected: /Active cycles and separate allocation retrieval records are excluded/,
   },
-  {
-    label: 'Cycle reserve split',
-    expected: /ETH reserve is allocated across protocol tracks/,
-  },
 ];
 
 /** Split legend entries and role names explain themselves: the word is the trigger. */
@@ -46,11 +42,7 @@ const ALLOCATION_DETAIL_TOOLTIPS = [
     expected: /Each track's share of the Cycle Reserve when this cycle was finalized/,
   },
   {
-    label: 'Cycle statistics',
-    expected: /Key metrics summarizing this cycle/,
-  },
-  {
-    label: 'Contributed ETH',
+    label: 'Direct contributions',
     expected: /Direct ETH contributions from the community/,
   },
 ];
@@ -81,6 +73,10 @@ test.describe('/allocation tooltips', () => {
     await page.emulateMedia({ reducedMotion: 'reduce' });
     await expectAllLabelTooltips(page, ALLOCATION_LIST_TOOLTIPS);
     await expectTermTooltips(page, ALLOCATION_LIST_TERMS);
+    // The split is a constant: one sentence under its heading, after the ledger.
+    await expect(
+      page.getByText('ETH reserve is allocated across protocol tracks', { exact: false }),
+    ).toBeVisible();
   });
 
   test('gives each ledger recipient its full address and the way to its page', async ({ page }) => {

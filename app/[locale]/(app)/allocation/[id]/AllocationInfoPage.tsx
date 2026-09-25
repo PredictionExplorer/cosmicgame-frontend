@@ -1,8 +1,7 @@
 'use client';
 
 import { useMemo, type ReactNode } from 'react';
-import { ChevronLeft, ChevronRight, Share2 } from 'lucide-react';
-import { toast } from 'sonner';
+import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { useLocale, useTranslations } from 'next-intl';
 
 import { getEnduranceChampions } from '@/utils';
@@ -21,7 +20,7 @@ import { AddressChip } from '@/components/ui/address-chip';
 import { Amount } from '@/components/ui/amount';
 import { PendingPlate, WallLabelMeta } from '@/components/ui/art-frame';
 import { Badge } from '@/components/ui/badge';
-import { Button, buttonVariants } from '@/components/ui/button';
+import { buttonVariants } from '@/components/ui/button';
 import { DateTime } from '@/components/ui/date-time';
 import { EmptyState } from '@/components/ui/empty-state';
 import { ErrorState } from '@/components/ui/error-state';
@@ -40,6 +39,7 @@ import AttachedERC20Table, {
 import RecipientHistoryTable, {
   type WinningHistoryEntry,
 } from '@/components/tables/RecipientHistoryTable';
+import { AllocationSignatureCard } from '@/components/winnings/AllocationSignatureCard';
 import {
   AllocationSplitBar,
   type AllocationSplitSegment,
@@ -48,8 +48,9 @@ import {
   cycleReserveSplit,
   type DistributedTrackId,
 } from '@/components/winnings/cycleReserveSplit';
-import { useMissingCycle } from '@/components/winnings/missingCycle';
-import { SignatureCard } from '@/components/winnings/SignatureCard';
+import { cycleRoles, type CycleRole } from '@/components/winnings/cycleRoles';
+import { useLiveCycle, useMissingCycle } from '@/components/winnings/missingCycle';
+import { ShareCycleButton } from '@/components/winnings/ShareCycleButton';
 import { useSignatureIndex, type SignatureArtState } from '@/components/winnings/useSignatureIndex';
 import {
   useRoundInfo,
@@ -57,66 +58,14 @@ import {
   useDonationsNFTByRound,
   useCSTAnchorDistributionsByCycle,
   useDonationsERC20ByRound,
-  useRoundList,
 } from '@/hooks/useApiQuery';
-import { useClipboard } from '@/hooks/useClipboard';
 import { useFormat } from '@/hooks/useFormat';
 import { isRecordNotFound } from '@/services/api/readError';
 import type { RoundInfo } from '@/services/api/types';
-import { countRecipients, STELLAR_SELECTION_RECORD_TYPES } from '@/utils/allocationRecords';
+import { countRecipients } from '@/utils/allocationRecords';
 import { toFiniteNumber } from '@/utils/finiteNumber';
 import { formatAddress, formatAmount } from '@/utils/format';
 import { formatId } from '@/utils/format/ids';
-
-/** The four roles a finalized cycle imprints a Signature for, in the order they are shown. */
-type RoleId = 'signature' | 'chrono' | 'endurance' | 'finalCst';
-
-interface CycleRole {
-  id: RoleId;
-  address: string;
-  tokenId: number;
-  /**
-   * What the role received besides its Signature. Every card follows the same rule, so the
-   * Signature Allocation's card names its ETH too, although the header repeats it.
-   */
-  eth: number | null;
-  cst: number | null;
-}
-
-function cycleRoles(cycle: RoundInfo): CycleRole[] {
-  const roles: CycleRole[] = [
-    {
-      id: 'signature',
-      address: cycle.WinnerAddr,
-      tokenId: cycle.TokenId,
-      eth: toFiniteNumber(cycle.AmountEth),
-      cst: toFiniteNumber(cycle.CSTAmountEth),
-    },
-    {
-      id: 'chrono',
-      address: cycle.ChronoWarriorAddr,
-      tokenId: cycle.ChronoWarriorNftTokenId,
-      eth: toFiniteNumber(cycle.ChronoWarriorAmountEth),
-      cst: toFiniteNumber(cycle.ChronoWarriorCstAmountEth),
-    },
-    {
-      id: 'endurance',
-      address: cycle.EnduranceWinnerAddr,
-      tokenId: toFiniteNumber(cycle.EnduranceERC721TokenId) ?? -1,
-      eth: null,
-      cst: toFiniteNumber(cycle.EnduranceERC20AmountEth),
-    },
-    {
-      id: 'finalCst',
-      address: cycle.LastCstBidderAddr,
-      tokenId: toFiniteNumber(cycle.LastCstBidderERC721TokenId) ?? -1,
-      eth: null,
-      cst: toFiniteNumber(cycle.LastCstBidderERC20AmountEth),
-    },
-  ];
-  // A role nobody filled (no CST gesture in the cycle, say) has neither holder nor token.
-  return roles.filter((role) => Boolean(role.address) || role.tokenId >= 0);
-}
 
 /** What a role received besides its Signature, as wall-label facts ("3.5397 ETH", "1,000 CST"). */
 function roleAmounts(role: CycleRole): ReactNode[] {
@@ -137,12 +86,25 @@ function distributedEth(cycle: RoundInfo): Record<DistributedTrackId, number | n
   };
 }
 
-/** A tab's label with its count, or a short skeleton while the count loads. */
-function TabCount({ count, loading }: { count: number; loading: boolean }) {
+/** One list behind a tab: its rows, and whether it is loading or could not be read. */
+interface TabRead<T> {
+  data: readonly T[] | undefined;
+  isLoading: boolean;
+  isError: boolean;
+  refetch: () => unknown;
+}
+
+/** A read with nothing to show because it failed (a failed refresh keeps its rows). */
+function unread<T>(read: TabRead<T>): boolean {
+  return read.isError && read.data === undefined;
+}
+
+/** A tab's count, a short skeleton while it loads, and nothing when its list could not be read. */
+function TabCount({ count, loading }: { count: number | null; loading: boolean }) {
   const format = useFormat();
   // A span: it sits inside the tab's button.
   if (loading) return <Skeleton as="span" className="ml-2 inline-block h-4 w-6" />;
-  if (count === 0) return null;
+  if (count === null || count === 0) return null;
   return (
     <Badge size="sm" className="ml-2 tabular-nums">
       {format.count(count)}
@@ -150,15 +112,57 @@ function TabCount({ count, loading }: { count: number; loading: boolean }) {
   );
 }
 
-/** Previous and next cycle, labelled on every screen size. */
-function CycleNavigation({ cycle, lastCycle }: { cycle: number; lastCycle: number }) {
+/**
+ * A tab's body for one read: its skeleton while it loads, a retryable error
+ * when it could not be read (never the empty state, which would say the cycle
+ * had none), the empty state, or the ledger.
+ */
+function TabBody<T>({
+  read,
+  skeleton,
+  empty,
+  children,
+}: {
+  read: TabRead<T>;
+  skeleton: ReactNode;
+  empty: ReactNode;
+  children: ReactNode;
+}) {
+  const t = useTranslations('allocation');
+  if (read.isLoading) return <>{skeleton}</>;
+  if (unread(read)) {
+    return (
+      <ErrorState
+        variant="panel"
+        headingLevel={3}
+        title={t('details.data.error.title')}
+        message={t('details.data.error.message')}
+        onRetry={() => void read.refetch()}
+      />
+    );
+  }
+  return <>{(read.data ?? []).length > 0 ? children : empty}</>;
+}
+
+/**
+ * Previous and next cycle, labelled on every screen size. Each link is named
+ * by its visible label first ("Cycle 0, previous cycle"), as the catalog
+ * words it for the locale (WCAG 2.5.3).
+ */
+function CycleNavigation({
+  cycle,
+  lastFinalized,
+}: {
+  cycle: number;
+  lastFinalized: number | null;
+}) {
   const t = useTranslations('allocation');
   const link = (target: number, direction: 'previous' | 'next') => {
     const label = t('formats.cycle', { cycle: target });
     return (
       <Link
         href={`/allocation/${target}`}
-        aria-label={`${t(`details.navigation.${direction}Aria`)}, ${label}`}
+        aria-label={t(`details.navigation.${direction}Aria`, { cycle: label })}
         className={buttonVariants({ variant: 'outline', size: 'sm' })}
       >
         {direction === 'previous' ? <ChevronLeft aria-hidden className="size-4" /> : null}
@@ -170,7 +174,7 @@ function CycleNavigation({ cycle, lastCycle }: { cycle: number; lastCycle: numbe
   return (
     <div className="flex items-center gap-2" data-testid="round-navigation">
       {cycle > 0 ? link(cycle - 1, 'previous') : null}
-      {cycle < lastCycle ? link(cycle + 1, 'next') : null}
+      {lastFinalized !== null && cycle < lastFinalized ? link(cycle + 1, 'next') : null}
     </div>
   );
 }
@@ -217,23 +221,32 @@ function CycleSection({
 
 interface AllocationInfoPageProps {
   roundNum: number;
+  /**
+   * The recipients' Signature seeds by token id, read on the server with the
+   * record, so the plates are in the first HTML without reading the whole
+   * collection in the browser.
+   */
+  roleSeeds?: Readonly<Record<string, { seed: string | number }>>;
 }
 
 /**
- * A finalized cycle's record. The header carries the cycle, its finalization and the figures
- * that define it; the recipients follow as the Signatures their roles imprinted (the art as soon
- * as the cycle loads), then how the ETH split, the cycle's statistics, every allocation record
- * and, in tabs, the detailed data. Each part renders as its own query arrives: the gesture
- * list, the anchoring and contribution reads only hold their own tab.
+ * A finalized cycle's record, story first and audit trail second. The header
+ * carries the cycle, its finalization and the figures that define it; the
+ * recipients follow as the Signatures their roles imprinted, then how the ETH
+ * split (with the cycle's other facts under it) and every allocation record,
+ * grouped by recipient; the gestures, champions, anchor-holders and
+ * contributions close the page in tabs. The server seeds the record and the
+ * plates' seeds, so everything above the tabs is in the first HTML; each tab
+ * loads, fails and retries on its own, and a list that could not be read is
+ * never shown as an empty one.
  */
-const AllocationInfoPage = ({ roundNum }: AllocationInfoPageProps) => {
+const AllocationInfoPage = ({ roundNum, roleSeeds }: AllocationInfoPageProps) => {
   const t = useTranslations('allocation');
   const tContracts = useTranslations('contracts');
   const tCommon = useTranslations('common');
   const tDetail = useTranslations('detail');
   const locale = useLocale();
   const format = useFormat();
-  const { copy } = useClipboard();
 
   const {
     data: allocationInfo,
@@ -243,25 +256,26 @@ const AllocationInfoPage = ({ roundNum }: AllocationInfoPageProps) => {
     refetch: refetchRound,
   } = useRoundInfo(roundNum);
   const missingCycle = useMissingCycle(roundNum);
-  const { data: gestureHistory = [], isLoading: loadingGestures } = useGestureListByCycle(
-    roundNum,
-    'desc',
-  );
-  const { data: nftDonationsRaw = [], isLoading: loadingNFT } = useDonationsNFTByRound(roundNum);
-  const { data: anchorDistributions = [], isLoading: loadingAnchoring } =
-    useCSTAnchorDistributionsByCycle(roundNum);
-  const { data: donatedERC20Raw = [], isLoading: loadingERC20 } =
-    useDonationsERC20ByRound(roundNum);
-  const { data: roundList = [] } = useRoundList();
-  const signatures = useSignatureIndex();
+  const liveCycle = useLiveCycle();
+  const lastFinalized = liveCycle === null ? null : liveCycle - 1;
+  const gestures = useGestureListByCycle(roundNum, 'desc');
+  const nfts = useDonationsNFTByRound(roundNum);
+  const anchorDistributions = useCSTAnchorDistributionsByCycle(roundNum);
+  const erc20 = useDonationsERC20ByRound(roundNum);
 
-  const nftDonations = nftDonationsRaw as NFTRecord[];
-  const donatedERC20Tokens = donatedERC20Raw as DonatedERC20Token[];
+  const gestureHistory = useMemo(() => gestures.data ?? [], [gestures.data]);
+  const nftDonations = (nfts.data ?? []) as NFTRecord[];
+  const donatedERC20Tokens = (erc20.data ?? []) as DonatedERC20Token[];
 
-  const lastCycle = useMemo(
-    () => roundList.reduce((max, r) => Math.max(max, r.RoundNum ?? 0), 0),
-    [roundList],
-  );
+  // Each plate's seed: the server's read, else the record's own (its Signature's), else the
+  // collection index, which is read only for a token neither of the others has.
+  const roles = useMemo(() => (allocationInfo ? cycleRoles(allocationInfo) : []), [allocationInfo]);
+  const knownSeed = (tokenId: number) =>
+    roleSeeds?.[String(tokenId)]?.seed ??
+    (tokenId === allocationInfo?.TokenId ? allocationInfo?.TokenSeed : undefined);
+  const signatures = useSignatureIndex({
+    enabled: roles.some((role) => role.tokenId >= 0 && knownSeed(role.tokenId) === undefined),
+  });
 
   const championList = useMemo(() => {
     if (gestureHistory.length > 0 && allocationInfo) {
@@ -276,43 +290,8 @@ const AllocationInfoPage = ({ roundNum }: AllocationInfoPageProps) => {
     [allocationInfo?.AllPrizes],
   );
 
-  const stellarSelectionLedger = useMemo(
-    () =>
-      cycleAllocationLedger.filter((entry) => STELLAR_SELECTION_RECORD_TYPES.has(entry.RecordType)),
-    [cycleAllocationLedger],
-  );
-
-  const handleShareRound = async () => {
-    if (!allocationInfo) return;
-    const summary = t('details.share.summary', {
-      cycle: roundNum,
-      amount: formatAmount(allocationInfo.AmountEth, { unit: 'ETH', locale, withUnit: false }),
-      recipient: formatAddress(allocationInfo.WinnerAddr),
-      gestures: format.count(allocationInfo.RoundStats.TotalBids),
-      url: typeof window !== 'undefined' ? window.location.href : '',
-    });
-    await copy(summary);
-    toast.success(t('details.share.success'));
-  };
-
   const breadcrumbs = [{ label: t('details.breadcrumbs.recipients'), href: '/allocation' }];
-  const title = t('formats.cycleHash', { cycle: roundNum });
-
-  const recipientsLink = [{ href: '/allocation', label: t('details.breadcrumbs.recipients') }];
-
-  if (roundNum < 0) {
-    return (
-      <PageShell variant="data" backdrop="signature">
-        <PageHeader
-          section="records"
-          breadcrumbs={breadcrumbs}
-          title={t('details.invalid.title')}
-          subtitle={t('details.invalid.help')}
-          related={recipientsLink}
-        />
-      </PageShell>
-    );
-  }
+  const title = t('formats.cycle', { cycle: roundNum });
 
   // The API answers 400 for a cycle it holds no record of (the live cycle, one not started):
   // a final answer, not a failure to retry.
@@ -330,9 +309,11 @@ const AllocationInfoPage = ({ roundNum }: AllocationInfoPageProps) => {
           actions={
             <>
               {missingCycle.currentCycleLink}
-              {missingCycle.state === 'unknown' || roundList.length === 0 ? null : (
+              {missingCycle.state === 'unknown' ||
+              lastFinalized === null ||
+              lastFinalized < 0 ? null : (
                 // From a cycle not finalized yet, "previous" is the newest finalized one.
-                <CycleNavigation cycle={lastCycle + 1} lastCycle={lastCycle} />
+                <CycleNavigation cycle={lastFinalized + 1} lastFinalized={lastFinalized} />
               )}
             </>
           }
@@ -395,18 +376,21 @@ const AllocationInfoPage = ({ roundNum }: AllocationInfoPageProps) => {
         actions={
           <>
             {allocationInfo ? (
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => void handleShareRound()}
-                aria-label={t('details.hero.shareAria')}
-                data-testid="share-round-button"
-              >
-                <Share2 aria-hidden className="size-4" />
-                {t('details.hero.share')}
-              </Button>
+              <ShareCycleButton
+                title={title}
+                text={t('details.share.summary', {
+                  cycle: roundNum,
+                  amount: formatAmount(allocationInfo.AmountEth, {
+                    unit: 'ETH',
+                    locale,
+                    withUnit: false,
+                  }),
+                  recipient: formatAddress(allocationInfo.WinnerAddr),
+                  gestures: format.count(allocationInfo.RoundStats.TotalBids),
+                })}
+              />
             ) : null}
-            <CycleNavigation cycle={roundNum} lastCycle={lastCycle} />
+            <CycleNavigation cycle={roundNum} lastFinalized={lastFinalized} />
           </>
         }
         figures={figures}
@@ -415,7 +399,10 @@ const AllocationInfoPage = ({ roundNum }: AllocationInfoPageProps) => {
             <>
               <span>
                 {t.rich('details.hero.finalized', {
-                  dateTime: () => <DateTime timestamp={allocationInfo.TimeStamp} />,
+                  // A record's date stands alone: the year and the reader's zone, always.
+                  dateTime: () => (
+                    <DateTime timestamp={allocationInfo.TimeStamp} year="always" showZone />
+                  ),
                 })}
               </span>
               {allocationInfo.TxHash ? (
@@ -438,10 +425,18 @@ const AllocationInfoPage = ({ roundNum }: AllocationInfoPageProps) => {
       ) : (
         <CycleRecord
           cycle={allocationInfo}
+          roles={roles}
           ledger={cycleAllocationLedger}
-          anchorHolders={loadingAnchoring ? undefined : anchorDistributions.length}
-          signatureSeed={(tokenId) => signatures.get(tokenId)?.seed}
-          artState={signatures.state}
+          anchorHolders={
+            anchorDistributions.isLoading
+              ? undefined
+              : unread(anchorDistributions)
+                ? null
+                : (anchorDistributions.data ?? []).length
+          }
+          signatureSeed={(tokenId) => knownSeed(tokenId) ?? signatures.get(tokenId)?.seed}
+          artState={(tokenId) => (knownSeed(tokenId) !== undefined ? 'ready' : signatures.state)}
+          artFailed={signatures.state === 'failed'}
           onRetryArt={signatures.retry}
           trackLabel={(id) => tContracts(`funds.segments.${ALLOCATION_TRACK_COPY_KEYS[id]}.label`)}
           trackDefinition={(id) =>
@@ -452,81 +447,85 @@ const AllocationInfoPage = ({ roundNum }: AllocationInfoPageProps) => {
         />
       )}
 
+      {/* The audit trail: a panel-size heading, a level under the story above it. */}
       <section aria-labelledby="cycle-data" className="scroll-mt-28">
-        <SectionHeader headingId="cycle-data" title={t('details.data.divider')} />
+        <SectionHeader headingId="cycle-data" size="panel" title={t('details.data.divider')} />
         <Tabs defaultValue="gestures" className="w-full">
           <TabsList variant="underline" scroll>
             <TabsTrigger value="gestures">
               {t('details.data.tabs.gestures')}
-              <TabCount count={gestureHistory.length} loading={loadingGestures} />
+              <TabCount
+                count={unread(gestures) ? null : gestureHistory.length}
+                loading={gestures.isLoading}
+              />
             </TabsTrigger>
             <TabsTrigger value="endurance">
               {t('details.data.tabs.endurance')}
-              <TabCount count={championList.length} loading={loadingGestures || !allocationInfo} />
-            </TabsTrigger>
-            <TabsTrigger value="stellar-selection">
-              {t('details.data.tabs.stellar')}
-              <TabCount count={stellarSelectionLedger.length} loading={!allocationInfo} />
+              <TabCount
+                count={unread(gestures) ? null : championList.length}
+                loading={gestures.isLoading || !allocationInfo}
+              />
             </TabsTrigger>
             <TabsTrigger value="anchoring">
               {t('details.data.tabs.anchoring')}
-              <TabCount count={anchorDistributions.length} loading={loadingAnchoring} />
+              <TabCount
+                count={unread(anchorDistributions) ? null : (anchorDistributions.data ?? []).length}
+                loading={anchorDistributions.isLoading}
+              />
             </TabsTrigger>
             <TabsTrigger value="contributions">
               {t('details.data.tabs.contributions')}
               <TabCount
-                count={nftDonations.length + donatedERC20Tokens.length}
-                loading={loadingNFT || loadingERC20}
+                count={
+                  unread(nfts) || unread(erc20)
+                    ? null
+                    : nftDonations.length + donatedERC20Tokens.length
+                }
+                loading={nfts.isLoading || erc20.isLoading}
               />
             </TabsTrigger>
           </TabsList>
 
           <TabsContent value="gestures" className="mt-6">
-            {loadingGestures ? (
-              <SkeletonTable rows={8} columns={5} />
-            ) : gestureHistory.length > 0 ? (
+            <TabBody
+              read={gestures}
+              skeleton={<SkeletonTable rows={8} columns={5} />}
+              empty={<EmptyState headingLevel={3} title={t('details.data.empty.gestures')} />}
+            >
               <GestureHistoryTable
                 gestureHistory={gestureHistory}
                 showRound={false}
                 heldUntil={allocationInfo?.TimeStamp}
               />
-            ) : (
-              <EmptyState headingLevel={3} title={t('details.data.empty.gestures')} />
-            )}
+            </TabBody>
           </TabsContent>
 
           <TabsContent value="endurance" className="mt-6">
-            {loadingGestures || !allocationInfo ? (
-              <SkeletonTable rows={5} columns={5} />
-            ) : championList.length > 0 ? (
-              <EnduranceChampionsTable championList={championList} />
-            ) : (
-              <EmptyState headingLevel={3} title={t('details.data.empty.endurance')} />
-            )}
-          </TabsContent>
-
-          <TabsContent value="stellar-selection" className="mt-6">
             {!allocationInfo ? (
-              <SkeletonTable rows={6} columns={4} />
-            ) : stellarSelectionLedger.length > 0 ? (
-              <RecipientHistoryTable
-                winningHistory={stellarSelectionLedger}
-                showRoundColumn={false}
-                perPage={10}
-              />
+              <SkeletonTable rows={5} columns={5} />
             ) : (
-              <EmptyState headingLevel={3} title={t('details.data.empty.stellar')} />
+              <TabBody
+                read={gestures}
+                skeleton={<SkeletonTable rows={5} columns={5} />}
+                empty={<EmptyState headingLevel={3} title={t('details.data.empty.endurance')} />}
+              >
+                {championList.length > 0 ? (
+                  <EnduranceChampionsTable championList={championList} />
+                ) : (
+                  <EmptyState headingLevel={3} title={t('details.data.empty.endurance')} />
+                )}
+              </TabBody>
             )}
           </TabsContent>
 
           <TabsContent value="anchoring" className="mt-6">
-            {loadingAnchoring ? (
-              <SkeletonTable rows={5} columns={4} />
-            ) : anchorDistributions.length > 0 ? (
-              <AnchoringRecipientTable list={anchorDistributions} />
-            ) : (
-              <EmptyState headingLevel={3} title={t('details.data.empty.anchoring')} />
-            )}
+            <TabBody
+              read={anchorDistributions}
+              skeleton={<SkeletonTable rows={5} columns={4} />}
+              empty={<EmptyState headingLevel={3} title={t('details.data.empty.anchoring')} />}
+            >
+              <AnchoringRecipientTable list={anchorDistributions.data ?? []} />
+            </TabBody>
           </TabsContent>
 
           <TabsContent value="contributions" className="mt-6 space-y-10">
@@ -537,13 +536,13 @@ const AllocationInfoPage = ({ roundNum }: AllocationInfoPageProps) => {
                 title={t('details.data.contributions.nfts')}
                 info={t('details.data.contributions.nftsTooltip')}
               />
-              {loadingNFT ? (
-                <SkeletonTable rows={3} columns={5} />
-              ) : nftDonations.length > 0 ? (
-                <AttachedNFTTable list={nftDonations} handleClaim={undefined} claimingTokens={[]} />
-              ) : (
-                <EmptyState variant="inline" title={t('details.data.empty.nfts')} />
-              )}
+              <TabBody
+                read={nfts}
+                skeleton={<SkeletonTable rows={3} columns={5} />}
+                empty={<EmptyState variant="inline" title={t('details.data.empty.nfts')} />}
+              >
+                <AttachedNFTTable list={nftDonations} />
+              </TabBody>
             </div>
             <div>
               <SectionHeader
@@ -552,13 +551,13 @@ const AllocationInfoPage = ({ roundNum }: AllocationInfoPageProps) => {
                 title={t('details.data.contributions.erc20')}
                 info={t('details.data.contributions.erc20Tooltip')}
               />
-              {loadingERC20 ? (
-                <SkeletonTable rows={3} columns={5} />
-              ) : donatedERC20Tokens.length > 0 ? (
-                <AttachedERC20Table list={donatedERC20Tokens} handleClaim={null} />
-              ) : (
-                <EmptyState variant="inline" title={t('details.data.empty.erc20')} />
-              )}
+              <TabBody
+                read={erc20}
+                skeleton={<SkeletonTable rows={3} columns={5} />}
+                empty={<EmptyState variant="inline" title={t('details.data.empty.erc20')} />}
+              >
+                <AttachedERC20Table list={donatedERC20Tokens} />
+              </TabBody>
             </div>
           </TabsContent>
         </Tabs>
@@ -569,14 +568,16 @@ const AllocationInfoPage = ({ roundNum }: AllocationInfoPageProps) => {
 
 /**
  * The parts of the record that come with the cycle itself: the recipients' Signatures, how the
- * ETH split, the cycle's statistics and every allocation record.
+ * ETH split (with the cycle's other facts under it) and every allocation record.
  */
 function CycleRecord({
   cycle,
+  roles,
   ledger,
   anchorHolders,
   signatureSeed,
   artState,
+  artFailed,
   onRetryArt,
   trackLabel,
   trackDefinition,
@@ -584,12 +585,17 @@ function CycleRecord({
   artworkUnavailable,
 }: {
   cycle: RoundInfo;
+  roles: readonly CycleRole[];
   ledger: WinningHistoryEntry[];
-  /** Wallets that received this cycle's Anchor Distribution; `undefined` while it loads. */
-  anchorHolders: number | undefined;
+  /**
+   * Wallets that received this cycle's Anchor Distribution: `undefined` while it loads, `null`
+   * when it could not be read (the unknown dash, never a confident 0).
+   */
+  anchorHolders: number | null | undefined;
   signatureSeed: (tokenId: number) => string | number | undefined;
-  /** Whether the seeds are known yet (the collection index loads apart from the cycle). */
-  artState: SignatureArtState;
+  /** Whether a plate's seed is known yet (the collection index loads apart from the cycle). */
+  artState: (tokenId: number) => SignatureArtState;
+  artFailed: boolean;
   onRetryArt: () => void;
   trackLabel: (id: AllocationTrackId) => string;
   trackDefinition: (id: AllocationTrackId) => string;
@@ -617,7 +623,10 @@ function CycleRecord({
     const known = toFiniteNumber(value);
     return known === null ? null : format.count(known);
   };
-  const statistics: PageHeaderFigure[] = [
+  // The cycle's other facts, set a size under the header's figures: they sit with the split,
+  // whose tracks they explain (the anchored NFTs shared the Anchor Distribution, the direct
+  // contributions went into the reserve).
+  const facts: PageHeaderFigure[] = [
     {
       id: 'attachedNfts',
       label: t('details.statistics.cards.attachedNfts.label'),
@@ -633,8 +642,8 @@ function CycleRecord({
       label: t('details.statistics.cards.uniqueAnchorHolders.label'),
       value:
         anchorHolders === undefined ? (
-          <Skeleton className="h-7 w-10" />
-        ) : (
+          <Skeleton className="h-6 w-10" />
+        ) : anchorHolders === null ? null : (
           format.count(anchorHolders)
         ),
       info: t('details.statistics.cards.uniqueAnchorHolders.tooltip'),
@@ -644,16 +653,16 @@ function CycleRecord({
       label: t('details.statistics.cards.totalContributed.label'),
       value:
         contributed === null ? null : (
-          // The label already names the unit ("Contributed ETH").
-          <Link href={`/eth-contribution/round/${cycle.RoundNum}`} className="link-quiet">
-            <Amount value={contributed} unit="ETH" context="hero" showUnit={false} />
+          // An ETH figure at ledger precision with its unit, linked as a record.
+          <Link href={`/eth-contribution/round/${cycle.RoundNum}`} className="link-entity">
+            <Amount value={contributed} unit="ETH" context="table" />
           </Link>
         ),
       info: t('details.statistics.cards.totalContributed.tooltip'),
     },
   ];
 
-  const roles = cycleRoles(cycle);
+  const anyArtFailed = artFailed && roles.some((role) => artState(role.tokenId) === 'failed');
 
   return (
     <>
@@ -665,7 +674,7 @@ function CycleRecord({
         description={t('details.recipientSection.description')}
         info={t('details.recipientSection.rolesInfo')}
       >
-        {artState === 'failed' ? (
+        {anyArtFailed ? (
           <ErrorState
             variant="inline"
             headingLevel={3}
@@ -690,10 +699,10 @@ function CycleRecord({
                 className="row-span-4 grid grid-cols-1 grid-rows-subgrid pb-7 sm:pb-9"
               >
                 {hasToken ? (
-                  <SignatureCard
+                  <AllocationSignatureCard
                     tokenId={role.tokenId}
                     seed={signatureSeed(role.tokenId)}
-                    artState={artState}
+                    artState={artState(role.tokenId)}
                     title={t(`details.recipientSection.cards.${role.id}.title`)}
                     titleAs="h3"
                     meta={[
@@ -715,7 +724,7 @@ function CycleRecord({
                         <AddressChip address={role.address} wrapLabel />
                       </p>
                     ) : null}
-                  </SignatureCard>
+                  </AllocationSignatureCard>
                 ) : (
                   <div className="row-span-4 grid grid-cols-1 grid-rows-subgrid">
                     <PendingPlate density="compact" label={artworkUnavailable} className="mb-2" />
@@ -749,14 +758,10 @@ function CycleRecord({
           label={t('details.distribution.title')}
           unavailableLabel={unavailable}
         />
-      </CycleSection>
-
-      <CycleSection
-        id="cycle-statistics"
-        title={t('details.statistics.title')}
-        info={t('details.statistics.tooltip')}
-      >
-        <PageHeaderFigures figures={statistics} className="mt-0 sm:mt-0" />
+        <PageHeaderFigures
+          figures={facts}
+          className="mt-8 sm:mt-10 lg:[&>div>dd:first-of-type]:type-figure-md"
+        />
       </CycleSection>
 
       <CycleSection

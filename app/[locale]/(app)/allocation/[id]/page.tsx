@@ -7,7 +7,10 @@ import { parseCanonicalNonNegativeSafeInteger } from '@/utils';
 import { createMetadata } from '@/utils/seo';
 import { PageMessages } from '@/components/i18n/PageMessages';
 
+import { QuerySeed } from '../../QuerySeed';
+
 import AllocationInfoPage from './AllocationInfoPage';
+import { readCycleRecord } from './cycleRecordReads';
 
 interface PageProps {
   params: Promise<{ locale: string; id: string }>;
@@ -32,12 +35,19 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 // fresh instead of freezing the first render forever (see route-group refactor).
 export const revalidate = 300;
 
+/**
+ * A finalized cycle's record. The server reads the record, the cycle list and
+ * the recipients' Signature seeds, so the page's first HTML is the record
+ * itself (the most linked page of the product: every ledger row, Signature
+ * card and finalized page leads here), not a header over skeletons.
+ */
 export default async function Page({ params }: PageProps) {
   const { locale, id } = await params;
   const cycleId = parseCanonicalNonNegativeSafeInteger(id);
   if (cycleId === null) notFound();
 
   setRequestLocale(locale);
+  const { seeds, roleSeeds } = await readCycleRecord(cycleId);
   return (
     <PageMessages
       namespaces={[
@@ -50,7 +60,9 @@ export default async function Page({ params }: PageProps) {
         'traits',
       ]}
     >
-      <AllocationInfoPage roundNum={cycleId} />
+      <QuerySeed seeds={seeds}>
+        <AllocationInfoPage roundNum={cycleId} roleSeeds={roleSeeds} />
+      </QuerySeed>
     </PageMessages>
   );
 }

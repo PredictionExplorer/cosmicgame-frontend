@@ -2,7 +2,7 @@
 
 import type { ReactNode } from 'react';
 import { useEffect, useMemo, useState } from 'react';
-import { ArrowRight } from 'lucide-react';
+import { ArrowRight, ChevronLeft, ChevronRight } from 'lucide-react';
 import { usePublicClient } from 'wagmi';
 import { useTranslations } from 'next-intl';
 
@@ -22,10 +22,10 @@ import { SectionHeader } from '@/components/ui/section-header';
 import { Skeleton } from '@/components/ui/skeleton';
 import { TxExplorerLink } from '@/components/ui/tx-status';
 import { isRenderPending, signatureMedia, signatureSources } from '@/components/nft/signatureArt';
-import { useMissingCycle } from '@/components/winnings/missingCycle';
-import { SignatureCard } from '@/components/winnings/SignatureCard';
+import { useLiveCycle, useMissingCycle } from '@/components/winnings/missingCycle';
+import { AllocationSignatureCard } from '@/components/winnings/AllocationSignatureCard';
 import { SignatureReveal } from '@/components/winnings/SignatureReveal';
-import { SpecList, SpecRow } from '@/components/winnings/SpecList';
+import { SpecList, SpecRow } from '@/components/ui/spec-list';
 import { useSignatureIndex } from '@/components/winnings/useSignatureIndex';
 import useCosmicGameContract from '@/hooks/useCosmicGameContract';
 import { useCSTInfo, useRoundInfo, useRoundList } from '@/hooks/useApiQuery';
@@ -44,6 +44,11 @@ import { FinalizedSignatureSkeleton } from './FinalizedSignatureSkeleton';
 const ACTIVATION_POLL_MS = 4000;
 /** Poll interval while the indexer has not yet recorded the cycle a participant just finalized. */
 const RECORD_POLL_MS = 5000;
+/**
+ * How long the page waits for the indexer before it stops asking: past it the
+ * page reads as the neutral "no record yet" state, which a reload re-checks.
+ */
+const RECORD_POLL_LIMIT_MS = 5 * 60_000;
 /** How many finalized cycles the page shows when no cycle is named. */
 const INDEX_CYCLES = 3;
 
@@ -79,7 +84,6 @@ const AllocationFinalizedPage = ({
   seoSummary,
 }: AllocationFinalizedPageProps) => {
   const t = useTranslations('allocation');
-  const tCommon = useTranslations('common');
   const { account } = useActiveWeb3React();
 
   const { data: allocationInfo, isLoading, isError, error, refetch } = useRoundInfo(cycle ?? -1);
@@ -91,13 +95,27 @@ const AllocationFinalizedPage = ({
 
   const nextCycleOpen = useNextCycleOpen(isClaimSuccess && cycle !== null);
   const nextCycleNotice = nextCycleOpen ? <NextCycleNotice /> : null;
+  // A `message=success` link can be shared, bookmarked or typed: its claim ("your finalization
+  // is on-chain") is believed only once the chain has moved past the cycle.
+  const finalizedOnChain = useCycleFinalizedOnChain(isClaimSuccess ? cycle : null);
+  const verifiedSuccess = isClaimSuccess && finalizedOnChain === true;
 
-  // A participant who just finalized arrives before the indexer: keep asking until it has
-  // the cycle, so the record (and its Signature) appears without a reload.
-  const waitingForRecord = isClaimSuccess && cycle !== null && missing;
+  // A participant who just finalized arrives before the indexer: keep asking until it has the
+  // cycle, so the record (and its Signature) appears without a reload. The wait is capped, and
+  // a hidden tab does not ask.
+  const [pollExpired, setPollExpired] = useState(false);
+  const waitingForRecord = verifiedSuccess && cycle !== null && missing && !pollExpired;
   useEffect(() => {
     if (!waitingForRecord) return;
-    const id = window.setInterval(() => void refetch(), RECORD_POLL_MS);
+    const started = Date.now();
+    const id = window.setInterval(() => {
+      if (Date.now() - started > RECORD_POLL_LIMIT_MS) {
+        window.clearInterval(id);
+        setPollExpired(true);
+        return;
+      }
+      if (document.visibilityState === 'visible') void refetch();
+    }, RECORD_POLL_MS);
     return () => window.clearInterval(id);
   }, [refetch, waitingForRecord]);
 
@@ -117,8 +135,8 @@ const AllocationFinalizedPage = ({
   }
 
   const trail = [
-    { label: tCommon('pageHeader.crumbs.allocationRecipients'), href: '/allocation' },
-    { label: tCommon('pageHeader.crumbs.cycle', { cycle }), href: `/allocation/${cycle}` },
+    { label: t('details.breadcrumbs.recipients'), href: '/allocation' },
+    { label: t('formats.cycle', { cycle }), href: `/allocation/${cycle}` },
   ];
 
   // The neutral record's header: the loading and error states keep it, so the record lands
@@ -132,9 +150,9 @@ const AllocationFinalizedPage = ({
     />
   );
 
-  // Arriving from their own finalization, the participant waits for the indexer here: the
-  // same header while the first read loads and while the indexer catches up.
-  if (isClaimSuccess && (isLoading || (!allocationInfo && missing))) {
+  // Arriving from their own finalization (the chain agrees), the participant waits for the
+  // indexer here: the same header while the first read loads and while the indexer catches up.
+  if (waitingForRecord || (verifiedSuccess && isLoading)) {
     return (
       <PageShell variant="data" backdrop="signature">
         <PageHeader
@@ -299,7 +317,7 @@ function FinalizedSignature({
             // The finalization moment is the spec sheet's "Finalized" row, not repeated here.
             meta={[
               name ? <span className="type-mono">{id}</span> : null,
-              t('formats.cycleHash', { cycle: allocation.RoundNum }),
+              t('formats.cycle', { cycle: allocation.RoundNum }),
             ]}
           />
         ) : null}
@@ -310,17 +328,18 @@ function FinalizedSignature({
           {t('finalized.result.componentsTitle')}
         </h2>
         <SpecList className="mt-4">
-          {/* A spec sheet is a ledger: ETH at ledger precision, as the cycle's own distribution
-              legend prints it (the full value is on hover); CST as the cycle's cards print it. */}
-          <SpecRow label={t('finalized.result.eth')}>
-            <Amount value={allocation.AmountEth} unit="ETH" context="table" />
-          </SpecRow>
-          <SpecRow label={t('finalized.result.cst')}>
-            <Amount value={allocation.CSTAmountEth} unit="CST" />
+          {/* One value scale down the sheet, each unit in its value only. ETH at ledger precision,
+              as the cycle's own distribution legend prints it (the full value is on hover); CST
+              as the cycle's cards print it. */}
+          <SpecRow label={t('finalized.result.allocation')}>
+            <span className="inline-flex flex-wrap justify-end gap-x-3">
+              <Amount value={allocation.AmountEth} unit="ETH" context="table" />
+              <Amount value={allocation.CSTAmountEth} unit="CST" />
+            </span>
           </SpecRow>
           {hasToken ? (
             <SpecRow label={t('finalized.result.nft')}>
-              <Link href={`/detail/${allocation.TokenId}`} className="link type-mono">
+              <Link href={`/detail/${allocation.TokenId}`} className="link-entity font-mono">
                 {id}
               </Link>
             </SpecRow>
@@ -331,11 +350,12 @@ function FinalizedSignature({
             </SpecRow>
           ) : null}
           <SpecRow label={t('finalized.result.recipient')}>
-            <AddressChip address={allocation.WinnerAddr} />
+            <AddressChip address={allocation.WinnerAddr} variant="plain" display="responsive" />
           </SpecRow>
           {allocation.TimeStamp ? (
             <SpecRow label={t('finalized.result.finalized')}>
-              <DateTime timestamp={allocation.TimeStamp} variant="full" />
+              {/* The format the cycle's record prints the same moment in, with the zone. */}
+              <DateTime timestamp={allocation.TimeStamp} year="always" showZone />
             </SpecRow>
           ) : null}
         </SpecList>
@@ -347,6 +367,7 @@ function FinalizedSignature({
             {t('finalized.links.viewCycle', { cycle: allocation.RoundNum })}
             <ArrowRight aria-hidden className="size-4" />
           </Link>
+          <FinalizedCycleNavigation cycle={allocation.RoundNum} />
           {allocation.TxHash ? (
             <TxExplorerLink
               hash={allocation.TxHash}
@@ -359,6 +380,41 @@ function FinalizedSignature({
       </div>
     </section>
   );
+}
+
+/**
+ * Whether the chain has moved past `cycle` (its `roundNum()` is higher, so the
+ * cycle is finalized), read once from the contract: `undefined` until read,
+ * or when no cycle is asked about. A success link is believed only on `true`.
+ */
+function useCycleFinalizedOnChain(cycle: number | null): boolean | undefined {
+  const cosmicGameContract = useCosmicGameContract();
+  const [answer, setAnswer] = useState<{ cycle: number; finalized: boolean } | null>(null);
+
+  useEffect(() => {
+    if (cycle === null || !cosmicGameContract) return;
+    let cancelled = false;
+    void (async () => {
+      try {
+        const current = await cosmicGameContract.read.roundNum?.();
+        if (cancelled || current === undefined) return;
+        const finalized = BigInt(current as bigint | number) > BigInt(cycle);
+        // The same answer keeps its object, so a re-read never re-renders the page.
+        setAnswer((previous) =>
+          previous?.cycle === cycle && previous.finalized === finalized
+            ? previous
+            : { cycle, finalized },
+        );
+      } catch {
+        /* an RPC failure leaves the claim unverified: the neutral record stands */
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, [cycle, cosmicGameContract]);
+
+  return answer !== null && answer.cycle === cycle ? answer.finalized : undefined;
 }
 
 /**
@@ -397,6 +453,38 @@ function useNextCycleOpen(enabled: boolean): boolean {
   }, [enabled, open, publicClient, cosmicGameContract]);
 
   return open;
+}
+
+/**
+ * The neighbouring cycles' Signature Allocations, as the cycle's record steps
+ * through cycles: "‹ Cycle 0" and "Cycle 2 ›", the next one only once it is
+ * finalized. Each link is named by its visible label first.
+ */
+function FinalizedCycleNavigation({ cycle }: { cycle: number }) {
+  const t = useTranslations('allocation');
+  const liveCycle = useLiveCycle();
+  const link = (target: number, direction: 'previous' | 'next') => {
+    const label = t('formats.cycle', { cycle: target });
+    return (
+      <Link
+        href={`/allocation-finalized?cycle=${target}`}
+        aria-label={t(`details.navigation.${direction}Aria`, { cycle: label })}
+        className={buttonVariants({ variant: 'ghost', size: 'sm' })}
+      >
+        {direction === 'previous' ? <ChevronLeft aria-hidden className="size-4" /> : null}
+        {label}
+        {direction === 'next' ? <ChevronRight aria-hidden className="size-4" /> : null}
+      </Link>
+    );
+  };
+  const hasNext = liveCycle !== null && cycle + 1 < liveCycle;
+  if (cycle <= 0 && !hasNext) return null;
+  return (
+    <nav aria-label={t('finalized.links.cycles')} className="flex items-center gap-1">
+      {cycle > 0 ? link(cycle - 1, 'previous') : null}
+      {hasNext ? link(cycle + 1, 'next') : null}
+    </nav>
+  );
 }
 
 /** The next cycle has opened: a quiet line with the way to it, announced politely. */
@@ -507,12 +595,12 @@ function FinalizedCycleIndex() {
               ))
             : latest.map((round) => (
                 <li key={round.RoundNum}>
-                  <SignatureCard
+                  <AllocationSignatureCard
                     tokenId={round.TokenId}
                     seed={round.TokenSeed ?? signatures.get(round.TokenId)?.seed}
                     artState={round.TokenSeed === undefined ? signatures.state : 'ready'}
                     href={`/allocation/${round.RoundNum}`}
-                    title={t('formats.cycleHash', { cycle: round.RoundNum })}
+                    title={t('formats.cycle', { cycle: round.RoundNum })}
                     meta={[
                       <Amount key="eth" value={round.AmountEth} unit="ETH" />,
                       round.TimeStamp ? <DateTime key="date" timestamp={round.TimeStamp} /> : null,

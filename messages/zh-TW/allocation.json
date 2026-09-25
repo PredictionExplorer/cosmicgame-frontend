@@ -1,7 +1,6 @@
 {
   "formats": {
     "cycle": "第 {cycle} 個週期",
-    "cycleHash": "第 {cycle} 個週期",
     "cosmicSignatureToken": "Cosmic Signature #{token}"
   },
   "recipients": {
@@ -11,28 +10,26 @@
       "scope": "僅顯示已收官週期紀錄",
       "scopeTooltip": "本頁僅彙總週期 API 中已收官的演繹週期；待收官週期及不屬於這些週期的分配取回紀錄不計入統計。"
     },
-    "intro": "週期收官後，寫下收官之筆的參與者會取回簽名分配——{percentage}% 的週期儲備、1,000 CST 與一枚專屬 Cosmic Signature NFT。其他分配則透過時之勇士、星選、錨定配發、公共財與滾動儲備等軌道流轉。",
     "reserveSplit": {
       "label": "週期儲備分配",
       "tooltip": "這些百分比表示週期收官後，ETH 儲備如何沿協議各條軌道分配。"
     },
-    "ledgerTitle": "已收官週期"
+    "ledgerTitle": "已收官週期",
+    "loadError": "已收官的週期暫時無法載入，請稍後再試。"
   },
   "details": {
     "navigation": {
-      "previousAria": "上一週期",
-      "nextAria": "下一週期"
+      "previousAria": "{cycle}，上一週期",
+      "nextAria": "{cycle}，下一週期"
     },
     "recipientCard": {
       "recipient": "獲配者"
     },
     "share": {
-      "summary": "Cosmic Signature · 第 {cycle} 個週期\n簽名分配：{amount} ETH\n獲配者：{recipient}\n落筆次數：{gestures}\n{url}",
-      "success": "週期摘要已複製到剪貼簿"
-    },
-    "invalid": {
-      "title": "週期編號無效",
-      "help": "週期編號必須為正整數。"
+      "summary": "Cosmic Signature · 第 {cycle} 個週期\n簽名分配：{amount} ETH\n獲配者：{recipient}\n落筆次數：{gestures}",
+      "copyLink": "複製連結",
+      "linkCopied": "連結已複製",
+      "failed": "無法複製連結"
     },
     "error": {
       "title": "無法載入該週期",
@@ -73,8 +70,6 @@
       "total": "本週期共發放 {amount} ETH"
     },
     "statistics": {
-      "title": "週期統計",
-      "tooltip": "彙總本週期活動與分配流向的關鍵指標。",
       "cards": {
         "signatureEth": {
           "label": "簽名分配（ETH）",
@@ -98,7 +93,7 @@
           "tooltip": "本週期內擁有已錨定 NFT 的獨立地址數量。"
         },
         "totalContributed": {
-          "label": "ETH 貢獻",
+          "label": "直接貢獻",
           "tooltip": "本週期來自社群的直接 ETH 貢獻。"
         }
       }
@@ -113,17 +108,19 @@
       "tabs": {
         "gestures": "落筆歷史",
         "endurance": "堅守冠軍",
-        "stellar": "星選",
         "anchoring": "錨定配發",
         "contributions": "貢獻"
       },
       "empty": {
         "gestures": "本週期暫無落筆紀錄。",
         "endurance": "本週期暫無堅守冠軍資料。",
-        "stellar": "本週期暫無星選獲配者。",
         "anchoring": "本週期暫無錨定配發。",
         "nfts": "本週期沒有隨落筆附加的 NFT。",
         "erc20": "本週期沒有隨落筆附加的 ERC-20 代幣。"
+      },
+      "error": {
+        "title": "無法載入此清單",
+        "message": "清單暫時無法取得，請稍後再試。"
       },
       "contributions": {
         "nfts": "已附加 NFT",
@@ -135,6 +132,10 @@
   },
   "art": {
     "failed": "無法載入作品"
+  },
+  "split": {
+    "label": "{label}：{items}",
+    "item": "{track} {share}"
   },
   "missingCycle": {
     "open": {
@@ -173,16 +174,16 @@
       "viewCycle": "檢視第 {cycle} 個週期",
       "myAllocations": "我的分配",
       "allRecipients": "分配名錄",
-      "allCycles": "全部週期"
+      "allCycles": "全部週期",
+      "cycles": "其他週期"
     },
     "result": {
       "title": "第 {cycle} 個週期的簽名分配",
       "successTitle": "恭喜！你獲得了第 {cycle} 個週期的簽名分配",
       "lede": "週期收官時，寫下收官之筆的參與者獲得的簽名分配。",
+      "allocation": "分配",
       "successLede": "你寫下了第 {cycle} 個週期的收官之筆。ETH、CST 和這枚 Cosmic Signature 已在你的錢包中。",
       "componentsTitle": "分配包含的內容",
-      "eth": "ETH",
-      "cst": "CST",
       "nft": "Cosmic Signature NFT",
       "attached": "已附加 NFT",
       "recipient": "獲配者",

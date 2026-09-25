@@ -492,7 +492,7 @@ test.describe('raw HTML SEO', () => {
     const cases = [
       {
         path: '/allocation/42',
-        title: 'Cycle #42 Allocation Information · Cosmic Signature',
+        title: 'Cycle 42 Allocation Information · Cosmic Signature',
         canonical: `https://${APP_HOST}/allocation/42`,
       },
       {

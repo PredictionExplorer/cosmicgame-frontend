@@ -223,6 +223,7 @@
     "columns": {
       "finalized": "Завершено",
       "signature": "Розподіл Сигнатури",
+      "signatureRecipient": "Отримувач розподілу Сигнатури",
       "signatureEth": "Розподіл Сигнатури (ETH)",
       "chrono": "Воїн часу",
       "chronoEth": "Воїн часу (ETH)",

@@ -223,6 +223,7 @@
     "columns": {
       "finalized": "確定日時",
       "signature": "シグネチャー配分",
+      "signatureRecipient": "シグネチャー配分の受領者",
       "signatureEth": "シグネチャー配分（ETH）",
       "chrono": "時の戦士",
       "chronoEth": "時の戦士（ETH）",

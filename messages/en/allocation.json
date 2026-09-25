@@ -1,7 +1,6 @@
 {
   "formats": {
     "cycle": "Cycle {cycle}",
-    "cycleHash": "Cycle #{cycle}",
     "cosmicSignatureToken": "Cosmic Signature #{token}"
   },
   "recipients": {
@@ -11,32 +10,30 @@
       "scope": "Finalized cycle records only",
       "scopeTooltip": "Totals cover finalized Performance Cycles. Active cycles and separate allocation retrieval records are excluded."
     },
-    "intro": "When a Performance Cycle finalizes, the participant who made the Final Gesture retrieves the Signature Allocation — {percentage}% of the Cycle Reserve, 1,000 CST, and a unique Cosmic Signature NFT. Additional allocations flow through Chrono-Warrior, Stellar Selection, Anchor Distributions, Public Goods, and the Compounding Cycle Reserve.",
     "reserveSplit": {
       "label": "Cycle reserve split",
       "tooltip": "Percentages show how a finalized cycle's ETH reserve is allocated across protocol tracks."
     },
-    "ledgerTitle": "Finalized cycles"
+    "ledgerTitle": "Finalized cycles",
+    "loadError": "The finalized cycles could not be loaded. Try again in a moment."
   },
   "details": {
     "navigation": {
-      "previousAria": "Previous cycle",
-      "nextAria": "Next cycle"
+      "previousAria": "{cycle}, previous cycle",
+      "nextAria": "{cycle}, next cycle"
     },
     "recipientCard": {
       "recipient": "Recipient"
     },
     "share": {
-      "summary": "Cycle #{cycle} — Cosmic Signature\nSignature Allocation: {amount} ETH\nRecipient: {recipient}\nGestures: {gestures}\n{url}",
-      "success": "Cycle summary copied to clipboard"
-    },
-    "invalid": {
-      "title": "Invalid cycle number",
-      "help": "The cycle number must be a positive integer."
+      "summary": "Cycle {cycle} — Cosmic Signature\nSignature Allocation: {amount} ETH\nRecipient: {recipient}\nGestures: {gestures}",
+      "copyLink": "Copy link",
+      "linkCopied": "Link copied",
+      "failed": "The link could not be copied"
     },
     "error": {
       "title": "Couldn't load this cycle",
-      "message": "Cycle #{cycle} data failed to load. Try again, or go back to the recipients list."
+      "message": "Cycle {cycle} data failed to load. Try again, or go back to the recipients list."
     },
     "breadcrumbs": {
       "recipients": "Allocation Recipients"
@@ -73,8 +70,6 @@
       "total": "{amount} ETH distributed this cycle"
     },
     "statistics": {
-      "title": "Cycle statistics",
-      "tooltip": "Key metrics summarizing this cycle's activity and allocation distribution.",
       "cards": {
         "signatureEth": {
           "label": "Signature Allocation",
@@ -98,7 +93,7 @@
           "tooltip": "How many unique addresses had NFTs anchored during this cycle."
         },
         "totalContributed": {
-          "label": "Contributed ETH",
+          "label": "Direct contributions",
           "tooltip": "Direct ETH contributions from the community during this cycle."
         }
       }
@@ -113,17 +108,19 @@
       "tabs": {
         "gestures": "Gesture history",
         "endurance": "Endurance Champions",
-        "stellar": "Stellar Selection",
         "anchoring": "Anchor Distributions",
         "contributions": "Contributions"
       },
       "empty": {
         "gestures": "No gestures were made in this cycle.",
         "endurance": "No Endurance Champion data available for this cycle.",
-        "stellar": "No Stellar Selection recipients for this cycle.",
         "anchoring": "No Anchor Distributions in this cycle.",
         "nfts": "No NFTs were attached to gestures in this cycle.",
         "erc20": "No ERC-20 tokens were attached to gestures in this cycle."
+      },
+      "error": {
+        "title": "This list could not be loaded",
+        "message": "The list is temporarily unavailable. Try again in a moment."
       },
       "contributions": {
         "nfts": "Attached NFTs",
@@ -136,17 +133,21 @@
   "art": {
     "failed": "The artwork couldn't be loaded"
   },
+  "split": {
+    "label": "{label}: {items}",
+    "item": "{track} {share}"
+  },
   "missingCycle": {
     "open": {
-      "title": "Cycle #{cycle} is still open",
+      "title": "Cycle {cycle} is still open",
       "body": "Its allocation record appears here once the cycle is finalized."
     },
     "notStarted": {
-      "title": "Cycle #{cycle} hasn't started",
-      "body": "Cycles run one at a time, and Cycle #{live} is the one open now."
+      "title": "Cycle {cycle} hasn't started",
+      "body": "Cycles run one at a time, and Cycle {live} is the one open now."
     },
     "unknown": {
-      "title": "No record of Cycle #{cycle} yet",
+      "title": "No record of Cycle {cycle} yet",
       "body": "The cycle may still be open, or its record is still being indexed."
     },
     "currentCycle": "Follow the current cycle"
@@ -166,23 +167,23 @@
       "status": "Loading the finalized cycle"
     },
     "pending": {
-      "successTitle": "Cycle #{cycle} is finalized",
+      "successTitle": "Cycle {cycle} is finalized",
       "successBody": "Your finalization is on-chain. Its record appears here as soon as it is indexed; this page updates by itself."
     },
     "links": {
-      "viewCycle": "View Cycle #{cycle}",
+      "viewCycle": "View Cycle {cycle}",
       "myAllocations": "My Allocations",
       "allRecipients": "Allocation Recipients",
-      "allCycles": "All cycles"
+      "allCycles": "All cycles",
+      "cycles": "Other cycles"
     },
     "result": {
-      "title": "Cycle #{cycle} Signature Allocation",
-      "successTitle": "Congratulations! The Cycle #{cycle} Signature Allocation is yours",
+      "title": "Cycle {cycle} Signature Allocation",
+      "successTitle": "Congratulations! The Cycle {cycle} Signature Allocation is yours",
       "lede": "What the participant who made the Final Gesture received when the cycle was finalized.",
-      "successLede": "You made the Final Gesture of Cycle #{cycle}. The ETH, the CST and this Signature are now in your wallet.",
+      "allocation": "Allocation",
+      "successLede": "You made the Final Gesture of Cycle {cycle}. The ETH, the CST and this Signature are now in your wallet.",
       "componentsTitle": "What the allocation holds",
-      "eth": "ETH",
-      "cst": "CST",
       "nft": "Cosmic Signature NFT",
       "attached": "Attached NFTs",
       "recipient": "Recipient",

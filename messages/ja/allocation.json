@@ -1,7 +1,6 @@
 {
   "formats": {
     "cycle": "サイクル{cycle}",
-    "cycleHash": "サイクル{cycle}",
     "cosmicSignatureToken": "Cosmic Signature #{token}"
   },
   "recipients": {
@@ -11,28 +10,26 @@
       "scope": "確定したサイクルの記録のみ",
       "scopeTooltip": "このページはサイクルAPIから確定済みのパフォーマンス・サイクルを要約しています。未確定のサイクルや、関係のない配分受け取りの記録はこれらの合計に含まれません。"
     },
-    "intro": "パフォーマンス・サイクルが確定すると、最後の一筆を入れた参加者がシグネチャー配分——サイクル準備金の{percentage}%、1,000 CST、そして唯一のCosmic Signature NFT——を受け取ります。さらに、時の戦士、星選、係留配分、公共財、累積準備金を通じて追加の配分が流れます。",
     "reserveSplit": {
       "label": "サイクル準備金の内訳",
       "tooltip": "確定したサイクルのETH準備金がプロトコルの各トラックにどう配分されるかを割合で示します。"
     },
-    "ledgerTitle": "確定したサイクル"
+    "ledgerTitle": "確定したサイクル",
+    "loadError": "確定したサイクルを読み込めませんでした。しばらくしてからもう一度お試しください。"
   },
   "details": {
     "navigation": {
-      "previousAria": "前のサイクル",
-      "nextAria": "次のサイクル"
+      "previousAria": "{cycle}、前のサイクル",
+      "nextAria": "{cycle}、次のサイクル"
     },
     "recipientCard": {
       "recipient": "受領者"
     },
     "share": {
-      "summary": "サイクル{cycle}——Cosmic Signature\nシグネチャー配分：{amount} ETH\n受領者：{recipient}\n筆数：{gestures}\n{url}",
-      "success": "サイクルの要約をクリップボードにコピーしました"
-    },
-    "invalid": {
-      "title": "サイクル番号が無効です",
-      "help": "サイクル番号は正の整数でなければなりません。"
+      "summary": "サイクル{cycle}——Cosmic Signature\nシグネチャー配分：{amount} ETH\n受領者：{recipient}\n筆数：{gestures}",
+      "copyLink": "リンクをコピー",
+      "linkCopied": "リンクをコピーしました",
+      "failed": "リンクをコピーできませんでした"
     },
     "error": {
       "title": "このサイクルを読み込めませんでした",
@@ -73,8 +70,6 @@
       "total": "このサイクルの配分総額：{amount} ETH"
     },
     "statistics": {
-      "title": "サイクル統計",
-      "tooltip": "このサイクルの活動と配分の分布を要約する主な指標。",
       "cards": {
         "signatureEth": {
           "label": "シグネチャー配分ETH",
@@ -98,7 +93,7 @@
           "tooltip": "このサイクル中にNFTを係留していた異なるアドレスの数。"
         },
         "totalContributed": {
-          "label": "拠出されたETH",
+          "label": "直接拠出",
           "tooltip": "このサイクル中にコミュニティから直接拠出されたETH。"
         }
       }
@@ -113,17 +108,19 @@
       "tabs": {
         "gestures": "一筆の履歴",
         "endurance": "持久チャンピオン",
-        "stellar": "星選",
         "anchoring": "係留配分",
         "contributions": "拠出"
       },
       "empty": {
         "gestures": "このサイクルでは一筆は入れられませんでした。",
         "endurance": "このサイクルの持久チャンピオンのデータはありません。",
-        "stellar": "このサイクルには星選の受領者がいません。",
         "anchoring": "このサイクルに係留配分はありません。",
         "nfts": "このサイクルでは一筆にNFTは添付されませんでした。",
         "erc20": "このサイクルでは一筆にERC-20トークンは添付されませんでした。"
+      },
+      "error": {
+        "title": "この一覧を読み込めませんでした",
+        "message": "一覧を一時的に取得できません。しばらくしてからもう一度お試しください。"
       },
       "contributions": {
         "nfts": "添付されたNFT",
@@ -135,6 +132,10 @@
   },
   "art": {
     "failed": "作品を読み込めませんでした"
+  },
+  "split": {
+    "label": "{label}：{items}",
+    "item": "{track}{share}"
   },
   "missingCycle": {
     "open": {
@@ -173,16 +174,16 @@
       "viewCycle": "サイクル{cycle}を見る",
       "myAllocations": "自分の配分",
       "allRecipients": "配分の受領者",
-      "allCycles": "すべてのサイクル"
+      "allCycles": "すべてのサイクル",
+      "cycles": "ほかのサイクル"
     },
     "result": {
       "title": "サイクル{cycle}のシグネチャー配分",
       "successTitle": "おめでとうございます。サイクル{cycle}のシグネチャー配分を受け取りました",
       "lede": "サイクルの確定時に、最後の一筆を入れた参加者が受け取った配分です。",
+      "allocation": "配分",
       "successLede": "サイクル{cycle}の最後の一筆を入れました。ETH、CST、このCosmic Signatureはすでにウォレットにあります。",
       "componentsTitle": "配分の内容",
-      "eth": "ETH",
-      "cst": "CST",
       "nft": "Cosmic Signature NFT",
       "attached": "添付されたNFT",
       "recipient": "受領者",

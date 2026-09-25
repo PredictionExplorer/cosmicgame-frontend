@@ -6,10 +6,18 @@ import { useTranslations } from 'next-intl';
 import { toFiniteNumber } from '@/utils/finiteNumber';
 import { DataTable, type DataTableColumn } from '@/components/ui/data-table';
 import type { LedgerStateProps } from '@/components/tables/ledger-props';
+import { signatureMedia, signatureSources } from '@/components/nft/signatureMedia';
+import { ArtFrame } from '@/components/ui/art-frame';
 import type { RoundInfo } from '@/services/api';
 
 interface AllocationTableProps extends LedgerStateProps {
   list: RoundInfo[];
+  /**
+   * Show each cycle by the Signature it imprinted: a small black plate beside
+   * "Cycle 12", drawn from the seed the cycle's record carries (no token
+   * read), so the index reads as a gallery ledger.
+   */
+  showArt?: boolean;
 }
 
 /**
@@ -20,8 +28,9 @@ interface AllocationTableProps extends LedgerStateProps {
  * sub-header needs neither the unit nor the shared word and stays on one or
  * two lines. Each row leads to that cycle's allocation page.
  */
-export const AllocationTable = ({ list, ...state }: AllocationTableProps) => {
+export const AllocationTable = ({ list, showArt = false, ...state }: AllocationTableProps) => {
   const t = useTranslations('tables');
+  const tCommon = useTranslations('common');
 
   const columns = useMemo<DataTableColumn<RoundInfo>[]>(() => {
     const ethGroup = t('allocation.groups.eth');
@@ -32,7 +41,23 @@ export const AllocationTable = ({ list, ...state }: AllocationTableProps) => {
         kind: 'text',
         header: t('columns.cycle'),
         value: (cycle) => cycle.RoundNum,
-        cell: (cycle) => t('allocation.cycle', { cycle: cycle.RoundNum }),
+        cell: (cycle) =>
+          showArt && typeof cycle.TokenId === 'number' && cycle.TokenId >= 0 ? (
+            <span className="inline-flex items-center gap-3">
+              {/* The record's own seed: no token read per row. */}
+              <ArtFrame
+                sources={signatureSources(signatureMedia(cycle.TokenSeed))}
+                alt=""
+                sizes="64px"
+                density="compact"
+                unavailableLabel={tCommon('status.unavailable')}
+                className="w-16 shrink-0"
+              />
+              <span>{t('allocation.cycle', { cycle: cycle.RoundNum })}</span>
+            </span>
+          ) : (
+            t('allocation.cycle', { cycle: cycle.RoundNum })
+          ),
         nowrap: true,
         sortable: true,
       },
@@ -49,7 +74,8 @@ export const AllocationTable = ({ list, ...state }: AllocationTableProps) => {
       {
         id: 'recipient',
         kind: 'address',
-        header: t('columns.recipient'),
+        // The one recipient a cycle row names: the Signature Allocation's (a cycle has several).
+        header: t('allocation.columns.signatureRecipient'),
         value: (cycle) => cycle.WinnerAddr || null,
         whenBlank: 'unknown',
       },
@@ -124,7 +150,7 @@ export const AllocationTable = ({ list, ...state }: AllocationTableProps) => {
         value: (cycle) => toFiniteNumber(cycle.RoundStats?.TotalRaffleNFTs),
       },
     ];
-  }, [t]);
+  }, [showArt, t, tCommon]);
 
   return (
     <DataTable

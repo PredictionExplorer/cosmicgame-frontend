@@ -11,9 +11,21 @@ jest.mock('../../../../../hooks/useApiQuery', () => ({
 }));
 
 let capturedList: unknown[] = [];
+let capturedProps: { error?: unknown; onRetry?: () => void; showArt?: boolean } = {};
 jest.mock('../../../../../components/tables/AllocationTable', () => ({
-  AllocationTable: ({ list, loading }: { list: unknown[]; loading: boolean }) => {
+  AllocationTable: ({
+    list,
+    loading,
+    ...props
+  }: {
+    list: unknown[];
+    loading: boolean;
+    error?: unknown;
+    onRetry?: () => void;
+    showArt?: boolean;
+  }) => {
     capturedList = list;
+    capturedProps = props;
     return (
       <div data-testid="allocation-table">{loading ? 'Loading...' : `rows: ${list.length}`}</div>
     );
@@ -46,7 +58,7 @@ describe('AllocationRecipientsPage', () => {
     expect(screen.getByText(/allocation\.recipients\.header\.subtitle/i)).toBeInTheDocument();
   });
 
-  it('renders page-scope and reserve-split tooltips', () => {
+  it('explains the scope once, and the split in one sentence under its heading', () => {
     mockUseRoundList.mockReturnValue({ data: [], isLoading: false });
     render(<AllocationRecipientsPage />);
 
@@ -55,11 +67,31 @@ describe('AllocationRecipientsPage', () => {
         name: 'More information about allocation.recipients.header.scope',
       }),
     ).toBeInTheDocument();
+    // The legend's terms explain themselves: the heading carries no second (i).
     expect(
-      screen.getByRole('button', {
+      screen.queryByRole('button', {
         name: 'More information about allocation.recipients.reserveSplit.label',
       }),
-    ).toBeInTheDocument();
+    ).not.toBeInTheDocument();
+    expect(screen.getByText('allocation.recipients.reserveSplit.tooltip')).toBeInTheDocument();
+  });
+
+  it('leads with the ledger of finalized cycles, each shown by its Signature', () => {
+    mockUseRoundList.mockReturnValue({ data: [createRound()], isLoading: false });
+    render(<AllocationRecipientsPage />);
+    const ledger = screen.getByTestId('allocation-table');
+    const split = screen.getByRole('region', { name: 'allocation.recipients.reserveSplit.label' });
+    expect(ledger.compareDocumentPosition(split) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+    expect(capturedProps.showArt).toBe(true);
+  });
+
+  it('shows a failed cycle list as an error with a retry, never as "no finalized cycles"', () => {
+    const refetch = jest.fn();
+    mockUseRoundList.mockReturnValue({ data: undefined, isLoading: false, isError: true, refetch });
+    render(<AllocationRecipientsPage />);
+    expect(capturedProps.error).toBe('allocation.recipients.loadError');
+    capturedProps.onRetry?.();
+    expect(refetch).toHaveBeenCalledTimes(1);
   });
 
   it('passes loading state to AllocationTable', () => {
@@ -124,7 +156,7 @@ describe('AllocationRecipientsPage', () => {
     render(<AllocationRecipientsPage />);
     const bar = screen.getByRole('img', { name: /allocation\.recipients\.reserveSplit\.label/ });
     expect(bar.getAttribute('aria-label')).toContain(
-      `Signature Allocation ${protocolFacts.mainEthPercentage}%`,
+      `track=Signature Allocation,share=${protocolFacts.mainEthPercentage}%`,
     );
   });
 

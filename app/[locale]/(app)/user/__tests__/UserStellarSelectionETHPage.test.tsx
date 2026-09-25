@@ -10,10 +10,17 @@ const mockRetrieveAllStellarSelectionETH = jest.fn();
 let mockAccount: string | null = ADDRESS;
 let mockEthRetrieveBusy = false;
 const mockUseStellarSelectionDepositsByUser = jest.fn();
+const mockUseNftAllocations = jest.fn();
+const mockUseUserInfo = jest.fn();
+const mockUseDashboardInfo = jest.fn();
 
 jest.mock('../../../../../hooks/useApiQuery', () => ({
   useStellarSelectionDepositsByUser: (...args: unknown[]) =>
     mockUseStellarSelectionDepositsByUser(...args),
+  // Read by the empty state: the sibling kind, the pool and the participant's gestures.
+  useStellarSelectionNFTAllocationsByUser: (...args: unknown[]) => mockUseNftAllocations(...args),
+  useUserInfo: (...args: unknown[]) => mockUseUserInfo(...args),
+  useDashboardInfo: (...args: unknown[]) => mockUseDashboardInfo(...args),
 }));
 
 jest.mock('../../../../../hooks/web3', () => ({
@@ -69,6 +76,9 @@ beforeEach(() => {
   mockAccount = ADDRESS;
   mockEthRetrieveBusy = false;
   withDeposits(DEPOSITS);
+  mockUseNftAllocations.mockReturnValue({ data: undefined, isLoading: false });
+  mockUseUserInfo.mockReturnValue({ data: undefined, isLoading: false });
+  mockUseDashboardInfo.mockReturnValue({ data: undefined, isLoading: false });
 });
 
 describe('UserStellarSelectionETHPage', () => {
@@ -79,10 +89,8 @@ describe('UserStellarSelectionETHPage', () => {
     ).toBeInTheDocument();
     const trail = screen.getByRole('navigation', { name: /breadcrumb/i });
     expect(trail.querySelector(`a[href="/user/${ADDRESS}"]`)).not.toBeNull();
-    expect(screen.getByRole('link', { name: 'Participant profile' })).toHaveAttribute(
-      'href',
-      `/user/${ADDRESS}`,
-    );
+    // The trail and the address already lead to the profile: no third link to it.
+    expect(screen.queryByRole('link', { name: 'Participant profile' })).not.toBeInTheDocument();
   });
 
   it('totals what was allocated and what still waits', () => {
@@ -113,6 +121,35 @@ describe('UserStellarSelectionETHPage', () => {
       'href',
       '/faq#how-does-the-stellarSelection-work',
     );
+  });
+
+  it('keeps the figures as confirmed zeros, so the header never collapses', () => {
+    withDeposits([]);
+    const { container } = render(<UserStellarSelectionETHPage address={ADDRESS} />);
+    expect(container.querySelector('[data-figure="count"]')).toHaveTextContent('0');
+    expect(container.querySelector('[data-figure="total"]')).toHaveTextContent(/0.ETH/);
+  });
+
+  it('shows an empty page the participant’s place in the live pool and the sibling page', () => {
+    withDeposits([]);
+    mockUseNftAllocations.mockReturnValue({
+      data: [{ TokenId: 1 }, { TokenId: 2 }],
+      isLoading: false,
+    });
+    mockUseDashboardInfo.mockReturnValue({
+      data: { CurRoundNum: 2, TsRoundStart: 100, CurNumBids: 1147 },
+      isLoading: false,
+    });
+    mockUseUserInfo.mockReturnValue({
+      data: { Gestures: Array.from({ length: 293 }, () => ({ RoundNum: 2 })) },
+      isLoading: false,
+    });
+    render(<UserStellarSelectionETHPage address={ADDRESS} />);
+    expect(mockUseNftAllocations).toHaveBeenCalledWith(ADDRESS);
+    const sibling = screen.getByRole('link', { name: /Stellar Selection · NFTs/ });
+    expect(sibling).toHaveAttribute('href', `/user/stellar-selection-nft/${ADDRESS}`);
+    expect(sibling).toHaveTextContent('2');
+    expect(screen.getByText(/293/)).toBeInTheDocument();
   });
 
   it('shows a failed read as an error with a retry, never as "no ETH yet"', () => {

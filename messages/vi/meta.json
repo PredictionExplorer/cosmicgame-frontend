@@ -122,8 +122,8 @@
     "description": "Chi tiết đầy đủ về chu kỳ trình diễn đang diễn ra: lịch sử nét bút, bảng xếp hạng, đóng góp đính kèm và phân phối phân bổ."
   },
   "allocationInfo": {
-    "titleFor": "Thông tin phân bổ chu kỳ #{id}",
-    "descriptionFor": "Thông tin phân bổ chi tiết của chu kỳ Cosmic Signature #{id} — chi tiết người nhận, phân phối phân bổ Signature, kết quả Tinh tuyển và phân bổ NFT đính kèm."
+    "titleFor": "Thông tin phân bổ chu kỳ {id}",
+    "descriptionFor": "Thông tin phân bổ chi tiết của chu kỳ {id} của Cosmic Signature — chi tiết người nhận, phân phối phân bổ Signature, kết quả Tinh tuyển và phân bổ NFT đính kèm."
   },
   "anchorAction": {
     "description": "Chi tiết về một thao tác neo giữ cụ thể trong Cosmic Signature — loại token, số lượng đã neo giữ và trạng thái nhận về phân phối."

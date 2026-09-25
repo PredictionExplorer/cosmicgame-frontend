@@ -87,7 +87,7 @@ describe('AllocationTable', () => {
     expect(headers).toEqual([
       'tables.columns.cycle',
       'tables.allocation.columns.finalized',
-      'tables.columns.recipient',
+      'tables.allocation.columns.signatureRecipient',
       'tables.allocation.columns.signature',
       'tables.allocation.columns.chrono',
       'tables.allocation.columns.stellar',

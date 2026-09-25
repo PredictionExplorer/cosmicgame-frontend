@@ -1,13 +1,11 @@
 'use client';
 
 import { useMemo } from 'react';
-import { ArrowRight } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 
-import { Link } from '@/i18n/navigation';
 import type { PageHeaderFigure } from '@/components/layout/PageHeader';
 import { Amount } from '@/components/ui/amount';
-import { Button, buttonVariants } from '@/components/ui/button';
+import { Button } from '@/components/ui/button';
 import { PageShell } from '@/components/ui/page-shell';
 import { Skeleton } from '@/components/ui/skeleton';
 import { TxStatus } from '@/components/ui/tx-status';
@@ -16,9 +14,9 @@ import {
   EthAllocationsTable,
   type EthAllocationRow,
 } from '@/components/winnings/EthAllocationsTable';
+import { StellarSelectionEmpty } from '@/components/winnings/StellarSelectionEmpty';
 import {
   InvalidParticipantState,
-  STELLAR_SELECTION_FAQ_HREF,
   StellarSelectionHeader,
 } from '@/components/winnings/StellarSelectionHeader';
 import { participantAddress } from '@/components/winnings/participantAddress';
@@ -27,7 +25,7 @@ import { useClaimAllocations } from '@/hooks/useClaimAllocations';
 import { useFormat } from '@/hooks/useFormat';
 import { useTxStageLabel } from '@/hooks/useTxStageLabel';
 import { useActiveWeb3React } from '@/hooks/web3';
-import { RetrieveIcon, StellarSelectionIcon } from '@/lib/conceptIcons';
+import { RetrieveIcon } from '@/lib/conceptIcons';
 import { toFiniteNumber } from '@/utils/finiteNumber';
 import { sameAddress } from '@/utils/format';
 
@@ -104,8 +102,9 @@ const UserStellarSelectionETHPage = ({ address: rawAddress }: { address: string 
       <StellarSelectionHeader
         kind="eth"
         address={address}
-        // An address with nothing selected yet (or whose read failed) reads from its state alone.
-        figures={isError || (!isLoading && rows.length === 0) ? undefined : figures}
+        // Confirmed zeros for an address with nothing selected yet, so the header never
+        // collapses (and moves the page) once the read arrives; a failed read has no figures.
+        figures={isError ? undefined : figures}
         empty={empty}
         actions={
           canRetrieve ? (
@@ -127,29 +126,21 @@ const UserStellarSelectionETHPage = ({ address: rawAddress }: { address: string 
         {canRetrieve ? <TxStatus stage={txStage} className="mt-4" /> : null}
       </StellarSelectionHeader>
 
-      <EthAllocationsTable
-        rows={rows}
-        ariaLabel={t('stellarSelectionEth.tableLabel')}
-        showSource={false}
-        showStatus
-        loading={isLoading}
-        error={isError ? t('stellarSelectionPages.errorMessage') : undefined}
-        errorTitle={t('stellarSelectionEth.errorTitle')}
-        onRetry={() => void refetch()}
-        headingLevel={2}
-        emptyTitle={t('stellarSelectionEth.emptyTitle')}
-        emptyDescription={t('stellarSelectionEth.emptyDescription')}
-        emptyIcon={<StellarSelectionIcon aria-hidden className="size-6" />}
-        emptyAction={
-          <Link
-            href={STELLAR_SELECTION_FAQ_HREF}
-            className={buttonVariants({ variant: 'outline', size: 'sm' })}
-          >
-            {t('stellarSelectionPages.howItWorks')}
-            <ArrowRight aria-hidden className="size-4" />
-          </Link>
-        }
-      />
+      {empty ? (
+        <StellarSelectionEmpty kind="eth" address={address} />
+      ) : (
+        <EthAllocationsTable
+          rows={rows}
+          ariaLabel={t('stellarSelectionEth.tableLabel')}
+          showSource={false}
+          showStatus
+          loading={isLoading}
+          error={isError ? t('stellarSelectionPages.errorMessage') : undefined}
+          errorTitle={t('stellarSelectionEth.errorTitle')}
+          onRetry={() => void refetch()}
+          headingLevel={2}
+        />
+      )}
     </PageShell>
   );
 };

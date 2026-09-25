@@ -21,6 +21,8 @@ jest.mock('../../../../../hooks/useApiQuery', () => ({
   useCSTInfo: (...args: unknown[]) => mockUseCSTInfo(...args),
   useRoundList: (...args: unknown[]) => mockUseRoundList(...args),
   useCSTList: (...args: unknown[]) => mockUseCSTList(...args),
+  // The live cycle (useLiveCycle); unread here, so the cycle list stands in.
+  useDashboardInfo: () => ({ data: undefined, isLoading: false }),
 }));
 
 const mockUseCSTList = jest.fn();
@@ -33,6 +35,8 @@ jest.mock('../../../../../hooks/web3', () => ({
 const mockReplace = jest.fn();
 const mockGetBlock = jest.fn().mockResolvedValue({ timestamp: 50n });
 const mockRoundActivationTime = jest.fn().mockResolvedValue(100n);
+/** The chain's cycle count: past 5 means Cycle 5 is finalized. */
+const mockRoundNum = jest.fn().mockResolvedValue(6n);
 
 jest.mock('wagmi', () => ({
   usePublicClient: () => ({
@@ -40,13 +44,16 @@ jest.mock('wagmi', () => ({
   }),
 }));
 
+// The real hook hands out one contract per address: so does the mock.
+const mockContract = {
+  read: {
+    roundActivationTime: (...args: unknown[]) => mockRoundActivationTime(...args),
+    roundNum: (...args: unknown[]) => mockRoundNum(...args),
+  },
+};
 jest.mock('../../../../../hooks/useCosmicGameContract', () => ({
   __esModule: true,
-  default: () => ({
-    read: {
-      roundActivationTime: (...args: unknown[]) => mockRoundActivationTime(...args),
-    },
-  }),
+  default: () => mockContract,
 }));
 
 /** The page's query; the server reads it (page.tsx) and passes the page its cycle. */
@@ -101,6 +108,7 @@ beforeEach(() => {
   query = new URLSearchParams('cycle=5');
   mockGetBlock.mockResolvedValue({ timestamp: 50n });
   mockRoundActivationTime.mockResolvedValue(100n);
+  mockRoundNum.mockResolvedValue(6n);
   roundInfo(undefined);
   mockUseCSTInfo.mockReturnValue({ data: { TokenId: 99, Seed: 'abc', TokenName: '' } });
   mockUseRoundList.mockReturnValue({ data: [], isLoading: false });
@@ -134,16 +142,27 @@ describe('AllocationFinalizedPage', () => {
     expect(screen.getByText('allocation.finalized.result.lede')).toBeInTheDocument();
   });
 
-  it('opens a finalization on the waiting header while the first read loads', () => {
+  it('opens a finalization on the waiting header once the chain has finalized the cycle', async () => {
     query = new URLSearchParams('cycle=5&message=success');
     roundInfo(undefined, true);
     render(<Page />);
     expect(
-      screen.getByRole('heading', {
+      await screen.findByRole('heading', {
         level: 1,
         name: 'allocation.finalized.pending.successTitle(cycle=5)',
       }),
     ).toBeInTheDocument();
+  });
+
+  it('never claims a finalization the chain has not made, whatever the link says', async () => {
+    // A shared or typed success link for a cycle still open: the chain is on Cycle 5.
+    query = new URLSearchParams('cycle=5&message=success');
+    mockRoundNum.mockResolvedValue(5n);
+    roundInfoFails(400);
+    render(<Page />);
+    await act(async () => {});
+    expect(screen.queryByText(/pending\.successTitle/)).not.toBeInTheDocument();
+    expect(screen.getByRole('heading', { level: 1 })).toHaveTextContent(/missingCycle/);
   });
 
   it('reads the cycle as a neutral record for any visitor', () => {
@@ -163,6 +182,8 @@ describe('AllocationFinalizedPage', () => {
     expect(section).toHaveTextContent('1.2346');
     expect(section).not.toHaveTextContent('1.234567');
     expect(section).toHaveTextContent('1,000');
+    // One "Allocation" row carries both amounts, each unit in its value only.
+    expect(section).toHaveTextContent(/allocation\.finalized\.result\.allocation1\.2346.ETH/);
     expect(within(section).getAllByRole('link', { name: /#000099/ })[0]).toHaveAttribute(
       'href',
       '/detail/99',
@@ -207,7 +228,7 @@ describe('AllocationFinalizedPage', () => {
     roundInfo(ALLOCATION);
     render(<Page />);
     const caption = screen.getByTestId('finalized-signature').querySelector('figcaption');
-    expect(caption).toHaveTextContent('allocation.formats.cycleHash(cycle=5)');
+    expect(caption).toHaveTextContent('allocation.formats.cycle(cycle=5)');
     expect(caption?.querySelector('time')).toBeNull();
   });
 
@@ -255,12 +276,13 @@ describe('AllocationFinalizedPage', () => {
     expect(screen.getByText('allocation.details.error.title')).toBeInTheDocument();
   });
 
-  it('keeps asking for the record after a finalization until the indexer has it', () => {
-    jest.useFakeTimers();
+  it('keeps asking for the record after a finalization until the indexer has it', async () => {
+    jest.useFakeTimers({ doNotFake: ['queueMicrotask', 'nextTick'] });
     try {
       query = new URLSearchParams('cycle=0&message=success');
       roundInfoFails(400);
       render(<Page />);
+      await act(async () => {});
       expect(
         screen.getByRole('heading', {
           level: 1,
@@ -276,6 +298,42 @@ describe('AllocationFinalizedPage', () => {
     }
   });
 
+  it('stops asking after five minutes and reads as the neutral "no record yet"', async () => {
+    jest.useFakeTimers({ doNotFake: ['queueMicrotask', 'nextTick'] });
+    try {
+      query = new URLSearchParams('cycle=0&message=success');
+      roundInfoFails(400);
+      render(<Page />);
+      await act(async () => {});
+      act(() => {
+        jest.advanceTimersByTime(5 * 60_000 + 10_000);
+      });
+      const calls = mockRefetch.mock.calls.length;
+      act(() => {
+        jest.advanceTimersByTime(60_000);
+      });
+      expect(mockRefetch).toHaveBeenCalledTimes(calls);
+      expect(screen.queryByText(/pending\.successTitle/)).not.toBeInTheDocument();
+    } finally {
+      jest.useRealTimers();
+    }
+  });
+
+  it('steps to the neighbouring cycles’ records', () => {
+    mockUseRoundList.mockReturnValue({
+      data: [3, 4, 5, 6].map((RoundNum) => ({ RoundNum })),
+      isLoading: false,
+    });
+    roundInfo(ALLOCATION);
+    render(<Page />);
+    const nav = screen.getByRole('navigation', { name: 'allocation.finalized.links.cycles' });
+    const links = within(nav).getAllByRole('link');
+    expect(links.map((link) => link.getAttribute('href'))).toEqual([
+      '/allocation-finalized?cycle=4',
+      '/allocation-finalized?cycle=6',
+    ]);
+  });
+
   it('shows the latest finalized cycles by their Signatures when no cycle is named', () => {
     query = new URLSearchParams('');
     mockUseRoundList.mockReturnValue({
@@ -288,10 +346,9 @@ describe('AllocationFinalizedPage', () => {
     render(<Page seoSummary={<h1>Summary</h1>} />);
     expect(screen.getByRole('heading', { level: 1, name: 'Summary' })).toBeInTheDocument();
     const cards = screen.getAllByRole('figure');
-    expect(within(cards[0]!).getByRole('link', { name: /cycleHash\(cycle=1\)/ })).toHaveAttribute(
-      'href',
-      '/allocation/1',
-    );
+    expect(
+      within(cards[0]!).getByRole('link', { name: /formats\.cycle\(cycle=1\)/ }),
+    ).toHaveAttribute('href', '/allocation/1');
     expect(mockUseRoundInfo).toHaveBeenCalledWith(-1);
   });
 

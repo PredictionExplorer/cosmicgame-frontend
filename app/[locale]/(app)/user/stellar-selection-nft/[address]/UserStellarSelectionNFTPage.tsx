@@ -1,30 +1,28 @@
 'use client';
 
 import { useMemo, useState } from 'react';
-import { ArrowRight } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 
 import { Link } from '@/i18n/navigation';
 import type { PageHeaderFigure } from '@/components/layout/PageHeader';
+import { useWallPage } from '@/components/nft/useWallPage';
 import { ArtTag, PendingPlate } from '@/components/ui/art-frame';
-import { buttonVariants } from '@/components/ui/button';
 import { DateTime } from '@/components/ui/date-time';
-import { EmptyState } from '@/components/ui/empty-state';
 import { ErrorState } from '@/components/ui/error-state';
 import { PageShell } from '@/components/ui/page-shell';
 import { TablePagination } from '@/components/ui/pagination';
 import { Skeleton } from '@/components/ui/skeleton';
-import { SignatureCard } from '@/components/winnings/SignatureCard';
+import { AllocationSignatureCard } from '@/components/winnings/AllocationSignatureCard';
+import { StellarSelectionEmpty } from '@/components/winnings/StellarSelectionEmpty';
 import {
   InvalidParticipantState,
-  STELLAR_SELECTION_FAQ_HREF,
   StellarSelectionHeader,
 } from '@/components/winnings/StellarSelectionHeader';
 import { participantAddress } from '@/components/winnings/participantAddress';
+import { useCycleHref } from '@/components/tables/useCycleHref';
 import { useSignatureIndex } from '@/components/winnings/useSignatureIndex';
 import { useStellarSelectionNFTAllocationsByUser } from '@/hooks/useApiQuery';
 import { useFormat } from '@/hooks/useFormat';
-import { StellarSelectionIcon } from '@/lib/conceptIcons';
 import { formatId } from '@/utils/format/ids';
 import type { StellarSelectionNFTRecipient } from '@/services/api/types';
 
@@ -43,21 +41,41 @@ function selectionSource(row: StellarSelectionNFTRecipient): SelectionSource {
   return row.IsStaker ? 'anchorHolder' : 'participant';
 }
 
+interface UserStellarSelectionNFTPageProps {
+  address: string;
+  /**
+   * Seeds and names of the Signatures on the first page, read on the server,
+   * so the first plates and their titles are in the first HTML.
+   */
+  artSeeds?: Readonly<Record<string, { seed: string | number; name?: string }>>;
+  /** The page in the URL (`UserStellarSelectionNFTRoute`); without it the page is local. */
+  page?: number;
+  onPageChange?: (page: number) => void;
+}
+
 /**
  * The Cosmic Signature NFTs Stellar Selection allocated to a participant,
  * shown as the art itself: each Signature on its plate with a wall label
  * (name or number, cycle and date, and what the participant was selected
  * as), newest first.
  */
-function UserStellarSelectionNFTPage({ address: rawAddress }: { address: string }) {
+function UserStellarSelectionNFTPage({
+  address: rawAddress,
+  artSeeds,
+  page: urlPage,
+  onPageChange,
+}: UserStellarSelectionNFTPageProps) {
   const t = useTranslations('statistics');
   const tDetail = useTranslations('detail');
+  const tTables = useTranslations('tables');
+  const cycleHref = useCycleHref();
   const format = useFormat();
   const address = participantAddress(rawAddress);
-  const [page, setPage] = useState(1);
+  const [localPage, setLocalPage] = useState(1);
+  const page = urlPage ?? localPage;
+  const setPage = onPageChange ?? setLocalPage;
 
   const { data, isLoading, isError, refetch } = useStellarSelectionNFTAllocationsByUser(address);
-  const signatures = useSignatureIndex();
 
   const rows = useMemo(
     () =>
@@ -67,6 +85,13 @@ function UserStellarSelectionNFTPage({ address: rawAddress }: { address: string 
     [data],
   );
   const cycles = useMemo(() => new Set(rows.map((row) => row.RoundNum)).size, [rows]);
+  // The server's seeds draw the first page; the collection is read only for a plate they
+  // do not cover (a later page, or a token newer than the server's read).
+  const serverEntry = (tokenId: number) => artSeeds?.[String(tokenId)];
+  const needsIndex = rows.some(
+    (row) => typeof row.TokenId === 'number' && serverEntry(row.TokenId) === undefined,
+  );
+  const signatures = useSignatureIndex({ enabled: needsIndex });
 
   if (!address) {
     return (
@@ -90,16 +115,21 @@ function UserStellarSelectionNFTPage({ address: rawAddress }: { address: string 
     },
   ];
 
-  const visible = rows.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
+  // A page past the end (a stale link) shows the last one.
+  const pageCount = Math.max(1, Math.ceil(rows.length / PAGE_SIZE));
+  const currentPage = Math.min(page, pageCount);
+  const visible = rows.slice((currentPage - 1) * PAGE_SIZE, currentPage * PAGE_SIZE);
+  const empty = !isLoading && !isError && rows.length === 0;
 
   return (
     <PageShell variant="data" backdrop="signature">
       <StellarSelectionHeader
         kind="nft"
         address={address}
-        // An address with nothing selected yet (or whose read failed) reads from its state alone.
-        figures={isError || (!isLoading && rows.length === 0) ? undefined : figures}
-        empty={!isLoading && !isError && rows.length === 0}
+        // Confirmed zeros for an address with nothing selected yet, so the header never
+        // collapses (and moves the page) once the read arrives; a failed read has no figures.
+        figures={isError ? undefined : figures}
+        empty={empty}
       />
 
       {isError ? (
@@ -121,22 +151,7 @@ function UserStellarSelectionNFTPage({ address: rawAddress }: { address: string 
           ))}
         </ul>
       ) : rows.length === 0 ? (
-        <EmptyState
-          variant="page"
-          headingLevel={2}
-          icon={<StellarSelectionIcon aria-hidden className="size-6" />}
-          title={t('stellarSelectionNft.emptyTitle')}
-          description={t('stellarSelectionNft.emptyDescription')}
-          action={
-            <Link
-              href={STELLAR_SELECTION_FAQ_HREF}
-              className={buttonVariants({ variant: 'outline', size: 'sm' })}
-            >
-              {t('stellarSelectionPages.howItWorks')}
-              <ArrowRight aria-hidden className="size-4" />
-            </Link>
-          }
-        />
+        <StellarSelectionEmpty kind="nft" address={address} />
       ) : (
         <section aria-label={t('stellarSelectionNft.gridLabel')} className="mb-10">
           {signatures.state === 'failed' ? (
@@ -152,20 +167,20 @@ function UserStellarSelectionNFTPage({ address: rawAddress }: { address: string 
           <ul className={GRID_CLASS}>
             {visible.map((row) => {
               const tokenId = row.TokenId as number;
-              const entry = signatures.get(tokenId);
+              const entry = serverEntry(tokenId) ?? signatures.get(tokenId);
               const id = formatId(tokenId);
               return (
                 <li key={`${row.EvtLogId ?? tokenId}-${tokenId}`}>
-                  <SignatureCard
+                  <AllocationSignatureCard
                     tokenId={tokenId}
                     seed={entry?.seed}
-                    artState={signatures.state}
+                    artState={serverEntry(tokenId) ? 'ready' : signatures.state}
                     title={entry?.name ?? t('stellarSelectionNft.unnamed', { id })}
                     meta={[
                       entry?.name ? <span className="type-mono">{id}</span> : null,
                       typeof row.RoundNum === 'number' ? (
-                        <Link href={`/allocation/${row.RoundNum}`} className="link-quiet">
-                          {t('stellarSelectionNft.cycle', { cycle: row.RoundNum })}
+                        <Link href={cycleHref(row.RoundNum)} className="link-quiet">
+                          {tTables('allocation.cycle', { cycle: row.RoundNum })}
                         </Link>
                       ) : null,
                       row.TimeStamp ? <DateTime timestamp={row.TimeStamp} /> : null,
@@ -188,7 +203,7 @@ function UserStellarSelectionNFTPage({ address: rawAddress }: { address: string 
             })}
           </ul>
           <TablePagination
-            page={page}
+            page={currentPage}
             pageSize={PAGE_SIZE}
             total={rows.length}
             onPageChange={setPage}
@@ -198,6 +213,18 @@ function UserStellarSelectionNFTPage({ address: rawAddress }: { address: string 
       )}
     </PageShell>
   );
+}
+
+/**
+ * The page with its page number in the URL (`?page=2`), so Back from a
+ * Signature returns to the same plates and a page can be shared. The route
+ * renders it under Suspense with the first page as the prerendered fallback.
+ */
+export function UserStellarSelectionNFTRoute(
+  props: Omit<UserStellarSelectionNFTPageProps, 'page' | 'onPageChange'>,
+) {
+  const { page, setPage } = useWallPage();
+  return <UserStellarSelectionNFTPage {...props} page={page} onPageChange={setPage} />;
 }
 
 export default UserStellarSelectionNFTPage;
