@@ -21,6 +21,10 @@ import { sumAllocatedEth } from '@/utils/allocationRecords';
 import { toFiniteNumber } from '@/utils/finiteNumber';
 import { formatCount, formatPercent, sameAddress } from '@/utils/format';
 
+import {
+  FINALIZED_INDEX_FIGURES,
+  FINALIZED_INDEX_LINKS,
+} from './allocation-finalized/finalizedIndexSummary';
 import { ContributionFigure } from './eth-contribution/ContributionFigure';
 import {
   readAnchorCstActions,
@@ -128,12 +132,7 @@ const routeDefinitions: Record<SeoSummaryRoute, RouteDefinition> = {
   },
   'allocation-finalized': {
     section: 'records',
-    // Every cycle is one click away in the page's own index ("All cycles").
-    links: [
-      { href: '/my-allocations', key: 'myAllocations' },
-      { href: '/statistics', key: 'statistics' },
-      { href: '/contracts', key: 'contracts' },
-    ],
+    links: FINALIZED_INDEX_LINKS,
   },
   'named-nfts': {
     section: 'collection',
@@ -449,18 +448,21 @@ async function getRouteFigures(
     case 'allocation-finalized': {
       const history = await readClaimHistory();
       const rows = history.data;
+      const values = {
+        records: rows && count(rows.length),
+        // History rows mix ETH, CST and NFT record types, and `AmountEth` carries each
+        // row's own unit: only ETH allocation types may be summed as ETH.
+        eth: rows && eth(sumAllocatedEth(rows)),
+        recipients: rows && count(countDistinctAddresses(rows.map((row) => row.WinnerAddr))),
+      };
       return {
         reads: [history],
-        figures: [
-          { key: 'records', value: rows && count(rows.length), hasTooltip: true },
-          // History rows mix ETH, CST and NFT record types, and `AmountEth` carries each
-          // row's own unit: only ETH allocation types may be summed as ETH.
-          { key: 'eth', value: rows && eth(sumAllocatedEth(rows)), hasTooltip: true },
-          {
-            key: 'recipients',
-            value: rows && count(countDistinctAddresses(rows.map((row) => row.WinnerAddr))),
-          },
-        ],
+        // The loading state draws the same figures (FINALIZED_INDEX_FIGURES) before they arrive.
+        figures: FINALIZED_INDEX_FIGURES.map(({ key, tooltip }) => ({
+          key,
+          value: values[key],
+          hasTooltip: tooltip,
+        })),
       };
     }
     case 'named-nfts': {

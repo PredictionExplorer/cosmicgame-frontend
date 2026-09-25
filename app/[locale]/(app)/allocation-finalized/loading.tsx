@@ -1,23 +1,20 @@
-import { useTranslations } from 'next-intl';
+import { PageMessages } from '@/components/i18n/PageMessages';
 
-import { PageShell } from '@/components/ui/page-shell';
-import { SkeletonPageHeader } from '@/components/ui/skeleton';
-
-import { FinalizedSignatureSkeleton } from './FinalizedSignatureSkeleton';
+import { FinalizedLoading } from './FinalizedLoading';
 
 /**
- * A finalized cycle's record while the server renders it (the route reads its
- * query, so it renders on every request): the page's own shell, header and
- * record skeleton, the shape a participant who just finalized lands in. The
- * finalize flow's navigation shows this at once instead of waiting on the
- * current page.
+ * A finalized cycle's record, or the index, while the server renders it: the
+ * route reads its query, so it renders on every request, and the finalize
+ * flow's navigation shows this at once instead of waiting on the current
+ * page. It is the page's own header and the shape its data lands in
+ * (`FinalizedLoading`), so nothing moves when the page arrives. The route is
+ * rendered per request, never for the cache, so the boundary may read the
+ * request's locale for the page's messages.
  */
 export default function AllocationFinalizedLoading() {
-  const t = useTranslations('allocation');
   return (
-    <PageShell variant="data" backdrop="signature">
-      <SkeletonPageHeader />
-      <FinalizedSignatureSkeleton label={t('finalized.loading.status')} />
-    </PageShell>
+    <PageMessages namespaces={['allocation', 'seo']}>
+      <FinalizedLoading />
+    </PageMessages>
   );
 }

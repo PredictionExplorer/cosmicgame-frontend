@@ -4,8 +4,8 @@ import { Skeleton } from '@/components/ui/skeleton';
 /**
  * A finalized cycle's record while it loads: the plate (7 of 12 columns from
  * `lg`) beside the spec sheet's rows, the shape the record lands in, so
- * nothing moves when it arrives. Shared by the page and the route's
- * loading.tsx.
+ * nothing moves when it arrives. Shared by the page and its loading state
+ * (`FinalizedLoading`).
  */
 export function FinalizedSignatureSkeleton({ label }: { label: string }) {
   return (

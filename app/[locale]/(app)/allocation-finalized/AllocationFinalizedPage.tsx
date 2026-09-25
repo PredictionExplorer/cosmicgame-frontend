@@ -18,8 +18,6 @@ import { DateTime } from '@/components/ui/date-time';
 import { EmptyState } from '@/components/ui/empty-state';
 import { ErrorState } from '@/components/ui/error-state';
 import { PageShell } from '@/components/ui/page-shell';
-import { SectionHeader } from '@/components/ui/section-header';
-import { Skeleton } from '@/components/ui/skeleton';
 import { TxExplorerLink } from '@/components/ui/tx-status';
 import { isRenderPending, signatureMedia, signatureSources } from '@/components/nft/signatureArt';
 import { useLiveCycle, useMissingCycle } from '@/components/winnings/missingCycle';
@@ -39,6 +37,14 @@ import { sameAddress } from '@/utils/format';
 import { formatId } from '@/utils/format/ids';
 
 import { FinalizedSignatureSkeleton } from './FinalizedSignatureSkeleton';
+import {
+  FinalizedIndexHeader,
+  FinalizedIndexSection,
+  FinalizedIndexSkeleton,
+  FinalizedRecordHeader,
+  INDEX_CYCLES,
+  finalizedTrail,
+} from './finalizedShell';
 
 /** Poll interval while waiting for the next cycle to become active (chain activation time). */
 const ACTIVATION_POLL_MS = 4000;
@@ -49,8 +55,6 @@ const RECORD_POLL_MS = 5000;
  * page reads as the neutral "no record yet" state, which a reload re-checks.
  */
 const RECORD_POLL_LIMIT_MS = 5 * 60_000;
-/** How many finalized cycles the page shows when no cycle is named. */
-const INDEX_CYCLES = 3;
 
 interface AllocationFinalizedPageProps {
   /** The cycle of `?cycle=N`, read on the server; `null` shows the index of the latest cycles. */
@@ -122,33 +126,14 @@ const AllocationFinalizedPage = ({
   if (cycle === null) {
     return (
       <PageShell variant="data" backdrop="signature">
-        {seoSummary ?? (
-          <PageHeader
-            section="records"
-            title={t('finalized.title')}
-            subtitle={t('finalized.index.description')}
-          />
-        )}
+        {seoSummary ?? <FinalizedIndexHeader />}
         <FinalizedCycleIndex />
       </PageShell>
     );
   }
 
-  const trail = [
-    { label: t('details.breadcrumbs.recipients'), href: '/allocation' },
-    { label: t('formats.cycle', { cycle }), href: `/allocation/${cycle}` },
-  ];
-
-  // The neutral record's header: the loading and error states keep it, so the record lands
-  // under the same title and lede.
-  const recordHeader = (
-    <PageHeader
-      section="records"
-      breadcrumbs={trail}
-      title={t('finalized.result.title', { cycle })}
-      subtitle={t('finalized.result.lede')}
-    />
-  );
+  const trail = finalizedTrail(t, cycle);
+  const recordHeader = <FinalizedRecordHeader cycle={cycle} />;
 
   // Arriving from their own finalization (the chain agrees), the participant waits for the
   // indexer here: the same header while the first read loads and while the indexer catches up.
@@ -586,54 +571,35 @@ function FinalizedCycleIndex() {
             className="mb-6"
           />
         ) : null}
-        <ul className="grid gap-x-8 gap-y-10 sm:grid-cols-2 lg:grid-cols-3" aria-busy={isLoading}>
-          {isLoading
-            ? Array.from({ length: INDEX_CYCLES }, (_, index) => (
-                <li key={index} className="flex flex-col gap-3">
-                  <PendingPlate busy density="compact" />
-                  <Skeleton className="h-4 w-2/5" />
-                  <Skeleton className="h-3 w-3/5" />
-                </li>
-              ))
-            : latest.map((round) => (
-                <li key={round.RoundNum}>
-                  <AllocationSignatureCard
-                    tokenId={round.TokenId}
-                    seed={round.TokenSeed ?? signatures.get(round.TokenId)?.seed}
-                    artState={round.TokenSeed === undefined ? signatures.state : 'ready'}
-                    href={`/allocation/${round.RoundNum}`}
-                    title={t('formats.cycle', { cycle: round.RoundNum })}
-                    meta={[
-                      <Amount key="eth" value={round.AmountEth} unit="ETH" />,
-                      round.TimeStamp ? <DateTime key="date" timestamp={round.TimeStamp} /> : null,
-                    ]}
-                    sizes="(min-width: 1024px) 26rem, (min-width: 640px) 45vw, 100vw"
-                    unavailableLabel={tDetail('image.artworkUnavailable')}
-                    unavailableDetail={formatId(round.TokenId)}
-                  />
-                </li>
-              ))}
-        </ul>
+        {isLoading ? (
+          <FinalizedIndexSkeleton />
+        ) : (
+          <ul className="grid gap-x-8 gap-y-10 sm:grid-cols-2 lg:grid-cols-3">
+            {latest.map((round) => (
+              <li key={round.RoundNum}>
+                <AllocationSignatureCard
+                  tokenId={round.TokenId}
+                  seed={round.TokenSeed ?? signatures.get(round.TokenId)?.seed}
+                  artState={round.TokenSeed === undefined ? signatures.state : 'ready'}
+                  href={`/allocation/${round.RoundNum}`}
+                  title={t('formats.cycle', { cycle: round.RoundNum })}
+                  meta={[
+                    <Amount key="eth" value={round.AmountEth} unit="ETH" />,
+                    round.TimeStamp ? <DateTime key="date" timestamp={round.TimeStamp} /> : null,
+                  ]}
+                  sizes="(min-width: 1024px) 26rem, (min-width: 640px) 45vw, 100vw"
+                  unavailableLabel={tDetail('image.artworkUnavailable')}
+                  unavailableDetail={formatId(round.TokenId)}
+                />
+              </li>
+            ))}
+          </ul>
+        )}
       </>
     );
   }
 
-  return (
-    <section aria-labelledby="finalized-index">
-      <SectionHeader
-        headingId="finalized-index"
-        title={t('finalized.index.title')}
-        description={t('finalized.index.description')}
-        actions={
-          <Link href="/allocation" className={buttonVariants({ variant: 'outline', size: 'sm' })}>
-            {t('finalized.links.allCycles')}
-            <ArrowRight aria-hidden className="size-4" />
-          </Link>
-        }
-      />
-      {body}
-    </section>
-  );
+  return <FinalizedIndexSection>{body}</FinalizedIndexSection>;
 }
 
 export default AllocationFinalizedPage;
