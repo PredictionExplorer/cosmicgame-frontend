@@ -9,8 +9,7 @@ import { render, screen, checkA11y, within } from '@/test-utils';
 
 import GlobalNotFound, { generateMetadata } from '../../../global-not-found';
 import NotFound from '../not-found';
-import { AppChrome } from '../app-chrome';
-import { LandingChrome } from '../../(landing)/landing-chrome';
+import * as notFoundShells from '../../../not-found-shells';
 import * as landingNotFoundModule from '../../(landing)/landing-site/not-found';
 
 const LandingNotFound = landingNotFoundModule.default;
@@ -25,8 +24,10 @@ let mockHost = 'app.cosmicsignature.com';
 jest.mock('next/headers', () => ({
   headers: async () => new Headers({ host: mockHost }),
 }));
-jest.mock('../app-chrome', () => ({ AppChrome: () => null }));
-jest.mock('../../(landing)/landing-chrome', () => ({ LandingChrome: () => null }));
+jest.mock('../../../not-found-shells', () => ({
+  AppNotFound: () => null,
+  LandingNotFound: () => null,
+}));
 jest.mock('../../../root-document', () => ({
   RootDocument: ({ children }: { children: React.ReactNode }) => children,
 }));
@@ -140,13 +141,14 @@ describe('global 404 (every URL no route matches)', () => {
 
   it('frames an unknown app URL with the app chrome', async () => {
     const tree = await GlobalNotFound();
-    expect(tree.props.children.type).toBe(AppChrome);
+    // RootDocument > the chrome-scoped messages > the page, loaded on demand.
+    expect(tree.props.children.props.children.type).toBe(notFoundShells.AppNotFound);
   });
 
   it('frames an unknown landing URL with the landing chrome, never the wallet stack', async () => {
     mockHost = 'cosmicsignature.com';
     const tree = await GlobalNotFound();
-    expect(tree.props.children.type).toBe(LandingChrome);
+    expect(tree.props.children.props.children.type).toBe(notFoundShells.LandingNotFound);
     const metadata = await generateMetadata();
     expect(metadata.manifest).toBeUndefined();
   });

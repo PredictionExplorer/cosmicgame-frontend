@@ -1,18 +1,21 @@
 import type { Metadata } from 'next';
 import { headers } from 'next/headers';
-import { hasLocale } from 'next-intl';
-import { getLocale, getTranslations, setRequestLocale } from 'next-intl/server';
+import { hasLocale, NextIntlClientProvider } from 'next-intl';
+import { getLocale, getMessages, getTranslations, setRequestLocale } from 'next-intl/server';
 
-import { NotFoundView } from '@/components/layout/NotFoundView';
+import { getLandingContent } from '@/content/landing';
+
 import { notFoundMetadata } from '@/components/layout/notFoundMetadata';
-import { PageShell } from '@/components/ui/page-shell';
 import { routing, type AppLocale } from '@/i18n/routing';
 import { APP_ORIGIN, LANDING_ORIGIN, isLandingHost } from '@/lib/hostRouting';
+import {
+  APP_CHROME_NAMESPACES,
+  LANDING_CHROME_NAMESPACES,
+  pickMessages,
+} from '@/lib/i18n/clientMessages';
 
-import { AppChrome } from './[locale]/(app)/app-chrome';
 import { webManifestPath } from './[locale]/(app)/manifest.webmanifest/build-manifest';
-import { LandingChrome } from './[locale]/(landing)/landing-chrome';
-import { AppShell, LandingShell } from './not-found-shells';
+import { AppNotFound, LandingNotFound } from './not-found-shells';
 import { RootDocument } from './root-document';
 import { createRootMetadata, rootViewport } from './root-metadata';
 
@@ -67,29 +70,34 @@ export async function generateMetadata(): Promise<Metadata> {
  * the host's own chrome: the app header and footer on app.cosmicsignature.com,
  * the landing header and footer (and no wallet stack) on
  * cosmicsignature.com. Rendered on the server like any page, so the 404
- * arrives styled and complete, script or no script. Next.js ships this file's
- * client references with every route, so each host's shell comes in behind
- * a dynamic import (app/not-found-shells.tsx) and downloads only here.
+ * arrives styled and complete, script or no script. Each host's page comes
+ * in behind a dynamic import (app/not-found-shells.tsx), because Next.js
+ * ships this file's client references with every route.
  */
 export default async function GlobalNotFound() {
   const [locale, host] = await Promise.all([requestLocale(), requestHost()]);
   setRequestLocale(locale);
+  const messages = await getMessages({ locale });
+
+  if (host === 'landing') {
+    const { footer, cycle, art, tracks } = getLandingContent(locale);
+    return (
+      <RootDocument locale={locale}>
+        <NextIntlClientProvider messages={pickMessages(messages, LANDING_CHROME_NAMESPACES)}>
+          <LandingNotFound
+            footer={footer}
+            sections={{ cycle: cycle.eyebrow, art: art.eyebrow, tracks: tracks.eyebrow }}
+          />
+        </NextIntlClientProvider>
+      </RootDocument>
+    );
+  }
 
   return (
     <RootDocument locale={locale}>
-      {host === 'landing' ? (
-        <LandingChrome locale={locale} shell={LandingShell}>
-          <main id="main" tabIndex={-1} className="site-container relative">
-            <NotFoundView host="landing" />
-          </main>
-        </LandingChrome>
-      ) : (
-        <AppChrome locale={locale} shell={AppShell}>
-          <PageShell variant="data" backdrop="subtle">
-            <NotFoundView host="app" />
-          </PageShell>
-        </AppChrome>
-      )}
+      <NextIntlClientProvider messages={pickMessages(messages, APP_CHROME_NAMESPACES)}>
+        <AppNotFound />
+      </NextIntlClientProvider>
     </RootDocument>
   );
 }
