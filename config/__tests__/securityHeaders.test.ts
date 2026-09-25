@@ -50,22 +50,45 @@ describe('security headers', () => {
     }
   });
 
+  const DSN = 'https://abc123@o42.ingest.sentry.io/4507';
+
   it('reports against the full allowlist without blocking', () => {
-    const policy = parsePolicy(header(securityHeaders(), 'Content-Security-Policy-Report-Only'));
+    const policy = parsePolicy(
+      header(securityHeaders({ sentryDsn: DSN }), 'Content-Security-Policy-Report-Only'),
+    );
     expect(policy.get('default-src')).toEqual(["'self'"]);
     expect(policy.get('script-src')).toEqual(["'self'", "'unsafe-inline'", ...SCRIPT_ORIGINS]);
     expect(policy.get('frame-src')).toEqual(["'self'", ...FRAME_ORIGINS]);
     expect(policy.get('connect-src')).toEqual(["'self'", 'https:', 'wss:']);
+    // Complete the day it is enforced, except frame-ancestors: browsers ignore
+    // it in a report-only policy and warn about it on every page.
     for (const [directive, sources] of Object.entries(ENFORCED_CSP)) {
-      expect(policy.get(directive)).toEqual(sources);
+      if (directive === 'frame-ancestors') expect(policy.has(directive)).toBe(false);
+      else expect(policy.get(directive)).toEqual(sources);
     }
-    expect(policy.has('report-uri')).toBe(false);
+  });
+
+  it('ships the report-only policy only where a report can go or a console is watched', () => {
+    const reportOnly = (options: Parameters<typeof securityHeaders>[0]) =>
+      header(securityHeaders(options), 'Content-Security-Policy-Report-Only');
+    // No destination: it would block nothing and make Safari log an error per page.
+    expect(reportOnly({})).toBeUndefined();
+    expect(reportOnly({ sentryDsn: 'not a dsn' })).toBeUndefined();
+    expect(parsePolicy(reportOnly({ development: true })).has('report-uri')).toBe(false);
+    expect(parsePolicy(reportOnly({ sentryDsn: DSN })).has('report-uri')).toBe(true);
+    // The enforced baseline ships either way.
+    expect(header(securityHeaders(), 'Content-Security-Policy')).toBe(
+      serializePolicy(ENFORCED_CSP),
+    );
   });
 
   it("allows React's development eval only under next dev", () => {
     const scriptSrc = (development: boolean) =>
       parsePolicy(
-        header(securityHeaders({ development }), 'Content-Security-Policy-Report-Only'),
+        header(
+          securityHeaders({ development, sentryDsn: DSN }),
+          'Content-Security-Policy-Report-Only',
+        ),
       ).get('script-src');
     expect(scriptSrc(true)).toContain("'unsafe-eval'");
     expect(scriptSrc(false)).not.toContain("'unsafe-eval'");
@@ -75,6 +98,7 @@ describe('security headers', () => {
     const policy = parsePolicy(
       header(
         securityHeaders({
+          sentryDsn: DSN,
           dataEndpoints: [
             'http://127.0.0.1:8099/api/cosmicgame/',
             'https://a1.cosmicsignature.com/api/cosmicgame/',
@@ -95,9 +119,8 @@ describe('security headers', () => {
   });
 
   it('sends violation reports to the Sentry project when a DSN is set', () => {
-    const dsn = 'https://abc123@o42.ingest.sentry.io/4507';
     const reportOnly = header(
-      securityHeaders({ sentryDsn: dsn }),
+      securityHeaders({ sentryDsn: DSN }),
       'Content-Security-Policy-Report-Only',
     );
     expect(parsePolicy(reportOnly).get('report-uri')).toEqual([

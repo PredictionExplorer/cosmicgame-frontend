@@ -13,8 +13,11 @@
  *   under (scripts from the site, Google Analytics, the Sentry replay loader
  *   and Vercel's scripts; frames only for WalletConnect's verify service).
  *   A browser reports what it would have blocked without blocking it, to
- *   Sentry when a DSN is configured, so the policy can be enforced once the
- *   reports show that wallets and analytics run clean under it.
+ *   Sentry, so the policy can be enforced once the reports show that
+ *   wallets and analytics run clean under it. The header ships only where a
+ *   report can go (a Sentry DSN is configured) or someone is watching the
+ *   console (`next dev`): without a destination it blocks nothing, and
+ *   Safari logs an error on every page saying so.
  *
  * Scripts keep `'unsafe-inline'`: Next.js streams its flight data and the
  * pre-paint theme script as inline scripts, and nonces would force every
@@ -104,7 +107,12 @@ function reportOnlyPolicy(development: boolean, dataOrigins: readonly string[]):
     'frame-src': ["'self'", ...FRAME_ORIGINS],
     'worker-src': ["'self'", 'blob:'],
     'manifest-src': ["'self'"],
-    ...ENFORCED_CSP,
+    // The enforced directives, so this policy is complete the day it is
+    // enforced; frame-ancestors aside, which browsers ignore (and warn
+    // about on every page) in a report-only policy.
+    ...Object.fromEntries(
+      Object.entries(ENFORCED_CSP).filter(([directive]) => directive !== 'frame-ancestors'),
+    ),
   };
 }
 
@@ -142,6 +150,15 @@ export function securityHeaders({
   // Only plain-http origins need naming: `https:` already covers the rest.
   const httpOrigins = originsOf(dataEndpoints).filter((origin) => origin.startsWith('http:'));
   const reportOnly = serializePolicy(reportOnlyPolicy(development, httpOrigins));
+  const reportOnlyHeader: SecurityHeader[] =
+    reportUri || development
+      ? [
+          {
+            key: 'Content-Security-Policy-Report-Only',
+            value: reportUri ? `${reportOnly}; report-uri ${reportUri}` : reportOnly,
+          },
+        ]
+      : [];
   return [
     { key: 'X-Frame-Options', value: 'SAMEORIGIN' },
     { key: 'X-Content-Type-Options', value: 'nosniff' },
@@ -149,9 +166,6 @@ export function securityHeaders({
     { key: 'Permissions-Policy', value: 'camera=(), microphone=(), geolocation=()' },
     { key: 'Cross-Origin-Opener-Policy', value: 'unsafe-none' },
     { key: 'Content-Security-Policy', value: serializePolicy(ENFORCED_CSP) },
-    {
-      key: 'Content-Security-Policy-Report-Only',
-      value: reportUri ? `${reportOnly}; report-uri ${reportUri}` : reportOnly,
-    },
+    ...reportOnlyHeader,
   ];
 }
