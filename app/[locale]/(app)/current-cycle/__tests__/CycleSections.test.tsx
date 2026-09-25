@@ -110,7 +110,7 @@ describe('CycleAllocations', () => {
       'currentCycle.allocations.cards.ethStellar.name',
       'currentCycle.allocations.cards.cosmicAnchor.name',
       'currentCycle.allocations.cards.publicGoods.name',
-      'Next cycle',
+      'currentCycle.allocations.cards.nextCycle.name',
       'currentCycle.allocations.cards.nftStellar.name',
       'currentCycle.allocations.cards.randomWalkAnchor.name',
       'currentCycle.allocations.cards.endurance.name',

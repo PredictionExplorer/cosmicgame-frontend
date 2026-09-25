@@ -62,7 +62,7 @@
     "cards": {
       "signature": {
         "name": "簽名分配",
-        "tooltip": "倒數歸零後，寫下收官之筆的參與者可取回這份分配：ETH、1,000 CST、一枚 Cosmic Signature NFT，以及已附加的代幣。"
+        "tooltip": "倒數歸零後，寫下收官之筆的參與者可收官並取回這份分配：ETH、1,000 CST、一枚 Cosmic Signature NFT，以及已附加的代幣。若其未在專屬收官窗口內收官，這份分配歸實際收官者。"
       },
       "chronoWarrior": {
         "name": "時之勇士分配",
@@ -81,6 +81,10 @@
         "name": "公共財",
         "tooltip": "每個週期，週期儲備的 {percent}% 都會轉撥給 Protocol Guild——為 170 多位以太坊核心貢獻者提供資助的機制。",
         "recipientLabel": "Protocol Guild"
+      },
+      "nextCycle": {
+        "name": "滾動儲備",
+        "tooltip": "收官時不分配的份額：它留在週期儲備中，滾入下一週期。"
       },
       "nftStellar": {
         "name": "NFT 星選",
@@ -152,9 +156,9 @@
     "heading": "本週期的附加資產",
     "cycleFallback": "目前",
     "description": {
-      "nftOnly": "本週期（#{cycle}）收官後，寫下收官之筆的參與者將一併獲得 {nftCount} 枚已附加 NFT。",
-      "erc20Only": "本週期（#{cycle}）收官後，寫下收官之筆的參與者將一併獲得 {erc20Count} 筆已附加的 ERC-20 代幣存入。",
-      "mixed": "本週期（#{cycle}）收官後，寫下收官之筆的參與者將一併獲得 {nftCount} 枚已附加 NFT 與 {erc20Count} 筆 ERC-20 代幣存入。"
+      "nftOnly": "本週期（#{cycle}）收官後，收官者將一併獲得 {nftCount} 枚已附加 NFT。",
+      "erc20Only": "本週期（#{cycle}）收官後，收官者將一併獲得 {erc20Count} 筆已附加的 ERC-20 代幣存入。",
+      "mixed": "本週期（#{cycle}）收官後，收官者將一併獲得 {nftCount} 枚已附加 NFT 與 {erc20Count} 筆 ERC-20 代幣存入。"
     },
     "bonusReceipt": {
       "nftOnly": "{nftCount} 枚 ERC-721 代幣",
@@ -166,7 +170,7 @@
       "cycle": "週期",
       "cycleValue": "#{cycle}",
       "recipientRule": "獲配規則",
-      "recipientRuleValue": "收官之筆"
+      "recipientRuleValue": "收官者"
     },
     "remainder": {
       "nftOnly": "此處僅展示精選清單預覽，完整週期明細中還有 {nftCount} 枚已附加 NFT。",

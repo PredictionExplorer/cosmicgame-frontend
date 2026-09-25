@@ -62,7 +62,7 @@
     "cards": {
       "signature": {
         "name": "Phân bổ Signature",
-        "tooltip": "Người tham gia đặt nét bút cuối cùng khi đếm ngược về không có thể nhận về phân bổ này: ETH, 1.000 CST, một Cosmic Signature NFT và các token đính kèm."
+        "tooltip": "Người tham gia đặt nét bút cuối cùng khi đếm ngược về không có thể hoàn tất chu kỳ và nhận về phân bổ này: ETH, 1.000 CST, một Cosmic Signature NFT và các token đính kèm. Nếu người đó không hoàn tất trong cửa sổ ưu tiên, người hoàn tất chu kỳ sẽ nhận phân bổ."
       },
       "chronoWarrior": {
         "name": "Phân bổ Chiến binh Thời gian",
@@ -81,6 +81,10 @@
         "name": "Hàng hóa công",
         "tooltip": "{percent}% của mỗi Dự trữ chu kỳ được chuyển đến Protocol Guild, cơ chế tài trợ cho hơn 170 người đóng góp cốt lõi cho Ethereum.",
         "recipientLabel": "Protocol Guild"
+      },
+      "nextCycle": {
+        "name": "Dự trữ tích lũy",
+        "tooltip": "Phần không được phân bổ khi hoàn tất: phần này ở lại trong Dự trữ chu kỳ và chuyển sang chu kỳ tiếp theo."
       },
       "nftStellar": {
         "name": "NFT Tinh tuyển",
@@ -152,9 +156,9 @@
     "heading": "Tài sản đính kèm trong chu kỳ này",
     "cycleFallback": "hiện tại",
     "description": {
-      "nftOnly": "Tài sản cộng đồng đính kèm thuộc phân bổ Signature. Khi chu kỳ #{cycle} hoàn tất, người đặt nét bút cuối cùng nhận {nftCount, plural, other {toàn bộ {nftCount} NFT đính kèm}}.",
-      "erc20Only": "Tài sản cộng đồng đính kèm thuộc phân bổ Signature. Khi chu kỳ #{cycle} hoàn tất, người đặt nét bút cuối cùng nhận {erc20Count, plural, other {toàn bộ {erc20Count} khoản nạp token ERC-20 đính kèm}}.",
-      "mixed": "Tài sản cộng đồng đính kèm thuộc phân bổ Signature. Khi chu kỳ #{cycle} hoàn tất, người đặt nét bút cuối cùng nhận {nftCount, plural, other {toàn bộ {nftCount} NFT đính kèm}} và {erc20Count, plural, other {toàn bộ {erc20Count} khoản nạp token ERC-20 đính kèm}}."
+      "nftOnly": "Tài sản cộng đồng đính kèm thuộc phân bổ Signature. Người hoàn tất chu kỳ #{cycle} nhận {nftCount, plural, other {toàn bộ {nftCount} NFT đính kèm}}.",
+      "erc20Only": "Tài sản cộng đồng đính kèm thuộc phân bổ Signature. Người hoàn tất chu kỳ #{cycle} nhận {erc20Count, plural, other {toàn bộ {erc20Count} khoản nạp token ERC-20 đính kèm}}.",
+      "mixed": "Tài sản cộng đồng đính kèm thuộc phân bổ Signature. Người hoàn tất chu kỳ #{cycle} nhận {nftCount, plural, other {toàn bộ {nftCount} NFT đính kèm}} và {erc20Count, plural, other {toàn bộ {erc20Count} khoản nạp token ERC-20 đính kèm}}."
     },
     "bonusReceipt": {
       "nftOnly": "{nftCount, plural, other {{nftCount} token ERC-721}}",
@@ -166,7 +170,7 @@
       "cycle": "Chu kỳ",
       "cycleValue": "#{cycle}",
       "recipientRule": "Quy tắc người nhận",
-      "recipientRuleValue": "Nét bút cuối cùng"
+      "recipientRuleValue": "Người hoàn tất chu kỳ"
     },
     "remainder": {
       "nftOnly": "Đang hiển thị một số tài sản. Trang chi tiết chu kỳ còn có {nftCount, plural, other {{nftCount} NFT đính kèm khác}}.",

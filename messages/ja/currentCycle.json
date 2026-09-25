@@ -62,7 +62,7 @@
     "cards": {
       "signature": {
         "name": "シグネチャー配分",
-        "tooltip": "確定時刻を過ぎると、最後に一筆を入れた参加者がサイクルを確定できます。シグネチャー配分にはETH、1,000 CST、Cosmic Signature NFT、添付されたトークンが含まれます。"
+        "tooltip": "確定時刻を過ぎると、最後に一筆を入れた参加者がサイクルを確定できます。シグネチャー配分にはETH、1,000 CST、Cosmic Signature NFT、添付されたトークンが含まれます。その参加者が優先期間内に確定しなければ、確定実行者が受け取ります。"
       },
       "chronoWarrior": {
         "name": "時の戦士配分",
@@ -81,6 +81,10 @@
         "name": "公共財",
         "tooltip": "すべてのサイクル準備金の{percent}%が、170人以上のEthereumコア貢献者の資金支援メカニズムであるProtocol Guildへ送られます。",
         "recipientLabel": "Protocol Guild"
+      },
+      "nextCycle": {
+        "name": "累積準備金",
+        "tooltip": "確定時に配分されない分です。サイクル準備金に残り、次のサイクルへ持ち越されます。"
       },
       "nftStellar": {
         "name": "NFT星選",
@@ -152,9 +156,9 @@
     "heading": "このサイクルに添付されたアセット",
     "cycleFallback": "現在",
     "description": {
-      "nftOnly": "コミュニティが添付したアセットは、シグネチャー配分とともに移ります。サイクル{cycle}が確定すると、最後の一筆の参加者が{nftCount, plural, other {添付された{nftCount}点のNFTすべて}}を受け取ります。",
-      "erc20Only": "コミュニティが添付したアセットは、シグネチャー配分とともに移ります。サイクル{cycle}が確定すると、最後の一筆の参加者が{erc20Count, plural, other {添付された{erc20Count}件のERC-20トークン添付分すべて}}を受け取ります。",
-      "mixed": "コミュニティが添付したアセットは、シグネチャー配分とともに移ります。サイクル{cycle}が確定すると、最後の一筆の参加者が{nftCount, plural, other {添付された{nftCount}点のNFT}}と{erc20Count, plural, other {添付された{erc20Count}件のERC-20トークン添付分}}のすべてを受け取ります。"
+      "nftOnly": "コミュニティが添付したアセットは、シグネチャー配分とともに移ります。サイクル{cycle}が確定すると、確定実行者が{nftCount, plural, other {添付された{nftCount}点のNFTすべて}}を受け取ります。",
+      "erc20Only": "コミュニティが添付したアセットは、シグネチャー配分とともに移ります。サイクル{cycle}が確定すると、確定実行者が{erc20Count, plural, other {添付された{erc20Count}件のERC-20トークン添付分すべて}}を受け取ります。",
+      "mixed": "コミュニティが添付したアセットは、シグネチャー配分とともに移ります。サイクル{cycle}が確定すると、確定実行者が{nftCount, plural, other {添付された{nftCount}点のNFT}}と{erc20Count, plural, other {添付された{erc20Count}件のERC-20トークン添付分}}のすべてを受け取ります。"
     },
     "bonusReceipt": {
       "nftOnly": "{nftCount, plural, other {ERC-721トークン{nftCount}点}}",
@@ -166,7 +170,7 @@
       "cycle": "サイクル",
       "cycleValue": "#{cycle}",
       "recipientRule": "受領者のルール",
-      "recipientRuleValue": "最後の一筆"
+      "recipientRuleValue": "確定実行者"
     },
     "remainder": {
       "nftOnly": "注目の受領証プレビューを表示しています。サイクルの詳細では、さらに{nftCount, plural, other {{nftCount}点の添付NFT}}を確認できます。",
