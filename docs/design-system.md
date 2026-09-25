@@ -568,6 +568,19 @@ index shows the cycle, its date, recipient, Signature Allocation and gestures; t
 per-track breakdown is one tap away). The connected wallet's record carries its 2px
 accent rule down the start edge.
 
+An activity ledger read as a feed (the transfer histories, ETH contributions, Public
+Goods deposits and retrievals, gesture history) passes `phoneRecord`: each record is two
+lines with no label at all. Line 1 opens on the row's name (`title`: its date or its
+activity) with the figure it is about at the end (`titleEnd`); line 2 holds the other
+facts in the muted tier, separated by middle dots (`details`), from the start or, for
+figures, at the end edge (`detailsAlign: 'end'`). The record takes the place of the
+`phone: 'title'` column's value below `sm`; the columns it already says set
+`phone: 'omit'`, and long text such as a message keeps its own stacked line. DataTable
+wraps the title, and only the title, in the row link (so the record's own links, an
+address or a proof, never nest inside it) and adds the "You" tag; a renderer told
+`linked` leaves a date's proof link off the title. A shortened address inside a record
+stays one word, and loading records have the finished record's two lines.
+
 The records keep table semantics: every part of `ResponsiveTable` and the static `Table`
 states its role (`table`, `rowgroup`, `row`, `columnheader`, `cell`), because WebKit drops
 the implicit roles of a table restyled with `display: block`, and the drawn label has

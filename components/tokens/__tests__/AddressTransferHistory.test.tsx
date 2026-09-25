@@ -150,8 +150,11 @@ describe('AddressTransferHistory — phone records', () => {
       'href',
       expect.stringContaining('/tx/0x4'),
     );
-    const secondary = cells.filter((cell) => cell.getAttribute('data-priority') === 'secondary');
-    expect(secondary).toHaveLength(cells.length - 1);
+    // The record says what the other columns say: they leave the phone.
+    const omitted = cells.filter((cell) => cell.getAttribute('data-phone') === 'omit');
+    expect(omitted).toHaveLength(cells.length - 1);
+    // The ledger's own cell keeps the wide layout's value, hidden on a phone.
+    expect(activity!.querySelector('[data-slot="phone-record"]')).toHaveClass('sm:hidden');
   });
 
   it('puts the artwork and its number on the first line of an NFT record', () => {

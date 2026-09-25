@@ -42,6 +42,12 @@ import {
   type SortValue,
 } from './column-kinds';
 import { KindValue, blankShowsUnknown } from './kind-value';
+import {
+  PhoneRecord,
+  PhoneRecordSkeleton,
+  type PhoneRecordContent,
+  type PhoneRecordContext,
+} from './phone-record';
 import { useDataTableWidth, type DataTableWidthMode } from './table-width';
 import { useCompactFit } from './use-compact-fit';
 import { DEFAULT_PAGE_SIZE, PHONE_PAGE_SIZE, usePhoneLayout } from './use-page-size';
@@ -266,6 +272,17 @@ export interface DataTableProps<T> {
    * table into records; see `phoneLayoutFor`.
    */
   layout?: 'auto' | TableLayout;
+  /**
+   * An activity ledger read as a feed on a phone (transfers, contributions,
+   * gestures): each record is two lines (`PhoneRecordContent`) instead of a
+   * labelled line per column. The record takes the place of the
+   * `phone: 'title'` column's value below `sm` (the row-link column's when
+   * no column is the title); give `phone: 'omit'` to every column the
+   * record already says, and leave long text such as a message in its own
+   * stacked line. The record's title carries the row link and the "You"
+   * tag. Wider screens keep every column.
+   */
+  phoneRecord?: (row: T, context: PhoneRecordContext) => PhoneRecordContent;
   /** Row height: `comfortable` 48px (default) or `compact` 40px. */
   density?: 'comfortable' | 'compact';
   /**
@@ -455,6 +472,7 @@ export function DataTable<T>({
   onPageChange,
   resetPageKey,
   layout: layoutProp = 'auto',
+  phoneRecord,
   density = 'comfortable',
   width: widthProp,
   links = 'underlined',
@@ -478,16 +496,19 @@ export function DataTable<T>({
     [resolved, data],
   );
 
+  // A two-line record is a record: its table never stays a table on a phone.
   const kindLayout: TableLayout =
-    layoutProp === 'auto'
-      ? phoneLayoutFor(
-          datasetColumns.map((col) => ({
-            kind: col.kind,
-            priority: col.priority,
-            stack: col.column.stack,
-          })),
-        )
-      : layoutProp;
+    layoutProp === 'auto' && phoneRecord
+      ? 'cards'
+      : layoutProp === 'auto'
+        ? phoneLayoutFor(
+            datasetColumns.map((col) => ({
+              kind: col.kind,
+              priority: col.priority,
+              stack: col.column.stack,
+            })),
+          )
+        : layoutProp;
   const pageSize = pageSizeProp ?? (isPhone ? PHONE_PAGE_SIZE : DEFAULT_PAGE_SIZE);
 
   // ── Sorting ───────────────────────────────────────────────────────────
@@ -570,9 +591,14 @@ export function DataTable<T>({
     focusCurrentRowRef.current = false;
     const row = scrollRef.current?.querySelector<HTMLElement>('tbody tr[data-current]');
     if (!row) return;
-    // Its first link or button (the row link, the address), else the row
-    // itself, which takes focus only from script (tabindex -1, no tab stop).
-    let target = row.querySelector<HTMLElement>('a[href], button');
+    // Its first link or button on screen (the row link, the address: a
+    // phone record repeats the row's links, and the layout this width does
+    // not show is display: none), else the row itself, which takes focus
+    // only from script (tabindex -1, no tab stop).
+    let target =
+      Array.from(row.querySelectorAll<HTMLElement>('a[href], button')).find(
+        (element) => typeof element.checkVisibility !== 'function' || element.checkVisibility(),
+      ) ?? null;
     if (!target) {
       row.tabIndex = -1;
       target = row;
@@ -613,6 +639,10 @@ export function DataTable<T>({
   const currentPage = currentIndex >= 0 && paginate ? Math.floor(currentIndex / pageSize) + 1 : 1;
 
   const linkColumnId = rowLinkColumn ?? visible[0]?.column.id;
+  // The cell a phone record takes over: the record opens on the row's name.
+  const recordHostId = phoneRecord
+    ? (visible.find((col) => col.column.phone === 'title')?.column.id ?? linkColumnId)
+    : undefined;
   // A table can leave its zone note out (`timeZoneNote={false}`), and a page may state the
   // zone once for every table on it (`<TimeZoneStated>`).
   const zoneStated = useTimeZoneStated();
@@ -816,22 +846,36 @@ export function DataTable<T>({
             {showSkeleton
               ? Array.from({ length: skeletonRows }, (_, rowIndex) => (
                   <tr key={rowIndex} role="row" aria-hidden="true">
-                    {visible.map((col) => (
-                      <ResponsiveTableCell
-                        key={col.column.id}
-                        label={col.label}
-                        align={col.align}
-                        priority={col.priority}
-                        className={cellPadding}
-                      >
+                    {visible.map((col) => {
+                      const placeholder = (
                         <Skeleton
                           className={cn(
                             'inline-block h-3.5 align-middle',
                             SKELETON_WIDTH[col.kind],
                           )}
                         />
-                      </ResponsiveTableCell>
-                    ))}
+                      );
+                      return (
+                        <ResponsiveTableCell
+                          key={col.column.id}
+                          label={col.label}
+                          align={col.align}
+                          priority={col.priority}
+                          // The loading record has the finished record's lines.
+                          phone={col.column.id === recordHostId ? 'title' : col.column.phone}
+                          className={cellPadding}
+                        >
+                          {col.column.id === recordHostId ? (
+                            <>
+                              <span className="max-sm:hidden">{placeholder}</span>
+                              <PhoneRecordSkeleton />
+                            </>
+                          ) : (
+                            placeholder
+                          )}
+                        </ResponsiveTableCell>
+                      );
+                    })}
                     {renderDetails ? (
                       <ResponsiveTableCell label={t('details.header')} className={cellPadding} />
                     ) : null}
@@ -889,6 +933,20 @@ export function DataTable<T>({
                               </span>
                             );
                           }
+                          const isRecordHost = col.column.id === recordHostId && phoneRecord;
+                          if (isRecordHost) {
+                            content = (
+                              <>
+                                <span className="max-sm:hidden">{content}</span>
+                                <RowPhoneRecord
+                                  record={phoneRecord(row, { index, linked: Boolean(href) })}
+                                  href={href}
+                                  destination={href ? getRowLabel?.(row, index) : undefined}
+                                  isCurrent={isCurrent}
+                                />
+                              </>
+                            );
+                          }
                           // Truly none: a phone record leaves the line out.
                           const noneHere =
                             col.column.whenBlank === 'none' && col.hasValue && isBlankValue(value);
@@ -901,7 +959,7 @@ export function DataTable<T>({
                               nowrap={col.nowrap}
                               stack={col.column.stack}
                               priority={col.priority}
-                              phone={noneHere ? 'omit' : col.column.phone}
+                              phone={isRecordHost ? 'title' : noneHere ? 'omit' : col.column.phone}
                               data-kind={col.kind}
                               className={cn(
                                 cellPadding,
@@ -985,6 +1043,42 @@ export function DataTable<T>({
       ) : null}
     </Frame>
   );
+}
+
+/**
+ * A row's phone record with the table's part in it: the row link around the
+ * title (with the words a screen reader hears after it) and the connected
+ * wallet's "You" tag beside it.
+ */
+function RowPhoneRecord({
+  record,
+  href,
+  destination,
+  isCurrent,
+}: {
+  record: PhoneRecordContent;
+  href: string | null;
+  destination?: string;
+  isCurrent: boolean;
+}) {
+  let title = record.title;
+  if (href) {
+    title = (
+      <Link href={href} className={TABLE_LINK_CLASS}>
+        {title}
+        {destination ? <span className="sr-only"> {destination}</span> : null}
+      </Link>
+    );
+  }
+  if (isCurrent) {
+    title = (
+      <span className="inline-flex max-w-full flex-wrap items-center gap-x-2 gap-y-1">
+        {title}
+        <YouBadge />
+      </span>
+    );
+  }
+  return <PhoneRecord {...record} title={title} />;
 }
 
 function renderCell<T>(

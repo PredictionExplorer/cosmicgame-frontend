@@ -909,6 +909,132 @@ describe('DataTable layout and naming', () => {
   });
 });
 
+describe('DataTable phone records', () => {
+  interface Transfer {
+    id: number;
+    at: number;
+    from: string;
+    amount: number;
+  }
+  const transfers: Transfer[] = [
+    { id: 1, at: 1_726_000_000, from: address(7), amount: 1.5 },
+    { id: 2, at: 1_726_100_000, from: address(8), amount: 0.25 },
+  ];
+  const transferColumns: DataTableColumn<Transfer>[] = [
+    { id: 'at', kind: 'datetime', header: 'Date', value: (r) => r.at, phone: 'title' },
+    { id: 'from', kind: 'address', header: 'From', value: (r) => r.from, phone: 'omit' },
+    { id: 'amount', kind: 'amount', header: 'Amount', value: (r) => r.amount, phone: 'omit' },
+  ];
+  const record = (row: Transfer, { linked }: { linked: boolean }) => ({
+    title: <span data-testid={`title-${row.id}`}>{linked ? 'linked' : 'plain'}</span>,
+    titleEnd: <span>{`${row.amount} ETH`}</span>,
+    details: [<a key="from" href={`/user/${row.from}`}>{`from ${row.id}`}</a>, null, 'note'],
+  });
+  const recordOf = (container: HTMLElement, rowIndex = 1) =>
+    container.querySelector<HTMLElement>(
+      `tbody tr:nth-child(${rowIndex}) [data-slot="phone-record"]`,
+    );
+
+  it('draws two lines in the title column’s cell, beside its wide value', () => {
+    const { container } = render(
+      <DataTable
+        ariaLabel="Transfers"
+        data={transfers}
+        columns={transferColumns}
+        getRowKey={(r) => r.id}
+        phoneRecord={record}
+      />,
+    );
+    const host = container.querySelector('tbody tr:first-child td');
+    expect(host).toHaveAttribute('data-phone', 'title');
+    const phone = recordOf(container)!;
+    expect(host).toContainElement(phone);
+    expect(phone).toHaveClass('sm:hidden');
+    // The wide value stays in the cell for wider screens.
+    expect(phone.previousElementSibling).toHaveClass('max-sm:hidden');
+    expect(phone).toHaveTextContent('plain');
+    expect(phone).toHaveTextContent('1.5 ETH');
+    // Blank facts drop out, and a middle dot separates the rest.
+    expect(phone).toHaveTextContent(/from 1\s*·\s*note$/);
+    // A record is a record: even three compact-looking columns turn into records.
+    expect(screen.getByRole('table')).toHaveAttribute('data-layout', 'cards');
+  });
+
+  it('wraps only the title in the row link, so the record’s own links never nest in it', () => {
+    const { container } = render(
+      <DataTable
+        ariaLabel="Transfers"
+        data={transfers}
+        columns={transferColumns}
+        getRowKey={(r) => r.id}
+        getRowHref={(r) => `/transfer/${r.id}`}
+        getRowLabel={(r) => `Transfer ${r.id}`}
+        phoneRecord={record}
+      />,
+    );
+    const phone = recordOf(container)!;
+    const title = within(phone).getByTestId('title-1');
+    expect(title).toHaveTextContent('linked');
+    const link = title.closest('a');
+    expect(link).toHaveAttribute('href', '/transfer/1');
+    // The link's name starts with what it shows, then says where it leads.
+    expect(link).toHaveTextContent(/^linked Transfer 1$/);
+    expect(container.querySelector('tbody a a')).toBeNull();
+    expect(within(phone).getByRole('link', { name: 'from 1' })).toHaveAttribute(
+      'href',
+      `/user/${address(7)}`,
+    );
+  });
+
+  it('tags the connected wallet’s record after its title', () => {
+    const { container } = render(
+      <DataTable
+        ariaLabel="Transfers"
+        data={transfers}
+        columns={transferColumns}
+        getRowKey={(r) => r.id}
+        isCurrentRow={(r) => r.id === 1}
+        phoneRecord={record}
+      />,
+    );
+    const phone = recordOf(container)!;
+    expect(within(phone).getByText('tables.status.youBadge')).toBeInTheDocument();
+    expect(within(recordOf(container, 2)!).queryByText('tables.status.youBadge')).toBeNull();
+  });
+
+  it('puts the record in the row-link column when no column is the title', () => {
+    const { container } = render(
+      <DataTable
+        ariaLabel="Transfers"
+        data={transfers}
+        columns={transferColumns.map((column) => ({ ...column, phone: undefined }))}
+        getRowKey={(r) => r.id}
+        rowLinkColumn="amount"
+        phoneRecord={record}
+      />,
+    );
+    const cells = container.querySelectorAll('tbody tr:first-child td');
+    expect(cells[2]).toContainElement(recordOf(container));
+    expect(cells[2]).toHaveAttribute('data-phone', 'title');
+  });
+
+  it('holds loading records at the finished record’s two lines', () => {
+    const { container } = render(
+      <DataTable
+        ariaLabel="Transfers"
+        data={[]}
+        loading
+        skeletonRows={2}
+        columns={transferColumns}
+        phoneRecord={record}
+      />,
+    );
+    const cells = [...container.querySelectorAll('tbody tr:first-child td')];
+    expect(cells.map((cell) => cell.getAttribute('data-phone'))).toEqual(['title', 'omit', 'omit']);
+    expect(cells[0]!.querySelectorAll('[data-slot="skeleton"]').length).toBeGreaterThan(2);
+  });
+});
+
 describe('DataTable framing', () => {
   const wrapper = (container: HTMLElement) =>
     container.querySelector('[data-slot="data-table"]') as HTMLElement;

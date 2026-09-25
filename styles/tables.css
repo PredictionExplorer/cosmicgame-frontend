@@ -391,9 +391,12 @@
  * three-column holders table squeezed at 390px broke "0x360E…FB32" before
  * its last character instead of turning into records. With the hex whole,
  * such a table is wider than its column, and `useCompactFit` turns it into
- * records by itself. This rule outranks both wrap rules and follows them.
+ * records by itself. The same holds for an address a two-line phone record
+ * carries in another column's cell (a counterparty, a contributor). This
+ * rule outranks both wrap rules and follows them.
  */
-.cs-table tbody td[data-kind='address'] > [data-slot='value'] :is(.font-mono, .font-mono *) {
+.cs-table tbody td[data-kind='address'] > [data-slot='value'] :is(.font-mono, .font-mono *),
+.cs-table tbody td > [data-slot='value'] [data-slot='phone-record'] :is(.font-mono, .font-mono *) {
   overflow-wrap: normal;
   text-wrap-mode: nowrap;
 }

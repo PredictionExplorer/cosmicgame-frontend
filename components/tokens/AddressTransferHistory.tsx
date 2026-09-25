@@ -1,6 +1,6 @@
 'use client';
 
-import { useMemo, useState, type ComponentType, type ReactNode } from 'react';
+import { useCallback, useMemo, useState, type ComponentType } from 'react';
 import { ArrowDownLeft, ArrowRight, ArrowUpRight, Flame, type LucideProps } from 'lucide-react';
 import { useLocale, useTranslations } from 'next-intl';
 import { getAddress, isAddress } from 'viem';
@@ -23,6 +23,7 @@ import {
   KindValue,
   useTablePageSize,
   type DataTableColumn,
+  type PhoneRecordContent,
 } from '@/components/ui/data-table';
 import { EmptyState } from '@/components/ui/empty-state';
 import { SegmentedControl } from '@/components/ui/segmented-control';
@@ -119,47 +120,6 @@ function ActivityCell({ activity }: { activity: TransferActivity }) {
 }
 
 /**
- * One transfer as a phone reads it: a two-line record instead of a label
- * beside every value. The activity and what moved (the signed amount, or the
- * artwork and its number) share the first line; the other side of a
- * transfer and the date, linked to its transaction, sit under it in the
- * subtle tier. The ledger's columns hold the same values from `sm`, where
- * this record is hidden.
- */
-function TransferPhoneRecord({
-  activity,
-  moved,
-  counterparty,
-  date,
-}: {
-  activity: TransferActivity;
-  moved: ReactNode;
-  counterparty: ReactNode;
-  date: ReactNode;
-}) {
-  return (
-    <span className="flex flex-col gap-1 sm:hidden">
-      <span className="flex items-center justify-between gap-4">
-        <ActivityCell activity={activity} />
-        <span className="shrink-0 font-medium text-foreground">{moved}</span>
-      </span>
-      {/* The second tier: its links keep the line's ink until hovered, each a 24px target. */}
-      <span className="flex flex-wrap items-baseline gap-x-2 type-body-sm font-normal text-muted-foreground [&_a]:inline-block [&_a]:min-h-6 [&_a]:leading-6 [&_a]:text-muted-foreground">
-        {counterparty ? (
-          <>
-            {counterparty}
-            <span aria-hidden className="text-subtle">
-              ·
-            </span>
-          </>
-        ) : null}
-        {date}
-      </span>
-    </span>
-  );
-}
-
-/**
  * One address's CST or NFT transfer history: an identity header (the full
  * address to copy and its explorer page directly under the title, then the
  * totals), a switch to the other asset's history, and a ledger that says what
@@ -232,10 +192,8 @@ export function AddressTransferHistory({
     [entries, filter],
   );
 
-  const columns = useMemo<DataTableColumn<TransferEntry>[]>(() => {
-    // The protocol imprints and consumes: those rows name it rather than
-    // print the zero address, and a transfer's other side is its address.
-    const protocolName = tFormats('address.known.protocol');
+  // What a row shows in both layouts: the ledger's cells and its phone record.
+  const cells = useMemo(() => {
     const counterpartyChip = (other: string) => (
       <AddressChip address={other} variant="plain" showCopy={false} currentAddress={address} />
     );
@@ -264,9 +222,42 @@ export function AddressTransferHistory({
           lookUpMissing={!collectionFailed}
         />
       );
+    return { counterpartyChip, cstAmount, token };
+  }, [address, collectionFailed, seedFor, seedsPending]);
+
+  /**
+   * One transfer as a phone reads it: the activity and what moved (the
+   * signed amount, or the artwork and its number) on the first line; the
+   * other side of the transfer and the date, linked to its transaction,
+   * under it in the muted tier.
+   */
+  const phoneRecord = useCallback(
+    (entry: TransferEntry): PhoneRecordContent => ({
+      title: <ActivityCell activity={entry.activity} />,
+      titleEnd: asset === 'cst' ? cells.cstAmount(entry) : cells.token(entry),
+      details: [
+        entry.counterparty ? cells.counterpartyChip(entry.counterparty) : null,
+        <KindValue
+          key="date"
+          kind="datetime"
+          value={entry.timestamp}
+          txHash={entry.txHash}
+          year="auto"
+        />,
+      ],
+    }),
+    [asset, cells],
+  );
+
+  const columns = useMemo<DataTableColumn<TransferEntry>[]>(() => {
+    // The protocol imprints and consumes: those rows name it rather than
+    // print the zero address, and a transfer's other side is its address.
+    const protocolName = tFormats('address.known.protocol');
+    const { counterpartyChip, cstAmount, token } = cells;
 
     // On a phone each row is one two-line record in the activity cell (its
-    // title), so the other columns leave the phone and no label repeats.
+    // title, `phoneRecord`), so the other columns leave the phone and no
+    // label repeats.
     const date: DataTableColumn<TransferEntry> = {
       id: 'date',
       kind: 'datetime',
@@ -276,7 +267,7 @@ export function AddressTransferHistory({
       year: 'auto',
       sortable: true,
       width: '12rem',
-      priority: 'secondary',
+      phone: 'omit',
     };
     const activity: DataTableColumn<TransferEntry> = {
       id: 'activity',
@@ -284,33 +275,14 @@ export function AddressTransferHistory({
       header: t('columns.activity'),
       value: (entry) => t(`activity.${entry.activity}`),
       phone: 'title',
-      cell: (entry) => (
-        <>
-          <span className="max-sm:hidden">
-            <ActivityCell activity={entry.activity} />
-          </span>
-          <TransferPhoneRecord
-            activity={entry.activity}
-            moved={asset === 'cst' ? cstAmount(entry) : token(entry)}
-            counterparty={entry.counterparty ? counterpartyChip(entry.counterparty) : null}
-            date={
-              <KindValue
-                kind="datetime"
-                value={entry.timestamp}
-                txHash={entry.txHash}
-                year="auto"
-              />
-            }
-          />
-        </>
-      ),
+      cell: (entry) => <ActivityCell activity={entry.activity} />,
       width: '11rem',
     };
     const counterparty: DataTableColumn<TransferEntry> = {
       id: 'counterparty',
       kind: 'address',
       header: t('columns.counterparty'),
-      priority: 'secondary',
+      phone: 'omit',
       value: (entry) => entry.counterparty ?? protocolName,
       cell: (entry) =>
         entry.counterparty ? (
@@ -330,7 +302,7 @@ export function AddressTransferHistory({
           header: tTables('columns.amountCst'),
           unit: 'CST',
           width: '10rem',
-          priority: 'secondary',
+          phone: 'omit',
           // A transfer that changes no hands sorts by its size, not as zero.
           value: (entry) => (entry.wei === null ? null : Number(entry.wei) * (signOf(entry) || 1)),
           cell: cstAmount,
@@ -349,11 +321,11 @@ export function AddressTransferHistory({
         cell: token,
         sortable: true,
         width: '12rem',
-        priority: 'secondary',
+        phone: 'omit',
       },
       counterparty,
     ];
-  }, [address, asset, collectionFailed, seedFor, seedsPending, t, tFormats, tTables]);
+  }, [asset, cells, t, tFormats, tTables]);
 
   // While the history loads a figure is a skeleton, with its caption line
   // held open; when it fails, the header's unavailable dash (`null`). Totals
@@ -484,6 +456,7 @@ export function AddressTransferHistory({
       <DataTable
         data={shown}
         columns={columns}
+        phoneRecord={phoneRecord}
         ariaLabel={t(`${asset}.title`)}
         getRowKey={(entry) => entry.key}
         initialSort={{ id: 'date', direction: 'desc' }}
