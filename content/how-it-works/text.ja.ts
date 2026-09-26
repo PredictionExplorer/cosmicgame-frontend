@@ -28,7 +28,7 @@ export const howItWorksTextJa = {
   hero: {
     heading: 'Cosmic Signatureの仕組み',
     paragraph:
-      'パフォーマンス・サイクルの間に参加者が一筆を入れ、その一筆一筆がサイクルのシグネチャーを形づくります。確定時刻を過ぎるとサイクルを確定でき、準備金はシグネチャー配分、係留配分、Protocol Guildなど、10を超えるトラックへ配分されます。',
+      'パフォーマンス・サイクルの間に参加者が一筆を入れ、その一筆一筆がサイクルのシグネチャーを形づくります。確定時刻を過ぎるとサイクルを確定でき、準備金はシグネチャー配分、係留配分、Protocol Guildなど、定められたトラックへ配分されます。',
     primaryCtaLabel: '一筆を入れる',
     secondaryCtaLabel: '現在のサイクルを見る',
   },

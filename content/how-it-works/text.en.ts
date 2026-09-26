@@ -30,7 +30,7 @@ export const howItWorksTextEn = {
   hero: {
     heading: 'How Cosmic Signature works',
     paragraph:
-      'Participants make gestures during a Performance Cycle, and every gesture shapes the cycle’s Signature. When the Cycle Finalization Time expires, the cycle can be finalized and allocations distribute across more than ten tracks — including the Signature Allocation, Anchor Distributions, and Protocol Guild.',
+      'Participants make gestures during a Performance Cycle, and every gesture shapes the cycle’s Signature. When the Cycle Finalization Time expires, the cycle can be finalized and allocations distribute across a fixed set of tracks — including the Signature Allocation, Anchor Distributions, and Protocol Guild.',
     primaryCtaLabel: 'Make a gesture',
     secondaryCtaLabel: 'See the live cycle',
   },

@@ -314,8 +314,8 @@
   },
   "jsonLd": {
     "app": {
-      "protocolDescription": "Cosmic SignatureはArbitrum上のプロシージャル・オンチェーンアート・プロトコルです。すべての一筆がサイクルの最終シグネチャーを形づくり、プロトコルは準備金をProtocol Guildを含む10を超える配分トラックへ配ります。",
-      "webApplicationDescription": "Arbitrum上のプロシージャル・オンチェーンアート・プロトコル。参加者はパフォーマンス・サイクルの間に一筆を入れ、サイクルが確定するとプロトコルは10を超えるトラックへ配分を配ります。",
+      "protocolDescription": "Cosmic SignatureはArbitrum上のプロシージャル・オンチェーンアート・プロトコルです。すべての一筆がサイクルの最終シグネチャーを形づくり、プロトコルは準備金をProtocol Guildを含む定められた配分トラックへ配ります。",
+      "webApplicationDescription": "Arbitrum上のプロシージャル・オンチェーンアート・プロトコル。参加者はパフォーマンス・サイクルの間に一筆を入れ、サイクルが確定するとプロトコルは定められたトラックへ配分を配ります。",
       "browserRequirements": "Web3対応のブラウザーまたはウォレット拡張機能が必要です"
     },
     "artProtocol": {
@@ -391,7 +391,7 @@
       "eyebrow": "配分",
       "title": "配分の分布",
       "titleWithValue": "サイクル{cycle}の配分",
-      "subhead": "サイクル準備金が10を超える配分トラックへどう配られたか。"
+      "subhead": "サイクル準備金が定められた配分トラックへどう配られたか。"
     },
     "participant": {
       "alt": "Cosmic Signature——参加者",

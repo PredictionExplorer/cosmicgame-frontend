@@ -2,7 +2,7 @@
   "shared": {
     "defaultTitle": "Cosmic Signature",
     "defaultOgTitle": "Cosmic Signature——すべての一筆がシグネチャーを形づくる。",
-    "defaultDescription": "Arbitrum上のプロシージャル・オンチェーンアート・プロトコル。入れた一筆の一つひとつが、サイクルの最終シグネチャーを形づくります。サイクルが確定すると、プロトコルは準備金を10を超える配分トラックへ配ります。その中には、170人以上のEthereumコア貢献者の資金支援メカニズムであるProtocol Guildも含まれます。"
+    "defaultDescription": "Arbitrum上のプロシージャル・オンチェーンアート・プロトコル。入れた一筆の一つひとつが、サイクルの最終シグネチャーを形づくります。サイクルが確定すると、プロトコルは準備金を定められた配分トラックへ配ります。その中には、170人以上のEthereumコア貢献者の資金支援メカニズムであるProtocol Guildも含まれます。"
   },
   "home": {
     "title": "Cosmic Signature",

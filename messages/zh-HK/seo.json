@@ -314,8 +314,8 @@
   },
   "jsonLd": {
     "app": {
-      "protocolDescription": "Cosmic Signature 是 Arbitrum 上的程序化鏈上藝術協議。每一筆都在塑造週期最終的簽名；協議會將儲備分配至十餘條軌道，其中包括 Protocol Guild。",
-      "webApplicationDescription": "Cosmic Signature 是 Arbitrum 上的程序化鏈上藝術協議。參與者在演繹週期中落筆；週期收官時，協議沿十餘條軌道發放分配。",
+      "protocolDescription": "Cosmic Signature 是 Arbitrum 上的程序化鏈上藝術協議。每一筆都在塑造週期最終的簽名；協議會將儲備分配至一組固定的軌道，其中包括 Protocol Guild。",
+      "webApplicationDescription": "Cosmic Signature 是 Arbitrum 上的程序化鏈上藝術協議。參與者在演繹週期中落筆；週期收官時，協議沿一組固定的軌道發放分配。",
       "browserRequirements": "需要支援 Web3 的瀏覽器或錢包擴展"
     },
     "artProtocol": {
@@ -391,7 +391,7 @@
       "eyebrow": "分配",
       "title": "分配明細",
       "titleWithValue": "第 {cycle} 個週期的分配",
-      "subhead": "查看週期儲備如何沿十餘條分配軌道發放。"
+      "subhead": "查看週期儲備如何沿一組固定的分配軌道發放。"
     },
     "participant": {
       "alt": "Cosmic Signature · 參與者",

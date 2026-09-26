@@ -314,8 +314,8 @@
   },
   "jsonLd": {
     "app": {
-      "protocolDescription": "Cosmic Signature is a procedural on-chain art protocol on Arbitrum. Every gesture shapes the cycle’s final Signature, and the protocol distributes its reserves across more than ten allocation tracks — including Protocol Guild.",
-      "webApplicationDescription": "A procedural on-chain art protocol on Arbitrum. Participants make gestures during a Performance Cycle; the protocol distributes allocations across more than ten tracks when the cycle finalizes.",
+      "protocolDescription": "Cosmic Signature is a procedural on-chain art protocol on Arbitrum. Every gesture shapes the cycle’s final Signature, and the protocol distributes its reserves across a fixed set of allocation tracks — including Protocol Guild.",
+      "webApplicationDescription": "A procedural on-chain art protocol on Arbitrum. Participants make gestures during a Performance Cycle; the protocol distributes allocations across a fixed set of tracks when the cycle finalizes.",
       "browserRequirements": "Requires a Web3-compatible browser or wallet extension"
     },
     "artProtocol": {
@@ -391,7 +391,7 @@
       "eyebrow": "Allocation",
       "title": "Allocation Distribution",
       "titleWithValue": "Cycle {cycle} allocations",
-      "subhead": "How the Cycle Reserve was distributed across more than ten allocation tracks."
+      "subhead": "How the Cycle Reserve was distributed across a fixed set of allocation tracks."
     },
     "participant": {
       "alt": "Cosmic Signature — Participant",

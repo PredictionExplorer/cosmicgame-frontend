@@ -28,7 +28,7 @@ export const howItWorksTextZh = {
   hero: {
     heading: 'Cosmic Signature 运作原理',
     paragraph:
-      '参与者在演绎周期中落笔，每一笔都在塑造本周期的签名；收官倒计时归零后，周期即可收官，储备将沿十余条分配轨道发放——签名分配、锚定派发与 Protocol Guild 都在其中。',
+      '参与者在演绎周期中落笔，每一笔都在塑造本周期的签名；收官倒计时归零后，周期即可收官，储备将沿一组固定的分配轨道发放——签名分配、锚定派发与 Protocol Guild 都在其中。',
     primaryCtaLabel: '落笔',
     secondaryCtaLabel: '查看当前周期',
   },

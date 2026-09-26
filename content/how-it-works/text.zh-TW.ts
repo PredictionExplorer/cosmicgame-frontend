@@ -28,7 +28,7 @@ export const howItWorksTextZhTw = {
   hero: {
     heading: 'Cosmic Signature 運作原理',
     paragraph:
-      '參與者在演繹週期中落筆，每一筆都在塑造本週期的簽名；收官倒數歸零後，週期即可收官，儲備將沿十餘條分配軌道發放——簽名分配、錨定配發與 Protocol Guild 都在其中。',
+      '參與者在演繹週期中落筆，每一筆都在塑造本週期的簽名；收官倒數歸零後，週期即可收官，儲備將沿一組固定的分配軌道發放——簽名分配、錨定配發與 Protocol Guild 都在其中。',
     primaryCtaLabel: '落筆',
     secondaryCtaLabel: '查看目前週期',
   },

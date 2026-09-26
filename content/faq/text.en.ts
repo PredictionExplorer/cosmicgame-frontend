@@ -21,7 +21,7 @@ export const faqTextEn = {
       'what-is-cosmic-signature': {
         question: 'What is Cosmic Signature?',
         answer:
-          'Cosmic Signature is a procedural on-chain art protocol on Arbitrum. Participants make gestures during a Performance Cycle; every gesture shapes the cycle’s final Signature. When the cycle finalizes, the protocol distributes its reserves across more than ten allocation tracks — including Protocol Guild, the funding mechanism for 170+ Ethereum core contributors.',
+          'Cosmic Signature is a procedural on-chain art protocol on Arbitrum. Participants make gestures during a Performance Cycle; every gesture shapes the cycle’s final Signature. When the cycle finalizes, the protocol distributes its reserves across a fixed set of allocation tracks — including Protocol Guild, the funding mechanism for 170+ Ethereum core contributors.',
       },
       'how-does-the-bidding-game-work': {
         question: 'How does a Performance Cycle work?',

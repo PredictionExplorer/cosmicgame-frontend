@@ -2,7 +2,7 @@
   "shared": {
     "defaultTitle": "Cosmic Signature",
     "defaultOgTitle": "Cosmic Signature — 모든 제스처가 시그니처를 빚어냅니다.",
-    "defaultDescription": "Arbitrum 위의 절차적 온체인 아트 프로토콜입니다. 제스처 하나하나가 사이클의 최종 시그니처를 빚어냅니다. 사이클이 마감되면 프로토콜은 준비금을 10개가 넘는 배분 경로로 배분하며, 여기에는 이더리움 핵심 기여자 170명 이상을 지원하는 자금 지원 메커니즘 Protocol Guild도 포함됩니다."
+    "defaultDescription": "Arbitrum 위의 절차적 온체인 아트 프로토콜입니다. 제스처 하나하나가 사이클의 최종 시그니처를 빚어냅니다. 사이클이 마감되면 프로토콜은 준비금을 정해진 배분 경로로 배분하며, 여기에는 이더리움 핵심 기여자 170명 이상을 지원하는 자금 지원 메커니즘 Protocol Guild도 포함됩니다."
   },
   "home": {
     "title": "Cosmic Signature",

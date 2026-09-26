@@ -33,7 +33,7 @@ export const faqTextKo = {
       'what-is-cosmic-signature': {
         question: 'Cosmic Signature란 무엇인가요?',
         answer:
-          'Cosmic Signature는 Arbitrum 위의 절차적 온체인 아트 프로토콜입니다. 참여자는 퍼포먼스 사이클 동안 제스처를 남기고, 모든 제스처가 사이클의 최종 시그니처를 빚어냅니다. 사이클이 마감되면 프로토콜은 준비금을 10개가 넘는 배분 경로로 배분합니다. 이더리움 핵심 기여자 170명 이상을 위한 자금 지원 메커니즘인 Protocol Guild도 그중 하나입니다.',
+          'Cosmic Signature는 Arbitrum 위의 절차적 온체인 아트 프로토콜입니다. 참여자는 퍼포먼스 사이클 동안 제스처를 남기고, 모든 제스처가 사이클의 최종 시그니처를 빚어냅니다. 사이클이 마감되면 프로토콜은 준비금을 정해진 배분 경로로 배분합니다. 이더리움 핵심 기여자 170명 이상을 위한 자금 지원 메커니즘인 Protocol Guild도 그중 하나입니다.',
       },
       'how-does-the-bidding-game-work': {
         question: '퍼포먼스 사이클은 어떻게 진행되나요?',

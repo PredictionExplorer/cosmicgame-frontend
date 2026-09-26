@@ -2,7 +2,7 @@
   "shared": {
     "defaultTitle": "Cosmic Signature",
     "defaultOgTitle": "Cosmic Signature — Mỗi nét bút đều định hình Signature.",
-    "defaultDescription": "Giao thức nghệ thuật tạo sinh trên chuỗi Arbitrum. Mỗi nét bút bạn đặt đều định hình Signature cuối cùng của chu kỳ. Khi chu kỳ hoàn tất, giao thức phân phối dự trữ của mình qua hơn mười luồng phân bổ — bao gồm Protocol Guild, cơ chế tài trợ cho hơn 170 người đóng góp cốt lõi cho Ethereum."
+    "defaultDescription": "Giao thức nghệ thuật tạo sinh trên chuỗi Arbitrum. Mỗi nét bút bạn đặt đều định hình Signature cuối cùng của chu kỳ. Khi chu kỳ hoàn tất, giao thức phân phối dự trữ của mình qua một nhóm luồng phân bổ cố định — bao gồm Protocol Guild, cơ chế tài trợ cho hơn 170 người đóng góp cốt lõi cho Ethereum."
   },
   "home": {
     "title": "Cosmic Signature",

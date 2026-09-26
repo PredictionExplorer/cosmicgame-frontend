@@ -34,7 +34,7 @@ export const howItWorksTextVi = {
   hero: {
     heading: 'Cosmic Signature hoạt động như thế nào',
     paragraph:
-      'Những nét bút nối tiếp nhau định hình Signature trong mỗi chu kỳ trình diễn. Khi đếm ngược về 0, chu kỳ có thể được hoàn tất. Giao thức khi đó phân phối dự trữ qua hơn mười luồng, gồm phân bổ Signature, phân phối neo giữ và phần dành cho Protocol Guild.',
+      'Những nét bút nối tiếp nhau định hình Signature trong mỗi chu kỳ trình diễn. Khi đếm ngược về 0, chu kỳ có thể được hoàn tất. Giao thức khi đó phân phối dự trữ qua một nhóm luồng cố định, gồm phân bổ Signature, phân phối neo giữ và phần dành cho Protocol Guild.',
     primaryCtaLabel: 'Đặt nét bút',
     secondaryCtaLabel: 'Xem chu kỳ hiện tại',
   },

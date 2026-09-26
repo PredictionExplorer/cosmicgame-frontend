@@ -27,7 +27,7 @@ export const faqTextJa = {
       'what-is-cosmic-signature': {
         question: 'Cosmic Signatureとは何ですか？',
         answer:
-          'Cosmic SignatureはArbitrum上のプロシージャル・オンチェーンアート・プロトコルです。参加者はパフォーマンス・サイクルの間に一筆を入れ、その一つひとつがサイクルの最終シグネチャーを形づくります。サイクルが確定すると、プロトコルは準備金を10を超える配分トラックへ配ります。その中には、170人以上のEthereumコア貢献者の資金支援メカニズムであるProtocol Guildも含まれます。',
+          'Cosmic SignatureはArbitrum上のプロシージャル・オンチェーンアート・プロトコルです。参加者はパフォーマンス・サイクルの間に一筆を入れ、その一つひとつがサイクルの最終シグネチャーを形づくります。サイクルが確定すると、プロトコルは準備金を定められた配分トラックへ配ります。その中には、170人以上のEthereumコア貢献者の資金支援メカニズムであるProtocol Guildも含まれます。',
       },
       'how-does-the-bidding-game-work': {
         question: 'パフォーマンス・サイクルはどのように進みますか？',

@@ -2,7 +2,7 @@
   "shared": {
     "defaultTitle": "Cosmic Signature",
     "defaultOgTitle": "Cosmic Signature — Every Gesture Shapes the Signature.",
-    "defaultDescription": "A procedural on-chain art protocol on Arbitrum. Every gesture you make shapes the cycle’s final Signature. When the cycle finalizes, the protocol distributes its reserves across more than ten allocation tracks — including Protocol Guild, the funding mechanism for 170+ Ethereum core contributors."
+    "defaultDescription": "A procedural on-chain art protocol on Arbitrum. Every gesture you make shapes the cycle’s final Signature. When the cycle finalizes, the protocol distributes its reserves across a fixed set of allocation tracks — including Protocol Guild, the funding mechanism for 170+ Ethereum core contributors."
   },
   "home": {
     "title": "Cosmic Signature",

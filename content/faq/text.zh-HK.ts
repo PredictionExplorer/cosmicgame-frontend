@@ -33,7 +33,7 @@ export const faqTextZhHk = {
       'what-is-cosmic-signature': {
         question: 'Cosmic Signature 是什麼？',
         answer:
-          'Cosmic Signature 是 Arbitrum 上的程序化鏈上藝術協議。參與者在演繹週期中落筆，每一筆都會塑造這一週期最終的簽名。週期收官後，協議將儲備分配至十餘條軌道，其中包括支持 170 多位以太坊核心貢獻者的 Protocol Guild。',
+          'Cosmic Signature 是 Arbitrum 上的程序化鏈上藝術協議。參與者在演繹週期中落筆，每一筆都會塑造這一週期最終的簽名。週期收官後，協議將儲備分配至一組固定的軌道，其中包括支持 170 多位以太坊核心貢獻者的 Protocol Guild。',
       },
       'how-does-the-bidding-game-work': {
         question: '演繹週期如何運作？',

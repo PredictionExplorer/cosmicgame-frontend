@@ -51,6 +51,9 @@ interface CopySource {
 const readPublicFile = (fileName: string) =>
   readFileSync(join(process.cwd(), 'public', fileName), 'utf8');
 
+/** The root layout's fallback description (app/root-metadata.ts), which no catalog holds. */
+const readRootMetadata = () => readFileSync(join(process.cwd(), 'app', 'root-metadata.ts'), 'utf8');
+
 /** Concatenated message catalogs for a locale (messages/<locale>/*.json). */
 const readMessageCatalogs = (locale: string) => {
   const dir = join(process.cwd(), 'messages', locale);
@@ -314,6 +317,18 @@ describe('copy numeric claims stay pinned to protocolFacts', () => {
       'CST amount',
     );
   });
+
+  // No protocol fact counts the allocation tracks, and the landing lists
+  // nine: "more than ten" (in any language) contradicted it on six surfaces
+  // (V169). A count of tracks must come from protocolFacts, never prose.
+  const unsourcedTrackCount =
+    /more than (?:ten|10)\b[^.]{0,40}tracks|十[余餘多]条|十[余餘多]條|понад десят|10개가 넘|10を超える(?:配分)?トラック|hơn (?:mười|10) luồng/i;
+  it.each([...sources, { name: 'root-metadata', text: readRootMetadata() }])(
+    '$name: claims no count of allocation tracks the protocol facts do not state',
+    (source) => {
+      expect(source.text).not.toMatch(unsourcedTrackCount);
+    },
+  );
 
   it('the key deployed percentages are actually present in the public docs', () => {
     // Guards against accidental deletion: llms.txt must keep quoting the

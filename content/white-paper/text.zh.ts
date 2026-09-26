@@ -39,7 +39,7 @@ export const whitePaperTextZh = {
   abstract: {
     heading: '摘要',
     paragraphs: [
-      'Cosmic Signature 是部署在 Arbitrum One 上的程序化艺术协议，以一个个限时的演绎周期运转。周期进行中，参与者以 ETH 或协议的 ERC-20 代币 CST 落笔：每一笔都会延长收官倒计时，计入一次星选资格，还可能铭刻新的 CST。倒计时结束、周期收官后，协议将 ETH 储备分配至十余条轨道，铭刻新一代 Cosmic Signature NFT，并把固定份额转拨给 Protocol Guild，即 170 余位以太坊核心贡献者的资助机制。约一半储备滚入下一周期，储备规模还取决于各周期新加入的 ETH。',
+      'Cosmic Signature 是部署在 Arbitrum One 上的程序化艺术协议，以一个个限时的演绎周期运转。周期进行中，参与者以 ETH 或协议的 ERC-20 代币 CST 落笔：每一笔都会延长收官倒计时，计入一次星选资格，还可能铭刻新的 CST。倒计时结束、周期收官后，协议将 ETH 储备分配至一组固定的轨道，铭刻新一代 Cosmic Signature NFT，并把固定份额转拨给 Protocol Guild，即 170 余位以太坊核心贡献者的资助机制。约一半储备滚入下一周期，储备规模还取决于各周期新加入的 ETH。',
       '每枚 Cosmic Signature NFT 都是对引力三体问题的确定性渲染：作品由链上种子生成，任何人都能逐像素复现，全程没有神经网络参与。本文完整阐述协议机制与代币设计，记录已上线的 V2 升级，介绍规划中的 V3 升级，并阐明一项承诺：待设计定稿，部署者地址将交出全部特权控制。',
     ],
   },

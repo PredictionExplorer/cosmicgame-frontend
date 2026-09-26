@@ -314,8 +314,8 @@
   },
   "jsonLd": {
     "app": {
-      "protocolDescription": "Cosmic Signature là giao thức nghệ thuật tạo sinh trên chuỗi Arbitrum. Mỗi nét bút đều định hình Signature cuối cùng của chu kỳ, và giao thức phân phối dự trữ của mình qua hơn mười luồng phân bổ — bao gồm Protocol Guild.",
-      "webApplicationDescription": "Giao thức nghệ thuật tạo sinh trên chuỗi Arbitrum. Người tham gia đặt nét bút trong một chu kỳ trình diễn; giao thức phân phối phân bổ qua hơn mười luồng khi chu kỳ hoàn tất.",
+      "protocolDescription": "Cosmic Signature là giao thức nghệ thuật tạo sinh trên chuỗi Arbitrum. Mỗi nét bút đều định hình Signature cuối cùng của chu kỳ, và giao thức phân phối dự trữ của mình qua một nhóm luồng phân bổ cố định — bao gồm Protocol Guild.",
+      "webApplicationDescription": "Giao thức nghệ thuật tạo sinh trên chuỗi Arbitrum. Người tham gia đặt nét bút trong một chu kỳ trình diễn; giao thức phân phối phân bổ qua một nhóm luồng cố định khi chu kỳ hoàn tất.",
       "browserRequirements": "Yêu cầu trình duyệt hoặc tiện ích ví tương thích Web3"
     },
     "artProtocol": {
@@ -391,7 +391,7 @@
       "eyebrow": "Phân bổ",
       "title": "Cơ cấu phân bổ",
       "titleWithValue": "Phân bổ chu kỳ {cycle}",
-      "subhead": "Dự trữ chu kỳ đã được phân phối qua hơn mười luồng phân bổ như thế nào."
+      "subhead": "Dự trữ chu kỳ đã được phân phối qua một nhóm luồng phân bổ cố định như thế nào."
     },
     "participant": {
       "alt": "Cosmic Signature — Người tham gia",

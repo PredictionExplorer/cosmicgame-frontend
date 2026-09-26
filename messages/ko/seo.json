@@ -314,8 +314,8 @@
   },
   "jsonLd": {
     "app": {
-      "protocolDescription": "Cosmic Signature는 Arbitrum 위의 절차적 온체인 아트 프로토콜입니다. 모든 제스처가 사이클의 최종 시그니처를 빚어내고, 프로토콜은 준비금을 Protocol Guild를 포함한 10개가 넘는 배분 경로로 배분합니다.",
-      "webApplicationDescription": "Arbitrum 위의 절차적 온체인 아트 프로토콜입니다. 참여자는 퍼포먼스 사이클 동안 제스처를 남기고, 사이클이 마감되면 프로토콜이 10개가 넘는 경로로 배분을 실행합니다.",
+      "protocolDescription": "Cosmic Signature는 Arbitrum 위의 절차적 온체인 아트 프로토콜입니다. 모든 제스처가 사이클의 최종 시그니처를 빚어내고, 프로토콜은 준비금을 Protocol Guild를 포함한 정해진 배분 경로로 배분합니다.",
+      "webApplicationDescription": "Arbitrum 위의 절차적 온체인 아트 프로토콜입니다. 참여자는 퍼포먼스 사이클 동안 제스처를 남기고, 사이클이 마감되면 프로토콜이 정해진 경로로 배분을 실행합니다.",
       "browserRequirements": "Web3 호환 브라우저 또는 지갑 확장 프로그램이 필요합니다."
     },
     "artProtocol": {
@@ -391,7 +391,7 @@
       "eyebrow": "배분",
       "title": "사이클 준비금 배분 결과",
       "titleWithValue": "사이클 {cycle} 배분",
-      "subhead": "사이클 준비금이 10개가 넘는 배분 경로로 어떻게 배분되었는지 보여 줍니다."
+      "subhead": "사이클 준비금이 정해진 배분 경로로 어떻게 배분되었는지 보여 줍니다."
     },
     "participant": {
       "alt": "Cosmic Signature — 참여자",

@@ -26,7 +26,7 @@ const englishRootMetadataCopy: RootMetadataCopy = {
   defaultTitle: SITE_NAME,
   defaultOgTitle: 'Cosmic Signature \u2014 Every Gesture Shapes the Signature.',
   defaultDescription:
-    'A procedural on-chain art protocol on Arbitrum. Every gesture you make shapes the cycle\u2019s final Signature. When the cycle finalizes, the protocol distributes its reserves across more than ten allocation tracks \u2014 including Protocol Guild, the funding mechanism for 170+ Ethereum core contributors.',
+    'A procedural on-chain art protocol on Arbitrum. Every gesture you make shapes the cycle\u2019s final Signature. When the cycle finalizes, the protocol distributes its reserves across a fixed set of allocation tracks \u2014 including Protocol Guild, the funding mechanism for 170+ Ethereum core contributors.',
 };
 
 /** Maps a routing locale to the OpenGraph `og:locale` value. */

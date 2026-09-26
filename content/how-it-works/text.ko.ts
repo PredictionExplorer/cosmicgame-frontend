@@ -28,7 +28,7 @@ export const howItWorksTextKo = {
   hero: {
     heading: 'Cosmic Signature 작동 원리',
     paragraph:
-      '참여자는 퍼포먼스 사이클 동안 제스처를 남기고, 제스처 하나하나가 사이클의 시그니처를 빚어냅니다. 사이클 마감 시각이 지나면 사이클을 마감할 수 있고, 배분은 시그니처 배분, 앵커링 지급, Protocol Guild를 비롯한 10개가 넘는 경로로 이루어집니다.',
+      '참여자는 퍼포먼스 사이클 동안 제스처를 남기고, 제스처 하나하나가 사이클의 시그니처를 빚어냅니다. 사이클 마감 시각이 지나면 사이클을 마감할 수 있고, 배분은 시그니처 배분, 앵커링 지급, Protocol Guild를 비롯한 정해진 경로로 이루어집니다.',
     primaryCtaLabel: '제스처 남기기',
     secondaryCtaLabel: '현재 사이클 보기',
   },

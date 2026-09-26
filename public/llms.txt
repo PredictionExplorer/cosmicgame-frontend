@@ -1,10 +1,10 @@
 # Cosmic Signature
 
-> Cosmic Signature is a procedural on-chain art protocol on Arbitrum. Every gesture shapes the cycle's final Signature, and the protocol redistributes its reserves across more than ten allocation tracks — including the infrastructure Ethereum itself depends on.
+> Cosmic Signature is a procedural on-chain art protocol on Arbitrum. Every gesture shapes the cycle's final Signature, and the protocol redistributes its reserves across a fixed set of allocation tracks — including the infrastructure Ethereum itself depends on.
 
 ## Overview
 
-Cosmic Signature is a procedural on-chain art protocol on Arbitrum. Participants make gestures during a Performance Cycle; when the cycle finalizes, the protocol distributes its reserves across more than ten allocation tracks — including Protocol Guild, the funding mechanism for 170+ Ethereum core contributors. The protocol runs on Arbitrum, a Layer 2 scaling solution for Ethereum, designed to process transactions at lower cost; fees vary with network conditions.
+Cosmic Signature is a procedural on-chain art protocol on Arbitrum. Participants make gestures during a Performance Cycle; when the cycle finalizes, the protocol distributes its reserves across a fixed set of allocation tracks — including Protocol Guild, the funding mechanism for 170+ Ethereum core contributors. The protocol runs on Arbitrum, a Layer 2 scaling solution for Ethereum, designed to process transactions at lower cost; fees vary with network conditions.
 
 Cosmic Signature is not related to the COSMIC cancer mutation database or COSMIC mutational signatures in biology.
 
@@ -91,7 +91,7 @@ Cosmic Signature is not related to the COSMIC cancer mutation database or COSMIC
 
 ## 中文概览
 
-Cosmic Signature 是运行于 Arbitrum 的程序化链上艺术协议。参与者在演绎周期中落笔；每一笔都会影响周期最终的签名作品。周期收官后，协议按公开规则将周期储备发往十余条分配轨道，其中包括支持以太坊核心贡献者的 Protocol Guild。
+Cosmic Signature 是运行于 Arbitrum 的程序化链上艺术协议。参与者在演绎周期中落笔；每一笔都会影响周期最终的签名作品。周期收官后，协议按公开规则将周期储备发往一组固定的分配轨道，其中包括支持以太坊核心贡献者的 Protocol Guild。
 
 Cosmic Signature 与 COSMIC 癌症突变数据库及生物学中的 COSMIC 突变特征没有关联。
 
@@ -131,7 +131,7 @@ Cosmic Signature 与 COSMIC 癌症突变数据库及生物学中的 COSMIC 突�
 
 ## 繁體中文（台灣）概覽
 
-Cosmic Signature 是運作於 Arbitrum 的程序化鏈上藝術協議。參與者在演繹週期中落筆；每一筆都會影響週期最終的簽名作品。週期收官後，協議按公開規則將週期儲備發往十餘條分配軌道，其中包括支持以太坊核心貢獻者的 Protocol Guild。
+Cosmic Signature 是運作於 Arbitrum 的程序化鏈上藝術協議。參與者在演繹週期中落筆；每一筆都會影響週期最終的簽名作品。週期收官後，協議按公開規則將週期儲備發往一組固定的分配軌道，其中包括支持以太坊核心貢獻者的 Protocol Guild。
 
 Cosmic Signature 與 COSMIC 癌症突變資料庫及生物學中的 COSMIC 突變特徵沒有關聯。
 
@@ -171,7 +171,7 @@ Cosmic Signature 與 COSMIC 癌症突變資料庫及生物學中的 COSMIC 突�
 
 ## 繁體中文（香港）概覽
 
-Cosmic Signature 是運行於 Arbitrum 的程序化鏈上藝術協議。參與者在演繹週期中落筆；每一筆都會影響週期最終的簽名作品。週期收官後，協議按公開規則將週期儲備發往十餘條分配軌道，其中包括支持以太坊核心貢獻者的 Protocol Guild。
+Cosmic Signature 是運行於 Arbitrum 的程序化鏈上藝術協議。參與者在演繹週期中落筆；每一筆都會影響週期最終的簽名作品。週期收官後，協議按公開規則將週期儲備發往一組固定的分配軌道，其中包括支持以太坊核心貢獻者的 Protocol Guild。
 
 Cosmic Signature 與 COSMIC 癌症突變數據庫及生物學中的 COSMIC 突變特徵沒有關聯。
 
@@ -211,7 +211,7 @@ Cosmic Signature 與 COSMIC 癌症突變數據庫及生物學中的 COSMIC 突�
 
 ## Українська: огляд
 
-Cosmic Signature — це процедурний протокол ончейн-мистецтва на Arbitrum. Учасники роблять жести протягом перформанс-циклу; кожен жест впливає на фінальну Сигнатуру циклу. Коли цикл завершується, протокол за відкритими правилами розподіляє резерв циклу за понад десятьма напрямами розподілу, серед яких Protocol Guild — механізм підтримки основних розробників Ethereum.
+Cosmic Signature — це процедурний протокол ончейн-мистецтва на Arbitrum. Учасники роблять жести протягом перформанс-циклу; кожен жест впливає на фінальну Сигнатуру циклу. Коли цикл завершується, протокол за відкритими правилами розподіляє резерв циклу за фіксованим набором напрямів розподілу, серед яких Protocol Guild — механізм підтримки основних розробників Ethereum.
 
 Cosmic Signature не пов’язаний із базою даних мутацій раку COSMIC чи мутаційними сигнатурами COSMIC у біології.
 
@@ -251,7 +251,7 @@ Cosmic Signature не пов’язаний із базою даних мута�
 
 ## 한국어 개요
 
-Cosmic Signature는 Arbitrum 위에서 작동하는 절차적 온체인 아트 프로토콜입니다. 참여자는 퍼포먼스 사이클 동안 제스처를 남기고, 모든 제스처는 사이클의 최종 시그니처에 영향을 줍니다. 사이클이 마감되면 프로토콜은 공개된 규칙에 따라 사이클 준비금을 10개가 넘는 배분 경로로 배분하며, 그 가운데에는 이더리움 핵심 기여자를 지원하는 Protocol Guild가 있습니다.
+Cosmic Signature는 Arbitrum 위에서 작동하는 절차적 온체인 아트 프로토콜입니다. 참여자는 퍼포먼스 사이클 동안 제스처를 남기고, 모든 제스처는 사이클의 최종 시그니처에 영향을 줍니다. 사이클이 마감되면 프로토콜은 공개된 규칙에 따라 사이클 준비금을 정해진 배분 경로로 배분하며, 그 가운데에는 이더리움 핵심 기여자를 지원하는 Protocol Guild가 있습니다.
 
 Cosmic Signature는 COSMIC 암 돌연변이 데이터베이스나 생물학의 COSMIC 돌연변이 시그니처와 관련이 없습니다.
 
@@ -291,7 +291,7 @@ Cosmic Signature는 COSMIC 암 돌연변이 데이터베이스나 생물학의 C
 
 ## 日本語の概要
 
-Cosmic SignatureはArbitrum上で動くプロシージャル・オンチェーンアート・プロトコルです。参加者はパフォーマンス・サイクルの間に一筆を入れ、すべての一筆がサイクルの最終シグネチャーに影響します。サイクルが確定すると、プロトコルは公開されたルールに従ってサイクル準備金を10を超える配分トラックへ配り、その中にはEthereumのコア貢献者を支えるProtocol Guildも含まれます。
+Cosmic SignatureはArbitrum上で動くプロシージャル・オンチェーンアート・プロトコルです。参加者はパフォーマンス・サイクルの間に一筆を入れ、すべての一筆がサイクルの最終シグネチャーに影響します。サイクルが確定すると、プロトコルは公開されたルールに従ってサイクル準備金を定められた配分トラックへ配り、その中にはEthereumのコア貢献者を支えるProtocol Guildも含まれます。
 
 Cosmic Signatureは、COSMICがん変異データベースや生物学のCOSMIC変異シグネチャーとは関係がありません。
 
@@ -331,7 +331,7 @@ Cosmic Signatureは、COSMICがん変異データベースや生物学のCOSMIC�
 
 ## Tiếng Việt: tổng quan
 
-Cosmic Signature là giao thức nghệ thuật tạo sinh trên chuỗi Arbitrum. Người tham gia đặt nét bút trong một chu kỳ trình diễn, và mỗi nét bút đều định hình Signature cuối cùng của chu kỳ. Khi chu kỳ hoàn tất, giao thức phân phối Dự trữ chu kỳ qua hơn mười luồng phân bổ theo các quy tắc đã công bố, bao gồm Protocol Guild, cơ chế tài trợ cho những người đóng góp cốt lõi cho Ethereum.
+Cosmic Signature là giao thức nghệ thuật tạo sinh trên chuỗi Arbitrum. Người tham gia đặt nét bút trong một chu kỳ trình diễn, và mỗi nét bút đều định hình Signature cuối cùng của chu kỳ. Khi chu kỳ hoàn tất, giao thức phân phối Dự trữ chu kỳ qua một nhóm luồng phân bổ cố định theo các quy tắc đã công bố, bao gồm Protocol Guild, cơ chế tài trợ cho những người đóng góp cốt lõi cho Ethereum.
 
 Cosmic Signature không liên quan đến cơ sở dữ liệu đột biến ung thư COSMIC hay các chữ ký đột biến COSMIC trong sinh học.
 

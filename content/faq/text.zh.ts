@@ -33,7 +33,7 @@ export const faqTextZh = {
       'what-is-cosmic-signature': {
         question: 'Cosmic Signature 是什么？',
         answer:
-          'Cosmic Signature 是 Arbitrum 上的程序化链上艺术协议。参与者在演绎周期中落笔，每一笔都会塑造这一周期最终的签名。周期收官后，协议将储备分配至十余条轨道，其中包括支持 170 多位以太坊核心贡献者的 Protocol Guild。',
+          'Cosmic Signature 是 Arbitrum 上的程序化链上艺术协议。参与者在演绎周期中落笔，每一笔都会塑造这一周期最终的签名。周期收官后，协议将储备分配至一组固定的轨道，其中包括支持 170 多位以太坊核心贡献者的 Protocol Guild。',
       },
       'how-does-the-bidding-game-work': {
         question: '演绎周期如何运作？',
