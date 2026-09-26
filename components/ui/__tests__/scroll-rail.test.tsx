@@ -193,9 +193,11 @@ describe('ScrollRail', () => {
       expect(rest(trust, 5, 353)).toBe(346 - 24);
     });
 
-    it('rests on the row end when the item it cuts there stays mostly in view', () => {
-      // Privacy Policy at the end: "Risk Disclosures" loses 7 of its 110px.
-      expect(rest(trust, 6, 353)).toBe(353);
+    it('never rests on a row end that cuts an item at the start, even by a letter', () => {
+      // Privacy Policy at the end: the row's end (353) took 7px of "Risk
+      // Disclosures", which read as "isk Disclosures" (regression). "Terms of
+      // Service" now starts one gap in, with room after the row.
+      expect(rest(trust, 6, 353)).toBe(480 - 24);
     });
 
     it('makes room after the row when its end would leave a fragment', () => {
@@ -218,14 +220,20 @@ describe('ScrollRail', () => {
       expect(rest(tabs, 2, 0, true)).toBe(59 - 24);
     });
 
-    it('leaves a row whose start cuts an item that stays mostly in view', () => {
+    it('moves a row whose start cuts an item by a letter onto whole items', () => {
       const tabs = at([-7, 103], [127, 241], [265, 358]);
+      expect(rest(tabs, 2, 0, true)).toBe(127 - 24);
+    });
+
+    it('takes a sub-pixel overhang at the start for layout rounding, not a fragment', () => {
+      const tabs = at([-0.6, 103], [127, 241], [265, 358]);
       expect(rest(tabs, 2, 0, true)).toBeNull();
     });
 
     it('draws no end fade to clear at the row end', () => {
-      const scrolled = trust.map(({ left, right }) => ({ left: left - 353, right: right - 353 }));
-      expect(rest(scrolled, 6, 0, true)).toBeNull();
+      // The last tab ends on the track's edge and the start edge falls in a gap.
+      const atRowEnd = at([-120, -10], [14, 124], [148, 262], [286, 358]);
+      expect(rest(atRowEnd, 3, 0, true)).toBeNull();
     });
   });
 });

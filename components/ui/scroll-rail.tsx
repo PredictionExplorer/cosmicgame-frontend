@@ -32,11 +32,12 @@ const FOCUSABLE_SELECTOR =
 const END_ROOM = '--rail-end-room';
 
 /**
- * At the row's own end an item cut at the start may stay when no more than
- * this share of it is hidden: its first letters fade in, the word still reads
- * whole and says the row continues. More hidden than that is a fragment.
+ * How much of an item may sit past the start edge (px) before it counts as
+ * cut: sub-pixel layout only. Any more is a fragment, even a first letter:
+ * "Risk disclosures" losing its R read as "isk disclosures", not as a row
+ * that continues.
  */
-const MOSTLY_IN_VIEW = 0.25;
+const CUT_TOLERANCE_PX = 1;
 
 /**
  * The row's items: the children of the one row the track scrolls (a tab list),
@@ -85,7 +86,7 @@ export interface RailSpan {
  *   scrolled a focused tab in), moves to the nearest place where the current
  *   item shows whole and clear of the fade: an item start at the rest inset,
  *   so the item before it leaves view entirely, or the row's own end (which
- *   has no fade) when the item it cuts at the start stays mostly in view.
+ *   has no fade) when that end cuts no item at the start.
  */
 export function restScroll({
   track,
@@ -108,14 +109,9 @@ export function restScroll({
   if (!active) return null;
   const restOn = (item: RailSpan) => item.left - track.left - inset;
   if (active.left < track.left + inset - 0.5) return restOn(items[index - 1] ?? active);
-  // An item the edge cuts with most of it out of view: a fragment.
+  // An item the edge cuts, by any visible amount: a fragment.
   const fragmentAt = (edge: number) =>
-    items.some(
-      (item) =>
-        item.left < edge &&
-        item.right > edge &&
-        edge - item.left > (item.right - item.left) * MOSTLY_IN_VIEW,
-    );
+    items.some((item) => item.right > edge && edge - item.left > CUT_TOLERANCE_PX);
   const underFade = active.right > track.right - (atEnd ? 0 : fade) + 0.5;
   if (!underFade && !fragmentAt(track.left)) return null;
   // Whole and clear of the end fade; at the row's end there is no fade.
