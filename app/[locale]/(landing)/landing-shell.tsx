@@ -10,7 +10,6 @@
  * Coinbase SDK, MetaMask SDK — out of the landing's client bundle.
  *
  * What this shell DOES ship:
- *   - React Cookies context (for analytics consent banner).
  *   - Global error handlers (reportError wiring).
  *   - Error boundary.
  *   - The landing header and footer, as top-level landmarks around every
@@ -34,7 +33,6 @@
  */
 
 import { useEffect, type ReactNode } from 'react';
-import { CookiesProvider } from 'react-cookie';
 
 import ErrorBoundary from '@/components/layout/ErrorBoundary';
 import { LandingHeader, type LandingSectionLabels } from '@/components/landing-v2/LandingHeader';
@@ -62,18 +60,16 @@ export function LandingShell({
 
   return (
     <ErrorBoundary>
-      <CookiesProvider>
-        <TooltipProvider delayDuration={200} skipDelayDuration={300}>
-          <SkipLink />
-          <div className="site-shell flex min-h-screen flex-col">
-            <LandingHeader sections={sections} />
-            <div className="min-w-0 flex-1">
-              <ErrorBoundary>{children}</ErrorBoundary>
-            </div>
-            {footer}
+      <TooltipProvider delayDuration={200} skipDelayDuration={300}>
+        <SkipLink />
+        <div className="site-shell flex min-h-screen flex-col">
+          <LandingHeader sections={sections} />
+          <div className="min-w-0 flex-1">
+            <ErrorBoundary>{children}</ErrorBoundary>
           </div>
-        </TooltipProvider>
-      </CookiesProvider>
+          {footer}
+        </div>
+      </TooltipProvider>
     </ErrorBoundary>
   );
 }

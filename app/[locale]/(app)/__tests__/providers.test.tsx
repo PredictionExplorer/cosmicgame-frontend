@@ -1,7 +1,6 @@
 import '@testing-library/jest-dom';
 import React from 'react';
 import { render, screen } from '@testing-library/react';
-import { CookiesProvider } from 'react-cookie';
 
 import { checkA11y } from '@/test-utils';
 
@@ -62,32 +61,6 @@ jest.mock('../../../../components/layout/ErrorBoundary', () => ({
     <div data-testid="error-boundary">{children}</div>
   ),
 }));
-
-// CookiesProvider is intentionally NOT mocked.
-// It validates that react-cookie v8's functional CookiesProvider
-// works correctly with React 19 JSX types — the core fix for task 4b.
-
-describe('CookiesProvider (react-cookie v8 + React 19)', () => {
-  it('renders as a JSX component without type errors', () => {
-    const { getByText } = render(
-      <CookiesProvider>
-        <span>Cookie child</span>
-      </CookiesProvider>,
-    );
-    expect(getByText('Cookie child')).toBeInTheDocument();
-  });
-
-  it('passes children through to the DOM', () => {
-    render(
-      <CookiesProvider>
-        <div data-testid="a">A</div>
-        <div data-testid="b">B</div>
-      </CookiesProvider>,
-    );
-    expect(screen.getByTestId('a')).toBeInTheDocument();
-    expect(screen.getByTestId('b')).toBeInTheDocument();
-  });
-});
 
 /** The server-rendered footer the root layout hands Providers as a slot. */
 const footerSlot = <footer data-testid="footer">Footer</footer>;

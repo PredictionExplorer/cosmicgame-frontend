@@ -6,7 +6,6 @@ import { offchainLookupSignature } from 'viem/utils';
 import { WagmiProvider } from 'wagmi';
 import { QueryClientProvider } from '@tanstack/react-query';
 import { useTranslations } from 'next-intl';
-import { CookiesProvider } from 'react-cookie';
 
 import { wagmiConfig } from '@/config/wagmi';
 import { networkConfig, getEnvValidation } from '@/config/networks';
@@ -174,24 +173,22 @@ export function Providers({
           <LiveGameDataRefreshGate />
           <WalletUiProvider>
             <ErrorBoundary>
-              <CookiesProvider>
-                <AccountDataProvider>
-                  <SystemModeProvider>
-                    <NotificationProvider>
-                      <TooltipProvider delayDuration={200} skipDelayDuration={300}>
-                        <div className="site-shell flex min-h-screen flex-col">
-                          <SkipLink />
-                          <Header />
-                          <div className="min-w-0 flex-1">
-                            <ErrorBoundary>{children}</ErrorBoundary>
-                          </div>
-                          {footer}
+              <AccountDataProvider>
+                <SystemModeProvider>
+                  <NotificationProvider>
+                    <TooltipProvider delayDuration={200} skipDelayDuration={300}>
+                      <div className="site-shell flex min-h-screen flex-col">
+                        <SkipLink />
+                        <Header />
+                        <div className="min-w-0 flex-1">
+                          <ErrorBoundary>{children}</ErrorBoundary>
                         </div>
-                      </TooltipProvider>
-                    </NotificationProvider>
-                  </SystemModeProvider>
-                </AccountDataProvider>
-              </CookiesProvider>
+                        {footer}
+                      </div>
+                    </TooltipProvider>
+                  </NotificationProvider>
+                </SystemModeProvider>
+              </AccountDataProvider>
             </ErrorBoundary>
             {HarnessPanel ? <HarnessPanel /> : null}
             <AppToaster />
