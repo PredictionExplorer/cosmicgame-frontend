@@ -354,7 +354,6 @@
   },
   "statisticsColumns": {
     "ownerAddress": "Власник",
-    "numberOfTokensOwned": "NFT у власності",
     "cstBalance": "Баланс (CST)",
     "contractAddress": "Адреса контракту",
     "numberOfNfts": "Кількість NFT",

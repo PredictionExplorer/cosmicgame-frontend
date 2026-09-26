@@ -354,7 +354,6 @@
   },
   "statisticsColumns": {
     "ownerAddress": "Người giữ",
-    "numberOfTokensOwned": "Số NFT nắm giữ",
     "cstBalance": "Số dư (CST)",
     "contractAddress": "Địa chỉ hợp đồng",
     "numberOfNfts": "Số NFT",

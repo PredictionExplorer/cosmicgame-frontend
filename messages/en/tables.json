@@ -354,7 +354,6 @@
   },
   "statisticsColumns": {
     "ownerAddress": "Holder",
-    "numberOfTokensOwned": "NFTs held",
     "cstBalance": "Balance (CST)",
     "contractAddress": "Contract address",
     "numberOfNfts": "NFTs",

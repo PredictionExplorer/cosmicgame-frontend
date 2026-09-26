@@ -354,7 +354,6 @@
   },
   "statisticsColumns": {
     "ownerAddress": "保有者",
-    "numberOfTokensOwned": "保有NFT数",
     "cstBalance": "残高（CST）",
     "contractAddress": "コントラクトアドレス",
     "numberOfNfts": "NFTの数",
