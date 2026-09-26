@@ -49,8 +49,6 @@ export interface LegalDocumentProps {
    * disclosures), with no per-section way back to the contents on phones.
    */
   density?: 'default' | 'compact';
-  /** `grid`: from `xl` the sections sit two to a row, each under its own hairline. */
-  sectionLayout?: 'stack' | 'grid';
   /** A closing note after the sections, outside the contents. */
   closing?: ReactNode;
   /**
@@ -86,7 +84,6 @@ export function LegalDocument({
   summary,
   sections,
   density = 'default',
-  sectionLayout = 'stack',
   closing,
   numbered = false,
   labels,
@@ -98,7 +95,6 @@ export function LegalDocument({
     label: heading,
     number: numbered ? `${index + 1}.` : undefined,
   }));
-  const grid = sectionLayout === 'grid';
 
   return (
     <PageShell variant="data">
@@ -174,11 +170,7 @@ export function LegalDocument({
           <div
             id={DOCUMENT_BODY_ID}
             data-numbered={numbered ? 'true' : undefined}
-            className={cn(
-              'group/legal',
-              numbered && '[counter-reset:legal-section]',
-              grid && 'xl:grid xl:grid-cols-2 xl:gap-x-12',
-            )}
+            className={cn('group/legal', numbered && '[counter-reset:legal-section]')}
           >
             {sections.map((section, index) => (
               <LegalSection

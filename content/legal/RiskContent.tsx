@@ -66,7 +66,6 @@ export function RiskContent({
         />
       }
       density="compact"
-      sectionLayout="grid"
       sections={copy.groups.map((group) => ({
         id: group.id,
         heading: group.heading,

@@ -351,11 +351,13 @@ describe('Risk disclosures', () => {
     expect(text).toContain('afford to forgo');
   });
 
-  it('sets the short groups compactly, two to a row, and closes on what participants do', () => {
+  it('sets the short groups compactly, one column on the document measure, and closes on what participants do', () => {
     render(PAGES.risk('en'));
     const groups = Array.from(document.querySelectorAll('main section[id]'));
     expect(groups.map((group) => group.id)).not.toContain('participation');
-    expect(groups[0]?.parentElement?.className).toMatch(/xl:grid-cols-2/);
+    // Regression: two to a row ran long bullets in about 45-character columns
+    // with uneven column ends; the groups read in one column, as every document does.
+    expect(groups[0]?.parentElement?.className).not.toMatch(/grid-cols/);
     // No per-section way back to the contents on a page of short sections.
     expect(screen.queryByRole('link', { name: 'Back to contents' })).toBeNull();
     expect(screen.getByText('What participants do')).toBeInTheDocument();
