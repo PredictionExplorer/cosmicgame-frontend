@@ -344,7 +344,7 @@ migration:
 | `formatYyyymmddLabel`, `formatUnixTsLabel` month arrays          | Same — `Intl.DateTimeFormat(locale, { month: 'short' })`                               |
 | `formatSeconds` → `1d 2h 30m 45s`                                | Locale unit map; zh: `3天5小时12分45秒` (compact contexts), see style guide §5         |
 | `formatEthValue`/`formatCSTValue` unit suffixes                  | Units stay `ETH`/`CST` in all locales (glossary: keep-in-English)                      |
-| `components/ui/date-picker.tsx` weekday labels `Su…Sa`           | zh: `日 一 二 三 四 五 六`; week starts Monday for zh                                  |
+| Date picker weekday labels `Su…Sa` (the picker has since gone)   | zh: `日 一 二 三 四 五 六`; week starts Monday for zh                                  |
 | Cycle clock unit captions                                        | One typed catalog, `clockUnitLabels` (`utils/format/durations.ts`), on both hosts      |
 
 That migration kept English output byte-identical. The formatting layer (§4.1) then
@@ -553,7 +553,7 @@ Noto cut per glyph is their intended rendering.
   reads `params.locale` and calls `getTranslations`. (~59 pages, tracked per-route in
   progress-zh.md.)
 - **`app/sitemap.ts` / `lib/seoRoutes.ts`**: every URL entry gains `alternates.languages`.
-- **JSON-LD** (`utils/jsonLd.ts`): translated `name`/`description`, `inLanguage: 'zh-Hans'`
+- **JSON-LD** (`utils/jsonLd.tsx`): translated `name`/`description`, `inLanguage: 'zh-Hans'`
   on zh pages; FAQ JSON-LD uses the zh FAQ content.
 - **OG images** (`opengraph-image.tsx` files): `ImageResponse` needs an explicit CJK font
   buffer (subset Noto Sans SC TTF in `assets/`) — Latin-only fonts render tofu. Scheduled

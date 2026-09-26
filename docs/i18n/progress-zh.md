@@ -488,7 +488,7 @@ plus the site-wide SEO finish.
 | -------------------------------------------------------------------------------------------------------------------- | ---- |
 | All ~59 `page.tsx` metadata title/description pairs served from `meta` namespace, verified per route in both locales | ✅   |
 | All 12 `opengraph-image.tsx` generators: each emitted endpoint directly returns `200 image/png` in Playwright        | ✅   |
-| JSON-LD (`utils/jsonLd.ts`): translated names/descriptions, `inLanguage: 'zh-Hans'`                                  | ✅   |
+| JSON-LD (`utils/jsonLd.tsx`): translated names/descriptions, `inLanguage: 'zh-Hans'`                                 | ✅   |
 | `app/sitemap.ts` / `lib/seoRoutes.ts` hreflang alternates verified for all indexable routes                          | ✅   |
 | `*SeoSummary.tsx` components localized                                                                               | ✅   |
 | `public/llms.txt` Chinese section                                                                                    | ✅   |

@@ -222,4 +222,4 @@ tone, grammar, dates, and typography: `docs/i18n/glossary-zh.md` + `style-guide-
 - The wallet stack (wagmi/RainbowKit) exists only in the `(app)` route group; keep the
   landing free of it.
 - Every informational page has `generateMetadata` (titles and descriptions in
-  `messages/{locale}/meta.json`) plus JsonLd breadcrumbs from `utils/jsonLd.ts`.
+  `messages/{locale}/meta.json`) plus JsonLd breadcrumbs from `utils/jsonLd.tsx`.
