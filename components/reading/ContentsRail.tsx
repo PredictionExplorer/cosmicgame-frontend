@@ -1,6 +1,14 @@
 'use client';
 
-import { useEffect, useId, useRef, type MouseEvent, type ReactNode } from 'react';
+import {
+  useEffect,
+  useId,
+  useRef,
+  useState,
+  type MouseEvent,
+  type ReactNode,
+  type RefObject,
+} from 'react';
 import { ArrowUp } from 'lucide-react';
 
 import { cn } from '@/lib/utils';
@@ -114,6 +122,12 @@ export function ContentsRail({ entries, copy, position, topId, footer }: RailPro
   const { activeId, progress } = position;
   const labelId = useId();
   const scrollerRef = useRef<HTMLDivElement>(null);
+  // A list taller than the screen fades out where it continues, so its last
+  // visible entry reads as more to come, never as a line cut in half.
+  const edges = useScrollEdges(scrollerRef);
+  const mask = `linear-gradient(to bottom, transparent 0, #000 ${
+    edges.top ? RAIL_FADE_TOP : '0px'
+  }, #000 calc(100% - ${edges.bottom ? RAIL_FADE_BOTTOM : '0px'}), transparent 100%)`;
 
   useEffect(() => {
     const scroller = scrollerRef.current;
@@ -140,7 +154,10 @@ export function ContentsRail({ entries, copy, position, topId, footer }: RailPro
       </p>
       <div
         ref={scrollerRef}
+        data-overflow-top={edges.top || undefined}
+        data-overflow-bottom={edges.bottom || undefined}
         className="relative mt-4 min-h-0 flex-1 overflow-y-auto overscroll-contain scrollbar-none"
+        style={{ maskImage: mask, WebkitMaskImage: mask }}
       >
         {/* The reading-progress hairline: the rule fills with the accent as the reader goes. */}
         <span aria-hidden className="absolute inset-y-0 left-0 w-px bg-rule" />
@@ -164,6 +181,39 @@ export function ContentsRail({ entries, copy, position, topId, footer }: RailPro
       </div>
     </nav>
   );
+}
+
+/** The fades at a scrolled rail's edges: short at the top, longer where the list continues below. */
+const RAIL_FADE_TOP = '1.5rem';
+const RAIL_FADE_BOTTOM = '2.5rem';
+
+/**
+ * Whether a scroller holds more above and below what shows, measured on
+ * scroll and whenever it or its content resizes.
+ */
+function useScrollEdges(scrollerRef: RefObject<HTMLDivElement | null>) {
+  const [edges, setEdges] = useState({ top: false, bottom: false });
+  useEffect(() => {
+    const scroller = scrollerRef.current;
+    if (!scroller) return undefined;
+    const measure = () => {
+      const next = {
+        top: scroller.scrollTop > 1,
+        bottom: scroller.scrollHeight - scroller.clientHeight - scroller.scrollTop > 1,
+      };
+      setEdges((prev) => (prev.top === next.top && prev.bottom === next.bottom ? prev : next));
+    };
+    measure();
+    scroller.addEventListener('scroll', measure, { passive: true });
+    const resize = typeof ResizeObserver === 'undefined' ? null : new ResizeObserver(measure);
+    resize?.observe(scroller);
+    for (const child of Array.from(scroller.children)) resize?.observe(child);
+    return () => {
+      scroller.removeEventListener('scroll', measure);
+      resize?.disconnect();
+    };
+  }, [scrollerRef]);
+  return edges;
 }
 
 export interface ReadingRailProps {

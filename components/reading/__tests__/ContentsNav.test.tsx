@@ -95,4 +95,36 @@ describe('ReadingRail', () => {
     // No floating sheet: the page's phones read its own contents.
     expect(screen.queryByTestId('contents-sheet-trigger')).toBeNull();
   });
+
+  it('fades the list out where it continues, never cutting its last entry in half', () => {
+    // Regression: the white paper's rail ended mid-line on "Appendix A:
+    // Verified…" at 900px, with nothing to say the list went on.
+    const sizes = { scrollHeight: 900, clientHeight: 600 };
+    const restore = (['scrollHeight', 'clientHeight'] as const).map((key) => {
+      const original = Object.getOwnPropertyDescriptor(HTMLElement.prototype, key);
+      Object.defineProperty(HTMLElement.prototype, key, {
+        configurable: true,
+        get: () => sizes[key],
+      });
+      return () => {
+        if (original) Object.defineProperty(HTMLElement.prototype, key, original);
+      };
+    });
+    try {
+      render(
+        <ReadingRail
+          entries={legal}
+          copy={{ railLabel: 'On this page', backToTopLabel: 'Back to top' }}
+          articleId="document-body"
+          topId="document-title"
+        />,
+      );
+      const scroller = screen.getByTestId('reading-progress').parentElement!;
+      expect(scroller).toHaveAttribute('data-overflow-bottom');
+      expect(scroller).not.toHaveAttribute('data-overflow-top');
+      expect(scroller.style.maskImage).toContain('calc(100% - 2.5rem)');
+    } finally {
+      restore.forEach((undo) => undo());
+    }
+  });
 });
