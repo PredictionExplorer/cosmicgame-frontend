@@ -238,6 +238,18 @@ describe('landing sections', () => {
       expect(screen.getAllByRole('listitem')).toHaveLength(3);
       expect(screen.getByText(/at least 100 CST/)).toBeInTheDocument();
     });
+
+    it('marks its rules with glyphs, as Verifiability beside it does, never with numbers', () => {
+      // Regression: numbered rules (01, 02, 03) sat beside glyph-marked claims,
+      // two list idioms in one band, and the rules are not steps in an order.
+      render(<CosmicCouncil council={content.council} />);
+      const list = screen.getAllByRole('listitem')[0]!.parentElement!;
+      expect(list.tagName).toBe('UL');
+      for (const item of screen.getAllByRole('listitem')) {
+        expect(item.querySelector('svg')).not.toBeNull();
+        expect(item).not.toHaveTextContent(/^0\d/);
+      }
+    });
   });
 
   describe('<ClosingBand />', () => {
