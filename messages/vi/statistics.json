@@ -348,7 +348,8 @@
       "summary": "{count, plural, other {# địa chỉ}} đang nắm giữ CST, xếp theo số dư lớn nhất. Tỷ lệ tính trên tổng cung {supply}.",
       "summaryNoSupply": "{count, plural, other {# địa chỉ}} đang nắm giữ CST, xếp theo số dư lớn nhất.",
       "share": "Tỷ lệ trên tổng cung",
-      "shareHelp": "Số dư này tính theo tỷ lệ trên tổng cung CST."
+      "shareHelp": "Số dư này tính theo tỷ lệ trên tổng cung CST.",
+      "uniswapLiquidity": "Thanh khoản Uniswap"
     },
     "nftHolders": {
       "inWallet": "Trong ví",

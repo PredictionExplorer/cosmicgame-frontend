@@ -348,7 +348,8 @@
       "summary": "{count, plural, one {# address holds} other {# addresses hold}} CST, largest balance first. Shares are of the total supply, {supply}.",
       "summaryNoSupply": "{count, plural, one {# address holds} other {# addresses hold}} CST, largest balance first.",
       "share": "Share of supply",
-      "shareHelp": "This balance as a share of the total CST supply."
+      "shareHelp": "This balance as a share of the total CST supply.",
+      "uniswapLiquidity": "Uniswap liquidity"
     },
     "nftHolders": {
       "inWallet": "In wallet",

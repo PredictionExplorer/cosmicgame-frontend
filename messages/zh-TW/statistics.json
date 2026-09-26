@@ -348,7 +348,8 @@
       "summary": "{count, plural, other {共 # 個地址持有 CST}}，按餘額從高到低排列。佔比以總供應量 {supply} 計算。",
       "summaryNoSupply": "{count, plural, other {共 # 個地址持有 CST}}，按餘額從高到低排列。",
       "share": "佔供應量",
-      "shareHelp": "該餘額佔 CST 總供應量的比例。"
+      "shareHelp": "該餘額佔 CST 總供應量的比例。",
+      "uniswapLiquidity": "Uniswap 流動性"
     },
     "nftHolders": {
       "inWallet": "錢包中",

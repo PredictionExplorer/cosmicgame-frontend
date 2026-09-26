@@ -348,7 +348,8 @@
       "summary": "{count, plural, other {#件のアドレス}}がCSTを保有しています（残高の多い順）。割合は総供給量{supply}に対するものです。",
       "summaryNoSupply": "{count, plural, other {#件のアドレス}}がCSTを保有しています（残高の多い順）。",
       "share": "供給量に占める割合",
-      "shareHelp": "この残高がCST総供給量に占める割合です。"
+      "shareHelp": "この残高がCST総供給量に占める割合です。",
+      "uniswapLiquidity": "Uniswapの流動性"
     },
     "nftHolders": {
       "inWallet": "ウォレット内",

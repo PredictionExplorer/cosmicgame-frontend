@@ -2,9 +2,14 @@
 
 import { useMemo } from 'react';
 import { useTranslations } from 'next-intl';
+import { arbitrum } from 'viem/chains';
 
+import { activeChain } from '@/config/chains';
+import { UNISWAP_V4_POOL_MANAGER_ARBITRUM } from '@/config/uniswap';
 import { useFormat } from '@/hooks/useFormat';
 import type { CTBalanceDistribution } from '@/services/api/types';
+import { sameAddress } from '@/utils/format';
+import { AddressChip } from '@/components/ui/address-chip';
 import { DataTable, type DataTableColumn } from '@/components/ui/data-table';
 
 interface HolderRow extends CTBalanceDistribution {
@@ -12,12 +17,22 @@ interface HolderRow extends CTBalanceDistribution {
   share: number | null;
 }
 
+/** The Uniswap v4 pool liquidity's holder: its balance is liquidity, not a participant's. */
+export function isUniswapLiquidity(
+  address: string | null | undefined,
+  chainId: number = activeChain.id,
+): boolean {
+  return chainId === arbitrum.id && sameAddress(address, UNISWAP_V4_POOL_MANAGER_ARBITRUM);
+}
+
 /**
  * Every CST holder with the share of the supply each holds, drawn as a bar in
  * the row: the concentration the old bar chart meant to show, in one list
  * with the balances instead of a chart and a table repeating each other.
  * Largest first; 20 rows a page, so the count in the header matches the
- * list. The Outreach Reserve wallet reads by its name (AddressChip).
+ * list. The Outreach Reserve wallet reads by its name (AddressChip), and so
+ * does Uniswap's pool liquidity, the largest balance, which is no one's
+ * holding.
  */
 export function CstHoldersLedger({
   list,
@@ -46,6 +61,16 @@ export function CstHoldersLedger({
         kind: 'address',
         header: tTables('statisticsColumns.ownerAddress'),
         value: (row) => row.OwnerAddr,
+        cell: (row) => (
+          <AddressChip
+            address={row.OwnerAddr}
+            variant="plain"
+            showCopy={false}
+            label={
+              isUniswapLiquidity(row.OwnerAddr) ? t('tokens.holders.uniswapLiquidity') : undefined
+            }
+          />
+        ),
       },
       {
         id: 'balance',

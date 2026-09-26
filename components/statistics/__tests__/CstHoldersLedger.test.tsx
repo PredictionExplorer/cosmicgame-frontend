@@ -1,6 +1,8 @@
+import { UNISWAP_V4_POOL_MANAGER_ARBITRUM } from '@/config/uniswap';
+
 import { checkA11y, render, screen, within } from '@/test-utils';
 
-import { CstHoldersLedger } from '../CstHoldersLedger';
+import { CstHoldersLedger, isUniswapLiquidity } from '../CstHoldersLedger';
 
 const holders = [
   { OwnerAid: 1, OwnerAddr: '0xA1b2C3d4E5f60718293a4B5c6D7e8F9012345678', BalanceFloat: 607 },
@@ -32,6 +34,15 @@ describe('CstHoldersLedger', () => {
       .getAllByText(/%$/)
       .map((cell) => cell.textContent);
     expect(shares).toEqual(['54.5%', '45.5%']);
+  });
+
+  it('names Uniswap’s pool liquidity instead of printing its bare address', () => {
+    // Regression: the largest balance (68.9% of supply) read as a bare
+    // "0x360E…FB32", as though one participant held most of the CST.
+    expect(isUniswapLiquidity(UNISWAP_V4_POOL_MANAGER_ARBITRUM.toLowerCase(), 42161)).toBe(true);
+    expect(isUniswapLiquidity(holders[0]!.OwnerAddr, 42161)).toBe(false);
+    // Only on Arbitrum One, where that contract is Uniswap's.
+    expect(isUniswapLiquidity(UNISWAP_V4_POOL_MANAGER_ARBITRUM, 421614)).toBe(false);
   });
 
   it('has no axe violations', async () => {

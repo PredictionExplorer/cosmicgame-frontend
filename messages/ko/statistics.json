@@ -348,7 +348,8 @@
       "summary": "CST 보유 주소 {count, plural, other {#개}}, 잔액이 큰 순서입니다. 비중은 총 공급량 {supply} 기준입니다.",
       "summaryNoSupply": "CST 보유 주소 {count, plural, other {#개}}, 잔액이 큰 순서입니다.",
       "share": "공급량 비중",
-      "shareHelp": "이 잔액이 CST 총 공급량에서 차지하는 비중입니다."
+      "shareHelp": "이 잔액이 CST 총 공급량에서 차지하는 비중입니다.",
+      "uniswapLiquidity": "Uniswap 유동성"
     },
     "nftHolders": {
       "inWallet": "지갑 보유",
