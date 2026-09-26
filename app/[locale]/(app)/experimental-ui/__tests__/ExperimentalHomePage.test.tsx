@@ -27,6 +27,8 @@ jest.mock('@/hooks/useApiQuery', () => ({
   useCSTInfo: (...args: unknown[]) => mockUseCSTInfo(...args),
   useDonationsNFTByRound: (...args: unknown[]) => mockUseDonationsNFTByRound(...args),
   useDonationsERC20ByRound: (...args: unknown[]) => mockUseDonationsERC20ByRound(...args),
+  // The hidden-message list the standings' Last Gesture line is moderated by: nothing hidden.
+  useBannedGestures: () => ({ data: [], isError: false, refetch: jest.fn() }),
 }));
 
 const mockEmptyGestures: unknown[] = [];
