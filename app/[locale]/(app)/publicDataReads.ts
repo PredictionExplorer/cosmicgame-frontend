@@ -3,6 +3,7 @@ import { unstable_cache } from 'next/cache';
 import { createPublicClient, http, isAddress, type Address } from 'viem';
 
 import { activeChain } from '@/config/chains';
+import { capCacheWindow } from '@/lib/cacheWindow';
 import { networkConfig } from '@/config/networks';
 import {
   get_staking_cst_actions,
@@ -38,8 +39,9 @@ import { get_cst_list, get_named_nfts, get_used_rwlk_nfts } from '@/services/api
  * Each read resolves once per request (React `cache()`), so the header's
  * figures and the client seed (`PublicDataQuerySeed`) share one upstream
  * request. A read never rejects: a failure resolves to `data: null`, which
- * marks only the figures built from it as unknown. `at` is when the data
- * arrived — the time a snapshot stamp shows.
+ * marks only the figures built from it as unknown, and keeps the render in
+ * the cache for the `pending` window only (`failedRead`). `at` is when the
+ * data arrived — the time a snapshot stamp shows.
  */
 export interface TimedRead<T> {
   data: T | null;
@@ -47,15 +49,28 @@ export interface TimedRead<T> {
   at: number;
 }
 
+/**
+ * The result of a server read that failed. The render that shows it is
+ * degraded (its figures read as unknown), so it is cached for the `pending`
+ * window, a minute, instead of the page's usual five minutes or a day: a
+ * read the API turned away in a burst is not served as a dash for long.
+ */
+export async function failedRead<T>(): Promise<TimedRead<T>> {
+  await capCacheWindow('pending');
+  return { data: null, at: Date.now() };
+}
+
+/** One server read made now, timed; a failure resolves through {@link failedRead}. */
+export async function readNow<T>(read: () => Promise<T>): Promise<TimedRead<T>> {
+  try {
+    return { data: await read(), at: Date.now() };
+  } catch {
+    return failedRead<T>();
+  }
+}
+
 function timedRead<T>(read: () => Promise<T>): () => Promise<TimedRead<T>> {
-  return cache(async () => {
-    try {
-      const data = await read();
-      return { data, at: Date.now() };
-    } catch {
-      return { data: null, at: Date.now() };
-    }
-  });
+  return cache(() => readNow(read));
 }
 
 /** How long a shared read serves every request before one of them refreshes it. */
@@ -79,7 +94,7 @@ function sharedTimedRead<T>(key: string, read: () => Promise<T>): () => Promise<
     try {
       return await shared();
     } catch {
-      return { data: null, at: Date.now() };
+      return failedRead<T>();
     }
   });
 }
@@ -160,7 +175,7 @@ export const readGameOwner = cache(async (): Promise<TimedRead<Address>> => {
     });
     return { data: owner, at: Date.now() };
   } catch {
-    return { data: null, at: Date.now() };
+    return failedRead<Address>();
   }
 });
 
@@ -181,7 +196,7 @@ export const readRandomWalkImprinted = cache(async (): Promise<TimedRead<number>
     });
     return { data: Number(next), at: Date.now() };
   } catch {
-    return { data: null, at: Date.now() };
+    return failedRead<number>();
   }
 });
 
@@ -194,6 +209,6 @@ export const readCoordinationEvents = cache(async () => {
     const data = await get_system_events(startId, COORDINATION_EVENTS_END_ID);
     return { data, at: Date.now(), startId };
   } catch {
-    return { data: null, at: Date.now(), startId };
+    return { ...(await failedRead<Awaited<ReturnType<typeof get_system_events>>>()), startId };
   }
 });

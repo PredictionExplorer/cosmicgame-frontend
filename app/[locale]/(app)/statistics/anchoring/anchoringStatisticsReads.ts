@@ -8,17 +8,10 @@ import {
   readAnchorCstActions,
   readAnchorRwalkActions,
   readDashboard,
+  readNow,
   type TimedRead,
 } from '../../publicDataReads';
 import { seedsDisabled, type QuerySeedEntry } from '../../QuerySeed';
-
-async function timed<T>(read: () => Promise<T>): Promise<TimedRead<T>> {
-  try {
-    return { data: await read(), at: Date.now() };
-  } catch {
-    return { data: null, at: Date.now() };
-  }
-}
 
 export interface AnchoringStatisticsRead {
   /** The dashboard's anchoring figures, for the first render of the panel's figures. */
@@ -44,10 +37,10 @@ export const readAnchoringStatistics = cache(async (): Promise<AnchoringStatisti
       readDashboard(),
       readAnchorCstActions(),
       readAnchorRwalkActions(),
-      timed(() => get_staked_cst_tokens()),
-      timed(() => get_staked_rwalk_tokens()),
-      timed(() => get_unique_cst_stakers()),
-      timed(() => get_unique_rwalk_stakers()),
+      readNow(() => get_staked_cst_tokens()),
+      readNow(() => get_staked_rwalk_tokens()),
+      readNow(() => get_unique_cst_stakers()),
+      readNow(() => get_unique_rwalk_stakers()),
     ]);
   const lists: [string, TimedRead<unknown>][] = [
     ['cstAnchorActions', cstActions],

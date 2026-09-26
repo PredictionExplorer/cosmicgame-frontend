@@ -5,7 +5,7 @@ import { getTranslations, setRequestLocale } from 'next-intl/server';
 import { createPageMetadata } from '@/utils/seo';
 import { PageMessages } from '@/components/i18n/PageMessages';
 
-import { readNamedNfts } from '../publicDataReads';
+import { readNamedNfts, readNow } from '../publicDataReads';
 import { PublicDataQuerySeed } from '../PublicDataQuerySeed';
 import { PublicDataRouteSeoSummary } from '../PublicDataRouteSeoSummary';
 import { QuerySeed, seedsDisabled } from '../QuerySeed';
@@ -44,11 +44,7 @@ export const revalidate = 300;
 const readNamedWallSeed = cache(
   async (): Promise<{ data: NamedSignature[] | null; at: number }> => {
     if (seedsDisabled()) return { data: null, at: Date.now() };
-    try {
-      return { data: await readNamedWall(), at: Date.now() };
-    } catch {
-      return { data: null, at: Date.now() };
-    }
+    return readNow(readNamedWall);
   },
 );
 

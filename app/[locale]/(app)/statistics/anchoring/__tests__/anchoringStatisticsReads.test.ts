@@ -20,6 +20,14 @@ jest.mock('../../../publicDataReads', () => ({
   readDashboard: jest.fn(),
   readAnchorCstActions: jest.fn(),
   readAnchorRwalkActions: jest.fn(),
+  // The real timing of one read, without the cache window a failure lowers.
+  readNow: async <T>(read: () => Promise<T>) => {
+    try {
+      return { data: await read(), at: Date.now() };
+    } catch {
+      return { data: null, at: Date.now() };
+    }
+  },
 }));
 
 const mocked = <T extends (...args: never[]) => unknown>(fn: T) =>
