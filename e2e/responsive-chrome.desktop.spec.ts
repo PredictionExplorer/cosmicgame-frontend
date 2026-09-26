@@ -55,9 +55,13 @@ test('drawer fits a small phone, returns focus and resets after a desktop resize
   const drawer = page.getByRole('dialog', { name: 'Navigation' });
   await expect(drawer).toBeVisible();
   await expect(drawer.locator('a[href="/gallery"]')).toBeInViewport();
-  expect(
-    await drawer.evaluate((element) => element.getBoundingClientRect().width),
-  ).toBeLessThanOrEqual(320);
+  // Measured once the slide-in has settled: mid-animation, the sub-pixel
+  // translate reports the box a fraction of a pixel wider than its layout.
+  const width = await drawer.evaluate(async (element) => {
+    await Promise.all(element.getAnimations().map((animation) => animation.finished));
+    return element.getBoundingClientRect().width;
+  });
+  expect(width).toBeLessThanOrEqual(320);
   await page.keyboard.press('Escape');
   await expect(drawer).toBeHidden();
   await expect(menu).toBeFocused();
