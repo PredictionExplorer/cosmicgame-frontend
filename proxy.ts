@@ -18,6 +18,7 @@ import {
   UNMATCHED_INTERNAL_PATH,
   canonicalParamPath,
   isRejectedParamPath,
+  pageAliasTarget,
 } from '@/lib/paramRoutes';
 
 export const config = {
@@ -135,7 +136,7 @@ export default function middleware(req: NextRequest) {
     }
 
     if (isAppOnlyPath(publicPath)) {
-      const target = `${APP_ORIGIN}${prefix}${publicPath}${search}`;
+      const target = `${APP_ORIGIN}${prefix}${pageAliasTarget(publicPath) ?? publicPath}${search}`;
       return NextResponse.redirect(target, 308);
     }
   }
@@ -151,9 +152,12 @@ export default function middleware(req: NextRequest) {
 
   const response = withoutLocaleCookieWrites(intlMiddleware(req));
 
-  // One URL per record: `/detail/025` moves to `/detail/25` here, before the
-  // page's cached render could raise the redirect (lib/paramRoutes.ts).
-  const canonical = isRedirect(response) ? null : canonicalParamPath(publicPath);
+  // One URL per page and per record: `/source-code` moves to `/code` and
+  // `/detail/025` to `/detail/25` here, before routing, so no cached render
+  // has to raise the redirect (lib/paramRoutes.ts).
+  const canonical = isRedirect(response)
+    ? null
+    : (pageAliasTarget(publicPath) ?? canonicalParamPath(publicPath));
   if (canonical) {
     const target = req.nextUrl.clone();
     target.pathname = `${prefix}${canonical}`;

@@ -20,6 +20,7 @@ import {
   normalizeHost,
   splitLocalePrefix,
 } from '@/lib/hostRouting';
+import { PAGE_ALIASES } from '@/lib/paramRoutes';
 
 describe('hostRouting', () => {
   describe('splitLocalePrefix', () => {
@@ -332,8 +333,13 @@ describe('hostRouting', () => {
       }
     });
 
-    it('names only real pages (plus the API)', () => {
-      const pages = new Set([...routeSegments('(app)'), ...routeSegments('(embed)'), '/api']);
+    it('names only real pages (plus the API and the aliases proxy.ts answers)', () => {
+      const pages = new Set([
+        ...routeSegments('(app)'),
+        ...routeSegments('(embed)'),
+        '/api',
+        ...PAGE_ALIASES.keys(),
+      ]);
       for (const prefix of APP_ONLY_PATH_PREFIXES) expect(pages).toContain(prefix);
     });
 

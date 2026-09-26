@@ -72,8 +72,8 @@ export function shareMetadataProblems(html: string): string[] {
 
 /**
  * Whether a prerendered document is a redirect (its `.meta` sidecar records a
- * 3xx status, as for the `/source-code` alias): it is never shown, so it has
- * no preview to check.
+ * 3xx status, as for a page whose render calls `redirect()`): it is never
+ * shown, so it has no preview to check.
  */
 export function isRedirectDocument(metaJson: string | undefined): boolean {
   if (!metaJson) return false;

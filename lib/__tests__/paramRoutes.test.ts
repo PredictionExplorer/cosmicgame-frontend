@@ -1,7 +1,13 @@
 import { generateStaticParams as learnParams } from '@/app/[locale]/(landing)/learn/[slug]/page';
 import { generateStaticParams as quizParams } from '@/app/[locale]/(landing)/quiz/[tier]/page';
 
-import { canonicalParamPath, isRejectedParamPath } from '@/lib/paramRoutes';
+import { isAppOnlyPath } from '@/lib/hostRouting';
+import {
+  PAGE_ALIASES,
+  canonicalParamPath,
+  isRejectedParamPath,
+  pageAliasTarget,
+} from '@/lib/paramRoutes';
 
 // The real address checks (the shared viem mock is lenient).
 jest.mock('viem', () => jest.requireActual('viem'));
@@ -122,4 +128,27 @@ describe('canonicalParamPath', () => {
   ])('leaves %s to routing', (path) => {
     expect(canonicalParamPath(path)).toBeNull();
   });
+});
+
+describe('pageAliasTarget', () => {
+  it('names the page an alias stands for', () => {
+    expect(pageAliasTarget('/source-code')).toBe('/code');
+  });
+
+  it.each(['/code', '/source-code/extra', '/source-code/', '/', '/detail/025'])(
+    'leaves %s to routing',
+    (path) => {
+      expect(pageAliasTarget(path)).toBeNull();
+    },
+  );
+
+  it.each([...PAGE_ALIASES])(
+    'keeps %s on the app host and points it at a page, never another alias',
+    (alias, page) => {
+      // The landing host sends app-only paths to the app host, alias resolved.
+      expect(isAppOnlyPath(alias)).toBe(true);
+      expect(isAppOnlyPath(page)).toBe(true);
+      expect(pageAliasTarget(page)).toBeNull();
+    },
+  );
 });

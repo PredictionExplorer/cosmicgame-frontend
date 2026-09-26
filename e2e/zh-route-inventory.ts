@@ -2,7 +2,8 @@
  * Canonical Sprint 8 inventory for every page under app/[locale].
  *
  * `pageFile` is checked against the filesystem by a Jest guard (the 404 is
- * app/global-not-found.tsx, outside app/[locale]). `publicPath`
+ * app/global-not-found.tsx, outside app/[locale], and an alias is answered
+ * by proxy.ts). `publicPath`
  * documents the real route shape, while `fixturePath` supplies deterministic
  * values for every dynamic segment.
  */
@@ -12,6 +13,13 @@
  * page files: app/global-not-found.tsx renders the whole document.
  */
 export const GLOBAL_NOT_FOUND_FILE = '../global-not-found.tsx';
+
+/**
+ * The source of every alias route, relative to app/[locale] like the page
+ * files: an alias has no page, and proxy.ts redirects it to the page it names
+ * (PAGE_ALIASES in lib/paramRoutes.ts).
+ */
+export const PROXY_ALIAS_FILE = '../../proxy.ts';
 
 export type ZhRouteHost = 'app' | 'landing';
 export type ZhRouteCluster =
@@ -540,7 +548,7 @@ export const ZH_ROUTE_INVENTORY: readonly ZhRouteInventoryEntry[] = [
   },
   {
     id: 'source-code-alias',
-    pageFile: '(app)/source-code/page.tsx',
+    pageFile: PROXY_ALIAS_FILE,
     publicPath: '/source-code',
     fixturePath: '/source-code',
     host: 'app',

@@ -116,3 +116,34 @@ describe('proxy: a Signature asked for by its zero-padded number', () => {
     expect(new URL(response.headers.get('location')!).pathname).toBe('/ja/detail/025');
   });
 });
+
+// An alias has no page: rendered, it showed the app shell only to raise the
+// redirect, and without the app's environment it rendered that shell instead.
+describe('proxy: a page asked for by an alias', () => {
+  it.each([
+    ['/source-code', '/code'],
+    ['/zh-TW/source-code', '/zh-TW/code'],
+    ['/en/source-code', '/code'],
+  ])('moves %s to %s before routing, keeping the query', (path, target) => {
+    const response = run(`${path}?ref=share`);
+    expect(response.status).toBe(308);
+    expect(response.headers.getSetCookie()).toEqual([]);
+    const location = new URL(response.headers.get('location')!);
+    expect(location.pathname).toBe(target);
+    expect(location.search).toBe('?ref=share');
+  });
+
+  it('sends the landing host straight to the page on the app host', () => {
+    const response = run('/ja/source-code?ref=share', { host: 'cosmicsignature.com' });
+    expect(response.status).toBe(308);
+    expect(response.headers.get('location')).toBe(
+      'https://app.cosmicsignature.com/ja/code?ref=share',
+    );
+  });
+
+  it('lets the redirect to the preferred locale happen first', () => {
+    const response = run('/source-code', { cookie: 'NEXT_LOCALE=uk' });
+    expect(response.status).toBe(307);
+    expect(new URL(response.headers.get('location')!).pathname).toBe('/uk/source-code');
+  });
+});

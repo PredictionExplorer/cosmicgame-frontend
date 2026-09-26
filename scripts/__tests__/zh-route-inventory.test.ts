@@ -1,7 +1,12 @@
 import { readdirSync } from 'node:fs';
 import { join, relative } from 'node:path';
 
-import { GLOBAL_NOT_FOUND_FILE, ZH_ROUTE_INVENTORY } from '../../e2e/zh-route-inventory';
+import {
+  GLOBAL_NOT_FOUND_FILE,
+  PROXY_ALIAS_FILE,
+  ZH_ROUTE_INVENTORY,
+} from '../../e2e/zh-route-inventory';
+import { PAGE_ALIASES, pageAliasTarget } from '../../lib/paramRoutes';
 
 const LOCALE_APP_ROOT = join(process.cwd(), 'app', '[locale]');
 
@@ -21,6 +26,8 @@ function publicPathForPageFile(pageFile: string): string {
   return `/${withoutPage}`;
 }
 
+const isAlias = (route: { pageFile: string }) => route.pageFile === PROXY_ALIAS_FILE;
+
 describe('canonical localized route inventory', () => {
   it('accounts for every app/[locale] page and the global 404 exactly once', () => {
     const globalNotFound = relative(
@@ -29,15 +36,29 @@ describe('canonical localized route inventory', () => {
     );
     expect(globalNotFound).toBe(GLOBAL_NOT_FOUND_FILE);
     const actual = [...collectPageFiles(LOCALE_APP_ROOT), globalNotFound].sort();
-    const inventoried = ZH_ROUTE_INVENTORY.map((route) => route.pageFile).sort();
+    const inventoried = ZH_ROUTE_INVENTORY.filter((route) => !isAlias(route))
+      .map((route) => route.pageFile)
+      .sort();
 
-    expect(actual).toHaveLength(66);
-    expect(inventoried).toHaveLength(66);
+    expect(actual).toHaveLength(65);
+    expect(inventoried).toHaveLength(65);
     expect(inventoried).toEqual(actual);
   });
 
+  it('accounts for every alias proxy.ts answers exactly once', () => {
+    expect(relative(LOCALE_APP_ROOT, join(process.cwd(), 'proxy.ts'))).toBe(PROXY_ALIAS_FILE);
+    const aliases = ZH_ROUTE_INVENTORY.filter(isAlias);
+
+    expect(aliases.map((route) => route.publicPath).sort()).toEqual(
+      [...PAGE_ALIASES.keys()].sort(),
+    );
+    for (const route of aliases) {
+      expect(route.redirectsTo).toBe(pageAliasTarget(route.publicPath));
+    }
+  });
+
   it('keeps public route templates synchronized with page locations', () => {
-    for (const route of ZH_ROUTE_INVENTORY) {
+    for (const route of ZH_ROUTE_INVENTORY.filter((entry) => !isAlias(entry))) {
       expect(route.publicPath).toBe(publicPathForPageFile(route.pageFile));
     }
   });

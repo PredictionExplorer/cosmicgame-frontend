@@ -116,3 +116,16 @@ export function canonicalParamPath(publicPath: string): string | null {
   if (tokenId === null || String(tokenId) === match[1]) return null;
   return `/detail/${tokenId}`;
 }
+
+/**
+ * Public paths that are another name for a page, and the page each names.
+ * An alias has no page of its own: proxy.ts redirects it before routing, on
+ * either host, so it never renders the app shell only to raise a redirect
+ * (which would also meet the doubled Location header described above).
+ */
+export const PAGE_ALIASES: ReadonlyMap<string, string> = new Map([['/source-code', '/code']]);
+
+/** The page a locale-stripped public path is an alias of, or null. */
+export function pageAliasTarget(publicPath: string): string | null {
+  return PAGE_ALIASES.get(publicPath) ?? null;
+}

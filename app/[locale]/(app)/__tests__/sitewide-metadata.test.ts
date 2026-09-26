@@ -9,10 +9,7 @@ import { routing } from '@/i18n/routing';
 import { SITE_NAME, documentTitle } from '@/utils/seo';
 
 const APP_LOCALE_ROOT = join(process.cwd(), 'app', '[locale]');
-const INHERITED_OR_NON_DOCUMENT_ROUTES = new Set([
-  'app/[locale]/(app)/source-code/page.tsx',
-  'app/[locale]/(landing)/landing-site/page.tsx',
-]);
+const INHERITED_OR_NON_DOCUMENT_ROUTES = new Set(['app/[locale]/(landing)/landing-site/page.tsx']);
 
 /**
  * Routes that are never shared as a link, so they carry no share card: the
@@ -74,8 +71,8 @@ describe('site-wide localized page metadata', () => {
     return !INHERITED_OR_NON_DOCUMENT_ROUTES.has(repoPath);
   });
 
-  it('audits all 65 locale pages and all 63 metadata-producing routes', () => {
-    expect(pageFiles).toHaveLength(65);
+  it('audits all 64 locale pages and all 63 metadata-producing routes', () => {
+    expect(pageFiles).toHaveLength(64);
     expect(metadataRoutes).toHaveLength(63);
   });
 

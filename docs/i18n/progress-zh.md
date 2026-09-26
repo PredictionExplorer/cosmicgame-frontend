@@ -447,7 +447,7 @@ with legal review authority signs off the R stage for Terms/Privacy/Risk.
 | `/imprint`          | `(app)/imprint/Imprint.tsx`                                                                  | ✅  | ✅  | ✅  | ✅  |
 | `/contracts`        | `(app)/contracts/`, `contractAddressData.ts` display names/descriptions                      | ✅  | ✅  | ✅  | ✅  |
 | `/code`             | `(app)/code/page.tsx`                                                                        | ✅  | ✅  | ✅  | ✅  |
-| `/source-code`      | `(app)/source-code/page.tsx`                                                                 | ✅  | ✅  | ✅  | ✅  |
+| `/source-code`      | `proxy.ts` (alias of `/code`, `PAGE_ALIASES` in `lib/paramRoutes.ts`)                        | ✅  | ✅  | ✅  | ✅  |
 
 **Acceptance:** legal reviewer confirms zh Terms/Privacy/Risk match English meaning
 clause-by-clause; zh lexicon scan passes with allow-pragmas only in denial copy; FAQ
