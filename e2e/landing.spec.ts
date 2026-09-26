@@ -112,7 +112,7 @@ test.describe('Landing page @ cosmicsignature.com', () => {
     await expect(timer).toBeVisible({ timeout: 10_000 });
     await expect(timer.getByText('Live cycle clock')).toBeVisible();
     await expect(timer.getByRole('heading', { name: /Cycle 42 finalizes in/i })).toBeVisible();
-    await expect(timer.getByText('128 Gestures')).toBeVisible();
+    await expect(timer.getByText('128 gestures')).toBeVisible();
     // One freshness stamp replaces the three "same clock as the app" lines.
     await expect(timer.getByText(/^Updated /)).toBeVisible();
     // The one Cycle clock: HH:MM:SS with about two hours left (DD:HH:MM:SS

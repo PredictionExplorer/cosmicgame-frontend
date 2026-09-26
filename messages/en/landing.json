@@ -45,7 +45,7 @@
     },
     "liveClock": "Live cycle clock",
     "cycleClock": "Cycle clock",
-    "gestureCount": "{count, plural, one {# Gesture} other {# Gestures}}",
+    "gestureCount": "{count, plural, one {# gesture} other {# gestures}}",
     "duration": {
       "days": "{count, plural, one {# day} other {# days}}",
       "hours": "{count, plural, one {# hour} other {# hours}}",
