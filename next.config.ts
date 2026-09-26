@@ -117,6 +117,15 @@ const nextConfig: NextConfig = {
      * 03-file-conventions/not-found.md, `global-not-found.js`).
      */
     globalNotFound: true,
+    /**
+     * Pages each build worker prerenders at once (Next's default is 8). Every
+     * prerender reads the public API, which rate-limits bursts: at 8 pages on
+     * each of a build machine's workers the last build was turned away 91
+     * times. Server reads also retry a 429 (services/api/rateLimit.ts); this
+     * keeps the burst smaller in the first place. Prerendering waits on the
+     * network, so the build stays within seconds of the default.
+     */
+    staticGenerationMaxConcurrency: 4,
     optimizePackageImports: [
       'lucide-react',
       'framer-motion',
