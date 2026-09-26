@@ -217,7 +217,8 @@ export function LegalCallout({
         <Icon aria-hidden className={cn('size-4 shrink-0', iconClass)} />
         {title}
       </p>
-      <p className="mt-2 type-prose text-muted-foreground">
+      {/* Below 40rem the body type, so a long warning is not a wall of 17px lines. */}
+      <p className="mt-2 type-prose text-muted-foreground max-sm:type-body-md">
         <RichText text={text} locale={locale} />
       </p>
     </div>

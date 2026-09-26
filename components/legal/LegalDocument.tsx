@@ -134,8 +134,8 @@ export function LegalDocument({
         </div>
 
         <div className="min-w-0 max-w-[var(--measure-document)]">
-          {summary ? <div className="mb-10 sm:mb-14">{summary}</div> : null}
-
+          {/* Phones: the contents first, so the way through the document is on
+              the first screen, before a long summary or warning pushes it down. */}
           <details
             id={CONTENTS_ID}
             className="group mb-10 scroll-mt-6 rounded-surface border border-rule lg:hidden"
@@ -166,6 +166,8 @@ export function LegalDocument({
               ))}
             </ol>
           </details>
+
+          {summary ? <div className="mb-10 sm:mb-14">{summary}</div> : null}
 
           <div
             id={DOCUMENT_BODY_ID}
