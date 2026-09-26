@@ -34,18 +34,13 @@ describe('<Hero />', () => {
     expect(hero.subhead).toMatch(/7% of it to Ethereum’s core contributors/);
   });
 
-  it('offers one commit action, the gesture, in the same tab', () => {
-    // V170: the commit gradient is the gesture's, never "Open the app", which
-    // the header and footer render solid.
+  it('opens the app home as its primary action in the same tab', () => {
     render(<Hero hero={hero} />);
-    const primaryCta = screen.getByRole('link', { name: /make a gesture/i });
-    // The same target as The Cycle's gesture: the app home's gesture panel.
-    expect(primaryCta.getAttribute('href')).toMatch(
-      /^https:\/\/app\.cosmicsignature\.com\/?#make-gesture$/,
-    );
+    const primaryCta = screen.getByRole('link', { name: 'nav.cta.openApp' });
+    expect(primaryCta).toHaveAttribute('href', 'https://app.cosmicsignature.com');
     expect(primaryCta).not.toHaveAttribute('target');
     expect(primaryCta.className).toMatch(/bg-signature-gradient/);
-    expect(screen.queryByRole('link', { name: /open the app/i })).not.toBeInTheDocument();
+    expect(primaryCta).toHaveClass('h-14');
   });
 
   it('offers a quiet second action to the cycle explainer', () => {
@@ -63,7 +58,7 @@ describe('<Hero />', () => {
     const inOrder = [
       screen.getByRole('heading', { level: 1 }),
       screen.getByText(hero.subhead),
-      screen.getByRole('link', { name: /make a gesture/i }),
+      screen.getByRole('link', { name: 'nav.cta.openApp' }),
       screen.getByRole('link', { name: hero.secondaryCta.label }),
       screen.getByTestId('hero-art-showcase'),
     ];
@@ -130,7 +125,7 @@ describe('<Hero />', () => {
     const candidates = [
       screen.getByRole('heading', { level: 1 }),
       screen.getByText(hero.subhead),
-      screen.getByRole('link', { name: /make a gesture/i }),
+      screen.getByRole('link', { name: 'nav.cta.openApp' }),
       container.querySelector('img')!,
     ];
     for (const element of candidates) {

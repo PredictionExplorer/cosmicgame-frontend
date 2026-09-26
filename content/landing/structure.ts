@@ -67,10 +67,6 @@ const GESTURE_HREF = `${APP_ORIGIN}/#make-gesture`;
 
 export const LANDING_STRUCTURE = {
   hero: {
-    // The page's one commit action, with the same label and target wherever
-    // it appears (the hero, The Cycle, the closing band); "Open the app" is
-    // the header's and the footer's solid button.
-    primaryCtaHref: GESTURE_HREF,
     secondaryCtaHref: '#cycle',
   },
   cycle: {
@@ -155,7 +151,6 @@ export const LANDING_STRUCTURE = {
   },
 } as const satisfies {
   readonly hero: {
-    readonly primaryCtaHref: string;
     readonly secondaryCtaHref: string;
   };
   readonly cycle: {

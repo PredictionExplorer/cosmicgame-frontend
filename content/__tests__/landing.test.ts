@@ -50,13 +50,12 @@ describe('landing content shape', () => {
     });
   });
 
-  it('makes the gesture the hero’s one commit action, with The Cycle’s label and target (V170)', () => {
+  it('keeps the closing gesture action consistent with The Cycle’s label and target', () => {
     for (const locale of routing.locales) {
-      const { hero, cycle, closing } = getLandingContent(locale);
-      expect(hero.primaryCta).toEqual(cycle.gestureCta);
+      const { cycle, closing } = getLandingContent(locale);
       expect(closing.gestureCta).toEqual(cycle.gestureCta);
     }
-    expect(landingContent.hero.primaryCta.href).toBe(
+    expect(landingContent.cycle.gestureCta.href).toBe(
       'https://app.cosmicsignature.com/#make-gesture',
     );
   });

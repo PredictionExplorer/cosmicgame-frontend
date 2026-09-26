@@ -26,7 +26,6 @@ export interface LandingHeroContent {
   readonly headlineAccent: string;
   /** The loop in one breath: what a visitor does and what happens at zero. */
   readonly subhead: string;
-  readonly primaryCta: LandingLink;
   readonly secondaryCta: LandingLink;
   readonly art: LandingHeroArtContent;
 }

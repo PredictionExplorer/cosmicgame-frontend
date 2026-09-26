@@ -86,11 +86,6 @@ function buildLandingContent(text: LandingText, locale: AppLocale): LandingConte
       headlineLead: text.hero.headlineLead,
       headlineAccent: text.hero.headlineAccent,
       subhead: text.hero.subhead,
-      // The hero's commit action is The Cycle's: one label for the one action.
-      primaryCta: {
-        label: text.cycle.gestureCtaLabel,
-        href: LANDING_STRUCTURE.hero.primaryCtaHref,
-      },
       secondaryCta: {
         label: text.hero.secondaryCtaLabel,
         href: LANDING_STRUCTURE.hero.secondaryCtaHref,

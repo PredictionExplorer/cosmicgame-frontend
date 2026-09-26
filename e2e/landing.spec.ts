@@ -99,10 +99,14 @@ test.describe('Landing page @ cosmicsignature.com', () => {
     await expect(h1).toContainText(hero.headlineAccent);
   });
 
-  test('primary CTA links to the app subdomain', async ({ page }) => {
+  test('hero primary CTA opens the app home', async ({ page }) => {
     await page.goto('/', { waitUntil: 'domcontentloaded' });
-    const cta = page.getByRole('link', { name: /open the app/i }).first();
+    const cta = page
+      .locator('[aria-labelledby="landing-headline"]')
+      .getByRole('link', { name: 'Open the app', exact: true });
+    await expect(cta).toBeVisible();
     await expect(cta).toHaveAttribute('href', APP_ORIGIN_PATTERN);
+    await expect(cta).not.toHaveAttribute('target');
   });
 
   test('renders the live Event Horizon cycle timer in the hero', async ({ page }) => {
@@ -521,10 +525,9 @@ test.describe('Landing page @ cosmicsignature.com', () => {
     await page.setViewportSize({ width: 390, height: 844 });
     await page.goto('/', { waitUntil: 'domcontentloaded' });
     const plate = page.getByTestId('hero-art-link');
-    // The hero's one commit action is The Cycle's gesture (V170).
     const primary = page
       .locator('[aria-labelledby="landing-headline"]')
-      .getByRole('link', { name: getLandingContent('en').hero.primaryCta.label });
+      .getByRole('link', { name: 'Open the app', exact: true });
     await expect(plate).toBeInViewport({ ratio: 1 });
     await expect(primary).toBeInViewport();
     // Drawn above the action, but read (and focused) after it.
@@ -536,7 +539,7 @@ test.describe('Landing page @ cosmicsignature.com', () => {
   test('reaches the primary action by keyboard before the exhibit controls', async ({ page }) => {
     await page.goto('/', { waitUntil: 'domcontentloaded' });
     const hero = page.locator('[aria-labelledby="landing-headline"]');
-    const primary = hero.getByRole('link', { name: getLandingContent('en').hero.primaryCta.label });
+    const primary = hero.getByRole('link', { name: 'Open the app', exact: true });
     const firstControl = hero.getByRole('button').first();
     const order = await primary.evaluate(
       (node, other) => node.compareDocumentPosition(other as Node),

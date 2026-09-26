@@ -10,19 +10,18 @@ import { cn } from '@/lib/utils';
  * "Open the app": the landing's one way into the Observatory, with one label
  * everywhere (`nav.cta.openApp`). It crosses hosts in the same tab, so it
  * carries a forward arrow, not the new-tab arrow. Renders on the server (the
- * landing footer) and inside client components (the landing header). It is
- * the solid primary, never the commit gradient: a section's own commit
- * action (the hero's, The Cycle's, the closing band's) is the one that asks
- * for a decision.
+ * landing hero and footer) and inside client components (the landing header).
+ * The hero uses the commit gradient for its primary action; other placements
+ * use the solid primary or an outline.
  */
 export function OpenAppLink({
   size = 'md',
   variant = 'default',
   className,
 }: {
-  size?: 'md' | 'lg';
-  /** `outline` where the page's own primary action should lead (the reading pages' header). */
-  variant?: 'default' | 'outline';
+  size?: 'md' | 'lg' | 'xl';
+  /** `commit` for the hero; `outline` where the page's own primary action should lead. */
+  variant?: 'default' | 'outline' | 'commit';
   className?: string;
 }) {
   const t = useTranslations('nav');
@@ -33,9 +32,9 @@ export function OpenAppLink({
       href={app.href}
       kind={app.kind}
       className={cn(
-        buttonVariants({ variant, size: size === 'md' ? 'default' : 'lg' }),
+        buttonVariants({ variant, size: size === 'md' ? 'default' : size }),
         'shrink-0 no-underline',
-        size === 'md' ? 'max-sm:px-3' : 'px-5',
+        size === 'md' ? 'max-sm:px-3' : size === 'lg' ? 'px-5' : undefined,
         className,
       )}
     >

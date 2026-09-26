@@ -1,17 +1,13 @@
-import { ArrowDown, ArrowRight } from 'lucide-react';
-import { useLocale } from 'next-intl';
+import { ArrowDown } from 'lucide-react';
 
 import type { LandingContent } from '@/content/landing';
 
-import { classifyHref } from '@/config/siteNav';
-import { localizeCrossHostHref } from '@/lib/hostRouting';
 import { cn } from '@/lib/utils';
-import { SiteLink } from '@/components/layout/SiteLink';
-import { buttonVariants } from '@/components/ui/button';
 import { PhrasedText } from '@/components/ui/phrased-text';
 
 import { EventHorizonCountdown } from './EventHorizonCountdown';
 import { HeroArtShowcase } from './HeroArtShowcase';
+import { OpenAppLink } from './OpenAppLink';
 import { SectionLink } from './SectionLink';
 import styles from './Landing.module.css';
 
@@ -28,9 +24,6 @@ import styles from './Landing.module.css';
  * A server component: only the exhibit and the clock hydrate.
  */
 export function Hero({ hero }: { hero: LandingContent['hero'] }) {
-  const locale = useLocale();
-  const primaryHref = localizeCrossHostHref(hero.primaryCta.href, locale);
-
   return (
     <section className={styles.hero} aria-labelledby="landing-headline">
       {/* The palette's atmosphere (::before) and a static starfield kept to the
@@ -50,15 +43,7 @@ export function Hero({ hero }: { hero: LandingContent['hero'] }) {
             {hero.subhead}
           </p>
           <div className={styles.actions}>
-            {/* Same tab and a forward arrow: the app is Cosmic Signature too. */}
-            <SiteLink
-              href={primaryHref}
-              kind={classifyHref(hero.primaryCta.href, 'landing')}
-              className={cn(buttonVariants({ variant: 'commit', size: 'xl' }), 'no-underline')}
-            >
-              {hero.primaryCta.label}
-              <ArrowRight aria-hidden />
-            </SiteLink>
+            <OpenAppLink variant="commit" size="xl" />
             {/* A link that reads as one: it takes the view and focus to the cycle below. */}
             <SectionLink
               section={hero.secondaryCta.href.replace(/^#/, '')}
