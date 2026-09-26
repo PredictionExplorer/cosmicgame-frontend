@@ -2,6 +2,8 @@ import { measureRows, measureUnit } from '../publicDataMeasures';
 
 const A = '0x1111111111111111111111111111111111111111';
 const B = '0x2222222222222222222222222222222222222222';
+/** The history's Anchor Distribution recipient: a placeholder, not a wallet. */
+const ANCHOR_DISTRIBUTION_RECIPIENT = '(All CS NFT Stakers)'; // lexicon-allow-backend-type
 
 describe('public header measures', () => {
   it('counts rows and distinct addresses, case-insensitively, skipping placeholders', () => {
@@ -9,7 +11,7 @@ describe('public header measures', () => {
       { WinnerAddr: A },
       { WinnerAddr: A.toUpperCase().replace('0X', '0x') },
       { WinnerAddr: B },
-      { WinnerAddr: '(All CS NFT Stakers)' },
+      { WinnerAddr: ANCHOR_DISTRIBUTION_RECIPIENT },
     ];
     expect(measureRows(rows, { kind: 'count' })).toBe(4);
     expect(measureRows(rows, { kind: 'distinct', fields: ['WinnerAddr'] })).toBe(2);
