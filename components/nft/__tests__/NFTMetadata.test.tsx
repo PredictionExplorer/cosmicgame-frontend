@@ -64,7 +64,8 @@ describe('NFTSpecList', () => {
 
   it('names the allocation from the traits, else from the record type', () => {
     const { rerender } = render(<NFTSpecList nft={fullNft} entry={entry} />);
-    expect(row('spec-allocation')).toHaveTextContent('Last CST Gesture');
+    // The glossary's name for the metadata's "Last CST Gesture" (as on every other page).
+    expect(row('spec-allocation')).toHaveTextContent('Final CST Gesture');
     rerender(<NFTSpecList nft={fullNft} />);
     expect(row('spec-allocation')).toHaveTextContent('detail.badges.cycleRecipient');
     rerender(<NFTSpecList nft={{ ...fullNft, RecordType: 5 }} />);

@@ -97,7 +97,7 @@ describe('traitProperties', () => {
         { name: '混沌度', value: 22 },
         { name: '连珠', value: 0 },
         { name: '周期', value: 0 },
-        { name: '分配', value: '最后 CST 落笔' },
+        { name: '分配', value: 'CST 收官之笔' },
       ]),
     );
     expect(properties.some((property) => property.name === 'Round')).toBe(false); // lexicon-allow-backend-type

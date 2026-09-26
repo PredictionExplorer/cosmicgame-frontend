@@ -28,7 +28,8 @@ describe('TraitSheet', () => {
       'href',
       '/allocation/0',
     );
-    expect(screen.getByTestId('trait-row-allocation')).toHaveTextContent('Last CST Gesture');
+    // The glossary's name for the metadata's "Last CST Gesture" (as on every other page).
+    expect(screen.getByTestId('trait-row-allocation')).toHaveTextContent('Final CST Gesture');
   });
 
   it('omits rows for traits the token does not carry', () => {

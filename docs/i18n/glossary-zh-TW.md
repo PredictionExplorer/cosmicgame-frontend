@@ -140,7 +140,7 @@ identical in zh-HK unless noted. The wire label `Round` maps to 週期, never �
 | Fate               | 命運 — Eternal Dance 永恆之舞 · Ejection 逃逸                                                                                                                      |
 | Chaos / Syzygies   | 混沌度 / 連珠                                                                                                                                                      |
 | Imprinted (trait)  | 銘刻時間                                                                                                                                                           |
-| Allocation (trait) | 分配 — 星選 · 錨定 NFT 星選 · 收官之筆 · 最後 CST 落筆 · 堅守冠軍 · 時之勇士                                                                                       |
+| Allocation (trait) | 分配 — 星選 · 錨定 NFT 星選 · 收官之筆 · CST 收官之筆 · 堅守冠軍 · 時之勇士                                                                                        |
 | Collection DNA     | 作品集基因                                                                                                                                                         |
 
 ## 4. Keep in English（保留英文）
