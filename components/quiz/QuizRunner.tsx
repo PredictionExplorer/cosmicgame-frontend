@@ -531,10 +531,13 @@ function QuizStartCard({ ui, rankFloors, saved, total, onBegin, onResume }: Quiz
         })
     : null;
 
+  // Not a region of its own: below lg its heading is the rank ladder's, and
+  // from lg the ranks sit in the panel beside it (a second region named
+  // "Ranks" failed axe's landmark-unique). From lg the way in is no card
+  // either, just the action under a rule, level with the panel's.
   return (
-    <section
-      aria-labelledby="quiz-start-ranks"
-      className="rounded-surface border border-rule bg-surface p-5 sm:p-8"
+    <div
+      className="rounded-surface border border-rule bg-surface p-5 sm:p-8 lg:rounded-none lg:border-x-0 lg:border-b-0 lg:bg-transparent lg:p-0 lg:pt-5"
       data-testid="quiz-start"
     >
       {/* Below lg the ranks are the card's goal; from lg they sit in the panel beside it. */}
@@ -586,7 +589,7 @@ function QuizStartCard({ ui, rankFloors, saved, total, onBegin, onResume }: Quiz
           {ui.intro.keyboardHint}
         </p>
       </div>
-    </section>
+    </div>
   );
 }
 

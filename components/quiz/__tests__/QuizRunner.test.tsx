@@ -132,6 +132,16 @@ describe('<QuizRunner />', () => {
     expect(screen.queryByText('First stub prompt?')).not.toBeInTheDocument();
   });
 
+  it('names one region "Ranks", never the start card as a second one', () => {
+    // Regression: from lg the card was a region labelled by its hidden ranks
+    // heading, beside the panel's own "Ranks" region (axe landmark-unique).
+    render(<QuizRunner {...props} />);
+    expect(screen.getByTestId('quiz-start').tagName).not.toBe('SECTION');
+    expect(
+      screen.getAllByRole('region', { name: ui.intro.ranksHeading, hidden: true }),
+    ).toHaveLength(1);
+  });
+
   it('lets a focused skip link handle Enter without starting the quiz', () => {
     render(
       <>
