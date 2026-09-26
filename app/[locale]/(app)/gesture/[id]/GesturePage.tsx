@@ -32,6 +32,7 @@ import NFTImage from '@/components/nft/NFTImage';
 import { useAttachedNftMetadata } from '@/components/attachments/useAttachedNftMetadata';
 import { resolveGestureType } from '@/components/tables/GestureMethodTag';
 import { useDashboardInfo, useGestureInfo, useRoundInfo } from '@/hooks/useApiQuery';
+import { mayShowMessage, useGestureModeration } from '@/hooks/useGestureModeration';
 import { useNow } from '@/hooks/useNow';
 import type { GestureInfo } from '@/services/api';
 import { isRecordNotFound } from '@/services/api/readError';
@@ -319,6 +320,9 @@ const GesturePage = ({
     poll: false,
   });
   const neighbours = useGestureNeighbours(gestureInfo?.RoundNum, gestureInfo?.BidPosition);
+  // The same fail-closed moderation as every public ledger: the message
+  // shows once the hidden list clears it (the server seeds that list).
+  const moderation = useGestureModeration();
   const cycle = gestureInfo?.RoundNum;
   const liveCycle = dashboard?.CurRoundNum ?? serverLiveCycle ?? undefined;
   const { section, trail, cycleState, cycleHref } = gestureTrail(
@@ -423,7 +427,10 @@ const GesturePage = ({
       : rwlkId !== null
         ? 'ethRandomWalk'
         : 'eth';
-  const message = gestureInfo.Message?.trim() ?? '';
+  const carriedMessage = gestureInfo.Message?.trim() ?? '';
+  const message =
+    carriedMessage && mayShowMessage(moderation, gestureInfo.EvtLogId) ? carriedMessage : '';
+  const messagePending = carriedMessage !== '' && moderation.status === 'pending';
   const hasNft = !!gestureInfo.NFTDonationTokenAddr && (gestureInfo.NFTDonationTokenId ?? -1) >= 0;
   const finalizationTime =
     typeof gestureInfo.PrizeTime === 'number' && gestureInfo.PrizeTime > 0
@@ -547,6 +554,17 @@ const GesturePage = ({
                 <blockquote className="mt-3 border-l-2 border-primary pl-5 type-prose whitespace-pre-wrap text-foreground [overflow-wrap:anywhere]">
                   <LinkifiedText text={message} />
                 </blockquote>
+              </figure>
+            ) : messagePending ? (
+              // The message waits for the hidden list; its place is held so the record does not move.
+              <figure data-testid="gesture-message-pending" aria-busy="true" className="max-w-3xl">
+                <figcaption className="type-label text-subtle">
+                  {t('sections.message.title')}
+                </figcaption>
+                <div className="mt-3 space-y-2 border-l-2 border-rule pl-5" aria-hidden>
+                  <Skeleton className="h-4 w-full max-w-xl" />
+                  <Skeleton className="h-4 w-2/3 max-w-md" />
+                </div>
               </figure>
             ) : null}
 

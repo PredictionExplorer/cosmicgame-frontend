@@ -14,9 +14,16 @@ jest.mock('../../../../../services/api', () => ({
 }));
 
 const mockDashboardRead = jest.fn();
+const mockHiddenRead = jest.fn();
 jest.mock('../../publicDataReads', () => ({
   readDashboard: () => mockDashboardRead(),
+  readHiddenGestures: () => mockHiddenRead(),
 }));
+
+beforeEach(() => {
+  mockHiddenRead.mockReset();
+  mockHiddenRead.mockResolvedValue({ data: [], at: 1_000 });
+});
 
 const mockCapCacheWindow = jest.fn();
 jest.mock('@/lib/cacheWindow', () => ({
@@ -38,11 +45,18 @@ interface GesturePageProps {
   children?: ReactNode;
 }
 
+interface Seed {
+  queryKey: unknown[];
+  absent?: boolean;
+  data: unknown;
+  at: number;
+}
+
 /** The seeds the route hands the client's query cache. */
-function renderedSeeds(tree: ReactNode): Array<{ absent?: boolean; data: unknown }> | undefined {
+function renderedSeeds(tree: ReactNode): Seed[] | undefined {
   if (!isValidElement(tree)) return undefined;
   const { props: elementProps } = tree as ReactElement<{
-    seeds?: Array<{ absent?: boolean; data: unknown }>;
+    seeds?: Seed[];
     children?: ReactNode;
   }>;
   if (Array.isArray(elementProps.seeds)) return elementProps.seeds;
@@ -172,6 +186,49 @@ describe('gesture/[id] seed', () => {
     mockGestureRead.mockRejectedValue(new Error('offline'));
     const seeds = renderedSeeds(await Page(props('40001')));
     expect(seeds?.[0]?.absent).toBe(false);
+  });
+});
+
+describe('gesture/[id] moderation', () => {
+  const withMessage = { EvtLogId: 29434, BidPosition: 1135, RoundNum: 2, Message: 'Hello there' };
+  const seededRecord = (seeds: Seed[] | undefined) =>
+    seeds?.find((seed) => seed.queryKey[0] === 'gestureInfo');
+
+  beforeEach(() => {
+    mockGestureRead.mockReset();
+    mockCapCacheWindow.mockReset();
+    mockDashboardRead.mockReset();
+    mockDashboardRead.mockResolvedValue({ data: { CurRoundNum: 3 }, at: 0 });
+  });
+
+  it('seeds a cleared message and the list it was checked against', async () => {
+    mockGestureRead.mockResolvedValue(withMessage);
+    const seeds = renderedSeeds(await Page(props('29434')));
+    expect(seededRecord(seeds)?.data).toMatchObject({ Message: 'Hello there' });
+    expect(seeds?.find((seed) => seed.queryKey[0] === 'bannedBids')?.data).toEqual([]);
+  });
+
+  it('keeps a message moderation hid out of the server HTML', async () => {
+    // Regression: the ledgers hid it, but the record they link to printed it.
+    mockHiddenRead.mockResolvedValue({ data: [{ bid_id: 29434 }], at: 1_000 });
+    mockGestureRead.mockResolvedValue(withMessage);
+    const seeds = renderedSeeds(await Page(props('29434')));
+    expect(seededRecord(seeds)?.data).toMatchObject({ Message: '', BidPosition: 1135 });
+  });
+
+  it('fails closed when the hidden list could not be read, and keeps the render a minute', async () => {
+    mockHiddenRead.mockResolvedValue({ data: null, at: 1_000 });
+    mockGestureRead.mockResolvedValue(withMessage);
+    const seeds = renderedSeeds(await Page(props('29434')));
+    // Dated stale, so the client reads the record again and moderation decides.
+    expect(seededRecord(seeds)).toMatchObject({ data: { Message: '' }, at: 0 });
+    expect(mockCapCacheWindow).toHaveBeenCalledWith('pending');
+  });
+
+  it('keeps a finalized record with a message five minutes, so a later hide leaves the HTML soon', async () => {
+    mockGestureRead.mockResolvedValue(withMessage);
+    await Page(props('29434'));
+    expect(mockCapCacheWindow).toHaveBeenCalledWith('live');
   });
 });
 

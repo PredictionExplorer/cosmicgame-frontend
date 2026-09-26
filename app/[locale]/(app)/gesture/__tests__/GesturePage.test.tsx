@@ -18,10 +18,19 @@ const mockUseRoundInfo = jest.fn(
     isPending: true,
   }),
 );
+/** The hidden-message list (`useGestureModeration` reads it): nothing hidden by default. */
+const mockUseBannedGestures = jest.fn(
+  (): { data?: Array<{ bid_id: number }>; isError: boolean; refetch: () => void } => ({
+    data: [],
+    isError: false,
+    refetch: jest.fn(),
+  }),
+);
 jest.mock('../../../../../hooks/useApiQuery', () => ({
   useGestureInfo: (...args: unknown[]) => mockUseGestureInfo(...args),
   useDashboardInfo: () => mockUseDashboardInfo(),
   useRoundInfo: (cycle: number) => mockUseRoundInfo(cycle),
+  useBannedGestures: () => mockUseBannedGestures(),
 }));
 
 const neighbour = (
@@ -67,6 +76,7 @@ jest.mock('../../../../../components/nft/NFTImage', () => ({
 
 beforeEach(() => {
   jest.clearAllMocks();
+  mockUseBannedGestures.mockReturnValue({ data: [], isError: false, refetch: jest.fn() });
   mockNeighbours.mockReturnValue({ previous: null, next: null, settled: false });
   mockUseRoundInfo.mockReturnValue({ data: undefined, isPending: true });
 });
@@ -386,6 +396,32 @@ describe('GesturePage', () => {
     renderGesture({ Message: '   ' });
     expect(screen.queryByTestId('gesture-message')).not.toBeInTheDocument();
     expect(screen.queryByText('gesture.sections.message.title')).not.toBeInTheDocument();
+  });
+
+  it('never quotes a message moderation hid, as every public ledger does', () => {
+    // Regression: the ledgers hid the message, but the record they link to printed it.
+    mockUseBannedGestures.mockReturnValue({
+      data: [{ bid_id: 29434 }],
+      isError: false,
+      refetch: jest.fn(),
+    });
+    renderGesture({ EvtLogId: 29434 }, 29434);
+    expect(screen.queryByTestId('gesture-message')).not.toBeInTheDocument();
+    expect(screen.queryByText('Hello World')).not.toBeInTheDocument();
+  });
+
+  it('holds the message back, in its place, until the hidden list is known', () => {
+    mockUseBannedGestures.mockReturnValue({ data: undefined, isError: false, refetch: jest.fn() });
+    const { unmount } = renderGesture({ EvtLogId: 29434 }, 29434);
+    expect(screen.queryByText('Hello World')).not.toBeInTheDocument();
+    expect(screen.getByTestId('gesture-message-pending')).toHaveAttribute('aria-busy', 'true');
+    unmount();
+
+    // A list that cannot be read keeps it back: moderation fails closed.
+    mockUseBannedGestures.mockReturnValue({ data: undefined, isError: true, refetch: jest.fn() });
+    renderGesture({ EvtLogId: 29434 }, 29434);
+    expect(screen.queryByText('Hello World')).not.toBeInTheDocument();
+    expect(screen.queryByTestId('gesture-message-pending')).not.toBeInTheDocument();
   });
 
   it('shows an unknown cost as unavailable instead of a fake zero', () => {

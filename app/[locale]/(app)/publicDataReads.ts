@@ -18,7 +18,12 @@ import {
   get_donations_nft_list,
 } from '@/services/api/donations';
 import { get_marketing_rewards } from '@/services/api/marketing';
-import { get_claim_history, get_dashboard_info, get_round_list } from '@/services/api/rounds';
+import {
+  get_banned_bids,
+  get_claim_history,
+  get_dashboard_info,
+  get_round_list,
+} from '@/services/api/rounds';
 import {
   COORDINATION_EVENTS_END_ID,
   coordinationStartId,
@@ -97,6 +102,12 @@ export const readPublicGoodsDeposits = timedRead(() => get_charity_cg_deposits()
 export const readVoluntaryPublicGoods = timedRead(() => get_charity_voluntary());
 export const readPublicGoodsRetrievals = timedRead(() => get_charity_withdrawals());
 export const readSystemModes = timedRead(() => get_system_modelist());
+/**
+ * The gestures whose messages moderation has hidden (`useGestureModeration`
+ * reads the same list): a server render that shows a message checks it
+ * here first, so a hidden message never reaches the HTML.
+ */
+export const readHiddenGestures = timedRead(() => get_banned_bids());
 
 /** How long the header waits for the chain before it shows a figure as unavailable. */
 const CHAIN_READ_TIMEOUT_MS = 5_000;

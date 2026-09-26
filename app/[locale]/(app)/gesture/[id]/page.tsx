@@ -5,13 +5,13 @@ import { getTranslations, setRequestLocale } from 'next-intl/server';
 import { capCacheWindow, type CacheWindow } from '@/lib/cacheWindow';
 import api from '@/services/api';
 import { isRecordNotFound } from '@/services/api/readError';
-import type { GestureInfo } from '@/services/api/types';
+import type { BannedGesture, GestureInfo } from '@/services/api/types';
 import { parseGestureId } from '@/utils/routeParams';
 import { createMetadata } from '@/utils/seo';
 import { PageMessages } from '@/components/i18n/PageMessages';
 
 import { DashboardQuerySeed, QuerySeed, seedsDisabled } from '../../QuerySeed';
-import { readDashboard } from '../../publicDataReads';
+import { readDashboard, readHiddenGestures } from '../../publicDataReads';
 
 import GesturePage from './GesturePage';
 
@@ -69,7 +69,9 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
  * render is kept for a day (`CACHE_WINDOW.final`). One of the live cycle
  * keeps five minutes (its trail leads to the live cycle until it
  * finalizes), and a record the API does not hold yet, or could not be read,
- * a minute.
+ * a minute. A record that carries a message keeps at most five minutes,
+ * so a message moderation hides later leaves the cached HTML within them,
+ * and a minute when the hidden list could not be read.
  */
 export function generateStaticParams() {
   return [];
@@ -77,14 +79,38 @@ export function generateStaticParams() {
 
 export const revalidate = 86400;
 
+/** Whether the record carries a message at all. */
+function carriesMessage(gesture: GestureInfo | null | undefined): boolean {
+  return typeof gesture?.Message === 'string' && gesture.Message.trim() !== '';
+}
+
+/**
+ * The record as the server may seed it. Moderation fails closed, as on
+ * every public ledger (`useGestureModeration`): a message moderation hid,
+ * or one the server could not check because the hidden list did not load,
+ * is left out of the seed, so it never reaches the HTML. The client reads
+ * the list itself and shows the message once it is cleared.
+ */
+function moderatedRecord(
+  gesture: GestureInfo | null | undefined,
+  hidden: readonly BannedGesture[] | null | undefined,
+): { data: GestureInfo | null | undefined; unchecked: boolean } {
+  if (!gesture || !carriesMessage(gesture)) return { data: gesture, unchecked: false };
+  if (!hidden) return { data: { ...gesture, Message: '' }, unchecked: true };
+  const isHidden = hidden.some((entry) => entry.bid_id === gesture.EvtLogId);
+  return { data: isHidden ? { ...gesture, Message: '' } : gesture, unchecked: false };
+}
+
 /** How long this render may be served, from what it shows. */
 function gestureCacheWindow(
   gesture: GestureInfo | null | undefined,
   liveCycle: number | null | undefined,
+  messageUnchecked: boolean,
 ): CacheWindow {
-  if (!gesture) return 'pending';
+  if (!gesture || messageUnchecked) return 'pending';
   const cycle = gesture.RoundNum;
   if (typeof liveCycle !== 'number' || typeof cycle !== 'number') return 'live';
+  if (carriesMessage(gesture)) return 'live';
   return cycle < liveCycle ? 'final' : 'live';
 }
 
@@ -93,11 +119,15 @@ export default async function Page({ params }: PageProps) {
   setRequestLocale(locale);
   // The same strict parse as the metadata: "12abc" is an invalid id, never gesture 12.
   const gestureId = parseGestureId(id) ?? -1;
-  const [gesture, dashboard] = await Promise.all([
+  const [gesture, dashboard, hidden] = await Promise.all([
     gestureId >= 0 ? readGesture(gestureId) : null,
     seedsDisabled() ? null : readDashboard(),
+    seedsDisabled() ? null : readHiddenGestures(),
   ]);
-  await capCacheWindow(gestureCacheWindow(gesture?.data, dashboard?.data?.CurRoundNum));
+  const record = moderatedRecord(gesture?.data, hidden?.data);
+  await capCacheWindow(
+    gestureCacheWindow(gesture?.data, dashboard?.data?.CurRoundNum, record.unchecked),
+  );
   return (
     <PageMessages namespaces={['detail', 'gesture', 'tables']}>
       {/* The live cycle decides the record's trail and cycle link; the record is its own seed. */}
@@ -106,12 +136,17 @@ export default async function Page({ params }: PageProps) {
           seeds={[
             {
               queryKey: ['gestureInfo', gestureId],
-              data: gesture?.data ?? null,
-              at: gesture?.at ?? 0,
+              data: record.data ?? null,
+              // A record seeded without its unchecked message is dated stale,
+              // so the client reads it again and moderation decides.
+              at: record.unchecked ? 0 : (gesture?.at ?? 0),
               // A record the API does not hold is seeded as absent, so the
               // server HTML opens on the not-found state, not a skeleton.
               absent: gesture?.data === null,
             },
+            // The list the record's message was checked against, so the
+            // client's moderation agrees with the server HTML at once.
+            { queryKey: ['bannedBids'], data: hidden?.data ?? null, at: hidden?.at ?? 0 },
           ]}
         >
           <GesturePage

@@ -1,9 +1,19 @@
 import type { ChampionsState } from '@/hooks/useChampions';
+import type { GestureModeration } from '@/hooks/useGestureModeration';
 import type { GestureInfo } from '@/services/api';
 
 import { render, screen, within, checkA11y } from '@/test-utils';
 
 import { StandingsLedger } from '../StandingsLedger';
+
+const NOTHING_HIDDEN: GestureModeration = { status: 'ready', hidden: new Set() };
+const mockModeration = jest.fn((): GestureModeration => NOTHING_HIDDEN);
+jest.mock('@/hooks/useGestureModeration', () => ({
+  ...jest.requireActual('@/hooks/useGestureModeration'),
+  useGestureModeration: () => mockModeration(),
+}));
+
+beforeEach(() => mockModeration.mockReturnValue(NOTHING_HIDDEN));
 
 const LATEST = '0x1111111111111111111111111111111111111111';
 const ENDURANCE = '0x2222222222222222222222222222222222222222';
@@ -175,6 +185,30 @@ describe('StandingsLedger', () => {
       within(screen.getByTestId('latest-participant-gesture-id')).getByRole('link'),
     ).toHaveAttribute('href', '/gesture/77');
     expect(screen.getByTestId('latest-participant-message')).toHaveTextContent('The orbit holds.');
+  });
+
+  it('never shows a message moderation hid, and holds its line while the list loads', () => {
+    // Regression: the chat and the ledgers moderated messages, but the Last
+    // Gesture line printed a hidden one.
+    mockModeration.mockReturnValue({ status: 'ready', hidden: new Set([77]) });
+    const { unmount } = render(<StandingsLedger {...baseProps} />);
+    expect(screen.queryByTestId('latest-participant-message')).not.toBeInTheDocument();
+    expect(screen.queryByText('The orbit holds.')).not.toBeInTheDocument();
+    unmount();
+
+    mockModeration.mockReturnValue({ status: 'pending' });
+    const { unmount: unmountPending } = render(<StandingsLedger {...baseProps} />);
+    expect(screen.queryByText('The orbit holds.')).not.toBeInTheDocument();
+    expect(
+      screen
+        .getByTestId('latest-participant-gesture-details')
+        .querySelector('[aria-hidden] [data-slot="skeleton"]'),
+    ).not.toBeNull();
+    unmountPending();
+
+    mockModeration.mockReturnValue({ status: 'failed', retry: jest.fn() });
+    render(<StandingsLedger {...baseProps} />);
+    expect(screen.queryByText('The orbit holds.')).not.toBeInTheDocument();
   });
 
   it('says the transaction is syncing while its row has not been indexed', () => {

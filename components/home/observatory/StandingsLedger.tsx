@@ -16,6 +16,7 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { Term } from '@/components/ui/term';
 import { UnknownValue } from '@/components/ui/unknown-value';
 import type { ChampionsState } from '@/hooks/useChampions';
+import { mayShowMessage, useGestureModeration } from '@/hooks/useGestureModeration';
 import type { PositionMoment } from '@/hooks/usePositionMoment';
 import { Link } from '@/i18n/navigation';
 import {
@@ -343,6 +344,9 @@ function LedgerFacts({ facts }: { facts: LedgerFact[] }) {
 function GestureFacts({ gesture, pending }: { gesture: GestureInfo | null; pending: boolean }) {
   const t = useTranslations('home.observatory');
   const tTables = useTranslations('tables');
+  // The message follows the same fail-closed moderation as the chat and the
+  // ledgers: it shows once the hidden list clears it, never before.
+  const moderation = useGestureModeration();
 
   if (!gesture) {
     return (
@@ -362,7 +366,10 @@ function GestureFacts({ gesture, pending }: { gesture: GestureInfo | null; pendi
   const paid = isCst ? getCstGestureCost(gesture) : getEthGestureCost(gesture);
   const received = getParticipationCST(gesture);
   const unavailable = tTables('status.unavailable');
-  const message = gesture.Message?.trim() ?? '';
+  const carriedMessage = gesture.Message?.trim() ?? '';
+  const message =
+    carriedMessage && mayShowMessage(moderation, gesture.EvtLogId) ? carriedMessage : '';
+  const messagePending = carriedMessage !== '' && moderation.status === 'pending';
   // Paid and received carry visible labels; the method shows only when the
   // unit does not already say it (a Random Walk NFT), and the time and the
   // position read as themselves, labelled for screen readers.
@@ -457,7 +464,7 @@ function GestureFacts({ gesture, pending }: { gesture: GestureInfo | null; pendi
           </div>
         ))}
       </dl>
-      {message && (
+      {message ? (
         <p
           data-testid="latest-participant-message"
           className="flex items-start gap-2 type-caption text-muted-foreground"
@@ -465,7 +472,13 @@ function GestureFacts({ gesture, pending }: { gesture: GestureInfo | null; pendi
           <MessageSquare className="mt-0.5 size-3.5 shrink-0 text-subtle" aria-hidden />
           <q className="line-clamp-2 break-words">{message}</q>
         </p>
-      )}
+      ) : messagePending ? (
+        // Its line is held while the hidden list loads, so the ledger does not move.
+        <p aria-hidden className="flex items-center gap-2">
+          <MessageSquare className="size-3.5 shrink-0 text-subtle" />
+          <Skeleton as="span" className="inline-block h-3.5 w-48 max-w-full" />
+        </p>
+      ) : null}
     </div>
   );
 }
