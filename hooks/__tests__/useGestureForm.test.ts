@@ -877,6 +877,50 @@ describe('useGestureForm', () => {
     );
   });
 
+  it('reads the attached token amount in the reader’s marks and names what the wallet asks for', async () => {
+    // Regression: the attached amount was read with English marks, so a
+    // Vietnamese "1.000" (a thousand, as the app prints it) approved 1 token
+    // and a Vietnamese "0,5" was refused.
+    const nextIntl = jest.requireMock('next-intl') as { useLocale: () => string };
+    const locale = jest.spyOn(nextIntl, 'useLocale').mockReturnValue('vi');
+    mockReadContract.mockImplementation(async ({ functionName }: { functionName: string }) => {
+      if (functionName === 'decimals') return 6;
+      if (functionName === 'balanceOf') return 5_000n * 10n ** 6n;
+      if (functionName === 'allowance') return 0n;
+      return true;
+    });
+
+    try {
+      const { result } = renderHook(() => useGestureForm());
+      await flushAsyncWork();
+      act(() => {
+        result.current.setContributionType('Token');
+        result.current.setTokenDonateAddress('0xTokenContract');
+        result.current.setTokenAmount('1.000');
+      });
+
+      // The locale's own thousands mark is never guessed at: refused, not sent as 1.
+      await result.current.onGesture();
+      expect(mockNotify).toHaveBeenCalledWith(
+        'error',
+        'toasts.gesture.validation.invalidTokenAmount',
+      );
+      expect(mockTx.writeContract).not.toHaveBeenCalledWith(
+        expect.objectContaining({ functionName: 'approve' }),
+      );
+
+      act(() => result.current.setTokenAmount('1000,5'));
+      await result.current.onGesture();
+
+      expect(mockTx.writeContract).toHaveBeenCalledWith(
+        expect.objectContaining({ functionName: 'approve', args: ['0xRaffle', 1_000_500_000n] }),
+      );
+      expect(mockTx.sentApprovals()).toEqual(['toasts.gesture.approval.token(amount=1.000,5)']);
+    } finally {
+      locale.mockRestore();
+    }
+  });
+
   it('onGestureWithCST succeeds and returns true', async () => {
     const { result } = renderHook(() => useGestureForm());
     await flushAsyncWork();

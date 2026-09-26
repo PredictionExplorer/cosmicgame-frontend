@@ -408,6 +408,20 @@ export function formatAmountParts(value: AmountInput, options: AmountOptions): A
 }
 
 /**
+ * Base units at full precision in the locale's conventions, with no unit:
+ * 1000n * 10n ** 18n with 18 decimals is "1,000" (en), "1.000" (vi) or
+ * "1 000" (uk); 1234567n with 6 decimals is "1.234567". For an amount a
+ * person confirms exactly, such as the allowance an approval grants, where
+ * the rounding of `formatAmount`'s policies would misstate it.
+ */
+export function formatExactUnits(
+  value: bigint,
+  { decimals, locale }: { decimals: number; locale?: string | null },
+): string {
+  return formatExactDecimal(baseUnitsToDecimal(value, decimals), locale);
+}
+
+/**
  * One amount by the shared precision policy (`AmountContext`), grouped in
  * the locale's style with the unit after a no-break space: "32.2939 ETH",
  * uk "60 872.26 CST", vi "8,0735 ETH", table dust "<0.0001".

@@ -16,7 +16,7 @@ import { parseTokenAmount } from '@/components/tokens/transfer/amount';
 import { classifyTxError } from '@/lib/txErrors';
 import { isTransientNetworkError, reportError, reportErrorThrottled } from '@/utils/errors';
 import { getContractErrorDescriptor } from '@/utils/contractErrors';
-import { formatAmount } from '@/utils/format/numbers';
+import { formatAmount, formatExactUnits } from '@/utils/format/numbers';
 import {
   type CosmicGameGestureFunctionName,
   pickGestureWriteAbi,
@@ -50,7 +50,7 @@ export type CSTGestureData = CstGestureData;
 /** An asset that passed validation and will ride along with the gesture. */
 type PreparedAttachment =
   | { kind: 'nft'; address: string; tokenId: bigint }
-  | { kind: 'token'; address: string; amountWei: bigint };
+  | { kind: 'token'; address: string; amountWei: bigint; decimals: number };
 
 /**
  * A typed NFT token id as an exact uint256: digits only, kept as a bigint so
@@ -724,9 +724,13 @@ export function useGestureForm({ firstGesture = false }: UseGestureFormOptions =
         return false;
       }
       const decimals = await getErc20Decimals(tokenDonateAddress);
-      // Digits and one decimal point only: no sign, no exponent, no more
-      // fraction digits than the token has, never zero.
-      const { wei: amountWei, error: amountError } = parseTokenAmount(tokenAmount, { decimals });
+      // Read in the reader's marks, as every other send is (vi "1.000" is a
+      // thousand, never 1): digits and one decimal mark only, no sign, no
+      // exponent, no more fraction digits than the token has, never zero.
+      const { wei: amountWei, error: amountError } = parseTokenAmount(tokenAmount, {
+        decimals,
+        locale,
+      });
       if (amountError || amountWei === null) {
         notify('error', t('gesture.validation.invalidTokenAmount'));
         return false;
@@ -741,7 +745,7 @@ export function useGestureForm({ firstGesture = false }: UseGestureFormOptions =
         notify('error', t('gesture.validation.insufficientAttachedToken'));
         return false;
       }
-      return { kind: 'token', address: tokenDonateAddress, amountWei };
+      return { kind: 'token', address: tokenDonateAddress, amountWei, decimals };
     }
 
     return null;
@@ -751,16 +755,27 @@ export function useGestureForm({ firstGesture = false }: UseGestureFormOptions =
    * The approval step for the prepared attachment (exact amount or the one
    * NFT), shown as "Approve 1 of 2" with a sentence on why the wallet asks.
    * Evaluated after `prepare`, so it reads the attachment that passed
-   * validation.
+   * validation: the sentence names the amount the wallet is asked for, as
+   * parsed and printed in the reader's marks, never the raw typed text.
    */
   const attachmentApprovals = (
     getAttachment: () => PreparedAttachment | null,
   ): TxApprovalStep[] => [
     {
-      description:
-        contributionType === 'NFT'
-          ? t('gesture.approval.nft', { tokenId: nftId })
-          : t('gesture.approval.token', { amount: tokenAmount }),
+      get description() {
+        const attachment = getAttachment();
+        if (attachment?.kind === 'token') {
+          return t('gesture.approval.token', {
+            amount: formatExactUnits(attachment.amountWei, {
+              decimals: attachment.decimals,
+              locale,
+            }),
+          });
+        }
+        return t('gesture.approval.nft', {
+          tokenId: attachment?.kind === 'nft' ? attachment.tokenId.toString() : nftId,
+        });
+      },
       isNeeded: async () => {
         const attachment = getAttachment();
         if (!attachment) return false;

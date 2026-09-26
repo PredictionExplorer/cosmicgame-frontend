@@ -28,6 +28,7 @@ export {
   formatAmount,
   formatAmountParts,
   formatCount,
+  formatExactUnits,
   formatNumber,
   formatPercent,
   type AmountContext,
