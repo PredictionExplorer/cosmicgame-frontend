@@ -27,10 +27,13 @@ export type { DashboardMetric } from './dashboardMetrics';
 export function DashboardFigure({
   metric,
   seed,
+  inline = false,
 }: {
   metric: DashboardMetric;
   /** The server-read value (`dashboardSeed`); undefined when the server read failed. */
   seed?: number | null;
+  /** In a line of text (a facts line): the placeholder is an inline bar at the text's height. */
+  inline?: boolean;
 }) {
   const t = useTranslations('common');
   const format = useFormat();
@@ -39,10 +42,11 @@ export function DashboardFigure({
   const value = hydrated && data ? dashboardMetricValue(data, metric) : seed;
 
   if (value === undefined) {
-    return !hydrated || isLoading ? (
-      <Skeleton className="mt-1 h-6 w-20" aria-hidden />
+    if (hydrated && !isLoading) return <UnknownValue label={t('status.unavailable')} />;
+    return inline ? (
+      <Skeleton as="span" className="inline-block h-[1em] w-8 align-middle" />
     ) : (
-      <UnknownValue label={t('status.unavailable')} />
+      <Skeleton className="mt-1 h-6 w-20" aria-hidden />
     );
   }
   if (value === null) return <UnknownValue label={t('status.unavailable')} />;
@@ -51,6 +55,8 @@ export function DashboardFigure({
     case 'reserve':
     case 'balance':
       return <Amount value={value} unit="ETH" />;
+    case 'outreachCst':
+      return <Amount value={value} unit="CST" />;
     case 'opened':
       return <DateTime timestamp={value} showZone />;
     default:

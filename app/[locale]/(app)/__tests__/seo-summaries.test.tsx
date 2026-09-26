@@ -91,6 +91,32 @@ const mockAnchorLists: Record<MockAnchorListId, MockAnchorList> = {
 const setAnchorLists = (state: MockAnchorList) => {
   for (const id of Object.keys(mockAnchorLists) as MockAnchorListId[]) mockAnchorLists[id] = state;
 };
+/**
+ * The lists a public header measures in the browser when the server's read
+ * failed (PublicDataFigureRefill), as the browser holds them: by default
+ * the browser's read failed too.
+ */
+type MockListId =
+  | 'rounds'
+  | 'rewards'
+  | 'attached'
+  | 'history'
+  | 'named'
+  | 'used'
+  | 'deposits'
+  | 'voluntary'
+  | 'retrievals';
+const mockLists: Record<MockListId, MockAnchorList> = {
+  rounds: { data: undefined, isLoading: false },
+  rewards: { data: undefined, isLoading: false },
+  attached: { data: undefined, isLoading: false },
+  history: { data: undefined, isLoading: false },
+  named: { data: undefined, isLoading: false },
+  used: { data: undefined, isLoading: false },
+  deposits: { data: undefined, isLoading: false },
+  voluntary: { data: undefined, isLoading: false },
+  retrievals: { data: undefined, isLoading: false },
+};
 jest.mock('@/hooks/useApiQuery', () => ({
   useDashboardInfo: jest.fn(),
   useCSTAnchorActions: () => mockAnchorLists.cstActions,
@@ -98,6 +124,15 @@ jest.mock('@/hooks/useApiQuery', () => ({
   useCSTAnchorDistributions: () => mockAnchorLists.deposits,
   useGlobalRWLKAnchorImprints: () => mockAnchorLists.imprints,
   useDonationsBoth: jest.fn(),
+  useRoundList: () => mockLists.rounds,
+  useMarketingRewards: () => mockLists.rewards,
+  useDonationsNFTList: () => mockLists.attached,
+  useClaimHistory: () => mockLists.history,
+  useNamedNFTs: () => mockLists.named,
+  useUsedRWLKNFTs: () => mockLists.used,
+  useCharityCGDeposits: () => mockLists.deposits,
+  useCharityVoluntary: () => mockLists.voluntary,
+  useCharityWithdrawals: () => mockLists.retrievals,
 }));
 jest.mock('../publicDataReads', () => ({
   ...jest.requireActual('../publicDataReads'),
@@ -214,6 +249,9 @@ const figureValue = (id: string) => {
 describe('server-rendered page headers', () => {
   beforeEach(() => {
     setAnchorLists({ data: [], isLoading: false });
+    for (const id of Object.keys(mockLists) as MockListId[]) {
+      mockLists[id] = { data: undefined, isLoading: false };
+    }
     mockRandomWalkImprinted.mockResolvedValue({ data: null, at: Date.UTC(2026, 8, 24) });
     mockGameOwner.mockResolvedValue({ data: null, at: Date.UTC(2026, 8, 24) });
     mockGetLocale.mockResolvedValue('en');
@@ -420,6 +458,36 @@ describe('server-rendered page headers', () => {
     expect(
       screen.queryByRole('navigation', { name: seoMessages.gallerySummary.relatedAria }),
     ).not.toBeInTheDocument();
+  });
+
+  it('fills the gallery facts from the browser when the server read was turned away', async () => {
+    // Regression: a build's 429 baked "Imprinted NFTs — Anchored NFTs — …" into
+    // the cached header, and hydration never refilled it.
+    mockGetDashboardInfo.mockRejectedValue(new Error('Request failed with status code 429'));
+    render(await GallerySeoSummary());
+    expect(figureValue('imprinted')).toHaveTextContent('240');
+    expect(figureValue('anchored')).toHaveTextContent('22');
+    expect(figureValue('named')).toHaveTextContent('3');
+    expect(figureValue('imprinted')).not.toHaveTextContent(COMMON.unavailable);
+  });
+
+  it('holds the gallery facts’ places while the browser reads them, and says unavailable only if it fails too', async () => {
+    mockGetDashboardInfo.mockRejectedValue(new Error('Request failed with status code 429'));
+    mockUseDashboardInfo.mockReturnValue({
+      data: undefined,
+      isLoading: true,
+    } as unknown as ReturnType<typeof useDashboardInfo>);
+    const { unmount } = render(await GallerySeoSummary());
+    expect(figureValue('imprinted')).not.toHaveTextContent(COMMON.unavailable);
+    expect(figureValue('imprinted')?.querySelector('[data-slot="skeleton"]')).not.toBeNull();
+    unmount();
+
+    mockUseDashboardInfo.mockReturnValue({
+      data: undefined,
+      isLoading: false,
+    } as unknown as ReturnType<typeof useDashboardInfo>);
+    render(await GallerySeoSummary());
+    expect(figureValue('imprinted')).toHaveTextContent(COMMON.unavailable);
   });
 
   it('renders the gallery’s closing section with the pages to read next', async () => {
@@ -640,10 +708,18 @@ describe('server-rendered page headers', () => {
     });
 
     it('shows Outreach CST Allocated in CST, not as an ETH reserve', async () => {
-      mockGetDashboardInfo.mockResolvedValue({
+      const withOutreach = {
         ...dashboard,
         MainStats: { ...dashboard.MainStats, TotalMktRewardsEth: 5999 },
-      } as unknown as Awaited<ReturnType<typeof get_dashboard_info>>);
+      };
+      mockGetDashboardInfo.mockResolvedValue(
+        withOutreach as unknown as Awaited<ReturnType<typeof get_dashboard_info>>,
+      );
+      // The same dashboard the page body polls.
+      mockUseDashboardInfo.mockReturnValue({
+        data: withOutreach,
+        isLoading: false,
+      } as unknown as ReturnType<typeof useDashboardInfo>);
 
       render(await PublicDataRouteSeoSummary({ route: 'marketing' }));
 
@@ -961,8 +1037,57 @@ describe('server-rendered page headers', () => {
       }
     });
 
+    it('measures the figures in the browser when the server’s read was turned away', async () => {
+      // Regression: a build's 429 baked four "Unavailable" figures into the
+      // allocation header for the life of the cached page.
+      mockGetRoundList.mockRejectedValue(new Error('Request failed with status code 429'));
+      mockLists.rounds = {
+        data: [
+          { AmountEth: 1.25, WinnerAddr: WALLET_A, RoundStats: { TotalBids: 10 } },
+          { AmountEth: 2.5, WinnerAddr: WALLET_B, RoundStats: { TotalBids: 20 } },
+          { AmountEth: 3, WinnerAddr: WALLET_A, RoundStats: { TotalBids: 30 } },
+        ],
+        isLoading: false,
+      };
+
+      render(await PublicDataRouteSeoSummary({ route: 'allocation' }));
+
+      // Measured exactly as the server measures the same rows.
+      expect(figureValue('finalizedCycles')).toHaveTextContent(/^3$/);
+      expect(figureValue('recipients')).toHaveTextContent(/^2$/);
+      expect(figureValue('totalEth')).toHaveTextContent('6.7500 ETH');
+      expect(figureValue('totalGestures')).toHaveTextContent('60');
+    });
+
+    it('holds a refilled figure’s place while the browser reads, never a dash', async () => {
+      mockPublicGoodsRetrievals.mockRejectedValue(new Error('Request failed with status code 429'));
+      mockLists.retrievals = { data: undefined, isLoading: true };
+
+      render(await PublicDataRouteSeoSummary({ route: 'public-goods-retrievals' }));
+
+      for (const key of ['totalEth', 'records', 'latest']) {
+        expect(figureValue(key)).not.toHaveTextContent(COMMON.unavailable);
+        expect(figureValue(key).querySelector('[data-slot="skeleton"]')).not.toBeNull();
+      }
+    });
+
+    it('says "None yet" for a refilled latest date of an empty list', async () => {
+      mockPublicGoodsRetrievals.mockRejectedValue(new Error('Request failed with status code 429'));
+      mockLists.retrievals = { data: [], isLoading: false };
+
+      render(await PublicDataRouteSeoSummary({ route: 'public-goods-retrievals' }));
+
+      expect(figureValue('latest')).toHaveTextContent('None yet');
+      expect(figureValue('records')).toHaveTextContent(/^0$/);
+    });
+
     it('marks only the figures whose read failed as unavailable', async () => {
+      // The server's read failed, and so did the browser's.
       mockGetDashboardInfo.mockRejectedValue(new Error('Network response was not OK'));
+      mockUseDashboardInfo.mockReturnValue({
+        data: undefined,
+        isLoading: false,
+      } as unknown as ReturnType<typeof useDashboardInfo>);
 
       render(await PublicDataRouteSeoSummary({ route: 'marketing' }));
 

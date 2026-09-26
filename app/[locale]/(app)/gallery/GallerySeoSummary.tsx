@@ -3,11 +3,10 @@ import { getLocale, getTranslations } from 'next-intl/server';
 
 import { PageHeader } from '@/components/layout/PageHeader';
 import { SnapshotStamp } from '@/components/layout/SnapshotStamp';
-import { UnknownValue } from '@/components/ui/unknown-value';
-import { toFiniteNumber } from '@/utils/finiteNumber';
-import { formatCount } from '@/utils/format';
 import { cn } from '@/lib/utils';
 
+import { DashboardFigure } from '../DashboardFigure';
+import { dashboardSeed, type DashboardMetric } from '../dashboardMetrics';
 import { readDashboard } from '../publicDataReads';
 
 /** One fact of the header's facts line. */
@@ -16,8 +15,8 @@ interface GalleryFact {
   label: string;
   /** The label on a phone ("Imprinted"); without one the fact shows from `sm` only. */
   shortLabel?: string;
-  /** The formatted count; `null` when the read failed. */
-  value: string | null;
+  /** The live dashboard metric the fact shows. */
+  metric: DashboardMetric;
 }
 
 /**
@@ -27,7 +26,14 @@ interface GalleryFact {
  * the first plates below a laptop's first screen. A phone keeps it to one
  * line ("Imprinted 48 · Anchored 33 · Named 3").
  */
-function GalleryFacts({ facts, unavailable }: { facts: GalleryFact[]; unavailable: string }) {
+function GalleryFacts({
+  facts,
+  seed,
+}: {
+  facts: GalleryFact[];
+  /** The server's value of a metric; undefined when its read failed. */
+  seed: (metric: DashboardMetric) => number | null | undefined;
+}) {
   return (
     <dl
       className="flex flex-wrap items-baseline gap-x-4 gap-y-1 sm:gap-x-5"
@@ -50,7 +56,8 @@ function GalleryFacts({ facts, unavailable }: { facts: GalleryFact[]; unavailabl
             )}
           </dt>
           <dd className="type-label font-medium tabular-nums text-foreground">
-            {fact.value === null ? <UnknownValue label={unavailable} /> : fact.value}
+            {/* The server's count in the HTML; a failed server read is read again in the browser. */}
+            <DashboardFigure metric={fact.metric} seed={seed(fact.metric)} inline />
           </dd>
         </div>
       ))}
@@ -70,16 +77,8 @@ function GalleryFacts({ facts, unavailable }: { facts: GalleryFact[]; unavailabl
  */
 export async function GallerySeoSummary({ actions }: { actions?: ReactNode } = {}) {
   const locale = await getLocale();
-  const [t, tCommon] = await Promise.all([
-    getTranslations({ locale, namespace: 'seo' }),
-    getTranslations({ locale, namespace: 'common' }),
-  ]);
+  const t = await getTranslations({ locale, namespace: 'seo' });
   const dashboard = await readDashboard();
-  const stats = dashboard.data?.MainStats;
-  const count = (value: unknown) => {
-    const numeric = toFiniteNumber(value);
-    return numeric === null ? null : formatCount(numeric, locale);
-  };
 
   return (
     <PageHeader
@@ -97,31 +96,31 @@ export async function GallerySeoSummary({ actions }: { actions?: ReactNode } = {
       {/* Closer to the lede than the header's meta line: one short label. */}
       <div className="mt-3 flex flex-wrap items-center gap-x-4 gap-y-1 type-caption text-subtle sm:mt-4">
         <GalleryFacts
-          unavailable={tCommon('status.unavailable')}
+          seed={(metric) => dashboardSeed(dashboard.data, metric)}
           facts={[
             {
               id: 'imprinted',
               label: t('gallerySummary.cards.imprinted'),
               shortLabel: t('gallerySummary.cardsShort.imprinted'),
-              value: count(stats?.NumCSTokenMints),
+              metric: 'imprinted',
             },
             {
               id: 'anchored',
               label: t('gallerySummary.cards.anchored'),
               shortLabel: t('gallerySummary.cardsShort.anchored'),
-              value: count(stats?.StakeStatisticsCST?.TotalTokensStaked),
+              metric: 'anchored',
             },
             {
               id: 'named',
               label: t('gallerySummary.cards.named'),
               shortLabel: t('gallerySummary.cardsShort.named'),
-              value: count(stats?.TotalNamedTokens),
+              metric: 'named',
             },
             {
               // Cycles are numbered from 0, so the current one's number is how many have finalized.
               id: 'cycles',
               label: t('gallerySummary.cards.cycles'),
-              value: count(dashboard.data?.CurRoundNum),
+              metric: 'cycle',
             },
           ]}
         />

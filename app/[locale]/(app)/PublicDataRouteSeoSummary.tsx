@@ -17,7 +17,6 @@ import { Badge } from '@/components/ui/badge';
 import { DateTime } from '@/components/ui/date-time';
 import { LANDING_ORIGIN, localizeCrossHostHref } from '@/lib/hostRouting';
 import { cn } from '@/lib/utils';
-import { sumAllocatedEth } from '@/utils/allocationRecords';
 import { toFiniteNumber } from '@/utils/finiteNumber';
 import { formatCount, formatPercent, sameAddress } from '@/utils/format';
 
@@ -26,6 +25,10 @@ import {
   FINALIZED_INDEX_LINKS,
 } from './allocation-finalized/finalizedIndexSummary';
 import { ContributionFigure } from './eth-contribution/ContributionFigure';
+import { DashboardFigure } from './DashboardFigure';
+import { dashboardSeed } from './dashboardMetrics';
+import { PublicDataFigureRefill, type RefillSource } from './PublicDataFigureRefill';
+import { latestTimestamp, measureRows, measureUnit, type ListMeasure } from './publicDataMeasures';
 import {
   readAnchorCstActions,
   readAnchorEthDeposits,
@@ -224,35 +227,6 @@ interface RouteFigures {
   reads: readonly TimedRead<unknown>[];
 }
 
-function sumAmountEth(rows: readonly { AmountEth?: unknown }[]): number {
-  return rows.reduce((total, row) => total + (toFiniteNumber(row.AmountEth) ?? 0), 0);
-}
-
-/**
- * Distinct wallet or contract addresses, case-insensitively. Anything that is not an address
- * is skipped: the allocation history records Anchor Distribution ETH against the placeholder
- * "(All CS NFT Stakers)", which is not a wallet and must not count as a recipient.
- */
-function countDistinctAddresses(values: readonly unknown[]): number {
-  const addresses = new Set<string>();
-  for (const value of values) {
-    if (typeof value === 'string' && isAddress(value, { strict: false })) {
-      addresses.add(value.toLowerCase());
-    }
-  }
-  return addresses.size;
-}
-
-/** The newest `TimeStamp` (Unix seconds) among rows, or null when there is none. */
-function latestTimestamp(rows: readonly { TimeStamp?: unknown }[]): number | null {
-  let latest: number | null = null;
-  for (const row of rows) {
-    const ts = toFiniteNumber(row.TimeStamp);
-    if (ts !== null && ts > 0 && (latest === null || ts > latest)) latest = ts;
-  }
-  return latest;
-}
-
 /** The row with the newest `TimeStamp`, or null. */
 function latestRow<T extends { TimeStamp?: unknown }>(rows: readonly T[]): T | null {
   let latest: T | null = null;
@@ -268,9 +242,31 @@ async function getRouteFigures(
   locale: string,
   /** The route's own copy, `publicData.routes.<route>.<key>`. */
   copy: (key: string) => string,
+  /** "None yet", for a latest date of an empty list the browser measures. */
+  none: string,
 ): Promise<RouteFigures> {
   const count = (value: number) => formatCount(value, locale);
-  const eth = (value: number) => <Amount value={value} unit="ETH" locale={locale} />;
+  /**
+   * A figure measured from one list: the server's measure of the rows it
+   * read or, when that read failed, the browser's measure of the same list
+   * (`PublicDataFigureRefill`), so a read turned away while the page was
+   * rendered is not cached as a dash.
+   */
+  const fromList = (
+    rows: readonly object[] | null,
+    source: RefillSource,
+    measure: ListMeasure,
+  ): FigureSpec['value'] => {
+    if (rows === null) {
+      return <PublicDataFigureRefill source={source} measure={measure} none={none} />;
+    }
+    const value = measureRows(rows, measure);
+    const unit = measureUnit(measure);
+    if (value === null) return unit === 'date' ? NONE_YET : null;
+    if (unit === 'eth') return <Amount value={value} unit="ETH" locale={locale} />;
+    if (unit === 'date') return <DateTime timestamp={value} locale={locale} year="always" />;
+    return count(value);
+  };
   /**
    * The newest row's date, "None yet" for an empty list, unknown when the read
    * failed. Always with its year, like the same date in the ledger below.
@@ -294,23 +290,20 @@ async function getRouteFigures(
         // Self-evident counts carry no explanation; the two figures a reader
         // could misread do.
         figures: [
-          { key: 'finalizedCycles', value: rows && count(rows.length) },
+          { key: 'finalizedCycles', value: fromList(rows, 'roundList', { kind: 'count' }) },
           {
             key: 'recipients',
-            value: rows && count(countDistinctAddresses(rows.map((row) => row.WinnerAddr))),
+            value: fromList(rows, 'roundList', { kind: 'distinct', fields: ['WinnerAddr'] }),
             hasTooltip: true,
           },
-          { key: 'totalEth', value: rows && eth(sumAmountEth(rows)), hasTooltip: true },
+          {
+            key: 'totalEth',
+            value: fromList(rows, 'roundList', { kind: 'ethSum' }),
+            hasTooltip: true,
+          },
           {
             key: 'totalGestures',
-            value:
-              rows &&
-              count(
-                rows.reduce(
-                  (total, row) => total + (toFiniteNumber(row.RoundStats?.TotalBids) ?? 0),
-                  0,
-                ),
-              ),
+            value: fromList(rows, 'roundList', { kind: 'sum', path: ['RoundStats', 'TotalBids'] }),
           },
         ],
       };
@@ -373,25 +366,26 @@ async function getRouteFigures(
     }
     case 'marketing': {
       const [dashboard, rewards] = await Promise.all([readDashboard(), readMarketingRewards()]);
-      // `TotalMktRewardsEth` is CST already sent to contributors (an 18-decimal token
-      // amount despite the `Eth` suffix), not an ETH balance.
-      const allocatedCst = toFiniteNumber(dashboard.data?.MainStats?.TotalMktRewardsEth);
       return {
         reads: [dashboard, rewards],
         figures: [
-          { key: 'records', value: rewards.data && count(rewards.data.length) },
+          { key: 'records', value: fromList(rewards.data, 'marketingRewards', { kind: 'count' }) },
           {
             key: 'allocatedCst',
-            value:
-              allocatedCst === null ? null : (
-                <Amount value={allocatedCst} unit="CST" locale={locale} />
-              ),
+            // The live dashboard's figure, starting from this render's read.
+            value: (
+              <DashboardFigure
+                metric="outreachCst"
+                seed={dashboardSeed(dashboard.data, 'outreachCst')}
+              />
+            ),
           },
           {
             key: 'contributors',
-            value:
-              rewards.data &&
-              count(countDistinctAddresses(rewards.data.map((row) => row.MarketerAddr))),
+            value: fromList(rewards.data, 'marketingRewards', {
+              kind: 'distinct',
+              fields: ['MarketerAddr'],
+            }),
           },
         ],
       };
@@ -410,7 +404,11 @@ async function getRouteFigures(
             value: imprinted.data === null ? null : count(imprinted.data),
             compact: true,
           },
-          { key: 'used', value: used.data && count(used.data.length), compact: true },
+          {
+            key: 'used',
+            value: fromList(used.data, 'usedRwlkNfts', { kind: 'count' }),
+            compact: true,
+          },
         ],
       };
     }
@@ -433,14 +431,14 @@ async function getRouteFigures(
       return {
         reads: [attached],
         figures: [
-          { key: 'records', value: rows && count(rows.length) },
+          { key: 'records', value: fromList(rows, 'attachedNfts', { kind: 'count' }) },
           {
             key: 'contracts',
-            value: rows && count(countDistinctAddresses(rows.map((row) => row.TokenAddr))),
+            value: fromList(rows, 'attachedNfts', { kind: 'distinct', fields: ['TokenAddr'] }),
           },
           {
             key: 'contributors',
-            value: rows && count(countDistinctAddresses(rows.map((row) => row.DonorAddr))),
+            value: fromList(rows, 'attachedNfts', { kind: 'distinct', fields: ['DonorAddr'] }),
           },
         ],
       };
@@ -448,12 +446,12 @@ async function getRouteFigures(
     case 'allocation-finalized': {
       const history = await readClaimHistory();
       const rows = history.data;
-      const values = {
-        records: rows && count(rows.length),
+      const values: Record<(typeof FINALIZED_INDEX_FIGURES)[number]['key'], FigureSpec['value']> = {
+        records: fromList(rows, 'claimHistory', { kind: 'count' }),
         // History rows mix ETH, CST and NFT record types, and `AmountEth` carries each
         // row's own unit: only ETH allocation types may be summed as ETH.
-        eth: rows && eth(sumAllocatedEth(rows)),
-        recipients: rows && count(countDistinctAddresses(rows.map((row) => row.WinnerAddr))),
+        eth: fromList(rows, 'claimHistory', { kind: 'allocatedEth' }),
+        recipients: fromList(rows, 'claimHistory', { kind: 'distinct', fields: ['WinnerAddr'] }),
       };
       return {
         reads: [history],
@@ -468,17 +466,21 @@ async function getRouteFigures(
     case 'named-nfts': {
       const named = await readNamedNfts();
       const rows = named.data;
-      const owners = rows?.map((row) => row.CurOwnerAddr || row.OwnerAddr) ?? [];
       // The names endpoint may omit owners. Rows without any owner field say nothing
       // about ownership: counting them would print "0 owners" beside 3 named NFTs.
-      const ownersKnown = rows !== null && (rows.length === 0 || owners.some(Boolean));
+      const owners: ListMeasure = {
+        kind: 'distinct',
+        fields: ['CurOwnerAddr', 'OwnerAddr'],
+        unknownWhenAbsent: true,
+      };
+      const ownersKnown = rows === null || measureRows(rows, owners) !== null;
       // Only facts about named NFTs: the collection's size is the gallery's.
       return {
         reads: [named],
         figures: [
-          { key: 'named', value: rows && count(rows.length) },
-          ...(rows === null || ownersKnown
-            ? [{ key: 'owners', value: rows && count(countDistinctAddresses(owners)) }]
+          { key: 'named', value: fromList(rows, 'namedNfts', { kind: 'count' }) },
+          ...(ownersKnown
+            ? [{ key: 'owners', value: fromList(rows, 'namedNfts', owners) } satisfies FigureSpec]
             : []),
         ],
       };
@@ -489,10 +491,10 @@ async function getRouteFigures(
       return {
         reads: [used],
         figures: [
-          { key: 'used', value: rows && count(rows.length) },
+          { key: 'used', value: fromList(rows, 'usedRwlkNfts', { kind: 'count' }) },
           {
             key: 'wallets',
-            value: rows && count(countDistinctAddresses(rows.map((row) => row.BidderAddr))),
+            value: fromList(rows, 'usedRwlkNfts', { kind: 'distinct', fields: ['BidderAddr'] }),
           },
           {
             key: 'discount',
@@ -549,8 +551,8 @@ async function getRouteFigures(
       return {
         reads: [deposits],
         figures: [
-          { key: 'totalEth', value: rows && eth(sumAmountEth(rows)) },
-          { key: 'records', value: rows && count(rows.length) },
+          { key: 'totalEth', value: fromList(rows, 'publicGoodsDeposits', { kind: 'ethSum' }) },
+          { key: 'records', value: fromList(rows, 'publicGoodsDeposits', { kind: 'count' }) },
           { key: 'share', value: formatPercent(share, locale), hasTooltip: true },
         ],
       };
@@ -563,11 +565,14 @@ async function getRouteFigures(
       return {
         reads: [deposits],
         figures: [
-          { key: 'totalEth', value: rows && eth(sumAmountEth(rows)) },
-          { key: 'records', value: rows && count(rows.length) },
+          { key: 'totalEth', value: fromList(rows, 'voluntaryPublicGoods', { kind: 'ethSum' }) },
+          { key: 'records', value: fromList(rows, 'voluntaryPublicGoods', { kind: 'count' }) },
           {
             key: 'contributors',
-            value: rows && count(countDistinctAddresses(rows.map((row) => row.DonorAddr))),
+            value: fromList(rows, 'voluntaryPublicGoods', {
+              kind: 'distinct',
+              fields: ['DonorAddr'],
+            }),
           },
         ],
       };
@@ -586,9 +591,14 @@ async function getRouteFigures(
       return {
         reads: [withdrawals],
         figures: [
-          { key: 'totalEth', value: rows && eth(sumAmountEth(rows)) },
-          { key: 'records', value: rows && count(rows.length) },
-          { key: 'latest', value: latestDate(rows), size: 'md', date: true },
+          { key: 'totalEth', value: fromList(rows, 'publicGoodsRetrievals', { kind: 'ethSum' }) },
+          { key: 'records', value: fromList(rows, 'publicGoodsRetrievals', { kind: 'count' }) },
+          {
+            key: 'latest',
+            value: fromList(rows, 'publicGoodsRetrievals', { kind: 'latest' }),
+            size: 'md',
+            date: true,
+          },
           {
             key: 'beneficiary',
             value:
@@ -651,7 +661,12 @@ export async function PublicDataRouteSeoSummary({
   const prefix = `publicData.routes.${route}`;
   const definition = routeDefinitions[route];
   const heading = t(`${prefix}.heading`);
-  const { figures, reads } = await getRouteFigures(route, locale, (key) => t(`${prefix}.${key}`));
+  const { figures, reads } = await getRouteFigures(
+    route,
+    locale,
+    (key) => t(`${prefix}.${key}`),
+    t('publicData.common.none'),
+  );
   const readAt = snapshotTime(reads);
   const related = definition.links.map((link) => ({
     href: localizeCrossHostHref(link.href, locale),

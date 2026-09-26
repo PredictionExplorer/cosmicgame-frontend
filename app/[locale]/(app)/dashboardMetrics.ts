@@ -12,6 +12,9 @@ export type DashboardMetric =
   | 'reserve'
   | 'balance'
   | 'imprinted'
+  | 'anchored'
+  | 'named'
+  | 'outreachCst'
   | 'allocations'
   | 'opened';
 
@@ -55,6 +58,14 @@ export function dashboardMetricValue(
       return toFiniteNumber(data.CosmicGameBalanceEth);
     case 'imprinted':
       return toFiniteNumber(data.MainStats?.NumCSTokenMints);
+    case 'anchored':
+      return toFiniteNumber(data.MainStats?.StakeStatisticsCST?.TotalTokensStaked);
+    case 'named':
+      return toFiniteNumber(data.MainStats?.TotalNamedTokens);
+    case 'outreachCst':
+      // CST already sent to Outreach contributors: an 18-decimal token amount
+      // despite the `Eth` suffix, not an ETH balance.
+      return toFiniteNumber(data.MainStats?.TotalMktRewardsEth);
     case 'allocations':
       return totalAllocationsDistributed(data);
     case 'opened': {
