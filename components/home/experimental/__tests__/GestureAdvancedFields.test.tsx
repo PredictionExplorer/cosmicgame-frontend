@@ -19,7 +19,6 @@ function makeProps(
     setTokenDonateAddress: jest.fn(),
     tokenAmount: '',
     setTokenAmount: jest.fn(),
-    setRwlkId: jest.fn(),
     gestureCostPlus: 2,
     setBidPricePlus: jest.fn(),
     ethGestureInfo: { AuctionDuration: 3600, SecondsElapsed: 900, ETHPrice: 0.1 },
@@ -43,7 +42,6 @@ describe('GestureAdvancedFields', () => {
 
     await userEvent.click(screen.getByRole('radio', { name: 'home.form.advanced.attachToken' }));
     expect(props.setContributionType).toHaveBeenCalledWith('Token');
-    expect(props.setRwlkId).toHaveBeenCalledWith(-1);
 
     rerender(<GestureAdvancedFields {...props} contributionType="Token" />);
     expect(screen.getByLabelText('home.form.advanced.tokenContractLabel')).toBeInTheDocument();

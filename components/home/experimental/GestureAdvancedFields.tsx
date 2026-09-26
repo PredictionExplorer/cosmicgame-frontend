@@ -30,7 +30,6 @@ export interface GestureAdvancedFieldsProps {
   setTokenDonateAddress: (value: string) => void;
   tokenAmount: string;
   setTokenAmount: (value: string) => void;
-  setRwlkId: (value: number) => void;
   gestureCostPlus: number;
   setBidPricePlus: (value: number) => void;
   ethGestureInfo: EthGestureInfo | null;
@@ -82,7 +81,6 @@ export function GestureAdvancedFields({
   setTokenDonateAddress,
   tokenAmount,
   setTokenAmount,
-  setRwlkId,
   gestureCostPlus,
   setBidPricePlus,
   ethGestureInfo,
@@ -123,10 +121,9 @@ export function GestureAdvancedFields({
         </legend>
         <RadioGroup
           value={contributionType}
-          onValueChange={(value) => {
-            setRwlkId(-1);
-            setContributionType(value);
-          }}
+          // Picking what to attach never clears the Random Walk NFT the
+          // method uses: an attachment rides with any method (V061).
+          onValueChange={setContributionType}
           aria-labelledby={ids.attach}
           className="flex flex-row flex-wrap gap-x-5 gap-y-2"
         >

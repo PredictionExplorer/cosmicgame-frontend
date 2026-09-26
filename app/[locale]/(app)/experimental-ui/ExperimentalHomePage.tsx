@@ -24,6 +24,7 @@ import { Sheet, SheetContent } from '@/components/ui/sheet';
 import { Surface } from '@/components/ui/surface';
 import { useActiveWeb3React } from '@/hooks/web3';
 import { GestureMessageChat } from '@/components/home/GestureMessageChat';
+import { readRandomWalkLink } from '@/components/home/gestureInput';
 import { deriveFeedSystemEvents } from '@/components/home/deck/feedSystemEvents';
 import { ActionDock } from '@/components/home/observatory/ActionDock';
 import {
@@ -517,17 +518,15 @@ const ExperimentalHomePage = ({
 
   // Deep link from the RandomWalk collection (?randomwalk=1&tokenId=N), read
   // in an effect: the search-params hook would force this statically
-  // generated route into client-side rendering.
-  // Only a whole token number preselects: a missing id is not token #0, and
-  // text is not NaN. The console still checks it against the wallet's own
-  // unused NFTs before it offers the Gesture.
+  // generated route into client-side rendering. The Observatory's reader
+  // (`readRandomWalkLink`): digits only, so "1e3" or "0x10" names no token.
+  // The console still checks it against the wallet's own unused NFTs before
+  // it offers the Gesture.
   useEffect(() => {
-    const params = new URLSearchParams(window.location.search);
-    if (!params.get('randomwalk')) return;
+    const link = readRandomWalkLink(window.location.search);
+    if (!link) return;
     setBidType('RandomWalk');
-    const raw = params.get('tokenId')?.trim();
-    const tokenId = raw ? Number(raw) : Number.NaN;
-    if (Number.isSafeInteger(tokenId) && tokenId >= 0) setRwlkId(tokenId);
+    if (link.tokenId != null) setRwlkId(link.tokenId);
     // eslint-disable-next-line react-hooks/exhaustive-deps -- runs once, on arrival
   }, []);
 

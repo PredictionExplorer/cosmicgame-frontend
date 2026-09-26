@@ -518,7 +518,6 @@ export function GestureConsole({
                 setTokenDonateAddress={form.setTokenDonateAddress}
                 tokenAmount={form.tokenAmount}
                 setTokenAmount={form.setTokenAmount}
-                setRwlkId={setRwlkId}
                 gestureCostPlus={gestureCostPlus}
                 setBidPricePlus={form.setBidPricePlus}
                 ethGestureInfo={ethGestureInfo}

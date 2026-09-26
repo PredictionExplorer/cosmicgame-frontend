@@ -117,6 +117,16 @@ describe('GestureConsole', () => {
     expect(radios[2]).toHaveTextContent('250.52 CST');
   });
 
+  it('keeps the chosen Random Walk NFT when an attachment is picked', async () => {
+    // Regression (V061, fixed in the Observatory first): picking what to attach
+    // cleared the Random Walk NFT, so the submit disabled with no reason given.
+    const form = makeForm({ gestureType: 'RandomWalk', rwlkId: 11, advancedExpanded: true });
+    renderConsole({ form });
+    await userEvent.click(screen.getByRole('radio', { name: 'home.form.advanced.attachToken' }));
+    expect(form.setContributionType).toHaveBeenCalledWith('Token');
+    expect(form.setRwlkId).not.toHaveBeenCalled();
+  });
+
   it('keeps the Calibration Window right under the methods', () => {
     renderConsole();
 
