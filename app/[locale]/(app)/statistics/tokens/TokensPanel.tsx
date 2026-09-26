@@ -12,6 +12,7 @@ import { StatsSection } from '@/components/statistics/StatsSection';
 import { AttachedAssetsSection } from '@/components/statistics/AttachedAssetsSection';
 import { CstHoldersLedger } from '@/components/statistics/CstHoldersLedger';
 import { DefinitionsDisclosure } from '@/components/statistics/DefinitionsDisclosure';
+import { LedgerPair } from '@/components/statistics/LedgerPair';
 import { NftHoldersLedger } from '@/components/statistics/NftHoldersLedger';
 import { useNftOwnership } from '@/components/statistics/useNftOwnership';
 import { ChartFigureSkeleton } from '@/components/statistics/charts/ChartFigureSkeleton';
@@ -58,44 +59,51 @@ const TokensPanel = () => {
 
   return (
     <div data-testid="tokens-panel" className="space-y-12 sm:space-y-16">
-      <StatsSection
-        title={title('nftDistribution')}
-        description={
-          custody !== null ? t('tokens.nftHolders.custodyNotice', { count: custody }) : undefined
+      <LedgerPair
+        start={
+          <StatsSection
+            title={title('nftDistribution')}
+            description={
+              custody !== null
+                ? t('tokens.nftHolders.custodyNotice', { count: custody })
+                : undefined
+            }
+            isLoading={!hydrated || ownership.isLoading}
+            isError={hydrated && ownership.isError}
+            onRetry={ownership.refetch}
+            isEmpty={holders.length === 0}
+            knownNonEmpty={imprinted > 0}
+            emptyTitle={t('tokens.empty.nftTitle')}
+            emptyDescription={t('tokens.empty.nftDescription')}
+          >
+            <NftHoldersLedger holders={holders} />
+          </StatsSection>
         }
-        isLoading={!hydrated || ownership.isLoading}
-        isError={hydrated && ownership.isError}
-        onRetry={ownership.refetch}
-        isEmpty={holders.length === 0}
-        knownNonEmpty={imprinted > 0}
-        emptyTitle={t('tokens.empty.nftTitle')}
-        emptyDescription={t('tokens.empty.nftDescription')}
-      >
-        <NftHoldersLedger holders={holders} />
-      </StatsSection>
-
-      <StatsSection
-        title={title('cstDistribution')}
-        description={
-          ctBalanceDistribution.length > 0
-            ? supply === null
-              ? t('tokens.holders.summaryNoSupply', { count: ctBalanceDistribution.length })
-              : t('tokens.holders.summary', {
-                  count: ctBalanceDistribution.length,
-                  supply: format.amount(supply, { unit: 'CST', context: 'hero' }),
-                })
-            : undefined
+        end={
+          <StatsSection
+            title={title('cstDistribution')}
+            description={
+              ctBalanceDistribution.length > 0
+                ? supply === null
+                  ? t('tokens.holders.summaryNoSupply', { count: ctBalanceDistribution.length })
+                  : t('tokens.holders.summary', {
+                      count: ctBalanceDistribution.length,
+                      supply: format.amount(supply, { unit: 'CST', context: 'hero' }),
+                    })
+                : undefined
+            }
+            isLoading={ctBalanceQuery.isLoading}
+            isError={ctBalanceQuery.isError}
+            onRetry={() => ctBalanceQuery.refetch()}
+            isEmpty={ctBalanceDistribution.length === 0}
+            knownNonEmpty={(supply ?? 0) > 0}
+            emptyTitle={t('tokens.empty.cstTitle')}
+            emptyDescription={t('tokens.empty.cstDescription')}
+          >
+            <CstHoldersLedger list={ctBalanceDistribution} supply={supply} />
+          </StatsSection>
         }
-        isLoading={ctBalanceQuery.isLoading}
-        isError={ctBalanceQuery.isError}
-        onRetry={() => ctBalanceQuery.refetch()}
-        isEmpty={ctBalanceDistribution.length === 0}
-        knownNonEmpty={(supply ?? 0) > 0}
-        emptyTitle={t('tokens.empty.cstTitle')}
-        emptyDescription={t('tokens.empty.cstDescription')}
-      >
-        <CstHoldersLedger list={ctBalanceDistribution} supply={supply} />
-      </StatsSection>
+      />
 
       <StatsSection title={title('totalSupply')}>
         <CstSupplyHistory label={title('totalSupply')} />

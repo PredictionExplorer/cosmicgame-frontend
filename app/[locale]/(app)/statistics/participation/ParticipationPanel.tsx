@@ -11,6 +11,7 @@ import {
 } from '@/hooks/useApiQuery';
 import { useHydrated } from '@/hooks/useHydrated';
 import { DefinitionsDisclosure } from '@/components/statistics/DefinitionsDisclosure';
+import { LedgerPair } from '@/components/statistics/LedgerPair';
 import { StatsSection } from '@/components/statistics/StatsSection';
 import {
   UniqueParticipantsTable,
@@ -30,7 +31,9 @@ import { dashboardCount } from '../dashboardCounts';
  * four counts, so the body is the lists themselves, one section each, and
  * what each list counts is in one Definitions disclosure at the end. Those
  * counts size each list's skeleton to the table it becomes, and an empty
- * list the header counts rows for reads as one that did not load.
+ * list the header counts rows for reads as one that did not load. On a wide
+ * screen the participants sit beside the recipients and the contributors
+ * (`LedgerPair`), two columns of about the same height.
  */
 const ParticipationPanel = () => {
   const t = useTranslations('statistics');
@@ -55,44 +58,50 @@ const ParticipationPanel = () => {
 
   return (
     <div data-testid="participation-panel" className="space-y-12 sm:space-y-16">
-      <StatsSection
-        title={t('participation.sections.participants')}
-        isLoading={participantsQuery.isLoading}
-        isError={participantsQuery.isError}
-        onRetry={() => participantsQuery.refetch()}
-        isEmpty={uniqueParticipants.length === 0}
-        expectedCount={expected('uniqueParticipants')}
-        emptyTitle={t('participation.empty.participantsTitle')}
-        emptyDescription={t('participation.empty.participantsDescription')}
-      >
-        <UniqueParticipantsTable list={uniqueParticipants} />
-      </StatsSection>
-
-      <StatsSection
-        title={t('participation.sections.recipients')}
-        isLoading={recipientsQuery.isLoading}
-        isError={recipientsQuery.isError}
-        onRetry={() => recipientsQuery.refetch()}
-        isEmpty={uniqueRecipients.length === 0}
-        expectedCount={expected('uniqueRecipients')}
-        emptyTitle={t('participation.empty.recipientsTitle')}
-        emptyDescription={t('participation.empty.recipientsDescription')}
-      >
-        <UniqueRecipientsTable list={uniqueRecipients} />
-      </StatsSection>
-
-      <StatsSection
-        title={t('participation.sections.contributors')}
-        isLoading={donorsQuery.isLoading}
-        isError={donorsQuery.isError}
-        onRetry={() => donorsQuery.refetch()}
-        isEmpty={uniqueDonors.length === 0}
-        expectedCount={expected('uniqueContributors')}
-        emptyTitle={t('participation.empty.contributorsTitle')}
-        emptyDescription={t('participation.empty.contributorsDescription')}
-      >
-        <UniqueEthDonorsTable list={uniqueDonors} />
-      </StatsSection>
+      <LedgerPair
+        start={
+          <StatsSection
+            title={t('participation.sections.participants')}
+            isLoading={participantsQuery.isLoading}
+            isError={participantsQuery.isError}
+            onRetry={() => participantsQuery.refetch()}
+            isEmpty={uniqueParticipants.length === 0}
+            expectedCount={expected('uniqueParticipants')}
+            emptyTitle={t('participation.empty.participantsTitle')}
+            emptyDescription={t('participation.empty.participantsDescription')}
+          >
+            <UniqueParticipantsTable list={uniqueParticipants} />
+          </StatsSection>
+        }
+        end={
+          <>
+            <StatsSection
+              title={t('participation.sections.recipients')}
+              isLoading={recipientsQuery.isLoading}
+              isError={recipientsQuery.isError}
+              onRetry={() => recipientsQuery.refetch()}
+              isEmpty={uniqueRecipients.length === 0}
+              expectedCount={expected('uniqueRecipients')}
+              emptyTitle={t('participation.empty.recipientsTitle')}
+              emptyDescription={t('participation.empty.recipientsDescription')}
+            >
+              <UniqueRecipientsTable list={uniqueRecipients} />
+            </StatsSection>
+            <StatsSection
+              title={t('participation.sections.contributors')}
+              isLoading={donorsQuery.isLoading}
+              isError={donorsQuery.isError}
+              onRetry={() => donorsQuery.refetch()}
+              isEmpty={uniqueDonors.length === 0}
+              expectedCount={expected('uniqueContributors')}
+              emptyTitle={t('participation.empty.contributorsTitle')}
+              emptyDescription={t('participation.empty.contributorsDescription')}
+            >
+              <UniqueEthDonorsTable list={uniqueDonors} />
+            </StatsSection>
+          </>
+        }
+      />
 
       <DefinitionsDisclosure
         className="border-t border-rule pt-8 sm:pt-10"

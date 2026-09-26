@@ -539,7 +539,10 @@ full width (a moderation list whose message takes what is left). A page that sta
 short and wide ledgers sets one width for all of them with `<DataTableWidth value="fill">`
 (the anchoring tabs, a participant's profile); a table's own `width` still wins. Only the
 table stops at the reading width: its empty and error states take the section's full
-width, so they stay centred on it.
+width, so they stay centred on it. A page whose sections are all short ledgers pairs them
+with `<LedgerPair>` (`components/statistics/LedgerPair`) instead of leaving a dead band
+beside each one: two stacks side by side from 1280px, each ledger filling its half, one
+above the other below it (/statistics/participation, /statistics/tokens).
 
 **Title.** `title`, `description` and `actions` render through `SectionHeader` (the page
 tier for an `h2`, the panel tier inside a section), so a ledger's heading, intro and
