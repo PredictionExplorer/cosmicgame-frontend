@@ -14,13 +14,12 @@ export interface CountdownGroup {
 /**
  * The clock's size. `hero` is the landing's clock band and `desk` the clock
  * in a column (the app home, /current-cycle); between their bounds the
- * figures fit the room they have (see `countdownFontSize`). `inline` is the
- * one-line form for a bar (the observatory's action dock): the same padded,
- * colon-separated groups at ledger size, with no captions under them.
+ * figures fit the room they have (see `countdownFontSize`). A one-line
+ * countdown in a bar is a `<Duration variant="clock">`, not these figures.
  */
-export type CountdownSize = 'hero' | 'desk' | 'inline';
+export type CountdownSize = 'hero' | 'desk';
 
-const SIZE_BOUNDS: Record<Exclude<CountdownSize, 'inline'>, readonly [min: string, max: string]> = {
+const SIZE_BOUNDS: Record<CountdownSize, readonly [min: string, max: string]> = {
   hero: ['2rem', '4.5rem'],
   desk: ['2.25rem', '3.5rem'],
 };
@@ -36,7 +35,7 @@ export function padCountdown(value: number): string {
  * size's bounds, so a three-digit day count still fits one row on a 320px
  * phone. The parent must be a size container (`container-type: inline-size`).
  */
-export function countdownFontSize(digits: number, size: Exclude<CountdownSize, 'inline'>): string {
+export function countdownFontSize(digits: number, size: CountdownSize): string {
   const [min, max] = SIZE_BOUNDS[size];
   return `clamp(${min}, calc(100cqi / (${digits} * 0.62 + 2.6)), ${max})`;
 }
@@ -142,12 +141,9 @@ export function CountdownFigures({
   'data-testid': testId = 'countdown-figures',
 }: CountdownFiguresProps) {
   const placeholder = tone === 'placeholder';
-  const inline = size === 'inline';
   const ticksBeforeHydration = deadlineMs !== undefined && !placeholder;
   const digits = groups.reduce((total, group) => total + padCountdown(group.value).length, 0);
-  const style: CSSProperties | undefined = inline
-    ? undefined
-    : { fontSize: countdownFontSize(digits, size) };
+  const style: CSSProperties = { fontSize: countdownFontSize(digits, size) };
 
   return (
     <div
@@ -157,10 +153,7 @@ export function CountdownFigures({
       data-deadline={ticksBeforeHydration ? deadlineMs : undefined}
       data-hydrated={ticksBeforeHydration && hydrated ? true : undefined}
       className={cn(
-        'flex min-w-0 [direction:ltr]',
-        inline
-          ? 'type-figure-sm inline-flex items-baseline gap-[0.08em]'
-          : 'type-figure-xl w-full items-start gap-[0.12em]',
+        'type-figure-xl flex w-full min-w-0 items-start gap-[0.12em] [direction:ltr]',
         ALIGN[align],
         className,
       )}
@@ -170,7 +163,7 @@ export function CountdownFigures({
         <Fragment key={group.id}>
           {index > 0 ? <span className="font-light text-subtle">:</span> : null}
           <span
-            className={cn('flex min-w-0 flex-col items-center', inline && 'inline-flex')}
+            className="flex min-w-0 flex-col items-center"
             data-countdown-unit={placeholder ? undefined : group.id}
           >
             <span
@@ -186,11 +179,9 @@ export function CountdownFigures({
             >
               {placeholder ? '––' : padCountdown(group.value)}
             </span>
-            {inline ? null : (
-              <span className="type-caption mt-2 whitespace-nowrap tracking-normal text-subtle">
-                {group.label}
-              </span>
-            )}
+            <span className="type-caption mt-2 whitespace-nowrap tracking-normal text-subtle">
+              {group.label}
+            </span>
           </span>
         </Fragment>
       ))}

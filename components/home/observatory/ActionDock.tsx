@@ -2,15 +2,10 @@
 
 import { useId, useRef, type ReactNode } from 'react';
 import { ArrowRight } from 'lucide-react';
-import { useLocale, useTranslations } from 'next-intl';
+import { useTranslations } from 'next-intl';
 
 import { SmoothCountdown } from '@/components/common/SmoothCountdown';
-import {
-  CountdownFigures,
-  countdownGroups,
-  countdownPartsFromMs,
-  countdownSeconds,
-} from '@/components/ui/countdown-figures';
+import { countdownSeconds } from '@/components/ui/countdown-figures';
 import { Amount } from '@/components/ui/amount';
 import { Button } from '@/components/ui/button';
 import { Duration } from '@/components/ui/duration';
@@ -97,7 +92,6 @@ export function ActionDock({
   className,
 }: ActionDockProps) {
   const t = useTranslations('home');
-  const locale = useLocale();
   const stageLabel = useTxStageLabel();
   const describedById = useId();
   // Keyboard focus never lands under the dock, on any page that mounts it.
@@ -195,16 +189,18 @@ export function ActionDock({
                 date={targetMs}
                 initialNowMs={now}
                 renderer={(parts) => (
-                  // The Cycle clock's one-line form: the same padded,
-                  // colon-separated groups as the clock above it, so the two
-                  // never show one number in two shapes. The figures are
-                  // decorative; the spelled-out time is for screen readers.
+                  // The dock shows only once the Cycle clock has scrolled
+                  // away, so it names its units on its own: the site's one
+                  // countdown shape, the day count with its unit and the
+                  // rest as a clock ("4d 21:30:48"), rounded like the Cycle
+                  // clock. Screen readers hear it spelled out ("4d 21h 30m 48s").
                   <>
-                    <CountdownFigures
-                      groups={countdownGroups(countdownPartsFromMs(parts.total), locale)}
-                      size="inline"
-                      align="start"
+                    <Duration
+                      seconds={countdownSeconds(parts.total)}
+                      variant="clock"
+                      aria-hidden="true"
                       data-testid="dock-clock"
+                      className="type-figure-sm text-foreground"
                     />
                     <Duration seconds={countdownSeconds(parts.total)} className="sr-only" />
                   </>

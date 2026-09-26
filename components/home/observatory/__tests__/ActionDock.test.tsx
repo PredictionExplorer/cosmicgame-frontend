@@ -52,9 +52,9 @@ describe('ActionDock', () => {
     render(<ActionDock {...baseProps} />);
 
     const dock = screen.getByTestId('action-dock');
-    // The Cycle clock's one-line form: the same padded, colon-separated
-    // groups as the clock above it, never a second shape ("6d 00:59:59").
-    expect(within(dock).getByTestId('dock-clock')).toHaveTextContent(/^06:\d{2}:\d{2}:\d{2}$/);
+    // On its own (the Cycle clock has scrolled away), the dock names its
+    // units: the site's countdown shape, never bare colon groups ("06:01:…").
+    expect(within(dock).getByTestId('dock-clock')).toHaveTextContent(/^6d\s01:\d{2}:\d{2}$/);
     expect(within(dock).getByTestId('dock-clock')).toHaveAttribute('aria-hidden', 'true');
     // Screen readers hear the time spelled out, with the locale's units.
     expect(within(dock).getByRole('timer')).toHaveTextContent(/6d.1h/);
@@ -147,12 +147,14 @@ describe('ActionDock', () => {
           <ActionDock {...props} />
         </>,
       );
-      const secondsOf = (figures: HTMLElement) =>
-        figures.querySelector('[data-countdown-unit="seconds"] [data-testid="countdown-value"]')!
-          .textContent;
-      const clockSeconds = secondsOf(screen.getByTestId('clock-figures'));
+      const clockSeconds = screen
+        .getByTestId('clock-figures')
+        .querySelector(
+          '[data-countdown-unit="seconds"] [data-testid="countdown-value"]',
+        )!.textContent;
       expect(clockSeconds).toMatch(/^\d{2}$/);
-      expect(secondsOf(screen.getByTestId('dock-clock'))).toBe(clockSeconds);
+      // The dock reads "5d 10:55:18": its last two digits are the seconds.
+      expect(screen.getByTestId('dock-clock').textContent).toMatch(new RegExp(`:${clockSeconds}$`));
     },
   );
 

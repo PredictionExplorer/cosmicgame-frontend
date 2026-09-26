@@ -98,18 +98,6 @@ describe('the one Cycle clock', () => {
     expect(countdownPartsFromMs(-1)).toEqual({ days: 0, hours: 0, minutes: 0, seconds: 0 });
   });
 
-  it('sets the dock one-line form in the same padded groups, without captions', () => {
-    render(
-      <CountdownFigures
-        groups={countdownGroups(countdownPartsFromMs(FIVE_DAYS), 'en')}
-        size="inline"
-      />,
-    );
-    const figures = screen.getByTestId('countdown-figures');
-    expect(figures).toHaveTextContent(/^05:10:55:19$/);
-    expect(figures).toHaveClass('type-figure-sm');
-  });
-
   it('marks each value for the pre-hydration tick when given a deadline', () => {
     const { rerender } = render(
       <CountdownFigures
