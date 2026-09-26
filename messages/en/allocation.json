@@ -1,7 +1,6 @@
 {
   "formats": {
-    "cycle": "Cycle {cycle}",
-    "cosmicSignatureToken": "Cosmic Signature #{token}"
+    "cycle": "Cycle {cycle}"
   },
   "recipients": {
     "header": {

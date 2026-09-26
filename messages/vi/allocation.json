@@ -1,7 +1,6 @@
 {
   "formats": {
-    "cycle": "Chu kỳ {cycle}",
-    "cosmicSignatureToken": "Cosmic Signature #{token}"
+    "cycle": "Chu kỳ {cycle}"
   },
   "recipients": {
     "header": {

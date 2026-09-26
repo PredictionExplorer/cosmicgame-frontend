@@ -534,8 +534,6 @@
       "viewAria": "Cosmic Signature {id} 보기",
       "alt": "Cosmic Signature 작품 {id}: 결정론적 삼체 제너러티브 아트",
       "pairingNote": "온체인에 각인된 결정론적 삼체 아트. 모든 시그니처에는 1,000 CST가 함께합니다.",
-      "title": "Cosmic Signature {id}",
-      "titleNamed": "“{name}”",
       "watchDrawing": "그려지는 과정 보기",
       "showFinished": "완성된 작품 보기"
     },

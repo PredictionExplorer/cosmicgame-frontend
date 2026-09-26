@@ -12,6 +12,7 @@ import { signatureMedia, signatureSources, useSignatureAlt } from '@/components/
 import { Button } from '@/components/ui/button';
 import { ArtFrame, PendingPlate, WallLabel, type ArtStatus } from '@/components/ui/art-frame';
 import { DateTime } from '@/components/ui/date-time';
+import { useSignatureLabel } from '@/components/ui/signature-label';
 import { cn } from '@/lib/utils';
 
 import { ArtReel, type ReelToken } from './ArtReel';
@@ -151,11 +152,11 @@ export function StageArtwork({
   const media = signatureMedia(token?.seed);
   const tokenLabel = token ? formatId(token.id) : null;
   const name = token?.name?.trim();
+  const signatureLabel = useSignatureLabel();
+  // The one wall-label rule: the name, or "Signature #000011" with the number in mono.
   const title = !token
     ? t('hero.artUnavailable.eyebrow')
-    : name
-      ? t('deck.art.titleNamed', { name })
-      : t('deck.art.title', { id: tokenLabel ?? '' });
+    : signatureLabel.title({ tokenId: token.id, name });
   // The shared Signature alt: the name and number (traits when the token carries them).
   const alt = token && tokenLabel ? signatureAlt({ id: tokenLabel, name }) : '';
   const canPause = drawing || rotates;

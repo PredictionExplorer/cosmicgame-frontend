@@ -12,7 +12,7 @@ import { cn } from '@/lib/utils';
 import { PageHeader } from '@/components/layout/PageHeader';
 import { AddressChip } from '@/components/ui/address-chip';
 import { Amount } from '@/components/ui/amount';
-import { PendingPlate, WallLabel } from '@/components/ui/art-frame';
+import { PendingPlate } from '@/components/ui/art-frame';
 import { buttonVariants } from '@/components/ui/button';
 import { DateTime } from '@/components/ui/date-time';
 import { EmptyState } from '@/components/ui/empty-state';
@@ -23,6 +23,7 @@ import { isRenderPending, signatureMedia, signatureSources } from '@/components/
 import { useLiveCycle, useMissingCycle } from '@/components/winnings/missingCycle';
 import { AllocationSignatureCard } from '@/components/winnings/AllocationSignatureCard';
 import { SignatureReveal } from '@/components/winnings/SignatureReveal';
+import { SignatureWallLabel } from '@/components/ui/signature-label';
 import { SpecList, SpecRow } from '@/components/ui/spec-list';
 import { useSignatureIndex } from '@/components/winnings/useSignatureIndex';
 import useCosmicGameContract from '@/hooks/useCosmicGameContract';
@@ -292,18 +293,15 @@ function FinalizedSignature({
           <PendingPlate label={tDetail('image.artworkUnavailable')} />
         )}
         {hasToken ? (
-          <WallLabel
+          // The one wall-label rule: the name or "Signature #000024", then the
+          // number (when a name took the title) and the cycle. The finalization
+          // moment is the spec sheet's "Finalized" row, not repeated here.
+          <SignatureWallLabel
             as="figcaption"
-            title={
-              <Link href={`/detail/${allocation.TokenId}`} className="link-quiet">
-                {name || t('formats.cosmicSignatureToken', { token: id.replace(/^#/, '') })}
-              </Link>
-            }
-            // The finalization moment is the spec sheet's "Finalized" row, not repeated here.
-            meta={[
-              name ? <span className="type-mono">{id}</span> : null,
-              t('formats.cycle', { cycle: allocation.RoundNum }),
-            ]}
+            tokenId={allocation.TokenId}
+            name={name}
+            cycle={allocation.RoundNum}
+            titleHref={`/detail/${allocation.TokenId}`}
           />
         ) : null}
       </figure>

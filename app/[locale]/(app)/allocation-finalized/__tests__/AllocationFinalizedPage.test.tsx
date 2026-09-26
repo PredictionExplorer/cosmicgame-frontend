@@ -231,7 +231,10 @@ describe('AllocationFinalizedPage', () => {
     roundInfo(ALLOCATION);
     render(<Page />);
     const caption = screen.getByTestId('finalized-signature').querySelector('figcaption');
-    expect(caption).toHaveTextContent('allocation.formats.cycle(cycle=5)');
+    // The one wall-label rule every art surface follows: "Signature #…", never
+    // "Cosmic Signature #…", then the cycle.
+    expect(caption).toHaveTextContent('common.signature.untitled');
+    expect(caption).toHaveTextContent('common.signature.cycle(n=5)');
     expect(caption?.querySelector('time')).toBeNull();
   });
 

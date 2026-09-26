@@ -75,7 +75,8 @@ describe('StageArtwork', () => {
     renderStage({ token: { ...TOKEN, name: 'Twisted Mind', imprintedAt: 1_786_491_506 } });
 
     const caption = screen.getByTestId('home-art-hero').querySelector('figcaption')!;
-    expect(caption).toHaveTextContent('home.deck.art.titleNamed(name=Twisted Mind)');
+    // The one wall-label rule: the bare name, never "Cosmic Signature …" or quotes.
+    expect(caption).toHaveTextContent(/^Twisted Mind/);
     // A name took the title line, so the number leads the meta line.
     expect(caption.querySelector('.type-mono')).toHaveTextContent('#000030');
     expect(caption).toHaveTextContent('home.latestSignature.imprintedIn(number=1)');
@@ -86,7 +87,7 @@ describe('StageArtwork', () => {
     renderStage();
 
     const caption = screen.getByTestId('home-art-hero').querySelector('figcaption')!;
-    expect(caption).toHaveTextContent('home.deck.art.title(id=#000030)');
+    expect(caption).toHaveTextContent('common.signature.untitled(id=#000030)');
     expect(caption.querySelector('.type-mono')).toBeNull();
     expect(caption).toHaveTextContent('home.latestSignature.imprintedIn(number=1)');
   });
