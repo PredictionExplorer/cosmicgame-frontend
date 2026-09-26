@@ -4,7 +4,10 @@
 import { createServer, type Server } from 'node:http';
 import type { AddressInfo } from 'node:net';
 
+import { AxiosError, type AxiosResponse, type InternalAxiosRequestConfig } from 'axios';
+
 import { SERVER_READ_TIMEOUT_MS, apiGet } from '@/services/api/client';
+import { RATE_LIMIT_RETRIES } from '@/services/api/rateLimit';
 
 jest.mock('@/utils/errors', () => ({ reportError: jest.fn() }));
 
@@ -46,6 +49,73 @@ describe('apiGet on the server', () => {
     expect(adapter.mock.calls[0]?.[0]).toMatchObject({
       signal: controller.signal,
       timeout: SERVER_READ_TIMEOUT_MS,
+    });
+  });
+
+  describe('when the API turns a read away with 429', () => {
+    /** The adapter's answer of 429, as axios raises it; `retry-after` of 0 keeps the test fast. */
+    const tooManyRequests = (config: InternalAxiosRequestConfig) => {
+      const response = {
+        data: { error: 'rate limit exceeded, slow down', status: 0 },
+        status: 429,
+        statusText: 'Too Many Requests',
+        headers: { 'retry-after': '0' },
+        config,
+      } as unknown as AxiosResponse;
+      return Promise.reject(
+        new AxiosError(
+          'Request failed with status code 429',
+          'ERR_BAD_REQUEST',
+          config,
+          {},
+          response,
+        ),
+      );
+    };
+
+    it('asks again, so a burst does not render the figures as unknown', async () => {
+      adapter
+        .mockImplementationOnce(tooManyRequests)
+        .mockImplementationOnce(async (config: unknown) => ({
+          data: { ok: true },
+          status: 200,
+          statusText: 'OK',
+          headers: {},
+          config,
+        }));
+
+      const response = await apiGet('/api/cosmicgame/test', undefined, { adapter });
+
+      expect(response.data).toEqual({ ok: true });
+      expect(adapter).toHaveBeenCalledTimes(2);
+    });
+
+    it('gives up after a bounded number of retries', async () => {
+      adapter.mockImplementation(tooManyRequests);
+
+      await expect(apiGet('/api/cosmicgame/test', undefined, { adapter })).rejects.toMatchObject({
+        response: { status: 429 },
+      });
+      expect(adapter).toHaveBeenCalledTimes(RATE_LIMIT_RETRIES + 1);
+    });
+
+    it('never retries any other failure', async () => {
+      adapter.mockImplementation((config: InternalAxiosRequestConfig) =>
+        Promise.reject(
+          new AxiosError('Request failed with status code 404', 'ERR_BAD_REQUEST', config, {}, {
+            data: {},
+            status: 404,
+            statusText: 'Not Found',
+            headers: {},
+            config,
+          } as unknown as AxiosResponse),
+        ),
+      );
+
+      await expect(apiGet('/api/cosmicgame/test', undefined, { adapter })).rejects.toMatchObject({
+        response: { status: 404 },
+      });
+      expect(adapter).toHaveBeenCalledTimes(1);
     });
   });
 

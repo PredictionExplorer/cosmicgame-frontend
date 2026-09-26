@@ -10,6 +10,7 @@ import {
   flattenTxArray,
   getAPIUrl,
 } from './client';
+import { RATE_LIMIT_RETRIES, TOO_MANY_REQUESTS, rateLimitDelayMs, waitMs } from './rateLimit';
 import { normalizeDashboardWire } from './rounds';
 import {
   DashboardInfoSchema,
@@ -101,17 +102,28 @@ export function resolveHomeTimingSample({
   return { targetServerTimeSec, currentServerTimeSec, cycleNumber, sampledAtMs };
 }
 
+/**
+ * One seed read. An answer of 429 Too Many Requests is asked again after a
+ * jittered wait, up to `RATE_LIMIT_RETRIES` times (./rateLimit), as every
+ * server read is; any other failure resolves to `null` at once.
+ */
 async function fetchApiJson(path: string, revalidateSeconds: number): Promise<unknown> {
-  try {
-    const response = await fetch(getAPIUrl(path), {
-      headers: { Accept: 'application/json' },
-      next: { revalidate: revalidateSeconds },
-      signal: AbortSignal.timeout(SERVER_READ_TIMEOUT_MS),
-    });
-    if (!response.ok) return null;
-    return (await response.json()) as unknown;
-  } catch {
-    return null;
+  for (let attempt = 0; ; attempt += 1) {
+    try {
+      const response = await fetch(getAPIUrl(path), {
+        headers: { Accept: 'application/json' },
+        next: { revalidate: revalidateSeconds },
+        signal: AbortSignal.timeout(SERVER_READ_TIMEOUT_MS),
+      });
+      if (response.status === TOO_MANY_REQUESTS && attempt < RATE_LIMIT_RETRIES) {
+        await waitMs(rateLimitDelayMs(attempt, response.headers.get('retry-after')));
+        continue;
+      }
+      if (!response.ok) return null;
+      return (await response.json()) as unknown;
+    } catch {
+      return null;
+    }
   }
 }
 

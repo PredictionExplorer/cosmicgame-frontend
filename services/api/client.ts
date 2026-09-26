@@ -61,6 +61,7 @@ import {
 } from '@/lib/serverRotation';
 import { reportError } from '@/utils/errors';
 
+import { RATE_LIMIT_RETRIES, TOO_MANY_REQUESTS, rateLimitDelayMs, waitMs } from './rateLimit';
 import { ApiReadError } from './readError';
 import type { RoundInfo } from './types';
 
@@ -264,24 +265,39 @@ export interface ApiRequestOptions {
 export type ApiListRequestOptions = ApiPageWindow & ApiRequestOptions;
 
 /**
- * Issues a GET against the shared axios instance, attaching the caller's abort
- * signal when there is one. On the server a request without its own timeout
- * gets {@link SERVER_READ_TIMEOUT_MS}.
- *
- * The config argument is omitted entirely when there is nothing to send, so the
- * request shape stays `axios.get(url)` for callers that pass no options.
+ * Issues a GET against the shared axios instance with the caller's abort
+ * signal. On the server a request without its own timeout gets
+ * {@link SERVER_READ_TIMEOUT_MS}, and a 429 is asked again after a jittered
+ * wait (./rateLimit), so a burst's turned-away reads never render as unknown.
+ * With nothing to send, the request stays `axios.get(url)`.
  */
-export function apiGet(
+export async function apiGet(
   url: string,
   opts?: ApiRequestOptions,
   config?: AxiosRequestConfig,
 ): Promise<AxiosResponse> {
   const merged: AxiosRequestConfig = { ...config };
   if (opts?.signal) merged.signal = opts.signal;
-  if (merged.timeout === undefined && typeof window === 'undefined') {
+  const onServer = typeof window === 'undefined';
+  if (merged.timeout === undefined && onServer) {
     merged.timeout = SERVER_READ_TIMEOUT_MS;
   }
-  return Object.keys(merged).length > 0 ? axios.get(url, merged) : axios.get(url);
+  const get = () => (Object.keys(merged).length > 0 ? axios.get(url, merged) : axios.get(url));
+  if (!onServer) return get();
+
+  for (let attempt = 0; ; attempt += 1) {
+    try {
+      return await get();
+    } catch (error: unknown) {
+      const rateLimited =
+        isAxiosError(error) &&
+        error.response?.status === TOO_MANY_REQUESTS &&
+        !isCancellation(error);
+      if (!rateLimited || attempt >= RATE_LIMIT_RETRIES || merged.signal?.aborted) throw error;
+      const retryAfter = error.response?.headers?.['retry-after'];
+      await waitMs(rateLimitDelayMs(attempt, typeof retryAfter === 'string' ? retryAfter : null));
+    }
+  }
 }
 
 /**
