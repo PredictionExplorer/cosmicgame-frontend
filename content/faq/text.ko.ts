@@ -169,7 +169,7 @@ export const faqTextKo = {
       'why-time-per-bid-increases': {
         question: '제스처마다 더해지는 시간이 왜 점점 늘어나나요?',
         answer:
-          '이 메커니즘은 Cosmic Signature NFT가 장기적으로 각인되는 속도를 제한합니다. 사이클이 느려질수록 단위 시간당 유통되는 새 NFT가 줄어들어 희귀성이 유지됩니다.',
+          '이 메커니즘은 Cosmic Signature NFT의 장기적인 각인 속도를 정합니다. 사이클이 길어질수록 같은 기간에 각인되는 새 NFT가 줄어듭니다.',
       },
       'how-time-increase-affects-game': {
         question: '제스처당 시간 증가는 프로토콜에 어떤 영향을 주나요?',
@@ -222,9 +222,9 @@ export const faqTextKo = {
         answer: `컨트랙트에 고정된 공급 상한은 없습니다. 제스처마다 더해지는 시간은 사이클이 마감될 때마다 ${protocolFacts.cycleTimeIncrementIncreasePercentPerCycle}% 늘어납니다. 이 구조로 사이클이 길어지는 경향이 생기고 NFT 각인 속도가 억제됩니다. 실제 각인 속도는 참여 상황에 따라서도 달라집니다.`,
       },
       'impact-of-limiting-nfts': {
-        question: 'NFT 공급이 제한되면 어떤 영향이 있나요?',
+        question: '사이클 길이는 새로 각인되는 NFT 수에 어떤 영향을 주나요?',
         answer:
-          '제스처마다 늘어나는 시간 증가량과 느려지는 각인 속도가 희귀성을 지킵니다. 새로 각인되는 Cosmic Signature NFT 하나하나는 누적된 프로토콜 역사에서 점점 더 드문 한 조각이 됩니다.',
+          '제스처마다 더해지는 시간이 늘어나면 사이클이 길어지는 경향이 있어, 같은 기간에 각인되는 NFT가 줄어듭니다. Cosmic Signature NFT 하나하나는 프로토콜 역사의 한 부분을 기록하며, 전체 수량에 고정된 상한은 없습니다.',
       },
       'connection-with-randomwalknft': {
         question: 'Random Walk NFT와는 어떤 관계인가요?',

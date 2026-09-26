@@ -169,7 +169,7 @@ export const faqTextZhTw = {
       'why-time-per-bid-increases': {
         question: '為什麼每筆落筆增加的時間會逐步增長？',
         answer:
-          '這一機制會限制 Cosmic Signature NFT 的長期銘刻速度。週期越慢，單位時間內進入流通的新 NFT 越少，從而維持稀缺性。',
+          '這一機制決定 Cosmic Signature NFT 的長期銘刻節奏：週期越長，同一段時間內銘刻的新 NFT 越少。',
       },
       'how-time-increase-affects-game': {
         question: '落筆時間增量上升會怎樣影響協議？',
@@ -222,9 +222,9 @@ export const faqTextZhTw = {
         answer: `合約沒有硬性供應上限。每個週期收官後，落筆時間增量會增長 ${protocolFacts.cycleTimeIncrementIncreasePercentPerCycle}%，通常會使週期變長、NFT 銘刻節奏放緩。實際銘刻速度也取決於參與情況。`,
       },
       'impact-of-limiting-nfts': {
-        question: 'NFT 供應增速受限會帶來什麼影響？',
+        question: '週期長短如何影響新 NFT 的銘刻數量？',
         answer:
-          '不斷增長的落筆時間增量與逐步放緩的銘刻速度會維持稀缺性。每一枚新 Cosmic Signature NFT，都是協議累計歷史中愈發少見的一段切片。',
+          '落筆時間增量逐步增長，通常會使週期變長，因此同一段時間內銘刻的 NFT 會減少。每一枚 Cosmic Signature NFT 都記錄了協議歷史的一部分，總量沒有固定上限。',
       },
       'connection-with-randomwalknft': {
         question: 'Cosmic Signature 與 Random Walk NFT 有什麼關聯？',

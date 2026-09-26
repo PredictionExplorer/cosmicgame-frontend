@@ -157,7 +157,7 @@ export const faqTextEn = {
       'why-time-per-bid-increases': {
         question: 'Why does the time added per gesture increase over time?',
         answer:
-          'The mechanism limits the long-term rate at which Cosmic Signature NFTs are imprinted. Slower cycles mean fewer new NFTs enter circulation per unit time, preserving scarcity.',
+          'It sets the long-term pace of imprinting. As cycles lengthen, fewer new Cosmic Signature NFTs are imprinted in the same span of time.',
       },
       'how-time-increase-affects-game': {
         question: 'How does the increase in time per gesture affect the protocol?',
@@ -210,9 +210,9 @@ export const faqTextEn = {
         answer: `The contract has no hard supply cap. The time added per gesture grows ${protocolFacts.cycleTimeIncrementIncreasePercentPerCycle}% with every finalized cycle, which tends to lengthen cycles and slow the pace of NFT imprinting. The actual pace also depends on participation.`,
       },
       'impact-of-limiting-nfts': {
-        question: 'What is the impact of the limited NFT supply?',
+        question: 'How does cycle length affect how many new NFTs are imprinted?',
         answer:
-          'The growing gesture-time increment and slowing imprint pace preserve scarcity. Each new Cosmic Signature NFT represents a progressively rarer slice of the cumulative protocol history.',
+          'A growing time increment tends to lengthen cycles, so fewer NFTs are imprinted in the same span of time. Each Cosmic Signature NFT records a part of the protocol’s history, and the total has no fixed cap.',
       },
       'connection-with-randomwalknft': {
         question: 'What is the connection with Random Walk NFT?',

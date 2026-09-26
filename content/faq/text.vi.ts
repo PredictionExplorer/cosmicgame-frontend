@@ -174,7 +174,7 @@ export const faqTextVi = {
       'why-time-per-bid-increases': {
         question: 'Vì sao thời gian cộng thêm cho mỗi nét bút tăng dần theo thời gian?',
         answer:
-          'Cơ chế này giới hạn tốc độ khắc Cosmic Signature NFT về dài hạn. Chu kỳ chậm hơn nghĩa là ít NFT mới đi vào lưu hành hơn trên mỗi đơn vị thời gian, giữ gìn sự khan hiếm.',
+          'Cơ chế này điều tiết tốc độ khắc Cosmic Signature NFT về dài hạn: chu kỳ càng dài thì càng ít NFT mới được khắc trong cùng một khoảng thời gian.',
       },
       'how-time-increase-affects-game': {
         question: 'Việc tăng thời gian mỗi nét bút ảnh hưởng thế nào đến giao thức?',

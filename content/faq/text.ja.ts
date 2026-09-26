@@ -163,7 +163,7 @@ export const faqTextJa = {
       'why-time-per-bid-increases': {
         question: '一筆ごとに加わる時間はなぜ増えていくのですか？',
         answer:
-          'この仕組みは、Cosmic Signature NFTが刻印される長期的な速度を抑えます。サイクルが遅くなるほど、単位時間あたりに流通に入る新しいNFTは少なくなり、希少性が保たれます。',
+          'この仕組みは、Cosmic Signature NFTが刻印される長期的なペースを決めます。サイクルが長くなるほど、同じ期間に刻印される新しいNFTは少なくなります。',
       },
       'how-time-increase-affects-game': {
         question: '一筆ごとの時間の増加はプロトコルにどう影響しますか？',
@@ -216,9 +216,9 @@ export const faqTextJa = {
         answer: `コントラクトに固定の供給上限はありません。一筆ごとに加わる時間は、サイクルが確定するたびに${protocolFacts.cycleTimeIncrementIncreasePercentPerCycle}%ずつ大きくなります。この仕組みによりサイクルは長くなる傾向があり、NFTの刻印ペースが抑えられます。実際のペースは参加状況によっても変わります。`,
       },
       'impact-of-limiting-nfts': {
-        question: 'NFTの供給が限られることの影響は何ですか？',
+        question: 'サイクルの長さは、新しく刻印されるNFTの数にどう影響しますか？',
         answer:
-          '一筆ごとの時間増分が大きくなり、刻印のペースが遅くなることで希少性が保たれます。新しいCosmic Signature NFTはそれぞれ、プロトコルの累積した歴史のますます希少な一片を表します。',
+          '一筆ごとに加わる時間が大きくなるとサイクルは長くなる傾向があり、同じ期間に刻印されるNFTは少なくなります。Cosmic Signature NFTはそれぞれプロトコルの歴史の一部を記録しており、総数に固定の上限はありません。',
       },
       'connection-with-randomwalknft': {
         question: 'Random Walk NFTとの関係は何ですか？',

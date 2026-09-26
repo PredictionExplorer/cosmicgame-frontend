@@ -132,6 +132,10 @@ export const DEFAULT_BANNED_TERMS: readonly string[] = [
   'earnings',
   'income',
   'tax-deductible',
+  // Scarcity as value: the imprint pace is a mechanic, never a promise of worth
+  'scarcity',
+  'scarce',
+  'rarer',
   // Crypto-slang landmines
   'degen',
   'moon',
@@ -265,6 +269,8 @@ export const ZH_BANNED_TERMS: readonly string[] = [
   // investment
   '投资',
   '理财',
+  // scarcity as value (稀缺性); trait rarity is 稀有度
+  '稀缺',
   '炒币',
   '建仓',
   // yield / profit / dividend
@@ -396,6 +402,8 @@ export const ZH_HANT_BANNED_TERMS: readonly string[] = [
   // investment
   '投資',
   '理財',
+  // scarcity as value (稀缺性); trait rarity is 稀有度
+  '稀缺',
   '炒幣',
   '建倉',
   // yield / profit / dividend
@@ -785,6 +793,8 @@ export const KO_BANNED_TERMS: readonly string[] = [
   '콘테스트',
   // securities / yield / earnings
   '투자',
+  // scarcity as value; trait rarity is 희귀도, which stays legal
+  '희귀성',
   '재테크',
   '수익',
   '이익',
@@ -911,6 +921,8 @@ export const JA_BANNED_TERMS: readonly string[] = [
   'バトル',
   // securities / yield / earnings
   '投資',
+  // scarcity as value; trait rarity is 希少度, which stays legal
+  '希少性',
   '利回り',
   '収益',
   '利益',
@@ -1088,6 +1100,8 @@ export const VI_BANNED_TERMS: readonly string[] = [
   'cuộc thi',
   // securities / yield / earnings
   'đầu tư',
+  // scarcity as value
+  'khan hiếm',
   'nhà đầu tư',
   'lợi nhuận',
   'lợi tức',
