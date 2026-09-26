@@ -88,7 +88,7 @@ describe('ActionDock', () => {
     expect(baseProps.onOpenSheet).not.toHaveBeenCalled();
   });
 
-  it('steps aside, out of the tab order, while the form it opens is on screen', () => {
+  it('steps aside, out of the tab order, while the clock or the form is on screen', () => {
     const { container } = render(<ActionDock {...baseProps} stepAside />);
     const layer = container.querySelector('[data-action-dock]');
     expect(layer).toHaveAttribute('aria-hidden', 'true');
@@ -97,17 +97,13 @@ describe('ActionDock', () => {
     expect(layer).toHaveAttribute('data-state', 'aside');
   });
 
-  it('is there from the first paint below 1024px, before the page measures anything', () => {
-    const { container } = render(<ActionDock {...baseProps} stepAside="from-lg" />);
+  it('is shown, in the tab order, once it neither repeats nor covers anything', () => {
+    const { container } = render(<ActionDock {...baseProps} stepAside={false} />);
     const layer = container.querySelector('[data-action-dock]');
-    // On a phone the form's action starts below the first viewport.
     expect(layer).not.toHaveAttribute('aria-hidden');
     expect(layer).not.toHaveAttribute('inert');
     expect(layer).not.toHaveClass('opacity-0');
-    // From 1024px the form's action is in the first viewport: out of sight
-    // and, being invisible, out of the tab order too.
-    expect(layer).toHaveClass('lg:invisible', 'lg:opacity-0', 'lg:pointer-events-none');
-    expect(layer).toHaveAttribute('data-state', 'unmeasured');
+    expect(layer).toHaveAttribute('data-state', 'shown');
   });
 
   it('sits on an opaque raised surface, so the form never shows through it', () => {

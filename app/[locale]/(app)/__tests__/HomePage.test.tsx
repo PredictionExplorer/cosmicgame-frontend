@@ -1978,7 +1978,7 @@ describe('HomePage', () => {
     );
   });
 
-  it('keeps the dock on a phone until the form’s own action is on screen', () => {
+  it('shows the dock only once the clock and the whole form have scrolled away', () => {
     type Observed = { target: Element; callback: IntersectionObserverCallback };
     const observed: Observed[] = [];
     class FakeIntersectionObserver {
@@ -2002,12 +2002,8 @@ describe('HomePage', () => {
       mockUseDashboardInfo.mockReturnValue({ data: makeDashboardData(), isLoading: false });
       render(<HomePage />);
 
-      const report = (testId: string, isIntersecting: boolean) => {
-        const entry = observed.filter(({ target }) =>
-          testId === 'make-gesture'
-            ? target.id === 'make-gesture'
-            : target.getAttribute('data-testid') === testId,
-        );
+      const report = (id: string, isIntersecting: boolean) => {
+        const entry = observed.filter(({ target }) => target.id === id);
         expect(entry.length).toBeGreaterThan(0);
         act(() => {
           for (const { target, callback } of entry) {
@@ -2020,14 +2016,24 @@ describe('HomePage', () => {
       };
       const dockWrapper = () => screen.getByTestId('action-dock').parentElement!;
 
-      // The form's heading shows at the bottom edge, its action row does not:
-      // the dock is the phone's action in the first viewport.
+      // The phone's first screen: the clock, with the form's heading at the
+      // bottom edge. Regression: the dock repeated the clock and the
+      // allocation there and lay over the form's method selector.
+      report('cycle-clock', true);
       report('make-gesture', true);
-      report('gesture-panel-action', false);
-      expect(dockWrapper()).not.toHaveAttribute('aria-hidden');
+      expect(dockWrapper()).toHaveAttribute('aria-hidden', 'true');
 
-      // The commit row itself is on screen: the dock never duplicates it.
-      report('gesture-panel-action', true);
+      // Scrolled past the clock, into the form: the dock would cover its controls.
+      report('cycle-clock', false);
+      expect(dockWrapper()).toHaveAttribute('aria-hidden', 'true');
+
+      // Both scrolled away (in the chat, say): now the dock is the way to act.
+      report('make-gesture', false);
+      expect(dockWrapper()).not.toHaveAttribute('aria-hidden');
+      expect(dockWrapper()).not.toHaveAttribute('inert');
+
+      // Back up to the clock: it steps aside again rather than repeat it.
+      report('cycle-clock', true);
       expect(dockWrapper()).toHaveAttribute('aria-hidden', 'true');
     } finally {
       if (original) Object.defineProperty(window, 'IntersectionObserver', original);
@@ -2035,7 +2041,7 @@ describe('HomePage', () => {
     }
   });
 
-  it('shows the dock from the first paint on phones, before any observer reports', () => {
+  it('keeps the dock aside from the first paint until the page has measured', () => {
     // No observer yet: the state of the server HTML and the first paint.
     const original = Object.getOwnPropertyDescriptor(window, 'IntersectionObserver');
     Object.defineProperty(window, 'IntersectionObserver', {
@@ -2047,10 +2053,10 @@ describe('HomePage', () => {
       mockUseDashboardInfo.mockReturnValue({ data: makeDashboardData(), isLoading: false });
       render(<HomePage />);
       const layer = screen.getByTestId('action-dock').parentElement!;
-      expect(layer).toHaveAttribute('data-state', 'unmeasured');
-      expect(layer).not.toHaveAttribute('aria-hidden');
-      // From 1024px, where the form's action is in the first viewport, it waits.
-      expect(layer).toHaveClass('lg:invisible');
+      // Every width's first screen holds the clock: nothing to add yet.
+      expect(layer).toHaveAttribute('data-state', 'aside');
+      expect(layer).toHaveAttribute('aria-hidden', 'true');
+      expect(layer).toHaveAttribute('inert');
     } finally {
       if (original) Object.defineProperty(window, 'IntersectionObserver', original);
       else Reflect.deleteProperty(window, 'IntersectionObserver');

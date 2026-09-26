@@ -539,12 +539,15 @@ test.describe('home gesture chat', () => {
     await page.setViewportSize({ width: 320, height: 800 });
     await page.goto('/', { waitUntil: 'domcontentloaded' });
 
-    // From the first paint on a phone, before anything is measured, the dock
-    // offers the one action: here, without a wallet, "Connect wallet".
+    // The phone's first screen holds the Cycle clock and the top of the form:
+    // the dock would repeat the one and lie over the other, so it waits aside.
+    // Aside, the dock slides away and leaves the accessibility tree and the
+    // tab order (aria-hidden and inert); Playwright counts a faded element
+    // as visible, so the attributes are the contract.
     const dock = page.locator('[data-action-dock]');
-    await expect(dock).not.toHaveAttribute('aria-hidden', 'true');
-    await expect(page.getByTestId('dock-connect')).toBeVisible();
-    await expect(page.getByTestId('dock-open-sheet')).toHaveCount(0);
+    await expect(page.getByTestId('cycle-clock')).toBeInViewport();
+    await expect(dock).toHaveAttribute('aria-hidden', 'true');
+    await expect(dock).toHaveAttribute('inert', '');
 
     const inlinePanel = page.locator('[data-testid="gesture-panel"][data-variant="card"]');
     await expect(inlinePanel).toBeVisible();
@@ -559,20 +562,20 @@ test.describe('home gesture chat', () => {
     const draft = 'A comment started before connecting.';
     await inlineMessage.fill(draft);
 
-    // The dock never lies over a field being filled: it steps aside while
-    // someone works in the form (or its own action is on screen) and returns
-    // once the form has scrolled away.
-    // Aside, the dock slides away and leaves the accessibility tree and the
-    // tab order (aria-hidden and inert); Playwright counts a faded element
-    // as visible, so the attributes are the contract.
+    // The dock never lies over a field being filled: it stays aside while any
+    // of the form is on screen and comes in once the clock and the form have
+    // both scrolled away.
     await expect(dock).toHaveAttribute('aria-hidden', 'true');
     await page.getByTestId('home-feed-layout').scrollIntoViewIfNeeded();
     await expect(dock).not.toHaveAttribute('aria-hidden', 'true');
+    await expect(dock).not.toHaveAttribute('inert');
 
-    // Its connect action opens the wallet list directly, never a sheet that
-    // only asks for a wallet; the draft waits in the form.
+    // Without a wallet its one action is the form's own "Connect wallet",
+    // which opens the wallet list directly, never a sheet that only asks for
+    // a wallet; the draft waits in the form.
     const dockConnect = page.getByTestId('dock-connect');
     await expect(dockConnect).toBeVisible();
+    await expect(page.getByTestId('dock-open-sheet')).toHaveCount(0);
     await dockConnect.click();
     const wallets = page.getByRole('dialog', { name: /connect a wallet/i }).first();
     await expect(wallets).toBeVisible({ timeout: 10_000 });

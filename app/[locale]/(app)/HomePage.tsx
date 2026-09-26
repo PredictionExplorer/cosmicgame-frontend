@@ -18,7 +18,7 @@ import { useActiveWeb3React } from '@/hooks/web3';
 import { CyclePhaseGuide, PHASE_GUIDE_LINK_CLASS } from '@/components/home/CyclePhaseGuide';
 import { GestureMessageChat } from '@/components/home/GestureMessageChat';
 import { deriveFeedSystemEvents } from '@/components/home/deck/feedSystemEvents';
-import { ActionDock, type ActionDockPlacement } from '@/components/home/observatory/ActionDock';
+import { ActionDock } from '@/components/home/observatory/ActionDock';
 import { AllocationLedger } from '@/components/home/observatory/AllocationLedger';
 import {
   AllocationsDisclosure,
@@ -519,61 +519,37 @@ const HomePage = ({
     [setBidType, setRwlkId],
   );
 
-  // The dock is the way to act while the form's own action is off screen,
-  // and it never duplicates that action: at every width it stays until the
-  // form's action row (the commit or connect button) is on screen, and it
-  // steps aside while someone works in the form on screen (focus inside
-  // it), so it never lies over the field being filled. The desk puts the
-  // form at the top of the right column from 1024px, so the dock only ever
-  // appears once the whole form has scrolled away. Before the observers
-  // report (the server HTML, the first paint, jsdom) the dock is shown below
-  // 1024px, where the action starts below the first viewport, and kept
-  // aside from 1024px, where it is in it.
-  const [formInView, setFormInView] = useState(false);
-  const [actionInView, setActionInView] = useState<boolean | null>(null);
-  const [formFocused, setFormFocused] = useState(false);
+  // The dock is the way to act once the page's own Cycle clock and gesture
+  // form have both scrolled away, and it never repeats them: while the clock
+  // is on screen it would show the same time and allocation twice, and while
+  // any of the form is on screen it would lie over the form's controls. The
+  // first screen of every width holds the clock, so until the observers
+  // report (the server HTML, the first paint) the dock stays aside, and it
+  // slides in only once the reader has scrolled past both.
+  const [clockInView, setClockInView] = useState<boolean | null>(null);
+  const [formInView, setFormInView] = useState<boolean | null>(null);
   useEffect(() => {
     if (typeof IntersectionObserver === 'undefined') return undefined;
-    const form = document.getElementById('make-gesture');
-    // While the form loads it has no action row yet: the form stands in.
-    const action = form?.querySelector('[data-testid="gesture-panel-action"]') ?? form;
     // The sticky header covers the top; a sliver behind it is not "in view".
     const options: IntersectionObserverInit = { rootMargin: headerRootMargin() };
-    const formObserver = new IntersectionObserver(
-      ([entry]) => setFormInView(entry ? entry.isIntersecting : false),
-      options,
-    );
-    const actionObserver = new IntersectionObserver(
-      ([entry]) => setActionInView(entry ? entry.isIntersecting : false),
-      options,
-    );
-    // Without a form (between cycles) the dock is not drawn at all.
-    if (form) formObserver.observe(form);
-    if (action) actionObserver.observe(action);
-    return () => {
-      formObserver.disconnect();
-      actionObserver.disconnect();
+    const watch = (id: string, report: (inView: boolean) => void) => {
+      const element = document.getElementById(id);
+      // Nothing to repeat or cover (no form between cycles, say).
+      if (!element) {
+        report(false);
+        return null;
+      }
+      const observer = new IntersectionObserver(
+        ([entry]) => report(entry ? entry.isIntersecting : false),
+        options,
+      );
+      observer.observe(element);
+      return observer;
     };
+    const observers = [watch('cycle-clock', setClockInView), watch('make-gesture', setFormInView)];
+    return () => observers.forEach((observer) => observer?.disconnect());
   }, [showPanel, loading]);
-  useEffect(() => {
-    const form = document.getElementById('make-gesture');
-    if (!form) return undefined;
-    const handleFocusIn = () => setFormFocused(true);
-    const handleFocusOut = (event: FocusEvent) => {
-      if (!form.contains(event.relatedTarget as Node | null)) setFormFocused(false);
-    };
-    form.addEventListener('focusin', handleFocusIn);
-    form.addEventListener('focusout', handleFocusOut);
-    return () => {
-      form.removeEventListener('focusin', handleFocusIn);
-      form.removeEventListener('focusout', handleFocusOut);
-    };
-  }, [showPanel, loading]);
-  const dockPlacement: ActionDockPlacement = gestureSheetOpen
-    ? true
-    : actionInView === null
-      ? 'from-lg'
-      : actionInView || (formFocused && formInView);
+  const dockPlacement = gestureSheetOpen || clockInView !== false || formInView !== false;
 
   // The source-aligned clock discovers milestones even between Gestures.
   // A 30-second bucket keeps this larger timeline out of the one-second

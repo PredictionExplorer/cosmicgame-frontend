@@ -28,19 +28,14 @@ import type { GestureSubmitParts } from './gestureSubmitLabel';
 import { PHASE_TEXT_CLASS, viewForPhase } from './phaseView';
 import { useFocusClearOfDock } from './useFocusClearOfDock';
 
-/**
- * `true`: the in-page form's own action is on screen or someone is working in
- * the form, so the dock steps aside and leaves the tab order; it never
- * duplicates the form's action or lies over a field being filled. `false`:
- * the dock is shown. `'from-lg'`: the page has not measured yet (the server
- * HTML and the first paint): shown below 1024px, where the form's action
- * starts below the first viewport, and kept aside (invisible, out of the tab
- * order) from 1024px, where the form's action is in it.
- */
-export type ActionDockPlacement = boolean | 'from-lg';
-
 export interface ActionDockProps {
-  stepAside: ActionDockPlacement;
+  /**
+   * Out of sight, out of the tab order and the accessibility tree: while the
+   * page's own clock or form is on screen (the dock would repeat the one and
+   * lie over the other), before the page has measured, or while the sheet
+   * is open.
+   */
+  stepAside: boolean;
   data: DashboardInfo | null;
   loading: boolean;
   allocationTime: number;
@@ -77,8 +72,8 @@ export interface ActionDockProps {
  * "Connect wallet" the form offers, opening the wallet list directly. It
  * shows the live transaction stage while a Gesture is in flight, and at zero
  * it turns into Finalize for whoever may finalize. It steps aside while the
- * in-page form's own action is on screen, so the two never show together,
- * and it keeps keyboard focus from landing under it.
+ * page's own clock or form is on screen, so it never repeats them or covers
+ * a control, and it keeps keyboard focus from landing under it.
  */
 export function ActionDock({
   stepAside,
@@ -132,8 +127,7 @@ export function ActionDock({
 
   const finalizeMode =
     cycleState.isReadyToFinalize && !!account && canClaim && (isHolder || claimWait <= now);
-  const hidden = stepAside === true;
-  const hiddenFromLg = stepAside === 'from-lg';
+  const hidden = stepAside;
 
   // The line under the clock: the wallet's own moment when there is one,
   // otherwise what the cycle is for. Who may finalize and from when stays
@@ -173,15 +167,11 @@ export function ActionDock({
     <div
       ref={dockRef}
       data-action-dock
-      data-state={hidden ? 'aside' : hiddenFromLg ? 'unmeasured' : 'shown'}
+      data-state={hidden ? 'aside' : 'shown'}
       className={cn(
         'fixed inset-x-3 bottom-[max(0.75rem,env(safe-area-inset-bottom))] z-40 md:inset-x-0 md:bottom-4 md:px-4 print:hidden',
         'transition-[transform,opacity,visibility] duration-[var(--duration-base)] ease-[var(--ease-out-expo)] motion-reduce:transition-none',
         hidden && 'pointer-events-none translate-y-[calc(100%+1.5rem)] opacity-0',
-        // Until the page measures: shown on phones and tablets from the first
-        // paint, and out of sight and out of the tab order from 1024px.
-        hiddenFromLg &&
-          'lg:pointer-events-none lg:invisible lg:translate-y-[calc(100%+1.5rem)] lg:opacity-0',
         className,
       )}
       aria-hidden={hidden || undefined}
