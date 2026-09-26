@@ -144,6 +144,9 @@ describe('learn reading path', () => {
 
   it('illustrates the guides that describe a mechanism', () => {
     const kinds = (slug: string) => getLearnArticle(slug)!.figures.map((figure) => figure.kind);
+    // The first guide is not text alone: the cycle it defines and the art it names.
+    expect(kinds('what-is-cosmic-signature')).toEqual(['cycleTimeline', 'seedPlates']);
+    expect(kinds('cosmic-signature-on-arbitrum')).toEqual(['contracts']);
     expect(kinds('how-the-performance-cycle-works')).toEqual(['cycleTimeline', 'allocation']);
     expect(kinds('how-gestures-work')).toEqual(['cycleTimeline']);
     expect(kinds('three-body-nft-art')).toEqual(['seedPlates']);

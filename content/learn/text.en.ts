@@ -89,7 +89,6 @@ export const learnTextEn = {
           heading: 'Why the name matters',
           body: [
             'The word Signature refers to the final artwork produced by a cycle. Every gesture influences the cycle context that ultimately becomes part of the protocol history around that Signature.',
-            'Cosmic Signature is not related to the COSMIC cancer mutation database or COSMIC mutational signatures in biology. It is an on-chain art protocol focused on deterministic three-body NFT art.',
           ],
         },
         {
@@ -102,8 +101,8 @@ export const learnTextEn = {
         {
           heading: 'How to read the public data',
           body: [
-            'The app shows live state such as the current cycle, statistics, allocation recipients, contract addresses, gallery records, and contribution histories. These pages are designed to be useful even before a wallet connects, because public protocol data should not depend on a private account state.',
-            'The main website explains the protocol and its terminology. The app shows current costs, timing, and activity, so you can move from understanding a rule to checking how it applies to a live cycle.',
+            'In the app you can follow the current cycle, statistics, allocation recipients, contract addresses, gallery records and contribution histories, all without connecting a wallet: every figure comes from public records on Arbitrum.',
+            'Read a rule here, then open the app to see how it applies to the live cycle: the Gesture Cost right now, the time left, and everything recorded so far.',
           ],
         },
       ],

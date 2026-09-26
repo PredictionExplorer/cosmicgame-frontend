@@ -94,7 +94,6 @@ export const learnTextVi = {
           heading: 'Vì sao cái tên quan trọng',
           body: [
             'Từ Signature chỉ tác phẩm cuối cùng mà một chu kỳ tạo ra. Mỗi nét bút ảnh hưởng đến bối cảnh chu kỳ, thứ cuối cùng trở thành một phần lịch sử giao thức xoay quanh Signature đó.',
-            'Cosmic Signature không liên quan đến cơ sở dữ liệu đột biến ung thư COSMIC hay các chữ ký đột biến COSMIC trong sinh học. Đây là một giao thức nghệ thuật trên chuỗi tập trung vào nghệ thuật NFT ba vật thể tất định.',
           ],
         },
         {
@@ -107,8 +106,8 @@ export const learnTextVi = {
         {
           heading: 'Cách đọc dữ liệu công khai',
           body: [
-            'Ứng dụng hiển thị trạng thái trực tiếp như chu kỳ hiện tại, thống kê, người nhận phân bổ, địa chỉ hợp đồng, bản ghi phòng trưng bày và lịch sử đóng góp. Các trang này được thiết kế để hữu ích ngay cả trước khi kết nối ví, vì dữ liệu giao thức công khai không nên phụ thuộc vào trạng thái tài khoản riêng.',
-            'Trang giới thiệu giải thích thuật ngữ và cơ chế; ứng dụng cung cấp dữ liệu hiện tại. Đọc cả hai giúp bạn hiểu giao thức và kiểm tra cách các quy tắc được thực thi.',
+            'Trong ứng dụng, bạn có thể theo dõi chu kỳ hiện tại, thống kê, người nhận phân bổ, địa chỉ hợp đồng, bản ghi phòng trưng bày và lịch sử đóng góp mà không cần kết nối ví: mọi con số đều đến từ bản ghi công khai trên Arbitrum.',
+            'Hãy đọc quy tắc ở đây, rồi mở ứng dụng để xem quy tắc đó áp dụng thế nào cho chu kỳ hiện tại: chi phí nét bút lúc này, thời gian còn lại và những gì đã được ghi nhận.',
           ],
         },
       ],

@@ -75,10 +75,15 @@ export const LEARN_STRUCTURE = {
     {
       slug: 'what-is-cosmic-signature',
       schemaType: 'Article',
-      updated: '2026-06-24',
+      updated: '2026-09-25',
       group: 'start',
       plate: 13,
       related: [APP_ORIGIN, appLink('/faq'), appLink('/statistics')],
+      // The cycle the definition describes, then two Signatures from their seeds.
+      figures: [
+        { kind: 'cycleTimeline', section: 0 },
+        { kind: 'seedPlates', section: 1 },
+      ],
     },
     {
       slug: 'how-the-performance-cycle-works',
@@ -117,10 +122,12 @@ export const LEARN_STRUCTURE = {
     {
       slug: 'cosmic-signature-on-arbitrum',
       schemaType: 'Article',
-      updated: '2026-06-24',
+      updated: '2026-09-25',
       group: 'mechanics',
       plate: 33,
       related: [appLink('/contracts'), appLink('/statistics')],
+      // Where the chain context is named: the core addresses themselves.
+      figures: [{ kind: 'contracts', section: 1 }],
     },
     {
       slug: 'contracts-security-verification',
