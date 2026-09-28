@@ -161,11 +161,12 @@ describe('Root layout metadata (shared by both route groups)', () => {
     const landingIcons = landingMetadata.icons as typeof icons;
 
     expect(landingIcons).toEqual(icons);
-    // The ICO names its sizes (not `any`) so SVG-capable browsers pick the SVG.
+    // Chromium keeps document order between an `any` icon and an exact size
+    // match: the SVG leads, and the ICO names only a size no tab asks for.
     const v = `?v=${BRAND_ICON_VERSION}`;
     expect(icons.icon).toEqual([
-      { url: `/favicon.ico${v}`, sizes: '16x16 32x32 48x48' },
-      { url: `/favicon.svg${v}`, type: 'image/svg+xml' },
+      { url: `/favicon.svg${v}`, type: 'image/svg+xml', sizes: 'any' },
+      { url: `/favicon.ico${v}`, sizes: '48x48' },
     ]);
     expect(icons.apple).toEqual([
       { url: `/apple-touch-icon.png${v}`, sizes: '180x180', type: 'image/png' },

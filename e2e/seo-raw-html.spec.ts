@@ -401,7 +401,7 @@ test.describe('raw HTML SEO', () => {
   }
 
   test('both hosts emit and serve the same versioned favicon assets', async ({ request }) => {
-    const expectedHrefs = [BRAND_ICON_URLS.faviconIco, BRAND_ICON_URLS.faviconSvg];
+    const expectedHrefs = [BRAND_ICON_URLS.faviconSvg, BRAND_ICON_URLS.faviconIco];
     let baselineAssets: Buffer[] | undefined;
 
     for (const host of [APP_HOST, LANDING_HOST]) {

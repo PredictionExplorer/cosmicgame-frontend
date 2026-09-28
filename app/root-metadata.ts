@@ -53,13 +53,16 @@ export function createRootMetadata(
     metadataBase: new URL(origin),
     title: { default: copy.defaultTitle, template: '%s' },
     description: copy.defaultDescription,
-    // The ICO is declared with its sizes, not `any`, so browsers that read
-    // SVG favicons choose the SVG; iOS takes the apple-touch icon
-    // (lib/og/brandIcons.ts, `npm run brand:icons`).
+    // Every current browser shows the SVG (lib/og/brandIcons.ts, `npm run
+    // brand:icons`). Chromium scores an `any`-sized icon 1 and an exact size
+    // match 1 too, keeping document order on a tie, so the SVG comes first and
+    // the ICO declares only its 48px frame, which no tab size matches exactly.
+    // Browsers without SVG favicons take the ICO and pick their own frame;
+    // iOS takes the apple-touch icon.
     icons: {
       icon: [
-        { url: BRAND_ICON_URLS.faviconIco, sizes: '16x16 32x32 48x48' },
-        { url: BRAND_ICON_URLS.faviconSvg, type: 'image/svg+xml' },
+        { url: BRAND_ICON_URLS.faviconSvg, type: 'image/svg+xml', sizes: 'any' },
+        { url: BRAND_ICON_URLS.faviconIco, sizes: '48x48' },
       ],
       apple: [{ url: BRAND_ICON_URLS.appleTouchIcon, sizes: '180x180', type: 'image/png' }],
     },
