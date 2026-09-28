@@ -13,6 +13,9 @@ import { SITE_NAME, SITE_SHORT_NAME } from '@/utils/seo';
  * marketing host links none, so installing from cosmicsignature.com never
  * turns the landing page into a chromeless "app". Every locale shares the
  * `id`, so switching language never installs a second copy.
+ *
+ * Install icons are the opaque PNGs only: the SVG favicon is a bare mark
+ * coloured for the tab strip's scheme, not an icon a launcher can plate.
  */
 
 /** URL the app layout links for `locale`; the physical `[locale]` path, as og:image uses. */
@@ -50,7 +53,6 @@ export async function buildWebManifest(locale: string): Promise<MetadataRoute.Ma
         type: 'image/png',
         purpose: 'maskable',
       },
-      { src: BRAND_ICON_URLS.faviconSvg, sizes: 'any', type: 'image/svg+xml', purpose: 'any' },
     ],
     categories: ['art'],
   };

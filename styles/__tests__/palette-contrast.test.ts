@@ -1,6 +1,8 @@
 import { readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 
+import { contrastRatio as contrast, type Rgb } from '@/test-utils/contrast';
+
 import { SITE_THEMES, type SiteTheme } from '@/lib/theme/config';
 
 /**
@@ -17,8 +19,6 @@ import { SITE_THEMES, type SiteTheme } from '@/lib/theme/config';
  * The stylesheet is parsed, not mocked: a value edited in themes.css is the
  * value tested here.
  */
-
-type Rgb = readonly [number, number, number];
 
 const THEMES_CSS = readFileSync(resolve(__dirname, '..', 'themes.css'), 'utf8').replace(
   /\/\*[\s\S]*?\*\//g,
@@ -78,16 +78,6 @@ function hslChannels(value: string): Rgb {
     return l - a * Math.max(-1, Math.min(k - 3, 9 - k, 1));
   };
   return [channel(0), channel(8), channel(4)];
-}
-
-function luminance([r, g, b]: Rgb): number {
-  const linear = (c: number) => (c <= 0.04045 ? c / 12.92 : ((c + 0.055) / 1.055) ** 2.4);
-  return 0.2126 * linear(r) + 0.7152 * linear(g) + 0.0722 * linear(b);
-}
-
-function contrast(a: Rgb, b: Rgb): number {
-  const [light, dark] = [luminance(a), luminance(b)].sort((x, y) => y - x) as [number, number];
-  return (light + 0.05) / (dark + 0.05);
 }
 
 function hueOf(value: string): number {

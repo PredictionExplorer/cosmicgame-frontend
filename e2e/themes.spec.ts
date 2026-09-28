@@ -138,7 +138,7 @@ for (const host of ['app', 'landing'] as const) {
       );
       expect(paints.length).toBeGreaterThanOrEqual(2);
       for (const paint of paints) {
-        expect(paint.artwork).toContain('/images/logo2.svg');
+        expect(paint.artwork).toContain('/images/brand/orbit-mark.svg');
         expect(paint.color).not.toBe('rgba(0, 0, 0, 0)');
         expect(paint.color).toBe(paints[0]!.color);
       }

@@ -39,6 +39,8 @@ jest.mock('../../../../utils/analytics', () => ({
 
 import type { Metadata } from 'next';
 
+import { BRAND_ICON_VERSION } from '@/lib/og/brandIcons';
+
 import { generateMetadata, viewport } from '../layout';
 import {
   generateMetadata as landingGenerateMetadata,
@@ -160,12 +162,13 @@ describe('Root layout metadata (shared by both route groups)', () => {
 
     expect(landingIcons).toEqual(icons);
     // The ICO names its sizes (not `any`) so SVG-capable browsers pick the SVG.
+    const v = `?v=${BRAND_ICON_VERSION}`;
     expect(icons.icon).toEqual([
-      { url: '/favicon.ico?v=20260923', sizes: '16x16 32x32 48x48' },
-      { url: '/favicon.svg?v=20260923', type: 'image/svg+xml' },
+      { url: `/favicon.ico${v}`, sizes: '16x16 32x32 48x48' },
+      { url: `/favicon.svg${v}`, type: 'image/svg+xml' },
     ]);
     expect(icons.apple).toEqual([
-      { url: '/apple-touch-icon.png?v=20260923', sizes: '180x180', type: 'image/png' },
+      { url: `/apple-touch-icon.png${v}`, sizes: '180x180', type: 'image/png' },
     ]);
   });
 

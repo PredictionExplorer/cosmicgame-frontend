@@ -2,6 +2,7 @@ import { expect, test } from '@playwright/test';
 
 import { getAboutContent } from '../content/about';
 import { getLandingContent } from '../content/landing';
+import { BRAND_ICON_URLS } from '../lib/og/brandIcons';
 
 import { LOCALE_CHROME, LOCALE_SEO, TRANSLATED_LOCALES } from './locale-fixtures';
 
@@ -400,7 +401,7 @@ test.describe('raw HTML SEO', () => {
   }
 
   test('both hosts emit and serve the same versioned favicon assets', async ({ request }) => {
-    const expectedHrefs = ['/favicon.ico?v=20260923', '/favicon.svg?v=20260923'];
+    const expectedHrefs = [BRAND_ICON_URLS.faviconIco, BRAND_ICON_URLS.faviconSvg];
     let baselineAssets: Buffer[] | undefined;
 
     for (const host of [APP_HOST, LANDING_HOST]) {

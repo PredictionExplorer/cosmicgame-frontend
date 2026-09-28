@@ -3,30 +3,43 @@ import { SITE_NAME } from '@/utils/seo';
 import { MIDNIGHT_TOKENS, hslTripletToHex } from './palette';
 
 /**
- * The brand's icon set: which files exist, how each is drawn, and the small
- * mark tab-sized icons use. `npm run brand:icons` (scripts/build-brand-icons.ts)
- * writes the files; the site metadata, the web manifest and the JSON-LD
- * Organization logo reference them through these paths.
+ * The brand's icon set: which files exist, how each is drawn, and the version
+ * that busts favicon caches. `npm run brand:icons`
+ * (scripts/build-brand-icons.ts) writes the files and the version; the site
+ * metadata, the web manifest and the JSON-LD Organization logo reference them
+ * through these paths.
  *
- * Every icon is the lavender orbit mark (`--primary`) on the Midnight ground
- * (`--background`), so it reads on light and dark tab strips and launchers
- * alike and matches the header. Tab sizes use a simplified mark (two orbits,
- * three bodies) because the full mark's hairline orbits dissolve below 32px.
+ * Every icon is the header's own artwork, public/images/brand/orbit-mark.svg
+ * (the file BrandMark masks), in the header's lavender (`--primary`); none is
+ * redrawn or simplified, so the tab shows the logo the page shows.
+ *
+ * - The SVG favicon, what current browsers put in the tab, is the bare mark,
+ *   as the header draws it. Tab strips are light or dark, so it follows
+ *   `prefers-color-scheme`: the header's lavender on a dark strip, and a
+ *   deeper tone of the same hue on a light one, where the lavender would
+ *   vanish (1.4:1 on white).
+ * - Raster icons cannot adapt, so each one sets the mark on the Midnight
+ *   ground (`--background`), as the header does.
  */
 
-/** Increment whenever an icon file is replaced: browsers cache favicons per origin. */
-export const BRAND_ICON_VERSION = '20260923';
+/**
+ * The icon set's content hash, written by `npm run brand:icons`: replaced
+ * files get new URLs, so browsers and installed apps that cached the old icons
+ * fetch them again. lib/og/__tests__/brandIcons.test.ts fails when the files
+ * and this hash disagree.
+ */
+export const BRAND_ICON_VERSION = 'd2072b9cd5';
 
 const versioned = (path: string) => `${path}?v=${BRAND_ICON_VERSION}`;
 
 export const BRAND_ICON_PATHS = {
-  /** 16, 32 and 48px frames of the small mark, for browsers without SVG favicons. */
+  /** 16, 32 and 48px frames on the plate, for browsers without SVG favicons. */
   faviconIco: '/favicon.ico',
-  /** The small mark on its plate, scalable; what modern browsers show in the tab. */
+  /** The bare mark, scalable and scheme-aware; what current browsers show in the tab. */
   faviconSvg: '/favicon.svg',
   /** iOS home screen and Safari favorites: full-bleed square, the system rounds it. */
   appleTouchIcon: '/apple-touch-icon.png',
-  /** Install icons (manifest `purpose: any`): the full mark on a rounded plate. */
+  /** Install icons (manifest `purpose: any`): the mark on a rounded plate. */
   icon192: '/images/brand/icon-192.png',
   icon512: '/images/brand/icon-512.png',
   /** Android adaptive icon (manifest `purpose: maskable`): the mark inside the safe zone. */
@@ -48,31 +61,70 @@ export const BRAND_ICON_URLS = {
   maskable512: versioned(BRAND_ICON_PATHS.maskable512),
 } as const;
 
+/** The primary's hue at a depth that reads on light tab strips (4.5:1 or more on white). */
+const MARK_ON_LIGHT = `${MIDNIGHT_TOKENS.primary.split(' ')[0]} 60% 50%`;
+
 export const BRAND_ICON_COLORS = {
+  /** The Midnight ground (`--background`) under every raster icon. */
   plate: hslTripletToHex(MIDNIGHT_TOKENS.background),
+  /** The header's lavender (`--primary`): the mark on the plate and on dark tab strips. */
   mark: hslTripletToHex(MIDNIGHT_TOKENS.primary),
+  /** The favicon's mark on light tab strips. */
+  markOnLight: hslTripletToHex(MARK_ON_LIGHT),
 } as const;
 
+interface MarkArtwork {
+  /** The mark's square viewBox side, in its own units. */
+  side: number;
+  /** Its `<g>` of paths, filled with `currentColor`. */
+  artwork: string;
+}
+
+/** The artwork of the orbit mark's source (public/images/brand/orbit-mark.svg). */
+function markArtwork(markSvg: string): MarkArtwork {
+  const viewBox = /\bviewBox="0 0 ([\d.]+) ([\d.]+)"/.exec(markSvg);
+  const artwork = /<g\b[\s\S]*<\/g>/.exec(markSvg)?.[0];
+  if (!viewBox || viewBox[1] !== viewBox[2] || !artwork?.includes('currentColor')) {
+    throw new Error('The orbit mark must be a square viewBox with a <g> in currentColor');
+  }
+  return { side: Number(viewBox[1]), artwork: artwork.replace(/>\s+</g, '><') };
+}
+
 /**
- * The small mark on a rounded Midnight plate, in a 32-unit grid: two orbits
- * (strokes stay above one pixel at 16px) and the three bodies, placed where
- * the full mark has them (upper left, right, lower left).
+ * The SVG favicon: the orbit mark's own viewBox and paths on no plate, in the
+ * header's lavender on dark tab strips and in `markOnLight` everywhere else
+ * (the default, so a renderer that ignores the media query still gets a mark
+ * that reads on white).
  */
-export function smallMarkSvg(): string {
-  const { plate, mark } = BRAND_ICON_COLORS;
+export function faviconSvg(markSvg: string): string {
+  const { side, artwork } = markArtwork(markSvg);
+  const { mark, markOnLight } = BRAND_ICON_COLORS;
   return [
-    '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">',
+    `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${side} ${side}">`,
     `<title>${SITE_NAME}</title>`,
-    `<rect width="32" height="32" rx="7" fill="${plate}"/>`,
-    `<g fill="none" stroke="${mark}" stroke-width="2.3">`,
-    '<ellipse cx="16" cy="16" rx="11.8" ry="6.1" transform="rotate(40 16 16)"/>',
-    '<ellipse cx="16" cy="16" rx="11.8" ry="6.1" transform="rotate(-22 16 16)"/>',
-    '</g>',
-    `<g fill="${mark}">`,
-    '<circle cx="8.61" cy="7.34" r="3.05"/>',
-    '<circle cx="25.83" cy="20.64" r="2.75"/>',
-    '<circle cx="14.79" cy="22.74" r="3.25"/>',
-    '</g>',
+    `<style>svg{color:${markOnLight}}@media (prefers-color-scheme:dark){svg{color:${mark}}}</style>`,
+    artwork,
+    '</svg>',
+  ].join('');
+}
+
+export interface PlateLayout {
+  /** The mark's side as a share of the icon's. */
+  markShare: number;
+  /** Corner radius as a share of the side: 0 is full bleed, for icons the system masks. */
+  radius: number;
+}
+
+/** The orbit mark centred on the Midnight plate, as one vector drawing to rasterize. */
+export function plateIconSvg(markSvg: string, { markShare, radius }: PlateLayout): string {
+  const { side, artwork } = markArtwork(markSvg);
+  const { plate, mark } = BRAND_ICON_COLORS;
+  const plateSide = side / markShare;
+  const inset = (plateSide - side) / 2;
+  return [
+    `<svg xmlns="http://www.w3.org/2000/svg" viewBox="${-inset} ${-inset} ${plateSide} ${plateSide}">`,
+    `<rect x="${-inset}" y="${-inset}" width="${plateSide}" height="${plateSide}" rx="${plateSide * radius}" fill="${plate}"/>`,
+    artwork.replaceAll('currentColor', mark),
     '</svg>',
   ].join('');
 }

@@ -5,6 +5,7 @@ import { SCRIPT_PATTERNS } from '@/test-utils/locale-expectations';
 
 import { getLocaleConfig } from '@/i18n/localeConfig';
 import { routing, TRANSLATED_LOCALES } from '@/i18n/routing';
+import { BRAND_ICON_VERSION } from '@/lib/og/brandIcons';
 import { SITE_NAME, SITE_SHORT_NAME } from '@/utils/seo';
 
 import { buildWebManifest, webManifestPath } from '../build-manifest';
@@ -50,18 +51,17 @@ describe('web app manifest', () => {
     expect(SITE_NAME.startsWith(SITE_SHORT_NAME)).toBe(true);
   });
 
-  it('lists PNG install icons, a maskable one, and files that exist', async () => {
+  // The SVG favicon is a bare, scheme-coloured mark: a launcher needs a plate.
+  it('lists only opaque-plate PNG install icons, a maskable one, and files that exist', async () => {
     const { icons = [] } = await buildWebManifest('en');
-    expect(icons).toEqual(
-      expect.arrayContaining([
-        expect.objectContaining({ sizes: '192x192', type: 'image/png', purpose: 'any' }),
-        expect.objectContaining({ sizes: '512x512', type: 'image/png', purpose: 'any' }),
-        expect.objectContaining({ sizes: '512x512', type: 'image/png', purpose: 'maskable' }),
-      ]),
-    );
+    expect(icons.map(({ sizes, type, purpose }) => ({ sizes, type, purpose }))).toEqual([
+      { sizes: '192x192', type: 'image/png', purpose: 'any' },
+      { sizes: '512x512', type: 'image/png', purpose: 'any' },
+      { sizes: '512x512', type: 'image/png', purpose: 'maskable' },
+    ]);
     for (const { src } of icons) {
       // Versioned like the page's own icon links, so a replaced file is refetched.
-      expect(src).toMatch(/\?v=\d+$/);
+      expect(src).toMatch(new RegExp(`\\?v=${BRAND_ICON_VERSION}$`));
       expect(existsSync(join(process.cwd(), 'public', src.replace(/\?.*$/, '')))).toBe(true);
     }
   });
