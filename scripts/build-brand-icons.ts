@@ -11,7 +11,8 @@
  *   public/images/brand/icon-192.png           mark on a rounded plate
  *   public/images/brand/icon-512.png           mark on a rounded plate
  *   public/images/brand/icon-maskable-512.png  full bleed, mark in the safe zone
- *   public/images/brand/logo-512.png           Organization logo, full bleed
+ *   public/images/brand/logo-512.png           Organization logo and CST token image, full bleed
+ *   public/images/logo2.svg                    the same drawing, for wallets that added CST before it
  *
  * then writes the files' content hash to BRAND_ICON_VERSION, so every page and
  * the manifest link the new files. Rasterized with sharp, so a rebuild is
@@ -29,6 +30,8 @@ import {
   BRAND_ICON_COLORS,
   BRAND_ICON_PATHS,
   faviconSvg,
+  LEGACY_CST_IMAGE_PATH,
+  LOGO_LAYOUT,
   plateIconSvg,
   type PlateLayout,
 } from '../lib/og/brandIcons';
@@ -102,7 +105,8 @@ async function main(): Promise<void> {
   // Android masks adaptive icons to a circle of 80% of the side at most:
   // a 56% square fits inside it (its diagonal is 79%).
   write(BRAND_ICON_PATHS.maskable512, await plateIcon(512, { markShare: 0.56, radius: 0 }));
-  write(BRAND_ICON_PATHS.logo512, await plateIcon(512, { markShare: 0.66, radius: 0 }));
+  write(BRAND_ICON_PATHS.logo512, await plateIcon(512, LOGO_LAYOUT));
+  write(LEGACY_CST_IMAGE_PATH, `${plateIconSvg(MARK, LOGO_LAYOUT)}\n`);
   writeVersion();
 }
 

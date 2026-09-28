@@ -6,6 +6,7 @@ import { isAddress } from 'viem';
 import { useConnection } from 'wagmi';
 
 import { useContractAddresses } from '@/contexts/ContractAddressesContext';
+import { BRAND_ICON_PATHS } from '@/lib/og/brandIcons';
 import { isUserRejection, reportError } from '@/utils/errors';
 
 import { useNotify } from './useNotify';
@@ -128,10 +129,12 @@ export function useMetaMaskWatchAsset() {
       return false;
     }
 
+    // An opaque square PNG: wallets crop token images to a circle, and several
+    // refuse SVG. Unversioned, since a wallet keeps the URL it is given.
     const image =
       typeof window === 'undefined'
         ? undefined
-        : new URL('/images/logo2.svg', window.location.origin).href;
+        : new URL(BRAND_ICON_PATHS.logo512, window.location.origin).href;
 
     return requestWatchAsset(
       'cst',

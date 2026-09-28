@@ -44,9 +44,20 @@ export const BRAND_ICON_PATHS = {
   icon512: '/images/brand/icon-512.png',
   /** Android adaptive icon (manifest `purpose: maskable`): the mark inside the safe zone. */
   maskable512: '/images/brand/icon-maskable-512.png',
-  /** Search-engine Organization logo (JSON-LD): square, opaque, 512px. */
+  /**
+   * Search-engine Organization logo (JSON-LD) and the CST token image wallets
+   * list (`wallet_watchAsset`): square, opaque, 512px, the mark clear of the
+   * circle wallets crop token icons to.
+   */
   logo512: '/images/brand/logo-512.png',
 } as const;
+
+/**
+ * The CST token image before logo512, the 2023 cyan mark. Wallets keep the
+ * image URL they were given when CST was added, so the file stays, redrawn as
+ * logo512 in SVG. Outside BRAND_ICON_PATHS: nothing links it with a version.
+ */
+export const LEGACY_CST_IMAGE_PATH = '/images/logo2.svg';
 
 /**
  * The icons as pages and the manifest link them: versioned, so a replaced
@@ -114,6 +125,12 @@ export interface PlateLayout {
   /** Corner radius as a share of the side: 0 is full bleed, for icons the system masks. */
   radius: number;
 }
+
+/**
+ * logo512 and the legacy CST image: full bleed, the mark small enough that a
+ * circular crop leaves a ring of plate around it.
+ */
+export const LOGO_LAYOUT: PlateLayout = { markShare: 0.66, radius: 0 };
 
 /** The orbit mark centred on the Midnight plate, as one vector drawing to rasterize. */
 export function plateIconSvg(markSvg: string, { markShare, radius }: PlateLayout): string {

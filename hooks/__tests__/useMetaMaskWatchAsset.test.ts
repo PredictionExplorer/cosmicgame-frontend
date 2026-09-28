@@ -92,7 +92,7 @@ describe('useMetaMaskWatchAsset', () => {
           address: CST_ADDRESS,
           symbol: 'CST',
           decimals: 18,
-          image: 'http://localhost/images/logo2.svg',
+          image: 'http://localhost/images/brand/logo-512.png',
         },
       },
     });

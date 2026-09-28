@@ -1,5 +1,10 @@
+/**
+ * @jest-environment node
+ */
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
+
+import sharp from 'sharp';
 
 import { contrastRatio, hexChannels } from '@/test-utils/contrast';
 import { brandIconDigest } from '@/scripts/brand-icon-digest';
@@ -10,6 +15,8 @@ import {
   BRAND_ICON_PATHS,
   BRAND_ICON_URLS,
   BRAND_ICON_VERSION,
+  LEGACY_CST_IMAGE_PATH,
+  LOGO_LAYOUT,
   faviconSvg,
   plateIconSvg,
 } from '@/lib/og/brandIcons';
@@ -135,6 +142,34 @@ describe('brand icon set (npm run brand:icons)', () => {
       height: size,
       colorType,
     });
+  });
+
+  // wallet_watchAsset: wallets draw token images in a circle inscribed in
+  // the square, some with a ring of their own on its edge.
+  it('keeps the CST token image’s mark inside the circle wallets crop it to', async () => {
+    const { data, info } = await sharp(publicFile(BRAND_ICON_PATHS.logo512))
+      .raw()
+      .toBuffer({ resolveWithObject: true });
+    const plate = hexChannels(BRAND_ICON_COLORS.plate).map((c) => Math.round(c * 255));
+    const centre = (info.width - 1) / 2;
+    let reach = 0;
+    for (let i = 0; i < data.length; i += info.channels) {
+      if (plate.every((c, channel) => Math.abs(data[i + channel]! - c) <= 8)) continue;
+      const pixel = i / info.channels;
+      const x = pixel % info.width;
+      const y = Math.floor(pixel / info.width);
+      reach = Math.max(reach, Math.hypot(x - centre, y - centre));
+    }
+    // The crop's radius is half the side.
+    expect(reach / info.width).toBeLessThan(0.4);
+    expect(reach / info.width).toBeGreaterThan(0.3);
+  });
+
+  it('redraws the retired CST image as the token image, for wallets that kept its URL', () => {
+    const legacy = publicFile(LEGACY_CST_IMAGE_PATH).toString('utf8');
+    expect(legacy.trim()).toBe(plateIconSvg(MARK, LOGO_LAYOUT));
+    expect(pathData(legacy)).toEqual(pathData(MARK));
+    expect(legacy).not.toMatch(/#15BFFD/i);
   });
 
   it('versions the set by its content, so a replaced icon gets a new URL', () => {

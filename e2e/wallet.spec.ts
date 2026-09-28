@@ -1,6 +1,7 @@
 import { test, expect, type Page } from '@playwright/test';
 
 import { protocolFacts } from '../content/protocol-facts';
+import { BRAND_ICON_PATHS } from '../lib/og/brandIcons';
 import { SITE_THEMES } from '../lib/theme/config';
 import common from '../messages/en/common.json';
 import home from '../messages/en/home.json';
@@ -364,7 +365,7 @@ test.describe('Wallet connection state (disconnected)', () => {
     await walletTrigger.click();
     await page.getByRole('menuitem', { name: 'Add CST to MetaMask' }).click();
 
-    const image = new URL('/images/logo2.svg', page.url()).href;
+    const image = new URL(BRAND_ICON_PATHS.logo512, page.url()).href;
     await expect
       .poll(() => page.evaluate(() => window.__mockWatchAssetRequests?.[0]))
       .toEqual({
@@ -376,6 +377,11 @@ test.describe('Wallet connection state (disconnected)', () => {
           image,
         },
       });
+
+    // The wallet fetches the image from the app host, where it was requested.
+    const response = await page.request.get(image);
+    expect(response.status()).toBe(200);
+    expect(response.headers()['content-type']).toBe('image/png');
   });
 
   test('Chinese wallet chooser connects through the non-mutating injected flow', async ({
