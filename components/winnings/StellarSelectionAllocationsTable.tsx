@@ -15,7 +15,7 @@ import {
   TablePrimaryHeadCell,
   TablePrimaryRow,
 } from '@/components/styled';
-import useStellarSelectionWalletContract from '@/hooks/useStellarSelectionWalletContract';
+import { useStellarSelectionWalletContractFactory } from '@/hooks/useStellarSelectionWalletContract';
 import { useNow } from '@/hooks/useNow';
 
 /** A single stellarSelection ETH winning entry. */
@@ -27,6 +27,8 @@ export interface StellarSelectionAllocation {
   Amount: number;
   WinnerAddr: string;
   Claimed: boolean;
+  /** Stellar-selection wallet contract holding this allocation (retrieval must target it). */
+  WalletAddr?: string;
 }
 
 /** The indexer can omit an allocation amount; a missing one must not crash the row. */
@@ -201,33 +203,41 @@ function StellarSelectionAllocationsPrintFallback({
 /** Table of stellarSelection ETH winnings with expiration countdown. */
 export function StellarSelectionAllocationsTable({ list }: { list: StellarSelectionAllocation[] }) {
   const t = useTranslations('myPages');
-  const stellarSelectionWalletContract = useStellarSelectionWalletContract();
+  const getWalletContract = useStellarSelectionWalletContractFactory();
   const [roundTimeouts, setRoundTimeouts] = useState<Record<number, number>>({});
 
   useEffect(() => {
-    if (!stellarSelectionWalletContract || list.length === 0) return;
+    if (list.length === 0) return;
 
-    const uniqueRounds = Array.from(new Set(list.map((w) => w.RoundNum)));
+    // A cycle's timeout lives in the wallet that holds its allocations
+    // (allocations deposited before a wallet switch stay in the superseded
+    // wallet). A cycle only ever uses one wallet, so keying by cycle is safe.
+    const uniqueRounds = new Map<number, string | undefined>();
+    for (const w of list) {
+      if (!uniqueRounds.has(w.RoundNum)) uniqueRounds.set(w.RoundNum, w.WalletAddr);
+    }
+    const entries = Array.from(uniqueRounds.entries());
 
     const fetchTimeouts = async () => {
       const results = await Promise.allSettled(
-        uniqueRounds.map(
-          (r) =>
-            stellarSelectionWalletContract.read.roundTimeoutTimesToWithdrawPrizes?.([BigInt(r)]) ??
-            Promise.resolve(0n),
-        ),
+        entries.map(([r, walletAddr]) => {
+          const contract = getWalletContract(walletAddr);
+          return (
+            contract?.read.roundTimeoutTimesToWithdrawPrizes?.([BigInt(r)]) ?? Promise.resolve(0n)
+          );
+        }),
       );
       const map: Record<number, number> = {};
       results.forEach((res, i) => {
         if (res.status === 'fulfilled') {
-          map[uniqueRounds[i]!] = Number(res.value);
+          map[entries[i]![0]] = Number(res.value);
         }
       });
       setRoundTimeouts(map);
     };
 
     fetchTimeouts();
-  }, [stellarSelectionWalletContract, list]);
+  }, [getWalletContract, list]);
 
   return (
     <>

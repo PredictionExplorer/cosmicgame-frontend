@@ -46,9 +46,16 @@ const mockUseStellarSelectionWalletContract = jest.fn(() => ({
   },
 }));
 
+// The hook resolves a contract per holding wallet through the factory; the
+// factory mock records which wallet address each claim targeted.
+const mockGetWalletContract = jest.fn((_address?: string) =>
+  mockUseStellarSelectionWalletContract(),
+);
+
 jest.mock('../useStellarSelectionWalletContract', () => ({
   __esModule: true,
   default: () => mockUseStellarSelectionWalletContract(),
+  useStellarSelectionWalletContractFactory: () => mockGetWalletContract,
 }));
 
 const mockIsUserRejection = jest.fn((_err: unknown) => false);
@@ -135,7 +142,11 @@ describe('useClaimAllocations', () => {
     it('calls withdrawEverything with the round list', async () => {
       const { result } = renderHook(() => useClaimAllocations());
       await act(async () => {
-        await result.current.retrieveAllStellarSelectionETH([5, 6, 7]);
+        await result.current.retrieveAllStellarSelectionETH([
+          { cycleNum: 5 },
+          { cycleNum: 6 },
+          { cycleNum: 7 },
+        ]);
       });
       expect(mockWriteWithdrawEverything).toHaveBeenCalledWith([[5, 6, 7], [], []]);
     });
@@ -143,7 +154,7 @@ describe('useClaimAllocations', () => {
     it('awaits the transaction receipt before finishing', async () => {
       const { result } = renderHook(() => useClaimAllocations());
       await act(async () => {
-        await result.current.retrieveAllStellarSelectionETH([1]);
+        await result.current.retrieveAllStellarSelectionETH([{ cycleNum: 1 }]);
       });
       expect(mockWaitForTransactionReceipt).toHaveBeenCalledWith({ hash: '0xtx1' });
     });
@@ -151,7 +162,7 @@ describe('useClaimAllocations', () => {
     it('refreshes status data on success', async () => {
       const { result } = renderHook(() => useClaimAllocations());
       await act(async () => {
-        await result.current.retrieveAllStellarSelectionETH([1]);
+        await result.current.retrieveAllStellarSelectionETH([{ cycleNum: 1 }]);
       });
       expect(mockFetchStatusData).toHaveBeenCalledTimes(1);
       expect(mockSetNotification).toHaveBeenCalledWith({
@@ -165,7 +176,7 @@ describe('useClaimAllocations', () => {
       const onSuccess = jest.fn();
       const { result } = renderHook(() => useClaimAllocations(onSuccess));
       await act(async () => {
-        await result.current.retrieveAllStellarSelectionETH([1]);
+        await result.current.retrieveAllStellarSelectionETH([{ cycleNum: 1 }]);
       });
       expect(onSuccess).toHaveBeenCalledTimes(1);
     });
@@ -174,7 +185,7 @@ describe('useClaimAllocations', () => {
       mockUseStellarSelectionWalletContract.mockReturnValue(null as never);
       const { result } = renderHook(() => useClaimAllocations());
       await act(async () => {
-        await result.current.retrieveAllStellarSelectionETH([1]);
+        await result.current.retrieveAllStellarSelectionETH([{ cycleNum: 1 }]);
       });
       expect(mockWriteWithdrawEverything).not.toHaveBeenCalled();
       expect(mockSetNotification).toHaveBeenCalledWith(
@@ -193,7 +204,7 @@ describe('useClaimAllocations', () => {
       });
       const { result } = renderHook(() => useClaimAllocations());
       await act(async () => {
-        await result.current.retrieveAllStellarSelectionETH([1]);
+        await result.current.retrieveAllStellarSelectionETH([{ cycleNum: 1 }]);
       });
       expect(capturedDuring).toBe(true);
       expect(result.current.isClaiming.raffleETH).toBe(false);
@@ -206,7 +217,7 @@ describe('useClaimAllocations', () => {
 
       const { result } = renderHook(() => useClaimAllocations());
       await act(async () => {
-        await result.current.retrieveAllStellarSelectionETH([1]);
+        await result.current.retrieveAllStellarSelectionETH([{ cycleNum: 1 }]);
       });
       expect(mockSetNotification).toHaveBeenCalledWith(
         expect.objectContaining({
@@ -226,7 +237,7 @@ describe('useClaimAllocations', () => {
 
       const { result } = renderHook(() => useClaimAllocations());
       await act(async () => {
-        await result.current.retrieveAllStellarSelectionETH([1]);
+        await result.current.retrieveAllStellarSelectionETH([{ cycleNum: 1 }]);
       });
       expect(mockReportError).toHaveBeenCalledWith(err, 'retrieve all Stellar Selection ETH');
       expect(mockSetNotification).toHaveBeenCalledWith(expect.objectContaining({ type: 'error' }));
@@ -238,7 +249,7 @@ describe('useClaimAllocations', () => {
       const { result } = renderHook(() => useClaimAllocations());
 
       await act(async () => {
-        await result.current.retrieveAllStellarSelectionETH([1]);
+        await result.current.retrieveAllStellarSelectionETH([{ cycleNum: 1 }]);
       });
 
       expect(mockReportError).toHaveBeenCalledWith(
@@ -253,19 +264,40 @@ describe('useClaimAllocations', () => {
       expect(mockFetchStatusData).not.toHaveBeenCalled();
     });
 
-    it('handles empty round list gracefully', async () => {
+    it('skips the transaction entirely when there is nothing to retrieve', async () => {
       const { result } = renderHook(() => useClaimAllocations());
       await act(async () => {
         await result.current.retrieveAllStellarSelectionETH([]);
       });
-      expect(mockWriteWithdrawEverything).toHaveBeenCalledWith([[], [], []]);
+      expect(mockWriteWithdrawEverything).not.toHaveBeenCalled();
+      expect(mockSetNotification).not.toHaveBeenCalled();
+    });
+
+    it('sends one transaction per holding wallet, preserving row order', async () => {
+      const oldWallet = '0xaa00000000000000000000000000000000000009';
+      const { result } = renderHook(() => useClaimAllocations());
+      await act(async () => {
+        await result.current.retrieveAllStellarSelectionETH([
+          { cycleNum: 1 },
+          { cycleNum: 2, walletAddr: oldWallet },
+          { cycleNum: 3 },
+        ]);
+      });
+      // Default-wallet rows (1, 3) batch together; the superseded wallet's
+      // row gets its own transaction against that contract.
+      expect(mockGetWalletContract).toHaveBeenNthCalledWith(1, undefined);
+      expect(mockGetWalletContract).toHaveBeenNthCalledWith(2, oldWallet);
+      expect(mockWriteWithdrawEverything).toHaveBeenNthCalledWith(1, [[1, 3], [], []]);
+      expect(mockWriteWithdrawEverything).toHaveBeenNthCalledWith(2, [[2], [], []]);
+      // Success toast fires once for the whole batch.
+      expect(mockSetNotification).toHaveBeenCalledTimes(1);
     });
 
     it('treats a missing transaction hash as a localized claim failure', async () => {
       mockWriteWithdrawEverything.mockResolvedValueOnce(undefined as never);
       const { result } = renderHook(() => useClaimAllocations());
       await act(async () => {
-        await result.current.retrieveAllStellarSelectionETH([1]);
+        await result.current.retrieveAllStellarSelectionETH([{ cycleNum: 1 }]);
       });
       expect(mockWaitForTransactionReceipt).not.toHaveBeenCalled();
       expect(mockSetNotification).toHaveBeenCalledWith({
@@ -283,6 +315,16 @@ describe('useClaimAllocations', () => {
       await act(async () => {
         await result.current.claimDonatedNFT(42);
       });
+      expect(mockWriteClaimDonatedNft).toHaveBeenCalledWith([42]);
+    });
+
+    it('targets the holding wallet contract when a wallet address is given', async () => {
+      const oldWallet = '0xaa00000000000000000000000000000000000009';
+      const { result } = renderHook(() => useClaimAllocations());
+      await act(async () => {
+        await result.current.claimDonatedNFT(42, oldWallet);
+      });
+      expect(mockGetWalletContract).toHaveBeenCalledWith(oldWallet);
       expect(mockWriteClaimDonatedNft).toHaveBeenCalledWith([42]);
     });
 
@@ -410,15 +452,34 @@ describe('useClaimAllocations', () => {
     it('calls claimManyDonatedNfts with the index list', async () => {
       const { result } = renderHook(() => useClaimAllocations());
       await act(async () => {
-        await result.current.claimAllDonatedNFTs([1, 2, 3]);
+        await result.current.claimAllDonatedNFTs([
+          { tokenIndex: 1 },
+          { tokenIndex: 2 },
+          { tokenIndex: 3 },
+        ]);
       });
       expect(mockWriteClaimManyDonatedNfts).toHaveBeenCalledWith([[1, 2, 3]]);
+    });
+
+    it('groups NFTs per holding wallet into separate transactions', async () => {
+      const oldWallet = '0xaa00000000000000000000000000000000000009';
+      const { result } = renderHook(() => useClaimAllocations());
+      await act(async () => {
+        await result.current.claimAllDonatedNFTs([
+          { tokenIndex: 1, walletAddr: oldWallet },
+          { tokenIndex: 2 },
+          { tokenIndex: 3, walletAddr: oldWallet.toUpperCase().replace('0X', '0x') },
+        ]);
+      });
+      // Wallet matching is case-insensitive, so 1 and 3 share a group.
+      expect(mockWriteClaimManyDonatedNfts).toHaveBeenNthCalledWith(1, [[1, 3]]);
+      expect(mockWriteClaimManyDonatedNfts).toHaveBeenNthCalledWith(2, [[2]]);
     });
 
     it('toggles isClaiming.donatedNFT around the call', async () => {
       const { result } = renderHook(() => useClaimAllocations());
       await act(async () => {
-        await result.current.claimAllDonatedNFTs([1]);
+        await result.current.claimAllDonatedNFTs([{ tokenIndex: 1 }]);
       });
       expect(result.current.isClaiming.donatedNFT).toBe(false);
     });
@@ -427,7 +488,7 @@ describe('useClaimAllocations', () => {
       mockUseStellarSelectionWalletContract.mockReturnValue(null as never);
       const { result } = renderHook(() => useClaimAllocations());
       await act(async () => {
-        await result.current.claimAllDonatedNFTs([1]);
+        await result.current.claimAllDonatedNFTs([{ tokenIndex: 1 }]);
       });
       expect(mockWriteClaimManyDonatedNfts).not.toHaveBeenCalled();
     });
@@ -435,7 +496,7 @@ describe('useClaimAllocations', () => {
     it('awaits receipt and refreshes on success', async () => {
       const { result } = renderHook(() => useClaimAllocations());
       await act(async () => {
-        await result.current.claimAllDonatedNFTs([1]);
+        await result.current.claimAllDonatedNFTs([{ tokenIndex: 1 }]);
       });
       expect(mockWaitForTransactionReceipt).toHaveBeenCalledWith({ hash: '0xtx3' });
       expect(mockFetchStatusData).toHaveBeenCalled();
@@ -445,7 +506,7 @@ describe('useClaimAllocations', () => {
       mockWriteClaimManyDonatedNfts.mockRejectedValueOnce(new Error('revert'));
       const { result } = renderHook(() => useClaimAllocations());
       await act(async () => {
-        await result.current.claimAllDonatedNFTs([1]);
+        await result.current.claimAllDonatedNFTs([{ tokenIndex: 1 }]);
       });
       expect(result.current.isClaiming.donatedNFT).toBe(false);
     });
@@ -538,6 +599,25 @@ describe('useClaimAllocations', () => {
       ]);
     });
 
+    it('splits per holding wallet and strips walletAddr from the on-chain struct', async () => {
+      const oldWallet = '0xaa00000000000000000000000000000000000009';
+      const { result } = renderHook(() => useClaimAllocations());
+      await act(async () => {
+        await result.current.claimAllDonatedERC20([
+          { roundNum: 1, tokenAddress: '0xA', amount: 2n, walletAddr: oldWallet },
+          { roundNum: 2, tokenAddress: '0xB', amount: 3n },
+        ]);
+      });
+      expect(mockGetWalletContract).toHaveBeenNthCalledWith(1, oldWallet);
+      expect(mockGetWalletContract).toHaveBeenNthCalledWith(2, undefined);
+      expect(mockWriteClaimManyDonatedTokens).toHaveBeenNthCalledWith(1, [
+        [{ roundNum: 1, tokenAddress: '0xA', amount: 2n }],
+      ]);
+      expect(mockWriteClaimManyDonatedTokens).toHaveBeenNthCalledWith(2, [
+        [{ roundNum: 2, tokenAddress: '0xB', amount: 3n }],
+      ]);
+    });
+
     it('does not write batch claims when any amount is display-denominated', async () => {
       const { result } = renderHook(() => useClaimAllocations());
       await act(async () => {
@@ -596,7 +676,7 @@ describe('useClaimAllocations', () => {
 
       let pending!: Promise<unknown>;
       await act(async () => {
-        pending = result.current.retrieveAllStellarSelectionETH([1]);
+        pending = result.current.retrieveAllStellarSelectionETH([{ cycleNum: 1 }]);
         // Let the microtask that invokes the write start.
         await Promise.resolve();
       });
@@ -619,7 +699,7 @@ describe('useClaimAllocations', () => {
       mockUsePublicClient.mockReturnValue(undefined as never);
       const { result } = renderHook(() => useClaimAllocations());
       await act(async () => {
-        await result.current.retrieveAllStellarSelectionETH([1]);
+        await result.current.retrieveAllStellarSelectionETH([{ cycleNum: 1 }]);
       });
       expect(mockFetchStatusData).not.toHaveBeenCalled();
       expect(mockSetNotification).toHaveBeenCalledWith({
@@ -636,7 +716,7 @@ describe('useClaimAllocations', () => {
       const onSuccess = jest.fn();
       const { result } = renderHook(() => useClaimAllocations(onSuccess));
       await act(async () => {
-        await result.current.retrieveAllStellarSelectionETH([1]);
+        await result.current.retrieveAllStellarSelectionETH([{ cycleNum: 1 }]);
       });
       expect(onSuccess).not.toHaveBeenCalled();
     });
@@ -645,7 +725,7 @@ describe('useClaimAllocations', () => {
       const { result } = renderHook(() => useClaimAllocations());
       await expect(
         act(async () => {
-          await result.current.retrieveAllStellarSelectionETH([1]);
+          await result.current.retrieveAllStellarSelectionETH([{ cycleNum: 1 }]);
         }),
       ).resolves.toBeUndefined();
     });
@@ -655,9 +735,9 @@ describe('useClaimAllocations', () => {
       const { result } = renderHook(() => useClaimAllocations(onSuccess));
 
       await act(async () => {
-        await result.current.retrieveAllStellarSelectionETH([1]);
+        await result.current.retrieveAllStellarSelectionETH([{ cycleNum: 1 }]);
         await result.current.claimDonatedNFT(2);
-        await result.current.claimAllDonatedNFTs([3]);
+        await result.current.claimAllDonatedNFTs([{ tokenIndex: 3 }]);
         await result.current.claimDonatedERC20(4, '0xT', '1');
       });
 

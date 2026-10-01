@@ -90,12 +90,18 @@ export interface ContractAddresses {
   ImplementationAddr?: string;
   MarketingWalletAddr: string;
   PrizesWalletAddr: string;
+  /**
+   * Every stellar-selection wallet the game has ever used: the current one
+   * first, then each superseded wallet. Old wallets keep holding allocations
+   * deposited before the switch until their winners retrieve them.
+   */
+  PrizesWalletAddrs?: string[];
   StakingWalletCSTAddr: string;
   StakingWalletRWalkAddr: string;
   RaffleWalletAddr?: string;
   StakingWalletAddr?: string;
   BusinessLogicAddr?: string;
-  [key: string]: string | undefined;
+  [key: string]: string | string[] | undefined;
 }
 
 export interface DashboardInfo {
@@ -184,6 +190,8 @@ export interface StellarSelectionETHDeposit {
   Amount?: number;
   WinnerAddr?: string;
   Claimed?: boolean;
+  /** Stellar-selection wallet contract holding this deposit (withdrawals must target it). */
+  WalletAddr?: string;
   [key: string]: unknown;
 }
 
@@ -553,6 +561,8 @@ export interface AttachedNFT extends TxInfo {
   NFTTokenURI?: string;
   TokenAddress?: string;
   Index?: number;
+  /** Stellar-selection wallet contract holding this attached NFT (claims must target it). */
+  WalletAddr?: string;
   [key: string]: unknown;
 }
 
@@ -853,6 +863,8 @@ export interface DonatedERC20Token extends TxInfo {
   Claimed?: boolean;
   DonateClaimDiff?: string;
   DonateClaimDiffEth?: string;
+  /** Stellar-selection wallet contract holding the cycle's attached tokens (claims must target it). */
+  WalletAddr?: string;
   [key: string]: unknown;
 }
 

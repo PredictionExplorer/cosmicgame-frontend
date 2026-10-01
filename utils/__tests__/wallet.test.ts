@@ -10,6 +10,10 @@ const SAMPLE_WALLETS: AppContractAddresses = {
   cosmicDao: '',
   charity: '0xaa00000000000000000000000000000000000001',
   prizesWallet: '0xaa00000000000000000000000000000000000002',
+  prizesWallets: [
+    '0xaa00000000000000000000000000000000000002',
+    '0xaa00000000000000000000000000000000000006',
+  ],
   stakingCst: '0xAa00000000000000000000000000000000000003',
   stakingRwalk: '0xaa00000000000000000000000000000000000004',
   marketing: '0xaa00000000000000000000000000000000000005',
@@ -30,6 +34,12 @@ describe('getWalletKind', () => {
   it('returns null for unknown and empty addresses', () => {
     expect(getWalletKind('0x0000000000000000000000000000000000000000', SAMPLE_WALLETS)).toBeNull();
     expect(getWalletKind('', SAMPLE_WALLETS)).toBeNull();
+  });
+
+  it('classifies a superseded stellar-selection wallet from the wallet list', () => {
+    expect(getWalletKind('0xAA00000000000000000000000000000000000006', SAMPLE_WALLETS)).toBe(
+      'stellarSelection',
+    );
   });
 });
 

@@ -32,17 +32,19 @@ export interface NFTRecord {
   NFTTokenURI?: string;
   WinnerAddr?: string;
   Index: number;
+  /** Stellar-selection wallet contract holding this attached NFT (claims must target it). */
+  WalletAddr?: string;
 }
 
 interface NFTRowProps {
   nft: NFTRecord;
-  handleClaim?: (tokenIndex: number) => void | Promise<void>;
+  handleClaim?: (tokenIndex: number, walletAddr?: string) => void | Promise<void>;
   claimingTokens: number[];
 }
 
 interface DonatedNFTTableProps {
   list: NFTRecord[];
-  handleClaim?: (tokenIndex: number) => void | Promise<void>;
+  handleClaim?: (tokenIndex: number, walletAddr?: string) => void | Promise<void>;
   claimingTokens: number[];
 }
 
@@ -154,7 +156,7 @@ const NFTRow: FC<NFTRowProps> = ({ nft, handleClaim, claimingTokens }) => {
         <TablePrimaryCell label={t('attachedAssets.aria.actions')}>
           {!nft.WinnerAddr && (
             <Button
-              onClick={() => handleClaim(nft.Index)}
+              onClick={() => handleClaim(nft.Index, nft.WalletAddr)}
               disabled={isClaiming}
               data-testid="Claim Button"
             >

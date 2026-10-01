@@ -135,6 +135,13 @@ export interface AppContractAddresses {
   charity: string;
   /** Escrow holding allocation / stellar-selection prizes (`PrizesWalletAddr`). */
   prizesWallet: string;
+  /**
+   * Every stellar-selection wallet the game has ever used (`PrizesWalletAddrs`),
+   * the current one first. Superseded wallets keep holding allocations until
+   * their winners retrieve them, so retrieval must target the wallet recorded
+   * on each allocation row rather than only the current one.
+   */
+  prizesWallets: string[];
   stakingCst: string;
   stakingRwalk: string;
   marketing: string;
@@ -150,6 +157,7 @@ export function emptyContractAddresses(): AppContractAddresses {
     cosmicDao: '',
     charity: '',
     prizesWallet: '',
+    prizesWallets: [],
     stakingCst: '',
     stakingRwalk: '',
     marketing: '',

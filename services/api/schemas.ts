@@ -106,6 +106,7 @@ const ContractAddressesSchema = z
     ImplementationAddr: AddressSchema.optional(),
     MarketingWalletAddr: AddressSchema,
     PrizesWalletAddr: AddressSchema,
+    PrizesWalletAddrs: z.array(AddressSchema).optional(),
     StakingWalletCSTAddr: AddressSchema,
     StakingWalletRWalkAddr: AddressSchema,
   })
@@ -171,6 +172,7 @@ export const StellarSelectionETHDepositSchema = z
     Amount: z.number().optional(),
     WinnerAddr: AddressSchema.optional(),
     Claimed: z.boolean().optional(),
+    WalletAddr: AddressSchema.optional(),
   })
   .loose();
 

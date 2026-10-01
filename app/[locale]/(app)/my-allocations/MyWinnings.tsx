@@ -112,15 +112,23 @@ export default function MyWinnings() {
   const perPage = 5;
 
   const handleAllETHClaim = () => {
-    const roundNums = (stellarSelectionETHAllocations || [])
+    // Each row carries the wallet contract holding it; the hook groups the
+    // retrievals per wallet (older allocations can live in a superseded
+    // stellar-selection wallet).
+    const deposits = (stellarSelectionETHAllocations || [])
       .filter((w) => !w.Claimed)
-      .map((w) => w.RoundNum);
-    retrieveAllStellarSelectionETH(roundNums);
+      .map((w) => ({ cycleNum: w.RoundNum, walletAddr: w.WalletAddr }));
+    retrieveAllStellarSelectionETH(deposits);
   };
 
   const handleAllDonatedNFTsClaim = () => {
     if (!donatedNFTs) return;
-    claimAllDonatedNFTs(donatedNFTs.map((item) => item.Index));
+    claimAllDonatedNFTs(
+      donatedNFTs.map((item) => ({
+        tokenIndex: item.Index,
+        walletAddr: typeof item.WalletAddr === 'string' ? item.WalletAddr : undefined,
+      })),
+    );
   };
 
   const handleAllDonatedERC20Claim = () => {
@@ -130,6 +138,7 @@ export default function MyWinnings() {
         roundNum: x.RoundNum,
         tokenAddress: x.TokenAddr,
         amount: getDonatedErc20RawClaimAmount(x),
+        walletAddr: x.WalletAddr,
       }));
     claimAllDonatedERC20(tokens);
   };

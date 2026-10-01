@@ -28,6 +28,12 @@ jest.mock('../../../hooks/useStellarSelectionWalletContract', () => ({
       roundTimeoutTimesToWithdrawPrizes: jest.fn().mockResolvedValue(0),
     },
   }),
+  // The table resolves the contract per row wallet through the factory.
+  useStellarSelectionWalletContractFactory: () => (_address?: string) => ({
+    read: {
+      roundTimeoutTimesToWithdrawPrizes: jest.fn().mockResolvedValue(0),
+    },
+  }),
 }));
 
 jest.mock('next/link', () => ({

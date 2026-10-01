@@ -24,7 +24,9 @@ export type { DonatedERC20Token };
 
 interface TokenRowProps {
   token: DonatedERC20Token;
-  handleClaim: ((roundNum: number, tokenAddr: string, amount: string) => void) | null;
+  handleClaim:
+    | ((roundNum: number, tokenAddr: string, amount: string, walletAddr?: string) => void)
+    | null;
 }
 
 const TokenRow = ({ token, handleClaim }: TokenRowProps) => {
@@ -122,7 +124,12 @@ const TokenRow = ({ token, handleClaim }: TokenRowProps) => {
           {!token.Claimed && (
             <Button
               onClick={() =>
-                handleClaim(token.RoundNum, token.TokenAddr, getDonatedErc20RawClaimAmount(token))
+                handleClaim(
+                  token.RoundNum,
+                  token.TokenAddr,
+                  getDonatedErc20RawClaimAmount(token),
+                  token.WalletAddr,
+                )
               }
               data-testid="Claim Button"
             >
@@ -137,7 +144,9 @@ const TokenRow = ({ token, handleClaim }: TokenRowProps) => {
 
 interface DonatedERC20TableProps {
   list: DonatedERC20Token[];
-  handleClaim: ((roundNum: number, tokenAddr: string, amount: string) => void) | null;
+  handleClaim:
+    | ((roundNum: number, tokenAddr: string, amount: string, walletAddr?: string) => void)
+    | null;
 }
 
 const DonatedERC20Table = ({ list, handleClaim }: DonatedERC20TableProps) => {

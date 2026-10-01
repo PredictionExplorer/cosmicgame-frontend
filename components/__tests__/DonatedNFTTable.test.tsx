@@ -191,7 +191,7 @@ describe('AttachedNFTTable', () => {
     });
 
     fireEvent.click(screen.getByTestId('Claim Button'));
-    expect(mockHandleClaim).toHaveBeenCalledWith(0);
+    expect(mockHandleClaim).toHaveBeenCalledWith(0, undefined);
   });
 
   test('does not render Claim button for already claimed NFT assets', () => {

@@ -30,6 +30,11 @@ export const getWalletKind = (
   if (addrEq(address, addrs.stakingRwalk)) return 'randomWalkAnchoring';
   if (addrEq(address, addrs.marketing)) return 'outreach';
   if (addrEq(address, addrs.prizesWallet)) return 'stellarSelection';
+  // Superseded stellar-selection wallets stay recognizable: they keep
+  // holding allocations until their winners retrieve them.
+  if ((addrs.prizesWallets ?? []).some((wallet) => addrEq(address, wallet))) {
+    return 'stellarSelection';
+  }
   if (addrEq(address, addrs.charity)) return 'publicGoods';
   return null;
 };

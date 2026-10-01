@@ -212,17 +212,25 @@ const UserStatisticsView = ({ address, isOwnProfile }: UserStatisticsViewProps) 
     loadingByDeposit ||
     loadingMints;
 
-  const handleDonatedNFTsClaim = (tokenID: number) => {
-    claimDonatedNFT(tokenID);
+  const handleDonatedNFTsClaim = (tokenID: number, walletAddr?: string) => {
+    claimDonatedNFT(tokenID, walletAddr);
   };
 
   const handleAllDonatedNFTsClaim = () => {
-    const indexList = unclaimedDonatedNFTsList.map((item: { Index: number }) => item.Index);
-    claimAllDonatedNFTs(indexList);
+    const nfts = unclaimedDonatedNFTsList.map((item: { Index: number; WalletAddr?: string }) => ({
+      tokenIndex: item.Index,
+      walletAddr: item.WalletAddr,
+    }));
+    claimAllDonatedNFTs(nfts);
   };
 
-  const handleDonatedERC20Claim = (roundNum: number, tokenAddr: string, amount: string) => {
-    claimDonatedERC20(roundNum, tokenAddr, amount);
+  const handleDonatedERC20Claim = (
+    roundNum: number,
+    tokenAddr: string,
+    amount: string,
+    walletAddr?: string,
+  ) => {
+    claimDonatedERC20(roundNum, tokenAddr, amount, walletAddr);
   };
 
   const handleAllDonatedERC20Claim = () => {
@@ -232,6 +240,7 @@ const UserStatisticsView = ({ address, isOwnProfile }: UserStatisticsViewProps) 
         roundNum: x.RoundNum,
         tokenAddress: x.TokenAddr,
         amount: getDonatedErc20RawClaimAmount(x),
+        walletAddr: x.WalletAddr,
       }));
     claimAllDonatedERC20(donatedTokensToClaim);
   };

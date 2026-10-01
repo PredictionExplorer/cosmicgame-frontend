@@ -93,6 +93,7 @@ describe('DonatedERC20Table', () => {
       7,
       '0xTokenAddr1234567890abcdef1234567890abcdef',
       '1999999999999999994000',
+      undefined,
     );
   });
 
@@ -116,6 +117,7 @@ describe('DonatedERC20Table', () => {
       1,
       '0xTokenAddr1234567890abcdef1234567890abcdef',
       '42000000000000000000',
+      undefined,
     );
   });
 

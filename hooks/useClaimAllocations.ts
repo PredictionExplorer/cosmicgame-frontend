@@ -9,12 +9,39 @@ import { useApiData } from '@/contexts/ApiDataContext';
 import { toDonatedErc20ClaimAmountBigInt } from '@/utils/donatedErc20';
 import { assertSuccessfulTransactionReceipt, assertTransactionHash } from '@/utils/transactions';
 
-import useStellarSelectionWalletContract from './useStellarSelectionWalletContract';
+import { useStellarSelectionWalletContractFactory } from './useStellarSelectionWalletContract';
 
 interface ClaimingState {
   raffleETH: boolean;
   donatedNFT: boolean;
   donatedERC20: boolean;
+}
+
+/**
+ * Groups allocation rows by the stellar-selection wallet contract holding
+ * them. The game can be pointed at a replacement wallet; assets deposited
+ * into a superseded wallet stay there until retrieved, so each group gets
+ * its own retrieval transaction against its own contract. Rows without a
+ * wallet address (older backend responses) fall into the default group,
+ * which targets the currently configured wallet.
+ */
+function groupByHoldingWallet<T extends { walletAddr?: string }>(
+  rows: T[],
+): { walletAddr?: string; rows: T[] }[] {
+  const order: string[] = [];
+  const buckets = new Map<string, { walletAddr?: string; rows: T[] }>();
+  for (const row of rows) {
+    const hasWallet = typeof row.walletAddr === 'string' && row.walletAddr.length >= 10;
+    const key = hasWallet ? (row.walletAddr as string).toLowerCase() : '';
+    let bucket = buckets.get(key);
+    if (!bucket) {
+      bucket = { walletAddr: hasWallet ? row.walletAddr : undefined, rows: [] };
+      buckets.set(key, bucket);
+      order.push(key);
+    }
+    bucket.rows.push(row);
+  }
+  return order.map((key) => buckets.get(key)!);
 }
 
 /**
@@ -41,7 +68,7 @@ export function useClaimAllocations(onSuccess?: () => void) {
   const locale = useLocale();
   const { setNotification } = useNotification();
   const { fetchData: fetchStatusData } = useApiData();
-  const stellarSelectionWalletContract = useStellarSelectionWalletContract();
+  const getWalletContract = useStellarSelectionWalletContractFactory();
   const publicClient = usePublicClient();
 
   const [isClaiming, setIsClaiming] = useState<ClaimingState>({
@@ -141,19 +168,26 @@ export function useClaimAllocations(onSuccess?: () => void) {
   );
 
   const retrieveAllStellarSelectionETH = useCallback(
-    async (roundNums: number[]) => {
-      if (!stellarSelectionWalletContract) {
-        notifyWalletNotConnected();
-        return;
-      }
+    async (deposits: { cycleNum: number; walletAddr?: string }[]) => {
+      const groups = groupByHoldingWallet(deposits);
+      if (groups.length === 0) return;
       setIsClaiming((prev) => ({ ...prev, raffleETH: true }));
       try {
-        const hash = await stellarSelectionWalletContract.write.withdrawEverything?.([
-          roundNums,
-          [],
-          [],
-        ]);
-        await awaitTx(hash);
+        // One transaction per holding wallet: ETH deposited before a wallet
+        // switch can only be withdrawn from the wallet that received it.
+        for (const group of groups) {
+          const contract = getWalletContract(group.walletAddr);
+          if (!contract) {
+            notifyWalletNotConnected();
+            return;
+          }
+          const hash = await contract.write.withdrawEverything?.([
+            group.rows.map((row) => row.cycleNum),
+            [],
+            [],
+          ]);
+          await awaitTx(hash);
+        }
         setNotification({
           text: t('claim.stellarEthSuccess'),
           type: 'success',
@@ -169,7 +203,7 @@ export function useClaimAllocations(onSuccess?: () => void) {
       }
     },
     [
-      stellarSelectionWalletContract,
+      getWalletContract,
       notifyWalletNotConnected,
       awaitTx,
       setNotification,
@@ -180,14 +214,15 @@ export function useClaimAllocations(onSuccess?: () => void) {
   );
 
   const claimDonatedNFT = useCallback(
-    async (tokenID: number) => {
-      if (!stellarSelectionWalletContract) {
+    async (tokenID: number, walletAddr?: string) => {
+      const contract = getWalletContract(walletAddr);
+      if (!contract) {
         notifyWalletNotConnected();
         return;
       }
       setClaimingDonatedNFTs((prev) => [...prev, tokenID]);
       try {
-        const hash = await stellarSelectionWalletContract.write.claimDonatedNft?.([tokenID]);
+        const hash = await contract.write.claimDonatedNft?.([tokenID]);
         await awaitTx(hash);
         setNotification({
           text: t('claim.nftSuccess'),
@@ -204,7 +239,7 @@ export function useClaimAllocations(onSuccess?: () => void) {
       }
     },
     [
-      stellarSelectionWalletContract,
+      getWalletContract,
       notifyWalletNotConnected,
       awaitTx,
       setNotification,
@@ -215,17 +250,25 @@ export function useClaimAllocations(onSuccess?: () => void) {
   );
 
   const claimAllDonatedNFTs = useCallback(
-    async (indexList: number[]) => {
-      if (!stellarSelectionWalletContract) {
-        notifyWalletNotConnected();
-        return;
-      }
+    async (nfts: { tokenIndex: number; walletAddr?: string }[]) => {
+      const groups = groupByHoldingWallet(nfts);
+      if (groups.length === 0) return;
       setIsClaiming((prev) => ({ ...prev, donatedNFT: true }));
       try {
-        const hash = await stellarSelectionWalletContract.write.claimManyDonatedNfts?.([indexList]);
-        await awaitTx(hash);
+        // One transaction per holding wallet (see retrieveAllStellarSelectionETH).
+        for (const group of groups) {
+          const contract = getWalletContract(group.walletAddr);
+          if (!contract) {
+            notifyWalletNotConnected();
+            return;
+          }
+          const hash = await contract.write.claimManyDonatedNfts?.([
+            group.rows.map((row) => row.tokenIndex),
+          ]);
+          await awaitTx(hash);
+        }
         setNotification({
-          text: t('claim.nftsSuccess', { count: indexList.length }),
+          text: t('claim.nftsSuccess', { count: nfts.length }),
           type: 'success',
           visible: true,
         });
@@ -239,7 +282,7 @@ export function useClaimAllocations(onSuccess?: () => void) {
       }
     },
     [
-      stellarSelectionWalletContract,
+      getWalletContract,
       notifyWalletNotConnected,
       awaitTx,
       setNotification,
@@ -250,14 +293,20 @@ export function useClaimAllocations(onSuccess?: () => void) {
   );
 
   const claimDonatedERC20 = useCallback(
-    async (roundNum: number, tokenAddr: string, amount: string | number | bigint) => {
-      if (!stellarSelectionWalletContract) {
+    async (
+      roundNum: number,
+      tokenAddr: string,
+      amount: string | number | bigint,
+      walletAddr?: string,
+    ) => {
+      const contract = getWalletContract(walletAddr);
+      if (!contract) {
         notifyWalletNotConnected();
         return;
       }
       setIsClaiming((prev) => ({ ...prev, donatedERC20: true }));
       try {
-        const hash = await stellarSelectionWalletContract.write.claimDonatedToken?.([
+        const hash = await contract.write.claimDonatedToken?.([
           roundNum,
           tokenAddr,
           toDonatedErc20ClaimAmountBigInt(amount),
@@ -278,7 +327,7 @@ export function useClaimAllocations(onSuccess?: () => void) {
       }
     },
     [
-      stellarSelectionWalletContract,
+      getWalletContract,
       notifyWalletNotConnected,
       awaitTx,
       setNotification,
@@ -294,24 +343,30 @@ export function useClaimAllocations(onSuccess?: () => void) {
         roundNum: number;
         tokenAddress: string;
         amount: string | number | bigint | null | undefined;
+        walletAddr?: string;
       }[],
     ) => {
-      if (!stellarSelectionWalletContract) {
-        notifyWalletNotConnected();
-        return;
-      }
+      const groups = groupByHoldingWallet(tokens);
+      if (groups.length === 0) return;
       setIsClaiming((prev) => ({ ...prev, donatedERC20: true }));
       try {
-        const rawTokens = tokens.map((token) => ({
-          ...token,
-          amount: toDonatedErc20ClaimAmountBigInt(token.amount),
-        }));
-        const hash = await stellarSelectionWalletContract.write.claimManyDonatedTokens?.([
-          rawTokens,
-        ]);
-        await awaitTx(hash);
+        // One transaction per holding wallet (see retrieveAllStellarSelectionETH).
+        for (const group of groups) {
+          const contract = getWalletContract(group.walletAddr);
+          if (!contract) {
+            notifyWalletNotConnected();
+            return;
+          }
+          const rawTokens = group.rows.map((token) => ({
+            roundNum: token.roundNum,
+            tokenAddress: token.tokenAddress,
+            amount: toDonatedErc20ClaimAmountBigInt(token.amount),
+          }));
+          const hash = await contract.write.claimManyDonatedTokens?.([rawTokens]);
+          await awaitTx(hash);
+        }
         setNotification({
-          text: t('claim.tokensSuccess', { count: rawTokens.length }),
+          text: t('claim.tokensSuccess', { count: tokens.length }),
           type: 'success',
           visible: true,
         });
@@ -325,7 +380,7 @@ export function useClaimAllocations(onSuccess?: () => void) {
       }
     },
     [
-      stellarSelectionWalletContract,
+      getWalletContract,
       notifyWalletNotConnected,
       awaitTx,
       setNotification,

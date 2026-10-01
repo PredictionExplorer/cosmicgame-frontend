@@ -239,7 +239,10 @@ describe('MyWinnings', () => {
 
     render(<MyWinnings />);
     fireEvent.click(screen.getByText('myPages.allocations.retrieveAll'));
-    expect(mockClaimAllDonatedNFTs).toHaveBeenCalledWith([7, 12]);
+    expect(mockClaimAllDonatedNFTs).toHaveBeenCalledWith([
+      { tokenIndex: 7, walletAddr: undefined },
+      { tokenIndex: 12, walletAddr: undefined },
+    ]);
   });
 
   it('retrieves all attached ERC20 tokens with raw base-unit amounts', () => {

@@ -1,12 +1,6 @@
 'use client';
 
-import {
-  createContext,
-  useContext,
-  useEffect,
-  useMemo,
-  type ReactNode,
-} from 'react';
+import { createContext, useContext, useEffect, useMemo, type ReactNode } from 'react';
 
 import {
   emptyContractAddresses,
@@ -25,6 +19,19 @@ function pickAddr(v: string | undefined): string {
 /** Maps Go `ContractAddrs` into {@link AppContractAddresses}. Uses only API fields (no env fallbacks). */
 export function mergeContractAddresses(api?: ContractAddresses): AppContractAddresses {
   if (!api) return emptyContractAddresses();
+  const currentEscrowWallet = pickAddr(api.PrizesWalletAddr);
+  // Current wallet first; older wallets still holding allocations follow.
+  // An API without the list (pre-upgrade backend) degrades to the single
+  // current wallet.
+  const escrowWalletList = (api.PrizesWalletAddrs ?? [])
+    .map((addr) => pickAddr(addr))
+    .filter((addr) => addr !== '');
+  if (
+    currentEscrowWallet &&
+    !escrowWalletList.some((a) => a.toLowerCase() === currentEscrowWallet.toLowerCase())
+  ) {
+    escrowWalletList.unshift(currentEscrowWallet);
+  }
   return {
     randomWalkNft: pickAddr(api.RandomWalkAddr),
     cosmicGame: pickAddr(api.CosmicGameAddr),
@@ -32,7 +39,8 @@ export function mergeContractAddresses(api?: ContractAddresses): AppContractAddr
     cosmicToken: pickAddr(api.CosmicTokenAddr),
     cosmicDao: pickAddr(api.CosmicDaoAddr),
     charity: pickAddr(api.CharityWalletAddr),
-    prizesWallet: pickAddr(api.PrizesWalletAddr),
+    prizesWallet: currentEscrowWallet,
+    prizesWallets: escrowWalletList,
     stakingCst: pickAddr(api.StakingWalletCSTAddr),
     stakingRwalk: pickAddr(api.StakingWalletRWalkAddr),
     marketing: pickAddr(api.MarketingWalletAddr),
@@ -48,10 +56,7 @@ const ContractAddressesCtx = createContext<AppContractAddresses | null>(null);
  */
 export function ContractAddressesProvider({ children }: { children: ReactNode }) {
   const { data } = useDashboardInfo();
-  const value = useMemo(
-    () => mergeContractAddresses(data?.ContractAddrs),
-    [data?.ContractAddrs],
-  );
+  const value = useMemo(() => mergeContractAddresses(data?.ContractAddrs), [data?.ContractAddrs]);
 
   useEffect(() => {
     publishDashboardContractAddresses(value);
