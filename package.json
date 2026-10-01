@@ -144,6 +144,7 @@
   "overrides": {
     "@noble/hashes": "^1.8.0",
     "axios": "^1.18.1",
+    "@coinbase/cdp-sdk": "1.49.1",
     "@rainbow-me/rainbowkit": {
       "wagmi": "^3.6.15"
     }
