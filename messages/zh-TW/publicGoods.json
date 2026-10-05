@@ -1,18 +1,32 @@
 {
-  "protocol": {
-    "title": "協議公共財資助",
-    "subtitle": "Cosmic Signature 協議自動轉入公共財金庫的資金",
-    "description": "週期收官時，協議會將一定比例的週期儲備轉入公共財金庫，由金庫為目前設定的公共財受益方保管。"
+  "loadError": "無法載入公共財紀錄。",
+  "vault": {
+    "description": "每個週期收官時，週期儲備中的公共財份額轉入金庫，並在此等待為 {beneficiary} 取回。",
+    "due": "本週期應轉入",
+    "dueCaption": "目前週期儲備的 {percent}",
+    "inVault": "金庫現存",
+    "retrieved": "累計已取回",
+    "beneficiaryNote": "<guild>Protocol Guild</guild> 是資助以太坊核心貢獻者的集體機制。",
+    "forwardNote": "任何人都可以把金庫餘額轉撥給 Protocol Guild，只需支付 Gas 費。"
   },
-  "voluntary": {
-    "title": "自願公共財資助",
-    "subtitle": "社群成員自願轉入公共財金庫的資金",
-    "description": "除協議自動轉撥外，社群成員也可自願向公共財金庫貢獻資金。這些鏈上紀錄展現了 Cosmic Signature 社群對公共財建設的持續支持。"
+  "ledger": {
+    "contributions": "資助紀錄",
+    "retrievals": "取回紀錄"
   },
-  "retrievals": {
-    "title": "公共財取回",
-    "subtitle": "從公共財金庫取回的資金",
-    "description": "查看 Cosmic Signature 公共財金庫轉撥給目前設定受益方的資金紀錄。"
-  },
-  "loading": "載入中…"
+  "contribute": {
+    "title": "向金庫資助",
+    "description": "在 {network} 上將 ETH 直接傳送到公共財金庫。它會與協議份額一起在金庫中等待為 {beneficiary} 取回。",
+    "networkWarning": "僅限在 {network} 上傳送。在其他網路上傳到此地址的 ETH 不會進入金庫。",
+    "network": "網路",
+    "form": {
+      "label": "向公共財金庫資助 ETH",
+      "amountHint": "任意大於 0 的數量，從 {network} 上的錢包傳送。",
+      "connectHint": "連接 {network} 上的錢包即可資助。",
+      "summary": "{amount} 將進入公共財金庫，為 {beneficiary} 保管。",
+      "submit": "資助 ETH",
+      "submitAmount": "資助 {amount}",
+      "confirmed": "向公共財金庫資助的 {amount} ETH 已確認。",
+      "failed": "資助未能完成。請檢查錢包後重試。"
+    }
+  }
 }

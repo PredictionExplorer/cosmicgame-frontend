@@ -13,6 +13,7 @@ import {
   type LocaleRouteEntry,
 } from './locale-route-inventory';
 import { mockMobileAuditApi } from './mobile-audit-fixtures';
+import { GLOBAL_NOT_FOUND_FILE, PROXY_ALIAS_FILE } from './zh-route-inventory';
 import {
   LANDING_HEADERS,
   collectOverflowViolations,
@@ -82,9 +83,13 @@ test.afterEach(async ({ page, isMobile }, testInfo) => {
 });
 
 test('the cohesion audit covers every page source', () => {
-  const pageSources = readdirSync(join(__dirname, '../app/[locale]'), { recursive: true })
-    .filter((path): path is string => typeof path === 'string' && path.endsWith('/page.tsx'))
-    .sort();
+  const pageSources = [
+    ...readdirSync(join(__dirname, '../app/[locale]'), { recursive: true }).filter(
+      (path): path is string => typeof path === 'string' && path.endsWith('/page.tsx'),
+    ),
+    GLOBAL_NOT_FOUND_FILE,
+    PROXY_ALIAS_FILE,
+  ].sort();
   expect([...new Set(routes.map((route) => route.pageFile))].sort()).toEqual(pageSources);
 });
 
@@ -149,7 +154,14 @@ for (const route of routes) {
         .soft(page.getByRole('banner').getByRole('button', { name: /connect wallet/i }))
         .toHaveCount(0);
       if (route.id.endsWith('not-found')) {
-        await expect.soft(page.getByRole('banner').locator('a[href="/learn"]')).toBeVisible();
+        // Below 1024px the landing header's links move into its menu sheet.
+        await expect
+          .soft(
+            isMobile
+              ? page.getByRole('banner').getByRole('button', { name: /^Open menu/ })
+              : page.getByRole('banner').locator('a[href="/learn"]'),
+          )
+          .toBeVisible();
       }
     }
 
@@ -161,7 +173,11 @@ for (const route of routes) {
       const footer = page.getByRole('contentinfo');
       if ((await footer.count()) === 1) {
         await expect.soft(footer.getByRole('link').first()).toBeVisible();
-        await expect.soft(footer.getByTestId('language-directory')).toBeVisible();
+        // Phones fold the footer's groups behind their headings; the language
+        // directory's links stay in the HTML either way.
+        const directory = footer.getByTestId('language-directory');
+        if (isMobile) await expect.soft(directory).toBeAttached();
+        else await expect.soft(directory).toBeVisible();
       }
 
       const header = page.getByRole('banner');

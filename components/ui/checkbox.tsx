@@ -14,12 +14,18 @@ const Checkbox = React.forwardRef<HTMLInputElement, CheckboxProps>(
         type="checkbox"
         ref={ref}
         className={cn(
-          'peer h-4 w-4 shrink-0 appearance-none rounded-sm border border-primary ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 checked:bg-primary checked:border-primary',
+          // A 2px corner reads as a box, so a multi-select filter no longer
+          // looks like a group of radio buttons.
+          'peer size-4 shrink-0 appearance-none rounded-edge border border-input bg-surface-sunken transition-colors duration-[var(--duration-fast)] hover:enabled:border-foreground/60 disabled:cursor-not-allowed disabled:opacity-50 checked:border-primary checked:bg-primary',
           className,
         )}
         {...props}
       />
-      <Check className="pointer-events-none absolute h-4 w-4 text-primary-foreground opacity-0 peer-checked:opacity-100" />
+      <Check
+        aria-hidden
+        strokeWidth={3}
+        className="pointer-events-none absolute size-4 p-0.5 text-primary-foreground opacity-0 peer-checked:opacity-100"
+      />
     </div>
   ),
 );

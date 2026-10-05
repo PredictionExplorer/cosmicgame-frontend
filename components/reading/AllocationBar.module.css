@@ -1,0 +1,68 @@
+/*
+ * The allocation bar and its key (./AllocationBar.tsx), shared by the
+ * landing's Allocation Tracks, the white paper and the Learn guides.
+ */
+
+/*
+ * One bar drawn to scale against 100%: each segment grows by its share, so
+ * the six ETH tracks always fill the width together. A two-pixel gap
+ * separates them; the end segments carry the bar's rounding.
+ */
+.bar {
+  display: flex;
+  gap: 2px;
+  height: clamp(2.75rem, 2.25rem + 1.5vw, 3.5rem);
+}
+
+.segment {
+  container-type: inline-size;
+  display: flex;
+  align-items: flex-end;
+  min-width: 0.375rem;
+  flex: var(--share) 1 0;
+  padding: 0.5rem;
+  border-radius: var(--radius-edge);
+}
+
+.segmentLabel {
+  color: hsl(var(--background));
+  white-space: nowrap;
+}
+
+/* Inside reading text (a figure): the same bar, a quieter height. */
+.barInline {
+  height: 2.25rem;
+}
+
+.barInline .segment {
+  padding: 0.375rem;
+}
+
+/* A share too narrow for its figure shows the colour alone; the key reads it. */
+@container (width < 2.5rem) {
+  .segmentLabel {
+    display: none;
+  }
+}
+
+/* The bar's key: swatch, name and share per track, wrapping in rows. */
+.key {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.625rem 1.5rem;
+  margin-top: 1rem;
+}
+
+.keyItem {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 0.5rem;
+}
+
+.swatch {
+  width: 0.75rem;
+  height: 0.75rem;
+  flex-shrink: 0;
+  align-self: center;
+  border-radius: var(--radius-edge);
+}

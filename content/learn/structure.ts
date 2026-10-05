@@ -1,9 +1,17 @@
+import { LEGAL_LINKS } from '@/content/legal/links';
+
 import { COSMIC_SIGNATURE_MARKETPLACE_URL } from '@/config/marketplace';
 import { CHAOS_ZERO_PREDICTIONS_URL } from '@/config/predictions';
 import { CST_UNISWAP_SWAP_URL } from '@/config/uniswap';
 import { APP_ORIGIN, LANDING_ORIGIN } from '@/lib/hostRouting';
 
-import type { LearnArticleUi, LearnSection } from './types';
+import type {
+  LearnArticleUi,
+  LearnFigure,
+  LearnGroupCopy,
+  LearnGroupId,
+  LearnSection,
+} from './types';
 
 /**
  * The locale-independent skeleton of the learn hub.
@@ -24,9 +32,40 @@ interface LearnArticleStructure {
   readonly slug: string;
   readonly schemaType: 'Article' | 'TechArticle';
   readonly updated: string;
-  /** Related-resource link targets; labels come from the text modules. */
+  /**
+   * The guide's stage on the reading path. Articles are listed in reading
+   * order, so each stage's guides are consecutive.
+   */
+  readonly group: LearnGroupId;
+  /** The Signature that opens the guide: a token id in components/reading/signaturePlates. */
+  readonly plate: number;
+  /** Related-resource link targets; the page names each after its destination. */
   readonly related: readonly string[];
+  /** Figures drawn inside the guide's sections (./types.ts `LearnFigureKind`). */
+  readonly figures?: readonly LearnFigure[];
 }
+
+/**
+ * The pages a guide's prose may link to inline. A section paragraph writes
+ * `[label](key)` and the page links `label` to the target `key` names
+ * (content/learn/links.ts), so the eight text modules name a page without
+ * repeating its URL, and a locale cannot link anywhere else.
+ */
+export const LEARN_LINK_TARGETS = {
+  contracts: appLink('/contracts'),
+  code: appLink('/code'),
+  audits: appLink('/audits'),
+  security: appLink('/security'),
+  statistics: appLink('/statistics'),
+  riskDisclosures: appLink('/risk-disclosures'),
+  // Evidence published elsewhere, opened in a new tab: the Trust Center's own links.
+  explorer: LEGAL_LINKS.explorer.href,
+  sourcify: LEGAL_LINKS.sourcify.href,
+  contractsRepository: LEGAL_LINKS.contractsRepository.href,
+  hackenReport: LEGAL_LINKS.hacken.href,
+} as const;
+
+export type LearnLinkTarget = keyof typeof LEARN_LINK_TARGETS;
 
 export const LEARN_STRUCTURE = {
   hub: {
@@ -36,68 +75,104 @@ export const LEARN_STRUCTURE = {
     {
       slug: 'what-is-cosmic-signature',
       schemaType: 'Article',
-      updated: '2026-06-24',
+      updated: '2026-09-25',
+      group: 'start',
+      plate: 13,
       related: [APP_ORIGIN, appLink('/faq'), appLink('/statistics')],
+      // The cycle the definition describes, then two Signatures from their seeds.
+      figures: [
+        { kind: 'cycleTimeline', section: 0 },
+        { kind: 'seedPlates', section: 1 },
+      ],
     },
     {
       slug: 'how-the-performance-cycle-works',
       schemaType: 'TechArticle',
       updated: '2026-06-24',
+      group: 'start',
+      plate: 22,
       related: [appLink('/current-cycle'), appLink('/allocation'), appLink('/faq')],
+      figures: [
+        { kind: 'cycleTimeline', section: 0 },
+        { kind: 'allocation', section: 1 },
+      ],
     },
     {
       slug: 'how-gestures-work',
       schemaType: 'Article',
       updated: '2026-06-24',
+      group: 'start',
+      plate: 14,
       related: [
         APP_ORIGIN,
         `${LANDING_ORIGIN}/learn/how-the-performance-cycle-works`,
         appLink('/current-cycle'),
       ],
+      figures: [{ kind: 'cycleTimeline', section: 0 }],
     },
     {
       slug: 'three-body-nft-art',
       schemaType: 'TechArticle',
       updated: '2026-06-24',
+      group: 'start',
+      plate: 3,
       related: [appLink('/gallery'), appLink('/code'), appLink('/contracts')],
+      figures: [{ kind: 'seedPlates', section: 0 }],
     },
     {
       slug: 'cosmic-signature-on-arbitrum',
       schemaType: 'Article',
-      updated: '2026-06-24',
+      updated: '2026-09-25',
+      group: 'mechanics',
+      plate: 33,
       related: [appLink('/contracts'), appLink('/statistics')],
+      // Where the chain context is named: the core addresses themselves.
+      figures: [{ kind: 'contracts', section: 1 }],
     },
     {
       slug: 'contracts-security-verification',
       schemaType: 'TechArticle',
-      updated: '2026-06-24',
-      related: [appLink('/contracts'), appLink('/code'), appLink('/faq')],
+      updated: '2026-09-25',
+      group: 'mechanics',
+      plate: 7,
+      related: [appLink('/contracts'), appLink('/audits'), appLink('/security')],
+      figures: [{ kind: 'contracts', section: 0 }],
     },
     {
       slug: 'cst-token-and-cosmic-council',
       schemaType: 'Article',
       updated: '2026-06-24',
+      group: 'mechanics',
+      plate: 11,
       related: [`${LANDING_ORIGIN}/learn/how-gestures-work`, APP_ORIGIN],
     },
     {
       slug: 'anchoring-nfts',
       schemaType: 'Article',
       updated: '2026-05-25',
+      group: 'mechanics',
+      plate: 39,
       related: [appLink('/anchoring'), appLink('/gallery')],
+      figures: [{ kind: 'allocation', section: 0 }],
     },
     {
       slug: 'protocol-guild-public-goods',
       schemaType: 'Article',
       updated: '2026-05-25',
+      group: 'context',
+      plate: 40,
       related: [
         appLink('/public-goods-contributions-cg'),
         `${LANDING_ORIGIN}/learn/how-the-performance-cycle-works`,
       ],
+      figures: [{ kind: 'allocation', section: 1 }],
     },
     {
       slug: 'collecting-and-trading-cosmic-signature',
       schemaType: 'Article',
       updated: '2026-07-06',
+      group: 'context',
+      plate: 25,
       related: [
         COSMIC_SIGNATURE_MARKETPLACE_URL,
         CHAOS_ZERO_PREDICTIONS_URL,
@@ -111,6 +186,8 @@ export const LEARN_STRUCTURE = {
       slug: 'not-a-lottery-not-an-investment',
       schemaType: 'Article',
       updated: '2026-05-25',
+      group: 'context',
+      plate: 9,
       related: [appLink('/terms'), appLink('/faq')],
     },
     // lexicon-allow-end
@@ -125,25 +202,25 @@ type LearnArticleStructureItem = LearnStructure['articles'][number];
 
 export type LearnSlug = LearnArticleStructureItem['slug'];
 
-/** Maps a tuple of link targets to a same-length tuple of labels. */
-type LabelsFor<Links extends readonly unknown[]> = {
-  readonly [Index in keyof Links]: string;
-};
-
 /** Copy for one learn article, provided per locale. */
-type LearnArticleText<Article extends LearnArticleStructureItem> = {
+type LearnArticleText = {
   readonly title: string;
   readonly description: string;
   readonly h1: string;
+  /** A short title for the hub's cards, without the brand name. */
+  readonly cardTitle: string;
+  /**
+   * The card's one line (at most 90 characters, no brand name): what the
+   * reader finds in the guide. `description` stays the search snippet.
+   */
+  readonly cardDescription: string;
   readonly summary: string;
   /**
-   * Sections stay fully in the text modules because their count legitimately
-   * differs per locale (the English answerability appendix is longer than the
-   * Chinese one).
+   * Sections stay fully in the text modules because their count may differ
+   * per locale; a figure names its section by index, so a translation keeps
+   * the illustrated section in the same place.
    */
   readonly sections: readonly LearnSection[];
-  /** Labels for the skeleton's related links, in the same order. */
-  readonly relatedLabels: LabelsFor<Article['related']>;
 };
 
 /**
@@ -156,12 +233,16 @@ export type LearnText = {
       readonly title: string;
       readonly description: string;
     };
-    readonly eyebrow: string;
     readonly h1: string;
     readonly intro: string;
     readonly breadcrumbs: {
       readonly homeLabel: string;
       readonly learnLabel: string;
+    };
+    readonly groups: Readonly<Record<LearnGroupId, LearnGroupCopy>>;
+    readonly whitePaper: {
+      readonly eyebrow: string;
+      readonly readLabel: string;
     };
     readonly quizCta: {
       readonly heading: string;
@@ -171,6 +252,6 @@ export type LearnText = {
   };
   readonly articleUi: LearnArticleUi;
   readonly articles: {
-    readonly [Article in LearnArticleStructureItem as Article['slug']]: LearnArticleText<Article>;
+    readonly [Article in LearnArticleStructureItem as Article['slug']]: LearnArticleText;
   };
 };

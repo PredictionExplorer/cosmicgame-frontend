@@ -1,272 +1,387 @@
 'use client';
 
-import { useMemo, useState } from 'react';
-import { ChevronDown, ChevronUp } from 'lucide-react';
-import { useLocale, useTranslations } from 'next-intl';
+import { useMemo } from 'react';
+import { ArrowRight } from 'lucide-react';
+import { useTranslations } from 'next-intl';
 
-import { getExplorerUrl } from '@/utils';
-
+import { distributionPerAnchoredNft } from '@/utils/anchoringStats';
+import { formatAddress, formatId } from '@/utils/format';
+import { useFormat } from '@/hooks/useFormat';
+import {
+  useAnchorDistributionsByUserByTokenDetails,
+  useCSTAnchorActionsByUser,
+  useCSTInfo,
+  useDashboardInfo,
+} from '@/hooks/useApiQuery';
 import { Link } from '@/i18n/navigation';
-import { HydrationSafeDateTime } from '@/components/common/HydrationSafeDateTime';
+import type { AnchorAction } from '@/services/api/types';
 import {
-  DefinitionList,
-  DetailRow,
-  detailLinkClass,
-  detailPanelClass,
-} from '@/components/detail-page/DetailPageChrome';
-import { PageHeader } from '@/components/layout/PageHeader';
+  PageHeader,
+  PageHeaderFigures,
+  type PageHeaderFigure,
+} from '@/components/layout/PageHeader';
+import { AddressChip } from '@/components/ui/address-chip';
+import { Amount } from '@/components/ui/amount';
+import { Badge } from '@/components/ui/badge';
+import { buttonVariants } from '@/components/ui/button';
+import { DataTable, TxProofLink, type DataTableColumn } from '@/components/ui/data-table';
+import { DateTime } from '@/components/ui/date-time';
 import { PageShell } from '@/components/ui/page-shell';
-import { Button } from '@/components/ui/button';
-import { useAnchorDistributionsByUserByTokenDetails } from '@/hooks/useApiQuery';
-import {
-  TablePrimary,
-  TablePrimaryBody,
-  TablePrimaryCell,
-  TablePrimaryContainer,
-  TablePrimaryHead,
-  TablePrimaryHeadCell,
-  TablePrimaryRow,
-} from '@/components/styled';
-import { CustomPagination } from '@/components/common/CustomPagination';
-import { cn } from '@/lib/utils';
-import { formatFixed } from '@/utils/format';
+import { SignatureWallLabel, useSignatureLabel } from '@/components/ui/signature-label';
+import { SiteNameText } from '@/components/ui/site-name-text';
+import { Skeleton } from '@/components/ui/skeleton';
+import { SpecList, SpecRow } from '@/components/ui/spec-list';
+import { UnknownValue } from '@/components/ui/unknown-value';
+import { TokenPlate } from '@/components/anchoring/TokenPlate';
+import { anchorActionHref } from '@/components/anchoring/anchorLinks';
+import { useCycleCell } from '@/components/tables/useCycleCell';
 
-interface AnchorInfo {
-  TxHash: string;
-  TimeStamp: number;
-  NumStakedNFTs: number;
-}
-
-interface ReleaseInfo {
-  EvtLogId: number;
-  TxHash: string;
-  TimeStamp: number;
-  NumStakedNFTs: number;
-  MaxUnpaidDepositIndex: number;
-  RewardAmountEth: number;
-}
-
-interface RewardsRowData {
+/** One ETH Anchor Distribution deposit the NFT shared in. */
+interface TokenDeposit {
+  DepositId: number;
   DepositTimeStamp: number;
   RoundNum: number;
-  DepositId: number;
-  DepositIndex: number;
-  Claimed: boolean;
   RewardEth: number;
-  Stake: AnchorInfo;
-  Unstake: ReleaseInfo;
+  Claimed: boolean;
 }
 
-function RewardsDetailRow({ row }: { row: RewardsRowData }) {
-  const t = useTranslations('anchoring');
-  const locale = useLocale();
-  const [open, setOpen] = useState<boolean>(false);
-
-  if (!row) return <TablePrimaryRow />;
-
-  const { DepositTimeStamp, RoundNum, DepositId, Claimed, RewardEth, Stake, Unstake } = row;
-
-  return (
-    <>
-      <TablePrimaryRow className="border-b-0">
-        <TablePrimaryCell label={t('distributionsByToken.columns.details')}>
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={() => setOpen((prev) => !prev)}
-            aria-label={t('common.aria.expandRow')}
-          >
-            {open ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
-          </Button>
-        </TablePrimaryCell>
-
-        <TablePrimaryCell label={t('distributionsByToken.columns.depositDatetime')} align="left">
-          <HydrationSafeDateTime timestamp={DepositTimeStamp} locale={locale} />
-        </TablePrimaryCell>
-
-        <TablePrimaryCell label={t('distributionsByToken.columns.cycle')} align="center">
-          <Link href={`/allocation/${RoundNum}`} className="text-inherit text-[inherit]">
-            {RoundNum}
-          </Link>
-        </TablePrimaryCell>
-
-        <TablePrimaryCell label={t('distributionsByToken.columns.depositId')} align="center">
-          {DepositId}
-        </TablePrimaryCell>
-        <TablePrimaryCell label={t('distributionsByToken.columns.retrieved')} align="center">
-          {Claimed ? t('common.yes') : t('common.no')}
-        </TablePrimaryCell>
-        <TablePrimaryCell label={t('distributionsByToken.columns.distributionEth')} align="right">
-          {formatFixed(RewardEth, 6)}
-        </TablePrimaryCell>
-      </TablePrimaryRow>
-
-      {open && (
-        <TablePrimaryRow className="border-t-0">
-          <TablePrimaryCell
-            className="!py-0"
-            colSpan={6}
-            label={t('distributionsByToken.columns.details')}
-          >
-            <div className="grid grid-cols-1 gap-6 py-4 md:grid-cols-2">
-              <div className={cn(detailPanelClass, 'mb-0')}>
-                <div className="border-b border-white/[0.06] px-4 py-3">
-                  <h3 className="font-display text-sm font-semibold text-foreground">
-                    {t('distributionsByToken.details.anchorTitle')}
-                  </h3>
-                </div>
-                <DefinitionList>
-                  <DetailRow label={t('distributionsByToken.details.anchoredDatetime')}>
-                    <a
-                      className={detailLinkClass}
-                      href={getExplorerUrl('tx', Stake.TxHash)}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                    >
-                      <HydrationSafeDateTime timestamp={Stake.TimeStamp} locale={locale} />
-                    </a>
-                  </DetailRow>
-                  <DetailRow label={t('distributionsByToken.details.anchoredNfts')}>
-                    <span className="font-mono tabular-nums">{Stake.NumStakedNFTs}</span>
-                  </DetailRow>
-                </DefinitionList>
-              </div>
-
-              {Unstake.EvtLogId !== 0 ? (
-                <div className={cn(detailPanelClass, 'mb-0')}>
-                  <div className="border-b border-white/[0.06] px-4 py-3">
-                    <h3 className="font-display text-sm font-semibold text-foreground">
-                      {t('distributionsByToken.details.releaseTitle')}
-                    </h3>
-                  </div>
-                  <DefinitionList>
-                    <DetailRow label={t('distributionsByToken.details.releasedDatetime')}>
-                      <a
-                        className={detailLinkClass}
-                        href={getExplorerUrl('tx', Unstake.TxHash)}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                      >
-                        <HydrationSafeDateTime timestamp={Unstake.TimeStamp} locale={locale} />
-                      </a>
-                    </DetailRow>
-                    <DetailRow label={t('distributionsByToken.details.anchoredNfts')}>
-                      <span className="font-mono tabular-nums">{Unstake.NumStakedNFTs}</span>
-                    </DetailRow>
-                    <DetailRow label={t('distributionsByToken.details.distribution')}>
-                      <span className="font-mono tabular-nums">
-                        {formatFixed(Unstake.RewardAmountEth, 6)} ETH
-                      </span>
-                    </DetailRow>
-                  </DefinitionList>
-                </div>
-              ) : (
-                <div />
-              )}
-            </div>
-          </TablePrimaryCell>
-        </TablePrimaryRow>
-      )}
-    </>
-  );
+/** The deposits of the details payload, which arrive as an object keyed "0", "1", … */
+export function depositsFromDetails(details: Record<string, unknown> | null | undefined) {
+  if (!details) return [];
+  return Object.keys(details)
+    .filter((key) => /^\d+$/.test(key))
+    .map((key) => details[key])
+    .filter((item): item is TokenDeposit => Boolean(item) && typeof item === 'object');
 }
 
-function RewardsDetailTable({ list }: { list: RewardsRowData[] }) {
-  const t = useTranslations('anchoring');
-  const PER_PAGE = 5;
-  const [currentPage, setCurrentPage] = useState<number>(1);
-
-  const paginatedData = list.slice((currentPage - 1) * PER_PAGE, currentPage * PER_PAGE);
-
-  return (
-    <>
-      <SectionCardTableShell>
-        <TablePrimaryContainer>
-          <TablePrimary>
-            <TablePrimaryHead>
-              <tr>
-                <TablePrimaryHeadCell>
-                  <span className="sr-only">{t('distributionsByToken.columns.details')}</span>
-                </TablePrimaryHeadCell>
-                <TablePrimaryHeadCell align="left">
-                  {t('distributionsByToken.columns.depositDatetime')}
-                </TablePrimaryHeadCell>
-                <TablePrimaryHeadCell>
-                  {t('distributionsByToken.columns.cycle')}
-                </TablePrimaryHeadCell>
-                <TablePrimaryHeadCell>
-                  {t('distributionsByToken.columns.depositId')}
-                </TablePrimaryHeadCell>
-                <TablePrimaryHeadCell>
-                  {t('distributionsByToken.columns.retrieved')}
-                </TablePrimaryHeadCell>
-                <TablePrimaryHeadCell align="right">
-                  {t('distributionsByToken.columns.distributionEth')}
-                </TablePrimaryHeadCell>
-              </tr>
-            </TablePrimaryHead>
-            <TablePrimaryBody>
-              {paginatedData.map((row) => (
-                <RewardsDetailRow key={row.DepositId} row={row} />
-              ))}
-            </TablePrimaryBody>
-          </TablePrimary>
-        </TablePrimaryContainer>
-      </SectionCardTableShell>
-
-      <CustomPagination
-        page={currentPage}
-        setPage={setCurrentPage}
-        totalLength={list.length}
-        perPage={PER_PAGE}
-      />
-    </>
-  );
+/** Where one NFT's anchor stands for one anchor-holder. */
+export interface TokenAnchorState {
+  /** The anchor action, or `null` when this address never anchored the NFT. */
+  anchor: AnchorAction | null;
+  /** The release, or `null` while the NFT is still anchored. */
+  release: AnchorAction | null;
 }
 
-function SectionCardTableShell({ children }: { children: React.ReactNode }) {
-  return <div className={cn(detailPanelClass, 'mb-8')}>{children}</div>;
+/**
+ * The NFT's anchor and release among the anchor-holder's actions. An NFT can
+ * be anchored only once, so there is at most one of each.
+ */
+export function tokenAnchorState(
+  actions: readonly AnchorAction[],
+  tokenId: number,
+): TokenAnchorState {
+  const ofToken = actions.filter((action) => action.TokenId === tokenId);
+  return {
+    anchor: ofToken.find((action) => action.ActionType === 0) ?? null,
+    release: ofToken.find((action) => action.ActionType === 1) ?? null,
+  };
 }
 
+/** A date that is its transaction's proof: the explorer link when the hash is known. */
+function ProvenDate({ action }: { action: AnchorAction }) {
+  const date = <DateTime timestamp={action.TimeStamp} year="always" />;
+  return action.TxHash ? <TxProofLink hash={action.TxHash}>{date}</TxProofLink> : date;
+}
+
+/**
+ * Every ETH Anchor Distribution deposit one anchored Cosmic Signature NFT
+ * shared in, for one anchor-holder. The artwork leads, and beside it, once,
+ * what the page is about: the totals (with what the NFT would receive now,
+ * while it is still anchored) and where its anchor stands: when it was
+ * anchored and by which action, and whether it is still anchored or was
+ * released and what that retrieved. The deposit ledger follows, one row per
+ * deposit, without repeating that one anchor on every row. The page sits
+ * under the Anchor Distributions records, by anchor-holder.
+ */
 function RewardsByTokenPage({ address, tokenId }: { address: string; tokenId: number }) {
   const t = useTranslations('anchoring');
-  const { data: rawResponse, isLoading: loading } = useAnchorDistributionsByUserByTokenDetails(
-    address,
-    tokenId,
+  const format = useFormat();
+  const query = useAnchorDistributionsByUserByTokenDetails(address, tokenId);
+  const actionsQuery = useCSTAnchorActionsByUser(address);
+  const token = useCSTInfo(tokenId);
+  const dashboard = useDashboardInfo();
+  const cycleCell = useCycleCell();
+  const label = useSignatureLabel();
+  const deposits = useMemo(() => depositsFromDetails(query.data), [query.data]);
+  const anchorState = useMemo(
+    () => (actionsQuery.data ? tokenAnchorState(actionsQuery.data, tokenId) : null),
+    [actionsQuery.data, tokenId],
   );
-  const rewardsData = useMemo(() => {
-    if (!rawResponse) return [];
-    return Object.keys(rawResponse)
-      .filter((key) => !isNaN(Number(key)))
-      .map((key) => (rawResponse as Record<string, unknown>)[key]) as RewardsRowData[];
-  }, [rawResponse]);
 
-  const pageTitle = t('distributionsByToken.title', { tokenId });
+  const totals = useMemo(() => {
+    let distributed = 0;
+    let unretrieved = 0;
+    for (const deposit of deposits) {
+      distributed += deposit.RewardEth ?? 0;
+      if (!deposit.Claimed) unretrieved += deposit.RewardEth ?? 0;
+    }
+    return { distributed, unretrieved };
+  }, [deposits]);
+
+  const pending = <Skeleton className="h-7 w-20" />;
+  const unread = query.isError;
+  const stillAnchored = anchorState?.anchor != null && anchorState.release === null;
+  const perNft = distributionPerAnchoredNft(
+    dashboard.data?.StakingAmountEth,
+    dashboard.data?.MainStats?.StakeStatisticsCST?.TotalTokensStaked,
+  );
+  const figures: PageHeaderFigure[] = [
+    {
+      id: 'deposits',
+      label: t('distributionsByToken.figures.deposits'),
+      value: query.isLoading ? pending : unread ? null : format.count(deposits.length),
+    },
+    {
+      id: 'distributed',
+      label: t('distributionsByToken.figures.distributed'),
+      value: query.isLoading ? (
+        pending
+      ) : unread ? null : (
+        <Amount value={totals.distributed} unit="ETH" context="card" />
+      ),
+    },
+    {
+      id: 'unretrieved',
+      label: t('distributionsByToken.figures.unretrieved'),
+      value: query.isLoading ? (
+        pending
+      ) : unread ? null : (
+        <Amount value={totals.unretrieved} unit="ETH" context="card" />
+      ),
+      caption: stillAnchored ? t('distributionsByToken.figures.unretrievedCaption') : undefined,
+    },
+  ];
+  // What the next deposit would bring it: only an NFT that is still anchored shares in it.
+  if (stillAnchored) {
+    figures.push({
+      id: 'perNft',
+      label: t('flow.cosmicSignature.perNft.label'),
+      info: t('flow.cosmicSignature.perNft.definition'),
+      value: dashboard.isLoading ? (
+        pending
+      ) : perNft.status === 'available' ? (
+        <Amount value={perNft.perNftEth} unit="ETH" context="card" />
+      ) : null,
+      caption: t('flow.cosmicSignature.perNft.caption'),
+    });
+  }
+
+  const columns = useMemo<DataTableColumn<TokenDeposit>[]>(
+    () => [
+      {
+        id: 'datetime',
+        kind: 'datetime',
+        header: t('distributionsByToken.columns.depositDatetime'),
+        value: (row) => row.DepositTimeStamp,
+      },
+      {
+        id: 'cycle',
+        kind: 'link',
+        header: t('distributionsByToken.columns.cycle'),
+        value: (row) => row.RoundNum,
+        cell: (row) => cycleCell(row.RoundNum),
+        nowrap: true,
+      },
+      {
+        id: 'deposit',
+        kind: 'text',
+        header: t('distributionsByToken.columns.depositId'),
+        value: (row) => row.DepositId,
+        nowrap: true,
+        cellClassName: 'font-mono tabular-nums',
+        priority: 'secondary',
+      },
+      {
+        id: 'retrieved',
+        kind: 'text',
+        header: t('distributionsByToken.columns.retrieved'),
+        value: (row) => (row.Claimed ? t('common.yes') : t('common.no')),
+        nowrap: true,
+      },
+      {
+        id: 'amount',
+        kind: 'amount',
+        header: t('distributionsByToken.columns.distributionEth'),
+        value: (row) => row.RewardEth,
+        showUnit: false,
+        sortable: true,
+      },
+    ],
+    [cycleCell, t],
+  );
+
+  const tokenName = token.data?.TokenName?.trim() || null;
+  const tokenTitle = label.text({ tokenId, name: tokenName });
+  const anchorAction = anchorState?.anchor ?? null;
 
   return (
-    <PageShell variant="data" backdrop="signature" className="max-sm:pb-16">
-      <div className="mx-auto max-w-5xl">
-        <PageHeader
-          title={pageTitle}
-          subtitle={t('distributionsByToken.subtitle', { address })}
-          breadcrumbs={[
-            { label: t('distributionsByToken.breadcrumbs.home'), href: '/' },
-            { label: t('distributionsByToken.breadcrumbs.user'), href: `/user/${address}` },
-            { label: t('distributionsByToken.breadcrumbs.token', { tokenId }) },
-          ]}
-          className="mb-10 text-left sm:max-w-none [&_p]:mx-0 [&_p]:max-w-none"
-          align="left"
-        />
+    <PageShell variant="data">
+      {/* A public record: it sits under the Anchor Distributions records, by anchor-holder. */}
+      <PageHeader
+        section="records"
+        breadcrumbs={[
+          { label: t('overview.title'), href: '/anchoring' },
+          { label: formatAddress(address), href: `/user/${address}`, mono: true },
+        ]}
+        // A long title balances its lines instead of leaving one word on the last,
+        // and keeps the collection's name on one line, as every string title does.
+        title={
+          <span className="block text-balance">
+            <SiteNameText>
+              {t('distributionsByToken.title', { id: formatId(tokenId) })}
+            </SiteNameText>
+          </span>
+        }
+        subtitle={t('distributionsByToken.subtitle')}
+      />
 
-        {loading ? (
-          <div className={cn(detailPanelClass, 'p-10 text-center')}>
-            <p className="text-sm font-medium text-muted-foreground">{t('common.loading')}</p>
+      <section
+        aria-label={tokenTitle}
+        className="mb-10 grid gap-x-10 gap-y-8 border-b border-rule-faint pb-10 sm:grid-cols-[12rem_minmax(0,1fr)] lg:grid-cols-[16rem_minmax(0,1fr)]"
+      >
+        <figure className="min-w-0">
+          {/* A pointer shortcut; the wall label's title names the same page. */}
+          <Link href={`/detail/${tokenId}`} tabIndex={-1} aria-hidden className="block">
+            <TokenPlate
+              collection="cosmicSignature"
+              tokenId={tokenId}
+              alt=""
+              sizes="(min-width: 1024px) 16rem, (min-width: 640px) 12rem, 100vw"
+              priority
+            />
+          </Link>
+          {/* The one wall label every Signature takes; its title is the link. */}
+          <SignatureWallLabel
+            as="figcaption"
+            className="mt-3"
+            tokenId={tokenId}
+            name={tokenName}
+            cycle={token.data?.RoundNum}
+            titleHref={`/detail/${tokenId}`}
+          />
+        </figure>
+
+        <div className="min-w-0 space-y-8">
+          {/* A wrapper keeps the column's rhythm: the strip's own negative margin would cancel it. */}
+          <div>
+            <PageHeaderFigures figures={figures} className="mt-0 sm:mt-0" />
           </div>
-        ) : (
-          <RewardsDetailTable list={rewardsData} />
-        )}
-      </div>
+
+          <SpecList density="dense">
+            <SpecRow density="dense" label={t('distributionsByToken.holder')}>
+              <AddressChip address={address} variant="plain" />
+            </SpecRow>
+            <AnchorStateRows
+              loading={actionsQuery.isLoading}
+              failed={actionsQuery.isError && !actionsQuery.data}
+              state={anchorState}
+            />
+          </SpecList>
+        </div>
+      </section>
+
+      <DataTable
+        data={deposits}
+        columns={columns}
+        ariaLabel={t('distributionsByToken.label')}
+        getRowKey={(row) => row.DepositId}
+        loading={query.isLoading}
+        error={query.isError ? t('distributionsByToken.error') : undefined}
+        onRetry={() => void query.refetch()}
+        emptyTitle={t('distributionsByToken.empty.title')}
+        emptyDescription={t('distributionsByToken.empty.description')}
+        emptyAction={
+          anchorAction ? (
+            <Link
+              href={anchorActionHref('cosmicSignature', anchorAction.ActionId)}
+              className={buttonVariants({ variant: 'outline', size: 'sm' })}
+            >
+              {t('distributionsByToken.empty.viewAction', { id: anchorAction.ActionId })}
+              <ArrowRight aria-hidden />
+            </Link>
+          ) : (
+            <Link href="/anchoring" className={buttonVariants({ variant: 'outline', size: 'sm' })}>
+              {t('distributionsByToken.empty.action')}
+            </Link>
+          )
+        }
+      />
     </PageShell>
+  );
+}
+
+/**
+ * Where the NFT's anchor stands, as spec rows: its status, when it was
+ * anchored (the transaction's proof) and by which action, then, once it was
+ * released, when and what the release retrieved. Unread, it says so.
+ */
+function AnchorStateRows({
+  loading,
+  failed,
+  state,
+}: {
+  loading: boolean;
+  failed: boolean;
+  state: TokenAnchorState | null;
+}) {
+  const t = useTranslations('anchoring');
+  const label = t('distributionsByToken.anchor.status');
+  if (loading) {
+    return (
+      <SpecRow density="dense" label={label}>
+        <Skeleton className="h-5 w-28" />
+      </SpecRow>
+    );
+  }
+  if (failed || state === null) {
+    return (
+      <SpecRow density="dense" label={label}>
+        <UnknownValue label={t('flow.unavailable')} />
+      </SpecRow>
+    );
+  }
+  const { anchor, release } = state;
+  if (!anchor) {
+    return (
+      <SpecRow density="dense" label={label}>
+        <span className="text-muted-foreground">
+          {t('distributionsByToken.anchor.notAnchored')}
+        </span>
+      </SpecRow>
+    );
+  }
+  return (
+    <>
+      <SpecRow density="dense" label={label}>
+        {release ? (
+          <Badge tone="neutral">{t('status.released')}</Badge>
+        ) : (
+          <Badge tone="positive" dot>
+            {t('anchorActionDetail.timeline.stillAnchored')}
+          </Badge>
+        )}
+      </SpecRow>
+      <SpecRow density="dense" label={t('distributionsByToken.details.anchoredDatetime')}>
+        <ProvenDate action={anchor} />
+      </SpecRow>
+      <SpecRow density="dense" label={t('distributionsByToken.details.action')}>
+        <Link href={anchorActionHref('cosmicSignature', anchor.ActionId)} className="link">
+          {t('anchorActionDetail.breadcrumbs.action', { id: anchor.ActionId })}
+        </Link>
+      </SpecRow>
+      {release ? (
+        <>
+          <SpecRow density="dense" label={t('distributionsByToken.details.releasedDatetime')}>
+            <ProvenDate action={release} />
+          </SpecRow>
+          {typeof release.RewardAmountEth === 'number' ? (
+            <SpecRow density="dense" label={t('distributionsByToken.details.distribution')}>
+              <Amount value={release.RewardAmountEth} unit="ETH" context="card" />
+            </SpecRow>
+          ) : null}
+        </>
+      ) : null}
+    </>
   );
 }
 

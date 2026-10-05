@@ -1,48 +1,55 @@
-'use client';
+import type { ComponentType, SVGProps } from 'react';
+import { Scale, ScrollText, UsersRound } from 'lucide-react';
 
-import { motion } from 'framer-motion';
+import type { LandingContent, LandingCouncilColumnId } from '@/content/landing';
 
-import type { LandingContent } from '@/content/landing';
+import { Steps } from '@/components/ui/steps';
 
 import { SectionHeading } from './SectionHeading';
+import styles from './Landing.module.css';
 
+/**
+ * Each rule's glyph, by its structure id (content/landing/structure.ts). The
+ * rules are not steps in an order, so they carry glyphs, as Verifiability's
+ * claims beside them do, never numbers: one list idiom across the band.
+ */
+const RULE_ICONS: Readonly<Record<LandingCouncilColumnId, ComponentType<SVGProps<SVGSVGElement>>>> =
+  {
+    proposal: ScrollText,
+    weight: Scale,
+    quorum: UsersRound,
+  };
+
+const isRuleId = (id: string): id is LandingCouncilColumnId => id in RULE_ICONS;
+
+/**
+ * The Cosmic Council, beside Verifiability: one line on what holders do, and
+ * the three rules that carry the numbers (threshold, weight, quorum).
+ */
 export function CosmicCouncil({ council }: { council: LandingContent['council'] }) {
   return (
-    <section className="relative border-t border-border bg-card py-16 sm:py-24 lg:py-28">
-      <div className="mx-auto max-w-7xl px-5 sm:px-6 lg:px-12">
-        <SectionHeading
-          eyebrow={council.eyebrow}
-          heading={council.heading}
-          description={council.body}
-          align="center"
-        />
-
-        <div className="mt-12 grid gap-6 md:grid-cols-3">
-          {council.columns.map((col, idx) => (
-            <motion.div
-              key={col.title}
-              initial={{ opacity: 0, y: 24 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, amount: 0.3 }}
-              transition={{ duration: 0.6, delay: idx * 0.08 }}
-              className="relative rounded-2xl border border-border bg-foreground/[0.02] p-6 backdrop-blur transition hover:border-primary/20"
-            >
-              <div className="flex flex-wrap items-start gap-3">
-                <span className="flex h-8 w-8 items-center justify-center rounded-full border border-primary/20 bg-foreground/5 font-mono text-xs text-muted-foreground">
-                  {String(idx + 1).padStart(2, '0')}
-                </span>
-                <h3
-                  className="text-xl font-semibold text-foreground sm:text-2xl"
-                  style={{ fontFamily: 'var(--font-family-display)' }}
-                >
-                  {col.title}
-                </h3>
-              </div>
-              <p className="mt-5 text-base leading-relaxed text-muted-foreground">{col.body}</p>
-            </motion.div>
-          ))}
-        </div>
-      </div>
+    <section aria-labelledby="landing-council-heading" className="min-w-0">
+      <SectionHeading
+        size="compact"
+        eyebrow={council.eyebrow}
+        heading={council.heading}
+        headingId="landing-council-heading"
+        description={council.body}
+      />
+      <Steps
+        ordered={false}
+        framed
+        className={styles.rows}
+        items={council.columns.map((column) => {
+          const Icon = isRuleId(column.id) ? RULE_ICONS[column.id] : ScrollText;
+          return {
+            id: column.id,
+            marker: <Icon aria-hidden className="size-5" strokeWidth={1.5} />,
+            title: column.title,
+            body: <p>{column.body}</p>,
+          };
+        })}
+      />
     </section>
   );
 }

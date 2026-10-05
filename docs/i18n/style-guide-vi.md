@@ -145,7 +145,9 @@ the rules below are for copy written by hand in catalogs and modules.
 - **Durations:** digit, space, unit — **48 giờ**, **5 tuần**, **1 ngày**, **7 ngày**, **30
   phút**, **10 giây**. No plural, no classifier. The numeric-claims test holds 48 giờ / 5
   tuần / 1 ngày figures to `protocolFacts`; narrative durations that are not protocol
-  facts are spelled in words (mười giờ, hai ngày).
+  facts are spelled in words (mười giờ, hai ngày). Compact durations and countdowns
+  (`formats.durationCompact`) keep the unit word — **5 ngày 10:48:08**, **2 giờ 30 phút** —
+  because Vietnamese has no abbreviation for these units (5ng reads as a typo).
 - **Dates:** numeric **DD/MM/YYYY** (28/08/2026) in tables and stamps; the long form is
   what `Intl` renders for vi-VN ("28 tháng 8, 2026"); a month in prose is **tháng 8 năm
   2026**. Days of the week: thứ Hai … Chủ nhật. The week starts on Monday

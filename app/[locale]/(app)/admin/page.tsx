@@ -1,8 +1,10 @@
-import type { Metadata } from 'next';
+import type { Metadata, ResolvingMetadata } from 'next';
 import { getTranslations, setRequestLocale } from 'next-intl/server';
 
-import { createMetadata } from '@/utils/seo';
+import { createPageMetadata } from '@/utils/seo';
+import { OperatorHeader } from '@/components/admin/OperatorHeader';
 import { PageMessages } from '@/components/i18n/PageMessages';
+import { PageShell } from '@/components/ui/page-shell';
 
 import AdminPage from './AdminPage';
 
@@ -10,10 +12,13 @@ interface PageProps {
   params: Promise<{ locale: string }>;
 }
 
-export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
+export async function generateMetadata(
+  { params }: PageProps,
+  parent: ResolvingMetadata,
+): Promise<Metadata> {
   const { locale } = await params;
   const t = await getTranslations({ locale, namespace: 'meta' });
-  return createMetadata(t('admin.title'), t('admin.description'), undefined, '/admin', {
+  return createPageMetadata(parent, t('admin.title'), t('admin.description'), undefined, '/admin', {
     index: false,
     locale,
   });
@@ -22,9 +27,17 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 export default async function Page({ params }: PageProps) {
   const { locale } = await params;
   setRequestLocale(locale);
+  const t = await getTranslations({ locale, namespace: 'admin' });
   return (
-    <PageMessages namespaces={['admin', 'marketing', 'tables']}>
-      <AdminPage />
+    <PageMessages namespaces={['admin', 'tables']}>
+      <PageShell variant="data">
+        <OperatorHeader
+          tool="moderation"
+          title={t('moderation.title')}
+          subtitle={t('moderation.subtitle')}
+        />
+        <AdminPage />
+      </PageShell>
     </PageMessages>
   );
 }

@@ -6,17 +6,36 @@
     "minutes": "ХВ",
     "seconds": "С"
   },
-  "countdownLong": {
-    "days": "Дні",
-    "hours": "Години",
-    "minutes": "Хв",
-    "seconds": "С"
-  },
   "durationCompact": {
     "days": "д",
     "hours": "год",
     "minutes": "хв",
-    "seconds": "с",
-    "leftPattern": "залишилося {duration}"
+    "seconds": "с"
+  },
+  "address": {
+    "zero": "Нульова адреса",
+    "imprinted": "Закарбовано",
+    "consumed": "Витрачено",
+    "self": "Ця адреса",
+    "known": {
+      "protocol": "Протокол Cosmic Signature",
+      "implementation": "Контракт реалізації",
+      "cst": "Токен Cosmic Signature CST",
+      "nft": "Cosmic Signature NFT",
+      "randomWalk": "Random Walk NFT",
+      "council": "Космічна Рада",
+      "publicGoods": "Сховище суспільних благ",
+      "outreach": "Резерв просування",
+      "allocations": "Гаманець розподілів",
+      "cosmicAnchor": "Гаманець закріплення Cosmic Signature NFT",
+      "rwalkAnchor": "Гаманець закріплення RWLK"
+    }
+  },
+  "dateTime": {
+    "timeZone": "Часовий пояс: {zone}"
+  },
+  "allocationSplit": {
+    "label": "{label}: {items}",
+    "item": "{track} {share}"
   }
 }

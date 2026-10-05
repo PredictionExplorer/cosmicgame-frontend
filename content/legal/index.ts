@@ -40,15 +40,18 @@ import { termsCopyVi } from './TermsContent.vi';
 import { termsCopyZh } from './TermsContent.zh';
 import { termsCopyZhHk } from './TermsContent.zh-HK';
 import { termsCopyZhTw } from './TermsContent.zh-TW';
+import type { AuditsCopy } from './AuditsContent';
 import type { PrivacyCopy } from './PrivacyContent';
+import type { RiskCopy } from './RiskContent';
+import type { SecurityCopy } from './SecurityContent';
 import type { TermsCopy } from './TermsContent';
-import type { TrustPageCopy } from './TrustPageContent';
 
 /**
  * Locale registries for every legal and trust page. Pages resolve their copy
- * here and render it through the shared TermsContent / PrivacyContent /
- * TrustPageContent components — adding a locale means adding one entry per
- * registry, enforced by the compiler.
+ * here and render it through their renderer (SecurityContent, AuditsContent,
+ * RiskContent, TermsContent, PrivacyContent), all built on the shared Trust
+ * Center template (components/legal/LegalDocument) — adding a locale means
+ * adding one entry per registry, enforced by the compiler.
  */
 
 const TERMS_COPY: LocaleRecord<TermsCopy> = {
@@ -71,7 +74,7 @@ const PRIVACY_COPY: LocaleRecord<PrivacyCopy> = {
   ja: privacyCopyJa,
   vi: privacyCopyVi,
 };
-const AUDITS_COPY: LocaleRecord<TrustPageCopy> = {
+const AUDITS_COPY: LocaleRecord<AuditsCopy> = {
   en: auditsCopyEn,
   zh: auditsCopyZh,
   'zh-TW': auditsCopyZhTw,
@@ -81,7 +84,7 @@ const AUDITS_COPY: LocaleRecord<TrustPageCopy> = {
   ja: auditsCopyJa,
   vi: auditsCopyVi,
 };
-const SECURITY_COPY: LocaleRecord<TrustPageCopy> = {
+const SECURITY_COPY: LocaleRecord<SecurityCopy> = {
   en: securityCopyEn,
   zh: securityCopyZh,
   'zh-TW': securityCopyZhTw,
@@ -91,7 +94,7 @@ const SECURITY_COPY: LocaleRecord<TrustPageCopy> = {
   ja: securityCopyJa,
   vi: securityCopyVi,
 };
-const RISK_COPY: LocaleRecord<TrustPageCopy> = {
+const RISK_COPY: LocaleRecord<RiskCopy> = {
   en: riskCopyEn,
   zh: riskCopyZh,
   'zh-TW': riskCopyZhTw,
@@ -110,14 +113,14 @@ export function getPrivacyCopy(locale: string): PrivacyCopy {
   return pickByLocale(PRIVACY_COPY, locale);
 }
 
-export function getAuditsCopy(locale: string): TrustPageCopy {
+export function getAuditsCopy(locale: string): AuditsCopy {
   return pickByLocale(AUDITS_COPY, locale);
 }
 
-export function getSecurityCopy(locale: string): TrustPageCopy {
+export function getSecurityCopy(locale: string): SecurityCopy {
   return pickByLocale(SECURITY_COPY, locale);
 }
 
-export function getRiskCopy(locale: string): TrustPageCopy {
+export function getRiskCopy(locale: string): RiskCopy {
   return pickByLocale(RISK_COPY, locale);
 }

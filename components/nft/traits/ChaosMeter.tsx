@@ -50,7 +50,7 @@ export function ChaosMeter({
             aria-valuemax={bound}
             aria-valuenow={value}
             className={cn(
-              'relative block overflow-hidden rounded-full bg-white/[0.08]',
+              'relative block overflow-hidden rounded-full bg-rule-faint',
               size === 'sm' ? 'h-1 w-10' : 'h-1.5 w-16',
             )}
           >
@@ -69,7 +69,7 @@ export function ChaosMeter({
               aria-hidden
               className={cn(
                 'font-mono tabular-nums text-muted-foreground',
-                size === 'sm' ? 'text-[10px]' : 'text-xs',
+                size === 'sm' ? 'type-caption' : 'text-xs',
               )}
             >
               {value.toLocaleString(toIntlLocale(locale))}

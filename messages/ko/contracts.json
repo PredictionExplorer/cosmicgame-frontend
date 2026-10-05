@@ -4,14 +4,8 @@
     "contracts": "컨트랙트"
   },
   "page": {
-    "eyebrow": "검증된 컨트랙트 · Arbitrum",
     "title": "컨트랙트 주소",
-    "subtitle": "Cosmic Signature 프로토콜의 온체인 주소, 구성, 소스 링크, 검증 정보입니다.",
-    "allocationAria": "배분 경로",
-    "configurationAria": "프로토콜 구성",
-    "addressesAria": "컨트랙트 주소",
-    "addressesTitle": "컨트랙트 주소",
-    "parametersAria": "보정 구간 및 별빛 선정 매개변수"
+    "subtitle": "Cosmic Signature 프로토콜의 온체인 주소, 구성, 소스 링크, 검증 정보입니다."
   },
   "network": {
     "chain": "체인 {chainId}"
@@ -34,7 +28,7 @@
       "description": "사이클 수령자에게 배분으로 각인되는 ERC-721 NFT 컬렉션"
     },
     "randomWalk": {
-      "name": "RandomWalk",
+      "name": "Random Walk NFT",
       "description": "ETH 제스처에 첨부해 1회 할인을 받거나, 앵커링하여 앵커링 NFT 별빛 선정 자격을 얻을 수 있는 RandomWalk NFT 컬렉션"
     },
     "council": {
@@ -59,27 +53,24 @@
     },
     "rwalkAnchor": {
       "name": "RWLK 앵커링 지갑",
-      "description": "RandomWalk NFT 앵커링 컨트랙트"
+      "description": "Random Walk NFT 앵커링 컨트랙트"
     }
   },
   "categories": {
     "core": "핵심 컨트랙트",
-    "wallet": "지갑 컨트랙트",
-    "anchoring": "앵커링 컨트랙트"
+    "wallet": "지갑",
+    "anchoring": "앵커링"
   },
-  "search": {
-    "placeholder": "이름 또는 주소로 컨트랙트 검색…",
-    "ariaLabel": "컨트랙트 검색",
-    "clearAria": "검색어 지우기",
-    "empty": "“{searchTerm}”에 해당하는 컨트랙트가 없습니다"
-  },
-  "addressCard": {
-    "copyAria": "{name} 주소 복사",
-    "explorerAria": "블록 탐색기에서 {name} 보기"
+  "addresses": {
+    "title": "컨트랙트 주소",
+    "description": "Arbitrum One의 모든 Cosmic Signature 컨트랙트입니다. 주소를 복사하거나 Arbiscan에서 주소를, Sourcify에서 소스 코드를 확인할 수 있습니다.",
+    "verified": "Sourcify 링크가 있는 주소는 모두 Sourcify에서 완전 일치합니다. 확인일: {date}.",
+    "markets": "마켓",
+    "reported": "인덱서가 보고한 다음 주소는 검증되지 않았습니다: {address}"
   },
   "funds": {
     "title": "배분 경로",
-    "description": "사이클 준비금은 시그니처 배분, 시간의 전사, 별빛 선정, 공공재, 앵커링 지급, 누적 준비금의 배분 경로로 나뉩니다.",
+    "description": "사이클 준비금은 시그니처 배분, 시간의 전사, 별빛 선정, 앵커링 지급, 공공재의 배분 경로로 나뉘고, 나머지는 누적 준비금으로 다음 사이클에 이월됩니다.",
     "chartAria": "배분 경로 막대 차트",
     "segments": {
       "signature": {
@@ -103,20 +94,21 @@
         "tooltip": "매 사이클 공공재 수령처(Protocol Guild)로 전달됩니다."
       },
       "next": {
-        "label": "다음 사이클",
+        "label": "누적 준비금",
         "tooltip": "누적 준비금으로 다음 사이클에 이월되는 나머지 자금입니다."
       }
     }
   },
   "configuration": {
     "title": "프로토콜 구성",
+    "description": "프로토콜 컨트랙트가 읽는 현재 매개변수입니다.",
     "cards": {
       "ethStep": {
         "label": "ETH 제스처 비용 인상률",
         "tooltip": "ETH 제스처 비용은 이 인상률 매개변수를 따릅니다. CST 제스처 비용은 실시간 CST 보정 구간을 따릅니다."
       },
       "timeIncrement": {
-        "label": "시간 증가량",
+        "label": "제스처당 추가되는 시간",
         "tooltip": "제스처마다 사이클 마감 시각에 이만큼의 시간이 더해집니다. 증가량은 사이클마다 {percent}%씩 늘어납니다."
       },
       "cstPreview": {
@@ -128,7 +120,7 @@
         "tooltip": "공개 마감 구간이 열려 누구나 마감할 수 있게 되기 전까지, 최종 제스처를 남긴 참여자가 사이클을 마감할 수 있는 시간입니다."
       },
       "initial": {
-        "label": "초기 시간 증가량",
+        "label": "초기 사이클 기간",
         "tooltip": "첫 제스처를 남길 때 더해지는 초기 사이클 마감 시간입니다."
       },
       "message": {
@@ -137,7 +129,7 @@
       },
       "v3CstDecline": {
         "label": "CST 가격 하락 속도",
-        "value": "{amount} CST/분",
+        "value": "{amount} CST/분",
         "tooltip": "CST 보정 구간 동안 CST 제스처 비용이 낮아지는 속도입니다. 각인되는 참여 CST는 추월당한 참여자에게 전액 지급됩니다."
       },
       "v3SignatureNfts": {
@@ -148,53 +140,58 @@
         "label": "막판 제스처 구간",
         "tooltip": "사이클 마감 시점 직전 구간으로, 제스처 비용에 기하급수적으로 커지는 할증(최대 약 5배)이 붙습니다."
       }
+    },
+    "groups": {
+      "gestures": "제스처",
+      "timing": "시간",
+      "selection": "별빛 선정"
     }
   },
   "parameters": {
-    "title": "보정 구간 및 별빛 선정 매개변수",
+    "windowsTitle": "보정 구간",
+    "windowsDescription": "각 구간은 시간이 지나면서 제스처 비용을 낮춥니다. CST 구간은 CST 제스처가 있을 때마다 다시 시작하고, ETH 구간은 사이클이 시작될 때 열려 첫 제스처에서 닫힙니다.",
     "cstTitle": "CST 보정 구간",
     "ethTitle": "ETH 보정 구간",
     "duration": "지속 시간",
     "elapsed": "경과 시간",
-    "ceiling": "보정 상한",
+    "remaining": "남은 시간",
+    "progress": "{percent} 진행",
+    "state": {
+      "running": "진행 중",
+      "complete": "완료",
+      "closed": "종료",
+      "notStarted": "시작 전"
+    },
+    "ceiling": "시작 비용",
     "cstDurationTooltip": "현재 저장된 CST 보정 구간의 지속 시간입니다. CST 제스처는 이를 약 {increase}% 늘리고, ETH 제스처는 약 {decrease}% 줄입니다.",
-    "cstElapsedTooltip": "현재 CST 보정 구간에서 이미 지난 시간입니다.",
     "cstCeilingTooltip": "현재 표시된 CST 보정 구간의 시작 제스처 비용입니다. 비용은 저장된 지속 시간에 걸쳐 선형으로 내려갑니다.",
-    "ethDurationTooltip": "제스처 비용이 시간에 따라 내려가는 ETH 보정 구간의 전체 지속 시간입니다.",
-    "ethElapsedTooltip": "현재 ETH 보정 구간에서 이미 지난 시간입니다.",
-    "publicGoodsAddress": "공공재 주소",
+    "publicGoodsAddress": "공공재 수령처",
     "publicGoodsAddressTooltip": "공공재 금고 컨트랙트에서 공공재 배분을 현재 받고 있는 온체인 주소입니다.",
-    "copyPublicGoodsAria": "공공재 주소 복사",
-    "viewPublicGoodsAria": "블록 탐색기에서 공공재 주소 보기",
     "selection": {
       "ethLabel": "ETH 별빛 선정 수령자",
       "ethTooltip": "매 사이클 ETH 배분을 받도록 무작위로 선정되는 참여자 수입니다.",
       "nftLabel": "NFT 별빛 선정 (참여자)",
       "nftTooltip": "매 사이클 Cosmic Signature NFT를 받도록 무작위로 선정되는 참여자 수입니다.",
       "anchorLabel": "NFT 별빛 선정 (앵커링 RWLK)",
-      "anchorTooltip": "매 사이클 Cosmic Signature NFT를 받도록 무작위로 선정되는 RandomWalk NFT 앵커링 보유자 수입니다."
-    }
+      "anchorTooltip": "매 사이클 Cosmic Signature NFT를 받도록 무작위로 선정되는 Random Walk NFT 앵커링 보유자 수입니다."
+    },
+    "cstComplete": "구간이 끝까지 지나 다음 CST 제스처로 다시 시작될 때까지 CST 제스처 비용은 최저가에 머뭅니다.",
+    "ethClosed": "이번 사이클의 첫 제스처로 이 구간은 닫혔습니다. 이제 ETH 제스처 비용은 제스처마다 오릅니다.",
+    "ethComplete": "구간이 끝까지 지나 이번 사이클의 첫 제스처가 있을 때까지 ETH 제스처 비용은 최저가에 머뭅니다."
   },
   "vault": {
-    "title": "공공재 금고 작업",
+    "title": "공공재",
+    "description": "각 사이클의 공공재 몫은 금고로 들어가고, 금고에서 공공재 수령처로 전달됩니다.",
     "tooltip": "공공재 금고의 send() 함수를 호출해 금고의 ETH 잔액을 설정된 Protocol Guild 수령처로 전달합니다.",
+    "vaultAddress": "금고",
+    "share": "사이클별 비율",
     "balance": "현재 금고 잔액",
-    "description": "금고에 있는 공공재 자금을 Protocol Guild로 전달합니다.",
-    "descriptionWithBeneficiary": "금고에 있는 공공재 자금을 Protocol Guild({address})로 전달합니다.",
-    "aria": "공공재 금고 잔액을 Protocol Guild로 전달"
+    "empty": "금고가 비어 있어 아직 전달할 자금이 없습니다.",
+    "balanceUnavailable": "금고 잔액을 읽을 수 없어 지금은 전달 기능을 제공하지 않습니다.",
+    "note": "누구나 금고 잔액을 수령처로 전달할 수 있으며, 가스비만 듭니다."
   },
   "seo": {
-    "eyebrow": "검증된 컨트랙트 · Arbitrum",
     "heading": "Cosmic Signature 컨트랙트",
-    "description": "Cosmic Signature의 공개 Arbitrum 컨트랙트 주소를 확인할 수 있습니다. 앱에 표시된 내용을 온체인 기록과 대조해 검증하는 데 활용할 수 있습니다.",
-    "partialFallback": "현재 컨트랙트 주소 데이터를 불러올 수 없어, 프로젝트에 등록된 프로토콜 프록시와 구현 컨트랙트 주소를 표시합니다.",
-    "empty": "현재 컨트랙트 주소를 불러올 수 없습니다. 데이터가 확인되면 아래 목록이 갱신됩니다.",
-    "relatedAria": "컨트랙트 신뢰 자료",
-    "links": {
-      "code": "Cosmic Signature 소스 코드 살펴보기",
-      "security": "보안 개요 읽기",
-      "audits": "보안 감사 및 검증 살펴보기",
-      "risk": "위험 고지 읽기"
-    }
+    "partialFallback": "지금은 실시간 수치를 불러올 수 없습니다. 아래 주소는 검증된 목록입니다."
   }
 }

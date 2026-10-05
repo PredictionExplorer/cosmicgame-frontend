@@ -1,5 +1,7 @@
 import { getLocaleConfig } from '@/i18n/localeConfig';
 import { APP_ORIGIN, LANDING_ORIGIN } from '@/lib/hostRouting';
+import { BRAND_ICON_PATHS } from '@/lib/og/brandIcons';
+import { SITE_NAME } from '@/utils/seo';
 
 interface FAQItem {
   question: string;
@@ -13,8 +15,17 @@ export function jsonLdInLanguage(locale: string): string {
 
 const SITE_URL = LANDING_ORIGIN;
 const APP_URL = APP_ORIGIN;
-const SITE_NAME = 'Cosmic Signature';
-const SITE_LOGO_URL = `${SITE_URL}/images/logo.svg`;
+/** The orbit mark on the Midnight plate: square, opaque, 512px (`npm run brand:icons`). */
+const SITE_LOGO_URL = `${SITE_URL}${BRAND_ICON_PATHS.logo512}`;
+/**
+ * A real Signature standing for the protocol's art: #23, bundled with the
+ * landing page (provenance in public/images/landing/README.md).
+ */
+export const ART_SPECIMEN = {
+  url: `${SITE_URL}/images/landing/signature-23.webp`,
+  width: 960,
+  height: 621,
+} as const;
 
 const PROTOCOL_DESCRIPTION =
   'Cosmic Signature is a procedural on-chain art protocol on Arbitrum. Every gesture shapes the cycle\u2019s final Signature, and the protocol distributes its reserves across more than ten allocation tracks \u2014 including Protocol Guild.';
@@ -187,7 +198,13 @@ export function artProtocolJsonLd(options: ArtProtocolJsonLdOptions = {}) {
     '@id': `${SITE_URL}/#art-protocol`,
     name: SITE_NAME,
     url: options.url ?? `${SITE_URL}/`,
-    image: SITE_LOGO_URL,
+    image: {
+      '@type': 'ImageObject',
+      contentUrl: ART_SPECIMEN.url,
+      url: ART_SPECIMEN.url,
+      width: ART_SPECIMEN.width,
+      height: ART_SPECIMEN.height,
+    },
     license: 'https://creativecommons.org/publicdomain/zero/1.0/',
     creditText: options.creditText ?? 'Cosmic Signature Protocol',
     description: options.description ?? PROTOCOL_DESCRIPTION,
@@ -374,7 +391,7 @@ export function liveCycleJsonLd({
     '@context': 'https://schema.org',
     '@type': 'Event',
     '@id': `${APP_URL}/#live-cycle`,
-    name: `${SITE_NAME} Performance Cycle #${cycleNumber}`,
+    name: `${SITE_NAME} Performance Cycle ${cycleNumber}`,
     description: PROTOCOL_DESCRIPTION,
     startDate: new Date(startTsSeconds * 1000).toISOString(),
     eventAttendanceMode: 'https://schema.org/OnlineEventAttendanceMode',
@@ -390,8 +407,40 @@ export function liveCycleJsonLd({
   };
 }
 
+/**
+ * Characters that can end or confuse an inline `<script>` element, each
+ * mapped to the JSON escape that parses back to the same character: `<` and
+ * `>` (so neither `</script>` nor `<!--` can appear in the markup), `&`, and
+ * U+2028 / U+2029 (line terminators to older JavaScript engines).
+ */
+const SCRIPT_UNSAFE_CHARS = /[<>&\u2028\u2029]/g;
+const SCRIPT_SAFE_ESCAPES: Readonly<Record<string, string>> = {
+  '<': '\\u003c',
+  '>': '\\u003e',
+  '&': '\\u0026',
+  '\u2028': '\\u2028',
+  '\u2029': '\\u2029',
+};
+
+/**
+ * JSON for an inline `<script type="application/ld+json">` body. Structured
+ * data carries text other people write (an owner-set Signature name, for
+ * one), and `JSON.stringify` leaves `<` and `>` as they are, so a value
+ * holding `</script>` would close the element and run markup of its choosing.
+ * Every escape parses back to the same JSON value.
+ */
+export function serializeJsonLd(data: unknown): string {
+  return JSON.stringify(data).replace(
+    SCRIPT_UNSAFE_CHARS,
+    (char) => SCRIPT_SAFE_ESCAPES[char] ?? char,
+  );
+}
+
 export function JsonLd({ data }: { data: Record<string, unknown> | Record<string, unknown>[] }) {
   return (
-    <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(data) }} />
+    <script
+      type="application/ld+json"
+      dangerouslySetInnerHTML={{ __html: serializeJsonLd(data) }}
+    />
   );
 }

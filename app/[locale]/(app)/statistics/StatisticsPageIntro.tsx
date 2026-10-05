@@ -1,24 +1,57 @@
-import { SectionEyebrow } from '@/components/ui/section-eyebrow';
+import type { ReactNode } from 'react';
+
+import {
+  PageHeader,
+  type PageHeaderFigure,
+  type PageHeaderLink,
+} from '@/components/layout/PageHeader';
+
+import { StatisticsSubNav } from './StatisticsSubNav';
 
 /**
- * Server-rendered heading block for statistics section pages. Keeps an h1 and
- * intro copy in the initial HTML for crawlers while the interactive content
- * hydrates client-side.
+ * The page header's own bottom rule and margin give way to the sub-navigation,
+ * whose tab row is the header's rule on these pages.
  */
-export function StatisticsPageIntro({
-  eyebrow,
-  title,
-  description,
-}: {
-  eyebrow: string;
+export const STATISTICS_HEADER_CLASS = 'mb-0 border-b-0 pb-6 sm:mb-0 sm:pb-8';
+
+export interface StatisticsPageIntroProps {
   title: string;
   description: string;
-}) {
+  /** The page's headline figures, once each (`PageHeaderFigure`). */
+  figures?: readonly PageHeaderFigure[];
+  /** The meta line: a `LiveStatus` for polled figures. */
+  meta?: ReactNode;
+  related?: readonly PageHeaderLink[];
+  relatedLabel?: string;
+}
+
+/**
+ * Server-rendered header for the statistics section pages: the shared
+ * `PageHeader` with the Explore eyebrow linked to the hub, then the sticky
+ * section tabs on its bottom rule, so the H1, intro, figures and navigation
+ * are all in the initial HTML while the panels hydrate.
+ */
+export function StatisticsPageIntro({
+  title,
+  description,
+  figures,
+  meta,
+  related,
+  relatedLabel,
+}: StatisticsPageIntroProps) {
   return (
-    <header className="mb-10 border-b border-border pb-10">
-      <SectionEyebrow tone="aurora">{eyebrow}</SectionEyebrow>
-      <h1 className="mt-4 type-display-lg text-foreground">{title}</h1>
-      <p className="mt-3 max-w-3xl type-body-lg text-muted-foreground">{description}</p>
-    </header>
+    <>
+      <PageHeader
+        section="explore"
+        title={title}
+        subtitle={description}
+        figures={figures}
+        meta={meta}
+        related={related}
+        relatedLabel={relatedLabel}
+        className={STATISTICS_HEADER_CLASS}
+      />
+      <StatisticsSubNav />
+    </>
   );
 }

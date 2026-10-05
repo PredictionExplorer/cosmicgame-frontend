@@ -19,7 +19,7 @@
     "anchoring": {
       "label": "Neo giữ",
       "title": "Thống kê neo giữ",
-      "description": "Thao tác neo giữ và gỡ neo, token đang neo giữ và người neo giữ riêng biệt của Cosmic Signature và RandomWalk NFT."
+      "description": "Thao tác neo giữ và gỡ neo, NFT đang neo giữ và người neo giữ riêng biệt của Cosmic Signature và Random Walk NFT."
     },
     "activity": {
       "label": "Hoạt động",
@@ -27,42 +27,31 @@
       "description": "Tần suất nét bút theo thời gian, các đợt tăng vọt hoạt động, khoảng hoạt động của người tham gia, tỷ lệ loại nét bút, dòng thời gian chu kỳ và các lần kích hoạt chu kỳ."
     },
     "performance": {
-      "label": "Thành tích",
-      "title": "Thống kê thành tích người tham gia",
-      "description": "Bảng xếp hạng thành tích người tham gia và kết quả phân bổ có thể nhận về của mọi chu kỳ trình diễn Cosmic Signature."
+      "label": "Kết quả",
+      "title": "Kết quả của người tham gia",
+      "description": "Mỗi người tham gia đã chi bao nhiêu cho nét bút và nhận bao nhiêu phân bổ, cùng tình hình nhận về tài sản của từng chu kỳ."
     }
-  },
-  "intro": {
-    "eyebrow": "Thống kê giao thức · Arbitrum"
   },
   "breadcrumbs": {
     "statistics": "Thống kê"
   },
   "shared": {
     "noDataTitle": "Chưa có dữ liệu",
-    "sectionLoadErrorTitle": "Không tải được {title}",
-    "serviceError": "Dịch vụ thống kê không phản hồi. Hãy thử lại sau ít phút."
+    "sectionLoadErrorTitle": "Phần này chưa tải được",
+    "serviceError": "Dịch vụ thống kê không phản hồi. Hãy thử lại sau ít phút.",
+    "definitions": "Định nghĩa",
+    "listMissingTitle": "Danh sách chưa tải được",
+    "listMissingMessage": "Các số liệu khác trên trang cho thấy ở đây có dữ liệu, nhưng chưa nhận được. Hãy thử lại.",
+    "showSection": "Hiện",
+    "hideSection": "Ẩn"
   },
   "hub": {
     "loadErrorTitle": "Không tải được thống kê",
     "loadErrorMessage": "Dịch vụ thống kê không phản hồi. Hãy thử lại sau ít phút.",
     "exploreTitle": "Khám phá thống kê",
     "exploreAria": "Các trang mục thống kê",
-    "currentCycleTitle": "Tìm dữ liệu chu kỳ hiện tại?",
-    "currentCycleSubtitle": "Xem lịch sử nét bút, bảng xếp hạng và chi tiết chu kỳ trực tiếp",
     "protocolEconomyTitle": "Dòng chảy của giao thức",
-    "anchoringGlanceTitle": "Tổng quan neo giữ",
-    "anchoringGlanceDescription": "{cosmicCount} Cosmic Signature NFT và {randomWalkCount} RandomWalk NFT hiện đang neo giữ. Xem thao tác neo giữ, token đang neo giữ và người neo giữ riêng biệt trên trang thống kê neo giữ.",
-    "anchoringGlanceLink": "Thống kê neo giữ",
-    "headlines": {
-      "uniqueParticipants": "người tham gia riêng biệt",
-      "nftsImprinted": "NFT đã khắc",
-      "nftsAnchored": "NFT đang neo giữ",
-      "gesturesThisCycle": "nét bút trong chu kỳ này",
-      "allocationsDistributed": "phân bổ đã phân phối"
-    },
-    "pendingStellarRetrievals": "{count} người nhận chưa nhận về tổng cộng {amount}",
-    "voluntaryContributionSummary": "{count} với tổng cộng {amount}",
+    "relatedTitle": "Trang liên quan",
     "jsonLd": {
       "webPageName": "Thống kê giao thức Cosmic Signature",
       "webPageDescription": "Thống kê công khai của giao thức Cosmic Signature trên Arbitrum, gồm trạng thái chu kỳ trình diễn, nét bút, NFT, CST, neo giữ, dự trữ và dữ liệu phân bổ.",
@@ -70,12 +59,8 @@
       "datasetDescription": "Bản tóm tắt có thể thu thập về hoạt động công khai của giao thức Cosmic Signature, được lập chỉ mục từ các hợp đồng thông minh Arbitrum và API của Cosmic Signature."
     },
     "seo": {
-      "eyebrow": "Thống kê giao thức · Arbitrum",
-      "heading": "Thống kê giao thức Cosmic Signature",
+      "heading": "Thống kê giao thức",
       "description": "Theo dõi hoạt động Cosmic Signature trên Arbitrum: chu kỳ trình diễn, nét bút, NFT, CST, neo giữ, dự trữ và các khoản phân bổ.",
-      "lastUpdated": "Cập nhật lần cuối: {date}",
-      "unavailableSuffix": ". Dữ liệu hiện tại tạm thời không khả dụng. Bạn vẫn có thể xem phần giới thiệu về giao thức.",
-      "dataSource": "Dữ liệu lấy từ API công khai của Cosmic Signature, tổng hợp hoạt động hợp đồng trên Arbitrum. Các liên kết bên dưới giải thích cơ chế giao thức và cách xác minh.",
       "relatedPagesAria": "Các trang liên quan đến thống kê",
       "links": {
         "currentCycle": "Xem chu kỳ trình diễn hiện tại",
@@ -83,43 +68,56 @@
         "contracts": "Xem các hợp đồng Arbitrum đã xác minh",
         "faq": "Đọc câu hỏi thường gặp về Cosmic Signature"
       },
-      "unavailable": "Không khả dụng"
-    }
+      "gesturesCaption": "{count, plural, other {# nét bút}} trong chu kỳ này"
+    },
+    "cycle": {
+      "title": "Chu kỳ {cycle} đến nay",
+      "open": "Mở chu kỳ hiện tại",
+      "opened": "Bắt đầu lúc",
+      "rhythmLabel": "Nét bút mỗi ngày (theo UTC), {days, number} ngày gần nhất",
+      "rhythmCycleLabel": "Nét bút mỗi ngày (theo UTC) trong chu kỳ này, không tính giờ đầu",
+      "rhythmSummary": "Tổng cộng: {total}. Ngày sôi động nhất: {date} ({peak}).",
+      "rhythmEmpty": "Không có nét bút nào trong khoảng thời gian này.",
+      "rhythmUnavailable": "Hiện chưa thể tải số nét bút theo ngày.",
+      "todaySoFar": "Hôm nay, đến lúc này",
+      "splitTitle": "Dự trữ chu kỳ đi về đâu",
+      "splitDescription": "Khi chu kỳ hoàn tất, Dự trữ chu kỳ được chia theo các luồng phân bổ dưới đây. Phần còn lại chuyển sang chu kỳ kế tiếp."
+    },
+    "index": {
+      "participation": "Ai đang tham gia: người tham gia, người nhận và người đóng góp ETH.",
+      "tokens": "Ai nắm giữ NFT và CST, tổng cung theo thời gian và tài sản đính kèm.",
+      "anchoring": "NFT đang neo giữ, người neo giữ và phân phối neo giữ.",
+      "activity": "Nét bút diễn ra khi nào, những người tham gia tích cực nhất và chi tiết từng chu kỳ.",
+      "performance": "Mỗi người tham gia đã chi và nhận bao nhiêu, cùng tình hình nhận về theo chu kỳ."
+    },
+    "figures": {
+      "participants": "{count, plural, other {# người tham gia}}",
+      "anchored": "{count, plural, other {# NFT đang neo giữ}}",
+      "gestures": "{count, plural, other {# nét bút}}",
+      "cycles": "{count, plural, other {# chu kỳ đã hoàn tất}}",
+      "supply": "Tổng cung: {amount}"
+    },
+    "pendingRecipients": "{count, plural, other {# người nhận chưa nhận về}}",
+    "outreachTransactions": "{count, plural, other {# giao dịch}}",
+    "contributionCount": "{count, plural, other {# khoản đóng góp}}",
+    "retrievalCount": "{count, plural, other {# lần nhận về}}"
   },
   "metrics": {
     "activePerformanceCycle": {
       "label": "Chu kỳ trình diễn đang diễn ra",
-      "tooltip": "Số chu kỳ trình diễn hiện tại được API công khai của Cosmic Signature lập chỉ mục.",
-      "seoDescription": "Số chu kỳ trình diễn hiện tại được lập chỉ mục từ hoạt động Cosmic Signature trên Arbitrum."
-    },
-    "activeCycleGestures": {
-      "label": "Nét bút của chu kỳ đang diễn ra",
-      "tooltip": "Số nét bút được lập chỉ mục đã đặt trong chu kỳ trình diễn đang diễn ra đến nay.",
-      "seoDescription": "Số nét bút được lập chỉ mục của chu kỳ trình diễn đang diễn ra."
-    },
-    "totalCycles": {
-      "label": "Tổng số chu kỳ",
-      "tooltip": "Tổng số chu kỳ trình diễn đã hoàn thành hoặc đang được lập chỉ mục kể từ khi giao thức ra mắt."
+      "tooltip": "Số chu kỳ trình diễn hiện tại được API công khai của Cosmic Signature lập chỉ mục."
     },
     "allocationsDistributed": {
       "label": "Phân bổ đã phân phối",
       "tooltip": "Các bản ghi phân bổ được lập chỉ mục qua mọi chu kỳ. Gồm phân bổ cho người nhận và các dấu mốc phân bổ của giao thức như các đợt nạp phân phối neo giữ."
     },
     "cosmicSignatureNftsImprinted": {
-      "label": "Cosmic Signature NFT đã khắc",
       "shortLabel": "NFT đã khắc",
-      "tooltip": "Số token ERC-721 Cosmic Signature NFT tích lũy mà giao thức đã khắc qua mọi chu kỳ được lập chỉ mục. Giá trị 0 nghĩa là API thống kê hiện không báo cáo lần khắc nào được lập chỉ mục cho bộ đếm này.",
-      "seoDescription": "Số token ERC-721 Cosmic Signature NFT tích lũy mà giao thức đã khắc qua mọi chu kỳ được lập chỉ mục."
+      "tooltip": "Số token ERC-721 Cosmic Signature NFT tích lũy mà giao thức đã khắc qua mọi chu kỳ được lập chỉ mục. Giá trị 0 nghĩa là API thống kê hiện không báo cáo lần khắc nào được lập chỉ mục cho bộ đếm này."
     },
     "contractBalance": {
       "label": "Số dư hợp đồng",
-      "seoLabel": "Số dư hợp đồng giao thức",
-      "tooltip": "ETH hiện được hợp đồng giao thức Cosmic Signature nắm giữ trước các phân bổ, lần nhận về hoặc chuyển tiếp chu kỳ trong tương lai.",
-      "seoDescription": "ETH hiện được hợp đồng giao thức Cosmic Signature nắm giữ trước các dòng phân bổ trong tương lai."
-    },
-    "numAllocationsDistributed": {
-      "label": "Số phân bổ đã phân phối",
-      "tooltip": "Số bản ghi phân bổ đã được ghi nhận. Nếu chưa có bản ghi chi tiết, số liệu sử dụng tổng phân bổ theo người nhận."
+      "tooltip": "ETH hiện được hợp đồng giao thức Cosmic Signature nắm giữ trước các phân bổ, lần nhận về hoặc chuyển tiếp chu kỳ trong tương lai."
     },
     "totalSignatureAllocationsDistributed": {
       "label": "Tổng phân bổ Signature đã phân phối",
@@ -129,9 +127,13 @@
       "label": "ETH Tinh tuyển đã nạp",
       "tooltip": "Tổng ETH đã phân bổ vào các quỹ Tinh tuyển qua các chu kỳ trình diễn được lập chỉ mục."
     },
-    "stellarSelectionEthRetrieved": {
-      "label": "ETH Tinh tuyển đã nhận về",
-      "tooltip": "Tổng ETH những người nhận được chọn đã nhận về từ các quỹ Tinh tuyển."
+    "chronoWarriorEthDeposited": {
+      "label": "ETH Chiến binh Thời gian đã nạp",
+      "tooltip": "Tổng ETH đã phân bổ cho Chiến binh Thời gian qua các chu kỳ trình diễn được lập chỉ mục, giữ trong Ví phân bổ cho đến khi người nhận nhận về."
+    },
+    "allocationsWalletEthRetrieved": {
+      "label": "ETH đã nhận về từ Ví phân bổ",
+      "tooltip": "ETH người nhận đã nhận về từ Ví phân bổ, gồm cả ETH Tinh tuyển và ETH Chiến binh Thời gian."
     },
     "totalSupplyErc20": {
       "label": "Tổng cung (ERC-20)",
@@ -153,17 +155,17 @@
       "label": "Nét bút bằng CST",
       "tooltip": "Số nét bút đặt bằng CST thay vì ETH trong các chu kỳ được lập chỉ mục."
     },
-    "outreachReserve": {
-      "label": "Dự trữ truyền thông",
-      "tooltip": "CST được khắc cho những người đóng góp truyền thông và hệ sinh thái, tách biệt với CST tham gia theo từng nét bút và CST ghi nhận đi kèm NFT."
+    "outreachCstAllocated": {
+      "label": "Tổng CST phân bổ truyền thông",
+      "tooltip": "CST đã chuyển từ Dự trữ truyền thông đến những người đóng góp truyền thông và hệ sinh thái cho đến nay, tách biệt với CST tham gia theo từng nét bút và CST ghi nhận đi kèm NFT."
     },
     "outreachTransactions": {
       "label": "Giao dịch truyền thông",
       "tooltip": "Số giao dịch phân phối từ Dự trữ truyền thông được lập chỉ mục."
     },
     "randomWalkNftsUsed": {
-      "label": "RandomWalk NFT đã sử dụng",
-      "tooltip": "Các RandomWalk NFT đã được đính kèm vào nét bút ETH để giảm chi phí nét bút một lần."
+      "label": "Random Walk NFT đã sử dụng",
+      "tooltip": "Các Random Walk NFT đã được đính kèm vào nét bút ETH để giảm chi phí nét bút một lần."
     },
     "namedTokens": {
       "label": "Token đã đặt tên",
@@ -181,13 +183,9 @@
       "label": "Người đóng góp ETH riêng biệt",
       "tooltip": "Các địa chỉ ví riêng biệt đã đóng góp ETH cho giao thức."
     },
-    "uniqueAnchorHolders": {
-      "label": "Người neo giữ riêng biệt",
-      "tooltip": "Tổng số ví riêng biệt đã neo giữ Cosmic Signature NFT hoặc RandomWalk NFT."
-    },
     "cosmicSignatureNftHolders": {
       "label": "Người nắm giữ Cosmic Signature NFT",
-      "tooltip": "Các địa chỉ ví riêng biệt hiện đang nắm giữ ít nhất một Cosmic Signature NFT."
+      "tooltip": "Các địa chỉ đang nắm giữ hoặc đã neo ít nhất một Cosmic Signature NFT. Ví neo giữ không được tính: NFT trong đó được tính cho người neo giữ của chúng."
     },
     "cstErc20Holders": {
       "label": "Người nắm giữ CST (ERC-20)",
@@ -202,16 +200,12 @@
       "tooltip": "ETH đã phân bổ cho đơn vị thụ hưởng Hàng hóa công và vẫn được phản ánh trong số dư giao thức đã lập chỉ mục."
     },
     "totalContributedEth": {
-      "label": "Tổng ETH đã đóng góp",
+      "label": "Đóng góp ETH trực tiếp",
       "tooltip": "Tổng ETH đã đóng góp cho giao thức qua mọi chu kỳ được lập chỉ mục."
     },
     "protocolContributions": {
       "label": "Đóng góp của giao thức",
       "tooltip": "Số giao dịch đóng góp hàng hóa công được lập chỉ mục gửi qua giao thức Cosmic Signature."
-    },
-    "protocolContributionsSum": {
-      "label": "Tổng đóng góp của giao thức",
-      "tooltip": "Tổng ETH đã đóng góp qua các giao dịch đóng góp hàng hóa công của giao thức Cosmic Signature được lập chỉ mục."
     },
     "voluntaryContributions": {
       "label": "Đóng góp tự nguyện",
@@ -242,12 +236,9 @@
   },
   "sectionTooltips": {
     "attachedAssets": "Các tài sản ERC-721 và ERC-20 đính kèm vào nét bút, có thể xem cho mọi chu kỳ hoặc chỉ chu kỳ trình diễn hiện tại.",
-    "gestureTypeDistribution": "Tỷ lệ nét bút đặt bằng ETH, RandomWalk (trả bằng ETH) và CST theo thời gian, lấy mẫu theo khoảng đã chọn. Chỉ chu kỳ hiện tại.",
-    "enduranceTimeline": "Biểu đồ Gantt về ai đã giữ vị trí dẫn đầu trong một chu kỳ. Mỗi thanh là một đoạn dẫn đầu (độ rộng = thời gian địa chỉ đó giữ vị trí dẫn đầu). Thanh rộng nhất là Quán quân Bền bỉ; Chiến binh Thời gian là người tham gia có một lần làm Quán quân Bền bỉ liên tục lâu nhất. Chọn bất kỳ chu kỳ nào để so sánh.",
-    "cstWindow": "Cửa sổ hiệu chỉnh CST đã biến đổi thế nào trong một chu kỳ. Mỗi nét bút ETH rút ngắn cửa sổ một chút; mỗi nét bút CST kéo dài nó. Cửa sổ quyết định chi phí nét bút CST giảm về không nhanh đến đâu. Chọn bất kỳ chu kỳ nào để so sánh.",
-    "cstCost": "Mỗi nét bút CST thực sự tốn bao nhiêu trong một chu kỳ, trên thang log, cùng với thời gian còn lại của đồng hồ phân bổ ngay trước đó. Nét bút giữa chu kỳ thường gần như không tốn chi phí; ở giai đoạn cuối, đặt nét bút liên tục khiến chi phí không có thời gian giảm và có thể lên tới hàng nghìn CST.",
+    "gestureTypeDistribution": "Cách các nét bút của một chu kỳ chia giữa ETH, ETH + Random Walk NFT và CST, đếm theo từng khoảng. Khoảng đông hơn hẳn phần còn lại, như lúc mở chu kỳ, được cắt ở đỉnh trục và ghi số thực.",
     "attachedTokenDistribution": "Hợp đồng và số token của các tài sản ERC-721 đính kèm vào nét bút.",
-    "cosmicSignatureTokenDistribution": "Phân bố chủ sở hữu hiện tại của các token ERC-721 Cosmic Signature NFT.",
+    "cosmicSignatureTokenDistribution": "Ai đang sở hữu Cosmic Signature NFT: NFT trong ví của mỗi địa chỉ và NFT địa chỉ đó đã neo, do Ví neo giữ giữ hộ.",
     "cstBalanceDistribution": "Phân bố ví hiện tại theo số dư CST ERC-20.",
     "cstTotalSupply": "Thay đổi nguồn cung CST ERC-20 theo lịch sử, gồm các lần khắc và tiêu thụ theo thời gian.",
     "cycleActivations": "Các cửa sổ sự kiện hệ thống cho biết khi nào các chu kỳ hoặc chế độ của giao thức bắt đầu và kết thúc.",
@@ -257,21 +248,15 @@
     "anchorReleaseActions": "Các thao tác neo giữ và gỡ neo theo thời gian của loại NFT đã chọn.",
     "anchoredTokens": "Các token hiện đang neo giữ trong ví neo giữ đã chọn.",
     "uniqueAnchorHolders": "Các ví đã neo giữ hoặc gỡ neo loại NFT đã chọn.",
-    "gestureFrequency": "Số nét bút được lập chỉ mục gom theo thời gian để thể hiện các mẫu hoạt động của giao thức.",
-    "gestureSpikes": "Các khoảng thời gian hoạt động nét bút thay đổi nhanh so với hoạt động xung quanh.",
-    "participantActivePeriods": "Các khoảng tham gia hoạt động dài nhất được lập chỉ mục của những ví hoạt động nhiều nhất."
+    "gestureSpikes": "Các khoảng thời gian hoạt động nét bút thay đổi nhanh so với hoạt động xung quanh."
   },
   "anchoringTooltips": {
     "cstActiveAnchorHolders": "Các ví hiện đang neo giữ ít nhất một Cosmic Signature NFT.",
     "cstAnchorDistributionDeposits": "Tổng số sự kiện nạp vào quỹ phân phối neo giữ Cosmic Signature NFT.",
     "cstTotalAnchorDistributions": "Tổng ETH đã phân phối dưới dạng phân phối neo giữ cho những người neo giữ Cosmic Signature NFT.",
-    "cstTotalTokensAnchored": "Số Cosmic Signature NFT hiện đang neo giữ trong giao thức.",
     "cstUnretrievedAnchorDistributions": "Phân phối neo giữ đã phân bổ nhưng những người neo giữ Cosmic Signature NFT chưa nhận về.",
     "rwlkActiveAnchorHolders": "Các ví hiện đang neo giữ ít nhất một RandomWalk NFT.",
-    "rwlkTotalTokensImprinted": "Tổng Cosmic Signature NFT và CST đi kèm đã khắc cho những người neo giữ RandomWalk NFT thông qua Tinh tuyển NFT neo giữ.",
-    "rwlkTotalTokensAnchored": "Số RandomWalk NFT hiện đang neo giữ trong giao thức.",
-    "cstGroup": "Neo giữ Cosmic Signature NFT chia sẻ phân phối neo giữ ETH giữa các Cosmic Signature NFT hiện đang neo giữ.",
-    "rwlkGroup": "Neo giữ RandomWalk NFT mang lại diện nhận phân bổ Tinh tuyển NFT neo giữ."
+    "rwlkTotalTokensImprinted": "Tổng Cosmic Signature NFT và CST đi kèm đã khắc cho những người neo giữ RandomWalk NFT thông qua Tinh tuyển NFT neo giữ."
   },
   "activity": {
     "heading": "Hoạt động nét bút",
@@ -283,52 +268,45 @@
       "enduranceTimeline": "Dòng thời gian Quán quân Bền bỉ và Chiến binh Thời gian",
       "cstWindow": "Dòng thời gian cửa sổ hiệu chỉnh CST",
       "cstCost": "Chi phí nét bút CST theo thời gian",
-      "cycleActivations": "Kích hoạt chu kỳ"
+      "cycleActivations": "Kích hoạt chu kỳ",
+      "cycleTimelines": "Chi tiết một chu kỳ"
     },
-    "currentCycleOnly": "Chỉ chu kỳ hiện tại",
-    "emptyCycleActivations": "Chưa có lần kích hoạt chu kỳ nào được lập chỉ mục"
+    "emptyCycleActivations": "Chưa có lần kích hoạt chu kỳ nào được lập chỉ mục",
+    "cycleActivationsCount": "Đã lập chỉ mục {count, number} lần kích hoạt",
+    "cycleTimelinesDescription": "Chọn một chu kỳ để xem nét bút chia theo phương thức ra sao, ai giữ vị trí dẫn đầu, và cửa sổ hiệu chỉnh CST cùng chi phí CST thay đổi thế nào."
   },
   "anchoringPage": {
     "snapshot": {
-      "cosmicSignatureLabel": "Cosmic Signature NFT đang neo giữ",
-      "cosmicSignatureTooltip": "Tổng số Cosmic Signature NFT hiện đang neo giữ trong giao thức và chia sẻ phân phối neo giữ.",
-      "randomWalkLabel": "RandomWalk NFT đang neo giữ",
-      "randomWalkTooltip": "Tổng số RandomWalk NFT hiện đang neo giữ và thuộc diện Tinh tuyển NFT neo giữ.",
-      "poolLabel": "Quỹ phân phối neo giữ",
-      "poolTooltip": "ETH hiện được phân bổ vào quỹ phân phối neo giữ cho những người neo giữ Cosmic Signature NFT.",
-      "perNftLabel": "Phân phối mỗi Cosmic Signature NFT",
-      "perNftTooltip": "Phân phối neo giữ ETH hiện tại trên mỗi Cosmic Signature NFT đang neo giữ: quỹ trên chuỗi chia cho tổng số NFT neo giữ đã lập chỉ mục.",
-      "perNftTooltipUnavailable": "Quỹ trên chuỗi có ETH nhưng dữ liệu chưa ghi nhận Cosmic Signature NFT nào đang neo giữ. Chưa thể tính mức phân phối cho mỗi NFT cho đến khi số liệu được cập nhật.",
       "activeHoldersLabel": "Người neo giữ đang hoạt động",
-      "activeHoldersTooltip": "Tổng số ví đang hoạt động hiện neo giữ ít nhất một Cosmic Signature NFT hoặc RandomWalk NFT."
+      "activeHoldersTooltip": "Số ví khác nhau hiện neo giữ ít nhất một Cosmic Signature NFT hoặc Random Walk NFT. Ví neo giữ cả hai loại chỉ được tính một lần."
     },
-    "description": "NFT đang neo giữ là phần cốt lõi của Cosmic Signature: Cosmic Signature NFT chia sẻ phân phối neo giữ ETH, còn RandomWalk NFT tham gia Tinh tuyển NFT neo giữ.",
+    "nowTitle": "Neo giữ hiện tại",
     "historyLink": "Xem lịch sử neo giữ",
-    "tableDescription": "Dùng các thẻ bên dưới để xem thao tác neo giữ/gỡ neo, token đang neo giữ và những ví riêng biệt phía sau các tổng số neo giữ toàn cầu.",
     "tabs": {
       "cosmicSignature": "Cosmic Signature NFT",
-      "randomWalk": "RandomWalk NFT"
+      "randomWalk": "Random Walk NFT",
+      "label": "Bộ sưu tập NFT"
     },
     "groups": {
       "cosmicSignature": "Tổng quan neo giữ Cosmic Signature NFT",
       "randomWalk": "Tổng quan neo giữ RWLK"
     },
     "stats": {
-      "activeHolders": "Số người neo giữ đang hoạt động",
+      "activeHoldersCosmicSignature": "Số người neo giữ Cosmic Signature NFT đang hoạt động",
+      "activeHoldersRandomWalk": "Số người neo giữ Random Walk NFT đang hoạt động",
       "distributionDeposits": "Số đợt nạp phân phối neo giữ",
       "totalDistributions": "Tổng phân phối neo giữ",
-      "tokensImprinted": "Tổng token đã khắc",
-      "tokensAnchored": "Tổng token đang neo giữ",
+      "tokensImprinted": "Cosmic Signature NFT đã khắc",
       "unretrievedDistributions": "Phân phối neo giữ chưa nhận về"
     },
     "tables": {
       "actions": "Thao tác neo giữ / gỡ neo",
-      "anchoredTokens": "Token đang neo giữ",
+      "anchoredTokens": "NFT đang neo giữ",
       "uniqueHolders": "Người neo giữ riêng biệt"
     },
     "empty": {
       "actions": "Chưa có thao tác neo giữ",
-      "tokens": "Hiện không có token nào đang neo giữ",
+      "tokens": "Hiện không có NFT nào đang neo giữ",
       "holders": "Chưa có người neo giữ"
     }
   },
@@ -365,10 +343,25 @@
     "supplyTabs": {
       "date": "Theo ngày",
       "gesture": "Theo nét bút"
-    }
+    },
+    "holders": {
+      "summary": "{count, plural, other {# địa chỉ}} đang nắm giữ CST, xếp theo số dư lớn nhất. Tỷ lệ tính trên tổng cung {supply}.",
+      "summaryNoSupply": "{count, plural, other {# địa chỉ}} đang nắm giữ CST, xếp theo số dư lớn nhất.",
+      "share": "Tỷ lệ trên tổng cung",
+      "shareHelp": "Số dư này tính theo tỷ lệ trên tổng cung CST.",
+      "uniswapLiquidity": "Thanh khoản Uniswap"
+    },
+    "nftHolders": {
+      "inWallet": "Trong ví",
+      "anchored": "Đang neo giữ",
+      "total": "Tổng",
+      "custodyNotice": "Ví neo giữ đang giữ {count, number} NFT đã neo thay cho người neo giữ; ở đây mỗi NFT được tính cho người neo giữ của nó."
+    },
+    "attachedContracts": "{count, number} hợp đồng ERC-721"
   },
   "attachedAssets": {
     "scopeAria": "Phạm vi NFT đính kèm",
+    "paginationLabel": "Phân trang NFT đính kèm",
     "scopeAll": "Mọi chu kỳ",
     "scopeCurrent": "Chu kỳ hiện tại",
     "nftTab": "NFT (ERC-721)",
@@ -383,32 +376,20 @@
     "erc20Description": "Các token ERC-20 đính kèm vào nét bút trong chu kỳ trình diễn hiện tại."
   },
   "performance": {
-    "leaderboardTitle": "Thành tích người tham gia",
-    "claimsTitle": "Nhận về phân bổ theo chu kỳ",
+    "leaderboardTitle": "Đã chi và đã nhận",
+    "claimsTitle": "Nhận về theo chu kỳ",
     "leaderboard": {
-      "description": "ETH ròng và tỷ lệ ròng theo từng người tham gia, qua mọi chu kỳ. Các con số <em>chỉ tính ETH</em> — ETH nhận từ phân bổ trừ ETH đã chi cho nét bút; phân bổ CST và NFT được hiển thị làm bối cảnh. Người tham gia chỉ dùng CST không có số liệu ETH ròng.",
-      "sort": {
-        "netEth": "ETH ròng cao nhất",
-        "netPercent": "% ròng cao nhất",
-        "allocationRate": "Tỷ lệ phân bổ tốt nhất",
-        "spender": "Chi nhiều nhất",
-        "nfts": "Nhiều NFT nhất"
-      },
+      "description": "Mỗi người tham gia đạt số nét bút tối thiểu đã chọn đã chi bao nhiêu cho nét bút và được phân bổ bao nhiêu ETH, trên mọi chu kỳ. Số liệu tính bằng ETH; CST đã chi cùng phân bổ NFT và CST hiển thị bên dưới.",
       "minimumGestures": "Số nét bút tối thiểu",
-      "cstOnly": "(chỉ CST)",
-      "cstOnlyTooltip": "Không chi ETH (người tham gia chỉ dùng CST)",
-      "noEthReceivedTooltip": "Chưa có ETH quay về — người tham gia này chưa nhận phân bổ ETH nào đến nay",
-      "loadErrorTitle": "Không tải được bảng xếp hạng thành tích",
+      "loadErrorTitle": "Không tải được dữ liệu đã chi và đã nhận",
       "loadErrorMessage": "Dịch vụ thống kê không phản hồi. Hãy thử lại sau ít phút.",
       "empty": "Chưa có người tham gia nào khớp với bộ lọc này.",
       "columns": {
         "participant": "Người tham gia",
-        "allocationRate": "Tỷ lệ phân bổ",
+        "cyclesWithAllocation": "Chu kỳ có phân bổ",
         "gestures": "Nét bút",
         "spent": "Đã chi (ETH)",
         "received": "Đã nhận (ETH)",
-        "net": "Ròng (ETH)",
-        "netPercent": "% ròng",
         "allocations": "Phân bổ"
       }
     },
@@ -427,8 +408,8 @@
       },
       "allClaimed": "Đã nhận về tất cả",
       "unclaimedCount": "{count} chưa nhận về",
-      "viewUnclaimed": "Xem tài sản chưa nhận về",
-      "explore": "Khám phá",
+      "showRetrievals": "Xem lượt nhận về",
+      "hideRetrievals": "Ẩn lượt nhận về",
       "dialog": {
         "unclaimedTitle": "Tài sản chưa nhận về — Chu kỳ {cycle}",
         "expired": "Thời hạn nhận về đã qua. Bất kỳ ai cũng có thể nhận về các tài sản còn lại cho mình.",
@@ -436,8 +417,6 @@
         "asset": "Tài sản",
         "recipient": "Người nhận",
         "detail": "Chi tiết",
-        "exploreTitle": "Khám phá chu kỳ {cycle}",
-        "exploreDescription": "Các giao dịch nhận về cùng thời gian mỗi người nhận đã mất, và các token đính kèm trong chu kỳ này.",
         "claimTransactions": "Giao dịch nhận về",
         "noClaims": "Không có lần nhận về nào được ghi nhận cho chu kỳ này.",
         "claimedAfter": "Nhận về sau",
@@ -451,9 +430,22 @@
       },
       "assets": {
         "eth": "ETH",
-        "nft": "NFT đính kèm",
-        "erc20": "ERC-20 đính kèm"
+        "nftItem": "NFT đính kèm {contract} #{id}",
+        "erc20Item": "ERC-20 đính kèm {contract}: {amount}"
       }
+    },
+    "outcomes": {
+      "participants": "Người tham gia có từ {min} nét bút",
+      "spent": "ETH đã chi cho nét bút",
+      "received": "ETH nhận qua phân bổ",
+      "cyclesHelp": "Số chu kỳ người này tham gia mà có nhận ít nhất một phân bổ.",
+      "cycles": "{part} trên {whole, number} chu kỳ"
+    },
+    "kinds": {
+      "eth": "{count, number} phân bổ ETH",
+      "nft": "{count, number} NFT",
+      "erc20": "{count, number} phân bổ ERC-20",
+      "cst": "{count, number} phân bổ CST"
     }
   },
   "charts": {
@@ -462,130 +454,152 @@
       "daily": "Theo ngày",
       "hourly": "Theo giờ",
       "gestures": "Nét bút",
+      "busiestDay": "Ngày sôi động nhất",
+      "busiestHour": "Giờ sôi động nhất",
       "uniqueParticipants": "Người tham gia riêng biệt",
       "loadErrorTitle": "Không tải được tần suất nét bút",
       "loadErrorMessage": "Không lấy được tần suất nét bút cho khoảng đã chọn.",
       "empty": "Không có hoạt động nét bút trong khoảng thời gian này.",
-      "openingExcluded": "Nét bút trong giờ đầu sau khi mỗi chu kỳ mở không được tính — hoạt động lúc mở tập trung bất thường và sẽ làm lệch biểu đồ này."
+      "openingExcluded": "Nét bút trong giờ đầu sau khi mỗi chu kỳ mở không được tính — hoạt động lúc mở tập trung bất thường và sẽ làm lệch biểu đồ này.",
+      "openingNote": "Không tính giờ đầu của mỗi chu kỳ, vì đợt dồn dập lúc mở sẽ lấn át mọi cột khác.",
+      "hour": "Giờ",
+      "day": "Ngày",
+      "allGestures": "Tất cả nét bút",
+      "allGesturesCaption": "Gồm cả giờ đầu tiên của mỗi chu kỳ"
     },
     "spikes": {
       "count": "Đợt tăng vọt ({count})",
-      "groupAria": "Các đợt tăng vọt nét bút được phát hiện",
       "previousAria": "Đợt tăng vọt trước",
       "nextAria": "Đợt tăng vọt sau",
-      "summary": "Đỉnh {peak} nét bút/giờ · tổng {total} trong đợt · {date}",
       "viewing": "Đang xem đợt tăng vọt #{index}: {start} → {end}",
       "gestures": "Nét bút: {count}",
+      "inSpike": "Nét bút trong đợt",
+      "peak": "Đỉnh của đợt",
       "loadErrorTitle": "Không tải được các đợt tăng vọt nét bút",
       "loadErrorMessage": "Không lấy được dữ liệu phát hiện đợt tăng vọt.",
       "empty": "Không phát hiện đợt tăng vọt nét bút nào trong lịch sử đã lập chỉ mục.",
-      "noneRecent": "Gần đây không có đợt tăng vọt.",
-      "selectEarlier": "Chọn số thứ tự ở trên để xem những đợt tăng hoạt động trước đó.",
-      "emptyWindow": "Không có khoảng gộp theo giờ cho cửa sổ đợt tăng vọt đã chọn."
+      "noneRecent": "Gần đây không có đợt tăng vọt; đang hiển thị đợt gần nhất đã ghi nhận.",
+      "emptyWindow": "Không có khoảng gộp theo giờ cho cửa sổ đợt tăng vọt đã chọn.",
+      "optionAria": "Đợt tăng vọt ngày {date}, tối đa {peak} mỗi giờ"
     },
     "activePeriods": {
       "description": "Khoảng hoạt động của {count} người tham gia hàng đầu (≥2 nét bút với khoảng cách ≤6 giờ giữa hai nét bút liên tiếp). Mỗi thanh là một đợt.",
+      "note": "Mỗi khoảng hoạt động gồm từ 2 nét bút trở lên, cách nhau không quá 6 giờ.",
       "participant": "Người tham gia",
-      "ariaLabel": "{address}: {count} nét bút từ {start} đến {end}",
-      "tooltipSummary": "{count} nét bút · kéo dài {minutes} phút",
+      "ariaLabel": "{address}: {count, number} nét bút từ {start} đến {end}",
       "loadErrorTitle": "Không tải được các khoảng hoạt động",
       "loadErrorMessage": "Không lấy được dòng thời gian hoạt động của những người tham gia hàng đầu.",
-      "empty": "Không tìm thấy khoảng hoạt động nét bút nào của những người tham gia hàng đầu."
+      "empty": "Không tìm thấy khoảng hoạt động nét bút nào của những người tham gia hàng đầu.",
+      "periods": "Khoảng hoạt động",
+      "noPeriods": "Không có khoảng hoạt động",
+      "longest": "Khoảng dài nhất",
+      "mostGestures": "Nhiều nét bút nhất",
+      "lastActive": "Hoạt động gần nhất",
+      "laneLabel": "{rank}. {address}: {gestures, number} nét bút trong {periods, number} khoảng hoạt động",
+      "hint": "Trỏ vào hoặc chọn một khoảng để xem chi tiết; phím mũi tên chuyển giữa các khoảng.",
+      "hintTouch": "Chạm vào một khoảng để xem chi tiết."
     },
     "typeRatio": {
       "totalGestures": "Tổng số nét bút",
       "sampleEvery": "Lấy mẫu mỗi",
-      "interpolation": "Nội suy",
       "intervals": {
         "oneHour": "1 giờ",
         "sixHours": "6 giờ",
         "twelveHours": "12 giờ",
         "oneDay": "1 ngày"
-      },
-      "linear": "Tuyến tính",
-      "step": "Bậc",
-      "smooth": "Mượt",
-      "notStarted": "Chu kỳ hiện tại chưa bắt đầu.",
-      "loadErrorTitle": "Không tải được phân bố loại nét bút",
-      "loadErrorMessage": "Không lấy được cơ cấu loại nét bút của chu kỳ hiện tại.",
-      "empty": "Chưa có hoạt động nét bút trong chu kỳ hiện tại.",
-      "description": "Mỗi mẫu là tỷ lệ loại nét bút trong cửa sổ đó (theo từng khoảng, không tích lũy). Cửa sổ không có nét bút hiển thị 0% cho mọi loại."
+      }
     },
     "endurance": {
       "timeIntoCycle": "Thời gian trong chu kỳ",
       "intoCycle": "{duration} trong chu kỳ",
       "currentLeadWindow": "Khoảng dẫn đầu hiện tại",
       "enduranceRecord": "Kỷ lục bền bỉ",
+      "recordCallout": "Kỷ lục bền bỉ · {duration}",
       "enduranceChampionRecord": "Kỷ lục Quán quân Bền bỉ",
       "chronoRecord": "Kỷ lục Chiến binh Thời gian",
-      "leadHeldBy": "Người dẫn đầu",
       "legendEndurance": "Quán quân Bền bỉ (lần giữ đơn lẻ dài nhất)",
       "legendChrono": "Chiến binh Thời gian (thời gian giữ vị trí dài nhất)",
       "legendLead": "Đã dẫn đầu",
       "legendNewRecord": "Lập kỷ lục mới",
       "enduranceChampion": "Quán quân Bền bỉ",
-      "enduranceChampionAbbr": "QB",
       "chronoWarrior": "Chiến binh Thời gian",
-      "chronoWarriorAbbr": "CT",
-      "newRecord": "kỷ lục mới",
+      "leaders": "Địa chỉ từng dẫn đầu",
       "roleEndurance": " (Quán quân Bền bỉ)",
       "roleNewRecord": " (kỷ lục mới)",
       "stintAria": "{address} • đã giữ {duration} • {from} → {to} trong chu kỳ{role}",
-      "description": "Mỗi thanh là một đoạn dẫn đầu — một địa chỉ giữ vị trí dẫn đầu từ một nét bút đến khi nét bút kế tiếp xuất hiện. Độ rộng thanh là thời gian họ dẫn đầu. Thanh viền hổ phách lập kỷ lục bền bỉ mới tại thời điểm đó; thanh tím là lần giữ đơn lẻ dài nhất (Quán quân Bền bỉ); làn hồng giữ danh hiệu lâu nhất tổng thể (Chiến binh Thời gian). Di chuột lên thanh để xem chi tiết.",
+      "description": "Mỗi thanh là một đoạn dẫn đầu — một địa chỉ giữ vị trí dẫn đầu từ một nét bút đến khi nét bút kế tiếp xuất hiện. Độ rộng thanh là thời gian dẫn đầu. Thanh có viền lập kỷ lục bền bỉ mới tại thời điểm đó. Quán quân Bền bỉ có lần giữ đơn lẻ dài nhất; Chiến binh Thời gian giữ danh hiệu Quán quân Bền bỉ lâu nhất tổng thể. Chú giải cho biết màu của từng danh hiệu.",
+      "note": "Mỗi thanh là một đoạn dẫn đầu, từ một nét bút đến nét bút kế tiếp. Thanh có viền lập kỷ lục mới tại thời điểm đó.",
       "selectCycle": "Chọn một chu kỳ để xem.",
       "loadErrorTitle": "Không tải được dòng thời gian bền bỉ",
       "loadErrorMessage": "Không lấy được lịch sử nét bút của chu kỳ này.",
       "empty": "Chưa có hoạt động dẫn đầu trong chu kỳ này.",
-      "championSummary": "Quán quân Bền bỉ: {address} đã giữ {duration}",
-      "chronoSummary": "Chiến binh Thời gian: {address} đã giữ vị trí {duration}",
       "gantt": "Gantt",
       "lineChart": "Biểu đồ đường",
-      "openWindowAria": "Mở biểu đồ trong cửa sổ mới",
-      "openWindowTitle": "Mở trong cửa sổ mới"
+      "openWindow": "Mở trong cửa sổ mới",
+      "leadHeldByValue": "Dẫn đầu: {address}",
+      "ganttLabel": "Các đoạn dẫn đầu theo người tham gia",
+      "laneLabel": "{address}: {count, number} đoạn dẫn đầu, dài nhất {longest}",
+      "hint": "Trỏ vào hoặc chọn một đoạn dẫn đầu để xem chi tiết; phím mũi tên chuyển giữa các đoạn.",
+      "hintTouch": "Chạm vào một đoạn dẫn đầu để xem chi tiết.",
+      "lanesAll": "Đang hiển thị tất cả {total, number} địa chỉ từng dẫn đầu",
+      "lanesShown": "Đang hiển thị {shown, number}/{total, number} địa chỉ từng dẫn đầu",
+      "showAllLanes": "Hiện tất cả {count, number}",
+      "showFewerLanes": "Chỉ hiện {count, number} địa chỉ đầu",
+      "role": "Danh hiệu",
+      "holds": "Số đoạn dẫn đầu",
+      "longestHold": "Đoạn dài nhất",
+      "totalHeld": "Tổng thời gian dẫn đầu",
+      "viewLabel": "Kiểu biểu đồ"
     },
     "cyclePicker": {
       "cycle": "Chu kỳ",
       "previousCycleAria": "Chu kỳ trước",
       "nextCycleAria": "Chu kỳ sau",
-      "cycleNumberAria": "Số chu kỳ",
       "liveCycle": "Chu kỳ trực tiếp",
-      "jumpLive": "Đến chu kỳ trực tiếp"
+      "jumpLive": "Đến chu kỳ trực tiếp",
+      "option": "Chu kỳ {cycle}",
+      "optionLive": "Chu kỳ {cycle} (đang diễn ra)"
     },
     "cstWindow": {
       "timeIntoCycle": "Thời gian trong chu kỳ",
       "intoCycle": "{duration} trong chu kỳ",
       "window": "Cửa sổ hiệu chỉnh CST",
       "windowAfter": "Cửa sổ sau nét bút này",
+      "windowNow": "Cửa sổ hiện tại",
+      "windowFinal": "Cửa sổ khi hoàn tất",
+      "shortest": "Ngắn nhất",
+      "longest": "Dài nhất",
       "typeEth": "Nét bút ETH (rút ngắn)",
-      "typeRandomWalk": "Nét bút ETH + RandomWalk (rút ngắn)",
+      "typeRandomWalk": "Nét bút ETH + Random Walk (rút ngắn)",
       "typeCst": "Nét bút CST (kéo dài)",
-      "summaryMin": "Thấp: {duration}",
-      "summaryMax": "Cao: {duration}",
-      "summaryCurrent": "Hiện tại: {duration}",
-      "summaryFinal": "Khi hoàn tất: {duration}",
-      "description": "Cửa sổ hiệu chỉnh CST quyết định chi phí một nét bút CST mất bao lâu để giảm từ giá khởi điểm về không. Mỗi nét bút ETH rút ngắn cửa sổ một chút; mỗi nét bút CST kéo dài nó. Mỗi chấm là một nét bút, tô màu theo loại; đường kẻ là cửa sổ có hiệu lực sau nét bút đó.",
+      "description": "Cửa sổ hiệu chỉnh CST quyết định chi phí một nét bút CST mất bao lâu để giảm từ giá khởi điểm về không. Mỗi nét bút ETH rút ngắn cửa sổ một chút; mỗi nét bút CST kéo dài nó. Đường kẻ đổi ở mỗi nét bút sang cửa sổ có hiệu lực sau nét bút đó; bảng liệt kê từng nét bút và loại của nó.",
+      "note": "Mỗi nét bút ETH rút ngắn cửa sổ một chút; mỗi nét bút CST kéo dài nó.",
       "empty": "Không có dữ liệu cửa sổ hiệu chỉnh theo từng nét bút cho chu kỳ này. Các chu kỳ được lập chỉ mục trước các sự kiện V2 không có dữ liệu này.",
       "selectCycle": "Chọn một chu kỳ để xem.",
       "loadErrorTitle": "Không tải được dòng thời gian cửa sổ hiệu chỉnh",
-      "loadErrorMessage": "Không lấy được lịch sử nét bút của chu kỳ này."
+      "loadErrorMessage": "Không lấy được lịch sử nét bút của chu kỳ này.",
+      "method": "Phương thức nét bút"
     },
     "cstCost": {
       "timeIntoCycle": "Thời gian trong chu kỳ",
       "intoCycle": "{duration} trong chu kỳ",
       "priceLine": "CST đã trả mỗi nét bút",
+      "freeGesture": "Nét bút không tốn phí",
       "clockLine": "Thời gian còn lại trước nét bút",
       "cstPaid": "CST đã trả",
+      "gestures": "Nét bút CST",
+      "consumed": "CST đã tiêu thụ",
+      "highest": "Chi phí cao nhất",
       "clockBefore": "Thời gian còn lại trước đó",
       "gestureBy": "Nét bút của",
       "clickHint": "Nhấn vào chấm để mở giao dịch.",
-      "summaryMax": "Cao nhất: {amount} ({when} trong chu kỳ)",
-      "summaryTotal": "Tổng đã tiêu thụ: {amount}",
-      "summaryCount": "{count} nét bút CST",
-      "description": "Mỗi chấm tím là lượng CST thực trả cho một nét bút (thang log — chấm rỗng là không tốn chi phí). Sau mỗi nét bút CST, chi phí đặt lại ở gần gấp đôi lượng đã trả rồi giảm về không qua cửa sổ hiệu chỉnh. Đường hồng đứt nét là thời gian còn lại của đồng hồ phân bổ ngay trước mỗi nét bút: khi đồng hồ cạn, đặt nét bút liên tục khiến chi phí không có thời gian giảm, nên giá phải trả leo thang. Nhấn vào một chấm để mở giao dịch của nó.",
+      "description": "Mỗi chấm là lượng CST thực trả cho một nét bút, theo thang log; chấm rỗng là không tốn phí. Sau mỗi nét bút CST, chi phí đặt lại ở gần gấp đôi lượng đã trả rồi giảm về không qua cửa sổ hiệu chỉnh. Bảng bên dưới là thời gian còn lại của đồng hồ phân bổ ngay trước mỗi nét bút: khi đồng hồ cạn, đặt nét bút liên tục khiến chi phí không có thời gian giảm, nên giá phải trả leo thang.",
+      "note": "Thang log; chấm rỗng là nét bút không tốn phí. Khi đồng hồ bên dưới sắp cạn, nét bút liên tục khiến chi phí không kịp giảm.",
       "empty": "Không có nét bút CST trong chu kỳ này.",
       "selectCycle": "Chọn một chu kỳ để xem.",
       "loadErrorTitle": "Không tải được chi phí nét bút CST",
-      "loadErrorMessage": "Không lấy được lịch sử nét bút của chu kỳ này."
+      "loadErrorMessage": "Không lấy được lịch sử nét bút của chu kỳ này.",
+      "when": "Thời điểm"
     },
     "supply": {
       "totalSupply": "Tổng cung",
@@ -593,89 +607,133 @@
       "consume": "Đốt",
       "net": "Ròng",
       "numGestures": "Số nét bút",
-      "from": "Từ",
-      "to": "Đến",
-      "update": "Cập nhật biểu đồ",
-      "invalidRange": "Ngày bắt đầu phải trước hoặc bằng ngày kết thúc.",
       "loadErrorTitle": "Không tải được lịch sử nguồn cung",
       "loadDateError": "Không lấy được tổng cung CST cho khoảng đã chọn.",
       "emptyDate": "Không có lịch sử nguồn cung cho khoảng ngày này.",
       "gesture": "Nét bút {number}",
-      "gestureType": "Loại nét bút",
-      "gestureInfoId": "Mã thông tin nét bút",
       "loadGestureError": "Không lấy được tổng cung CST theo nét bút.",
-      "emptyGesture": "Không có lịch sử nguồn cung theo nét bút."
+      "emptyGesture": "Không có lịch sử nguồn cung theo nét bút.",
+      "view": "Chế độ xem",
+      "range": "Khoảng thời gian",
+      "rangeDays": "{days, number} ngày",
+      "rangeYear": "1 năm qua",
+      "rangeAll": "Toàn bộ",
+      "gestureNumber": "Nét bút số"
     },
-    "balance": {
-      "outreachWallet": "Ví truyền thông",
-      "others": "Khác"
+    "viewTable": "Xem dạng bảng",
+    "mix": {
+      "eth": "ETH",
+      "ethRandomWalk": "ETH + Random Walk NFT",
+      "cst": "CST",
+      "total": "Tổng cộng {count, number} nét bút",
+      "window": "Khung bắt đầu",
+      "intervalAria": "{hours, plural, other {Mỗi # giờ}}",
+      "selectCycle": "Chọn một chu kỳ để xem.",
+      "loadErrorTitle": "Không tải được phân bố loại nét bút",
+      "loadErrorMessage": "Không lấy được lịch sử nét bút của chu kỳ này.",
+      "empty": "Chu kỳ này chưa có nét bút nào."
     }
+  },
+  "embed": {
+    "title": "Dòng thời gian Quán quân Bền bỉ và Chiến binh Thời gian · Chu kỳ {cycle}",
+    "final": "Đã hoàn tất",
+    "source": "Mở trong Cosmic Signature",
+    "opensNewWindow": "(mở trong cửa sổ mới)"
   },
   "recipientHistory": {
     "pageTitle": "Lịch sử phân bổ của tôi",
-    "connectedTitle": "Lịch sử phân bổ của tôi",
-    "subtitle": "Xem các lần nhận về phân bổ và phân phối trước đây của bạn",
-    "disconnectedDescription": "Theo dõi toàn bộ lịch sử phân bổ của bạn qua mọi chu kỳ trình diễn Cosmic Signature. Bao gồm các lần nhận về phân bổ Signature, phân phối ETH Tinh tuyển, phân bổ Cosmic Signature NFT và phân phối neo giữ.",
-    "connectedDescription": "Theo dõi toàn bộ lịch sử phân bổ của bạn qua mọi chu kỳ trình diễn Cosmic Signature. Bao gồm các lần nhận về phân bổ Signature, phân bổ ETH Tinh tuyển, phân bổ Cosmic Signature NFT và phân phối neo giữ.",
-    "walletTitle": "Chưa kết nối ví",
-    "walletDescription": "Vui lòng kết nối ví để xem lịch sử phân bổ của bạn.",
+    "connectedDescription": "Mọi phân bổ mà ví này đã nhận qua từng chu kỳ, cùng trạng thái nhận về của từng khoản.",
     "loadError": "Không tải được lịch sử phân bổ",
     "loadErrorDescription": "Vui lòng thử lại sau ít phút.",
     "emptyTitle": "Chưa có phân bổ",
-    "emptyDescription": "Bạn hiện chưa có phân bổ nào được ghi nhận."
+    "emptyDescription": "Khi một chu kỳ đã hoàn tất phân bổ cho ví này, bản ghi sẽ xuất hiện tại đây."
   },
   "namedNfts": {
-    "eyebrow": "NFT đã đặt tên · {count}",
     "title": "Cosmic Signature NFT đã đặt tên",
     "subtitle": "Duyệt các Cosmic Signature NFT đã được đặt tên tùy chỉnh",
-    "description": "Chủ sở hữu Cosmic Signature NFT có thể đặt tên tùy chỉnh cho NFT của mình, tạo nên một danh tính độc nhất trong bộ sưu tập. NFT đã đặt tên nổi bật trong phòng trưng bày và mang dấu ấn cá nhân của chủ sở hữu.",
+    "loadErrorTitle": "Không tải được các NFT đã đặt tên",
+    "loadErrorMessage": "Không đọc được bản ghi NFT đã đặt tên. Hãy thử lại.",
     "emptyTitle": "Không có NFT đã đặt tên",
-    "emptyDescription": "Chưa có Cosmic Signature NFT nào được đặt tên."
+    "emptyDescription": "Chưa có Cosmic Signature NFT nào được đặt tên.",
+    "galleryLink": "Xem trong phòng trưng bày",
+    "card": {
+      "namedOn": "Đặt tên ngày",
+      "namedBy": "Người đặt tên"
+    }
   },
   "attachedNfts": {
-    "eyebrow": "NFT đính kèm · {count}",
     "title": "Đóng góp NFT đính kèm",
     "subtitle": "Các NFT thành viên cộng đồng đã đính kèm vào nét bút qua các chu kỳ",
-    "description": "Thành viên cộng đồng có thể đính kèm NFT (ERC-721) của mình vào nét bút bằng các tùy chọn nâng cao. NFT đính kèm được chuyển đến người tham gia nhận phân bổ Signature khi chu kỳ hoàn tất, làm giàu phần phân phối ngoài ETH."
+    "loadErrorTitle": "Không tải được các NFT đính kèm",
+    "loadErrorMessage": "Không đọc được bản ghi NFT đính kèm. Hãy thử lại.",
+    "emptyTitle": "Chưa có NFT đính kèm nào",
+    "emptyDescription": "Các NFT đính kèm vào nét bút sẽ hiện ở đây. Mỗi NFT được chuyển cho người nhận phân bổ Signature của chu kỳ khi chu kỳ hoàn tất.",
+    "card": {
+      "cycle": "Chu kỳ {cycle}",
+      "attachedBy": "Đính kèm bởi"
+    }
   },
   "usedRwlkNfts": {
-    "eyebrow": "RWLK đã sử dụng · {count}",
     "title": "Random Walk NFT đã sử dụng",
     "subtitle": "Các Random Walk NFT đã đính kèm vào nét bút ETH để giảm 50% chi phí nét bút một lần",
-    "description": "Người nắm giữ RandomWalk NFT có thể đính kèm một NFT chưa sử dụng vào nét bút ETH để giảm 50% chi phí nét bút trong Cosmic Signature. Sau khi sử dụng, RandomWalk NFT được ghi lại ở đây. Mỗi NFT chỉ dùng được một lần cho mức giảm giá này, nên thời điểm sử dụng là một quyết định chiến thuật.",
-    "loading": "Đang tải…",
-    "empty": "Chưa có NFT nào."
+    "artAlt": "Random Walk NFT #{id}",
+    "loadErrorTitle": "Không tải được các Random Walk NFT đã sử dụng",
+    "loadError": "Không đọc được các Random Walk NFT đã sử dụng. Hãy thử lại.",
+    "emptyTitle": "Chưa có Random Walk NFT nào được sử dụng",
+    "emptyDescription": "Random Walk NFT sẽ hiện ở đây khi một nét bút ETH dùng nó để giảm chi phí nét bút một lần.",
+    "card": {
+      "cycle": "Chu kỳ {cycle}",
+      "title": "Random Walk #{id}",
+      "usedBy": "Người tham gia"
+    }
   },
   "stellarSelectionEth": {
-    "invalidAddress": "Địa chỉ không hợp lệ",
-    "user": "Người dùng",
-    "heading": "ETH Tinh tuyển được phân bổ cho người tham gia này",
-    "retrievable": "Phân bổ bạn có thể nhận về là {amount} ETH",
-    "retrieveAll": "Nhận về tất cả",
-    "empty": "Chưa có ETH Tinh tuyển."
+    "heading": "Tinh tuyển · ETH",
+    "lede": "ETH mà <term>Tinh tuyển</term> đã phân bổ cho người tham gia này qua từng chu kỳ.",
+    "figures": {
+      "total": "Tổng đã phân bổ",
+      "count": "Số lần phân bổ",
+      "waiting": "Chưa nhận về"
+    },
+    "tableLabel": "Phân bổ ETH Tinh tuyển",
+    "emptyTitle": "Chưa có ETH Tinh tuyển",
+    "emptyDescription": "Khi một chu kỳ đã hoàn tất chọn địa chỉ này để phân bổ ETH, khoản phân bổ sẽ xuất hiện tại đây.",
+    "errorTitle": "Không tải được ETH Tinh tuyển",
+    "retrieve": "Nhận về ETH"
   },
   "stellarSelectionNft": {
-    "invalidAddress": "Địa chỉ không hợp lệ",
-    "user": "Người dùng",
-    "heading": "NFT Tinh tuyển được phân bổ cho người tham gia này",
-    "loading": "Đang tải…",
-    "empty": "Chưa có phân bổ NFT.",
-    "isRandomWalk": "Là RandomWalk",
-    "isAnchorHolder": "Là người neo giữ"
+    "heading": "Tinh tuyển · NFT",
+    "lede": "Các Cosmic Signature NFT mà <term>Tinh tuyển</term> đã phân bổ cho người tham gia này.",
+    "figures": {
+      "count": "Số NFT",
+      "cycles": "Số chu kỳ"
+    },
+    "gridLabel": "NFT Tinh tuyển",
+    "sources": {
+      "participant": "Người tham gia",
+      "randomWalk": "Random Walk",
+      "anchorHolder": "Người neo giữ"
+    },
+    "emptyTitle": "Chưa có NFT Tinh tuyển",
+    "emptyDescription": "Khi một chu kỳ đã hoàn tất chọn địa chỉ này cho một Cosmic Signature NFT, NFT đó sẽ xuất hiện tại đây.",
+    "errorTitle": "Không tải được NFT Tinh tuyển",
+    "artFailed": "Không tải được tác phẩm"
+  },
+  "stellarSelectionPages": {
+    "invalidTitle": "Địa chỉ không hợp lệ",
+    "invalidDescription": "Hãy kiểm tra địa chỉ trong liên kết: địa chỉ bắt đầu bằng 0x và có 40 ký tự thập lục phân.",
+    "participant": "Người tham gia",
+    "profile": "Hồ sơ người tham gia",
+    "howItWorks": "Tinh tuyển hoạt động thế nào",
+    "errorMessage": "Không đọc được các phân bổ của địa chỉ này. Bạn hãy thử lại sau giây lát."
   },
   "systemEvent": {
-    "titleBeforeCycle": "Cấu hình hệ thống được thiết lập trước chu kỳ {cycle}",
-    "titleBeforeDeployment": "Cấu hình hệ thống được thiết lập trước khi triển khai",
     "range": "Phạm vi nhật ký sự kiện {start}–{end}",
     "breadcrumbs": {
-      "home": "Trang chủ",
-      "coordination": "Thay đổi điều phối",
-      "beforeCycle": "Trước chu kỳ {cycle}",
-      "deployment": "Triển khai"
+      "coordination": "Thay đổi điều phối"
     },
     "loading": "Đang tải…",
     "loadError": "Không tải được sự kiện hệ thống",
-    "explainEvent": "Giải thích {event}",
     "adminEvents": {
       "undefined": "Không xác định",
       "publicGoodsPercentage": "Đã thay đổi tỷ lệ dành cho Hàng hóa công.",
@@ -735,67 +793,11 @@
     "attached": "Đã đính kèm"
   },
   "attachedNftLinks": {
-    "viewNft": "Xem NFT",
+    "projectSite": "Trang dự án",
     "viewOpenSea": "Xem trên OpenSea",
     "viewContract": "Xem hợp đồng",
     "detailsUnavailable": "Chi tiết NFT không khả dụng",
     "contractUnavailable": "Hợp đồng không khả dụng"
-  },
-  "publicDataSummaries": {
-    "common": {
-      "lastUpdated": "Cập nhật: {date}. Nguồn: {source}.",
-      "relatedPagesAria": "Các trang liên quan đến {heading}",
-      "unavailable": "Không khả dụng"
-    },
-    "attachedNfts": {
-      "eyebrow": "Đóng góp NFT đính kèm · Arbitrum",
-      "heading": "Đóng góp NFT đính kèm",
-      "description": "Duyệt các NFT đính kèm vào nét bút Cosmic Signature. Token ERC-721 đính kèm được chuyển đến người tham gia nhận phân bổ Signature khi chu kỳ hoàn tất.",
-      "source": "Các API NFT đính kèm công khai của Cosmic Signature",
-      "cards": {
-        "records": "Bản ghi NFT đính kèm",
-        "contracts": "Hợp đồng NFT riêng biệt",
-        "contributors": "Ví người đóng góp"
-      },
-      "links": {
-        "gallery": "Khám phá phòng trưng bày Cosmic Signature",
-        "cycle": "Xem chu kỳ trình diễn hiện tại",
-        "learn": "Tìm hiểu vai trò của đính kèm trong chu kỳ"
-      }
-    },
-    "namedNfts": {
-      "eyebrow": "NFT đã đặt tên · Arbitrum",
-      "heading": "Cosmic Signature NFT đã đặt tên",
-      "description": "Khám phá Cosmic Signature NFT đã được chủ sở hữu đặt tên. Xem tác phẩm, thông tin token và lịch sử sở hữu trên chuỗi.",
-      "source": "Các API token công khai của Cosmic Signature",
-      "cards": {
-        "named": "Cosmic Signature NFT đã đặt tên",
-        "owners": "Chủ sở hữu hiện tại",
-        "collection": "Bộ sưu tập"
-      },
-      "links": {
-        "gallery": "Khám phá toàn bộ phòng trưng bày",
-        "learn": "Tìm hiểu về nghệ thuật",
-        "code": "Xem mã nguồn kết xuất"
-      }
-    },
-    "usedRwlkNfts": {
-      "eyebrow": "Sử dụng RandomWalk NFT · Arbitrum",
-      "heading": "RandomWalk NFT đã sử dụng",
-      "description": "Xem các RandomWalk NFT đã được đính kèm vào nét bút ETH để hưởng mức giảm chi phí nét bút một lần.",
-      "source": "Các API sử dụng RandomWalk công khai của Cosmic Signature",
-      "cards": {
-        "used": "RandomWalk NFT đã sử dụng",
-        "discount": "Giảm giá một lần",
-        "scope": "Phạm vi sử dụng",
-        "scopeValue": "Một nét bút mỗi NFT"
-      },
-      "links": {
-        "imprint": "Khắc RandomWalk NFT",
-        "learn": "Tìm hiểu cách nét bút vận hành",
-        "cycle": "Xem dữ liệu chu kỳ hiện tại"
-      }
-    }
   },
   "routeError": {
     "title": "Không tải được thống kê",

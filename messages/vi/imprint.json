@@ -5,28 +5,51 @@
   },
   "page": {
     "title": "Khắc Random Walk NFT",
-    "subtitle": "Sở hữu một Random Walk NFT để được giảm 50% chi phí nét bút ETH",
-    "description": "Mỗi RandomWalk NFT là một tác phẩm số độc nhất. Khi đính kèm một NFT chưa sử dụng vào nét bút ETH, bạn được giảm 50% chi phí nét bút, kể cả ở giai đoạn cuối chu kỳ. Mỗi NFT chỉ áp dụng mức giảm này một lần, vì vậy thời điểm sử dụng tùy thuộc vào lựa chọn của bạn. Bạn cũng có thể neo giữ RandomWalk NFT để thuộc diện Tinh tuyển NFT neo giữ; đây là cơ chế riêng, không liên quan đến việc đính kèm NFT vào nét bút.",
+    "subtitle": "Một Random Walk NFT giảm 50% chi phí của một nét bút ETH. Khắc NFT tại đây, rồi đính kèm vào nét bút bạn chọn.",
     "currentCost": "Chi phí khắc hiện tại",
+    "costBreakdown": "Chi phí trong hợp đồng {base} ETH, cộng thêm {percent}% dự phòng để lượt khắc vẫn thành công nếu chi phí tăng trước khi được xác nhận.",
     "submit": "Khắc ngay",
-    "myNfts": "Random Walk NFT của tôi"
+    "myNfts": "Random Walk NFT của tôi",
+    "panelAria": "Khắc Random Walk NFT",
+    "tokenAlt": "Random Walk NFT {id}",
+    "connect": "Kết nối ví để khắc Random Walk NFT. Việc kết nối không ký bất cứ điều gì.",
+    "why": {
+      "title": "Việc khắc mang lại gì cho bạn"
+    },
+    "benefits": {
+      "gesture": {
+        "title": "Giảm một nửa chi phí cho một nét bút ETH",
+        "label": "Khoản tiết kiệm cho một nét bút ETH theo chi phí hiện tại",
+        "caption": "Bằng một nửa chi phí nét bút ETH hiện tại là {cost} ETH. Mỗi Random Walk NFT chỉ dùng được một lần, cho nét bút bạn chọn."
+      },
+      "anchoring": {
+        "title": "Tinh tuyển NFT neo giữ",
+        "body": "Khi được neo giữ, Random Walk NFT tham gia Tinh tuyển NFT neo giữ: mỗi lần chu kỳ hoàn tất, {count, number} Random Walk NFT đang neo giữ được chọn và người nắm giữ mỗi NFT nhận {cst} CST cùng một Cosmic Signature NFT. NFT đã dùng cho nét bút vẫn có thể được neo giữ.",
+        "link": "Xem cách neo giữ hoạt động"
+      }
+    },
+    "latest": {
+      "meta": "Lần khắc gần nhất",
+      "earlierAria": "Các lần khắc ngay trước đó"
+    },
+    "success": {
+      "eyebrow": "Đã khắc",
+      "title": "Random Walk NFT {id} giờ là của bạn",
+      "description": "Đính kèm vào một nét bút ETH để được giảm {percent}% chi phí nét bút một lần.",
+      "use": "Dùng cho một nét bút",
+      "again": "Khắc thêm một NFT"
+    },
+    "owned": {
+      "used": "Đã dùng",
+      "unused": "Chưa dùng",
+      "use": "Dùng cho nét bút",
+      "checking": "Đang kiểm tra",
+      "unknownNote": "Hiện chưa thể kiểm tra các Random Walk NFT này đã được dùng hay chưa, nên chưa đề xuất NFT nào cho nét bút.",
+      "empty": "Ví này chưa có Random Walk NFT nào.",
+      "error": "Không thể đọc Random Walk NFT trong ví này."
+    }
   },
   "seo": {
-    "eyebrow": "Khắc RandomWalk NFT · Arbitrum",
-    "heading": "Khắc RandomWalk NFT",
-    "description": "Khắc RandomWalk NFT để tham gia Cosmic Signature. Mỗi RandomWalk NFT chưa sử dụng có thể được đính kèm vào một nét bút ETH để giảm 50% chi phí nét bút.",
-    "source": "Các API cấu hình giao thức công khai của Cosmic Signature",
-    "lastUpdated": "Cập nhật: {date}. Nguồn: {source}.",
-    "relatedAria": "Các trang liên quan đến Khắc RandomWalk NFT",
-    "cards": {
-      "cycle": "Chu kỳ trình diễn đang diễn ra",
-      "cost": "Chi phí nét bút ETH hiện tại",
-      "discount": "Giảm giá RandomWalk"
-    },
-    "links": {
-      "cycle": "Mở chu kỳ trình diễn đang diễn ra",
-      "learn": "Tìm hiểu cách nét bút vận hành",
-      "used": "Xem các RandomWalk NFT đã sử dụng"
-    }
+    "heading": "Khắc Random Walk NFT"
   }
 }

@@ -41,7 +41,7 @@ export const whitePaperTextVi = {
   abstract: {
     heading: 'Tóm tắt',
     paragraphs: [
-      'Cosmic Signature là một giao thức nghệ thuật tạo sinh trên Arbitrum One. Nó vận hành như một chuỗi các chu kỳ trình diễn có giới hạn thời gian. Trong một chu kỳ, người tham gia đặt nét bút bằng ETH hoặc bằng CST, token ERC-20 của giao thức. Mỗi nét bút kéo dài đếm ngược của chu kỳ, ghi nhận một lượt trong Tinh tuyển của chu kỳ và có thể khắc CST mới. Khi đếm ngược hết hạn và chu kỳ được hoàn tất, giao thức phân phối dự trữ ETH của mình qua hơn mười luồng phân bổ, khắc một thế hệ Cosmic Signature NFT mới, và chuyển một phần cố định đến Protocol Guild, cơ chế tài trợ cho hơn 170 người đóng góp cốt lõi cho Ethereum. Khoảng một nửa dự trữ được chuyển sang chu kỳ sau. Số dư mở đầu không nhất thiết tăng qua từng chu kỳ; mức dự trữ còn phụ thuộc vào ETH mới được đóng góp.',
+      'Cosmic Signature là một giao thức nghệ thuật tạo sinh trên Arbitrum One. Nó vận hành như một chuỗi các chu kỳ trình diễn có giới hạn thời gian. Trong một chu kỳ, người tham gia đặt nét bút bằng ETH hoặc bằng CST, token ERC-20 của giao thức. Mỗi nét bút kéo dài đếm ngược của chu kỳ, ghi nhận một lượt trong Tinh tuyển của chu kỳ và có thể khắc CST mới. Khi đếm ngược hết hạn và chu kỳ được hoàn tất, giao thức phân phối dự trữ ETH của mình qua một nhóm luồng phân bổ cố định, khắc một thế hệ Cosmic Signature NFT mới, và chuyển một phần cố định đến Protocol Guild, cơ chế tài trợ cho hơn 170 người đóng góp cốt lõi cho Ethereum. Khoảng một nửa dự trữ được chuyển sang chu kỳ sau. Số dư mở đầu không nhất thiết tăng qua từng chu kỳ; mức dự trữ còn phụ thuộc vào ETH mới được đóng góp.',
       'Mỗi Cosmic Signature NFT là một bản kết xuất tất định của bài toán ba vật thể hấp dẫn, được tạo từ một seed trên chuỗi và bất kỳ ai cũng có thể tái tạo đến từng điểm ảnh. Hình ảnh được tạo mà không sử dụng mạng thần kinh. Bài viết này mô tả đầy đủ cơ chế và thiết kế token, ghi lại nâng cấp V2 đang vận hành hôm nay, trình bày nâng cấp V3 dự kiến, và nêu cam kết loại bỏ mọi hình thức kiểm soát đặc quyền khỏi địa chỉ triển khai một khi thiết kế hoàn thành.',
     ],
   },
@@ -274,9 +274,9 @@ export const whitePaperTextVi = {
                     'Quán quân Bền bỉ giữ vị trí lâu nhất (Mục 5.2).',
                   ],
                   [
-                    'Phân bổ Hàng hóa công',
-                    `${protocolFacts.publicGoodsPercentage}%`,
-                    'Protocol Guild, qua Kho Hàng hóa công.',
+                    'ETH Tinh tuyển',
+                    `${protocolFacts.stellarSelectionEthPercentage}%`,
+                    `${protocolFacts.ethStellarSelectionRecipients} lượt được chọn từ quỹ nét bút của chu kỳ, chia đều số tiền.`,
                   ],
                   [
                     'Phân phối neo giữ',
@@ -284,9 +284,9 @@ export const whitePaperTextVi = {
                     'Các Cosmic Signature NFT đang neo giữ, theo tỷ lệ.',
                   ],
                   [
-                    'ETH Tinh tuyển',
-                    `${protocolFacts.stellarSelectionEthPercentage}%`,
-                    `${protocolFacts.ethStellarSelectionRecipients} lượt được chọn từ quỹ nét bút của chu kỳ, chia đều số tiền.`,
+                    'Phân bổ Hàng hóa công',
+                    `${protocolFacts.publicGoodsPercentage}%`,
+                    'Protocol Guild, qua Kho Hàng hóa công.',
                   ],
                   [
                     'Dự trữ tích lũy',
@@ -464,6 +464,21 @@ export const whitePaperTextVi = {
             {
               kind: 'formula',
               formula: protocolFacts.dynamicCstRewardFormula,
+              notation: protocolFacts.participationCstNotation,
+              legend: [
+                {
+                  symbol: protocolFacts.participationCstSymbols[0],
+                  meaning: 'số giây kể từ nét bút trước',
+                },
+                {
+                  symbol: protocolFacts.participationCstSymbols[1],
+                  meaning: 'hệ số nhân CST tham gia, một tham số của hợp đồng',
+                },
+                {
+                  symbol: protocolFacts.participationCstSymbols[2],
+                  meaning: 'mức tăng thời gian hiện tại của chu kỳ, tính bằng micro giây',
+                },
+              ],
               caption:
                 'CST tham gia được khắc bởi một nét bút. Thời gian trôi qua được đo kể từ nét bút trước và tỷ lệ theo mức tăng thời gian hiện tại của chu kỳ.',
             },
@@ -901,4 +916,56 @@ export const whitePaperTextVi = {
   },
   licenseNote:
     'Bài viết này, như mọi tài liệu thuộc dự án Cosmic Signature, được đưa vào phạm vi công cộng theo CC0 1.0.',
+  reading: {
+    railLabel: 'Trên trang này',
+    openContentsLabel: 'Mục lục',
+    backToTopLabel: 'Lên đầu trang',
+    headingLinkTemplate: 'Liên kết đến mục này: {title}',
+    formulaLabel: 'Công thức',
+    noteLabel: 'Ghi chú',
+    contractExpressionLabel: 'Biểu thức trong hợp đồng',
+    figureTemplate: 'Hình {number}',
+    readingTimeTemplate: '{minutes} phút đọc',
+    newTabNote: '(mở trong thẻ mới)',
+  },
+  figures: {
+    cycle: {
+      title: 'Một chu kỳ trình diễn, từ lúc mở đến chu kỳ tiếp theo',
+      caption: 'Thời lượng là tham số lúc ra mắt; các mục 3.1 đến 3.3 nêu các quy tắc chính xác.',
+      steps: [
+        {
+          label: 'Mở chu kỳ',
+          detail:
+            'Cửa sổ hiệu chỉnh ETH hạ dần chi phí mở cho đến khi có người đặt nét bút đầu tiên.',
+        },
+        {
+          label: 'Nét bút',
+          detail: `Mỗi nét bút cộng thêm mức tăng thời gian vào đếm ngược: ${protocolFacts.initialCycleTimeIncrementHours} giờ lúc ra mắt.`,
+        },
+        {
+          label: 'Cửa sổ nét bút cuối',
+          detail: `Khi đếm ngược kết thúc, chỉ người đặt nét bút cuối cùng được hoàn tất trong ${protocolFacts.finalGestureExclusivityHours} giờ.`,
+        },
+        {
+          label: 'Hoàn tất mở',
+          detail: 'Sau đó, bất kỳ ai cũng có thể hoàn tất và nhận vai trò người nhận của chu kỳ.',
+        },
+        {
+          label: 'Chu kỳ tiếp theo',
+          detail: `Chu kỳ tiếp theo mở sau một độ trễ ngắn, mặc định ${protocolFacts.defaultNextCycleDelayMinutes} phút.`,
+        },
+      ],
+    },
+    allocation: {
+      title: 'Dự trữ chu kỳ đi đâu khi hoàn tất',
+      caption:
+        'Tỷ lệ trên số dư ETH của giao thức lúc hoàn tất. Phần còn lại, khoảng một nửa, được cộng dồn sang chu kỳ tiếp theo.',
+    },
+    art: {
+      title: 'Hai Signature trong bộ sưu tập',
+      caption:
+        'Mỗi hình là kết quả của quy trình với seed in bên dưới; bất kỳ ai cũng có thể tạo lại từng điểm ảnh.',
+      seedLabel: 'Seed',
+    },
+  },
 } satisfies WhitePaperText;

@@ -1,23 +1,14 @@
 {
-  "gestureSubmitted": "一筆を送信しました。確認を待っています。",
-  "gestureConfirmed": "一筆が確認されました。サイクルは続きます。",
   "allocationRetrieved": "配分をウォレットに受け取りました。",
-  "anchorSet": "NFTをプロトコルに係留しました。",
-  "anchorReleased": "係留を解除しました。",
   "cycleFinalized": "サイクルが確定しました。配分が配られました。",
   "walletTransactionCancelled": "トランザクションは送信されませんでした。ウォレットでキャンセルされました。",
-  "unexpectedError": "予期しないエラーです。もう一度お試しください。",
   "generic": {
-    "unexpectedError": "予期しないエラーです。もう一度お試しください。",
-    "rpcFailure": "トランザクションを完了できませんでした。ウォレットとネットワーク接続を確認してから、もう一度お試しください。",
-    "receiptFailure": "トランザクションは送信されましたが、確認できませんでした。もう一度試す前に、ウォレットまたはブロックエクスプローラーで状態を確認してください。",
-    "transactionFailed": "トランザクションが失敗しました。もう一度お試しください。"
+    "rpcFailure": "トランザクションを完了できませんでした。ウォレットとネットワーク接続を確認してから、もう一度お試しください。"
   },
   "wallet": {
     "connect": "ウォレットを接続してください。",
     "connectCorrectNetwork": "ウォレットを接続し、正しいネットワークに接続していることを確認してください。",
-    "notReady": "ウォレットの準備ができていません。再接続してからもう一度お試しください。",
-    "stillConnecting": "ウォレットはまだ接続中です。しばらくしてからもう一度お試しください。"
+    "notReady": "ウォレットの準備ができていません。再接続してからもう一度お試しください。"
   },
   "watchAsset": {
     "metaMaskRequired": "このアセットを追加するにはMetaMaskを接続してください。",
@@ -33,21 +24,24 @@
   },
   "network": {
     "unavailable": "ネットワークを利用できません。ウォレットを再接続してください。",
-    "switchForGesture": "一筆を入れる前に、ウォレットをアプリのネットワークに切り替えてください。",
-    "wrongChain": "ウォレットがまだ接続中か、MetaMaskが別のチェーンにあります。アプリのネットワークに切り替えてからもう一度お試しください。"
+    "wrongChain": "ウォレットがまだ接続中か、別のネットワークにあります。{network}に切り替えてから、もう一度お試しください。"
   },
   "gesture": {
     "simulated": "シミュレーションの一筆を入れました。タイマーが{seconds, plural, other {#秒}}延びました。",
-    "confirmed": "一筆が確認されました。サイクルは続きます。",
+    "confirmed": "一筆が記録されました。サイクル確定時刻が延長されました。",
     "validation": {
       "notNftOwner": "このトークンの所有者ではありません。",
+      "chooseRandomWalkNft": "このウォレットにある未使用のRandom Walk NFTを選択してください。",
       "tokenDecimalsWarning": "トークンがdecimals()を実装していないため、小数点以下18桁と仮定します。",
       "invalidContractAddress": "指定されたアドレスは有効なコントラクトアドレスではありません。",
       "notErc721": "添付されたNFTコントラクトはERC721トークンコントラクトではありません。",
       "notErc20": "添付されたトークンコントラクトはERC20トークンコントラクトではありません。",
       "insufficientAttachedToken": "この一筆に添付するトークンの残高が不足しています。",
-      "insufficientEth": "ETHの残高が不足しています。ウォレットに十分なETHがありません。",
-      "insufficientCst": "CSTの残高が不足しています。ウォレットに十分なCST（ERC-20）がありません。",
+      "insufficientEth": "この一筆には{required} ETHとネットワーク手数料が必要です。{network}上のウォレット残高は{available} ETHです。",
+      "insufficientCst": "この一筆には最大{required} CSTが必要です。ウォレット残高は{available} CSTです。",
+      "invalidNftId": "NFTのトークンIDを数字だけで入力してください。",
+      "invalidTokenAmount": "0より大きい数量を数字で入力してください。小数点以下の桁数は、このトークンが扱える桁数までです。",
+      "cstRewardUnavailable": "参加CSTのプレビューを読み込めないため、最低参加CST保護を適用できません。少し待ってからもう一度試すか、「どの参加CSTでも受け入れる」を選んでください。",
       "cycleNotStarted": "次のサイクルはまだ始まっていません。あと{duration}で一筆を入れられます。"
     },
     "transaction": {
@@ -56,7 +50,7 @@
     },
     "contractErrors": {
       "insufficientReceivedBidAmount": "現在の一筆の費用が、送金した金額を上回っています。",
-      "usedRandomWalkNft": "このRandomWalk NFTはすでに一筆に使われています。",
+      "usedRandomWalkNft": "このRandom Walk NFTはすでに一筆に使われています。",
       "callerIsNotNftOwner": "このNFTの所有者ではありません。",
       "roundIsInactive": "現在のサイクルは有効ではありません。",
       "tooLongBidMessage": "一筆のメッセージが長すぎます。",
@@ -64,15 +58,22 @@
       "fundTransferFailed": "資金の送付に失敗しました。",
       "ethCostChanged": "トランザクションの送信中に一筆の費用が{increase} ETH上がりました。新たに必要な費用は{required} ETHです。もう一度お試しください。",
       "cstCostChanged": "トランザクションの送信中にCST一筆の費用が変わりました。別の一筆が先に届いたためと考えられます。コントラクトは{required} CSTを求めましたが、上限の{maximum} CSTを超えています。更新してからもう一度お試しください。",
+      "cstRewardBelowMinimum": "この一筆の参加CSTが設定した最小数量を下回ります。別の一筆が先に届いたためと考えられます。プレビューを更新してもう一度試すか、許容する減少幅を広げてください。",
       "bidHasBeenPlacedInCurrentRound": "現在のサイクルには既に一筆が入っています。"
+    },
+    "confirmedWithCst": "一筆が記録されました。サイクル確定時刻が延長され、参加CSTとして{cst} CSTがウォレットに届きました。",
+    "approval": {
+      "token": "一筆と一緒にこのトークンをちょうど{amount}だけ移動できるよう、ウォレットが許可を求めます。添付したトークンはサイクルの受領者に渡り、返却されません。",
+      "nft": "一筆と一緒にNFT #{tokenId}を移動できるよう、ウォレットが許可を求めます。添付したNFTはサイクルの受領者に渡り、返却されません。"
     }
   },
   "anchor": {
-    "walletNotReady": "ウォレットがまだ接続中か、MetaMaskが別のチェーンにあります。アプリのネットワークに切り替えてからもう一度お試しください。",
+    "walletNotReady": "ウォレットがまだ接続中か、別のネットワークにあります。{network}に切り替えてから、もう一度お試しください。",
     "anchored": "{count, plural, other {#点のNFTをプロトコルに係留しました。}}",
     "released": "{count, plural, other {選択した#件の係留を解除しました。}}",
     "releasedWithDistributions": "{count, plural, other {選択した#件の係留を解除し、累積したETHの係留配分を受け取りました。}}",
-    "failed": "係留のトランザクションを完了できませんでした。ウォレットとネットワーク接続を確認してから、もう一度お試しください。"
+    "failed": "係留のトランザクションを完了できませんでした。ウォレットとネットワーク接続を確認してから、もう一度お試しください。",
+    "approval": "係留している間、係留コントラクトがNFTを保管できるよう、ウォレットが許可を求めます。許可はコレクションごとに一度だけです。"
   },
   "allocation": {
     "retrieved": "配分をウォレットに受け取りました。"
@@ -89,7 +90,7 @@
   },
   "claim": {
     "walletNotConnected": "ウォレットを接続し、正しいネットワークに接続していることを確認してください。",
-    "failed": "エラーが発生しました",
+    "failed": "受け取りが完了しませんでした。ウォレットとネットワークを確認してから、もう一度お試しください。",
     "stellarEthSuccess": "星選ETHをウォレットに受け取りました。",
     "nftSuccess": "添付されたNFTをウォレットに受け取りました。",
     "nftsSuccess": "{count, plural, other {添付された#点のNFTをウォレットに受け取りました。}}",
@@ -98,72 +99,33 @@
     "retrieving": "受け取り中…"
   },
   "transfer": {
-    "common": {
-      "sourceUnavailable": "送付元のウォレットを利用できません。",
-      "invalidRecipient": "有効な送付先アドレスを入力してください。",
-      "invalidAmount": "有効なCSTの数量を入力してください。",
-      "invalidDecimals": "小数点以下の桁数が有効なCSTの数量を入力してください。",
-      "amountPositive": "0より大きい数量を入力してください。"
-    },
     "cst": {
       "tokenUnavailable": "CSTトークンのアドレスはまだ利用できません。",
-      "walletRequired": "CSTを送る前にウォレットを接続してください。",
-      "sourceWalletRequired": "CSTを送るには、送付元のウォレットを接続してください。",
-      "balanceLoading": "CSTの残高はまだ読み込み中です。しばらくしてからもう一度お試しください。",
-      "insufficientBalance": "CSTの残高が不足しています。",
-      "decimalsWarning": "CSTのdecimalsを読み取れないため、小数点以下18桁と仮定します。",
       "confirmed": "CSTの送付が確認されました。",
       "failed": "CSTを送れませんでした。もう一度お試しください。"
     },
     "nft": {
       "contractUnavailable": "Cosmic Signature NFTコントラクトのアドレスはまだ利用できません。",
-      "walletRequired": "NFTを送る前にウォレットを接続してください。",
-      "sourceWalletRequired": "NFTを送るには、送付元のウォレットを接続してください。",
-      "recipientMustDiffer": "接続中のウォレットとは別の送付先アドレスを入力してください。",
-      "selectOne": "移転できるNFTを少なくとも1点選んでください。",
       "confirmed": "{count, plural, other {#件のNFT移転が確認されました。}}",
       "detailTransferConfirmed": "NFTの移転が確認されました。",
-      "recipientCheckFailed": "送付先アドレスを確認できませんでした。ウォレットとネットワーク接続を確認してから、もう一度お試しください。",
-      "failed": "選択したNFTを送れませんでした。もう一度お試しください。",
-      "failedToken": "NFT #{tokenId}を移転できませんでした。もう一度お試しください。",
+      "failedToken": "NFT {tokenId}を送れませんでした。ウォレットを確認して、もう一度お試しください。",
       "nameSet": "トークン名を変更しました。",
       "nameCleared": "トークン名をクリアしました。",
       "nameSetFailed": "トークン名の設定中にエラーが発生しました。もう一度お試しください。",
       "nameClearFailed": "トークン名のクリア中にエラーが発生しました。もう一度お試しください。"
     },
     "marketingCst": {
-      "tokenUnavailable": "CSTトークンのアドレスはまだ利用できません。",
-      "walletRequired": "CST広報配分を送付する前にウォレットを接続してください。",
-      "reserveUnavailable": "広報準備金のウォレットを利用できません。",
-      "treasurerUnavailable": "広報ウォレットの財務担当者を利用できません。",
       "treasurerRequired": "CST広報配分を送付するには、現在の広報ウォレットの財務担当者を接続してください。",
-      "balanceLoading": "広報準備金のCST残高はまだ読み込み中です。しばらくしてからもう一度お試しください。",
-      "insufficientBalance": "広報準備金のCST残高が不足しています。",
-      "decimalsWarning": "CSTのdecimalsを読み取れないため、小数点以下18桁と仮定します。",
-      "balanceReadFailed": "広報準備金のCST残高を読み取れませんでした。もう一度お試しください。",
       "confirmed": "CST広報配分が確認されました。",
       "failed": "CST広報配分を送付できませんでした。もう一度お試しください。",
-      "loading": "読み込み中…",
-      "pay": "CST広報配分を送付",
-      "paying": "送付中…",
-      "viewTransaction": "トランザクションを見る"
+      "pay": "CST広報配分を送付"
     }
   },
   "contribution": {
-    "connectWallet": "ETHを拠出するにはウォレットを接続してください。",
-    "connectWalletInline": "ETHを拠出するにはウォレットを接続してください。",
-    "invalidAmount": "0より大きいETHの金額を入力してください。",
-    "invalidUrl": "http://またはhttps://で始まる有効なURLを入力してください。",
-    "invalidUrlInline": "http://またはhttps://のURLを使ってください。",
-    "contractUnavailable": "ウォレットを接続し、正しいネットワークに接続していることを確認してください。",
+    "contractUnavailable": "プロトコルのコントラクトをまだ利用できません。ページを再読み込みして、もう一度お試しください。",
     "formSubmitted": "{amount} ETHの拠出が確認されました。",
     "formSubmittedWithInfo": "情報付きの{amount} ETHの拠出が確認されました。",
-    "submitted": "{amount} ETHを拠出しました。",
-    "submittedWithInfo": "情報付きで{amount} ETHを拠出しました。",
     "formFailed": "ETHの拠出に失敗しました。入力内容を確認してからもう一度お試しください。",
-    "failed": "拠出に失敗しました。もう一度お試しください。",
-    "failedWithInfo": "情報付きの拠出に失敗しました。入力内容を確認してください。",
-    "submitting": "送信中…",
     "publicGoodsVault": {
       "none": "金庫に待機中の公共財の資金はありません。",
       "connectWallet": "公共財金庫の資金を送るにはウォレットを接続してください。",
@@ -177,14 +139,59 @@
   "imprint": {
     "contractUnavailable": "Random Walk NFTコントラクトを利用できません。正しいネットワークでウォレットを接続してからもう一度お試しください。",
     "confirmed": "Random Walk NFTの刻印が確認されました。",
-    "failed": "刻印に失敗しました",
+    "failed": "刻印が完了しませんでした。ウォレットとネットワークを確認してから、もう一度お試しください。",
     "imprinting": "刻印中…"
   },
-  "admin": {
-    "gestureBan": {
-      "banned": "一筆を非表示にしました。",
-      "unbanned": "一筆の非表示を解除しました。",
-      "failed": "エラーが発生しました"
-    }
+  "regionLabel": "通知",
+  "close": "通知を閉じる",
+  "tx": {
+    "stage": {
+      "switchNetwork": "ウォレットで{network}に切り替えてください",
+      "switchNetworkHint": "Cosmic Signatureは{network}で動いています。続けるには、ウォレットで切り替えを承認してください。",
+      "approve": "ウォレットで{step}/{total}件目を承認してください",
+      "approvalPending": "{step}/{total}件目の承認を確認しています",
+      "confirm": "ウォレットで確認してください",
+      "confirmStep": "ウォレットで{step}/{total}件目を確認してください",
+      "confirmHint": "ウォレットで内容を確認してください。確認するまで何も送信されません。",
+      "pending": "{network}での確認を待っています"
+    },
+    "button": {
+      "preparing": "準備中…",
+      "switchNetwork": "ウォレットでネットワークを切り替え…",
+      "approve": "ウォレットで{step}/{total}件目を承認…",
+      "approvalPending": "{step}/{total}件目の承認を確認中…",
+      "confirm": "ウォレットで確認…",
+      "confirmStep": "ウォレットで{step}/{total}件目を確認…",
+      "pending": "確認待ち…"
+    },
+    "steps": {
+      "signature": "署名",
+      "pending": "確認待ち",
+      "confirmed": "確認済み"
+    },
+    "status": {
+      "confirmed": "オンチェーンで確認されました。",
+      "cancelled": "ウォレットでキャンセルされました。何も送信されていません。",
+      "cancelledInWallet": "ウォレットでキャンセルされました。キャンセルにネットワーク手数料がかかりましたが、それ以外は何も送信されていません。",
+      "replacedInWallet": "ウォレットで別のトランザクションに置き換えられ、そのトランザクションにネットワーク手数料がかかりました。この操作は記録されていません。"
+    },
+    "confirmedRefresh": "オンチェーンで確認されました。ページがまだ更新されていない場合は、再読み込みしてください。",
+    "error": {
+      "insufficientFunds": "このトランザクションとネットワーク手数料を支払うには、{network}上のウォレットのETHが足りません。",
+      "wrongNetwork": "ウォレットが別のネットワークにあります。{network}に切り替えてから、もう一度お試しください。",
+      "walletNotConnected": "ウォレットを接続してから、もう一度お試しください。",
+      "walletBusy": "ウォレットに未完了のリクエストがあります。ウォレットで完了するか閉じてから、もう一度お試しください。",
+      "wouldRevert": "コントラクトがこのトランザクションを拒否するため、送信しませんでした。ページを再読み込みしてから、もう一度お試しください。",
+      "reverted": "トランザクションはオンチェーンで失敗しました。消費されたのはネットワーク手数料だけです。ページを再読み込みしてから、もう一度お試しください。",
+      "timeout": "まだ確認を待っています。もう一度試す前に、{explorer}でトランザクションを確認してください。",
+      "network": "ネットワークに接続できません。接続を確認してから、もう一度お試しください。",
+      "untrustedContract": "このトランザクションの送信先がオンチェーンのCosmic Signatureコントラクトと一致しないため、送信しませんでした。ページを再読み込みしてから、もう一度お試しください。"
+    },
+    "viewOnExplorer": "{explorer}で見る",
+    "viewOnExplorerShort": "トランザクションを見る",
+    "copyDetails": "詳細をコピー",
+    "detailsCopied": "エラーの詳細をコピーしました。",
+    "connectWallet": "ウォレットを接続",
+    "busy": "進行中のトランザクションを先に完了してください。"
   }
 }

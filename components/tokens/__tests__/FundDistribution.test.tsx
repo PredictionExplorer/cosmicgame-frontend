@@ -1,6 +1,8 @@
+import { ALLOCATION_TRACK_COLORS, ALLOCATION_TRACK_IDS } from '@/config/allocationTracks';
+
 import { render, screen, checkA11y } from '@/test-utils';
 
-import { FundDistribution } from '../FundDistribution';
+import { FundDistribution, reserveTracks } from '../FundDistribution';
 
 const createData = (overrides = {}) => ({
   PrizePercentage: 25,
@@ -12,86 +14,66 @@ const createData = (overrides = {}) => ({
   ...overrides,
 });
 
-describe('FundDistribution', () => {
-  it('renders the container', () => {
-    render(<FundDistribution data={createData()} />);
-    expect(screen.getByTestId('fund-distribution')).toBeInTheDocument();
-  });
+const segment = (id: string) => screen.getByTestId(`fund-track-fill-${id}`);
 
-  it('renders all six category labels', () => {
-    render(<FundDistribution data={createData()} />);
-    expect(screen.getByText('Signature Allocation')).toBeInTheDocument();
-    expect(screen.getByText('Stellar Selection')).toBeInTheDocument();
-    expect(screen.getByText('Public Goods')).toBeInTheDocument();
-    expect(screen.getByText('Anchor Distribution')).toBeInTheDocument();
-    expect(screen.getByText('Chrono-Warrior')).toBeInTheDocument();
-    expect(screen.getByText('Next cycle')).toBeInTheDocument();
-  });
-
-  it('renders percentage values for each category', () => {
-    render(<FundDistribution data={createData()} />);
-    expect(screen.getByText(/^25%/)).toBeInTheDocument();
-    expect(screen.getByText(/^50%/)).toBeInTheDocument();
-    expect(screen.getByText(/^8%/)).toBeInTheDocument();
-    expect(screen.getByText(/^7%/)).toBeInTheDocument();
-    expect(screen.getByText(/^6%/)).toBeInTheDocument();
-    expect(screen.getByText(/^4%/)).toBeInTheDocument();
-  });
-
-  it('renders ETH amounts', () => {
-    render(<FundDistribution data={createData({ CosmicGameBalanceEth: 100 })} />);
-    expect(screen.getByText(/25\.0000 ETH/)).toBeInTheDocument();
-    expect(screen.getByText(/50\.0000 ETH/)).toBeInTheDocument();
-    expect(screen.getByText(/8\.0000 ETH/)).toBeInTheDocument();
-    expect(screen.getByText(/7\.0000 ETH/)).toBeInTheDocument();
-    expect(screen.getByText(/6\.0000 ETH/)).toBeInTheDocument();
-    expect(screen.getByText(/4\.0000 ETH/)).toBeInTheDocument();
-  });
-
-  it('computes Next round as the remainder', () => {
-    render(<FundDistribution data={createData()} />);
-    // 100 - 25 - 4 - 7 - 6 - 8 = 50%
-    expect(screen.getByText(/50%/)).toBeInTheDocument();
-  });
-
-  it('handles undefined data gracefully', () => {
-    render(<FundDistribution />);
-    expect(screen.getByTestId('fund-distribution')).toBeInTheDocument();
-    expect(screen.getByText('Next cycle')).toBeInTheDocument();
-  });
-
-  it('clamps negative percentages to zero', () => {
-    render(<FundDistribution data={createData({ PrizePercentage: -10 })} />);
-    expect(screen.getByText('Signature Allocation')).toBeInTheDocument();
-    const allocationRow = screen.getByText('Signature Allocation').closest('[class*="group"]')!;
-    expect(allocationRow).toHaveTextContent('0%');
-  });
-
-  it('clamps percentages above 100 to 100', () => {
-    render(<FundDistribution data={createData({ RafflePercentage: 200 })} />);
-    const stellarSelectionRow = screen.getByText('Stellar Selection').closest('[class*="group"]')!;
-    expect(stellarSelectionRow).toHaveTextContent('100%');
-  });
-
-  it('renders tooltip icons for each category', () => {
-    const { container } = render(<FundDistribution data={createData()} />);
-    const tooltipTriggers = container.querySelectorAll('[data-state="closed"]');
-    expect(tooltipTriggers.length).toBeGreaterThanOrEqual(6);
-  });
-
-  it('sorts categories in descending order by value', () => {
-    const { container } = render(<FundDistribution data={createData()} />);
-    const rows = container.querySelectorAll('[class*="group"]');
-    const labels = Array.from(rows).map((row) => {
-      const labelEl = row.querySelector('.text-sm.font-medium.text-white');
-      return labelEl?.textContent;
+describe('reserveTracks', () => {
+  it('lists every track in the shared order, completed with the next-cycle remainder', () => {
+    const tracks = reserveTracks(createData());
+    expect(tracks.map((track) => track.id)).toEqual([...ALLOCATION_TRACK_IDS]);
+    expect(tracks.find((track) => track.id === 'nextCycle')).toEqual({
+      id: 'nextCycle',
+      percent: 50,
+      eth: 5,
     });
-    expect(labels[0]).toBe('Next cycle');
-    expect(labels[1]).toBe('Signature Allocation');
+  });
+
+  it('prices each share against the reserve', () => {
+    const signature = reserveTracks(createData()).find((track) => track.id === 'signature');
+    expect(signature).toEqual({ id: 'signature', percent: 25, eth: 2.5 });
+  });
+
+  it('keeps an unreadable share unknown, never 0, and the remainder with it', () => {
+    const tracks = reserveTracks(createData({ RafflePercentage: undefined }));
+    expect(tracks.find((track) => track.id === 'stellar')?.percent).toBeNull();
+    expect(tracks.find((track) => track.id === 'nextCycle')?.percent).toBeNull();
+  });
+
+  it('keeps ETH unknown when the reserve could not be read', () => {
+    const tracks = reserveTracks(createData({ CosmicGameBalanceEth: undefined }));
+    expect(tracks.every((track) => track.eth === null)).toBe(true);
+  });
+});
+
+describe('FundDistribution', () => {
+  it('draws one segment per track, sized by its share of the whole reserve', () => {
+    render(<FundDistribution data={createData()} />);
+    expect(segment('signature')).toHaveStyle({ flexGrow: '25' });
+    expect(segment('nextCycle')).toHaveStyle({ flexGrow: '50' });
+  });
+
+  it('colours each segment with its track token', () => {
+    render(<FundDistribution data={createData()} />);
+    for (const id of ALLOCATION_TRACK_IDS) {
+      expect(segment(id)).toHaveClass(ALLOCATION_TRACK_COLORS[id]);
+    }
+  });
+
+  it('draws an empty track rather than a guess when a share is unknown', () => {
+    render(<FundDistribution data={createData({ StakingPercentage: undefined })} />);
+    expect(screen.queryByTestId('fund-track-fill-signature')).not.toBeInTheDocument();
+  });
+
+  it('lists the shares for screen readers unless a ledger follows', () => {
+    const { unmount } = render(<FundDistribution data={createData()} />);
+    expect(screen.getByText(/^Signature Allocation/)).toHaveTextContent('25%');
+    unmount();
+
+    render(<FundDistribution data={createData()} describe={false} />);
+    expect(screen.queryByText(/^Signature Allocation/)).toBeNull();
   });
 
   it('has no accessibility violations', async () => {
     const { container } = render(<FundDistribution data={createData()} />);
     await checkA11y(container);
-  }, 15_000);
+  });
 });

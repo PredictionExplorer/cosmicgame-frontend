@@ -447,7 +447,7 @@ with legal review authority signs off the R stage for Terms/Privacy/Risk.
 | `/imprint`          | `(app)/imprint/Imprint.tsx`                                                                  | ✅  | ✅  | ✅  | ✅  |
 | `/contracts`        | `(app)/contracts/`, `contractAddressData.ts` display names/descriptions                      | ✅  | ✅  | ✅  | ✅  |
 | `/code`             | `(app)/code/page.tsx`                                                                        | ✅  | ✅  | ✅  | ✅  |
-| `/source-code`      | `(app)/source-code/page.tsx`                                                                 | ✅  | ✅  | ✅  | ✅  |
+| `/source-code`      | `proxy.ts` (alias of `/code`, `PAGE_ALIASES` in `lib/paramRoutes.ts`)                        | ✅  | ✅  | ✅  | ✅  |
 
 **Acceptance:** legal reviewer confirms zh Terms/Privacy/Risk match English meaning
 clause-by-clause; zh lexicon scan passes with allow-pragmas only in denial copy; FAQ
@@ -467,7 +467,7 @@ plus the site-wide SEO finish.
 
 | Route                                   | Sources                                                    | E   | T   | R   | Q   |
 | --------------------------------------- | ---------------------------------------------------------- | --- | --- | --- | --- |
-| `/eth-contribution`                     | `(app)/eth-contribution/`, `components/donations/`         | ✅  | ✅  | ✅  | ✅  |
+| `/eth-contribution`                     | `(app)/eth-contribution/`, `components/contributions/`     | ✅  | ✅  | ✅  | ✅  |
 | `/eth-contribution/detail/[id]`         | `(app)/eth-contribution/detail/`                           | ✅  | ✅  | ✅  | ✅  |
 | `/eth-contribution/round/[round]`       | `(app)/eth-contribution/round/`                            | ✅  | ✅  | ✅  | ✅  |
 | `/public-goods-contributions-cg`        | `(app)/public-goods-contributions-cg/`                     | ✅  | ✅  | ✅  | ✅  |
@@ -479,7 +479,7 @@ plus the site-wide SEO finish.
 | `/admin`                                | `(app)/admin/page.tsx`                                     | ✅  | ✅  | ✅  | ✅  |
 | `/admin/admin`                          | `(app)/admin/admin/page.tsx`                               | ✅  | ✅  | ✅  | ✅  |
 | `/internal/cst-outreach-transfer`       | `(app)/internal/`                                          | ✅  | ✅  | ✅  | ✅  |
-| `/embed/endurance/[round]`              | `(app)/embed/endurance/`                                   | ✅  | ✅  | ✅  | ✅  |
+| `/embed/endurance/[round]`              | `(embed)/embed/endurance/`                                 | ✅  | ✅  | ✅  | ✅  |
 | `/experimental-ui` (noindex)            | `(app)/experimental-ui/`, `components/home/deck/`          | ✅  | ✅  | ☐   | ✅  |
 
 **SEO sweep (cross-cutting):**
@@ -488,7 +488,7 @@ plus the site-wide SEO finish.
 | -------------------------------------------------------------------------------------------------------------------- | ---- |
 | All ~59 `page.tsx` metadata title/description pairs served from `meta` namespace, verified per route in both locales | ✅   |
 | All 12 `opengraph-image.tsx` generators: each emitted endpoint directly returns `200 image/png` in Playwright        | ✅   |
-| JSON-LD (`utils/jsonLd.ts`): translated names/descriptions, `inLanguage: 'zh-Hans'`                                  | ✅   |
+| JSON-LD (`utils/jsonLd.tsx`): translated names/descriptions, `inLanguage: 'zh-Hans'`                                 | ✅   |
 | `app/sitemap.ts` / `lib/seoRoutes.ts` hreflang alternates verified for all indexable routes                          | ✅   |
 | `*SeoSummary.tsx` components localized                                                                               | ✅   |
 | `public/llms.txt` Chinese section                                                                                    | ✅   |

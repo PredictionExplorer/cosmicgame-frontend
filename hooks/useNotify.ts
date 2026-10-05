@@ -1,47 +1,50 @@
 import { useCallback } from 'react';
-import { useLocale, useTranslations } from 'next-intl';
+import { useTranslations } from 'next-intl';
 
-import { getLocaleConfig } from '@/i18n/localeConfig';
 import { useNotification } from '@/contexts/NotificationContext';
-import getErrorMessage from '@/utils/alert';
-import { isEthProviderError, isUserRejection, reportError } from '@/utils/errors';
+import { useTxErrorMessage } from '@/hooks/useTxErrorMessage';
+import { classifyTxError } from '@/lib/txErrors';
+import { reportError } from '@/utils/errors';
 
 type NotificationType = 'error' | 'warning' | 'success' | 'info';
 
 export function useNotify() {
   const t = useTranslations('toasts');
-  const locale = useLocale();
   const { setNotification } = useNotification();
+  const describeFailure = useTxErrorMessage();
 
   const notify = useCallback(
     (type: NotificationType, text: string) => setNotification({ visible: true, type, text }),
     [setNotification],
   );
 
+  /**
+   * Explains a failed wallet or RPC read in one localized sentence — the
+   * classified cause when there is one (wrong network, wallet busy,
+   * offline…), otherwise `fallback` — and offers the technical details
+   * behind "Copy details". Raw provider text is never shown, in any locale.
+   * The toast keeps the normal duration, and a repeat of the same failure
+   * replaces it instead of stacking. A wallet rejection is a neutral
+   * "cancelled" notice.
+   *
+   * Transactions use `useTxFlow`, whose failures stay until dismissed.
+   */
   const notifyErrorFromEthers = useCallback(
     (err: unknown, fallback?: string) => {
-      if (isUserRejection(err)) {
+      const info = classifyTxError(err);
+      if (info.kind === 'rejected') {
         notify('info', t('walletTransactionCancelled'));
         return;
       }
       reportError(err, 'ethers provider error');
-      const localizedFallback = fallback ?? t('generic.rpcFailure');
-
-      if (!getLocaleConfig(locale).showRawProviderErrors) {
-        notify('error', localizedFallback);
-        return;
-      }
-
-      if (isEthProviderError(err) && err.data?.message) {
-        const msg = getErrorMessage(err.data.message);
-        notify('error', msg || localizedFallback);
-      } else if (err instanceof Error) {
-        notify('error', err.message);
-      } else {
-        notify('error', localizedFallback);
-      }
+      setNotification({
+        visible: true,
+        type: 'error',
+        text: describeFailure(info, fallback ?? t('generic.rpcFailure')),
+        details: info.details,
+      });
     },
-    [locale, notify, t],
+    [describeFailure, notify, setNotification, t],
   );
 
   return { notify, notifyErrorFromEthers } as const;

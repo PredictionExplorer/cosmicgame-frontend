@@ -32,6 +32,13 @@ module.exports = {
   decodeEventLog: (args: unknown) =>
     // eslint-disable-next-line @typescript-eslint/no-require-imports
     (require('viem/utils') as { decodeEventLog: (a: unknown) => unknown }).decodeEventLog(args),
+  // Real revert decoding, so "Copy details" carries the decoded custom error
+  // (utils/contractErrors withDecodedContractError) under test as in production.
+  decodeErrorResult: (args: unknown) =>
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    (require('viem/utils') as { decodeErrorResult: (a: unknown) => unknown }).decodeErrorResult(
+      args,
+    ),
   // Inert client factories for modules that build viem clients at setup time
   // (e.g. the harness burner wallet). Tests interact through higher-level
   // fakes; these only need to be constructible.

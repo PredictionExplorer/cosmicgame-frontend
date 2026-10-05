@@ -4,86 +4,54 @@ import { render, screen, checkA11y } from '@/test-utils';
 
 import { HeroSection } from '../components/HeroSection';
 
-jest.mock('framer-motion', () => {
-  const React = require('react');
-  const cache: Record<string, React.ForwardRefExoticComponent<unknown>> = {};
-  return {
-    motion: new Proxy(
-      {},
-      {
-        get: (_target: unknown, prop: string) => {
-          if (!cache[prop]) {
-            const Comp = React.forwardRef(function MotionProxy(
-              props: Record<string, unknown>,
-              ref: React.Ref<HTMLElement>,
-            ) {
-              const {
-                initial: _i,
-                animate: _a,
-                whileInView: _w,
-                viewport: _v,
-                transition: _t,
-                variants: _va,
-                ...rest
-              } = props;
-              return React.createElement(prop, { ...rest, ref });
-            });
-            Comp.displayName = `motion.${prop}`;
-            cache[prop] = Comp;
-          }
-          return cache[prop];
-        },
-      },
-    ),
-  };
-});
-
-jest.mock('next/link', () => ({
-  __esModule: true,
-  default: ({ children, ...props }: { children: React.ReactNode; href: string }) => (
-    <a {...props}>{children}</a>
-  ),
-}));
-
 const hero = howItWorksContentEn.hero;
 
 describe('HeroSection', () => {
-  it('renders the main heading', () => {
+  it('renders the H1 as one plain string, in the reading size', () => {
     render(<HeroSection hero={hero} />);
-    expect(screen.getByRole('heading', { level: 1 })).toHaveTextContent(
-      'How Cosmic Signature Works',
-    );
+    const heading = screen.getByRole('heading', { level: 1 });
+    expect(heading).toHaveTextContent(/^How Cosmic Signature works$/);
+    // One string: no markup but the span that holds the brand on one line (V425).
+    expect([...heading.querySelectorAll('*')].map((node) => node.textContent)).toEqual([
+      'Cosmic Signature',
+    ]);
+    expect(heading).toHaveClass('type-display-md');
+    expect(heading).toHaveAttribute('id', 'hero-heading');
   });
 
-  it('renders the tagline', () => {
+  it('renders the lede', () => {
     render(<HeroSection hero={hero} />);
     expect(screen.getByText(hero.paragraph)).toBeInTheDocument();
-    expect(
-      screen.getByText(/Participants make gestures during a Performance Cycle/),
-    ).toBeInTheDocument();
   });
 
-  it('renders the protocol badge', () => {
+  it('names the Learn section in the eyebrow without linking the hub to itself', () => {
     render(<HeroSection hero={hero} />);
-    expect(screen.getByText('Procedural On-Chain Art Protocol')).toBeInTheDocument();
+    expect(screen.getByText('nav.sections.learn')).toBeInTheDocument();
+    expect(screen.queryByRole('link', { name: 'nav.sections.learn' })).toBeNull();
   });
 
-  it('renders Open the Protocol link pointing to homepage', () => {
+  it('leads to the gesture form and to the live cycle', () => {
     render(<HeroSection hero={hero} />);
-    const link = screen.getByRole('link', { name: 'Open the Protocol' });
-    expect(link).toHaveAttribute('href', '/');
+    expect(screen.getByRole('link', { name: 'Make a gesture' })).toHaveAttribute(
+      'href',
+      '/#make-gesture',
+    );
+    expect(screen.getByRole('link', { name: 'See the live cycle' })).toHaveAttribute(
+      'href',
+      '/current-cycle',
+    );
+    expect(screen.queryByRole('link', { name: 'Learn More' })).not.toBeInTheDocument();
   });
 
-  it('renders Learn More link pointing to game overview section', () => {
+  it('gives both ways in the same arrow, as the live cycle’s commit button has (V242)', () => {
     render(<HeroSection hero={hero} />);
-    const link = screen.getByRole('link', { name: 'Learn More' });
-    expect(link).toHaveAttribute('href', '#protocol-overview');
+    for (const name of ['Make a gesture', 'See the live cycle']) {
+      expect(screen.getByRole('link', { name }).querySelector('svg')).not.toBeNull();
+    }
   });
 
-  it('has the correct aria-labelledby on the section', () => {
-    const { container } = render(<HeroSection hero={hero} />);
-    const section = container.querySelector('section');
-    expect(section).toHaveAttribute('aria-labelledby', 'hero-heading');
+  it('opens the lede with the mechanism, not the slogan (V242)', () => {
+    expect(hero.paragraph.startsWith('Gesture. Endure.')).toBe(false);
   });
 
   it('has no accessibility violations', async () => {

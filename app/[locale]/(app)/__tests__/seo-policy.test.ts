@@ -1,7 +1,9 @@
+import { resolvingMetadata } from '@/test-utils/metadata';
+
 import { appSitemapRoutes, dynamicNoindexRoutePrefixes, noindexAppRoutes } from '@/lib/seoRoutes';
 import { createMetadata } from '@/utils/seo';
 
-import { generateMetadata as generateEmbedEnduranceMetadata } from '../embed/endurance/[round]/page';
+import { generateMetadata as generateEmbedEnduranceMetadata } from '../../(embed)/embed/endurance/[round]/page';
 import { generateMetadata as generateCstOutreachTransferMetadata } from '../internal/cst-outreach-transfer/page';
 import { generateMetadata as generateRecipientHistoryMetadata } from '../recipient-history/page';
 import { generateMetadata as generateTransferCstMetadata } from '../transfer-cst/page';
@@ -11,9 +13,15 @@ jest.mock('../internal/cst-outreach-transfer/CstOutreachTransferPage', () => ({
   default: () => null,
 }));
 
-jest.mock('../embed/endurance/[round]/EmbedEnduranceChart', () => ({
+jest.mock('../../(embed)/embed/endurance/[round]/EmbedEnduranceChart', () => ({
   __esModule: true,
   default: () => null,
+}));
+// The embed's metadata asks the live dashboard whether its cycle has opened;
+// unread here, as when the read fails, it names the chart.
+jest.mock('../publicDataReads', () => ({
+  ...jest.requireActual<typeof import('../publicDataReads')>('../publicDataReads'),
+  readDashboard: async () => ({ data: null, at: 0 }),
 }));
 
 jest.mock('../transfer-cst/TransferCstPage', () => ({
@@ -94,22 +102,31 @@ describe('SEO route policy', () => {
 
   it('marks wallet-personal routes as noindex', async () => {
     expectNoIndex(
-      await generateRecipientHistoryMetadata({
-        params: Promise.resolve({ locale: 'en' }),
-      }),
+      await generateRecipientHistoryMetadata(
+        {
+          params: Promise.resolve({ locale: 'en' }),
+        },
+        resolvingMetadata(),
+      ),
     );
     expectNoIndex(
-      await generateTransferCstMetadata({
-        params: Promise.resolve({ locale: 'en' }),
-      }),
+      await generateTransferCstMetadata(
+        {
+          params: Promise.resolve({ locale: 'en' }),
+        },
+        resolvingMetadata(),
+      ),
     );
   });
 
   it('marks the URL-only CST outreach transfer route as noindex and out of sitemap', async () => {
     expectNoIndex(
-      await generateCstOutreachTransferMetadata({
-        params: Promise.resolve({ locale: 'en' }),
-      }),
+      await generateCstOutreachTransferMetadata(
+        {
+          params: Promise.resolve({ locale: 'en' }),
+        },
+        resolvingMetadata(),
+      ),
     );
     expect(noindexAppRoutes).toEqual(
       expect.arrayContaining([

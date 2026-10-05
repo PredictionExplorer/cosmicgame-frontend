@@ -40,7 +40,9 @@ export const KO_TERMINOLOGY_RULES: readonly TerminologyRule[] = [
   {
     concept: 'Finalize / Finalization',
     canonical: '마감 / 마감하다',
-    variants: ['파이널라이즈', '정산'],
+    // 확정 alone stays legal (a confirmed transaction, a settled result);
+    // only the cycle's finalization must read 마감.
+    variants: ['파이널라이즈', '정산', '사이클이 확정', '사이클 확정'],
   },
   {
     concept: 'Final Gesture',
@@ -232,9 +234,10 @@ export const KO_TERMINOLOGY_RULES: readonly TerminologyRule[] = [
     variants: ['지식 테스트', '지식 시험'],
   },
   {
-    concept: 'Learn Hub',
-    canonical: '학습 센터',
-    variants: ['학습 허브', '러닝 허브', '배움터'],
+    concept: 'Learn (was Learn Hub)',
+    canonical: '학습',
+    // The retired canonical stays banned so it cannot drift back in.
+    variants: ['학습 허브', '러닝 허브', '배움터', '학습 센터'],
   },
   {
     concept: 'How It Works',

@@ -1,8 +1,7 @@
 import type { ReactElement } from 'react';
 
 import Footer from '@/components/layout/Footer';
-import { ECOSYSTEM_DESTINATIONS } from '@/config/ecosystem';
-import getNAVs, { type NavDescriptor } from '@/config/nav';
+import { OUTBOUND_LINKS, appHeaderRouteIds, getSiteRoute } from '@/config/siteNav';
 import { appSitemapRoutes } from '@/lib/seoRoutes';
 
 import { render } from '@/test-utils';
@@ -19,7 +18,7 @@ jest.mock('next/image', () => ({
 /**
  * Crawl-path parity guard.
  *
- * The header renders its Explore/Help destinations inside client-only
+ * The header renders its Explore and Learn destinations inside client-only
  * dropdown panels, which never appear in the raw HTML that non-rendering
  * search and AI crawlers read. These tests guarantee that every navigation
  * destination keeps a server-rendered anchor on at least one always-present
@@ -38,13 +37,6 @@ function collectHrefs(ui: ReactElement): Set<string> {
   return hrefs;
 }
 
-function internalNavRoutes(navs: NavDescriptor[]): string[] {
-  return navs
-    .flatMap((nav) => [nav, ...(nav.children ?? [])])
-    .map((nav) => nav.route)
-    .filter((route): route is string => !!route && route.startsWith('/'));
-}
-
 describe('crawl paths', () => {
   let footerHrefs: Set<string>;
   let siteMapHrefs: Set<string>;
@@ -57,8 +49,11 @@ describe('crawl paths', () => {
   });
 
   it('every internal header-nav route has a server-rendered anchor', () => {
-    const routes = internalNavRoutes(getNAVs(null, null, (key) => key, 'en'));
-    expect(routes.length).toBeGreaterThan(5);
+    const routes = appHeaderRouteIds()
+      .map(getSiteRoute)
+      .filter((route) => route.host === 'app')
+      .map((route) => route.path);
+    expect(routes.length).toBeGreaterThan(15);
     for (const route of routes) {
       if (!union.has(route)) {
         throw new Error(
@@ -79,10 +74,10 @@ describe('crawl paths', () => {
     }
   });
 
-  it('every ecosystem destination is linked from both the footer and the site map', () => {
-    for (const destination of ECOSYSTEM_DESTINATIONS) {
-      expect(footerHrefs.has(destination.href)).toBe(true);
-      expect(siteMapHrefs.has(destination.href)).toBe(true);
+  it('every ecosystem and community destination is linked from both the footer and the site map', () => {
+    for (const link of OUTBOUND_LINKS) {
+      expect(footerHrefs.has(link.href)).toBe(true);
+      expect(siteMapHrefs.has(link.href)).toBe(true);
     }
   });
 });

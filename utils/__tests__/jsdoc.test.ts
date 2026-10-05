@@ -4,17 +4,18 @@ import { resolve } from 'node:path';
 const UTILS_DIR = resolve(__dirname, '..');
 
 const UTIL_FILES = [
-  'alert.ts',
   'analytics.ts',
   'contractErrors.ts',
-  'contractWrite.ts',
   'endurance.ts',
   'errors.ts',
   'format.ts',
-  'metadata.ts',
+  'format/addresses.ts',
+  'format/dates.ts',
+  'format/durations.ts',
+  'format/ids.ts',
+  'format/numbers.ts',
   'seo.ts',
   'urls.ts',
-  'wallet.ts',
 ] as const;
 
 type FileEntry = {
@@ -55,9 +56,10 @@ function hasJSDocBefore(source: string, fnName: string): boolean {
     const match = pattern.exec(source);
     if (!match) continue;
 
-    const before = source.slice(0, match.index);
-    const trimmed = before.trimEnd();
-    return trimmed.endsWith('*/') && JSDOC_PATTERN.test(trimmed.slice(-500));
+    // The comment must end right before the export; it may be any length.
+    const trimmed = source.slice(0, match.index).trimEnd();
+    if (!trimmed.endsWith('*/')) return false;
+    return JSDOC_PATTERN.test(trimmed.slice(trimmed.lastIndexOf('/**')));
   }
   return false;
 }
@@ -68,17 +70,18 @@ const files: FileEntry[] = UTIL_FILES.map((name) => {
 });
 
 const EXPECTED_COUNTS: Record<string, number> = {
-  'alert.ts': 1,
   'analytics.ts': 3,
-  'contractErrors.ts': 6,
-  'contractWrite.ts': 1,
+  'contractErrors.ts': 5,
   'endurance.ts': 3,
   'errors.ts': 6,
-  'format.ts': 26,
-  'metadata.ts': 1,
-  'seo.ts': 1,
-  'urls.ts': 12,
-  'wallet.ts': 2,
+  'format.ts': 5,
+  'format/addresses.ts': 5,
+  'format/dates.ts': 8,
+  'format/durations.ts': 7,
+  'format/ids.ts': 1,
+  'format/numbers.ts': 8,
+  'seo.ts': 7,
+  'urls.ts': 17,
 };
 
 describe('Utils JSDoc coverage', () => {
@@ -102,9 +105,9 @@ describe('Utils JSDoc coverage', () => {
   });
 
   describe('no function is missing from the inventory', () => {
-    it('total exported functions/constants across all util files is 62', () => {
+    it('total exported functions/constants across all util files is 75', () => {
       const total = files.reduce((sum, f) => sum + f.exports.length, 0);
-      expect(total).toBe(62);
+      expect(total).toBe(75);
     });
   });
 

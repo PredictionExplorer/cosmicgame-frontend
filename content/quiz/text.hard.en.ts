@@ -21,7 +21,7 @@ export const hardQuestionsTextEn = {
     },
     explanation:
       'The gesture adds one increment to the stored finalization time and takes over the Final Gesture position. It does not restart a full countdown from the current time, so the updated deadline may still be in the past.',
-    referenceLabel: 'White paper \u00a73.2 \u2014 The Countdown',
+    referenceLabel: 'White paper \u00a73.2 \u2014 The countdown',
   },
   'refusing-beneficiary': {
     prompt:
@@ -47,7 +47,7 @@ export const hardQuestionsTextEn = {
     },
     explanation:
       'Secondary ETH allocations are held in the Allocations Wallet rather than transferred to recipients during finalization. A recipient that rejects ETH therefore cannot block finalization through that transfer. The allocation remains available for retrieval under the escrow deadline.',
-    referenceLabel: 'White paper \u00a711.2 \u2014 Defensive Design',
+    referenceLabel: 'White paper \u00a711.2 \u2014 Defensive design',
   },
   'public-goods-transfer-fails': {
     prompt:
@@ -60,7 +60,7 @@ export const hardQuestionsTextEn = {
     },
     explanation:
       'Failure-tolerant forwarding is a deliberate design choice: a problem at the Public Goods Vault must never strand a cycle. Finalization completes, the failure is recorded on-chain, and the forwarding is handled afterward. Compare that with the beneficiary push, which does revert \u2014 but only the caller\u2019s own transaction.',
-    referenceLabel: 'White paper \u00a711.2 \u2014 Defensive Design',
+    referenceLabel: 'White paper \u00a711.2 \u2014 Defensive design',
   },
   'no-anchored-nfts': {
     prompt:
@@ -73,7 +73,7 @@ export const hardQuestionsTextEn = {
     },
     explanation:
       'If no Cosmic Signature NFTs are anchored at finalization, the Anchor Distribution is skipped and its share rolls forward with the compounding reserve. Nothing is held back for future anchor-holders \u2014 each cycle\u2019s distribution reads the anchored set as it stands.',
-    referenceLabel: 'White paper \u00a75.1 \u2014 Distribution at Finalization',
+    referenceLabel: 'White paper \u00a75.1 \u2014 Distribution at finalization',
   },
   'no-cst-gestures': {
     prompt:
@@ -86,7 +86,7 @@ export const hardQuestionsTextEn = {
     },
     explanation:
       'Cycles with no CST gestures simply skip the Final CST Gesture track \u2014 no substitute recipient is drafted, and finalization proceeds normally. The same skip-not-substitute principle applies to the anchored-Random-Walk Selection when nothing is anchored.',
-    referenceLabel: 'White paper \u00a75.1 \u2014 Distribution at Finalization',
+    referenceLabel: 'White paper \u00a75.1 \u2014 Distribution at finalization',
   },
   'randomness-sources': {
     prompt: 'Where does the randomness behind Stellar Selection and art seeds come from?',
@@ -135,7 +135,7 @@ export const hardQuestionsTextEn = {
     },
     explanation:
       'Under flat imprinting, a burst of rapid gestures manufactured CST from nothing but speed. Under the square-root rule, a burst imprints approximately zero while patient participation creates supply \u2014 the formula is itself a supply control, not just a pricing curve.',
-    referenceLabel: 'White paper \u00a712.2 \u2014 The V2 Upgrade',
+    referenceLabel: 'White paper \u00a712.2 \u2014 The V2 upgrade',
   },
   'v2-min-imprint-guard': {
     prompt:
@@ -148,7 +148,7 @@ export const hardQuestionsTextEn = {
     },
     explanation:
       'Participation CST depends on the time since the previous gesture. If another gesture executes first, that interval can shrink between signing and execution. The minimum-imprint guard makes the transaction revert when the actual imprint would be below the participant’s specified minimum.',
-    referenceLabel: 'White paper \u00a712.2 \u2014 The V2 Upgrade',
+    referenceLabel: 'White paper \u00a712.2 \u2014 The V2 upgrade',
   },
   'v2-exclusivity-change': {
     prompt: 'What did V2 do to the Final Gesture participant\u2019s exclusive finalization window?',
@@ -159,7 +159,7 @@ export const hardQuestionsTextEn = {
       d: 'It became infinite \u2014 only the Final Gesture participant may ever finalize.',
     },
     explanation: `V2 doubled the exclusivity window from ${protocolFacts.initialCycleFinalizationHoursAtLaunch} to ${protocolFacts.finalGestureExclusivityHours} hours \u2014 a response to observed behavior: real people sleep, travel, and lose track of deadlines. The window is still finite, because nothing in the protocol waits forever.`,
-    referenceLabel: 'White paper \u00a712.2 \u2014 The V2 Upgrade',
+    referenceLabel: 'White paper \u00a712.2 \u2014 The V2 upgrade',
   },
   'v2-timing-loophole': {
     prompt: 'V2\u2019s timing hardening closed a loophole. What was it?',
@@ -171,7 +171,7 @@ export const hardQuestionsTextEn = {
     },
     explanation:
       'When the CST cost has descended to almost zero, post-expiry gestures were nearly free \u2014 and if each one extended the deadline from the present moment, a cycle could be dragged out indefinitely for pennies. Anchoring extensions to the stored time closed the loophole; the same upgrade hardened the scheduling arithmetic so no parameter configuration can prevent finalization.',
-    referenceLabel: 'White paper \u00a712.2 \u2014 The V2 Upgrade',
+    referenceLabel: 'White paper \u00a712.2 \u2014 The V2 upgrade',
   },
   'v3-what-changes': {
     prompt: 'The planned V3 upgrade changes exactly one thing. What?',
@@ -183,7 +183,7 @@ export const hardQuestionsTextEn = {
     },
     explanation:
       'V3 touches nothing but the endgame: in the final 20 minutes before the Cycle Finalization Time, every Gesture Cost \u2014 ETH, ETH with a Random Walk NFT, or CST \u2014 is multiplied by a premium that ramps polynomially from 1x to 10x. Everything else in the protocol stays as V2 defined it.',
-    referenceLabel: 'White paper \u00a712.3 \u2014 The Planned V3 Upgrade',
+    referenceLabel: 'White paper \u00a712.3 \u2014 The planned V3 upgrade',
   },
   'v3-shape': {
     prompt:
@@ -196,7 +196,7 @@ export const hardQuestionsTextEn = {
     },
     explanation:
       'The eighth-power curve concentrates most of the increase near the deadline. Earlier in the window, the multiplier remains close to 1; near the end, it rises sharply toward 10. A linear curve would spread the increase evenly, while a fixed multiplier would apply the same cost throughout.',
-    referenceLabel: 'White paper \u00a712.3 \u2014 The Planned V3 Upgrade',
+    referenceLabel: 'White paper \u00a712.3 \u2014 The planned V3 upgrade',
   },
   'v3-overtime': {
     prompt:
@@ -209,7 +209,7 @@ export const hardQuestionsTextEn = {
     },
     explanation:
       'Under the planned V3 rules, the multiplier reaches 10 at the deadline and stays there during overtime. Post-expiry gestures remain possible, and V2’s rule of extending the stored finalization time still applies.',
-    referenceLabel: 'White paper \u00a712.3 \u2014 The Planned V3 Upgrade',
+    referenceLabel: 'White paper \u00a712.3 \u2014 The planned V3 upgrade',
   },
   'owner-mid-cycle': {
     prompt:
@@ -222,7 +222,7 @@ export const hardQuestionsTextEn = {
     },
     explanation:
       'During an active cycle, the owner cannot change core percentages, time increments, or Gesture Costs, and cannot upgrade the protocol contract. Narrower controls, such as some peripheral settings, have separately documented limits.',
-    referenceLabel: 'White paper \u00a713 \u2014 The Path to Full Decentralization',
+    referenceLabel: 'White paper \u00a713 \u2014 The path to full decentralization',
   },
   'owner-cannot-reach': {
     prompt: 'Which of these can the owner touch, even between cycles?',
@@ -234,7 +234,7 @@ export const hardQuestionsTextEn = {
     },
     explanation:
       'The documented administrative functions do not directly reassign escrowed allocations, imprinted NFT ownership, recorded seeds, or CST balances. The owner retains separately disclosed upgrade authority between cycles until privileged control is relinquished.',
-    referenceLabel: 'White paper \u00a713 \u2014 The Path to Full Decentralization',
+    referenceLabel: 'White paper \u00a713 \u2014 The path to full decentralization',
   },
   'owner-endgame': {
     prompt: 'How does the owner role end, according to the white paper\u2019s commitment?',
@@ -246,7 +246,7 @@ export const hardQuestionsTextEn = {
     },
     explanation:
       'The commitment is explicit: after the remaining upgrades land, beginning with V3, the owner role leaves the deployer permanently, with the exact mechanism announced in advance. From then on no private party can upgrade the protocol or change its parameters \u2014 and every step of the process is visible on-chain, including the last one.',
-    referenceLabel: 'White paper \u00a713 \u2014 The Path to Full Decentralization',
+    referenceLabel: 'White paper \u00a713 \u2014 The path to full decentralization',
   },
   'postpone-activation-limit': {
     prompt:
@@ -259,7 +259,7 @@ export const hardQuestionsTextEn = {
     },
     explanation:
       'Postponing an upcoming cycle\u2019s activation is one of the three narrow controls available at any time \u2014 but only until its first gesture arrives. The moment someone gestures, the cycle is live and the owner\u2019s timing lever is gone.',
-    referenceLabel: 'White paper \u00a713 \u2014 The Path to Full Decentralization',
+    referenceLabel: 'White paper \u00a713 \u2014 The path to full decentralization',
   },
   'no-team-eth': {
     prompt:
@@ -271,7 +271,7 @@ export const hardQuestionsTextEn = {
       d: 'Nothing at all, including CST.',
     },
     explanation: `The Outreach Reserve receives ${cst(protocolFacts.outreachReserveCst)} CST per cycle for community outreach \u2014 the only recurring flow the team directs, and it carries no special powers. On the ETH side the paper is absolute: no team wallet receives ETH from gestures.`,
-    referenceLabel: 'White paper \u00a77.1 \u2014 Imprint Rules',
+    referenceLabel: 'White paper \u00a77.1 \u2014 Imprint rules',
   },
   'art-integrator': {
     prompt:
@@ -284,7 +284,7 @@ export const hardQuestionsTextEn = {
     },
     explanation:
       'Symplectic integrators preserve the geometric structure of Hamiltonian systems and are designed for stable energy behavior over long simulations. They do not guarantee exact energy conservation at every step. The three-body problem has no general closed-form solution, so the pipeline uses numerical integration.',
-    referenceLabel: 'White paper \u00a76.1 \u2014 The Pipeline',
+    referenceLabel: 'White paper \u00a76.1 \u2014 The pipeline',
   },
   'art-candidates': {
     prompt: 'How does the pipeline pick the orbit that becomes a Signature?',
@@ -296,7 +296,7 @@ export const hardQuestionsTextEn = {
     },
     explanation:
       'The seed spawns one hundred thousand candidates; each is integrated for a million physics steps; a Borda rank aggregation across chaos and equilateralness metrics picks the standout. Every stage is a pure function of the seed \u2014 curation happens by algorithm, identically reproducible by anyone.',
-    referenceLabel: 'White paper \u00a76.1 \u2014 The Pipeline',
+    referenceLabel: 'White paper \u00a76.1 \u2014 The pipeline',
   },
   'art-color': {
     prompt: 'How are the colors of the three bodies chosen?',
@@ -308,7 +308,7 @@ export const hardQuestionsTextEn = {
     },
     explanation:
       'Colors are mixed in OKLab \u2014 a perceptual space where equal numeric distances look equally different to human eyes \u2014 with 120-degree hue separation keeping the three bodies visually distinct. Like everything downstream of the seed, the palette is deterministic.',
-    referenceLabel: 'White paper \u00a76.1 \u2014 The Pipeline',
+    referenceLabel: 'White paper \u00a76.1 \u2014 The pipeline',
   },
   'art-spectral': {
     prompt: 'What makes the orbit trails render the way they do?',
@@ -320,7 +320,7 @@ export const hardQuestionsTextEn = {
     },
     explanation:
       'The renderer treats light as a spectrum, not three color channels: sixty-four wavelength bins across the visible range, trails whose thickness responds to velocity, and depth of field for dimensionality. AgX tonemapping, bloom, OpenSimplex nebula layers, and grading finish the frame.',
-    referenceLabel: 'White paper \u00a76.1 \u2014 The Pipeline',
+    referenceLabel: 'White paper \u00a76.1 \u2014 The pipeline',
   },
   'art-output': {
     prompt: 'What files does the pipeline output for every NFT?',
@@ -332,7 +332,7 @@ export const hardQuestionsTextEn = {
     },
     explanation:
       'Each Signature ships as a 16-bit PNG \u2014 double the usual color depth per channel \u2014 plus a 30-second H.265 video of the orbit in motion. Both are regenerable from the on-chain seed by anyone running the open-source pipeline.',
-    referenceLabel: 'White paper \u00a76.1 \u2014 The Pipeline',
+    referenceLabel: 'White paper \u00a76.1 \u2014 The pipeline',
   },
   'art-server-death': {
     prompt:
@@ -347,7 +347,7 @@ export const hardQuestionsTextEn = {
       'NFT seeds remain on-chain, and the rendering pipeline is open source and deterministic. Anyone with the seed and the pipeline can regenerate the artwork without relying on the project’s image servers.',
     funFact:
       'Continuous integration asserts SHA-256 hashes of rendered frames, so even an accidental one-pixel drift in the pipeline would fail the build.',
-    referenceLabel: 'White paper \u00a76.2 \u2014 Reproducibility and License',
+    referenceLabel: 'White paper \u00a76.2 \u2014 Reproducibility and license',
   },
   'art-naming': {
     prompt: 'What customization does an owner have over their Cosmic Signature NFT?',
@@ -359,7 +359,7 @@ export const hardQuestionsTextEn = {
     },
     explanation:
       'Owners may record a name of up to 32 bytes on-chain. That is the entire customization surface: the seed, the orbit, the palette, and the video are fixed forever at imprint time — determinism is the collection’s core promise, and regenerating would break it.',
-    referenceLabel: 'White paper \u00a76.2 \u2014 Reproducibility and License',
+    referenceLabel: 'White paper \u00a76.2 \u2014 Reproducibility and license',
   },
   'art-license': {
     prompt:
@@ -372,7 +372,7 @@ export const hardQuestionsTextEn = {
     },
     explanation:
       'Project-owned code is dedicated under CC0 1.0 with no rights reserved: anyone may fork the contracts, the renderer, or the site. Third-party dependencies retain their own licenses. Even this white paper is CC0.',
-    referenceLabel: 'White paper \u00a76.2 \u2014 Reproducibility and License',
+    referenceLabel: 'White paper \u00a76.2 \u2014 Reproducibility and license',
   },
   'seed-derivation': {
     prompt: 'When and how is an NFT\u2019s art seed created?',
@@ -384,7 +384,7 @@ export const hardQuestionsTextEn = {
     },
     explanation:
       'The seed is derived on-chain at imprint time and stored with the NFT permanently. It initializes a SHA3-256 random number generator, and every downstream choice \u2014 candidate orbits, camera, colors \u2014 is a pure function of it. Render it today or in a decade: same seed, same Signature.',
-    referenceLabel: 'White paper \u00a76.1 \u2014 The Pipeline',
+    referenceLabel: 'White paper \u00a76.1 \u2014 The pipeline',
   },
   'hacken-findings': {
     prompt: 'What did Hacken\u2019s independent security review of the contracts conclude?',
@@ -396,7 +396,7 @@ export const hardQuestionsTextEn = {
     },
     explanation:
       'Published in January 2026, the review covered the core protocol, CST, both NFT integrations, anchoring wallets, and supporting contracts. Assess the findings together with their severity, resolution status, and scope. The absence of critical or high-severity findings does not establish that the protocol is risk-free.',
-    referenceLabel: 'White paper \u00a711.1 \u2014 Independent Review',
+    referenceLabel: 'White paper \u00a711.1 \u2014 Independent review',
   },
   'hacken-invariants': {
     prompt: 'Beyond the manual review, what did Hacken\u2019s fuzz testing check?',
@@ -408,7 +408,7 @@ export const hardQuestionsTextEn = {
     },
     explanation:
       'Fuzz testing runs generated inputs while checking specified properties. Hacken tested 14 invariants across 10,000 runs, with no violation reported. This complements manual review but does not prove every possible state is safe.',
-    referenceLabel: 'White paper \u00a711.1 \u2014 Independent Review',
+    referenceLabel: 'White paper \u00a711.1 \u2014 Independent review',
   },
   'verification-tooling': {
     prompt: 'Besides the external review, what verification tooling does the repository carry?',
@@ -420,7 +420,7 @@ export const hardQuestionsTextEn = {
     },
     explanation:
       'Certora specifications, SMTChecker, Slither, and coverage-focused tests examine different properties and classes of defects. They complement Hacken’s review and fuzz testing; none of these checks alone establishes complete correctness.',
-    referenceLabel: 'White paper \u00a711.1 \u2014 Independent Review',
+    referenceLabel: 'White paper \u00a711.1 \u2014 Independent review',
   },
   'sourcify-status': {
     prompt: 'What is the source-verification status of the deployed contracts?',
@@ -432,7 +432,7 @@ export const hardQuestionsTextEn = {
     },
     explanation:
       'All contracts are exact-match verified on Sourcify for chain 42161 \u2014 the strictest verification tier, where the on-chain bytecode matches the published source byte for byte, metadata included. The proxy address is the protocol\u2019s permanent address; implementations change only through the public upgrade process.',
-    referenceLabel: 'White paper \u00a711.4 \u2014 Open Verification',
+    referenceLabel: 'White paper \u00a711.4 \u2014 Open verification',
   },
   reentrancy: {
     prompt:
@@ -445,7 +445,7 @@ export const hardQuestionsTextEn = {
     },
     explanation:
       'Reentrancy guards prevent protected entry points from being called again during an ongoing transaction. Escrowing secondary allocations also avoids recipient transfers during finalization. These defenses address specific risks without proving all possible attacks are prevented.',
-    referenceLabel: 'White paper \u00a711.2 \u2014 Defensive Design',
+    referenceLabel: 'White paper \u00a711.2 \u2014 Defensive design',
   },
   'intercycle-locks-why': {
     prompt: 'Why are contract upgrades impossible while a cycle runs \u2014 even in an emergency?',
@@ -482,7 +482,7 @@ export const hardQuestionsTextEn = {
     },
     explanation:
       'Overpayment above the dust threshold is refunded in the same transaction. Below the threshold, it remains in the reserve because the gas cost of sending a refund would exceed the amount returned.',
-    referenceLabel: 'White paper \u00a74.1 \u2014 ETH Gestures',
+    referenceLabel: 'White paper \u00a74.1 \u2014 ETH gestures',
   },
   'rwlk-not-transferred': {
     prompt: 'Sol attaches his Random Walk NFT for the cost reduction. Where is the NFT afterward?',
@@ -494,7 +494,7 @@ export const hardQuestionsTextEn = {
     },
     explanation:
       'The NFT stays in its owner’s wallet. The contract marks its cost reduction as used and applies the discount to the ETH gesture. That one-time discount cannot be used again in a later cycle.',
-    referenceLabel: 'White paper \u00a74.2 \u2014 Random Walk NFT Attachment',
+    referenceLabel: 'White paper \u00a74.2 \u2014 Random Walk NFT attachment',
   },
   'open-finalization-carries': {
     prompt:
@@ -518,7 +518,7 @@ export const hardQuestionsTextEn = {
       d: 'Until the next cycle finalizes.',
     },
     explanation: `Attached assets sit in the Allocations Wallet with the same ${protocolFacts.secondaryRetrievalTimeoutWeeks}-week timeout as every escrowed allocation. The beneficiary has priority during that window; afterward, the assets become available to the first caller. The ${protocolFacts.finalGestureExclusivityHours}-hour figure governs finalization rights, not escrow.`,
-    referenceLabel: 'White paper \u00a75.4 \u2014 Delivery, Escrow, and Timeouts',
+    referenceLabel: 'White paper \u00a75.4 \u2014 Delivery, escrow, and timeouts',
   },
   'eth-window-duration-drift': {
     prompt: 'How long does the ETH Calibration Window\u2019s descent take, and is that fixed?',
@@ -565,7 +565,7 @@ export const hardQuestionsTextEn = {
       d: 'All three flows are team-directed.',
     },
     explanation: `The three flows are: Participation CST (imprinted at gesture time by formula), Recognition CST (${cst(protocolFacts.specialAllocationCst)} CST paired with each NFT distribution at finalization), and the Outreach Reserve (${cst(protocolFacts.outreachReserveCst)} CST per cycle). Only the last is team-directed \u2014 and it is ordinary CST with no special powers, spent on community outreach.`,
-    referenceLabel: 'White paper \u00a77.1 \u2014 Imprint Rules',
+    referenceLabel: 'White paper \u00a77.1 \u2014 Imprint rules',
   },
   'finalization-actions': {
     prompt: 'Finalization is a single transaction. What does it actually do?',
@@ -625,6 +625,6 @@ export const hardQuestionsTextEn = {
     },
     explanation:
       'The risk factors are stated without varnish: smart contract risk survives every review; the randomness has stated limits; the timeout deadlines are real; parameters can change between cycles until decentralization completes; asset values move. Treat gestures as expenditure on participation and art \u2014 that is the paper\u2019s own framing.',
-    referenceLabel: 'White paper \u00a714.2 \u2014 Risk Factors',
+    referenceLabel: 'White paper \u00a714.2 \u2014 Risk factors',
   },
 } as const satisfies QuizTierQuestionsText<'hard'>;

@@ -1,6 +1,6 @@
 import '@testing-library/jest-dom';
 
-import { convertTimestampToDateTime, shortenHex } from '@/utils';
+import { formatAddress } from '@/utils';
 import {
   TEST_STAKING_CST_LABEL,
   TEST_STAKING_RWALK_LABEL,
@@ -10,6 +10,16 @@ import { ZERO_ADDRESS } from '@/config/misc';
 import { TransferHistoryTable } from '@/components/tables/TransferHistoryTable';
 
 import { checkA11y, render, screen } from '@/test-utils';
+
+let mockPhone = false;
+jest.mock('../../../components/ui/data-table/use-page-size', () => ({
+  ...jest.requireActual('../../../components/ui/data-table/use-page-size'),
+  usePhoneLayout: () => mockPhone,
+}));
+
+beforeEach(() => {
+  mockPhone = false;
+});
 
 jest.mock('../../../contexts/ContractAddressesContext', () => ({
   useContractAddresses: () => ({
@@ -40,6 +50,31 @@ const createRecord = (overrides = {}) => ({
   ...overrides,
 });
 
+describe('TransferHistoryTable on a phone', () => {
+  it('stays a table of one line per transfer: the date, then From → To', () => {
+    mockPhone = true;
+    const { container } = render(<TransferHistoryTable list={[createRecord()]} />);
+    expect(screen.getByRole('table')).toHaveAttribute('data-layout', 'compact');
+    const headers = screen.getAllByRole('columnheader').map((header) => header.textContent);
+    expect(headers).toEqual([
+      'tables.columns.dateTimeCompact',
+      'tables.columns.from → tables.columns.to',
+    ]);
+    const route = container.querySelectorAll('tbody td')[1];
+    // Both addresses link to their participant pages, and a screen reader
+    // hears "From … To …" rather than an arrow.
+    const links = [...(route?.querySelectorAll('a') ?? [])].map((a) => a.getAttribute('href'));
+    expect(links).toEqual([
+      '/user/0x1111111111111111111111111111111111111111',
+      '/user/0x2222222222222222222222222222222222222222',
+    ]);
+    const spoken = [...(route?.querySelectorAll('.sr-only:not([role])') ?? [])].map(
+      (node) => node.textContent,
+    );
+    expect(spoken).toEqual(['tables.columns.from', 'tables.columns.to']);
+  });
+});
+
 describe('TransferHistoryTable', () => {
   it('renders table headers', () => {
     render(<TransferHistoryTable list={[createRecord()]} />);
@@ -51,7 +86,7 @@ describe('TransferHistoryTable', () => {
   it('renders datetime as explorer link with rel attrs', () => {
     const record = createRecord();
     render(<TransferHistoryTable list={[record]} />);
-    const datetime = screen.getByText(convertTimestampToDateTime(record.TimeStamp));
+    const datetime = screen.getByText('Nov 30, 2023, 12:18');
     expect(datetime.closest('a')).toHaveAttribute('target', '_blank');
     expect(datetime.closest('a')).toHaveAttribute('rel', 'noopener noreferrer');
   });
@@ -65,26 +100,24 @@ describe('TransferHistoryTable', () => {
         ]}
       />,
     );
-    const datetimes = screen.getAllByText(convertTimestampToDateTime(1701346718));
+    const datetimes = screen.getAllByText('Nov 30, 2023, 12:18');
     expect(datetimes).toHaveLength(1);
   });
 
-  it('shows Cosmic Signature NFT anchoring wallet label for CST anchoring address', () => {
+  it('names the Cosmic Signature NFT anchoring wallet instead of showing hex', () => {
     render(<TransferHistoryTable list={[createRecord({ FromAddr: TEST_STAKING_CST_LABEL })]} />);
-    expect(screen.getByText('tables.transferHistory.signatureAnchoringWallet')).toBeInTheDocument();
+    expect(screen.getByText('formats.address.known.cosmicAnchor')).toBeInTheDocument();
   });
 
-  it('shows RandomWalk NFT anchoring wallet label for RWLK anchoring address', () => {
+  it('names the Random Walk NFT anchoring wallet instead of showing hex', () => {
     render(<TransferHistoryTable list={[createRecord({ FromAddr: TEST_STAKING_RWALK_LABEL })]} />);
-    expect(
-      screen.getByText('tables.transferHistory.randomWalkAnchoringWallet'),
-    ).toBeInTheDocument();
+    expect(screen.getByText('formats.address.known.rwalkAnchor')).toBeInTheDocument();
   });
 
   it('shows shortened hex for regular addresses', () => {
     const addr = '0x1111111111111111111111111111111111111111';
     render(<TransferHistoryTable list={[createRecord({ FromAddr: addr })]} />);
-    expect(screen.getByText(shortenHex(addr, 6))).toBeInTheDocument();
+    expect(screen.getByText(formatAddress(addr))).toBeInTheDocument();
   });
 
   it('renders From and To as links to user pages', () => {
@@ -96,15 +129,13 @@ describe('TransferHistoryTable', () => {
     expect(userLinks.length).toBeGreaterThanOrEqual(2);
   });
 
-  it('renders only first page of results (perPage=5)', () => {
-    const list = Array.from({ length: 8 }, (_, i) =>
+  it('shows 20 rows a page with the row range', () => {
+    const list = Array.from({ length: 25 }, (_, i) =>
       createRecord({ EvtLogId: i, TimeStamp: 1701346718 + i * 86400 }),
     );
-    render(<TransferHistoryTable list={list} />);
-    expect(screen.getByText(convertTimestampToDateTime(list[4]!.TimeStamp))).toBeInTheDocument();
-    expect(
-      screen.queryByText(convertTimestampToDateTime(list[5]!.TimeStamp)),
-    ).not.toBeInTheDocument();
+    const { container } = render(<TransferHistoryTable list={list} />);
+    expect(container.querySelectorAll('tbody tr')).toHaveLength(20);
+    expect(screen.getByText('tables.pagination.range(from=1,to=20,total=25)')).toBeInTheDocument();
   });
 
   it('has no accessibility violations', async () => {

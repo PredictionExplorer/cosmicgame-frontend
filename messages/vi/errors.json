@@ -1,9 +1,7 @@
 {
   "generic": "Đã xảy ra lỗi. Vui lòng thử lại.",
-  "networkOffline": "Không có mạng. Kết nối lại để tiếp tục.",
   "walletNotConnected": "Kết nối ví Web3 để đặt nét bút.",
   "insufficientEth": "Ví không đủ ETH cho nét bút này.",
-  "cycleClosed": "Chu kỳ này đã đóng. Chu kỳ trình diễn tiếp theo sẽ sớm mở.",
   "state": {
     "title": "Đã xảy ra lỗi",
     "retry": "Thử lại"
@@ -11,7 +9,7 @@
   "boundary": {
     "title": "Đã xảy ra lỗi",
     "description": "Đã xảy ra lỗi ngoài dự kiến.",
-    "retry": "Thử lại"
+    "home": "Về trang chủ"
   },
   "route": {
     "message": "Không thể hiển thị trang này. Hãy thử lại hoặc quay lại sau ít phút.",
@@ -37,21 +35,13 @@
     "missing": "Thiếu hoặc không hợp lệ:",
     "resolution": "Hãy thiết lập chúng trong shell hoặc trong tệp .env, rồi khởi động lại máy chủ phát triển."
   },
-  "apiFailure": "Dịch vụ không phản hồi. Hãy thử lại sau ít phút.",
   "unexpected": "Đã xảy ra lỗi ngoài dự kiến. Vui lòng thử lại.",
   "notFound": {
-    "title": "404 — Không tìm thấy trang",
-    "description": "Trang bạn tìm không tồn tại hoặc có thể đã được chuyển đi. Cosmic Signature là giao thức nghệ thuật tạo sinh trên chuỗi Arbitrum — hãy khám phá các liên kết bên dưới để tìm điều bạn cần.",
-    "returnHome": "Về trang chủ",
-    "suggestedPages": "Trang gợi ý",
-    "popularPages": "Trang phổ biến",
-    "links": {
-      "home": "Trang chủ — Chu kỳ đang diễn ra",
-      "gallery": "Phòng trưng bày NFT",
-      "howItWorks": "Cách hoạt động",
-      "faq": "Câu hỏi thường gặp",
-      "statistics": "Thống kê",
-      "anchoring": "Phân phối neo giữ"
-    }
+    "code": "Lỗi 404",
+    "title": "Không tìm thấy trang",
+    "description": "Đường dẫn có thể bị gõ sai, hoặc trang đã được chuyển đi. Hãy tiếp tục từ một trong các trang dưới đây.",
+    "primaryCta": "Đến Đài quan sát",
+    "secondaryCta": "Xem phòng trưng bày",
+    "suggestedPages": "Trang gợi ý"
   }
 }

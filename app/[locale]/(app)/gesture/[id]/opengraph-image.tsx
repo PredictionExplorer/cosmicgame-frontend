@@ -1,49 +1,26 @@
 import { COSMIC_OG_SIZE } from '@/lib/og/CosmicOgCard';
-import { formatOgEyebrow, getOgCopy, getOgImageMetadata } from '@/lib/og/copy';
-import { createCosmicOgImage } from '@/lib/og/createCosmicOgImage';
-
-export const contentType = 'image/png';
-export const size = COSMIC_OG_SIZE;
+import { gestureCard, gestureCardAlt, ogImageMetadata } from '@/lib/og/cards';
 
 /**
- * The route param is the event-log id, not the gesture position. Unlike the
- * other OG cards (which intentionally avoid the API), we must fetch to resolve
- * the human-facing "Gesture Position". The lookup is best-effort: any failure
- * falls back to a plain "Gesture" eyebrow so card generation never breaks.
+ * A gesture's card: its position and cycle in the headline, its method above.
+ * The route parameter is the event-log id, not the position, so the card
+ * reads the gesture record; without it the card keeps the generic headline.
  */
-async function fetchGesturePosition(rawId: string): Promise<number | null> {
-  const id = Number.parseInt(rawId, 10);
-  if (!Number.isFinite(id) || id < 0) return null;
-
-  const base = (process.env.NEXT_PUBLIC_API_URL || '').trim().replace(/\/+$/, '');
-  if (!base) return null;
-
-  try {
-    // lexicon-allow-start: backend HTTP URL paths mirror the Go server routes and are a sealed contract
-    const res = await fetch(`${base}/bid/info/${id}`, { next: { revalidate: 300 } });
-    // lexicon-allow-end
-    if (!res.ok) return null;
-    const data = await res.json();
-    const position = data?.BidInfo?.BidPosition;
-    return typeof position === 'number' && position >= 0 ? position : null;
-  } catch {
-    return null;
-  }
-}
+export const contentType = 'image/png';
+export const size = COSMIC_OG_SIZE;
+// A gesture record never changes once indexed.
+export const revalidate = 86400;
 
 interface ImageProps {
   params: Promise<{ locale: string; id: string }>;
 }
 
 export async function generateImageMetadata({ params }: ImageProps) {
-  const { locale } = await params;
-  return getOgImageMetadata(locale, 'gesture');
+  const { locale, id } = await params;
+  return ogImageMetadata(await gestureCardAlt(locale, id));
 }
 
 export default async function Image({ params }: ImageProps) {
   const { locale, id } = await params;
-  const copy = getOgCopy(locale, 'gesture');
-  const eyebrow = formatOgEyebrow(copy, await fetchGesturePosition(id));
-
-  return createCosmicOgImage(locale, { ...copy, eyebrow });
+  return gestureCard(locale, id);
 }

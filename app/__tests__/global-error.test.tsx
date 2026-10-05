@@ -25,9 +25,9 @@ beforeEach(() => {
  * `global-error` owns `<html>`/`<body>`, which React refuses to mount inside a
  * jsdom `<div>` container, so every case renders into a detached document.
  */
-function renderGlobalError(reset: () => void = () => {}) {
+function renderGlobalError(retry: () => void = () => {}) {
   const container = document.createElement('div');
-  return render(<GlobalError error={new Error('root layout blew up')} reset={reset} />, {
+  return render(<GlobalError error={new Error('root layout blew up')} retry={retry} />, {
     container: document.body.appendChild(container),
     baseElement: document.body,
   });
@@ -48,13 +48,19 @@ describe('global error boundary', () => {
     expect(reportError).toHaveBeenCalledWith(expect.any(Error), 'global-error');
   });
 
-  it('retries via reset', async () => {
+  it('retries via retry, which re-fetches the root instead of re-rendering the failure', async () => {
     const user = userEvent.setup();
-    const reset = jest.fn();
-    renderGlobalError(reset);
+    const retry = jest.fn();
+    renderGlobalError(retry);
 
     await user.click(screen.getByRole('button', { name: enErrors.global.retry }));
-    expect(reset).toHaveBeenCalledTimes(1);
+    expect(retry).toHaveBeenCalledTimes(1);
+  });
+
+  it('keeps the brand ground and wordmark without the stylesheet', () => {
+    renderGlobalError();
+    expect(screen.getByText('Cosmic Signature')).toHaveAttribute('translate', 'no');
+    expect(document.body.style.background).toContain('--background');
   });
 
   it('renders Chinese copy under the /zh prefix, where next-intl is unavailable', () => {

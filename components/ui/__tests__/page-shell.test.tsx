@@ -19,16 +19,28 @@ describe('PageShell', () => {
   });
 
   it.each([
-    ['data', 'max-w-[83rem]'],
-    ['marketing', 'max-w-[83rem]'],
-    ['form', 'max-w-3xl'],
-    ['detail', 'max-w-6xl'],
-  ])('applies variant=%s max-width', (variant, expected) => {
+    ['data', 'max-w-[calc(80rem+2*var(--gutter))]'],
+    ['marketing', 'max-w-[calc(80rem+2*var(--gutter))]'],
+    ['form', 'max-w-[calc(48rem+2*var(--gutter))]'],
+    ['detail', 'max-w-[calc(72rem+2*var(--gutter))]'],
+  ] as const)('applies variant=%s its measure on the shared gutter', (variant, expected) => {
+    render(<PageShell variant={variant}>body</PageShell>);
+    const main = screen.getByRole('main');
+    expect(main).toHaveClass(expected, 'px-[var(--gutter)]', 'mx-auto');
+    // The header and footer draw their edge from --gutter; a fixed padding
+    // put page content 9-27px off the wordmark between 640 and 1376px.
+    expect(main.className).not.toMatch(/\bsm:px-6\b|\bpx-4\b/);
+  });
+
+  it('lets a caller open a full-bleed page', () => {
     render(
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      <PageShell variant={variant as any}>body</PageShell>,
+      <PageShell variant="detail" className="max-w-none px-0">
+        body
+      </PageShell>,
     );
-    expect(screen.getByRole('main')).toHaveClass(expected);
+    const main = screen.getByRole('main');
+    expect(main).toHaveClass('max-w-none', 'px-0');
+    expect(main).not.toHaveClass('px-[var(--gutter)]');
   });
 
   it('renders an AmbientBackdrop by default', () => {

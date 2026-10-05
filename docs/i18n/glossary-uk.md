@@ -58,7 +58,10 @@ plural forms are regular for ICU (`one {# жест} few {# жести} many {# �
 | a gesture / this gesture           | жест / цей жест           |
 | ETH gesture / CST gesture          | ETH-жест / CST-жест       |
 | Gesture Cost                       | вартість жесту            |
+| Gesture method (not «оплати»)      | спосіб жесту              |
 | Final Gesture                      | завершальний жест         |
+| Last Gesture (the role)            | Останній жест             |
+| Your cycle standing (personal)     | Ваша позиція в циклі      |
 | gesture count / Number of Gestures | кількість жестів          |
 | Live gestures                      | жести наживо              |
 | Gestures with CST                  | CST-жести                 |
@@ -309,7 +312,7 @@ Interface vocabulary — no coinage needed, but fixed for consistency:
 | Gallery                              | Галерея                                           |                                                |
 | How It Works                         | Як це працює                                      |                                                |
 | FAQ / Clarifications                 | Поширені запитання                                | nav and page heading alike; never ЧаПи         |
-| Learn Hub                            | Навчальний центр                                  |                                                |
+| Learn (was Learn Hub)                | Навчання                                          | prose: розділ «Навчання»                       |
 | About                                | Про проєкт                                        | 2019 orthography: проєкт                       |
 | Statistics                           | Статистика                                        |                                                |
 | My Statistics / My Tokens            | Моя статистика / Мої токени                       |                                                |

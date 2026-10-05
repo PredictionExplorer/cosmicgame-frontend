@@ -16,12 +16,22 @@ export const quizTextJa = {
       quizLabel: 'クイズ',
     },
     questionCountTemplate: '{count}問',
+    durationTemplate: '約{minutes}分',
+    difficultyTemplate: '難易度{level}/{max}',
+    bestTemplate: '最高記録{correct}/{total}',
+    inProgressTemplate: '途中：{total}問中{current}問目',
     startLabel: '開始',
+    resumeLabel: '続きから',
   },
   ui: {
     intro: {
       keyboardHint: 'ヒント：1〜4のキーで答え、Enterで進めます。',
       beginLabel: '始める',
+      resumeLabel: '続きから再開',
+      startOverLabel: '最初からやり直す',
+      ranksHeading: '到達点',
+      rankFromTemplate: '{percent}以上',
+      rankBelowTemplate: '{percent}未満',
     },
     progressTemplate: '{total}問中{current}問目',
     correctFeedback: [
@@ -36,44 +46,51 @@ export const quizTextJa = {
       '正解とその理由を見てみましょう。',
       '正解の根拠は、解説とホワイトペーパーで確認できます。',
     ],
+    correctAnswerTemplate: '正解は{letter}です。',
+    yourAnswerLabel: '選んだ答え',
+    correctAnswerLabel: '正解',
+    newTabNote: '（新しいタブで開きます）',
     streakTemplate: '{count}問連続正解',
     explanationHeading: 'なぜ',
     funFactHeading: 'ご存じでしたか？',
-    referenceLabel: 'さらに深く',
+    referenceTemplate: 'さらに深く：{section}',
     nextLabel: '次の問題',
     finishLabel: '結果を見る',
     summary: {
       eyebrow: '読了',
       scoreTemplate: '{total}問中{correct}問正解',
       rankLabel: '到達点',
+      rankTemplate: '到達点：{rank}',
       ranks: {
-        observer: {
-          name: '観測者',
+        reader: {
+          name: '読者',
           line: 'ここから理解を深めていきましょう。下の解説と参照先が復習に役立ちます。',
         },
-        participant: {
-          name: '参加者',
+        student: {
+          name: '学生',
           line: '基本的な仕組みを理解できています。次は、細かな条件や例外にも目を向けてみましょう。',
         },
-        enduranceChampion: {
-          name: '持久チャンピオン',
+        scholar: {
+          name: '学者',
           line: '仕組みをよく理解できています。間違えた問題を振り返ると、さらに理解が深まります。',
         },
-        chronoWarrior: {
-          name: '時の戦士',
+        cartographer: {
+          name: '地図製作者',
           line: 'プロトコルを詳しく理解できています。参考セクションでは、設計の背景も読めます。',
         },
       },
-      studyHeading: '復習する',
-      studyIntro: '間違えた問題と、それぞれをはっきりさせるセクション：',
+      studyHeading: '復習する問題',
+      studyIntro: '選んだ答えと正解、そしてその根拠となるルールです。',
       noMissesNote: '復習するものはありません——すべて正解でした。',
       restartLabel: '新しい並びでやり直す',
       hubLabel: 'すべての段階',
+      nextTierTemplate: '次は{tier}へ',
     },
   },
   tiers: {
     basic: {
       title: '基礎',
+      heading: '基礎：プロトコルの基本',
       tagline: 'プロトコルの輪郭：サイクル、一筆、配分、そしてアート。',
       description:
         '基礎概念25問——一筆とは何か、サイクルはどう終わるか、ETHはどこへ行くか、アートワークはなぜ決定論的なのか。初めての方はここから始めてください。',
@@ -81,6 +98,7 @@ export const quizTextJa = {
     },
     medium: {
       title: '中級',
+      heading: '中級：動いている仕組み',
       tagline: '動いている仕組み：調律期間、持続トラック、評議会のルール。',
       description:
         '動いている機構についての25問——費用の曲線、CSTのフィードバックループ、持久チャンピオンと時の戦士の違い、星選の計算、評議会のパラメーター。サイクルを一つ二つ見守ってきた読者のために。',
@@ -88,6 +106,7 @@ export const quizTextJa = {
     },
     hard: {
       title: '上級',
+      heading: '上級：設計を掘り下げる',
       tagline: '設計を掘り下げる：敵対的なウォレット、アップグレードの歴史、アートパイプライン。',
       description:
         '注意深い読者のための50問——期限が過ぎた後の動作、ETHを拒むコントラクト、V2が五つのことを変えた理由、V3が何の価格を変えたか、乱数はどう作られるか、そしてヨシダ積分器がアートプロジェクトで何をしているのか。',

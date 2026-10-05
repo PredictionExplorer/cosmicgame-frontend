@@ -21,6 +21,10 @@
  *                         staking/cst/rewards/to_claim/by_user/…
  *                         prizes/eth/unclaimed/by_user/…
  *                         donations/nft/unclaimed/by_user/…
+ *                       and the hidden-message list, where an empty list
+ *                       would show every hidden message as visible, so
+ *                       every reader holds messages back until it loads:
+ *                         get_banned_bids
  *
  *   apiCallEmptyOn404   404 means "nothing yet"; everything else rejects.
  *                       Analytics routes that ship ahead of the Go server:
@@ -33,8 +37,12 @@
  *
  *   apiCall             Lenient: 400/403/404 resolve to the fallback. The long
  *                       tail of secondary tables, badges, and admin-gated
- *                       routes (get_banned_bids answers 403 to ordinary
- *                       clients) where an empty result is a truthful answer.
+ *                       routes where an empty result is a truthful answer.
+ *
+ * A read that rejects does so with an `ApiReadError` (./readError) carrying the
+ * HTTP status and the answer's body, so a page can tell a record the server
+ * does not hold (`isRecordNotFound`: `rounds/info/{n}` answers 400 "record
+ * not found" for the live cycle) from a read that failed.
  */
 import axios, {
   isAxiosError,
@@ -53,6 +61,8 @@ import {
 } from '@/lib/serverRotation';
 import { reportError } from '@/utils/errors';
 
+import { RATE_LIMIT_RETRIES, TOO_MANY_REQUESTS, rateLimitDelayMs, waitMs } from './rateLimit';
+import { ApiReadError } from './readError';
 import type { RoundInfo } from './types';
 
 /** True when the failed request was aimed at our Cosmic Game or main NFT API (not arbitrary third-party URLs). */
@@ -179,6 +189,16 @@ axios.interceptors.response.use(
 // Individual calls can still override via a per-request `timeout` config.
 axios.defaults.timeout = 15_000;
 
+/**
+ * How long one API request made on the server (a render, its metadata, a
+ * route handler) may take. The API answers in about a quarter second; a read
+ * still waiting after 2.5 s fails like any other, so a page rendered for the
+ * cache shows its honest loading, empty or error state instead of hanging.
+ * A server that times out is marked down and the read tried once on the
+ * next, so a server read takes at most twice this. Browsers keep 15 s.
+ */
+export const SERVER_READ_TIMEOUT_MS = 2_500;
+
 if (typeof window !== 'undefined' && process.env.NODE_ENV === 'development') {
   const configured =
     apiBaseUrls.length > 0 ? apiBaseUrls : [(process.env.NEXT_PUBLIC_API_URL || '').trim()];
@@ -245,20 +265,39 @@ export interface ApiRequestOptions {
 export type ApiListRequestOptions = ApiPageWindow & ApiRequestOptions;
 
 /**
- * Issues a GET against the shared axios instance, attaching the caller's abort
- * signal when there is one.
- *
- * The config argument is omitted entirely when there is nothing to send, so the
- * request shape stays `axios.get(url)` for callers that pass no options.
+ * Issues a GET against the shared axios instance with the caller's abort
+ * signal. On the server a request without its own timeout gets
+ * {@link SERVER_READ_TIMEOUT_MS}, and a 429 is asked again after a jittered
+ * wait (./rateLimit), so a burst's turned-away reads never render as unknown.
+ * With nothing to send, the request stays `axios.get(url)`.
  */
-export function apiGet(
+export async function apiGet(
   url: string,
   opts?: ApiRequestOptions,
   config?: AxiosRequestConfig,
 ): Promise<AxiosResponse> {
   const merged: AxiosRequestConfig = { ...config };
   if (opts?.signal) merged.signal = opts.signal;
-  return Object.keys(merged).length > 0 ? axios.get(url, merged) : axios.get(url);
+  const onServer = typeof window === 'undefined';
+  if (merged.timeout === undefined && onServer) {
+    merged.timeout = SERVER_READ_TIMEOUT_MS;
+  }
+  const get = () => (Object.keys(merged).length > 0 ? axios.get(url, merged) : axios.get(url));
+  if (!onServer) return get();
+
+  for (let attempt = 0; ; attempt += 1) {
+    try {
+      return await get();
+    } catch (error: unknown) {
+      const rateLimited =
+        isAxiosError(error) &&
+        error.response?.status === TOO_MANY_REQUESTS &&
+        !isCancellation(error);
+      if (!rateLimited || attempt >= RATE_LIMIT_RETRIES || merged.signal?.aborted) throw error;
+      const retryAfter = error.response?.headers?.['retry-after'];
+      await waitMs(rateLimitDelayMs(attempt, typeof retryAfter === 'string' ? retryAfter : null));
+    }
+  }
 }
 
 /**
@@ -441,6 +480,7 @@ export const flattenRoundInfo = (roundInfo: unknown) => {
     /** V3 multi-NFT main prize; V2 cycles report 1 / a single-id list. */
     NumCSNfts: (MainPrize as Record<string, unknown>)?.NumCSNfts ?? 1,
     NftTokenIds: (MainPrize as Record<string, unknown>)?.NftTokenIds ?? [],
+    TokenSeed: (MainPrize as Record<string, unknown>)?.Seed,
     CSTAmountEth: (MainPrize as Record<string, unknown>)?.CstAmountEth || 0,
     CharityAddress: (CharityDeposit as Record<string, unknown>)?.CharityAddress || '',
     CharityAmountETH: (CharityDeposit as Record<string, unknown>)?.CharityAmountETH || 0,
@@ -503,13 +543,19 @@ export function assertApiEnvelope(response: AxiosResponse): void {
 /**
  * Normalizes a failed read into the error React Query surfaces.
  *
- * Transport failures collapse to one message (the status is already on the
- * Sentry report); schema mismatches and backend envelope errors keep their own
- * message, which is the part that says *which field* broke.
+ * Transport failures collapse to one message (the detail is already on the
+ * Sentry report) but keep the HTTP status, which is what tells "no such
+ * record" from "the read failed"; schema mismatches and backend envelope
+ * errors keep their own message, which is the part that says *which field*
+ * broke.
  */
 function toReadError(err: unknown): Error {
   if (!isAxiosError(err) && err instanceof Error) return err;
-  return new Error('Network response was not OK');
+  return new ApiReadError(
+    'Network response was not OK',
+    isAxiosError(err) ? err.response?.status : undefined,
+    isAxiosError(err) ? err.response?.data : undefined,
+  );
 }
 
 /**

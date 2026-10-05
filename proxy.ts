@@ -7,20 +7,30 @@ import {
   LANDING_ORIGIN,
   isAppOnlyPath,
   isAppHost,
+  isKnownPublicPath,
   isLandingHost,
   isLandingOnlyPath,
   isLegacyWwwLandingHost,
   normalizeHost,
   splitLocalePrefix,
 } from '@/lib/hostRouting';
+import {
+  UNMATCHED_INTERNAL_PATH,
+  canonicalParamPath,
+  isRejectedParamPath,
+  pageAliasTarget,
+} from '@/lib/paramRoutes';
 
 export const config = {
   matcher: [
     /*
      * Run on all paths except Next assets and public files. The negative
-     * lookahead exclusions here are the standard Vercel recipe.
+     * lookahead exclusions here are the standard Vercel recipe. The web
+     * manifest is localized (`/[locale]/manifest.webmanifest`), so the legacy
+     * `/manifest.webmanifest` goes through next-intl to the English one.
+     * `.well-known` holds security.txt, which is the same on both hosts.
      */
-    '/((?!_next/static|_next/image|_next/data|favicon.ico|paint-worklet.js|robots.txt|sitemap.xml|sitemap-nfts.xml|llms(?:-full)?\\.txt|manifest.webmanifest|fonts|audio|images|.*\\.(?:png|jpg|jpeg|gif|svg|webp|ico|avif|woff|woff2|ttf|eot|map|pdf)$).*)',
+    '/((?!_next/static|_next/image|_next/data|favicon.ico|paint-worklet.js|robots.txt|sitemap.xml|sitemap-nfts.xml|llms(?:-full)?\\.txt|\\.well-known|fonts|audio|images|.*\\.(?:png|jpg|jpeg|gif|svg|webp|ico|avif|woff|woff2|ttf|eot|map|pdf)$).*)',
   ],
 };
 
@@ -85,8 +95,12 @@ export default function middleware(req: NextRequest) {
   // including `/en/` under the public `as-needed` locale policy. Sending these
   // through next-intl would redirect English images to an unprefixed path, and
   // the hidden landing-site image would be canonicalized to `/`. Serve the
-  // generated endpoint at the exact URL emitted in og:image instead.
-  if (locale !== undefined && /\/opengraph-image(?:[-/]|$)/.test(publicPath)) {
+  // generated endpoint at the exact URL emitted in og:image instead. The app
+  // layout links its locale's web manifest the same way.
+  if (
+    locale !== undefined &&
+    (/\/opengraph-image(?:[-/]|$)/.test(publicPath) || publicPath === '/manifest.webmanifest')
+  ) {
     return NextResponse.next();
   }
 
@@ -122,7 +136,7 @@ export default function middleware(req: NextRequest) {
     }
 
     if (isAppOnlyPath(publicPath)) {
-      const target = `${APP_ORIGIN}${prefix}${publicPath}${search}`;
+      const target = `${APP_ORIGIN}${prefix}${pageAliasTarget(publicPath) ?? publicPath}${search}`;
       return NextResponse.redirect(target, 308);
     }
   }
@@ -136,5 +150,34 @@ export default function middleware(req: NextRequest) {
     return NextResponse.next();
   }
 
-  return withoutLocaleCookieWrites(intlMiddleware(req));
+  const response = withoutLocaleCookieWrites(intlMiddleware(req));
+
+  // One URL per page and per record: `/source-code` moves to `/code` and
+  // `/detail/025` to `/detail/25` here, before routing, so no cached render
+  // has to raise the redirect (lib/paramRoutes.ts).
+  const canonical = isRedirect(response)
+    ? null
+    : (pageAliasTarget(publicPath) ?? canonicalParamPath(publicPath));
+  if (canonical) {
+    const target = req.nextUrl.clone();
+    target.pathname = `${prefix}${canonical}`;
+    return NextResponse.redirect(target, 308);
+  }
+
+  // A page asked for a parameter it does not serve (/detail/abc,
+  // /learn/no-such-guide) is the global 404 too, answered before routing
+  // (lib/paramRoutes.ts). The rewrite keeps next-intl's request headers (the
+  // resolved locale) and the visitor's URL.
+  if (!isRedirect(response) && isRejectedParamPath(publicPath)) {
+    const target = req.nextUrl.clone();
+    target.pathname = `/${locale ?? routing.defaultLocale}${UNMATCHED_INTERNAL_PATH}`;
+    const notFound = NextResponse.rewrite(target, { headers: response.headers });
+    notFound.headers.delete('link');
+    return notFound;
+  }
+
+  // A path no page starts with is a 404 (app/global-not-found.tsx): it has no
+  // editions in other languages to advertise.
+  if (!isKnownPublicPath(publicPath)) response.headers.delete('link');
+  return response;
 }

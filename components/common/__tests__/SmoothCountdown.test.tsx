@@ -58,17 +58,51 @@ describe('SmoothCountdown', () => {
     expect(screen.getByTestId('seconds')).toHaveTextContent('1');
   });
 
-  it('feeds tenths to the existing Counter renderer under one minute', () => {
-    render(<SmoothCountdown date={12_900} />);
+  it('hands the renderer the milliseconds, so it can show tenths under a minute', () => {
+    render(
+      <SmoothCountdown
+        date={12_900}
+        renderer={({ seconds, milliseconds }) => (
+          <span data-testid="tenths">{`${seconds}.${Math.floor(milliseconds / 100)}`}</span>
+        )}
+      />,
+    );
 
-    expect(screen.getByTestId('countdown-tenths')).toHaveTextContent('.9');
+    expect(screen.getByTestId('tenths')).toHaveTextContent('12.9');
   });
 
-  it('supplies localized unit labels to the shared Counter', () => {
-    render(<SmoothCountdown date={90_000} />);
+  it("hands the renderer the Cycle clock's unit captions in the locale", () => {
+    render(
+      <SmoothCountdown
+        date={90_000}
+        renderer={({ unitLabels }) => <span>{`${unitLabels.minutes} ${unitLabels.seconds}`}</span>}
+      />,
+    );
 
-    expect(screen.getByText('formats.countdown.minutes')).toBeInTheDocument();
-    expect(screen.getByText('formats.countdown.seconds')).toBeInTheDocument();
+    expect(screen.getByText('minutes seconds')).toBeInTheDocument();
+  });
+
+  it('hands the renderer only the parts: no stand-ins for a library it never ran', () => {
+    const received: Record<string, unknown>[] = [];
+    render(
+      <SmoothCountdown
+        date={90_000}
+        renderer={(props) => {
+          received.push(props as unknown as Record<string, unknown>);
+          return null;
+        }}
+      />,
+    );
+    expect(Object.keys(received[0]!).sort()).toEqual([
+      'completed',
+      'days',
+      'hours',
+      'milliseconds',
+      'minutes',
+      'seconds',
+      'total',
+      'unitLabels',
+    ]);
   });
 
   it('renders an epoch deadline against the serialized clock before hydration', () => {

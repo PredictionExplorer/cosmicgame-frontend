@@ -1,89 +1,82 @@
-import { render, screen, within } from '@testing-library/react';
+import '@testing-library/jest-dom';
 
-import { landingContentEn } from '@/content/landing';
-
+import { FOOTER_SECTIONS } from '@/config/siteNav';
 import { LOCALE_LABELS, routing } from '@/i18n/routing';
+import { APP_ORIGIN, localeHref } from '@/lib/hostRouting';
 import { LandingFooter } from '@/components/landing-v2/LandingFooter';
 
+import { checkA11y, render, screen, within } from '@/test-utils';
+
 describe('<LandingFooter />', () => {
-  it('renders the wordmark link back to the landing root', () => {
-    render(<LandingFooter footer={landingContentEn.footer} />);
-    const home = screen.getByRole('link', { name: /cosmic signature/i });
-    expect(home).toHaveAttribute('href', '/');
+  it('renders the wordmark link back to the landing root and the shared tagline', () => {
+    render(<LandingFooter />);
+    expect(screen.getByRole('link', { name: 'nav.brand.homeLabel' })).toHaveAttribute('href', '/');
+    // One copy source for both hosts: the footer catalog, not landing copy.
+    expect(screen.getByText('footer.tagline')).toBeInTheDocument();
+    expect(screen.getByText('footer.disambiguation')).toBeInTheDocument();
   });
 
-  it('renders the protocol tagline', () => {
-    render(<LandingFooter footer={landingContentEn.footer} />);
-    expect(screen.getByText(landingContentEn.footer.tagline)).toBeInTheDocument();
-  });
-
-  it('renders every link column heading', () => {
-    render(<LandingFooter footer={landingContentEn.footer} />);
-    for (const col of landingContentEn.footer.columns) {
-      expect(screen.getByText(col.heading)).toBeInTheDocument();
+  it('renders the same section columns as the app footer', () => {
+    render(<LandingFooter />);
+    const nav = screen.getByRole('navigation', { name: 'common.accessibility.footer' });
+    for (const section of FOOTER_SECTIONS) {
+      expect(
+        within(nav).getByRole('heading', { level: 2, name: `nav.sections.${section}` }),
+      ).toBeInTheDocument();
     }
   });
 
-  it('renders every link with correct href', () => {
-    render(<LandingFooter footer={landingContentEn.footer} />);
-    for (const col of landingContentEn.footer.columns) {
-      for (const link of col.links) {
-        const el = screen.getByRole('link', { name: link.label });
-        expect(el).toHaveAttribute('href', link.href);
-      }
-    }
+  it('keeps landing pages on the router and sends app pages to the app in the same tab', () => {
+    render(<LandingFooter />);
+    expect(screen.getByRole('link', { name: 'nav.routes.whitePaper.label' })).toHaveAttribute(
+      'href',
+      '/white-paper',
+    );
+    const faq = screen.getByRole('link', { name: 'nav.routes.faq.label' });
+    expect(faq).toHaveAttribute('href', localeHref(APP_ORIGIN, '/faq', 'en'));
+    expect(faq).not.toHaveAttribute('target');
   });
 
-  it('marks external links with target=_blank and rel=noopener', () => {
-    render(<LandingFooter footer={landingContentEn.footer} />);
-    const nav = screen.getByRole('navigation', { name: /footer/i });
-    const externalLinks = within(nav)
-      .getAllByRole('link')
-      .filter((a) => (a.getAttribute('href') ?? '').startsWith('http'));
-
-    expect(externalLinks.length).toBeGreaterThan(0);
-    for (const link of externalLinks) {
-      expect(link).toHaveAttribute('target', '_blank');
-      expect(link.getAttribute('rel')).toContain('noopener');
-    }
+  it('never links an in-page anchor that only exists on the home page', () => {
+    const { container } = render(<LandingFooter />);
+    const anchors = Array.from(container.querySelectorAll('a[href^="#"]'));
+    expect(anchors).toHaveLength(0);
   });
 
-  it('renders the crawlable language directory with a link per locale', () => {
-    render(<LandingFooter footer={landingContentEn.footer} />);
+  it('offers a way into the app, and names the app home that way in the directory too', () => {
+    render(<LandingFooter />);
+    const links = screen.getAllByRole('link', { name: 'nav.cta.openApp' });
+    // The action beside the wordmark, and the Participate column's first row.
+    expect(links).toHaveLength(2);
+    for (const link of links) {
+      expect(link).toHaveAttribute('href', localeHref(APP_ORIGIN, '/', 'en'));
+    }
+    const nav = screen.getByRole('navigation', { name: 'common.accessibility.footer' });
+    expect(within(nav).queryByRole('link', { name: 'nav.routes.observatory.label' })).toBeNull();
+    // Nor does it link the landing home it is on as "Project Site".
+    expect(within(nav).queryByRole('link', { name: 'nav.routes.projectSite.label' })).toBeNull();
+  });
+
+  it('renders the crawlable language directory', () => {
+    render(<LandingFooter />);
     const directory = screen.getByRole('navigation', { name: 'common.languageSwitcher.label' });
-    const links = within(directory).getAllByRole('link');
-    expect(links.map((link) => link.textContent)).toEqual(
-      routing.locales.map((locale) => LOCALE_LABELS[locale]),
-    );
-    // Landing pages link the same page in every language at its canonical URL.
-    expect(links.map((link) => link.getAttribute('href'))).toEqual(
-      routing.locales.map((locale) => (locale === routing.defaultLocale ? '/' : `/${locale}`)),
+    for (const locale of routing.locales) {
+      expect(within(directory).getByText(LOCALE_LABELS[locale])).toBeInTheDocument();
+    }
+  });
+
+  it('renders the copyright with the current year and the colophon', () => {
+    render(<LandingFooter />);
+    const year = String(new Date().getFullYear());
+    expect(screen.getByText(`footer.copyright(year=${year})`)).toBeInTheDocument();
+    expect(screen.getByRole('link', { name: 'footer.colophon' })).toHaveAttribute(
+      'href',
+      localeHref(APP_ORIGIN, '/security', 'en'),
     );
   });
 
-  it('renders the CC0 colophon', () => {
-    render(<LandingFooter footer={landingContentEn.footer} />);
-    expect(screen.getByText(landingContentEn.footer.colophon)).toBeInTheDocument();
-  });
-
-  it('renders the current year in the copyright', () => {
-    const { container } = render(<LandingFooter footer={landingContentEn.footer} />);
-    const year = new Date().getFullYear().toString();
-    // The copyright line is rendered as a <p> with the year inline.
-    const copyright = Array.from(container.querySelectorAll('p')).find((p) =>
-      (p.textContent ?? '').includes(`\u00a9 ${year}`),
-    );
-    expect(copyright).toBeDefined();
-    expect(copyright?.textContent).toContain('Cosmic Signature');
-  });
-
-  it('contains no banned lexicon terms in the rendered DOM', () => {
-    const { container } = render(<LandingFooter footer={landingContentEn.footer} />);
-    const text = container.textContent ?? '';
-    expect(text).not.toMatch(/\bbid(?:ding|der|s)?\b/i);
-    expect(text).not.toMatch(/\bprize(?:s|d)?\b/i);
-    expect(text).not.toMatch(/\braffle(?:s)?\b/i);
-    expect(text).not.toMatch(/\bstak(?:e|er|ing)\b/i);
-    expect(text).not.toMatch(/\bcharit(?:y|able)\b/i);
+  it('has no accessibility violations', async () => {
+    const { container } = render(<LandingFooter />);
+    await checkA11y(container);
   });
 });

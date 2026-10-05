@@ -1,66 +1,39 @@
 'use client';
 
-import 'yet-another-react-lightbox/styles.css';
+import { useMemo, useEffect, useCallback, useId, useRef, type ReactNode } from 'react';
+import { useTranslations } from 'next-intl';
+import { getAddress, isAddress } from 'viem';
 
-import { useState, useMemo, useEffect, useCallback, useRef, type ChangeEvent } from 'react';
-import { useLocale, useTranslations } from 'next-intl';
-import Lightbox from 'yet-another-react-lightbox';
-import { usePublicClient } from 'wagmi';
-import { isAddress } from 'viem';
-import { motion } from 'framer-motion';
-import { ArrowLeft, ArrowRight, ChevronUp, ChevronDown, Expand, Trophy } from 'lucide-react';
-
-import { formatId, getAssetsUrl, getOriginUrl, getWebImageUrl } from '@/utils';
-
+import { isAnchorable } from '@/utils/anchoringStats';
+import { formatId, sameAddress } from '@/utils/format';
+import { cn } from '@/lib/utils';
 import { useCollectionTraits, useNftMetadata } from '@/hooks/useNftTraits';
 import { normalizeTraitEntry, type CosmicSignatureMetadata } from '@/lib/nftMetadata';
 import { useRouter } from '@/i18n/navigation';
-import { Button } from '@/components/ui/button';
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogDescription,
-  DialogFooter,
-} from '@/components/ui/dialog';
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
-import { Badge } from '@/components/ui/badge';
-import { InfoTooltip } from '@/components/ui/info-tooltip';
-import { SectionDivider } from '@/components/ui/section-divider';
 import NameHistoryTable from '@/components/tables/NameHistoryTable';
 import { TransferHistoryTable } from '@/components/tables/TransferHistoryTable';
 import { useActiveWeb3React } from '@/hooks/web3';
-import { useRequireChain } from '@/hooks/useRequireChain';
-import useCosmicSignatureContract from '@/hooks/useCosmicSignatureContract';
-import { useNotification } from '@/contexts/NotificationContext';
+import { useHydrated } from '@/hooks/useHydrated';
 import type { CSTTokenInfo, CSTTransferRecord } from '@/services/api';
-import { isUserRejection, getEthErrorMessage, reportError } from '@/utils/errors';
-import { assertSuccessfulTransactionReceipt, assertTransactionHash } from '@/utils/transactions';
 import {
   useDashboardInfo,
   useCSTInfo,
   useNameHistory,
   useCTOwnershipTransfers,
 } from '@/hooks/useApiQuery';
-import { useClipboard } from '@/hooks/useClipboard';
 import { useMetaMaskWatchAsset } from '@/hooks/useMetaMaskWatchAsset';
-import { GradientText } from '@/components/styled';
-import VideoPlayerDialog from '@/components/common/VideoPlayerDialog';
+import { useNow } from '@/hooks/useNow';
 import { NftMarketplaceButton } from '@/components/common/NftMarketplaceButton';
 
-import NFTImage from './NFTImage';
-import NFTVideo from './NFTVideo';
-import { NFTMetadata } from './NFTMetadata';
+import { DETAIL_GRID_CLASS } from './detailLayout';
+import { NFTSeed } from './NFTMetadata';
 import { NFTOwnerActions } from './NFTOwnerActions';
 import { NFTDetailSkeleton } from './NFTDetailSkeleton';
-import { NFTBreadcrumb } from './NFTBreadcrumb';
-import { HueStrip, RarityRankChip, SpectralClassBadge } from './traits';
+import { NFTIdentity } from './NFTIdentity';
+import { NFTNeighbourNav, neighbourIds } from './NFTNeighbourNav';
+import { NFTShareMenu } from './NFTShareMenu';
+import { SignatureViewer } from './SignatureViewer';
+import { isRenderPending, signatureMedia, useSignatureAlt } from './signatureArt';
 import { NftTraitPanel } from './traits/NftTraitPanel';
 
 interface NFTDetailInfo extends CSTTokenInfo {
@@ -76,69 +49,115 @@ interface NFTTraitProps {
    * so the trait panel is in the first HTML paint. Omit to load on the client.
    */
   initialMetadata?: CosmicSignatureMetadata | null;
+  /**
+   * The token record the server already read, so the art and its wall label
+   * are in the first HTML paint. It is as old as the page's last ISR
+   * regeneration, so it is refreshed right after hydration. Omit to load it
+   * on the client.
+   */
+  initialToken?: CSTTokenInfo | null;
 }
-
-const fadeUp = {
-  hidden: { opacity: 0, y: 20 },
-  visible: { opacity: 1, y: 0 },
-};
 
 /** Naming writes land before the indexer catches up, so the refetch is deferred. */
 const NAME_REFETCH_DELAY_MS = 3000;
 
-function getAllocationTypeConfig(recordType?: number) {
-  switch (recordType) {
-    case 1:
-      return {
-        labelKey: 'badges.stellarSelectionRecipient',
-        className: 'bg-accent/20 text-accent border-accent/30',
-      } as const;
-    case 2:
-      return {
-        labelKey: 'badges.anchorRecipient',
-        className: 'bg-emerald-500/20 text-emerald-400 border-emerald-500/30',
-      } as const;
-    case 3:
-      return {
-        labelKey: 'badges.cycleRecipient',
-        className: 'bg-primary/20 text-primary border-primary/30',
-      } as const;
-    case 4:
-      return {
-        labelKey: 'badges.enduranceChampion',
-        className: 'bg-amber-500/20 text-amber-400 border-amber-500/30',
-      } as const;
-    default:
-      return null;
-  }
+/**
+ * The plate's rendered width: the art column beside the 16–22rem wall label
+ * from `lg` (at most the 80rem container less the label), the full screen
+ * width below.
+ */
+const PLATE_SIZES = '(min-width: 1280px) 880px, (min-width: 1024px) 62vw, 100vw';
+
+/**
+ * Focus inside any of these owns the arrow keys: fields, every focusable
+ * control (the Still / In motion segments, buttons, links, scrollable
+ * regions), composite widgets that move their own selection, and overlays.
+ * The page walks the collection only from the page itself.
+ */
+const KEY_OWNING_SELECTOR = [
+  'input',
+  'textarea',
+  'select',
+  '[contenteditable]:not([contenteditable="false"])',
+  'button',
+  'a[href]',
+  'summary',
+  '[tabindex]:not([tabindex="-1"])',
+  '[role="button"]',
+  '[role="link"]',
+  '[role="group"]',
+  '[role="toolbar"]',
+  '[role="tablist"]',
+  '[role="radiogroup"]',
+  '[role="menu"]',
+  '[role="menubar"]',
+  '[role="listbox"]',
+  '[role="grid"]',
+  '[role="tree"]',
+  '[role="slider"]',
+  '[role="dialog"]',
+  '[role="region"]',
+].join(',');
+
+/** The animation (or anything else) fills the screen: arrows belong to it. */
+function isFullscreen(): boolean {
+  const doc = document as Document & { webkitFullscreenElement?: Element | null };
+  return Boolean(doc.fullscreenElement ?? doc.webkitFullscreenElement);
 }
 
-/** Full detail page for a Cosmic Signature NFT, showing metadata, traits, image/video, naming, transfer, and ownership history. */
-const NFTTrait = ({ tokenId, initialMetadata }: NFTTraitProps) => {
-  const t = useTranslations('detail');
-  const tCommon = useTranslations('common');
-  const tToasts = useTranslations('toasts');
-  const locale = useLocale();
-  const [openDialog, setOpenDialog] = useState(false);
-  const [openVideo, setOpenVideo] = useState(false);
-  const [imageOpen, setImageOpen] = useState(false);
-  const [videoPath, setVideoPath] = useState<string | null>(null);
-  const [address, setAddress] = useState('');
-  const [tokenName, setTokenName] = useState('');
-  const [menuOpen, setMenuOpen] = useState(false);
+/** Whether an arrow key press walks the collection. */
+function isPageLevelArrow(event: KeyboardEvent): boolean {
+  if (event.defaultPrevented || event.altKey || event.ctrlKey || event.metaKey || event.shiftKey) {
+    return false;
+  }
+  if (isFullscreen()) return false;
+  const target = event.target;
+  return !(target instanceof Element && target.closest(KEY_OWNING_SELECTOR));
+}
 
-  const { data: dashboard, isLoading: loadingDashboard } = useDashboardInfo();
-  const { data: nftRaw, isLoading: loadingNFT, refetch: refetchCSTInfo } = useCSTInfo(tokenId);
+/** A titled block below the hero. */
+function DetailSection({
+  title,
+  children,
+  testId,
+}: {
+  title: string;
+  children: ReactNode;
+  testId?: string;
+}) {
+  const headingId = useId();
+  return (
+    <section aria-labelledby={headingId} className="mt-16" data-testid={testId}>
+      <h2 id={headingId} className="mb-6 type-section text-foreground">
+        {title}
+      </h2>
+      {children}
+    </section>
+  );
+}
+
+/**
+ * The NFT detail page: the Signature on its plate with the Still / In motion
+ * viewer beside its wall label (name, number, traits, provenance ledger and
+ * actions), then the seed, the trait panel, the owner's tools, and the name
+ * and ownership histories.
+ */
+const NFTTrait = ({ tokenId, initialMetadata, initialToken }: NFTTraitProps) => {
+  const t = useTranslations('detail');
+  const tTraits = useTranslations('traits');
+  const signatureAlt = useSignatureAlt();
+  const titleId = useId();
+
+  // The count only bounds the "next" link, so it need not poll on an art page.
+  const { data: dashboard } = useDashboardInfo(undefined, { poll: false });
   const {
-    data: nameHistory = [],
-    isLoading: loadingNames,
-    refetch: refetchNameHistory,
-  } = useNameHistory(tokenId);
-  const {
-    data: transferHistoryRaw = [],
-    isLoading: loadingTransfers,
-    refetch: refetchTransferHistory,
-  } = useCTOwnershipTransfers(tokenId);
+    data: nftRaw,
+    isLoading: loadingNFT,
+    refetch: refetchCSTInfo,
+  } = useCSTInfo(tokenId, initialToken, { seedIsStale: true });
+  const { data: nameHistory = [], refetch: refetchNameHistory } = useNameHistory(tokenId);
+  const { data: transferHistoryRaw = [], refetch: refetchTransferHistory } =
+    useCTOwnershipTransfers(tokenId);
 
   const nft = (nftRaw as NFTDetailInfo | null) ?? null;
   const transferHistory = transferHistoryRaw as (CSTTransferRecord & { TransferType?: number })[];
@@ -155,29 +174,17 @@ const NFTTrait = ({ tokenId, initialMetadata }: NFTTraitProps) => {
   const { traits: collectionTraits } = useCollectionTraits();
   const rarity = collectionTraits?.rarity.byId.get(tokenId) ?? null;
 
-  const image = useMemo(() => {
-    if (!nft?.Seed) return '';
-    return getAssetsUrl(`cosmicsignature/0x${nft.Seed}.png`);
-  }, [nft]);
-
-  // Same pixels as the PNG at a fraction of the bytes; the PNG stays the
-  // fallback for tokens rendered before the WebP derivative existed.
-  const heroImage = useMemo(() => (nft?.Seed ? getWebImageUrl(nft.Seed) : ''), [nft]);
-
-  const video = useMemo(() => {
-    if (!nft?.Seed) return '';
-    return getAssetsUrl(`cosmicsignature/0x${nft.Seed}.mp4`);
-  }, [nft]);
-
-  const loading = loadingDashboard || loadingNFT || loadingNames || loadingTransfers;
+  const media = useMemo(() => signatureMedia(nft?.Seed), [nft?.Seed]);
+  // A token imprinted moments ago may not have its render published yet.
+  const nowMs = useNow(60_000);
+  const renderPending = isRenderPending(nft?.TimeStamp, nowMs);
 
   const router = useRouter();
-  const nftContract = useCosmicSignatureContract();
   const { account } = useActiveWeb3React();
-  const publicClient = usePublicClient();
-  const { setNotification } = useNotification();
-  const { ensureCorrectChain } = useRequireChain();
-  const { copy } = useClipboard();
+  // The server renders without a wallet: the owner's tools wait for
+  // hydration, so a wallet that reconnects first cannot change the first
+  // client render and make React discard the page's server HTML.
+  const hydrated = useHydrated();
   const { isMetaMaskConnected, isAddingNft, addCosmicSignatureNft } = useMetaMaskWatchAsset();
 
   const nameRefetchTimers = useRef(new Set<ReturnType<typeof setTimeout>>());
@@ -200,548 +207,140 @@ const NFTTrait = ({ tokenId, initialMetadata }: NFTTraitProps) => {
     timers.add(timerId);
   }, []);
 
-  const isOwner = account != null && account === nft?.CurOwnerAddr;
-  const totalImprints = dashboard?.MainStats?.NumCSTokenMints ?? 0;
-  const canGoPrev = tokenId > 0;
-  const canGoNext = totalImprints > 0 && tokenId < totalImprints - 1;
+  // The connected wallet, when it owns this token: the owner's tools appear.
+  const owner =
+    hydrated &&
+    account &&
+    nft?.CurOwnerAddr &&
+    sameAddress(account, nft.CurOwnerAddr) &&
+    isAddress(account)
+      ? getAddress(account)
+      : null;
+  const totalImprints = dashboard?.MainStats?.NumCSTokenMints ?? null;
+  const { previous: previousId, next: nextId } = neighbourIds(tokenId, totalImprints);
 
-  const handlePrev = useCallback(() => {
-    if (canGoPrev) router.push(`/detail/${tokenId - 1}`);
-  }, [canGoPrev, tokenId, router]);
-
-  const handleNext = useCallback(async () => {
-    if (!nftContract) return;
-    const totalSupply = await nftContract.read.totalSupply?.();
-    router.push(`/detail/${Math.min(tokenId + 1, Number(totalSupply ?? 0) - 1)}`);
-  }, [nftContract, tokenId, router]);
-
-  // Keyboard navigation
+  // The arrow keys walk the collection, as the labelled links do: no read
+  // before navigating, and never while a control or full screen owns them.
   useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.target instanceof HTMLInputElement || e.target instanceof HTMLTextAreaElement) return;
-      if (e.key === 'ArrowLeft' && canGoPrev) handlePrev();
-      if (e.key === 'ArrowRight' && canGoNext) handleNext();
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (!isPageLevelArrow(event)) return;
+      if (event.key === 'ArrowLeft' && previousId !== null) router.push(`/detail/${previousId}`);
+      if (event.key === 'ArrowRight' && nextId !== null) router.push(`/detail/${nextId}`);
     };
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [canGoPrev, canGoNext, handlePrev, handleNext]);
+  }, [previousId, nextId, router]);
 
-  const handleClickTransfer = async () => {
-    if (!isAddress(address)) {
-      setNotification({
-        text: tToasts('transfer.common.invalidRecipient'),
-        type: 'error',
-        visible: true,
-      });
-      return;
-    }
-    const { ethereum } = window as Window & {
-      ethereum?: { request: (args: { method: string; params: unknown[] }) => Promise<unknown> };
-    };
-    if (!ethereum) {
-      setNotification({
-        text: tToasts('wallet.notReady'),
-        type: 'error',
-        visible: true,
-      });
-      return;
-    }
-    try {
-      const txCount = await ethereum.request({
-        method: 'eth_getTransactionCount',
-        params: [address, 'latest'],
-      });
-      if (Number(txCount) === 0) {
-        setOpenDialog(true);
-      } else {
-        await handleTransfer();
-      }
-    } catch (err) {
-      reportError(err, 'check transfer destination');
-      setNotification({
-        text: tToasts('transfer.nft.recipientCheckFailed'),
-        type: 'error',
-        visible: true,
-      });
-    }
-  };
-
-  const handleCloseDialog = () => setOpenDialog(false);
-
-  const handlePlay = (videoUrl: string) => {
-    if (!videoUrl) return;
-    setVideoPath(videoUrl);
-    setOpenVideo(true);
-  };
-
-  const handleTransfer = async () => {
-    handleCloseDialog();
-    if (!nftContract || !account) return;
-    if (!isAddress(address)) {
-      setNotification({
-        text: tToasts('transfer.common.invalidRecipient'),
-        type: 'error',
-        visible: true,
-      });
-      return;
-    }
-    if (!(await ensureCorrectChain())) return;
-    try {
-      const hash = await nftContract.write.transferFrom?.([account, address, tokenId]);
-      assertTransactionHash(hash);
-      const receipt = await publicClient?.waitForTransactionReceipt({ hash });
-      assertSuccessfulTransactionReceipt(receipt);
-      await Promise.all([refetchCSTInfo(), refetchTransferHistory()]);
-      setAddress('');
-      setNotification({
-        text: tToasts('transfer.nft.detailTransferConfirmed'),
-        type: 'success',
-        visible: true,
-      });
-    } catch (err) {
-      if (isUserRejection(err)) {
-        setNotification({
-          text: tToasts('walletTransactionCancelled'),
-          type: 'info',
-          visible: true,
-        });
-      } else {
-        reportError(err, 'transfer Cosmic Signature NFT');
-        setNotification({
-          text: getEthErrorMessage(err, tToasts('transfer.nft.failed'), { locale }),
-          type: 'error',
-          visible: true,
-        });
-      }
-    }
-  };
-
-  const handleSetTokenName = async () => {
-    if (!nftContract) return;
-    if (!(await ensureCorrectChain())) return;
-    try {
-      const hash = await nftContract.write.setNftName?.([tokenId, tokenName]);
-      assertTransactionHash(hash);
-      const receipt = await publicClient?.waitForTransactionReceipt({ hash });
-      assertSuccessfulTransactionReceipt(receipt);
-      scheduleNameRefetch(() => {
-        void Promise.all([refetchCSTInfo(), refetchNameHistory()]);
-      });
-      setTokenName('');
-      setNotification({
-        text: tToasts('transfer.nft.nameSet'),
-        type: 'success',
-        visible: true,
-      });
-    } catch (err) {
-      if (isUserRejection(err)) {
-        setNotification({
-          visible: true,
-          type: 'info',
-          text: tToasts('walletTransactionCancelled'),
-        });
-      } else {
-        reportError(err, 'set Cosmic Signature NFT name');
-        const msg = getEthErrorMessage(err, tToasts('transfer.nft.nameSetFailed'), { locale });
-        setNotification({ visible: true, type: 'error', text: msg });
-      }
-    }
-  };
-
-  const handleClearName = async () => {
-    if (!nftContract) return;
-    if (!(await ensureCorrectChain())) return;
-    try {
-      const hash = await nftContract.write.setNftName?.([tokenId, '']);
-      assertTransactionHash(hash);
-      const receipt = await publicClient?.waitForTransactionReceipt({ hash });
-      assertSuccessfulTransactionReceipt(receipt);
-      scheduleNameRefetch(() => {
-        void Promise.all([refetchCSTInfo(), refetchNameHistory()]);
-      });
-      setTokenName('');
-      setNotification({
-        text: tToasts('transfer.nft.nameCleared'),
-        type: 'success',
-        visible: true,
-      });
-    } catch (err) {
-      if (isUserRejection(err)) {
-        setNotification({
-          visible: true,
-          type: 'info',
-          text: tToasts('walletTransactionCancelled'),
-        });
-      } else {
-        reportError(err, 'clear Cosmic Signature NFT name');
-        const msg = getEthErrorMessage(err, tToasts('transfer.nft.nameClearFailed'), { locale });
-        setNotification({ visible: true, type: 'error', text: msg });
-      }
-    }
-  };
-
-  const handleChangeName = (e: ChangeEvent<HTMLInputElement>) => {
-    const inputName = e.target.value;
-    let len = 0;
-    let i;
-    for (i = 0; i < inputName.length; i++) {
-      if (inputName.charCodeAt(i) > 255) {
-        len += 3;
-      } else {
-        len++;
-      }
-      if (len > 32) {
-        i--;
-        break;
-      }
-    }
-    setTokenName(inputName.slice(0, i));
-  };
-
-  if (loading) {
+  if (!nft && loadingNFT) {
     return <NFTDetailSkeleton />;
   }
 
-  const currentTokenName = nameHistory.length > 0 ? nameHistory[0]?.TokenName : undefined;
-  const allocationConfig = getAllocationTypeConfig(nft?.RecordType);
-  const anchoringEligible = !nft?.Staked && !nft?.WasUnstaked;
+  // The name history is newest first; before it loads, the token record's name.
+  const currentName =
+    (nameHistory.length > 0 ? nameHistory[0]?.TokenName : nft?.TokenName)?.trim() || null;
+  const id = formatId(tokenId);
+  const subject = currentName ?? tTraits('quickView.title', { id });
+  const alt = signatureAlt({ id, name: currentName, entry: traitEntry });
 
   return (
-    <div className="container mx-auto px-4">
-      {/* Breadcrumb */}
-      <motion.div
-        initial="hidden"
-        animate="visible"
-        variants={fadeUp}
-        transition={{ duration: 0.4 }}
-        className="print-motion-visible pb-6"
-      >
-        <NFTBreadcrumb tokenId={tokenId} tokenName={currentTokenName} />
-      </motion.div>
-
-      {/* Hero: Image + Token Identity */}
-      <motion.section
-        initial="hidden"
-        animate="visible"
-        variants={fadeUp}
-        transition={{ duration: 0.5, delay: 0.1 }}
-        className="print-motion-visible"
-        data-testid="hero-section"
-      >
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-10">
-          {/* Image column */}
-          <div>
-            <div
-              className="gradient-border-card rounded-xl overflow-hidden cursor-pointer transition-shadow duration-300 hover:shadow-[0_0_40px_hsl(var(--primary)/0.15)]"
-              onClick={() => setImageOpen(true)}
-              data-testid="nft-image-container"
-            >
-              <NFTImage
-                src={heroImage || image}
-                fallbackSrc={heroImage ? image : undefined}
-                terminalFallbackSrc={null}
-                alt={t('image.defaultAlt')}
-                priority
-              />
-              <HueStrip
-                hues={traitEntry?.hues}
-                size="sm"
-                className="absolute inset-x-0 bottom-0 rounded-none"
-              />
-              <div className="absolute top-3 left-3">
-                <Badge className="bg-black/50 backdrop-blur-sm text-white border-white/20 text-xs font-mono">
-                  {formatId(tokenId)}
-                </Badge>
-              </div>
-              <div className="absolute top-3 right-3 opacity-0 group-hover:opacity-100 transition-opacity">
-                <Expand className="h-5 w-5 text-white/70" />
-              </div>
-            </div>
-
-            {/* Actions bar below image */}
-            {/* Wraps on phones: share, marketplace and the prev/next pair do
-                not fit one 320px row once each control reaches its 44px touch
-                target, and without wrapping the marketplace label spills out
-                of its own button. */}
-            <div className="mt-4 flex items-center gap-3 max-sm:flex-wrap">
-              <DropdownMenu open={menuOpen} onOpenChange={setMenuOpen}>
-                <DropdownMenuTrigger asChild>
-                  <Button variant="outline" size="sm" className="text-xs">
-                    {t('share.trigger')}
-                    {menuOpen ? (
-                      <ChevronUp className="ml-1 h-3.5 w-3.5" />
-                    ) : (
-                      <ChevronDown className="ml-1 h-3.5 w-3.5" />
-                    )}
-                  </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="start">
-                  <DropdownMenuItem
-                    onClick={() => {
-                      copy(getOriginUrl(video));
-                      setMenuOpen(false);
-                    }}
-                  >
-                    {t('share.copyVideoLink')}
-                  </DropdownMenuItem>
-                  <DropdownMenuItem
-                    onClick={() => {
-                      copy(getOriginUrl(image));
-                      setMenuOpen(false);
-                    }}
-                  >
-                    {t('share.copyImageLink')}
-                  </DropdownMenuItem>
-                  <DropdownMenuItem
-                    onClick={() => {
-                      copy(window.location.href);
-                      setMenuOpen(false);
-                    }}
-                  >
-                    {t('share.copyPageLink')}
-                  </DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
-
-              <NftMarketplaceButton variant="card" label={t('actions.buyOrSellNfts')} />
-
-              <div className="flex gap-2 ml-auto">
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={handlePrev}
-                  disabled={!canGoPrev}
-                  aria-label={t('navigation.previousToken')}
-                  // Icon-only, so `px-3` alone leaves it ~42px wide.
-                  className="max-sm:min-w-11"
-                >
-                  <ArrowLeft className="h-4 w-4" />
-                </Button>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={handleNext}
-                  disabled={!canGoNext}
-                  aria-label={t('navigation.nextToken')}
-                  className="max-sm:min-w-11"
-                >
-                  <ArrowRight className="h-4 w-4" />
-                </Button>
-              </div>
-            </div>
-          </div>
-
-          {/* Token Identity column */}
-          <div className="flex flex-col gap-4 pt-2" data-testid="token-identity">
-            {/* Token name */}
-            {currentTokenName ? (
-              <h1 className="text-3xl md:text-4xl font-bold font-display tracking-tight">
-                <GradientText>{currentTokenName}</GradientText>
-              </h1>
-            ) : (
-              <h1 className="text-3xl md:text-4xl font-bold font-display tracking-tight text-muted-foreground/50">
-                {t('hero.unnamedToken')}
-              </h1>
-            )}
-
-            {/* Badges row */}
-            <div className="flex flex-wrap items-center gap-2" data-testid="token-badges">
-              <Badge variant="outline" className="font-mono text-xs">
-                {formatId(tokenId)}
-              </Badge>
-
-              {allocationConfig && (
-                <Badge className={`border text-xs ${allocationConfig.className}`}>
-                  {t(allocationConfig.labelKey)}
-                  <InfoTooltip
-                    content={
-                      nft?.RecordType === 3
-                        ? t('badges.receivedAsCycleRecipient', { round: String(nft?.RoundNum) })
-                        : t('badges.receivedAs', { label: t(allocationConfig.labelKey) })
-                    }
-                    iconClassName="h-3 w-3 ml-1"
-                  />
-                </Badge>
-              )}
-
-              {anchoringEligible ? (
-                <Badge className="bg-emerald-500/15 text-emerald-400 border border-emerald-500/30 text-xs">
-                  {t('badges.eligibleForAnchoring')}
-                  <InfoTooltip
-                    content={t('badges.eligibleForAnchoringTooltip')}
-                    iconClassName="h-3 w-3 ml-1"
-                  />
-                </Badge>
-              ) : (
-                <Badge className="bg-red-500/15 text-red-400 border border-red-500/30 text-xs">
-                  {t('badges.alreadyAnchored')}
-                  <InfoTooltip
-                    content={t('badges.alreadyAnchoredTooltip')}
-                    iconClassName="h-3 w-3 ml-1"
-                  />
-                </Badge>
-              )}
-            </div>
-
-            {traitEntry?.hasArtTraits ? (
-              <div className="flex flex-wrap items-center gap-2" data-testid="token-trait-badges">
-                <SpectralClassBadge value={traitEntry.spectralClass} size="md" withLabel />
-                <RarityRankChip
-                  rarity={rarity}
-                  total={collectionTraits?.rarity.total ?? 0}
-                  size="md"
-                  verbose
-                />
-              </div>
-            ) : null}
-
-            {/* Round link */}
-            {nft?.RoundNum != null && (
-              <div className="mt-1">
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => router.push(`/allocation/${nft.RoundNum ?? 0}`)}
-                  className="text-xs"
-                >
-                  <Trophy className="h-3.5 w-3.5 mr-1.5" />
-                  {t('actions.viewCycleDetails', { round: nft.RoundNum })}
-                </Button>
-              </div>
-            )}
-          </div>
-        </div>
-      </motion.section>
-
-      {/* Metadata Stat Cards */}
-      <motion.section
-        initial="hidden"
-        animate="visible"
-        variants={fadeUp}
-        transition={{ duration: 0.5, delay: 0.25 }}
-        className="print-motion-visible mt-12"
-        data-testid="metadata-section"
-      >
-        <NFTMetadata nft={nft} />
-      </motion.section>
-
-      {/* Traits: composition, orbital physics, provenance, media */}
-      <motion.section
-        initial="hidden"
-        animate="visible"
-        variants={fadeUp}
-        transition={{ duration: 0.5, delay: 0.3 }}
-        className="print-motion-visible mt-12"
-        data-testid="traits-section"
-      >
-        <NftTraitPanel
-          tokenId={tokenId}
-          metadata={metadata}
-          entry={traitEntry}
-          isError={metadataError}
-          onRetry={() => void refetchMetadata()}
-          collectionTraits={collectionTraits}
+    <div className="site-container">
+      <section aria-labelledby={titleId} className={DETAIL_GRID_CLASS} data-testid="hero-section">
+        <SignatureViewer
+          media={media}
+          alt={alt}
+          subject={subject}
+          tokenLabel={id}
+          unavailableLabel={renderPending ? t('image.rendering') : t('image.artworkUnavailable')}
+          renderPending={renderPending}
+          sizes={PLATE_SIZES}
+          // Never taller than the screen leaves room for; full-bleed on phones.
+          // Beside a taller column (the owner's tools open) the plate stays in
+          // view while the tools scroll, instead of leaving a band of ground.
+          className="mx-auto w-full max-w-[max(20rem,calc((100svh_-_var(--header-height)_-_11rem)_*_var(--art-ratio)))] max-sm:-mx-[var(--gutter)] max-sm:w-auto max-sm:max-w-none lg:sticky lg:top-[var(--sticky-offset)]"
+          plateClassName="max-sm:rounded-none"
+          controlsClassName="max-sm:px-[var(--gutter)]"
         />
-      </motion.section>
 
-      {/* Video Preview */}
-      {video ? (
-        <motion.section
-          initial="hidden"
-          animate="visible"
-          variants={fadeUp}
-          transition={{ duration: 0.5, delay: 0.35 }}
-          className="print-motion-visible mt-12"
-        >
-          <NFTVideo image_thumb={image} onClick={() => handlePlay(video)} />
-        </motion.section>
-      ) : null}
-
-      {/* Owner Actions */}
-      {isOwner && (
-        <motion.section
-          initial="hidden"
-          animate="visible"
-          variants={fadeUp}
-          transition={{ duration: 0.5, delay: 0.45 }}
-          className="print-motion-visible mt-12"
-        >
-          <NFTOwnerActions
-            address={address}
-            tokenName={tokenName}
-            nftTokenName={nft?.TokenName ?? ''}
-            nameHistoryCount={nameHistory.length}
-            currentName={nameHistory[0]?.TokenName ?? ''}
-            totalNamedTokens={dashboard?.MainStats.TotalNamedTokens ?? 0}
-            disabled={!address || address === account}
-            showMetaMaskAction={isMetaMaskConnected}
-            addingToMetaMask={isAddingNft}
-            onAddressChange={setAddress}
-            onTokenNameChange={handleChangeName}
-            onAddToMetaMask={() => void addCosmicSignatureNft(tokenId)}
-            onTransfer={handleClickTransfer}
-            onSetName={handleSetTokenName}
-            onClearName={handleClearName}
+        {/* The wall label, and for the owner their tools, beside the plate. */}
+        <div className="flex min-w-0 flex-col gap-8 lg:sticky lg:top-[var(--sticky-offset)]">
+          <NFTIdentity
+            tokenId={tokenId}
+            name={currentName}
+            titleId={titleId}
+            nft={nft}
+            entry={traitEntry}
+            rarity={rarity}
+            rarityTotal={collectionTraits?.rarity.total ?? 0}
+            actions={
+              <>
+                <NFTShareMenu imageUrl={media?.sourceImage} videoUrl={media?.video} />
+                <NftMarketplaceButton size="sm" />
+              </>
+            }
           />
-        </motion.section>
-      )}
+          {/*
+           * The walk through the collection closes the wall label, so on a
+           * phone nothing stands between the art and its title.
+           */}
+          <NFTNeighbourNav tokenId={tokenId} total={totalImprints} className="-mt-4 sm:w-full" />
+          {owner ? (
+            <NFTOwnerActions
+              tokenId={tokenId}
+              owner={owner}
+              currentName={currentName ?? ''}
+              totalNamedTokens={dashboard?.MainStats?.TotalNamedTokens ?? null}
+              // The anchoring rule: not anchored now, and never released.
+              anchoringEligible={isAnchorable(nft)}
+              onAnchored={() =>
+                // The indexer records the anchor a moment after the receipt.
+                scheduleNameRefetch(() => {
+                  void refetchCSTInfo();
+                })
+              }
+              showMetaMaskAction={isMetaMaskConnected}
+              addingToMetaMask={isAddingNft}
+              onAddToMetaMask={() => void addCosmicSignatureNft(tokenId)}
+              onTransferred={() => Promise.all([refetchCSTInfo(), refetchTransferHistory()])}
+              onRenamed={() =>
+                scheduleNameRefetch(() => {
+                  void Promise.all([refetchCSTInfo(), refetchNameHistory()]);
+                })
+              }
+            />
+          ) : null}
+        </div>
+      </section>
 
-      {/* Name History */}
-      {nameHistory.length > 0 && (
-        <motion.section
-          initial="hidden"
-          animate="visible"
-          variants={fadeUp}
-          transition={{ duration: 0.5, delay: 0.5 }}
-          className="print-motion-visible mt-12"
-        >
-          <SectionDivider title={t('sections.nameHistory')} className="mb-6" />
-          <NameHistoryTable list={nameHistory} />
-        </motion.section>
-      )}
+      {/* Under the art, on its track: the traits and the seed they all
+          derive from (verification data first), then the histories, their
+          edges on the plate's edges. */}
+      <div className={cn(DETAIL_GRID_CLASS, 'mt-16')}>
+        <div className="min-w-0">
+          <section data-testid="traits-section">
+            <NftTraitPanel
+              tokenId={tokenId}
+              metadata={metadata}
+              entry={traitEntry}
+              isError={metadataError}
+              onRetry={() => void refetchMetadata()}
+              collectionTraits={collectionTraits}
+              lead={<NFTSeed seed={nft?.Seed} headingLevel={3} />}
+            />
+          </section>
 
-      {/* Transfer History */}
-      {transferHistory.length > 0 && !transferHistory[0]?.TransferType && (
-        <motion.section
-          initial="hidden"
-          animate="visible"
-          variants={fadeUp}
-          transition={{ duration: 0.5, delay: 0.55 }}
-          className="print-motion-visible mt-12"
-        >
-          <SectionDivider title={t('sections.ownershipHistory')} className="mb-6" />
-          <TransferHistoryTable list={transferHistory} />
-        </motion.section>
-      )}
+          {nameHistory.length > 0 && (
+            <DetailSection title={t('sections.nameHistory')}>
+              <NameHistoryTable list={nameHistory} timeZoneNote={false} />
+            </DetailSection>
+          )}
 
-      {/* Lightbox & Video Dialog */}
-      {image ? (
-        <Lightbox open={imageOpen} close={() => setImageOpen(false)} slides={[{ src: image }]} />
-      ) : null}
-      <VideoPlayerDialog
-        open={openVideo}
-        videoPath={videoPath}
-        onClose={() => {
-          setOpenVideo(false);
-          setVideoPath(null);
-        }}
-      />
-
-      {/* Transfer confirmation dialog */}
-      <Dialog open={openDialog} onOpenChange={(open) => !open && handleCloseDialog()}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>{t('transferDialog.title')}</DialogTitle>
-            <DialogDescription>{t('transferDialog.description')}</DialogDescription>
-          </DialogHeader>
-          <DialogFooter>
-            <Button onClick={handleTransfer}>{t('transferDialog.confirm')}</Button>
-            <Button variant="outline" onClick={handleCloseDialog}>
-              {tCommon('actions.cancel')}
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+          {transferHistory.length > 0 && !transferHistory[0]?.TransferType && (
+            <DetailSection title={t('sections.ownershipHistory')}>
+              <TransferHistoryTable list={transferHistory} timeZoneNote={false} />
+            </DetailSection>
+          )}
+        </div>
+      </div>
     </div>
   );
 };

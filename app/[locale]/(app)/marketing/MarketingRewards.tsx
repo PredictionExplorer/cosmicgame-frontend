@@ -1,64 +1,41 @@
 'use client';
 
-import type { ReactNode } from 'react';
-import { useMemo } from 'react';
 import { useTranslations } from 'next-intl';
 
-import { PageShell } from '@/components/ui/page-shell';
-import { Spinner } from '@/components/ui/spinner';
 import { useMarketingRewards } from '@/hooks/useApiQuery';
-import { useDashboardInfo } from '@/hooks/useApiQuery';
+import type { LedgerStateProps } from '@/components/tables/ledger-props';
 import type { MarketingReward } from '@/services/api/types';
-import { MarketingHero } from '@/components/marketing/MarketingHero';
-import { MarketingStats } from '@/components/marketing/MarketingStats';
-import { HowItWorks } from '@/components/marketing/HowItWorks';
 import { TopMarketersLeaderboard } from '@/components/marketing/TopMarketersLeaderboard';
 import { RewardsHistorySection } from '@/components/marketing/RewardsHistorySection';
-import { MarketingCTA } from '@/components/marketing/MarketingCTA';
 
-const MarketingRewards = ({ seoSummary }: { seoSummary?: ReactNode }) => {
+const NO_REWARDS: MarketingReward[] = [];
+
+/**
+ * The outreach page's two ledgers, from one read of every allocation: the
+ * top contributors and the full history. Both hold their places with
+ * placeholder rows while the read is in flight; a failed read is reported
+ * once, by the history, with a retry. The page's figures are in the
+ * server-rendered header.
+ */
+export default function MarketingRewards() {
   const t = useTranslations('marketing');
-  const { data: marketingRewards = [], isLoading: rewardsLoading } = useMarketingRewards();
-  const { data: dashboard, isLoading: dashboardLoading } = useDashboardInfo();
+  const { data, isLoading, isError, refetch } = useMarketingRewards();
+  const rewards = data ?? NO_REWARDS;
 
-  const loading = rewardsLoading || dashboardLoading;
+  const state: LedgerStateProps = {
+    loading: isLoading,
+    error: isError ? t('loadError') : undefined,
+    onRetry: () => void refetch(),
+  };
 
-  const rewards = useMemo(() => (marketingRewards ?? []) as MarketingReward[], [marketingRewards]);
-
-  const activeMarketers = useMemo(() => {
-    const unique = new Set(rewards.map((r) => r.MarketerAddr));
-    return unique.size;
-  }, [rewards]);
-
-  const totalRewardsEth = dashboard?.MainStats?.TotalMktRewardsEth ?? 0;
-  const rewardTransactions = dashboard?.MainStats?.NumMktRewards ?? 0;
-
-  if (loading) {
-    return (
-      <PageShell variant="data" backdrop="signature">
-        {seoSummary}
-        <div className="flex justify-center py-16" role="status" aria-label={t('loadingAria')}>
-          <Spinner />
-        </div>
-      </PageShell>
-    );
-  }
+  // With no allocations yet, or none readable, the history's empty or error
+  // state says so once; the ranking above it would only repeat it.
+  const showRanking = isLoading || rewards.length > 0;
 
   return (
-    <PageShell variant="data" backdrop="signature">
-      {seoSummary}
-      <MarketingHero compact={Boolean(seoSummary)} />
-      <MarketingStats
-        totalRewardsEth={totalRewardsEth}
-        activeMarketers={activeMarketers}
-        rewardTransactions={rewardTransactions}
-      />
-      <HowItWorks />
-      <TopMarketersLeaderboard rewards={rewards} />
-      <RewardsHistorySection rewards={rewards} />
-      <MarketingCTA />
-    </PageShell>
+    <>
+      {showRanking && <TopMarketersLeaderboard rewards={rewards} {...state} />}
+      <RewardsHistorySection rewards={rewards} {...state} />
+    </>
   );
-};
-
-export default MarketingRewards;
+}

@@ -26,7 +26,9 @@ jest.mock('next/link', () => ({
 
 jest.mock('../../../../../../components/tables/UniqueParticipantsTable', () => ({
   UniqueParticipantsTable: ({ list }: { list: { BidderAddr: string }[] }) => (
-    <div data-testid="unique-participants-table">{list.length} rows</div>
+    <div data-testid="unique-participants-table">
+      {list.length} rows: {list.map((row) => row.BidderAddr).join(' ')}
+    </div>
   ),
 }));
 jest.mock('../../../../../../components/tables/UniqueRecipientsTable', () => ({
@@ -42,6 +44,7 @@ function okQuery<T>(data: T) {
 
 beforeEach(() => {
   jest.clearAllMocks();
+  // Two contributors, as the header counts them; the lists below agree unless a test says not.
   mockUseDashboardInfo.mockReturnValue(okQuery(createDashboardInfo()));
   mockUseUniqueParticipants.mockReturnValue(
     okQuery([
@@ -54,26 +57,19 @@ beforeEach(() => {
 });
 
 describe('ParticipationPanel', () => {
-  it('renders the participation stat cards from dashboard data', () => {
+  it('renders the three ledgers under H2 sections, leaving the counts to the header', () => {
     render(<ParticipationPanel />);
-    // Labels appear both as stat-card labels and section titles.
-    expect(screen.getAllByText('Unique Participants').length).toBeGreaterThanOrEqual(1);
-    expect(screen.getByText('29')).toBeInTheDocument();
-    expect(screen.getAllByText('Unique Recipients').length).toBeGreaterThanOrEqual(1);
-    // Anchor-holders card sums CST + RWLK unique anchor-holders (7 + 3).
-    expect(screen.getByText('10')).toBeInTheDocument();
+    expect(
+      screen.getAllByRole('heading', { level: 2 }).map((heading) => heading.textContent),
+    ).toEqual(['Unique participants', 'Unique recipients', 'Unique ETH contributors']);
+    expect(document.querySelector('.stat-card-value')).not.toBeInTheDocument();
   });
 
   it('sorts participants by gesture count before rendering the table', () => {
     render(<ParticipationPanel />);
-    expect(screen.getByTestId('unique-participants-table')).toHaveTextContent('2 rows');
-    const passedList = mockUseUniqueParticipants.mock.results;
-    expect(passedList).toBeTruthy();
-  });
-
-  it('requests the dashboard without polling', () => {
-    render(<ParticipationPanel />);
-    expect(mockUseDashboardInfo).toHaveBeenCalledWith(undefined, { poll: false });
+    expect(screen.getByTestId('unique-participants-table')).toHaveTextContent(
+      '2 rows: 0xbbb 0xaaa',
+    );
   });
 
   it('shows a skeleton while a table query loads', () => {
@@ -84,7 +80,8 @@ describe('ParticipationPanel', () => {
       refetch: jest.fn(),
     });
     render(<ParticipationPanel />);
-    expect(screen.getAllByTestId('stats-section-skeleton').length).toBeGreaterThan(0);
+    const section = screen.getByRole('heading', { name: 'Unique participants' }).closest('section');
+    expect(section).toHaveAttribute('aria-busy', 'true');
     expect(screen.queryByTestId('unique-participants-table')).not.toBeInTheDocument();
   });
 
@@ -98,16 +95,46 @@ describe('ParticipationPanel', () => {
       refetch,
     });
     render(<ParticipationPanel />);
-    expect(screen.getByText(/failed to load unique recipients/i)).toBeInTheDocument();
+    expect(screen.getByText('This section did not load')).toBeInTheDocument();
 
     await user.click(screen.getByRole('button', { name: /try again/i }));
     expect(refetch).toHaveBeenCalled();
   });
 
   it('shows empty states when lists are empty', () => {
+    mockUseDashboardInfo.mockReturnValue(
+      okQuery(
+        createDashboardInfo({
+          MainStats: { ...createDashboardInfo().MainStats, NumUniqueDonors: 0 },
+        }),
+      ),
+    );
     mockUseUniqueDonors.mockReturnValue(okQuery([]));
     render(<ParticipationPanel />);
     expect(screen.getByText('No ETH contributions yet')).toBeInTheDocument();
+  });
+
+  it('reads an empty list the header counts rows for as one that did not load', async () => {
+    // Regression: "No participants yet" under "Unique participants 4" turned a failed list
+    // read into a claim about the protocol.
+    const user = userEvent.setup();
+    const refetch = jest.fn();
+    mockUseUniqueDonors.mockReturnValue({ ...okQuery([]), refetch });
+    render(<ParticipationPanel />);
+    expect(screen.queryByText('No ETH contributions yet')).not.toBeInTheDocument();
+    expect(screen.getByText('This list did not load')).toBeInTheDocument();
+    await user.click(screen.getByRole('button', { name: /try again/i }));
+    expect(refetch).toHaveBeenCalled();
+  });
+
+  it('sizes a loading list to the rows the header counts', () => {
+    mockUseUniqueDonors.mockReturnValue({ ...okQuery(undefined), isLoading: true });
+    render(<ParticipationPanel />);
+    const section = screen
+      .getByRole('heading', { name: 'Unique ETH contributors' })
+      .closest('section')!;
+    // Two contributors: two skeleton rows (from sm), not the default five.
+    expect(section.querySelectorAll('.min-h-\\[var\\(--row-h\\)\\]')).toHaveLength(2);
   });
 
   it('has no accessibility violations', async () => {

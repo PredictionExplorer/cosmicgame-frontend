@@ -1,11 +1,21 @@
 import { readFileSync, readdirSync } from 'fs';
 import { join } from 'path';
 
+import { getAboutContent } from '@/content/about';
 import { getAllFaqItems, getFaqContent } from '@/content/faq';
+import { getHowItWorksContent } from '@/content/how-it-works';
 import { getLandingContent } from '@/content/landing';
 import { getLearnContent } from '@/content/learn';
+import {
+  getAuditsCopy,
+  getPrivacyCopy,
+  getRiskCopy,
+  getSecurityCopy,
+  getTermsCopy,
+} from '@/content/legal';
 import { protocolFacts } from '@/content/protocol-facts';
 import { getQuizContent } from '@/content/quiz';
+import { getWhitePaperContent } from '@/content/white-paper';
 import { DURATION_NOUNS, type DurationNouns } from '@/test-utils/locale-expectations';
 
 import { getLocaleConfig } from '@/i18n/localeConfig';
@@ -41,6 +51,9 @@ interface CopySource {
 const readPublicFile = (fileName: string) =>
   readFileSync(join(process.cwd(), 'public', fileName), 'utf8');
 
+/** The root layout's fallback description (app/root-metadata.ts), which no catalog holds. */
+const readRootMetadata = () => readFileSync(join(process.cwd(), 'app', 'root-metadata.ts'), 'utf8');
+
 /** Concatenated message catalogs for a locale (messages/<locale>/*.json). */
 const readMessageCatalogs = (locale: string) => {
   const dir = join(process.cwd(), 'messages', locale);
@@ -60,9 +73,25 @@ const sources: CopySource[] = [
         .join('\n'),
     },
     { name: `landing-${locale}`, locale, text: JSON.stringify(getLandingContent(locale)) },
+    {
+      name: `how-it-works-${locale}`,
+      locale,
+      text: JSON.stringify(getHowItWorksContent(locale)),
+    },
     { name: `learn-${locale}`, locale, text: JSON.stringify(getLearnContent(locale).articles) },
     { name: `quiz-${locale}`, locale, text: JSON.stringify(getQuizContent(locale)) },
     { name: `messages-${locale}`, locale, text: readMessageCatalogs(locale) },
+    // The Trust Center documents state protocol figures too (the Terms'
+    // allocation tracks, the risk disclosures' hours and weeks).
+    { name: `terms-${locale}`, locale, text: JSON.stringify(getTermsCopy(locale)) },
+    { name: `risk-${locale}`, locale, text: JSON.stringify(getRiskCopy(locale)) },
+    { name: `privacy-${locale}`, locale, text: JSON.stringify(getPrivacyCopy(locale)) },
+    { name: `audits-${locale}`, locale, text: JSON.stringify(getAuditsCopy(locale)) },
+    { name: `security-${locale}`, locale, text: JSON.stringify(getSecurityCopy(locale)) },
+    // The white paper states more percentages, durations and CST amounts than
+    // any other page, and About carries the Public Goods template.
+    { name: `white-paper-${locale}`, locale, text: JSON.stringify(getWhitePaperContent(locale)) },
+    { name: `about-${locale}`, locale, text: JSON.stringify(getAboutContent(locale)) },
   ]),
   { name: 'llms.txt', text: readPublicFile('llms.txt') },
   { name: 'llms-full.txt', text: readPublicFile('llms-full.txt') },
@@ -301,6 +330,18 @@ describe('copy numeric claims stay pinned to protocolFacts', () => {
       'CST amount',
     );
   });
+
+  // No protocol fact counts the allocation tracks, and the landing lists
+  // nine: "more than ten" (in any language) contradicted it on six surfaces
+  // (V169). A count of tracks must come from protocolFacts, never prose.
+  const unsourcedTrackCount =
+    /more than (?:ten|10)\b[^.]{0,40}tracks|十[余餘多]条|十[余餘多]條|понад десят|10개가 넘|10を超える(?:配分)?トラック|hơn (?:mười|10) luồng/i;
+  it.each([...sources, { name: 'root-metadata', text: readRootMetadata() }])(
+    '$name: claims no count of allocation tracks the protocol facts do not state',
+    (source) => {
+      expect(source.text).not.toMatch(unsourcedTrackCount);
+    },
+  );
 
   it('the key deployed percentages are actually present in the public docs', () => {
     // Guards against accidental deletion: llms.txt must keep quoting the

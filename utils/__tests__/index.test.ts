@@ -1,66 +1,27 @@
 import {
-  shortenHex,
-  parseBalance,
+  formatAddress,
   formatId,
-  convertTimestampToDateTime,
   formatSeconds,
-  formatEthValue,
-  formatCSTValue,
-  isWalletAddress,
   getExplorerUrl,
   getAssetsUrl,
   getRWLKImageUrl,
   getEnduranceChampions,
 } from '@/utils/index';
 
-describe('shortenHex', () => {
-  it('shortens a standard Ethereum address', () => {
+describe('formatAddress through the utils entry', () => {
+  it('shortens a standard Ethereum address to the checksummed 0x + 4 … 4 form', () => {
     const addr = '0x1234567890abcdef1234567890abcdef12345678';
-    expect(shortenHex(addr, 4)).toBe('0x1234....5678');
+    expect(formatAddress(addr)).toBe('0x1234…\u20605678');
   });
 
-  it('shortens with custom length', () => {
-    const addr = '0x1234567890abcdef1234567890abcdef12345678';
-    expect(shortenHex(addr, 6)).toBe('0x123456....345678');
+  it('returns an empty string for empty input', () => {
+    expect(formatAddress('')).toBe('');
+    expect(formatAddress(null)).toBe('');
+    expect(formatAddress(undefined)).toBe('');
   });
 
-  it('returns empty string for falsy input', () => {
-    expect(shortenHex('', 4)).toBe('');
-  });
-
-  it('returns empty string for null-like inputs', () => {
-    expect(shortenHex(null as unknown as string, 4)).toBe('');
-    expect(shortenHex(undefined as unknown as string, 4)).toBe('');
-  });
-
-  it('handles very short strings', () => {
-    const short = '0x12';
-    const result = shortenHex(short, 4);
-    expect(result).toContain('0x');
-    expect(result).toContain('....');
-  });
-});
-
-describe('parseBalance', () => {
-  it('formats a balance with default 18 decimals', () => {
-    const result = parseBalance('1000000000000000000', 18, 2);
-    expect(result).toBe('1.00');
-  });
-
-  it('formats a zero balance', () => {
-    const result = parseBalance('0', 18, 4);
-    expect(result).toBe('0.0000');
-  });
-
-  it('handles different decimal values', () => {
-    expect(parseBalance('1000000', 6, 2)).toBe('1.00');
-    expect(parseBalance('1000000000000', 12, 2)).toBe('1.00');
-    expect(parseBalance('1234567890123456789', 18, 4)).toBe('1.2346');
-  });
-
-  it('handles bigint input', () => {
-    const result = parseBalance(BigInt('1000000000000000000'), 18, 2);
-    expect(result).toBe('1.00');
+  it('returns strings too short to shorten unchanged', () => {
+    expect(formatAddress('0x12')).toBe('0x12');
   });
 });
 
@@ -71,21 +32,6 @@ describe('formatId', () => {
 
   it('pads larger numbers', () => {
     expect(formatId(123456)).toBe('#123456');
-  });
-});
-
-describe('convertTimestampToDateTime', () => {
-  it('converts a Unix timestamp to a date string', () => {
-    // 1609459200 = 2021-01-01 00:00 UTC; output varies by timezone (e.g. Jan 01 or Dec 31)
-    const result = convertTimestampToDateTime(1609459200);
-    expect(result).toMatch(/^[A-Za-z]{3} \d{2}, \d{2}:\d{2}$/);
-  });
-
-  it('includes seconds when flag is set', () => {
-    const withSeconds = convertTimestampToDateTime(1609459200, true);
-    const without = convertTimestampToDateTime(1609459200, false);
-    expect(withSeconds).toMatch(/^[A-Za-z]{3} \d{2}, \d{2}:\d{2}:\d{2}$/);
-    expect(without).toMatch(/^[A-Za-z]{3} \d{2}, \d{2}:\d{2}$/);
   });
 });
 
@@ -104,59 +50,6 @@ describe('formatSeconds', () => {
 
   it('returns space for negative values', () => {
     expect(formatSeconds(-1).trim()).toBe('');
-  });
-});
-
-describe('formatEthValue', () => {
-  it('formats a number as ETH with decimals', () => {
-    const result = formatEthValue(1.23456789);
-    expect(result).toContain('1.2346');
-    expect(result).toContain('ETH');
-  });
-
-  it('returns 0 ETH for zero input', () => {
-    expect(formatEthValue(0)).toBe('0 ETH');
-  });
-
-  it('uses 2 decimals for large values', () => {
-    const result = formatEthValue(100.123);
-    expect(result).toBe('100.12 ETH');
-  });
-});
-
-describe('formatCSTValue', () => {
-  it('formats small values with 4 decimals', () => {
-    expect(formatCSTValue(5)).toBe('5.0000 CST');
-  });
-
-  it('formats larger values with 2 decimals', () => {
-    expect(formatCSTValue(15)).toBe('15.00 CST');
-  });
-
-  it('formats zero', () => {
-    expect(formatCSTValue(0)).toBe('0 CST');
-  });
-});
-
-describe('isWalletAddress', () => {
-  it('returns wallet name for known addresses', () => {
-    const result = isWalletAddress('0x0000000000000000000000000000000000000000');
-    expect(typeof result).toBe('string');
-  });
-
-  it('returns empty string for unknown addresses', () => {
-    const result = isWalletAddress('0x1111111111111111111111111111111111111111');
-    expect(result).toBe('');
-  });
-
-  it('returns empty string for a random non-wallet address', () => {
-    const result = isWalletAddress('0xabcdef1234567890abcdef1234567890abcdef12');
-    expect(result).toBe('');
-  });
-
-  it('returns empty string for address 0x1234567890abcdef1234567890abcdef12345678', () => {
-    const result = isWalletAddress('0x1234567890abcdef1234567890abcdef12345678');
-    expect(result).toBe('');
   });
 });
 

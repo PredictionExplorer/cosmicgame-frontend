@@ -72,6 +72,7 @@ needs. The idiom 一筆を入れる ("to put in a stroke") is the verb.
 | Gesture Cost                       | 一筆の費用               |
 | Final Gesture                      | 最後の一筆               |
 | Last Gesture (most recent)         | 最新の一筆               |
+| Your cycle standing (personal)     | このサイクルでの位置     |
 | gesture count / Number of Gestures | 筆数                     |
 | Total Gestures                     | 一筆の総数               |
 | Live gestures                      | 直近の一筆               |
@@ -227,12 +228,12 @@ something lost), never 請求 (a bill or a legal claim).
 **刻印** (engraving, imprinting a mark) — the artwork is inscribed into the chain. Never
 ミント / 鋳造 (banned), never 発行 (issuance — paperwork register), never インプリント.
 
-| English                | 日本語               |
-| ---------------------- | -------------------- |
-| Imprint (verb)         | 刻印する             |
-| Imprinted at           | 刻印日時             |
-| Imprint RandomWalk NFT | RandomWalk NFTの刻印 |
-| premine                | 事前刻印             |
+| English                 | 日本語                |
+| ----------------------- | --------------------- |
+| Imprint (verb)          | 刻印する              |
+| Imprinted at            | 刻印日時              |
+| Imprint Random Walk NFT | Random Walk NFTの刻印 |
+| premine                 | 事前刻印              |
 
 ### Endurance Champion → 持久チャンピオン; Chrono-Warrior → 時の戦士
 
@@ -265,6 +266,7 @@ never 寄付 / 寄附 / 募金 (banned). The vault is the **公共財金庫**.
 | ----------------------------------- | ---------------------- |
 | Public Goods                        | 公共財                 |
 | Public Goods Vault                  | 公共財金庫             |
+| Public Goods Beneficiary            | 公共財の受け手         |
 | Protocol Public Goods contributions | プロトコルの公共財拠出 |
 | voluntary contributions             | 自発的な公共財拠出     |
 
@@ -307,7 +309,7 @@ Interface vocabulary — no coinage needed, but fixed for consistency:
 | Gallery                              | ギャラリー                                      | never 画廊                                              |
 | How It Works                         | 仕組み                                          | never 使い方 (a help page)                              |
 | FAQ / Clarifications                 | よくある質問                                    | nav and page heading alike                              |
-| Learn Hub                            | 学習ハブ                                        |                                                         |
+| Learn (was Learn Hub)                | 学ぶ                                            |                                                         |
 | About                                | Cosmic Signatureについて                        | short form in nav: 概要                                 |
 | Statistics                           | 統計                                            |                                                         |
 | My Statistics / My Tokens            | 自分の統計 / 自分のNFT                          | 自分の, never 私の or マイ                              |

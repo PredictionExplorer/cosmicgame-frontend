@@ -1,5 +1,4 @@
 import '@testing-library/jest-dom';
-import userEvent from '@testing-library/user-event';
 
 import { UniqueParticipantsTable } from '@/components/tables/UniqueParticipantsTable';
 
@@ -19,37 +18,35 @@ describe('UniqueParticipantsTable', () => {
     expect(screen.getByText('tables.empty.participants')).toBeInTheDocument();
   });
 
-  it('renders table headers', () => {
+  it('renders short table headers', () => {
     render(<UniqueParticipantsTable list={[createParticipant()]} />);
-    expect(screen.getAllByText('tables.columns.participantAddress').length).toBeGreaterThanOrEqual(
-      1,
-    );
-    expect(screen.getAllByText('tables.columns.numberOfGestures').length).toBeGreaterThanOrEqual(1);
-    expect(screen.getAllByText('tables.columns.maxGestureEth').length).toBeGreaterThanOrEqual(1);
+    // The sorted header's arrow is joined to its label by U+2060.
+    const headers = screen
+      .getAllByRole('columnheader')
+      .map((header) => header.textContent?.replace(/\u2060/g, ''));
+    expect(headers).toEqual([
+      'tables.columns.participant',
+      'tables.columns.gestureCount',
+      'tables.columns.maxGestureEth',
+    ]);
   });
 
-  it('renders localized header help for confusing columns', async () => {
-    const user = userEvent.setup();
+  it('carries no info button on headers that say what they hold', () => {
     render(<UniqueParticipantsTable list={[createParticipant()]} />);
-    const triggers = screen.getAllByRole('button', {
-      name: /^tables\.tableHeaderHelp\.explainColumn/,
-    });
-    expect(triggers.length).toBeGreaterThanOrEqual(3);
-    await user.hover(triggers[1]!);
-    expect(await screen.findByRole('tooltip')).toHaveTextContent(
-      'tables.statisticsTooltips.numberOfGestures',
-    );
+    expect(
+      screen.queryAllByRole('button', { name: /^tables\.tableHeaderHelp\.explainColumn/ }),
+    ).toHaveLength(0);
   });
 
   it('renders participant data', () => {
     render(<UniqueParticipantsTable list={[createParticipant()]} />);
     expect(screen.getByText('42')).toBeInTheDocument();
-    expect(screen.getByText('1.234567')).toBeInTheDocument();
+    expect(screen.getByText('1.2346')).toBeInTheDocument();
   });
 
-  it('formats MaxBidAmountEth without a trailing-zero wall', () => {
+  it('formats MaxBidAmountEth to the fixed 4-decimal table precision', () => {
     render(<UniqueParticipantsTable list={[createParticipant({ MaxBidAmountEth: 0.1 })]} />);
-    expect(screen.getByText('0.1')).toBeInTheDocument();
+    expect(screen.getByText('0.1000')).toBeInTheDocument();
   });
 
   it('renders zero and dust amounts distinctly', () => {
@@ -69,21 +66,22 @@ describe('UniqueParticipantsTable', () => {
         ]}
       />,
     );
-    expect(screen.getByText('0')).toBeInTheDocument();
+    // Zero keeps the column's four digits, so the decimals line up.
+    expect(screen.getByText('0.0000')).toBeInTheDocument();
     expect(screen.getByText('<0.0001')).toBeInTheDocument();
   });
 
-  it('renders only first page of results (perPage=5)', () => {
-    const list = Array.from({ length: 8 }, (_, i) =>
+  it('shows 20 rows a page with the row range', () => {
+    const list = Array.from({ length: 25 }, (_, i) =>
       createParticipant({
         BidderAid: String(i),
         BidderAddr: `0x${String(i).padStart(40, '0')}`,
         NumBids: i + 1,
       }),
     );
-    render(<UniqueParticipantsTable list={list} />);
-    expect(screen.getByText('5')).toBeInTheDocument();
-    expect(screen.queryByText('6')).not.toBeInTheDocument();
+    const { container } = render(<UniqueParticipantsTable list={list} />);
+    expect(container.querySelectorAll('tbody tr')).toHaveLength(20);
+    expect(screen.getByText('tables.pagination.range(from=1,to=20,total=25)')).toBeInTheDocument();
   });
 
   it('renders address as link to user page', () => {

@@ -1,8 +1,12 @@
+import { readFileSync } from 'node:fs';
+import { resolve } from 'node:path';
 import { runInNewContext } from 'node:vm';
 
 import {
   DEFAULT_SITE_THEME,
   isSiteTheme,
+  SITE_THEMES,
+  THEME_CHROME,
   THEME_COOKIE_NAME,
   THEME_INIT_SCRIPT,
   THEME_STORAGE_KEY,
@@ -66,13 +70,54 @@ describe('theme cookie scope', () => {
   });
 });
 
+describe('browser chrome colour', () => {
+  /** `--background` of each palette block in styles/themes.css, as #rrggbb. */
+  function paletteBackground(theme: string): string {
+    const css = readFileSync(resolve(__dirname, '..', '..', '..', 'styles', 'themes.css'), 'utf8');
+    const start = css.indexOf(`[data-palette='${theme}'] {`);
+    expect(start).toBeGreaterThan(-1);
+    const block = css.slice(start, css.indexOf('}', start));
+    const [h, s, l] = /--background:\s*([\d.]+) ([\d.]+)% ([\d.]+)%/
+      .exec(block)!
+      .slice(1)
+      .map(Number) as [number, number, number];
+    const a = (s / 100) * Math.min(l / 100, 1 - l / 100);
+    const channel = (n: number) => {
+      const k = (n + h / 30) % 12;
+      const value = l / 100 - a * Math.max(-1, Math.min(k - 3, 9 - k, 1));
+      return Math.round(value * 255)
+        .toString(16)
+        .padStart(2, '0');
+    };
+    return `#${channel(0)}${channel(8)}${channel(4)}`;
+  }
+
+  it.each(SITE_THEMES)('matches the %s page background', (theme) => {
+    expect(THEME_CHROME[theme]).toBe(paletteBackground(theme));
+  });
+});
+
 describe('theme bootstrap before hydration', () => {
   function runBootstrap(cookie: string, stored: string | null) {
-    const document = { cookie, documentElement: { dataset: { theme: DEFAULT_SITE_THEME } } };
+    const meta = { content: '#15BFFD', setAttribute: jest.fn() };
+    meta.setAttribute.mockImplementation((_name: string, value: string) => {
+      meta.content = value;
+    });
+    const document = {
+      cookie,
+      documentElement: { dataset: { theme: DEFAULT_SITE_THEME } },
+      querySelectorAll: jest.fn().mockReturnValue([meta]),
+    };
     const localStorage = { getItem: jest.fn().mockReturnValue(stored) };
     runInNewContext(THEME_INIT_SCRIPT, { document, localStorage });
-    return { theme: document.documentElement.dataset.theme, localStorage };
+    return { theme: document.documentElement.dataset.theme, localStorage, meta };
   }
+
+  it('paints the browser chrome in the chosen palette before first paint', () => {
+    const { meta } = runBootstrap(`${THEME_COOKIE_NAME}=ember`, null);
+    expect(meta.content).toBe(THEME_CHROME.ember);
+    expect(runBootstrap('', null).meta.content).toBe(THEME_CHROME[DEFAULT_SITE_THEME]);
+  });
 
   it('uses the shared cookie over an older preference stored on this host', () => {
     const { theme, localStorage } = runBootstrap(`${THEME_COOKIE_NAME}=aurora`, 'classic-blue');

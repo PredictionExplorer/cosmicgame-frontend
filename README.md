@@ -11,7 +11,7 @@ The app serves two hosts from one codebase: the marketing site (`cosmicsignature
 - **Web3:** wagmi v3, viem v2, RainbowKit v2; typed ABIs generated with `@wagmi/cli`
 - **Data:** TanStack React Query v5 for all data fetching, Axios for HTTP, Zod for runtime API validation
 - **Charts:** Recharts
-- **3D / effects:** three.js + react-three-fiber (marketing hero), tsparticles (app backdrop, idle-deferred)
+- **Backdrops:** static CSS on both hosts (`AmbientBackdrop`, the landing hero's atmosphere and starfield); only the artwork moves
 - **Testing:** Jest + React Testing Library (unit), Playwright (E2E), jest-axe / axe-core (a11y)
 - **Quality:** ESLint 9 (flat config), Prettier, Husky, lint-staged, commitlint, Sentry
 
@@ -106,7 +106,7 @@ The app serves two hosts from one codebase: the marketing site (`cosmicsignature
 │   ├── home/         Homepage sections (observatory/ control desk: CycleClock,
 │   │                 participant intel, GesturePanel, AllocationLedger, ActionDock)
 │   ├── layout/       Header, Footer, ErrorBoundary
-│   ├── nft/          NFT display (NFTTrait, NFTImage, LatestNFTs, grids)
+│   ├── nft/          NFT display (NFTImage, SignatureCard, PagedWall, SignatureViewer)
 │   ├── anchoring/    Anchoring (staking) tables and actions
 │   ├── attachments/  Attached NFT / ERC-20 showcases
 │   ├── tables/       Data tables (gestures, allocations, recipients, ...)

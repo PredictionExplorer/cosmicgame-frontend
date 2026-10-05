@@ -245,17 +245,25 @@ test.describe('zh Sprint 7 — long-tail routes', () => {
 
   test('renders Chinese ETH contribution list, detail, and cycle routes', async ({ page }) => {
     await openZh(page, '/zh/eth-contribution');
-    await expect(page.getByRole('heading', { name: 'ETH 贡献', exact: true })).toBeVisible();
-    await expect(page.getByText('暂无贡献记录。')).toBeVisible();
+    await expect(page.getByRole('heading', { level: 1, name: '直接 ETH 贡献' })).toBeVisible();
+    // The ledger's empty state names itself in a heading (no sentence period).
+    await expect(page.getByRole('heading', { name: '暂无贡献记录', exact: true })).toBeVisible();
 
     await openZh(page, '/zh/eth-contribution/detail/7');
-    await expect(page.getByRole('heading', { name: 'ETH 贡献详情', exact: true })).toBeVisible();
-    await expect(page.getByRole('link', { name: '第 7 个周期' })).toBeVisible();
+    await expect(
+      page.getByRole('heading', { level: 1, name: '贡献 #7', exact: true }),
+    ).toBeVisible();
+    // The record leads with its facts: the Cycle figure's number, under its
+    // localized label, links the cycle's contributions and says so.
+    await expect(
+      page.getByRole('link', { name: '第 7 个周期的全部贡献', exact: true }),
+    ).toHaveAttribute('href', '/zh/eth-contribution/round/7');
+    await expect(page.getByRole('term').filter({ hasText: /^周期$/ })).toBeVisible();
     await expect(page.getByText('贡献者留言')).toBeVisible();
 
     await openZh(page, '/zh/eth-contribution/round/7');
     await expect(
-      page.getByRole('heading', { name: '第 7 个周期的直接 ETH 贡献', exact: true }),
+      page.getByRole('heading', { name: '第 7 个周期的贡献', exact: true }),
     ).toBeVisible();
   });
 
@@ -274,13 +282,17 @@ test.describe('zh Sprint 7 — long-tail routes', () => {
 
   test('renders Chinese outreach overview and participant history', async ({ page }) => {
     await openZh(page, '/zh/marketing');
-    await expect(page.getByRole('heading', { name: /推广 Cosmic Signature/ })).toBeVisible();
+    await expect(page.getByRole('heading', { level: 1, name: '推广分配' })).toBeVisible();
     await expect(page.getByRole('heading', { name: '推广分配记录', exact: true })).toBeVisible();
-    await expect(page.getByText('暂无推广分配')).toBeVisible();
+    await expect(page.getByText('暂无推广储备分配')).toBeVisible();
+    await expect(page.getByRole('link', { name: '发邮件联系推广团队' })).toHaveAttribute(
+      'href',
+      'mailto:marketing@cosmicsignature.com',
+    );
 
     await openZh(page, `/zh/marketing/${ADDRESS}`);
-    await expect(page.getByText('此参与者的推广分配', { exact: true })).toBeVisible();
-    await expect(page.getByText('暂无分配。')).toBeVisible();
+    await expect(page.getByRole('heading', { level: 1, name: '获得的推广分配' })).toBeVisible();
+    await expect(page.getByText('暂无推广储备分配')).toBeVisible();
   });
 
   test('renders Chinese coordination, admin, and internal tools', async ({ page }) => {
@@ -293,17 +305,17 @@ test.describe('zh Sprint 7 — long-tail routes', () => {
     });
 
     await openZh(page, '/zh/admin');
-    await expect(page.getByRole('heading', { name: '管理', exact: true })).toBeVisible();
+    await expect(page.getByRole('heading', { name: '落笔留言审核', exact: true })).toBeVisible();
     const gestureRow = page.getByRole('row', { name: /Review locale link/ });
     await expect(gestureRow).toBeVisible();
-    await expect(gestureRow.getByRole('link', { name: '7', exact: true })).toHaveAttribute(
-      'href',
-      '/zh/allocation/7',
-    );
+    // A cycle reads "第 7 个周期", never a bare "7", and leads to its record.
+    await expect(
+      gestureRow.getByRole('link', { name: '第 7 个周期', exact: true }),
+    ).toHaveAttribute('href', '/zh/allocation/7');
 
     await openZh(page, '/zh/admin/admin');
-    await expect(page.getByRole('heading', { name: '管理方法', exact: true })).toBeVisible();
-    await expect(page.getByText('Cosmic Signature 合约', { exact: true })).toBeVisible();
+    await expect(page.getByRole('heading', { name: '合约设置', exact: true })).toBeVisible();
+    await expect(page.getByRole('heading', { name: '合约', exact: true })).toBeVisible();
 
     await openZh(page, '/zh/internal/cst-outreach-transfer');
     await expect(page.getByRole('heading', { name: 'CST 推广转账', exact: true })).toBeVisible();
@@ -330,20 +342,14 @@ test.describe('zh Sprint 7 — long-tail routes', () => {
         },
       });
     });
-    // The full special-allocation cards (with participant profile links)
-    // live on the cycle details page; the home standings link to gestures.
+    // The cycle details page shows the home's standings ledger; every holder
+    // links to their participant page inside the locale.
     await openZh(page, '/zh/current-cycle');
-    const latestCard = page.getByTestId('special-allocation-card-latest-participant').first();
-    await expect(latestCard).toBeVisible({ timeout: 30_000 });
-    await expect(latestCard.getByRole('link', { name: latestParticipant })).toHaveAttribute(
-      'href',
-      `/zh/user/${latestParticipant}`,
-    );
-    const chronoCard = page.getByTestId('special-allocation-card-chrono-warrior').first();
-    await expect(chronoCard.getByRole('link', { name: chronoWarrior })).toHaveAttribute(
-      'href',
-      `/zh/user/${chronoWarrior}`,
-    );
+    const latestRow = page.getByTestId('latest-participant-intel').first();
+    await expect(latestRow).toBeVisible({ timeout: 30_000 });
+    await expect(latestRow.locator(`a[href="/zh/user/${latestParticipant}"]`)).toBeVisible();
+    const chronoRow = page.getByTestId('chrono-role-summary').first();
+    await expect(chronoRow.locator(`a[href="/zh/user/${chronoWarrior}"]`)).toBeVisible();
   });
 
   test('renders the localized endurance embed and keeps noindex,nofollow', async ({ page }) => {

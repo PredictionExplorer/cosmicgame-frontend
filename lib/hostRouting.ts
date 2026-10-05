@@ -74,9 +74,12 @@ export const APP_ONLY_PATH_PREFIXES: readonly string[] = [
   '/code',
   '/contracts',
   '/coordination-changes',
+  '/cosmic-signature-transfer',
+  '/cosmic-token-transfer',
   '/current-cycle',
   '/detail',
   '/distributions-by-token',
+  '/embed',
   '/eth-contribution',
   '/experimental-ui',
   '/faq',
@@ -129,6 +132,16 @@ export function isLandingOnlyPath(pathname: string): boolean {
   return LANDING_ONLY_PATH_PREFIXES.some(
     (prefix) => pathname === prefix || pathname.startsWith(`${prefix}/`),
   );
+}
+
+/**
+ * Whether a locale-stripped public path starts like one of the site's pages:
+ * the home or a prefix of either host. Everything else is a 404
+ * (app/global-not-found.tsx), which proxy.ts serves without the `hreflang`
+ * alternates the locale middleware would otherwise advertise for it.
+ */
+export function isKnownPublicPath(pathname: string): boolean {
+  return pathname === '/' || isAppOnlyPath(pathname) || isLandingOnlyPath(pathname);
 }
 
 /**

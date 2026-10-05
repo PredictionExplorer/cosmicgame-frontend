@@ -1,8 +1,16 @@
 import { cache } from 'react';
 
 import type { ServerTimingSample } from '@/utils/time';
+import { LATEST_SIGNATURES_LIMIT } from '@/lib/latestSignatures';
 
-import { flattenGestureArray, flattenTx, getAPIUrl } from './client';
+import {
+  SERVER_READ_TIMEOUT_MS,
+  flattenGestureArray,
+  flattenTx,
+  flattenTxArray,
+  getAPIUrl,
+} from './client';
+import { RATE_LIMIT_RETRIES, TOO_MANY_REQUESTS, rateLimitDelayMs, waitMs } from './rateLimit';
 import { normalizeDashboardWire } from './rounds';
 import {
   DashboardInfoSchema,
@@ -24,8 +32,9 @@ import type { CSTTokenInfo, DashboardInfo, GestureInfo, SpecialRecipients } from
  * Client-side React Query takes over for live updates immediately after
  * hydration, so seeds only need to be fresh enough for the first paint.
  *
- * Every helper resolves to `null` on failure: a missing seed must degrade to
- * the client-side loading path, never fail the prerender. Helpers are
+ * Every helper resolves to `null` on failure, a read that takes longer than
+ * `SERVER_READ_TIMEOUT_MS` included: a missing seed must degrade to the
+ * client-side loading path, never fail or hold up the prerender. Helpers are
  * wrapped in React `cache()` so `generateMetadata` and the page body share
  * one upstream request per render.
  */
@@ -93,16 +102,28 @@ export function resolveHomeTimingSample({
   return { targetServerTimeSec, currentServerTimeSec, cycleNumber, sampledAtMs };
 }
 
+/**
+ * One seed read. An answer of 429 Too Many Requests is asked again after a
+ * jittered wait, up to `RATE_LIMIT_RETRIES` times (./rateLimit), as every
+ * server read is; any other failure resolves to `null` at once.
+ */
 async function fetchApiJson(path: string, revalidateSeconds: number): Promise<unknown> {
-  try {
-    const response = await fetch(getAPIUrl(path), {
-      headers: { Accept: 'application/json' },
-      next: { revalidate: revalidateSeconds },
-    });
-    if (!response.ok) return null;
-    return (await response.json()) as unknown;
-  } catch {
-    return null;
+  for (let attempt = 0; ; attempt += 1) {
+    try {
+      const response = await fetch(getAPIUrl(path), {
+        headers: { Accept: 'application/json' },
+        next: { revalidate: revalidateSeconds },
+        signal: AbortSignal.timeout(SERVER_READ_TIMEOUT_MS),
+      });
+      if (response.status === TOO_MANY_REQUESTS && attempt < RATE_LIMIT_RETRIES) {
+        await waitMs(rateLimitDelayMs(attempt, response.headers.get('retry-after')));
+        continue;
+      }
+      if (!response.ok) return null;
+      return (await response.json()) as unknown;
+    } catch {
+      return null;
+    }
   }
 }
 
@@ -198,4 +219,17 @@ export const getCstInfoSeed = cache(async (tokenId: number): Promise<CSTTokenInf
   const tokenInfo = (raw as { TokenInfo?: unknown }).TokenInfo;
   if (tokenInfo == null || typeof tokenInfo !== 'object') return null;
   return flattenTx(tokenInfo) as CSTTokenInfo | null;
+});
+
+/**
+ * The newest imprinted Signatures, newest first, for the app home's plate.
+ * Imprints only happen when a cycle finalizes, so a minute of staleness is
+ * plenty; an empty list or a failed read renders the designed pending plate.
+ */
+export const getLatestSignaturesSeed = cache(async (): Promise<CSTTokenInfo[] | null> => {
+  const raw = await fetchApiJson(`cst/list/all/0/${LATEST_SIGNATURES_LIMIT}`, 60);
+  if (raw == null || typeof raw !== 'object') return null;
+  const list = (raw as { CosmicSignatureTokenList?: unknown }).CosmicSignatureTokenList;
+  if (!Array.isArray(list)) return null;
+  return flattenTxArray<CSTTokenInfo>(list).filter((token) => Boolean(token?.Seed));
 });

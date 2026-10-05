@@ -1,25 +1,18 @@
 {
-  "invalid": {
-    "title": "トークンIDが無効です"
+  "notFound": {
+    "title": "このシグネチャーはまだ刻印されていません",
+    "description": "シグネチャーには刻印された順に番号が付きます。",
+    "newest": "最新は#{id}です。",
+    "newestLink": "最新のシグネチャーを見る"
   },
   "jsonLd": {
-    "productName": "Cosmic Signature NFT #{id}",
-    "productDescription": "Cosmic Signatureから生まれたジェネラティブNFT。三体問題の物理シミュレーションが、一点ごとに異なる軌跡を描きます。",
-    "breadcrumbToken": "トークン #{id}"
-  },
-  "breadcrumb": {
-    "tokenFallback": "トークン{id}"
-  },
-  "hero": {
-    "unnamedToken": "名前のないトークン"
+    "productDescription": "Cosmic Signatureから生まれたジェネラティブNFT。三体問題の物理シミュレーションが、一点ごとに異なる軌跡を描きます。"
   },
   "badges": {
     "stellarSelectionRecipient": "星選の受領者",
     "anchorRecipient": "係留の受領者",
     "cycleRecipient": "サイクル受領者",
     "enduranceChampion": "持久チャンピオン",
-    "receivedAsCycleRecipient": "サイクル{round}のサイクル受領者として受領",
-    "receivedAs": "{label}として受領",
     "eligibleForAnchoring": "係留可能",
     "eligibleForAnchoringTooltip": "このCosmic Signature NFTはまだ係留されたことがなく、係留するとETHの係留配分を受け取れます。",
     "alreadyAnchored": "係留済み",
@@ -29,66 +22,66 @@
     "trigger": "共有",
     "copyVideoLink": "動画リンクをコピー",
     "copyImageLink": "画像リンクをコピー",
-    "copyPageLink": "ページリンクをコピー"
-  },
-  "actions": {
-    "buyOrSellNfts": "NFTを売買する",
-    "viewCycleDetails": "サイクル{round}の詳細を見る"
+    "copyPageLink": "ページリンクをコピー",
+    "copyFailed": "リンクをコピーできませんでした。"
   },
   "navigation": {
-    "previousToken": "前のトークン",
-    "nextToken": "次のトークン"
+    "label": "前後のシグネチャー"
   },
   "sections": {
     "nameHistory": "名前の履歴",
     "ownershipHistory": "所有権の履歴"
   },
-  "transferDialog": {
-    "title": "移転の確認",
-    "description": "送付先アドレスにはトランザクション履歴が見つかりません。送付先に間違いがないか、もう一度確認してください。",
-    "confirm": "はい、移転します"
-  },
   "ownerActions": {
     "title": "トークンを管理する",
-    "titleTooltip": "このトークンの所有者は、名前の設定や送付、MetaMaskへの表示追加ができます。",
-    "metaMaskHeading": "MetaMaskに表示",
+    "tabs": {
+      "name": "名前",
+      "transfer": "移転"
+    },
+    "anchor": {
+      "button": "{id}を係留",
+      "note": "係留したNFTは、確定した各サイクルの係留配分を分け合います。係留は各NFTにつき一度しかできないため、係留解除は取り消せません。"
+    },
     "metaMaskTooltip": "MetaMaskのブラウザー拡張機能にこのNFTを追加します。NFTのインポートは実験的な機能で、MetaMask Mobileには対応していません。",
     "addToMetaMask": "NFTをMetaMaskに追加",
     "addingToMetaMask": "NFTをMetaMaskに追加しています…",
-    "transferHeading": "移転",
-    "transferTooltip": "このトークンを別のEthereumアドレスへ送ります。確認する前にアドレスをもう一度確かめてください。移転は取り消せません。",
-    "recipientPlaceholder": "送付先アドレス（0x…）",
-    "transferButton": "移転",
-    "nameHeading": "トークンに名前を付ける",
-    "renameHeading": "トークン名を変更",
-    "nameTooltip": "トークンに任意の名前を付けられます（最大32バイト）。名前付きトークンは名前付きNFTのページに表示されます。",
+    "nameLabel": "名前",
+    "nameHint": "最大{max}バイトまで。オンチェーンに記録され、誰でも見られます。",
     "namePlaceholder": "トークン名を入力",
     "setName": "名前を設定",
     "changeName": "名前を変更",
     "clearName": "クリア",
+    "transferButton": "{id}を移転",
     "namedTokensCount": "名前の付いたトークンは{count}件あります。",
     "viewAllNamedTokens": "名前付きトークンをすべて見る"
   },
   "metadata": {
     "imprinted": "刻印日時",
-    "imprintedTooltip": "このトークンがオンチェーンに刻印された時刻です。クリックするとトランザクションを表示します。",
     "cycle": "サイクル",
-    "cycleTooltip": "このトークンが配分されたパフォーマンス・サイクルです。クリックするとサイクルの詳細を表示します。",
     "recipient": "受領者",
-    "recipientTooltip": "パフォーマンス・サイクルの中でこのトークンを最初に受領したアドレスです。",
     "owner": "所有者",
-    "ownerTooltip": "このトークンの現在の保有者です。トークンが移転されていれば受領者と異なることがあります。",
     "roundNumber": "サイクル{round}",
+    "anchoring": "係留",
     "seed": "シード",
     "seedTooltip": "このトークンのアートワークと特性の生成に使われた唯一の乱数シードです。",
     "copySeed": "シードをコピー"
   },
-  "video": {
-    "watchAnimation": "アニメーションを見る",
-    "watchAnimationTooltip": "各Cosmic Signature NFTには、そのシードから導かれた固有のジェネラティブアニメーションがあります。クリックして再生します。"
-  },
   "image": {
-    "defaultAlt": "NFT",
+    "rendering": "レンダリング中",
     "artworkUnavailable": "アートワークを利用できません"
+  },
+  "viewer": {
+    "modeLabel": "アートワークの表示",
+    "still": "静止画",
+    "motion": "動画",
+    "play": "アニメーションを再生",
+    "pause": "アニメーションを一時停止",
+    "fullscreen": "全画面",
+    "zoomIn": "拡大",
+    "zoomOut": "画面に合わせる",
+    "zoomHint": "作品を選択するか+キーを押すと拡大します。",
+    "panHint": "ドラッグまたは矢印キーで作品を移動します。0キーで画面に合わせます。",
+    "motionError": "アニメーションを読み込めませんでした。",
+    "motionLabel": "{subject}のアニメーション"
   }
 }

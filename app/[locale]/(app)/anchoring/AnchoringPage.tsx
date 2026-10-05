@@ -1,202 +1,132 @@
 'use client';
 
 import type { ReactNode } from 'react';
-import { useMemo } from 'react';
-import { Coins, Users, Layers, TrendingUp, ArrowRight } from 'lucide-react';
-import { useLocale, useTranslations } from 'next-intl';
+import { useTranslations } from 'next-intl';
 
-import { ethDistributionFacts } from '@/content/protocol-facts';
+import { ethDistributionFacts, protocolFacts } from '@/content/protocol-facts';
 
-import { Link } from '@/i18n/navigation';
-import { GlobalAnchorDistributionsTable } from '@/components/anchoring/GlobalAnchorDistributionsTable';
-import { RwalkAnchorDistributionImprintsTable } from '@/components/anchoring/RwalkAnchorDistributionImprintsTable';
-import { AnchoringHeroStats } from '@/components/anchoring/AnchoringHeroStats';
-import { HowAnchoringWorks } from '@/components/anchoring/HowAnchoringWorks';
+import { toFiniteNumber } from '@/utils/finiteNumber';
+import { countActiveAnchorHolders, distributionPerAnchoredNft } from '@/utils/anchoringStats';
 import {
   useCSTAnchorDistributions,
-  useGlobalRWLKAnchorImprints,
   useDashboardInfo,
+  useGlobalRWLKAnchorImprints,
   useUniqueCSTAnchorHolders,
+  useUniqueRWLKAnchorHolders,
 } from '@/hooks/useApiQuery';
-import { Skeleton } from '@/components/ui/skeleton';
-import { ErrorState } from '@/components/ui/error-state';
 import { PageHeader } from '@/components/layout/PageHeader';
+import { DataTableWidth } from '@/components/ui/data-table';
 import { PageShell } from '@/components/ui/page-shell';
-import { SectionDivider } from '@/components/ui/section-divider';
-import { SectionEyebrow } from '@/components/ui/section-eyebrow';
-import { Surface } from '@/components/ui/surface';
-import { formatEthValue } from '@/utils/format';
-import { formatDistributionPerAnchoredNftEth } from '@/utils/anchoringStats';
+import { SectionHeader } from '@/components/ui/section-header';
+import { AnchoringFlow } from '@/components/anchoring/AnchoringFlow';
+import { GlobalAnchorDistributionsTable } from '@/components/anchoring/GlobalAnchorDistributionsTable';
+import { SelectionImprintGallery } from '@/components/anchoring/SelectionImprintGallery';
 
-const AnchoringPage = ({ seoSummary }: { seoSummary?: ReactNode }) => {
+interface AnchoringPageProps {
+  /** The server-rendered header; the plain PageHeader stands in without one. */
+  seoSummary?: ReactNode;
+  /** "How anchoring works" steps, rendered on the server (static copy, no client JS). */
+  steps: ReactNode;
+  /** The question list, rendered on the server with its own spacing. */
+  questions: ReactNode;
+  /**
+   * The header's related pages again, as a list at the end of the page on
+   * phones, where the header hides its chips: rendered on the server.
+   */
+  related?: ReactNode;
+}
+
+/**
+ * The Anchor Distributions records: the page a Records link leads to, so
+ * the records lead. Every ETH Anchor Distribution deposit, then the
+ * Anchored-NFT Stellar Selection imprints hung as the Signatures they are,
+ * both at one width; then how anchoring works (the steps and the live
+ * figures of both lanes) and the questions a newcomer asks. The static
+ * explanations arrive as server-rendered slots; this client part only reads
+ * the live figures and the two ledgers, which the route seeds.
+ */
+const AnchoringPage = ({ seoSummary, steps, questions, related }: AnchoringPageProps) => {
   const t = useTranslations('anchoring');
-  const locale = useLocale();
-  const {
-    data: cosmicSignatureRewards,
-    isLoading: isLoadingCST,
-    error: cstError,
-  } = useCSTAnchorDistributions();
-  const {
-    data: randomWalkRewards,
-    isLoading: isLoadingRWLK,
-    error: rwlkError,
-  } = useGlobalRWLKAnchorImprints();
-  const { data: dashboardData, isLoading: isLoadingDashboard } = useDashboardInfo();
-  const { data: uniqueStakers, isLoading: isLoadingStakers } = useUniqueCSTAnchorHolders();
+  const distributions = useCSTAnchorDistributions();
+  const imprints = useGlobalRWLKAnchorImprints();
+  const dashboard = useDashboardInfo();
+  const cstHolders = useUniqueCSTAnchorHolders();
+  const rwlkHolders = useUniqueRWLKAnchorHolders();
 
-  const loading = isLoadingCST || isLoadingRWLK;
-  const statsLoading = isLoadingDashboard || isLoadingStakers;
-  const hasError = Boolean(cstError || rwlkError);
-
-  const distributionPerNft = useMemo(
-    () =>
-      formatDistributionPerAnchoredNftEth(
-        dashboardData?.StakingAmountEth,
-        dashboardData?.MainStats?.StakeStatisticsCST?.TotalTokensStaked,
-      ),
-    [dashboardData],
-  );
-
-  const heroStats = useMemo(
-    () => [
-      {
-        label: t('overview.stats.pool.label'),
-        value: formatEthValue(dashboardData?.StakingAmountEth ?? 0),
-        tooltip: t('overview.stats.pool.tooltip'),
-        icon: <Coins className="h-4 w-4" />,
-        featured: true,
-        gradient: true,
-      },
-      {
-        label: t('overview.stats.cosmicSignatureAnchored.label'),
-        value: (
-          dashboardData?.MainStats?.StakeStatisticsCST?.TotalTokensStaked ?? 0
-        ).toLocaleString(locale),
-        tooltip: t('overview.stats.cosmicSignatureAnchored.tooltip'),
-        icon: <Layers className="h-4 w-4" />,
-      },
-      {
-        label: t('overview.stats.randomWalkAnchored.label'),
-        value: (
-          dashboardData?.MainStats?.StakeStatisticsRWalk?.TotalTokensStaked ?? 0
-        ).toLocaleString(locale),
-        tooltip: t('overview.stats.randomWalkAnchored.tooltip'),
-        icon: <Layers className="h-4 w-4" />,
-      },
-      {
-        label: t('overview.stats.distributionPerNft.label'),
-        value: distributionPerNft.value,
-        tooltip: distributionPerNft.indexedCountUnavailable
-          ? t('overview.stats.distributionPerNft.tooltipUnavailable')
-          : t('overview.stats.distributionPerNft.tooltip'),
-        icon: <TrendingUp className="h-4 w-4" />,
-      },
-      {
-        label: t('overview.stats.uniqueHolders.label'),
-        value: (uniqueStakers?.length ?? 0).toLocaleString(locale),
-        tooltip: t('overview.stats.uniqueHolders.tooltip'),
-        icon: <Users className="h-4 w-4" />,
-      },
-    ],
-    [dashboardData, distributionPerNft, locale, t, uniqueStakers],
-  );
-
-  if (hasError) {
-    return (
-      <PageShell variant="data">
-        {seoSummary}
-        <ErrorState title={t('overview.errorTitle')} message={t('overview.errorMessage')} />
-      </PageShell>
-    );
-  }
+  const stats = dashboard.data?.MainStats;
+  const flowLoading = dashboard.isLoading || cstHolders.isLoading || rwlkHolders.isLoading;
+  const ledgerValues = {
+    // Version-aware: V3 routes 5% to the anchor distribution, V2 routed 6%.
+    percentage: ethDistributionFacts.anchorDistributionPercentage,
+    count: protocolFacts.anchoredRwlkNftSelectionRecipients,
+    cst: protocolFacts.specialAllocationCst,
+  };
 
   return (
-    <PageShell variant="data" backdrop="signature">
-      {seoSummary}
-      {!seoSummary && (
+    <PageShell variant="data">
+      {seoSummary ?? (
         <PageHeader
-          align="left"
-          eyebrow={
-            <SectionEyebrow tone="aurora" pulse>
-              {t('overview.eyebrow')}
-            </SectionEyebrow>
-          }
+          section="records"
           title={t('overview.title')}
-          titleLevel={2}
           subtitle={t('overview.subtitle')}
         />
       )}
 
-      <Surface
-        variant="impact"
-        radius="xl"
-        padding="lg"
-        className="mb-8 grid gap-6 lg:grid-cols-[1fr_340px] lg:items-center"
+      {/* Both ledgers run the column's full width, so they share one right edge. */}
+      <DataTableWidth value="fill">
+        <GlobalAnchorDistributionsTable
+          list={distributions.data ?? []}
+          loading={distributions.isLoading}
+          error={
+            distributions.error && !distributions.data ? t('overview.errorMessage') : undefined
+          }
+          errorTitle={t('overview.errorTitle')}
+          onRetry={() => void distributions.refetch()}
+          title={t('ledgers.distributions.title')}
+          description={t('ledgers.distributions.description', ledgerValues)}
+        />
+      </DataTableWidth>
+
+      <SelectionImprintGallery
+        className="mt-[var(--block-gap)] sm:mt-20"
+        list={imprints.data ?? []}
+        loading={imprints.isLoading}
+        error={imprints.error && !imprints.data ? t('overview.errorMessage') : undefined}
+        errorTitle={t('overview.errorTitle')}
+        onRetry={() => void imprints.refetch()}
+        title={t('ledgers.imprints.title')}
+        description={t('ledgers.imprints.description', ledgerValues)}
+      />
+
+      <section
+        aria-labelledby="anchoring-how-heading"
+        className="mt-[var(--block-gap)] grid gap-x-12 gap-y-8 border-t border-rule-faint pt-[var(--block-gap)] sm:mt-20 lg:grid-cols-12"
       >
-        <p className="type-body-md text-muted-foreground">
-          {t('overview.intro.description', {
-            percentage: ethDistributionFacts.anchorDistributionPercentage,
-          })}
-        </p>
-        <div className="relative min-h-[160px] overflow-hidden rounded-[var(--radius-surface)] border border-white/[0.08] bg-black/20">
-          <div
-            aria-hidden
-            className="absolute left-1/2 top-1/2 h-28 w-28 -translate-x-1/2 -translate-y-1/2 rounded-full border border-[rgb(var(--impact-green-rgb)/0.5)] shadow-[0_0_50px_rgb(var(--impact-green-rgb)/0.16)]"
+        <div className="lg:col-span-5">
+          <SectionHeader
+            headingId="anchoring-how-heading"
+            title={t('overview.howItWorks.title')}
+            description={t('overview.howItWorks.description')}
           />
-          <div
-            aria-hidden
-            className="absolute left-1/2 top-1/2 h-48 w-48 -translate-x-1/2 -translate-y-1/2 rounded-full border border-[rgb(var(--aurora-cyan-rgb)/0.25)]"
-          />
-          <div className="absolute inset-0 flex items-center justify-center">
-            <div className="rounded-full bg-[rgb(var(--impact-green-rgb)/0.14)] px-4 py-2 text-sm font-semibold text-[rgb(var(--impact-green-rgb))]">
-              {t('overview.intro.flow', {
-                percentage: ethDistributionFacts.anchorDistributionPercentage,
-              })}
-            </div>
-          </div>
+          {steps}
         </div>
-      </Surface>
+        <AnchoringFlow
+          className="lg:col-span-7 lg:mt-1 lg:self-start"
+          poolEth={toFiniteNumber(dashboard.data?.StakingAmountEth)}
+          anchoredCosmicSignature={toFiniteNumber(stats?.StakeStatisticsCST?.TotalTokensStaked)}
+          perNft={distributionPerAnchoredNft(
+            dashboard.data?.StakingAmountEth,
+            stats?.StakeStatisticsCST?.TotalTokensStaked,
+          )}
+          anchoredRandomWalk={toFiniteNumber(stats?.StakeStatisticsRWalk?.TotalTokensStaked)}
+          activeHolders={countActiveAnchorHolders(cstHolders.data, rwlkHolders.data)}
+          loading={flowLoading}
+        />
+      </section>
 
-      <AnchoringHeroStats stats={heroStats} loading={statsLoading} className="mb-10" />
+      {questions}
 
-      <HowAnchoringWorks className="mb-10" />
-
-      <Link
-        href="/my-anchors"
-        className="group mb-10 flex items-center justify-between rounded-xl border border-primary/20 bg-primary/[0.04] p-5 transition-all hover:border-primary/40 hover:bg-primary/[0.08] no-underline"
-      >
-        <div>
-          <p className="text-base font-semibold text-foreground">{t('overview.cta.title')}</p>
-          <p className="text-sm text-muted-foreground mt-1">{t('overview.cta.description')}</p>
-        </div>
-        <ArrowRight className="h-5 w-5 text-primary opacity-60 transition-transform group-hover:translate-x-1 group-hover:opacity-100" />
-      </Link>
-
-      <div>
-        <SectionDivider title={t('overview.sections.cosmicSignature')} />
-        {loading ? (
-          <div className="space-y-3 py-4">
-            <Skeleton className="h-10 w-full" />
-            <Skeleton className="h-10 w-full" />
-            <Skeleton className="h-10 w-full" />
-          </div>
-        ) : (
-          <GlobalAnchorDistributionsTable list={cosmicSignatureRewards ?? []} />
-        )}
-      </div>
-
-      <div>
-        <SectionDivider title={t('overview.sections.randomWalk')} />
-        {loading ? (
-          <div className="space-y-3 py-4">
-            <Skeleton className="h-10 w-full" />
-            <Skeleton className="h-10 w-full" />
-            <Skeleton className="h-10 w-full" />
-          </div>
-        ) : (
-          <RwalkAnchorDistributionImprintsTable list={randomWalkRewards ?? []} />
-        )}
-      </div>
+      {related}
     </PageShell>
   );
 };

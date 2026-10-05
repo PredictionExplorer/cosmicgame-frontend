@@ -53,6 +53,10 @@ describe('next.config', () => {
     expect(patterns).toHaveLength(4);
   });
 
+  it('keeps optimized renditions of the seed-named art for a month', () => {
+    expect((config as NextConfig).images?.minimumCacheTTL).toBe(2_678_400);
+  });
+
   it('enables turbopack', () => {
     expect(config).toHaveProperty('turbopack');
   });
@@ -126,8 +130,17 @@ describe('next.config', () => {
   describe('security headers', () => {
     let headers: Awaited<ReturnType<NonNullable<NextConfig['headers']>>>;
 
+    const DSN = 'https://abc123@o42.ingest.sentry.io/4507';
+    const savedDsn = process.env.NEXT_PUBLIC_SENTRY_DSN;
+
     beforeAll(async () => {
+      process.env.NEXT_PUBLIC_SENTRY_DSN = DSN;
       headers = await (config as NextConfig).headers!();
+    });
+
+    afterAll(() => {
+      if (savedDsn === undefined) delete process.env.NEXT_PUBLIC_SENTRY_DSN;
+      else process.env.NEXT_PUBLIC_SENTRY_DSN = savedDsn;
     });
 
     it('applies headers to all routes', () => {
@@ -142,6 +155,37 @@ describe('next.config', () => {
     ])('includes %s header', (key, value) => {
       const headerValues = headers[0]?.headers;
       expect(headerValues).toContainEqual({ key, value });
+    });
+
+    it('enforces the CSP baseline and reports against the full allowlist', () => {
+      const value = (key: string) =>
+        headers[0]?.headers.find((header) => header.key === key)?.value;
+      expect(value('Content-Security-Policy')).toBe(
+        "object-src 'none'; base-uri 'self'; frame-ancestors 'self'; form-action 'self'",
+      );
+      const reportOnly = value('Content-Security-Policy-Report-Only');
+      expect(reportOnly).toMatch(/^default-src 'self'; script-src 'self' 'unsafe-inline' /);
+      // jest.setup.ts points the API at a plain-http origin, which is named.
+      expect(reportOnly).toContain("connect-src 'self' https: wss: http://test-api.example");
+      expect(reportOnly).toContain(
+        'report-uri https://o42.ingest.sentry.io/api/4507/security/?sentry_key=abc123',
+      );
+    });
+
+    it('sends no report-only policy when there is nowhere to report', async () => {
+      delete process.env.NEXT_PUBLIC_SENTRY_DSN;
+      const withoutDsn = await (config as NextConfig).headers!();
+      process.env.NEXT_PUBLIC_SENTRY_DSN = DSN;
+      const keys = withoutDsn[0]?.headers.map((header) => header.key);
+      expect(keys).toContain('Content-Security-Policy');
+      expect(keys).not.toContain('Content-Security-Policy-Report-Only');
+    });
+
+    it('lets browsers keep static images for a day and revalidate in the background', () => {
+      const images = headers.find((rule) => rule.source === '/images/:path*');
+      expect(images?.headers).toEqual([
+        { key: 'Cache-Control', value: 'public, max-age=86400, stale-while-revalidate=604800' },
+      ]);
     });
   });
 

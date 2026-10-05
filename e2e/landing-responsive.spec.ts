@@ -77,7 +77,9 @@ test.describe('Landing responsive regressions', () => {
 
       const timer = page.getByRole('timer');
       await expect(timer).toHaveAttribute('aria-live', 'off');
-      await expect(timer).toHaveAccessibleName(/Cycle #42.*4 days/i);
+      // Named by its heading; the duration reads as text, to the minute.
+      await expect(timer).toHaveAccessibleName(/Cycle 42\b/i);
+      await expect(timer).toContainText(/4 days/i);
 
       const cards = page.getByTestId('countdown-units').locator('[data-countdown-unit]');
       await expect(cards).toHaveCount(4);
@@ -153,7 +155,7 @@ test.describe('Landing responsive regressions', () => {
     await mockLandingApi(page, 123);
     await openLanding(page);
 
-    await expect(page.getByRole('timer')).toHaveAccessibleName(/Cycle #42.*123 days/i);
+    await expect(page.getByRole('timer')).toContainText(/123 days/i);
     const days = page.locator('[data-countdown-unit="days"]').getByTestId('countdown-value');
     await expect(days).toHaveText('123');
     const geometry = await days.evaluate((element) => {
@@ -187,7 +189,32 @@ test.describe('Landing responsive regressions', () => {
       await page.keyboard.press('Enter');
       await expect(page.locator('main#main')).toBeFocused();
 
-      const languages = page.getByRole('button', { name: 'Language', exact: true });
+      const cycleEyebrow = getLandingContent('en').cycle.eyebrow;
+      if (width < 1024) {
+        // Phones: the header's links and preferences live in the menu sheet.
+        const menuButton = page.getByRole('banner').getByRole('button', { name: 'Open menu' });
+        await menuButton.focus();
+        await page.keyboard.press('Enter');
+        const sheet = page.getByRole('dialog', { name: 'Navigation' });
+        await expect(sheet).toBeVisible();
+        // The language is an explicit pick from a menu, named after the current one.
+        await expect(sheet.getByRole('button', { name: 'Language: English' })).toBeVisible();
+        await page.keyboard.press('Escape');
+        await expect(sheet).toBeHidden();
+        await expect(menuButton).toBeFocused();
+
+        await page.keyboard.press('Enter');
+        await expect(sheet).toBeVisible();
+        await sheet.getByRole('link', { name: cycleEyebrow, exact: true }).focus();
+        await page.keyboard.press('Enter');
+        await expect(sheet).toBeHidden();
+        await expect(page).toHaveURL(/#cycle$/);
+        await expect(page.locator('#cycle')).toBeInViewport({ ratio: 0.01 });
+        return;
+      }
+
+      // "(EN)" is added where the header shows the short name (1280–1535px).
+      const languages = page.getByRole('button', { name: /^Language: English( \(EN\))?$/ });
       await languages.focus();
       await page.keyboard.press('Enter');
       const menu = page.getByRole('menu');
@@ -203,7 +230,7 @@ test.describe('Landing responsive regressions', () => {
 
       const cycleLink = page
         .locator('header nav')
-        .getByRole('link', { name: getLandingContent('en').cycle.eyebrow, exact: true });
+        .getByRole('link', { name: cycleEyebrow, exact: true });
       await cycleLink.focus();
       await page.keyboard.press('Enter');
       await expect(page).toHaveURL(/#cycle$/);

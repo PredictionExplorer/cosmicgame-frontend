@@ -2,6 +2,16 @@ import type { Page } from '@playwright/test';
 
 const MOCK_NOW_SECONDS = Math.floor(Date.now() / 1000);
 const CYCLE_NUMBER = 7;
+/**
+ * When the cycle finalizes: 45 minutes after the mocked server time, well
+ * inside the final hour and clear of every clock phase line. The mocked
+ * server clock stands still at MOCK_NOW_SECONDS and the page reads it again
+ * every 12 s, so each read winds the countdown back to this lead. At exactly
+ * one hour, each read put the clock back on the final-hour line: it read
+ * "Under 12 hours" for a second, and its longer or shorter phase sentence
+ * moved everything below it, the chat included, at moments no test chose.
+ */
+const FINALIZATION_SECONDS = MOCK_NOW_SECONDS + 45 * 60;
 
 const dashboard = {
   CurRoundNum: CYCLE_NUMBER,
@@ -10,8 +20,8 @@ const dashboard = {
   CurBidPriceEth: 0.1,
   PrizeAmountEth: 2.5,
   RaffleAmountEth: 0.4,
-  PrizeClaimTs: MOCK_NOW_SECONDS + 3_600,
-  CurRoundPrizeTime: MOCK_NOW_SECONDS + 3_600,
+  PrizeClaimTs: FINALIZATION_SECONDS,
+  CurRoundPrizeTime: FINALIZATION_SECONDS,
   TsRoundStart: MOCK_NOW_SECONDS - 3_600,
   LastBidderAddr: '0x3333333333333333333333333333333333333333',
   GestureCostEth: 0.1,
@@ -156,7 +166,7 @@ export async function mockHomeGestureChatApi(
     }
 
     if (path.endsWith('/rounds/current/time')) {
-      await route.fulfill({ json: { CurRoundPrizeTime: MOCK_NOW_SECONDS + 3_600 } });
+      await route.fulfill({ json: { CurRoundPrizeTime: FINALIZATION_SECONDS } });
       return;
     }
 
@@ -286,7 +296,7 @@ export async function mockPagedHomeGestureChatApi(
             bidderAddress: row.bidderAddress,
             occurredAt: row.occurredAt,
             bidType: row.bidType,
-            prizeAt: new Date((MOCK_NOW_SECONDS + 3_600) * 1_000).toISOString(),
+            prizeAt: new Date(FINALIZATION_SECONDS * 1_000).toISOString(),
             cstDutchAuctionDurationSeconds: 3_600,
           })),
           meta: { revision },

@@ -85,7 +85,7 @@ export const mediumQuestionsTextVi = {
       c: 'Không gì cả \u2014 hai loại tiền độc lập với nhau.',
       d: 'Cửa sổ đặt lại về thời lượng ban đầu.',
     },
-    explanation: `Thời lượng cửa sổ thay đổi theo hoạt động, tạo cơ chế phản hồi giữa hai cách thanh toán: mỗi nét bút ETH rút ngắn nó khoảng ${percent(protocolFacts.cstCalibrationWindowDecreasePercentPerEthGesture)}%, mỗi nét bút CST kéo dài nó khoảng ${percent(protocolFacts.cstCalibrationWindowIncreasePercentPerCstGesture)}%. Hoạt động ETH sôi động đẩy nhanh đường giảm của CST, và hoạt động CST sôi động lại làm chậm nó \u2014 đẩy mỗi chu kỳ về một cán cân hài hòa.`,
+    explanation: `Thời lượng cửa sổ thay đổi theo hoạt động, tạo cơ chế phản hồi giữa hai loại nét bút: mỗi nét bút ETH rút ngắn nó khoảng ${percent(protocolFacts.cstCalibrationWindowDecreasePercentPerEthGesture)}%, mỗi nét bút CST kéo dài nó khoảng ${percent(protocolFacts.cstCalibrationWindowIncreasePercentPerCstGesture)}%. Hoạt động ETH sôi động đẩy nhanh đường giảm của CST, và hoạt động CST sôi động lại làm chậm nó \u2014 đẩy mỗi chu kỳ về một cán cân hài hòa.`,
     referenceLabel: 'Sách trắng \u00a74.3 \u2014 Nét bút CST',
   },
   'participation-cst-timing': {

@@ -1,10 +1,8 @@
 {
-  "faqPage": {
-    "heading": "Clarifications",
-    "description": "Answers to common questions about Cosmic Signature, its protocol, and how gestures work."
-  },
   "languageSwitcher": {
-    "label": "Language"
+    "label": "Language",
+    "current": "Language: {language}",
+    "currentShort": "Language: {language} ({short})"
   },
   "themeSwitcher": {
     "label": "Color scheme",
@@ -42,12 +40,63 @@
     "home": "Home",
     "gallery": "Gallery"
   },
+  "pageHeader": {
+    "snapshot": "Snapshot · {date}",
+    "lastReviewed": "Last reviewed {date}",
+    "lastUpdated": "Last updated {date}",
+    "relatedPages": "Related pages",
+    "readMore": "Read more",
+    "readLess": "Show less",
+    "crumbs": {
+      "participants": "Participants",
+      "allocationRecipients": "Allocation recipients",
+      "cycle": "Cycle {cycle}"
+    }
+  },
   "status": {
     "loading": "Loading",
     "loadingEllipsis": "Loading…",
-    "loadingDots": "Loading...",
-    "noData": "No data available.",
-    "nothingHere": "Nothing here yet"
+    "loadingDots": "Loading…",
+    "unavailable": "Unavailable"
+  },
+  "liveStatus": {
+    "connecting": "Connecting…",
+    "live": "Live",
+    "updated": "Updated {age}",
+    "reconnecting": "Reconnecting…",
+    "delayed": "Updates delayed · last update {age}",
+    "delayedCaveat": "Updates delayed · last update {age}. The clock may have been extended since then.",
+    "offline": "Offline",
+    "offlineDetail": "You’re offline. Last update {age}.",
+    "offlineCaveat": "You’re offline. Last update {age}. The clock may have been extended since then.",
+    "age": {
+      "justNow": "just now",
+      "seconds": "{count}s ago",
+      "minutes": "{count}m ago",
+      "hours": "{count}h ago",
+      "days": "{count}d ago"
+    },
+    "delayedShort": "Updates delayed"
+  },
+  "attention": {
+    "menuLabel": "Alerts and sound",
+    "title": "Alerts and sound",
+    "intro": "Everything here stays off until you turn it on. Choices are saved in this browser.",
+    "sound": {
+      "label": "Chime when a gesture follows yours",
+      "description": "A short sound when another participant’s gesture follows your latest one. Needs a connected wallet and this tab open."
+    },
+    "alert": {
+      "label": "Alert before finalization",
+      "description": "A browser notification before the Cycle Finalization Time. Keep this tab open.",
+      "minutes": "{minutes} min",
+      "blocked": "Notifications are blocked for this site. Allow them in your browser settings to use this alert.",
+      "unsupported": "This browser does not show notifications."
+    },
+    "tabTitle": {
+      "label": "Countdown in the tab title",
+      "description": "Shows the time left in the browser tab during the final hour of a cycle."
+    }
   },
   "actions": {
     "copyAddress": "Copy address",
@@ -59,9 +108,15 @@
   "externalLink": {
     "title": "Leaving Cosmic Signature",
     "description": "This link comes from a participant message stored on-chain. It has not been reviewed or verified — check that the destination below is what you expect.",
+    "site": "Site",
     "copy": "Copy link",
     "copied": "Link copied",
     "warning": "Never enter your wallet seed phrase or private keys on an external site.",
-    "open": "Open Link"
+    "open": "Open link"
+  },
+  "signature": {
+    "untitled": "Signature {id}",
+    "cycle": "Cycle {n}",
+    "anchored": "Anchored"
   }
 }

@@ -1,25 +1,25 @@
 import type { ReactNode } from 'react';
 
-import { PageMessages } from '@/components/i18n/PageMessages';
+import { cn } from '@/lib/utils';
 import { PageShell } from '@/components/ui/page-shell';
-
-import { StatisticsSubNav } from './StatisticsSubNav';
+import { SITE_EDGE_SHELL_CLASS } from '@/components/statistics/shell';
 
 /**
- * Shared shell for the statistics hub and its section pages.
+ * Shared shell for the statistics hub and its section pages, on the site's
+ * one content edge (`site-container`, the header's and footer's edge). Each
+ * page renders its header and, on the header's rule, the sticky section tabs
+ * (`StatisticsPageIntro`, `StatisticsSeoSummary`).
  *
- * Clip horizontal overflow without creating a vertical scroll container,
- * so the section navigation can remain sticky within the document.
+ * Horizontal overflow is clipped without creating a scroll container, so the
+ * tabs stay sticky within the document.
  */
 export default function StatisticsLayout({ children }: { children: ReactNode }) {
   return (
-    <PageShell variant="data" backdrop="signature" className="overflow-visible overflow-x-clip">
-      {/* The sub-nav renders from this LAYOUT, outside every page's
-          <PageMessages> boundary, so it needs its own scoped provider —
-          the chrome-only layout catalog has no statistics namespace. */}
-      <PageMessages namespaces={['statistics']}>
-        <StatisticsSubNav />
-      </PageMessages>
+    <PageShell
+      variant="data"
+      backdrop="signature"
+      className={cn(SITE_EDGE_SHELL_CLASS, 'overflow-visible overflow-x-clip')}
+    >
       {children}
     </PageShell>
   );

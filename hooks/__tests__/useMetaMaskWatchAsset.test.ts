@@ -5,7 +5,7 @@ const NFT_ADDRESS = '0x2222222222222222222222222222222222222222';
 
 const mockNotify = jest.fn();
 const mockEnsureCorrectChain = jest.fn<Promise<boolean>, []>();
-const mockUseAccount = jest.fn();
+const mockUseConnection = jest.fn();
 const mockUseContractAddresses = jest.fn();
 const mockReportError = jest.fn();
 
@@ -24,7 +24,7 @@ jest.mock('../../contexts/ContractAddressesContext', () => ({
 }));
 
 jest.mock('wagmi', () => ({
-  useAccount: () => mockUseAccount(),
+  useConnection: () => mockUseConnection(),
 }));
 
 jest.mock('../../utils/errors', () => ({
@@ -51,7 +51,7 @@ beforeEach(() => {
   mockRequest.mockResolvedValue(true);
   mockGetProvider.mockResolvedValue({ request: mockRequest });
   mockEnsureCorrectChain.mockResolvedValue(true);
-  mockUseAccount.mockReturnValue({
+  mockUseConnection.mockReturnValue({
     isConnected: true,
     connector: metaMaskConnector,
   });
@@ -174,7 +174,7 @@ describe('useMetaMaskWatchAsset', () => {
   });
 
   it('requires the current connection to be MetaMask', async () => {
-    mockUseAccount.mockReturnValue({
+    mockUseConnection.mockReturnValue({
       isConnected: true,
       connector: {
         id: 'walletConnect',

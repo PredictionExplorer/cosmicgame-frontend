@@ -1,16 +1,14 @@
 import '@testing-library/jest-dom';
 
-import { convertTimestampToDateTime } from '@/utils';
-
 import NameHistoryTable from '@/components/tables/NameHistoryTable';
 
 import { render, screen, checkA11y } from '@/test-utils';
 
 describe('NameHistoryTable', () => {
-  test('with no records', () => {
+  test('with no records shows the empty state', () => {
     render(<NameHistoryTable list={[]} />);
-    expect(screen.getByText('tables.columns.dateTimeCompact')).toBeInTheDocument();
-    expect(screen.getByText('tables.columns.tokenName')).toBeInTheDocument();
+    expect(screen.queryByRole('table')).not.toBeInTheDocument();
+    expect(screen.getByText('tables.empty.history')).toBeInTheDocument();
   });
 
   test('with mock data', async () => {
@@ -27,9 +25,7 @@ describe('NameHistoryTable', () => {
       },
     ];
     render(<NameHistoryTable list={mockData} />);
-    expect(
-      screen.getByText(convertTimestampToDateTime(mockData[0]!.TimeStamp)),
-    ).toBeInTheDocument();
+    expect(screen.getByText('Nov 08, 2023, 14:04')).toBeInTheDocument();
     expect(screen.getByText(mockData[0]!.TokenName)).toBeInTheDocument();
   });
 
@@ -69,9 +65,7 @@ describe('NameHistoryTable', () => {
       },
     ];
     render(<NameHistoryTable list={mockData} />);
-    expect(
-      screen.getByText(convertTimestampToDateTime(mockData[0]!.TimeStamp)),
-    ).toBeInTheDocument();
+    expect(screen.getByText('Nov 08, 2023, 14:05')).toBeInTheDocument();
     expect(screen.getByText('tables.nameHistory.removed')).toBeInTheDocument();
   });
 

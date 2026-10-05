@@ -1,167 +1,124 @@
-import { useEffect, useState } from 'react';
-import { useTranslations } from 'next-intl';
+'use client';
 
-import type { GestureInfo } from '@/services/api';
-import {
-  TablePrimaryContainer,
-  TablePrimaryBody,
-  TablePrimaryCell,
-  TablePrimaryHead,
-  TablePrimaryRow,
-  TablePrimary,
-  TablePrimaryHeadCell,
-} from '@/components/styled';
-import { CustomPagination } from '@/components/common/CustomPagination';
-import { AddressLink } from '@/components/common/AddressLink';
+import { useMemo } from 'react';
+import { useLocale, useTranslations } from 'next-intl';
+
+import { formatCount, sameAddress } from '@/utils/format';
+import { getSelectionShare } from '@/lib/selectionStanding';
+import { DataTable, type DataTableColumn } from '@/components/ui/data-table';
+import type { LedgerStateProps } from '@/components/tables/ledger-props';
 import { useActiveWeb3React } from '@/hooks/web3';
+import type { GestureInfo } from '@/services/api';
 
-interface HolderRowProps {
-  holder: {
-    userAddr: string;
-    count: number;
-    ethProbability: number;
-    NFTProbability: number;
-  } | null;
+interface PoolEntry {
+  userAddr: string;
+  /** The participant's gestures this cycle: their entries in the pool. */
+  gestures: number;
+  /** Their part of the pool, from 0 to 1 (lib/selectionStanding). */
+  share: number;
 }
 
-const HolderRow = ({ holder }: HolderRowProps) => {
-  const t = useTranslations('tables');
-  const { account } = useActiveWeb3React();
-
-  if (!holder) {
-    return <TablePrimaryRow />;
-  }
-
-  const isCurrentUser = holder && account === holder.userAddr;
-
-  return (
-    <TablePrimaryRow className={isCurrentUser ? 'bg-white/[0.06]' : undefined}>
-      <TablePrimaryCell label={t('columns.holder')} align="left">
-        <AddressLink address={holder?.userAddr ?? ''} url={`/user/${holder?.userAddr ?? ''}`} />
-        &nbsp;
-        {isCurrentUser && t('status.you')}
-      </TablePrimaryCell>
-      <TablePrimaryCell label={t('columns.numberOfStellarEntries')} align="center">
-        {holder?.count ?? 0}
-      </TablePrimaryCell>
-      <TablePrimaryCell label={t('columns.ethSelectionProbability')} align="center">
-        {((holder?.ethProbability ?? 0) * 100).toFixed(2)}%
-      </TablePrimaryCell>
-      <TablePrimaryCell label={t('columns.nftSelectionProbability')} align="center">
-        {((holder?.NFTProbability ?? 0) * 100).toFixed(2)}%
-      </TablePrimaryCell>
-    </TablePrimaryRow>
-  );
-};
-
-interface StellarSelectionHolderTableProps {
+interface StellarSelectionHolderTableProps extends LedgerStateProps {
   list: GestureInfo[];
-  numRaffleEthWinner?: number;
-  numRaffleNFTWinner?: number;
+  /** ETH Stellar Selections drawn at finalization, when the dashboard carries them. */
+  stellarEthSelections?: number;
+  /** NFT Stellar Selections drawn at finalization. */
+  stellarNftSelections?: number;
 }
 
+/**
+ * Each participant's entries in this cycle's Stellar Selection pool (one per
+ * gesture), most first, with their linear share of the pool. The share is
+ * the count it comes from divided by every gesture of the cycle, computed in
+ * lib/selectionStanding; it is never compounded into a chance of "at least
+ * one" selection, which climbs toward 100% with every paid entry.
+ */
+function poolEntriesFrom(list: readonly GestureInfo[]): PoolEntry[] {
+  const counts = new Map<string, { userAddr: string; gestures: number }>();
+  for (const gesture of list) {
+    const key = gesture.BidderAddr.toLowerCase();
+    const entry = counts.get(key) ?? { userAddr: gesture.BidderAddr, gestures: 0 };
+    entry.gestures += 1;
+    counts.set(key, entry);
+  }
+  return [...counts.values()]
+    .map(({ userAddr, gestures }) => ({
+      userAddr,
+      gestures,
+      share: getSelectionShare({ totalGestures: list.length, myGestures: gestures })?.share ?? 0,
+    }))
+    .sort((a, b) => b.gestures - a.gestures);
+}
+
+/**
+ * The cycle's Stellar Selection pool by participant: three short columns, so
+ * it stays a real table on a phone. The connected wallet's row stays at its
+ * true position, marked "You", with its position above the table. Under the
+ * table, how many selections finalization draws from the pool; the tab's note
+ * says how they are drawn (with replacement), so the caption only counts.
+ */
 const StellarSelectionHolderTable = ({
   list,
-  numRaffleEthWinner,
-  numRaffleNFTWinner,
+  stellarEthSelections,
+  stellarNftSelections,
+  ...state
 }: StellarSelectionHolderTableProps) => {
   const t = useTranslations('tables');
-  const perPage = 5;
-  const [page, setPage] = useState(1);
-  const [holderList, setHolderList] = useState<
-    | {
-        userAddr: string;
-        count: number;
-        ethProbability: number;
-        NFTProbability: number;
-      }[]
-    | null
-  >(null);
-
+  const locale = useLocale();
   const { account } = useActiveWeb3React();
 
-  useEffect(() => {
-    const groupAndCountByParticipantAddr = () => {
-      const result: { [key: string]: number } = {};
+  const entries = useMemo(() => poolEntriesFrom(list), [list]);
 
-      list.forEach((event: GestureInfo) => {
-        const addr = event.BidderAddr;
-        if (result[addr]) {
-          result[addr]++;
-        } else {
-          result[addr] = 1;
-        }
-      });
+  const columns = useMemo<DataTableColumn<PoolEntry>[]>(
+    () => [
+      {
+        id: 'participant',
+        kind: 'address',
+        header: t('columns.participant'),
+        value: (row) => row.userAddr,
+        phone: 'title',
+      },
+      {
+        id: 'gestures',
+        kind: 'count',
+        header: t('columns.gesturesThisCycle'),
+        value: (row) => row.gestures,
+      },
+      {
+        id: 'share',
+        kind: 'percent',
+        header: t('columns.shareOfPool'),
+        value: (row) => row.share,
+        percentScale: 'ratio',
+      },
+    ],
+    [t],
+  );
 
-      const sortedResults = Object.entries(result)
-        .map(([bidderAddr, count]) => ({
-          userAddr: bidderAddr,
-          count,
-          ethProbability:
-            1 - Math.pow((list.length - count) / list.length, numRaffleEthWinner ?? 1),
-          NFTProbability:
-            1 - Math.pow((list.length - count) / list.length, numRaffleNFTWinner ?? 1),
-        }))
-        .sort((a, b) => b.count - a.count);
-
-      const userIndex = sortedResults.findIndex((item) => item.userAddr === account);
-      if (userIndex !== -1) {
-        const userItem = sortedResults.splice(userIndex, 1)[0];
-        if (userItem) sortedResults.unshift(userItem);
-      }
-
-      return sortedResults;
-    };
-
-    if (numRaffleEthWinner && numRaffleNFTWinner) {
-      const holders = groupAndCountByParticipantAddr();
-      // eslint-disable-next-line react-hooks/set-state-in-effect
-      setHolderList(holders);
-    }
-  }, [list, numRaffleEthWinner, numRaffleNFTWinner, account]);
-
-  if (list.length === 0) {
-    return <p>{t('empty.holders')}</p>;
-  }
+  const drawsKnown =
+    typeof stellarEthSelections === 'number' &&
+    stellarEthSelections > 0 &&
+    typeof stellarNftSelections === 'number' &&
+    stellarNftSelections > 0;
 
   return (
-    <>
-      {holderList === null ? (
-        <p className="text-lg font-semibold">{t('status.loading')}</p>
-      ) : (
-        <>
-          <TablePrimaryContainer>
-            <TablePrimary>
-              <TablePrimaryHead>
-                <tr>
-                  <TablePrimaryHeadCell align="left">{t('columns.holder')}</TablePrimaryHeadCell>
-                  <TablePrimaryHeadCell align="center">
-                    {t('columns.numberOfStellarEntries')}
-                  </TablePrimaryHeadCell>
-                  <TablePrimaryHeadCell align="center">
-                    {t('columns.ethSelectionProbability')}
-                  </TablePrimaryHeadCell>
-                  <TablePrimaryHeadCell align="center">
-                    {t('columns.nftSelectionProbability')}
-                  </TablePrimaryHeadCell>
-                </tr>
-              </TablePrimaryHead>
-              <TablePrimaryBody>
-                {holderList.slice((page - 1) * perPage, page * perPage).map((holder) => (
-                  <HolderRow key={holder.userAddr} holder={holder} />
-                ))}
-              </TablePrimaryBody>
-            </TablePrimary>
-          </TablePrimaryContainer>
-          <CustomPagination
-            page={page}
-            setPage={setPage}
-            totalLength={holderList.length}
-            perPage={perPage}
-          />
-        </>
-      )}
-    </>
+    <DataTable
+      data={entries}
+      columns={columns}
+      ariaLabel={t('names.stellarSelectionEntries')}
+      getRowKey={(row) => row.userAddr}
+      isCurrentRow={(row) => sameAddress(row.userAddr, account)}
+      emptyTitle={t('empty.stellarEntries')}
+      caption={
+        drawsKnown
+          ? t('stellarSelection.draws', {
+              eth: formatCount(stellarEthSelections, locale),
+              nft: formatCount(stellarNftSelections, locale),
+            })
+          : undefined
+      }
+      {...state}
+    />
   );
 };
 

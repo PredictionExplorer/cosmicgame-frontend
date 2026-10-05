@@ -5,18 +5,10 @@ test.describe('Mobile gesture touch handling', () => {
     await page.goto('/', { waitUntil: 'networkidle' });
   });
 
-  test('particle backdrop never boots on touch devices', async ({ page }) => {
-    // The strongest possible touch-safety guarantee, and a deliberate INP
-    // win: the particle engine is skipped entirely for coarse pointers and
-    // small viewports (see Providers), so there is no canvas to interfere
-    // with touch input and no persistent rAF loop competing with taps.
-    // Give the idle-callback window that used to boot the engine time to
-    // fire before asserting.
-    await page.waitForTimeout(3_000);
-    await expect(page.locator('#tsparticles')).toHaveCount(0);
-  });
-
-  test('foreground controls win hit-testing over the particle canvas', async ({ page }) => {
+  // The backdrop (AmbientBackdrop) is static CSS behind the page with
+  // pointer-events disabled; these guard against any layer, backdrop or
+  // canvas, ever sitting on top of the controls a thumb reaches for.
+  test('foreground controls win hit-testing over the backdrop', async ({ page }) => {
     const foregroundTarget = page
       .locator('main button:not([disabled]):visible, main a[href]:visible')
       .first();
@@ -30,23 +22,18 @@ test.describe('Mobile gesture touch handling', () => {
       const hit = document.elementFromPoint(x, y);
 
       return {
-        hitParticleLayer: Boolean(
-          hit &&
-          (hit.tagName.toLowerCase() === 'canvas' ||
-            hit.id === 'tsparticles' ||
-            hit.closest('#tsparticles')),
+        hitBackdrop: Boolean(
+          hit && (hit.tagName.toLowerCase() === 'canvas' || hit.closest('[data-ambient-backdrop]')),
         ),
         targetReceivesHit: Boolean(hit && (hit === target || target.contains(hit))),
       };
     });
 
-    expect(hitTest.hitParticleLayer).toBe(false);
+    expect(hitTest.hitBackdrop).toBe(false);
     expect(hitTest.targetReceivesHit).toBe(true);
   });
 
-  test('particle layer never wins elementFromPoint across visible main content', async ({
-    page,
-  }) => {
+  test('no backdrop layer wins elementFromPoint across visible main content', async ({ page }) => {
     const samples = await page.evaluate(() => {
       const main = document.querySelector('main');
       if (!main) return [];
@@ -67,8 +54,7 @@ test.describe('Mobile gesture touch handling', () => {
             x,
             y,
             tagName: hit?.tagName.toLowerCase() ?? null,
-            id: (hit as HTMLElement | null)?.id ?? null,
-            insideParticles: Boolean(hit?.closest('#tsparticles')),
+            insideBackdrop: Boolean(hit?.closest('[data-ambient-backdrop]')),
           };
         }),
       );
@@ -76,20 +62,21 @@ test.describe('Mobile gesture touch handling', () => {
 
     expect(samples.length).toBeGreaterThan(0);
     for (const sample of samples) {
-      expect(sample.insideParticles).toBe(false);
-      expect(sample.id).not.toBe('tsparticles');
+      expect(sample.insideBackdrop).toBe(false);
       expect(sample.tagName).not.toBe('canvas');
     }
   });
 
   test('gesture method controls accept real touch taps when rendered', async ({ page }) => {
     // Target the gesture method button precisely: a loose /ETH/i name also
-    // matches info-tooltip triggers whose labels mention ETH.
-    const ethOption = page.getByRole('button', { name: /pay with ether/i }).first();
+    // matches explained terms and info triggers whose labels mention ETH.
+    const ethOption = page
+      .locator('[data-testid="gesture-panel"][data-variant="card"]')
+      .getByTestId('panel-method-eth');
     if (await ethOption.isVisible({ timeout: 5_000 }).catch(() => false)) {
       await ethOption.tap();
       await expect(ethOption).toBeVisible();
-      await expect(ethOption).toHaveAttribute('aria-pressed', 'true');
+      await expect(ethOption).toHaveAttribute('aria-checked', 'true');
     }
   });
 });

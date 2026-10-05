@@ -1,10 +1,11 @@
 import '@testing-library/jest-dom';
 
-import { convertTimestampToDateTime } from '@/utils';
+import { protocolFacts } from '@/content/protocol-facts';
+import { phoneRecords, recordLines, wideLedger } from '@/test-utils/ledger';
 
 import CharityWithdrawalTable from '@/components/tables/CharityWithdrawalTable';
 
-import { render, screen, checkA11y } from '@/test-utils';
+import { render, screen, checkA11y, within } from '@/test-utils';
 
 describe('CharityWithdrawalTable', () => {
   test('with no records', () => {
@@ -25,12 +26,42 @@ describe('CharityWithdrawalTable', () => {
         AmountEth: 0.10041564272868614,
       },
     ];
-    render(<CharityWithdrawalTable list={mockData} />);
-    expect(
-      screen.getByText(convertTimestampToDateTime(mockData[0]!.TimeStamp)),
-    ).toBeInTheDocument();
-    expect(screen.getByText(mockData[0]!.DestinationAddr)).toBeInTheDocument();
-    expect(screen.getByText(mockData[0]!.AmountEth.toFixed(6))).toBeInTheDocument();
+    const { container } = render(<CharityWithdrawalTable list={mockData} />);
+    const wide = within(wideLedger(container));
+    expect(wide.getAllByText('Nov 30, 2023, 12:18')).toHaveLength(1);
+    expect(wide.getAllByText('0x555e…\u20600e60')).toHaveLength(1);
+    // ETH reads at the ledger precision, with the exact value on hover.
+    const amount = wide.getByText('0.1004');
+    expect(amount).toHaveAttribute('title', expect.stringContaining('0.10041564272868614'));
+
+    // On a phone: the date and the amount, then where the ETH went.
+    const [line1, line2] = recordLines(phoneRecords(container)[0]!);
+    expect(line1).toHaveTextContent(/^Nov 30, 2023, 12:18.*0\.1004\sETH$/);
+    expect(line2).toHaveTextContent('0x555e…\u20600e60');
+  });
+
+  test('names the documented beneficiary, as the page header does', () => {
+    // Regression: the header said "Protocol Guild" and the column said 0xdddd…cf79.
+    const { name, address } = protocolFacts.publicGoodsBeneficiary;
+    render(
+      <CharityWithdrawalTable
+        list={[
+          {
+            EvtLogId: '1',
+            BlockNum: 1,
+            TxId: 1,
+            TxHash: `0x${'1'.repeat(64)}`,
+            TimeStamp: 1701346718,
+            DateTime: '2023-11-30T12:18:38Z',
+            DestinationAddr: address.toLowerCase(),
+            AmountEth: 1,
+          },
+        ]}
+      />,
+    );
+    // In the ledger's cell and in the phone record alike.
+    expect(screen.getAllByText(name)).toHaveLength(2);
+    expect(screen.getAllByTitle(`${name} · ${address}`)).toHaveLength(2);
   });
 
   test('external links have rel="noopener noreferrer"', () => {

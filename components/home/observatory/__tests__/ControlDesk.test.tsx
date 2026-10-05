@@ -1,123 +1,212 @@
-import { createRef } from 'react';
 import userEvent from '@testing-library/user-event';
+import { ImageIcon } from 'lucide-react';
 
-import { render, screen, checkA11y } from '@/test-utils';
+import { render, screen, within, checkA11y } from '@/test-utils';
 
-import { ControlDesk } from '../ControlDesk';
+import { AllocationsDisclosure, ControlDesk, DESK_REGION, DeskDisclosure } from '../ControlDesk';
 
-const makeProps = () => ({
-  header: <div data-testid="slot-header">Header</div>,
-  clock: <div data-testid="slot-clock">Clock</div>,
-  calibration: <div data-testid="slot-calibration">Calibration</div>,
-  orientation: <div data-testid="slot-orientation">Orientation</div>,
-  latestParticipant: <div data-testid="slot-latest">Latest</div>,
-  chronoEndurance: <div data-testid="slot-chrono">Chrono</div>,
-  gestureConsole: <div data-testid="slot-gesture">Gesture</div>,
-  personal: <div data-testid="slot-personal">Personal</div>,
-  allocationLedger: <div data-testid="slot-ledger">Ledger</div>,
-});
+const regions = {
+  header: <h1>Observatory</h1>,
+  clock: <section aria-label="Clock">Clock</section>,
+  calibration: <section aria-label="Calibration">Calibration</section>,
+  standings: <section aria-label="Standings">Standings</section>,
+  gestureConsole: <section aria-label="Gesture form">Form</section>,
+  standing: <section aria-label="Your standing">Standing</section>,
+  art: <section aria-label="Latest Signature">Art</section>,
+};
+
+/** Classes that draw a box: a border on every side, a fill or a rounded frame. */
+const BOX = /(?:^|\s)(?:border(?:\s|$)|bg-surface|rounded-surface)/;
+
+/** The desk's cells in DOM order. */
+const cellOrder = () =>
+  [
+    ...screen.getByTestId('control-desk-grid').querySelectorAll('[data-testid^="control-desk-"]'),
+  ].map((node) => node.getAttribute('data-testid'));
+
+/** The 1024px grid placement classes of a cell, which must read in DOM order column by column. */
+const placement = (testId: string) =>
+  screen
+    .getByTestId(testId)
+    .className.split(/\s+/)
+    .filter((name) => /^lg:(?:col|row)-/.test(name));
 
 describe('ControlDesk', () => {
-  it('keeps every decision surface, the guide, and supporting information together', () => {
-    render(<ControlDesk {...makeProps()} />);
-
-    const desk = screen.getByTestId('control-desk');
-    for (const id of [
-      'slot-header',
-      'slot-clock',
-      'slot-calibration',
-      'slot-orientation',
-      'slot-latest',
-      'slot-chrono',
-      'slot-gesture',
-      'slot-personal',
-      'slot-ledger',
-    ]) {
-      expect(desk).toContainElement(screen.getByTestId(id));
+  it('reads in one order at every width: clock, Calibration, form, standing, standings, art', () => {
+    render(<ControlDesk {...regions} />);
+    expect(cellOrder()).toEqual([
+      'control-desk-clock',
+      'control-desk-calibration',
+      'control-desk-gesture',
+      'control-desk-standing',
+      'control-desk-standings',
+      'control-desk-art',
+    ]);
+    // No visual reordering anywhere: what is drawn is what is read and tabbed.
+    for (const cell of screen.getByTestId('control-desk-grid').children) {
+      expect(cell.className).not.toMatch(/(?:^|\s)(?:[a-z-]+:)*order-/);
     }
   });
 
-  it('shows the clock, standings, calibration, and action without disclosure', () => {
-    render(<ControlDesk {...makeProps()} />);
-
-    expect(screen.getByTestId('slot-clock')).toBeVisible();
-    expect(screen.getByTestId('slot-latest')).toBeVisible();
-    expect(screen.getByTestId('slot-chrono')).toBeVisible();
-    expect(screen.getByTestId('slot-calibration')).toBeVisible();
-    expect(screen.getByTestId('slot-gesture')).toBeVisible();
-    expect(screen.queryByTestId('standings-disclosure')).not.toBeInTheDocument();
-    // jsdom cannot evaluate Tailwind breakpoints; guard the old mobile-only
-    // hiding rule separately from the semantic visibility assertions.
-    expect(screen.getByTestId('control-desk-gesture')).not.toHaveClass('hidden');
-  });
-
-  it('reveals supplementary allocations without changing the decision surfaces', async () => {
-    const user = userEvent.setup();
-    render(<ControlDesk {...makeProps()} />);
-
-    const allocations = screen.getByTestId('allocations-disclosure');
-    const allocationsSummary = screen
-      .getByText('home.orientation.allocationsTitle')
-      .closest('summary');
-    expect(allocations).not.toHaveAttribute('open');
-    expect(screen.getByTestId('slot-ledger')).not.toBeVisible();
-
-    expect(allocationsSummary).not.toBeNull();
-    await user.click(allocationsSummary!);
-    expect(screen.getByTestId('slot-ledger')).toBeVisible();
-    await user.click(allocationsSummary!);
-    expect(screen.getByTestId('slot-ledger')).not.toBeVisible();
-    expect(screen.getByTestId('slot-latest')).toBeVisible();
-    expect(screen.getByTestId('slot-chrono')).toBeVisible();
-    expect(screen.getByTestId('slot-calibration')).toBeVisible();
-    expect(screen.getByTestId('slot-gesture')).toBeVisible();
-  });
-
-  it('keeps the allocation fragment on the disclosure that reveals its content', () => {
-    render(<ControlDesk {...makeProps()} />);
-
-    expect(screen.getByTestId('allocations-disclosure')).toHaveAttribute(
-      'id',
-      'allocation-breakdown',
+  it('puts the form beside the Cycle column from 1024px, so its action is in the first viewport', () => {
+    render(<ControlDesk {...regions} />);
+    // Row 1: the Cycle column (5 of 12): clock, Calibration, then the standing.
+    expect(placement('control-desk-clock')).toEqual(
+      expect.arrayContaining(['lg:col-span-5', 'lg:col-start-1', 'lg:row-start-1']),
+    );
+    expect(placement('control-desk-calibration')).toEqual(
+      expect.arrayContaining(['lg:col-start-1', 'lg:row-start-2']),
+    );
+    expect(placement('control-desk-standing')).toEqual(
+      expect.arrayContaining(['lg:col-start-1', 'lg:row-start-3']),
+    );
+    // Beside it, the form (7 of 12) spans the column's three rows.
+    expect(placement('control-desk-gesture')).toEqual(
+      expect.arrayContaining([
+        'lg:col-span-7',
+        'lg:col-start-6',
+        'lg:row-start-1',
+        'lg:row-span-3',
+      ]),
+    );
+    // Row 2: the standings (7 of 12) beside the art (5 of 12).
+    expect(placement('control-desk-standings')).toEqual(
+      expect.arrayContaining(['lg:col-span-7', 'lg:col-start-1', 'lg:row-start-4']),
+    );
+    expect(placement('control-desk-art')).toEqual(
+      expect.arrayContaining(['lg:col-span-5', 'lg:col-start-8', 'lg:row-start-4']),
     );
   });
 
-  it('omits optional personal and gesture slots cleanly', () => {
-    const props = makeProps();
-    render(<ControlDesk {...props} personal={undefined} gestureConsole={undefined} />);
+  it('never moves focus up within a column from 1024px', () => {
+    const rowStart = (testId: string) =>
+      Number(
+        placement(testId)
+          .find((name) => name.startsWith('lg:row-start-'))!
+          .split('-')
+          .pop(),
+      );
+    const colStart = (testId: string) =>
+      Number(
+        placement(testId)
+          .find((name) => name.startsWith('lg:col-start-'))!
+          .split('-')
+          .pop(),
+      );
+    for (const props of [regions, { ...regions, gestureConsole: undefined }]) {
+      const { unmount } = render(<ControlDesk {...props} />);
+      const cells = cellOrder() as string[];
+      for (const [index, cell] of cells.entries()) {
+        for (const later of cells.slice(index + 1)) {
+          if (colStart(later) !== colStart(cell)) continue;
+          expect(rowStart(later)).toBeGreaterThan(rowStart(cell));
+        }
+      }
+      unmount();
+    }
+  });
 
-    expect(screen.queryByTestId('control-desk-personal')).not.toBeInTheDocument();
+  it("gives the art the form's place between cycles, the standings filling row 2", () => {
+    render(<ControlDesk {...regions} gestureConsole={undefined} />);
     expect(screen.queryByTestId('control-desk-gesture')).not.toBeInTheDocument();
-    expect(screen.getByTestId('slot-ledger')).toBeInTheDocument();
-    expect(screen.getByTestId('slot-clock')).toBeVisible();
-    expect(screen.getByTestId('slot-calibration')).toBeVisible();
-    expect(screen.getByTestId('slot-orientation')).toBeVisible();
+    expect(cellOrder()).toEqual([
+      'control-desk-clock',
+      'control-desk-calibration',
+      'control-desk-standing',
+      'control-desk-art',
+      'control-desk-standings',
+    ]);
+    expect(placement('control-desk-art')).toEqual(
+      expect.arrayContaining(['lg:col-span-7', 'lg:col-start-6', 'lg:row-start-1']),
+    );
+    // The whole row: no empty cell is left beside the standings.
+    expect(placement('control-desk-standings')).toEqual(
+      expect.arrayContaining(['lg:col-span-12', 'lg:col-start-1', 'lg:row-start-4']),
+    );
   });
 
-  it('keeps calibration before the form in reading order', () => {
-    render(<ControlDesk {...makeProps()} />);
-
-    const calibration = screen.getByTestId('slot-calibration');
-    const gesture = screen.getByTestId('slot-gesture');
-    expect(calibration.compareDocumentPosition(gesture)).toBe(Node.DOCUMENT_POSITION_FOLLOWING);
+  it('renders no standing without a wallet', () => {
+    render(<ControlDesk {...regions} standing={undefined} />);
+    expect(screen.queryByTestId('control-desk-standing')).not.toBeInTheDocument();
   });
 
-  it('forwards the stage ref for ActionDock visibility tracking', () => {
-    const ref = createRef<HTMLDivElement>();
-    render(<ControlDesk {...makeProps()} ref={ref} />);
-    expect(ref.current).toHaveAttribute('id', 'deck');
-    expect(ref.current).toContainElement(screen.getByTestId('slot-gesture'));
-    expect(ref.current).toContainElement(screen.getByTestId('slot-latest'));
-    expect(ref.current).toContainElement(screen.getByTestId('slot-chrono'));
-    expect(ref.current).toContainElement(screen.getByTestId('slot-calibration'));
-    expect(ref.current).not.toContainElement(screen.getByTestId('allocations-disclosure'));
+  it('keeps phones and tablets in one column', () => {
+    render(<ControlDesk {...regions} />);
+    // No two-column split before 1024px.
+    expect(screen.getByTestId('control-desk-grid').className).not.toMatch(
+      /(?:^|\s)(?:md|sm):grid-cols/,
+    );
+  });
+
+  it('boxes only the form: every other region opens on a hairline on the page ground', () => {
+    render(<ControlDesk {...regions} />);
+    // The form is the page's one quiet surface: a fill, no border.
+    const form = screen.getByTestId('control-desk-gesture');
+    expect(form).toHaveClass('bg-surface', 'rounded-surface');
+    expect(form.className).not.toMatch(/(?:^|\s)border(?:\s|$)/);
+    for (const testId of [
+      'control-desk-clock',
+      'control-desk-standings',
+      'control-desk-calibration',
+      'control-desk-art',
+      'control-desk-standing',
+    ]) {
+      const cell = screen.getByTestId(testId);
+      expect(cell.className).not.toMatch(BOX);
+      expect(cell).toHaveClass(...DESK_REGION.split(' '));
+    }
+    // A region that continues its column opens on the fainter rule from 1024px.
+    expect(screen.getByTestId('control-desk-calibration')).toHaveClass('lg:border-rule-faint');
+    expect(screen.getByTestId('control-desk-standing')).toHaveClass('lg:border-rule-faint');
+  });
+
+  it('keeps the allocation breakdown in a native disclosure row that names the reserve', async () => {
+    const user = userEvent.setup();
+    render(
+      <AllocationsDisclosure reserveEth={32.29}>
+        <p>Ledger</p>
+      </AllocationsDisclosure>,
+    );
+    const disclosure = screen.getByTestId('allocations-disclosure');
+    expect(disclosure.tagName).toBe('DETAILS');
+    expect(disclosure.className).not.toMatch(BOX);
+    expect(disclosure).toHaveClass('border-t', 'border-b');
+    expect(disclosure).not.toHaveAttribute('open');
+    // Closed, the row already says something: the Cycle Reserve the tracks share.
+    expect(screen.getByTestId('allocations-disclosure-figure')).toHaveTextContent(
+      /32\.2900\sETH.*Cycle Reserve/,
+    );
+    await user.click(within(disclosure).getByText('home.orientation.allocationsTitle'));
+    expect(disclosure).toHaveAttribute('open');
+    expect(within(disclosure).getByText('Ledger')).toBeVisible();
+  });
+
+  it('shows no reserve figure until the dashboard reports it', () => {
+    render(
+      <AllocationsDisclosure reserveEth={null}>
+        <p>Ledger</p>
+      </AllocationsDisclosure>,
+    );
+    expect(screen.queryByTestId('allocations-disclosure-figure')).not.toBeInTheDocument();
+  });
+
+  it('builds every disclosure row the same way: glyph, title and one line on what opens', () => {
+    render(
+      <DeskDisclosure testId="row" icon={ImageIcon} title="Story" description="What it holds">
+        <p>Notes</p>
+      </DeskDisclosure>,
+    );
+    const row = screen.getByTestId('row');
+    expect(row).toHaveClass('border-b');
+    expect(row).not.toHaveClass('border-t');
+    const summary = row.querySelector('summary')!;
+    expect(summary.querySelector('svg')).not.toBeNull();
+    expect(within(summary).getByText('Story')).toHaveClass('type-heading-3');
+    expect(within(summary).getByText('What it holds')).toHaveClass('type-body-sm');
   });
 
   it('has no accessibility violations', async () => {
-    const user = userEvent.setup();
-    const { container } = render(<ControlDesk {...makeProps()} />);
-    await checkA11y(container);
-    await user.click(screen.getByText('home.orientation.allocationsTitle'));
+    const { container } = render(<ControlDesk {...regions} />);
     await checkA11y(container);
   });
 });

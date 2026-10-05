@@ -18,7 +18,7 @@ export const basicQuestionsTextZh = {
     explanation:
       'Cosmic Signature 是程序化艺术协议：限时的演绎周期在一次次落笔中延展，收官时铭刻确定性的三体艺术作品。整条管线没有任何 AI 参与——作品是由种子驱动的物理计算，与文字提示词式的图像服务恰好相反。',
     funFact: 'COSMIC 也是一个癌症突变数据库的名称，两者没有关联。协议文档对此有明确说明。',
-    referenceLabel: '学习中心：什么是 Cosmic Signature？',
+    referenceLabel: '学习：什么是 Cosmic Signature？',
   },
   'what-is-a-gesture': {
     prompt: '在协议术语中，“落笔”指什么？',
@@ -238,9 +238,9 @@ export const basicQuestionsTextZh = {
     prompt: '典型周期会铭刻多少枚 Cosmic Signature NFT？',
     options: {
       a: `${protocolFacts.typicalNftsPerCycle} 枚`,
-      b: '1 枚',
+      b: '1 枚',
       c: `${protocolFacts.nftStellarSelectionRecipients} 枚`,
-      d: '100 枚',
+      d: '100 枚',
     },
     explanation: `典型周期铭刻 ${protocolFacts.typicalNftsPerCycle} 枚 NFT：${protocolFacts.roleNftsPerCycle} 枚角色 NFT（受益方、时之勇士、坚守冠军、CST 收官之笔）、${protocolFacts.nftStellarSelectionRecipients} 枚参与者 NFT 星选、${protocolFacts.anchoredRwlkNftSelectionRecipients} 枚锚定 NFT 星选。跳过某条轨道的周期会少铭刻几枚。`,
     referenceLabel: '白皮书 §5.1 · 收官时的发放',
@@ -303,6 +303,6 @@ export const basicQuestionsTextZh = {
     },
     explanation:
       '协议运行在 Arbitrum One 上，重要记录——每一笔落笔、每一个种子、每一份分配——都在链上。正因如此，作品可复现、发放可审计，任何人都无需信任任何服务器。',
-    referenceLabel: '学习中心：Cosmic Signature 与 Arbitrum',
+    referenceLabel: '学习：Cosmic Signature 与 Arbitrum',
   },
 } as const satisfies QuizTierQuestionsText<'basic'>;

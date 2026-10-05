@@ -690,6 +690,8 @@ export type QuizTierQuestionsText<TierId extends QuizTierId> = {
 /** Copy for one tier's hub card and tier-page hero. */
 export interface QuizTierTextMeta {
   readonly title: string;
+  /** The tier page's H1: the tier's name and what it covers. */
+  readonly heading: string;
   readonly tagline: string;
   readonly description: string;
 }

@@ -1,62 +1,159 @@
 'use client';
 
-import { useTranslations } from 'next-intl';
+import { ArrowRight, ChevronLeft, ChevronRight, Link2Off } from 'lucide-react';
+import { useLocale, useTranslations } from 'next-intl';
 
-import { detailPanelClass } from '@/components/detail-page/DetailPageChrome';
-import { PageHeader } from '@/components/layout/PageHeader';
-import { PageShell } from '@/components/ui/page-shell';
+import { Link } from '@/i18n/navigation';
+import { formatCount } from '@/utils/format';
+import { useDashboardInfo, useDonationsBothByRound } from '@/hooks/useApiQuery';
+import { LedgerPage } from '@/components/ledger/LedgerPage';
+import { PageHeader, type PageHeaderFigure } from '@/components/layout/PageHeader';
+import { summarizeContributions } from '@/components/contributions/summary';
 import EthDonationTable, { type EthDonation } from '@/components/tables/EthDonationTable';
-import { useDonationsBothByRound } from '@/hooks/useApiQuery';
-import { cn } from '@/lib/utils';
+import { Amount } from '@/components/ui/amount';
+import { buttonVariants } from '@/components/ui/button';
+import { EmptyState } from '@/components/ui/empty-state';
+import { Skeleton } from '@/components/ui/skeleton';
 
 interface EthDonationByRoundPageProps {
   round: number;
 }
 
+/**
+ * One cycle's direct ETH contributions: the count, total and contributors in
+ * the header, the neighbouring cycles one step away, the cycle's own page
+ * (its allocation, or the live cycle), and the ledger in one reading column
+ * (a cycle's ledger is always short). A cycle without contributions says so
+ * once, in the past tense once the cycle has closed, centred on the full
+ * width like every ledger state (so is a failed read).
+ */
 const EthDonationByRoundPage = ({ round }: EthDonationByRoundPageProps) => {
-  const t = useTranslations('ethContribution');
-  const { data: donationInfo = [], isLoading: loading } = useDonationsBothByRound(round);
+  const t = useTranslations('ethContribution.cycle');
+  const locale = useLocale();
+  const valid = Number.isInteger(round) && round >= 0;
+  const { data, isLoading, isError, refetch } = useDonationsBothByRound(valid ? round : -1);
+  const { data: dashboard } = useDashboardInfo(undefined, { poll: false });
+  const liveCycle = typeof dashboard?.CurRoundNum === 'number' ? dashboard.CurRoundNum : null;
+  const trail = [{ label: t('breadcrumbContributions'), href: '/eth-contribution' }];
 
-  if (!Number.isInteger(round) || round < 0) {
+  if (!valid) {
     return (
-      <PageShell variant="data" backdrop="signature">
-        <div className={cn(detailPanelClass, 'mx-auto max-w-lg p-8 text-center')}>
-          <p className="font-display text-lg font-semibold text-foreground">
-            {t('cycle.invalidNumber')}
-          </p>
-        </div>
-      </PageShell>
+      <LedgerPage
+        header={<PageHeader section="records" breadcrumbs={trail} title={t('invalidNumber')} />}
+      >
+        <EmptyState
+          variant="page"
+          headingLevel={2}
+          icon={<Link2Off aria-hidden />}
+          title={t('invalidTitle')}
+          description={t('invalidDescription')}
+          action={
+            <Link
+              href="/eth-contribution"
+              className="link inline-flex min-h-11 items-center gap-1.5 sm:min-h-6"
+            >
+              {t('breadcrumbContributions')}
+              <ArrowRight aria-hidden className="size-3.5" />
+            </Link>
+          }
+        />
+      </LedgerPage>
     );
   }
 
-  const title = t('cycle.title', { cycle: round });
+  const rows = (data ?? []) as EthDonation[];
+  const ready = !isLoading && !isError;
+  const pending = isLoading ? <Skeleton className="h-7 w-20" /> : null;
+  // The same guarded summary as the all-contributions header.
+  const summary = summarizeContributions(rows);
+  const figures: PageHeaderFigure[] = [
+    {
+      id: 'count',
+      label: t('figures.count'),
+      value: ready ? formatCount(summary.records, locale) : pending,
+    },
+    {
+      id: 'total',
+      label: t('figures.total'),
+      value: ready ? <Amount value={summary.totalEth} unit="ETH" context="hero" /> : pending,
+    },
+    {
+      id: 'contributors',
+      label: t('figures.contributors'),
+      value: ready ? formatCount(summary.contributors, locale) : pending,
+    },
+  ];
+
+  // The neighbours that exist: never below cycle 0, never past the live cycle.
+  const previous = round > 0 ? round - 1 : null;
+  const next = liveCycle === null || round < liveCycle ? round + 1 : null;
+  const isLive = liveCycle !== null && round === liveCycle;
+  const cycleHref = isLive ? '/current-cycle' : `/allocation/${round}`;
+
+  const neighbours = (
+    <nav aria-label={t('otherCycles')} className="flex flex-wrap items-center gap-2">
+      {previous !== null ? (
+        <Link
+          href={`/eth-contribution/round/${previous}`}
+          className={buttonVariants({ variant: 'outline', size: 'sm', className: 'px-3' })}
+        >
+          <ChevronLeft aria-hidden />
+          <span className="sr-only">{t('previous')}: </span>
+          {t('cycleLabel', { cycle: previous })}
+        </Link>
+      ) : null}
+      {next !== null ? (
+        <Link
+          href={`/eth-contribution/round/${next}`}
+          className={buttonVariants({ variant: 'outline', size: 'sm', className: 'px-3' })}
+        >
+          <span className="sr-only">{t('next')}: </span>
+          {t('cycleLabel', { cycle: next })}
+          <ChevronRight aria-hidden />
+        </Link>
+      ) : null}
+    </nav>
+  );
+
+  // An empty ledger says so itself; three zeros above it would say it again.
+  const empty = ready && rows.length === 0;
+  const closed = liveCycle !== null && round < liveCycle;
+
+  const header = (
+    <PageHeader
+      section="records"
+      breadcrumbs={trail}
+      title={t('title', { cycle: round })}
+      subtitle={t('lede', { cycle: round })}
+      figures={empty ? undefined : figures}
+      actions={neighbours}
+      meta={
+        liveCycle !== null && round <= liveCycle ? (
+          <Link
+            href={cycleHref}
+            className="link-quiet inline-flex min-h-11 items-center gap-1.5 text-muted-foreground sm:min-h-6"
+          >
+            {isLive ? t('viewLive') : t('viewAllocation', { cycle: round })}
+            <ArrowRight aria-hidden className="size-3.5 text-subtle" />
+          </Link>
+        ) : undefined
+      }
+    />
+  );
 
   return (
-    <PageShell variant="data" backdrop="signature" className="max-sm:pb-16">
-      <div className="mx-auto max-w-5xl">
-        <PageHeader
-          title={title}
-          subtitle={t('cycle.subtitle')}
-          breadcrumbs={[
-            { label: t('cycle.breadcrumbHome'), href: '/' },
-            { label: t('cycle.breadcrumbContributions'), href: '/eth-contribution' },
-            { label: t('cycle.breadcrumbCycle', { cycle: round }) },
-          ]}
-          className="mb-10 text-left sm:max-w-none [&_p]:mx-0 [&_p]:max-w-none"
-          align="left"
-        />
-
-        {loading ? (
-          <div className={cn(detailPanelClass, 'p-10 text-center')}>
-            <p className="text-sm font-medium text-muted-foreground">{t('cycle.loading')}</p>
-          </div>
-        ) : (
-          <div className={cn(detailPanelClass, 'overflow-x-auto p-2 sm:p-4')}>
-            <EthDonationTable list={(donationInfo ?? []) as EthDonation[]} />
-          </div>
-        )}
-      </div>
-    </PageShell>
+    <LedgerPage width={empty || isError ? 'full' : 'narrow'} header={header}>
+      <EthDonationTable
+        list={rows}
+        showCycle={false}
+        loading={isLoading}
+        error={isError ? t('loadError') : undefined}
+        onRetry={() => void refetch()}
+        emptyDescription={t(closed ? 'emptyDescriptionPast' : 'emptyDescription', {
+          cycle: round,
+        })}
+      />
+    </LedgerPage>
   );
 };
 

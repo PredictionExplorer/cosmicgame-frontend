@@ -69,11 +69,14 @@ test.describe('dApp home page @ app.cosmicsignature.com', () => {
   });
 
   test('shows cycle info', async ({ page }) => {
-    await openDisclosure(page, 'home-story-section');
-    const cycleInfo = page.getByRole('region', { name: 'Current cycle observatory' });
-    await ensureVisible(cycleInfo);
-    await expect(cycleInfo).toBeVisible();
-    await expect(cycleInfo.getByRole('heading', { name: /Cycle #/ })).toBeVisible();
+    const clock = page.getByRole('region', { name: 'Cycle Finalization Time' });
+    await ensureVisible(clock);
+    await expect(clock).toBeVisible();
+    await expect(page.getByTestId('home-deck-header').getByText(/Cycle \d+/)).toBeVisible();
+    // Where the cycle is now, beside the chat.
+    const guide = page.getByRole('region', { name: 'How this cycle works' });
+    await ensureVisible(guide);
+    await expect(guide.locator('[aria-current="step"]')).toHaveCount(1);
   });
 
   test('links to trade CST on Uniswap', async ({ page }) => {
@@ -112,7 +115,7 @@ test.describe('dApp home page @ app.cosmicsignature.com', () => {
     await expect(
       clock
         .getByText(
-          /Gestures open when this countdown reaches zero|first Gesture starts the finalization clock|Cycle is live|less than one hour|Final minutes|Final minute|Finalization is ready/i,
+          /Gestures open when this countdown reaches zero|first Gesture starts the finalization clock|can extend the finalization clock|less than one hour|Final minutes|Final minute|Finalization is ready/i,
         )
         .first(),
     ).toBeVisible();
@@ -182,24 +185,25 @@ test.describe('dApp home page @ app.cosmicsignature.com', () => {
     await ensureVisible(latest);
     await expect(latest).toBeVisible();
     await expect(latest.getByRole('heading', { name: 'Last Gesture' })).toBeVisible();
-    await expect(latest.getByText('Amount paid')).toBeVisible();
-    await expect(latest.getByText('CST received')).toBeVisible();
+    await expect(latest.getByText('Paid', { exact: true })).toBeVisible();
+    await expect(latest.getByText('Received', { exact: true })).toBeVisible();
     await expect(page.getByTestId('clock-reserve')).toContainText('Signature Allocation');
     await expect(
       latest.getByRole('progressbar', { name: /Progress toward Endurance/ }),
     ).toBeVisible();
   });
 
-  test('shows Endurance and Chrono intelligence in the control desk', async ({ page }) => {
+  test('sets every standing role in one ledger in the control desk', async ({ page }) => {
     await skipUnlessCycleHasGestures(page);
-    const intel = page.getByTestId('chrono-endurance-intel').first();
-    await ensureVisible(intel);
-    await expect(intel).toBeVisible({ timeout: 15000 });
-    await expect(intel).toHaveAccessibleName('Endurance & Chrono');
-    const championLabel = intel.getByText('Endurance Champion').first();
-    await expect(championLabel).toBeVisible();
-    const chronoLabel = intel.getByText(/Chrono-Warrior|Chrono Warrior/i).first();
-    await expect(chronoLabel).toBeVisible();
+    const ledger = page.getByTestId('standings-ledger');
+    await ensureVisible(ledger);
+    await expect(ledger).toBeVisible({ timeout: 15000 });
+    await expect(ledger).toHaveAccessibleName('Live standings');
+    const rows = ledger.getByRole('listitem');
+    await expect(rows).toHaveCount(4);
+    await expect(rows.nth(0)).toHaveAttribute('data-testid', 'latest-participant-intel');
+    await expect(ledger.getByText('Endurance Champion').first()).toBeVisible();
+    await expect(ledger.getByText(/Chrono-Warrior|Chrono Warrior/i).first()).toBeVisible();
   });
 
   test('ERC721/ERC20 contribution tabs work', async ({ page }) => {
@@ -226,14 +230,18 @@ test.describe('dApp home page @ app.cosmicsignature.com', () => {
     }
   });
 
-  test('features one artwork panel with a path to the gallery', async ({ page }) => {
-    const artwork = page.getByTestId('deck-art-card');
+  test('hangs the newest Signature on the desk with a path to the gallery', async ({ page }) => {
+    const artwork = page.getByTestId('latest-signature');
     await expect(artwork).toHaveCount(1);
     await ensureVisible(artwork);
     await expect(artwork).toBeVisible();
-    await expect(artwork.getByRole('link', { name: 'Gallery' })).toHaveAttribute(
+    await expect(artwork.getByRole('link', { name: /Gallery/ })).toHaveAttribute(
       'href',
       '/gallery',
+    );
+    await expect(artwork.getByTestId('latest-signature-link')).toHaveAttribute(
+      'href',
+      /^\/detail\/\d+$/,
     );
     await expect(page.getByText('Latest NFTs', { exact: true })).toHaveCount(0);
   });
@@ -247,14 +255,26 @@ test.describe('dApp home page @ app.cosmicsignature.com', () => {
 
   test('Chrono-Warrior standing uses its own address when leaders differ', async ({ page }) => {
     await skipUnlessCycleHasGestures(page);
+    const nowSeconds = Math.floor(Date.now() / 1000);
+    // A complete (V2) snapshot: the page trusts it as it stands. A V1 payload
+    // without the segment fields is completed from the live chain, whose
+    // holders would replace the mocked ones. The records are longer than any
+    // live hold, so the live Last Gesture (measured from the real dashboard)
+    // never takes the Endurance title from the mocked holder.
+    const day = 86_400;
     const data = {
       ChronoWarriorAddress: '0x2222222222222222222222222222222222222222',
-      ChronoWarriorDuration: 7200,
+      ChronoWarriorDuration: 400 * day,
+      ChronoWarriorIsLive: false,
       EnduranceChampionAddress: '0x1111111111111111111111111111111111111111',
-      EnduranceChampionDuration: 3600,
+      EnduranceChampionDuration: 365 * day,
+      EnduranceChampionStartTimeStamp: nowSeconds - 400 * day,
+      PrevEnduranceChampionDuration: 0,
       LastBidderAddress: '0x3333333333333333333333333333333333333333',
-      LastBidderLastBidTime: Math.floor(Date.now() / 1000) - 60,
+      LastBidderLastBidTime: nowSeconds - 60,
       LastCstBidderAddress: '0x4444444444444444444444444444444444444444',
+      SourceBlockNumber: 100,
+      SourceBlockTimeStamp: nowSeconds,
     };
 
     await page.route(/\/api\/cosmicgame\/bid\/current_special_winners(?:\?.*)?$/, async (route) => {
@@ -269,16 +289,14 @@ test.describe('dApp home page @ app.cosmicsignature.com', () => {
     const chronoRow = page.getByTestId('chrono-role-summary').first();
     const enduranceRow = page.getByTestId('control-desk-endurance').first();
     await ensureVisible(chronoRow);
-    await expect(chronoRow.getByRole('link', { name: data.ChronoWarriorAddress })).toHaveAttribute(
-      'href',
-      `/user/${data.ChronoWarriorAddress}`,
-    );
-    await expect(chronoRow.getByRole('link', { name: data.EnduranceChampionAddress })).toHaveCount(
+    // Holder links read the short address; the full one is their target.
+    await expect(chronoRow.locator(`a[href="/user/${data.ChronoWarriorAddress}"]`)).toBeVisible();
+    await expect(chronoRow.locator(`a[href="/user/${data.EnduranceChampionAddress}"]`)).toHaveCount(
       0,
     );
     await expect(
-      enduranceRow.getByRole('link', { name: data.EnduranceChampionAddress }),
-    ).toHaveAttribute('href', `/user/${data.EnduranceChampionAddress}`);
+      enduranceRow.locator(`a[href="/user/${data.EnduranceChampionAddress}"]`),
+    ).toBeVisible();
   });
 
   test('Recipient History section renders', async ({ page }) => {
@@ -301,23 +319,35 @@ test.describe('dApp home page @ app.cosmicsignature.com', () => {
     expect(description!).not.toMatch(/strategy bidding game/i);
   });
 
-  test('navigation hosts a cross-host Discover link to the marketing site', async ({ page }) => {
+  test('navigation links the project site on the landing host, in the same tab', async ({
+    page,
+  }) => {
     const isMobileViewport = await page.evaluate(() => window.innerWidth < 1024);
+    // The production origin in CI; the dev landing host when run against `next dev`.
+    const landingHome = /^https?:\/\/cosmicsignature\.(com|local:3000)\/?$/;
 
+    let projectSite;
     if (isMobileViewport) {
-      // On mobile the featured Discover card lives inside the drawer.
-      await page.getByRole('button', { name: 'menu' }).click();
-      const discover = page
-        .getByRole('dialog')
-        .locator('a[href="https://cosmicsignature.com"]')
-        .first();
-      await expect(discover).toBeVisible();
+      // On phones it closes the drawer's Learn section, after the host divider.
+      await page
+        .getByRole('banner')
+        .getByRole('button', { name: /^Open menu/ })
+        .click();
+      const drawer = page.getByRole('dialog', { name: 'Navigation' });
+      await drawer.locator('summary', { hasText: /^Learn$/ }).click();
+      projectSite = drawer.getByRole('link', { name: 'Project site' });
     } else {
-      // On desktop it is the featured card at the bottom of the Help panel.
-      await page.getByRole('button', { name: /^Help$/ }).click();
-      const discover = page.locator('[role="menu"] a[href="https://cosmicsignature.com"]').first();
-      await expect(discover).toBeVisible();
-      await expect(discover).toContainText(/Discover/i);
+      // On desktop it closes the Learn panel's first column.
+      const learn = page
+        .getByRole('navigation', { name: 'Primary' })
+        .getByRole('button', { name: /^Learn$/ });
+      await learn.click();
+      projectSite = page
+        .locator(`[id="${await learn.getAttribute('aria-controls')}"]`)
+        .getByRole('link', { name: /^Project site/ });
     }
+    await expect(projectSite).toBeVisible();
+    await expect(projectSite).toHaveAttribute('href', landingHome);
+    await expect(projectSite).not.toHaveAttribute('target');
   });
 });

@@ -1,18 +1,19 @@
-import { createContext, useContext, useMemo, type ReactNode } from 'react';
+import { useMemo, type ReactNode } from 'react';
 
 import { useActiveWeb3React } from '@/hooks/web3';
 import { useAnchoredCSTokensByUser, useAnchoredRWLKTokensByUser } from '@/hooks/useApiQuery';
 import type { AnchoredTokenInfo } from '@/services/api/types';
 
-interface AnchoredTokenContextValue {
-  cstokens: AnchoredTokenInfo[];
-  rwlktokens: AnchoredTokenInfo[];
-  fetchData: () => Promise<void>;
-  error: string | null;
-  isLoading: boolean;
-}
+import { AnchoredTokenContext, useAnchoredToken } from './accountDataContexts';
 
-const AnchoredTokenContext = createContext<AnchoredTokenContextValue | undefined>(undefined);
+export { useAnchoredToken };
+export type { AnchoredTokenContextValue } from './accountDataContexts';
+
+/**
+ * The lists while a read has no data (disconnected, loading or failed): one
+ * stable array, so effects that depend on a list do not re-run every render.
+ */
+const NO_TOKENS: AnchoredTokenInfo[] = [];
 
 interface AnchoredTokenProviderProps {
   children: ReactNode;
@@ -34,8 +35,8 @@ export const AnchoredTokenProvider = ({ children }: AnchoredTokenProviderProps) 
     error: rwlkError,
   } = useAnchoredRWLKTokensByUser(account);
 
-  const cstokens = cstData ?? [];
-  const rwlktokens = rwlkData ?? [];
+  const cstokens = cstData ?? NO_TOKENS;
+  const rwlktokens = rwlkData ?? NO_TOKENS;
   const isLoading = cstLoading || rwlkLoading;
   const queryError = cstError || rwlkError;
   const error = queryError
@@ -43,6 +44,9 @@ export const AnchoredTokenProvider = ({ children }: AnchoredTokenProviderProps) 
       ? queryError.message
       : String(queryError)
     : null;
+
+  const cstFailed = Boolean(cstError) && cstData === undefined;
+  const rwlkFailed = Boolean(rwlkError) && rwlkData === undefined;
 
   const fetchData = useMemo(
     () => async () => {
@@ -52,16 +56,10 @@ export const AnchoredTokenProvider = ({ children }: AnchoredTokenProviderProps) 
   );
 
   return (
-    <AnchoredTokenContext.Provider value={{ cstokens, rwlktokens, fetchData, error, isLoading }}>
+    <AnchoredTokenContext.Provider
+      value={{ cstokens, rwlktokens, fetchData, error, isLoading, cstFailed, rwlkFailed }}
+    >
       {children}
     </AnchoredTokenContext.Provider>
   );
-};
-
-export const useAnchoredToken = (): AnchoredTokenContextValue => {
-  const context = useContext(AnchoredTokenContext);
-  if (!context) {
-    throw new Error('useAnchoredToken must be used within a AnchoredTokenProvider');
-  }
-  return context;
 };

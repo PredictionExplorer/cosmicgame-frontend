@@ -1,6 +1,6 @@
 {
   "gallery": {
-    "placeholder": "Tìm theo mã token hoặc tên…",
+    "placeholder": "Số hoặc tên",
     "ariaLabel": "Tìm NFT",
     "clear": "Xóa tìm kiếm",
     "submit": "Tìm",

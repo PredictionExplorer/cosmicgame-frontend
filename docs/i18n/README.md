@@ -311,10 +311,14 @@ compile**. `index.ts` composes skeleton + text into the public content shape (ex
 unchanged) and resolves the locale through a `LocaleRecord` registry — see
 `content/faq/` for the reference implementation.
 
-Legal and trust pages (Terms, Privacy, Risk Disclosures, Security, Audits) share one
-renderer each (`TermsContent.tsx`, `PrivacyContent.tsx`, `TrustPageContent.tsx`) plus
-per-locale copy objects (`*.en.ts` / `*.zh.ts`), resolved via `content/legal/index.ts`.
-No JSX is duplicated per locale.
+Legal and trust pages (Security, Audits, Risk Disclosures, Terms, Privacy) have one
+renderer each (`SecurityContent.tsx`, `AuditsContent.tsx`, `RiskContent.tsx`,
+`TermsContent.tsx`, `PrivacyContent.tsx`) over the shared `components/legal/LegalDocument`
+template, plus per-locale copy objects (`*.en.ts` / `*.zh.ts`), resolved via
+`content/legal/index.ts`. A link inside legal copy is a tag naming an entry of
+`LEGAL_LINKS` (`content/legal/links.ts`), rendered by `components/legal/RichText`; an
+unknown tag keeps its words and the legal-copy test rejects it. No JSX is duplicated per
+locale.
 
 **Fallback policy:** `i18n/request.ts` deep-merges each translated locale's messages over
 the `en` catalog, so a missing key renders English — never a raw key path. Long-form content has **no
@@ -325,10 +329,13 @@ locale ships complete or not at all.
 
 Formatting conventions live in two places: `i18n/localeConfig.ts` for non-text conventions
 (Intl tag, week start, word spacing, ellipsis, provider-error policy) and
-`LocaleRecord`-typed format registries in `utils/format.ts` / `utils/time.ts` for
-per-locale date/duration templates (compact duration units come from the
-`formats.durationCompact` message catalog, the single source shared with
-`useTranslations('formats')` consumers). The table below records the original migration:
+`LocaleRecord`-typed format registries in `utils/format/` / `utils/time.ts` for
+per-locale date/duration templates. Compact duration units live in
+`utils/format/durations.ts` (`DURATION_UNITS`), so formatting a number never ships all
+eight catalogs; `formats.durationCompact` keeps the same units for
+`useTranslations('formats')` consumers, and `utils/__tests__/format-duration-units.test.ts`
+fails when the two drift — change both together. The table below records the original
+migration:
 
 | Today                                                            | Change                                                                                 |
 | ---------------------------------------------------------------- | -------------------------------------------------------------------------------------- |
@@ -337,11 +344,61 @@ per-locale date/duration templates (compact duration units come from the
 | `formatYyyymmddLabel`, `formatUnixTsLabel` month arrays          | Same — `Intl.DateTimeFormat(locale, { month: 'short' })`                               |
 | `formatSeconds` → `1d 2h 30m 45s`                                | Locale unit map; zh: `3天5小时12分45秒` (compact contexts), see style guide §5         |
 | `formatEthValue`/`formatCSTValue` unit suffixes                  | Units stay `ETH`/`CST` in all locales (glossary: keep-in-English)                      |
-| `components/ui/date-picker.tsx` weekday labels `Su…Sa`           | zh: `日 一 二 三 四 五 六`; week starts Monday for zh                                  |
-| `react-countdown` renderers                                      | Localized unit labels via `formats.json`                                               |
+| Date picker weekday labels `Su…Sa` (the picker has since gone)   | zh: `日 一 二 三 四 五 六`; week starts Monday for zh                                  |
+| Cycle clock unit captions                                        | One typed catalog, `clockUnitLabels` (`utils/format/durations.ts`), on both hosts      |
 
-English output must remain byte-identical — every formatting change is guarded by
-existing unit tests plus new zh cases.
+That migration kept English output byte-identical. The formatting layer (§4.1) then
+changed English on purpose, to one standard for every locale: a number and its unit
+joined by U+00A0, the year on any date outside the current year, ETH at 4 decimals in
+cards, and grouped CST ("60,764.15 CST"). Every formatting change is guarded by unit
+tests in all eight locales (`utils/__tests__/format*.test.ts`).
+
+### 4.1 The formatting layer
+
+Every displayed number, amount, date, duration and address goes through
+`utils/format.ts` (implementation in `utils/format/`), tested in all locales by
+`utils/__tests__/format.test.ts`:
+
+| Value           | Function                                   | Component                                    |
+| --------------- | ------------------------------------------ | -------------------------------------------- |
+| ETH / CST / USD | `formatAmount(value, { unit, context })`   | `<Amount>` (`components/ui/amount.tsx`)      |
+| count           | `formatCount`                              | ICU `{n, number}` or plural `#`              |
+| percentage      | `formatPercent` (percentage points)        | —                                            |
+| date-time       | `formatDateTime`, `formatDateTimeTitle`    | `<DateTime>` (`components/ui/date-time.tsx`) |
+| duration        | `formatDuration` (`compact` or `clock`)    | `<Duration>` (`components/ui/duration.tsx`)  |
+| address / hash  | `formatAddress` (0x1Ec1…E990, checksummed) | `<AddressChip>`                              |
+
+- **Precision policy** (`AmountContext`): `table` pads to fixed digits so columns line
+  up (ETH 4, CST 2), renders zero as `0` and dust as `<0.0001`; `card` (default) keeps
+  ETH at 4 digits and CST at 0–2 (a protocol constant reads 1,000 CST); `hero` trims
+  trailing zeros; `exact` (an amount about to be paid) keeps up to 6 digits and never
+  bounds.
+- **Numbers** come from `Intl` for the locale's `intlLocale`, with one documented
+  deviation: `uk` prints token amounts and percentages with the dot (§4 of its style
+  guide), grouped with U+00A0. `vi` keeps Intl's comma decimal and dot grouping.
+- **No-break joins:** a number and its unit, and the tokens of one duration, are joined
+  by U+00A0 so they never wrap apart. Catalogs follow the same rule (`{amount} ETH`
+  with U+00A0), enforced by `i18n:strict` (§7).
+- **Addresses** shorten to `0x` + 4 … 4 around one U+2026, followed by U+2060 WORD
+  JOINER: line breaking allows a break after an ellipsis, and the joiner removes it, so
+  the short form never wraps even without `whitespace-nowrap`. Tests that pin a short
+  address write it as `'0x1234…\u20605678'`; copy buttons copy the full address.
+- **Dates:** the compact form adds the year when it is not the current one; `<DateTime>`
+  renders `<time dateTime title>` in UTC on the server and in the browser alike (a record
+  never rewrites itself after load), with the full date, the reader's own time (as a UTC
+  offset) and the age on hover. State the zone once per table with `<TimeZoneNote>`.
+  Vietnamese numeric dates are padded DD/MM(/YYYY), so a column lines up.
+- Token amounts in messages are passed as strings from `formatAmount`; counts are passed
+  as numbers and formatted by the message (`{count, number}` or `#`).
+- **Locale is never defaulted where it can be forgotten:** the legacy helpers
+  `formatEthValue`, `formatCSTValue` and `formatTableAmount` require it, and `<Amount>`,
+  `<DateTime>`, `<Duration>` and the hydration-safe date helpers fall back to
+  `useLocale()`, never to `'en'`.
+- **Guards:** `format-call-sites.test.ts` ratchets raw `toFixed` and private
+  amount formatters (each baseline entry must equal the file's current count, so it only
+  goes down); `format-known-addresses.test.ts` pins `formats.address.known.*` to the
+  /contracts names; `format-landing-entry.test.ts` keeps the landing on leaf modules
+  (`formatId` from `@/utils/format/ids`), never the `@/utils/format` barrel.
 
 ## 5. Fonts
 
@@ -349,50 +406,83 @@ Clash Display (display headings) and Inter (body) contain **no CJK glyphs**. Wit
 action, Chinese renders in unstyled system fallback.
 
 - Add **Noto Sans SC** via `next/font/google` (one variable-weight set,
-  `--font-noto-sc`, `display: 'optional'`). Google Fonts serves it as ~100 small
-  `unicode-range` slices, so browsers only download the glyph ranges a page actually uses —
-  English pages fetch nothing. `optional` prevents a late CJK metric swap on slow links;
-  the approved system CJK stack remains visible when Noto misses the short load window.
-  Noto is appended to the global font stacks unconditionally (after Inter / after Clash
-  Display).
+  `display: 'optional'`). Google Fonts serves it as ~100 small `unicode-range` slices, so
+  browsers only download the glyph ranges a page actually uses. `optional` prevents a late
+  CJK metric swap on slow links; the approved system CJK stack remains visible when Noto
+  misses the short load window.
+- **Each companion face loads on its own locale's pages only.** The root layout serves
+  every locale, and next/font attaches a face's `@font-face` stylesheet to every page of
+  the module graph that declares it — declared in `lib/fonts.ts`, the five CJK cuts made
+  every English page carry about 170 KB of render-blocking CSS. Each face therefore lives in
+  its own module under `components/theme/companion-fonts/`, and `CompanionFontFaces`
+  (rendered by `RootDocument`) loads the page locale's module through `next/dynamic`, which
+  links that face's stylesheet and no other. `lib/fonts.ts` keeps only descriptors (`id`,
+  `family`, `variable`), and `styles/global.css` names each family in its variable
+  (`--font-noto-sc: 'Noto Sans SC'`) so every stack stays valid on pages that never load
+  the face. `lib/__tests__/fonts-policy.test.ts` checks the descriptor, the module, the
+  loader entry and the variable agree.
 - Chinese headings render in the locale's Noto Sans cut via fallback (Clash Display has
-  no CJK). An `html:lang(zh)` rule — matching `zh`, `zh-TW`, and `zh-HK` alike — bumps
-  display-heading weight to 700 and tightens letter-spacing to `0` (CJK must never be
-  letter-spaced like the Latin display face).
-- System fallback chain after Noto: `"PingFang SC", "Microsoft YaHei", sans-serif`.
+  no CJK). The `html:lang(zh), html:lang(ja), html:lang(ko)` rule sets the display tokens
+  (`--display-weight: 600`, `--display-tracking-scale: 0`) that every display and heading
+  utility reads, and the `:lang()` heading rules set tracking to `0` (CJK must never be
+  letter-spaced like the Latin display face). 600 rather than 700: every CJK face in the
+  stacks carries it, and it stays below the Latin display voice.
+- The default `--cjk-font-stack` (English, Ukrainian and Vietnamese pages) is
+  platform-only: PingFang SC, Hiragino Sans, Apple SD Gothic Neo, Microsoft YaHei and
+  Malgun Gothic. Each CJK locale swaps in its own Noto cut first. Elements whose own
+  `lang` differs from the page's (the language menu's endonyms) re-declare the text stack
+  with their language's cut (`:where([lang]:not(html)):lang(ja)` …), so 日本語 takes
+  Japanese forms on an English page.
+- **Chinese headings break at phrases.** No browser segments Chinese (`auto-phrase` is
+  Japanese-only), so Chinese headings use `word-break: keep-all` (lines turn at
+  punctuation and spaces) with `overflow-wrap: anywhere` as the net. A clause longer than
+  about nine characters (one display line at 320px) carries authored zero-width spaces
+  (`\u200B`, `PHRASE_BREAK` in `lib/phrases.ts`) between its phrases, never inside a word
+  or before a mark, and renders through `<PhrasedText>`, which glues each mark to its
+  character so an overflow break cannot start a line with 。. `lib/__tests__/phrases.test.ts`
+  checks the landing headings; the zh and locale site-QA specs check every heading line.
+- Chinese ellipses and dashes: Inter leads the text stack and carries `…` and `—`, so the
+  zh, zh-TW and zh-HK text stacks start with a `local()` alias limited to those code points
+  (plus `“”` for zh) that resolves to the platform's regional CJK face.
 - **Three cuts, one property.** Noto Sans SC, TC, and HK share a design but differ in
   glyph forms (mainland, Taiwan MOE, and Hong Kong 常用字字形表 standards); a Hong Kong
   reader shown TC forms sees text that is legible but subtly wrong. Every font-family that
   may render Chinese references `--cjk-font-stack` (body, display, mono); `:root` sets the
   SC stack and `html:lang(zh-TW)` / `html:lang(zh-HK)` swap in `--font-noto-tc` +
   `PingFang TC` / `--font-noto-hk` + `PingFang HK` (`lib/fonts.ts`, same loading policy).
-  OG images embed the matching weight-700 subset, regenerated by `npm run og:fonts`
-  (`scripts/build-og-fonts.ts`) from the copy in each locale's `seo.json`; the OG tests
-  fail when a subset no longer covers its copy.
+  Share cards embed the matching cut as a weight-700 subset (titles) and a weight-400
+  subset (running text), regenerated by `npm run og:fonts` (`scripts/build-og-fonts.ts`)
+  from the copy in each locale's `seo.json`; the OG tests fail when a locale's stacks no
+  longer cover its copy.
 - **Hangul (Korean).** Noto Sans KR is the Korean cut of the same family, loaded with the
   same policy (`--font-noto-kr`); `html:lang(ko)` swaps it into `--cjk-font-stack`, so
   Korean falls through per glyph like Chinese (Latin tokens stay in Clash / Inter). The
-  CJK heading rule (weight 700, tracking 0) covers `:lang(ko)` too, and `html:lang(ko)`
+  CJK display tokens (weight 600, tracking 0) cover `:lang(ko)` too, and `html:lang(ko)`
   sets `word-break: keep-all` — the browser's CJK default breaks a Korean word between
-  syllables, which is the most visible typographic defect in Korean web copy;
-  `.font-mono` opts back into `break-all` so addresses still wrap.
+  syllables, which is the most visible typographic defect in Korean web copy. Monospace
+  text keeps `keep-all` as well (a `break-all` opt-out used to split the live countdown and
+  durations mid-number); addresses and hashes still wrap through
+  `overflow-wrap: anywhere`.
 - **Kanji and kana (Japanese).** Noto Sans JP is the Japanese cut (`--font-noto-jp`): its
   kanji follow the JIS glyph standard, which differs from every Chinese cut (直, 骨, 令 are
   drawn differently), and it carries the kana the Chinese cuts only nominally cover.
   `html:lang(ja)` swaps it into `--cjk-font-stack` with the Japanese system faces as
   fallbacks and sets `line-break: strict` (kinsoku: no line starts with a small kana or ー);
   it deliberately does **not** set `keep-all`, which is right for Korean and wrong for a
-  language with no word spaces. Display headings additionally opt into
-  `word-break: auto-phrase` so browsers that support it break between phrases rather than
-  mid-word. The CJK heading, tracking, and mono rules cover `:lang(ja)` alongside `zh` and
-  `ko`. The white-paper PDF binds Hiragino's separately named weights explicitly
+  language with no word spaces. Headings, ledes, labels, captions, buttons, tabs,
+  summaries and definition lists additionally opt into `word-break: auto-phrase` so
+  browsers that support it break between phrases rather than mid-word; paragraphs keep
+  normal breaking with `text-wrap: pretty`, which avoids a lone 「す。」 line. The CJK
+  heading, tracking, and mono rules cover `:lang(ja)` alongside `zh` and `ko`. The white-paper PDF binds Hiragino's separately named weights explicitly
   (`BoldFont={Hiragino Mincho ProN W6}`), because fontspec cannot infer them.
 - **The companion face is a registry.** `LOCALE_COMPANION_FONTS` in `lib/fonts.ts` records
-  one face (or `null`) per locale, `RootDocument` derives its font-variable classes from
-  it, and `OG_TYPOGRAPHY` (`lib/og/fonts.ts`) + `OG_FONT_SOURCES`
-  (`scripts/build-og-fonts-core.ts`) do the same for the OG subsets — all four cuts and
-  Onest are built by one `npm run og:fonts` run, and a unit test fails when the two OG
-  registries disagree or a notice is missing from `THIRD_PARTY_NOTICES.md`.
+  one face (or `null`) per locale, `RootDocument` loads the page locale's face from it
+  through `CompanionFontFaces`, and `OG_TYPOGRAPHY` (`lib/og/fonts.ts`, a display stack, a
+  body stack and the line-breaking rule per locale) + `OG_SUBSET_SOURCES`
+  (`scripts/build-og-fonts-core.ts`) do the same for the share cards — every subset (the CJK
+  cuts, Onest, Inter, JetBrains Mono) is built by one `npm run og:fonts` run, and a unit test
+  fails when the two registries disagree, a stack leaves a character of its locale's copy
+  uncovered, or a notice is missing from `THIRD_PARTY_NOTICES.md`.
 - `RootDocument` receives `locale` and sets `<html lang={locale}>` and `<html dir>` (from
   `LocaleConfig.textDirection`) — this is also what activates the CSS overrides and
   correct line-breaking behavior.
@@ -401,13 +491,19 @@ action, Chinese renders in unstyled system fallback.
 `cyrillic-ext` `unicode-range` slices, so body text needs nothing extra and those slices
 are fetched on demand only (never preloaded — English pages must not pay for them).
 Clash Display, however, has no Cyrillic glyphs, so `/uk` headings switch to **Onest**
-(`next/font/google`, `--font-onest`, `preload: false`, `display: 'optional'` — the same
-policy as Noto Sans SC). The display stack is indirected through the
-`--display-font-stack` custom property in `styles/global.css`: `html:lang(uk)` replaces
-the whole stack rather than appending Onest after Clash, so Latin letters inside a
+(`next/font/google`, `--font-onest`, `preload: false`, loaded on `/uk` and `/vi` only).
+Onest is small, so it uses `display: 'swap'` rather than `optional`: with `optional` the
+hero headline painted in the fallback and never swapped while later headings picked Onest
+up, so one page showed two display faces. Onest and Inter are narrower than Clash, so the
+same rule halves the display tracking (`--display-tracking-scale: 0.45`). The display
+stack is indirected through the `--display-font-stack` custom property in
+`styles/global.css`: `html:lang(uk)` replaces the whole stack rather than appending Onest
+after Clash, so Latin letters inside a
 Ukrainian heading (ETH, CST, brand names) do not render in a different face with a
-different x-height. OG images for `/uk` load `assets/fonts/Onest-700.subset.ttf`, cut by
-`npm run og:fonts` like the CJK subsets, through `lib/og/fonts.ts`.
+different x-height. Share cards for `/uk` set titles in `assets/fonts/Onest-500.subset.ttf`
+and running text in the Inter subsets, cut by `npm run og:fonts` like the CJK subsets from
+the copy **and its uppercase forms** (eyebrows are uppercased with `toLocaleUpperCase`),
+through `lib/og/fonts.ts`.
 
 **Vietnamese (Latin with stacked diacritics).** Vietnamese is written in the Latin
 alphabet, but with 134 letters the Latin-1 repertoire does not have: the horned Ơ/Ư, the
@@ -423,11 +519,11 @@ self-hosts every slice when `preload` is off; the `subsets` option only names sl
 preload and is validated against next/font's bundled font metadata, which predates Onest's
 Vietnamese coverage — so the option stays on the Cyrillic and Latin sets while the
 Vietnamese slice ships regardless (the comment on `onest` in `lib/fonts.ts` records this).
-The OG subset is shared too: `OG_TYPOGRAPHY.uk` and `.vi` point at one `Onest-700.subset.ttf`,
-and `npm run og:fonts` cuts every shared file once from the **union** of the copy of every
-locale that embeds it (`ogFontBuilds` in `scripts/build-og-fonts-core.ts`);
-`sourceRegistryProblems` rejects two locales that embed one file under different sources
-or family names. Two rules generalize from this rollout: (1) a display face is a per-locale
+The share-card subsets are shared too: `OG_TYPOGRAPHY.uk` and `.vi` point at one
+`Onest-500.subset.ttf`, and `npm run og:fonts` cuts every shared file once from the
+**union** of the copy of every locale that embeds it (`subsetGlyphText` in
+`scripts/build-og-fonts-core.ts`); `sourceRegistryProblems` rejects one file embedded as
+two faces or cut at a weight other than the one it is embedded at. Two rules generalize from this rollout: (1) a display face is a per-locale
 decision, never a per-script one — check the actual letter repertoire, since "Latin"
 covers Vietnamese and Clash Display does not; (2) stacked diacritics need vertical room, so
 never set Vietnamese below `line-height: 1.3`. The white-paper PDF uses the same macOS
@@ -457,7 +553,7 @@ Noto cut per glyph is their intended rendering.
   reads `params.locale` and calls `getTranslations`. (~59 pages, tracked per-route in
   progress-zh.md.)
 - **`app/sitemap.ts` / `lib/seoRoutes.ts`**: every URL entry gains `alternates.languages`.
-- **JSON-LD** (`utils/jsonLd.ts`): translated `name`/`description`, `inLanguage: 'zh-Hans'`
+- **JSON-LD** (`utils/jsonLd.tsx`): translated `name`/`description`, `inLanguage: 'zh-Hans'`
   on zh pages; FAQ JSON-LD uses the zh FAQ content.
 - **OG images** (`opengraph-image.tsx` files): `ImageResponse` needs an explicit CJK font
   buffer (subset Noto Sans SC TTF in `assets/`) — Latin-only fonts render tofu. Scheduled
@@ -471,7 +567,16 @@ Noto cut per glyph is their intended rendering.
    compares each namespace against `messages/en/**` and checks key parity, ICU syntax
    (the same `@formatjs` parser next-intl uses), placeholder parity (same `{arguments}`,
    no invented `<tags>`), plural completeness against the locale's CLDR categories
-   (`one/few/many/other` for uk, `other` for zh, ko, ja, and vi), and verbatim-copy catalogs. It
+   (`one/few/many/other` for uk, `other` for zh, ko, ja, and vi), number-format parity
+   (an argument the English formats as a number, `#` or `{n, number}`, is never printed
+   bare and ungrouped), no-break unit joins in every catalog including the English
+   (`{amount}`, `{cost}`, `{count}`… or `#` before ETH, CST, USD or NFT takes U+00A0), and
+   verbatim-copy catalogs. The English source is also held to its typography (`…`, never
+   three dots; `’`, never a straight apostrophe) and to reachability
+   (`scripts/i18n-unused-keys-core.ts`): a key with a path segment that no application
+   source file spells cannot be rendered, so it fails until it is deleted from every
+   locale (the few families keyed by data, such as trait values, are listed in
+   `DYNAMIC_KEY_FAMILIES`). It
    then reports every long-form content area (`scripts/i18n-content-areas.ts`) as the
    share of prose still identical to the English, and `--strict` fails an area that is
    untranslated — a scaffolded module cannot ship as a translation. `npm run

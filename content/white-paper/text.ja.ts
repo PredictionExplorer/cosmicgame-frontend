@@ -38,7 +38,7 @@ export const whitePaperTextJa = {
   abstract: {
     heading: '概要',
     paragraphs: [
-      'Cosmic SignatureはArbitrum One上のプロシージャルアート・プロトコルです。時間制限のあるパフォーマンス・サイクルの連なりとして動きます。サイクルの間、参加者はETH、またはプロトコルのERC-20トークンであるCSTで一筆を入れます。すべての一筆はサイクルのカウントダウンを延ばし、サイクルの星選に対象を記録し、新しいCSTを刻印することがあります。カウントダウンが切れてサイクルが確定すると、プロトコルはETH準備金を10を超える配分トラックへ配り、新しい世代のCosmic Signature NFTを刻印し、170人以上のEthereumコア貢献者の資金支援メカニズムであるProtocol Guildへ固定の分を送ります。準備金のおよそ半分は次のサイクルへ持ち越されます。次の準備金の規模は、その後の参加と配分によって変わります。',
+      'Cosmic SignatureはArbitrum One上のプロシージャルアート・プロトコルです。時間制限のあるパフォーマンス・サイクルの連なりとして動きます。サイクルの間、参加者はETH、またはプロトコルのERC-20トークンであるCSTで一筆を入れます。すべての一筆はサイクルのカウントダウンを延ばし、サイクルの星選に対象を記録し、新しいCSTを刻印することがあります。カウントダウンが切れてサイクルが確定すると、プロトコルはETH準備金を定められた配分トラックへ配り、新しい世代のCosmic Signature NFTを刻印し、170人以上のEthereumコア貢献者の資金支援メカニズムであるProtocol Guildへ固定の分を送ります。準備金のおよそ半分は次のサイクルへ持ち越されます。次の準備金の規模は、その後の参加と配分によって変わります。',
       '各Cosmic Signature NFTは、オンチェーンのシードから生成され、誰でもピクセル単位で再現できる、重力三体問題の決定論的なレンダリングです。画像の生成にニューラルネットワークは使いません。本稿は仕組みとトークンの設計を完全に記述し、現在稼働中のV2アップグレードを記録し、計画されているV3アップグレードを提示し、設計が完成した後にデプロイしたアドレスからあらゆる形の特権的な管理を取り除くという約束を述べます。',
     ],
   },
@@ -268,9 +268,9 @@ export const whitePaperTextJa = {
                     '最も長く在位した持久チャンピオン（第5.2節）。',
                   ],
                   [
-                    '公共財配分',
-                    `${protocolFacts.publicGoodsPercentage}%`,
-                    '公共財金庫を通じてProtocol Guildへ。',
+                    'ETH星選',
+                    `${protocolFacts.stellarSelectionEthPercentage}%`,
+                    `サイクルの一筆のプールから選ばれた${protocolFacts.ethStellarSelectionRecipients}件の対象が、金額を等しく分け合う。`,
                   ],
                   [
                     '係留配分',
@@ -278,9 +278,9 @@ export const whitePaperTextJa = {
                     '係留中のCosmic Signature NFTへ、比例して。',
                   ],
                   [
-                    'ETH星選',
-                    `${protocolFacts.stellarSelectionEthPercentage}%`,
-                    `サイクルの一筆のプールから選ばれた${protocolFacts.ethStellarSelectionRecipients}件の対象が、金額を等しく分け合う。`,
+                    '公共財配分',
+                    `${protocolFacts.publicGoodsPercentage}%`,
+                    '公共財金庫を通じてProtocol Guildへ。',
                   ],
                   [
                     '累積準備金',
@@ -457,6 +457,18 @@ export const whitePaperTextJa = {
             {
               kind: 'formula',
               formula: protocolFacts.dynamicCstRewardFormula,
+              notation: protocolFacts.participationCstNotation,
+              legend: [
+                { symbol: protocolFacts.participationCstSymbols[0], meaning: '前の一筆からの秒数' },
+                {
+                  symbol: protocolFacts.participationCstSymbols[1],
+                  meaning: '参加CSTの乗数（コントラクトのパラメーター）',
+                },
+                {
+                  symbol: protocolFacts.participationCstSymbols[2],
+                  meaning: '現在のサイクルの時間増分（マイクロ秒）',
+                },
+              ],
               caption:
                 '一筆が刻印する参加CST。経過時間は前の一筆から測り、現在のサイクルの時間増分に対して尺度化されます。',
             },
@@ -887,4 +899,55 @@ export const whitePaperTextJa = {
   },
   licenseNote:
     '本稿は、すべてのプロジェクト所有のCosmic Signatureの素材と同じく、CC0 1.0のもとでパブリックドメインに捧げられています。',
+  reading: {
+    railLabel: 'このページの内容',
+    openContentsLabel: '目次',
+    backToTopLabel: 'ページの先頭へ',
+    headingLinkTemplate: 'この節へのリンク：{title}',
+    formulaLabel: '式',
+    noteLabel: '注記',
+    contractExpressionLabel: 'コントラクト上の式',
+    figureTemplate: '図{number}',
+    readingTimeTemplate: '約{minutes}分で読めます',
+    newTabNote: '（新しいタブで開きます）',
+  },
+  figures: {
+    cycle: {
+      title: 'パフォーマンス・サイクルの流れ：開始から次のサイクルまで',
+      caption: '時間は開始時のパラメーターです。正確なルールは第3.1節から第3.3節にあります。',
+      steps: [
+        {
+          label: '開始',
+          detail: 'ETHの調律期間が、最初の一筆が入るまで開始時の費用を下げていきます。',
+        },
+        {
+          label: '一筆',
+          detail: `一筆ごとに、カウントダウンへ時間増分が加わります。開始時は${protocolFacts.initialCycleTimeIncrementHours}時間です。`,
+        },
+        {
+          label: '最後の一筆の優先期間',
+          detail: `カウントダウンが終わると、${protocolFacts.finalGestureExclusivityHours}時間は最後の一筆の参加者だけが確定できます。`,
+        },
+        {
+          label: '公開確定',
+          detail: 'その後は誰でも確定でき、受領者の役割を引き継ぎます。',
+        },
+        {
+          label: '次のサイクル',
+          detail: `短い遅延を経て次のサイクルが始まります。既定では${protocolFacts.defaultNextCycleDelayMinutes}分です。`,
+        },
+      ],
+    },
+    allocation: {
+      title: '確定時にサイクル準備金が向かう先',
+      caption:
+        '確定時点のプロトコルのETH残高に対する割合です。残りの約半分は次のサイクルへ持ち越されます。',
+    },
+    art: {
+      title: 'コレクションから二点のシグネチャー',
+      caption:
+        'どの画像も、下に記したシードからパイプラインが出力したものです。誰でもピクセル単位で再生成できます。',
+      seedLabel: 'シード',
+    },
+  },
 } satisfies WhitePaperText;

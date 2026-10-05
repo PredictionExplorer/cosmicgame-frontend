@@ -4,14 +4,8 @@
     "contracts": "コントラクト"
   },
   "page": {
-    "eyebrow": "検証済みコントラクト · Arbitrum",
     "title": "コントラクトアドレス",
-    "subtitle": "Cosmic Signatureプロトコルのオンチェーンアドレス、構成、ソースへのリンク、検証の背景。",
-    "allocationAria": "配分トラック",
-    "configurationAria": "プロトコル構成",
-    "addressesAria": "コントラクトアドレス",
-    "addressesTitle": "コントラクトアドレス",
-    "parametersAria": "調律期間と星選のパラメーター"
+    "subtitle": "Cosmic Signatureプロトコルのオンチェーンアドレス、構成、ソースへのリンク、検証の背景。"
   },
   "network": {
     "chain": "チェーン{chainId}"
@@ -34,7 +28,7 @@
       "description": "サイクルの受領者への配分として刻印されるERC-721 NFTコレクション"
     },
     "randomWalk": {
-      "name": "RandomWalk",
+      "name": "Random Walk NFT",
       "description": "一度だけの割引のためにETH一筆に添付するか、係留NFT星選の対象となるために係留できるRandomWalk NFTコレクション"
     },
     "council": {
@@ -59,27 +53,24 @@
     },
     "rwalkAnchor": {
       "name": "RWLK係留ウォレット",
-      "description": "RandomWalk NFTの係留コントラクト"
+      "description": "Random Walk NFTの係留コントラクト"
     }
   },
   "categories": {
     "core": "コアコントラクト",
-    "wallet": "ウォレットコントラクト",
-    "anchoring": "係留コントラクト"
+    "wallet": "ウォレット",
+    "anchoring": "係留"
   },
-  "search": {
-    "placeholder": "名前またはアドレスでコントラクトを検索…",
-    "ariaLabel": "コントラクトを検索",
-    "clearAria": "検索をクリア",
-    "empty": "「{searchTerm}」に一致するコントラクトはありません"
-  },
-  "addressCard": {
-    "copyAria": "{name}のアドレスをコピー",
-    "explorerAria": "{name}をブロックエクスプローラーで見る"
+  "addresses": {
+    "title": "コントラクトアドレス",
+    "description": "Arbitrum One上のCosmic Signatureのすべてのコントラクトです。アドレスをコピーするか、Arbiscanでアドレスを、Sourcifyでソースコードを確認できます。",
+    "verified": "Sourcifyへのリンクがあるアドレスは、すべてSourcifyで完全一致しています（{date}に確認）。",
+    "markets": "マーケット",
+    "reported": "インデクサーが報告するアドレス{address}は検証されていません。"
   },
   "funds": {
     "title": "配分トラック",
-    "description": "サイクル準備金が配分トラックにどう分かれるか：シグネチャー配分、時の戦士、星選、公共財、係留配分、そして累積準備金。",
+    "description": "サイクル準備金が配分トラックにどう分かれるか：シグネチャー配分、時の戦士、星選、係留配分、公共財。残りは累積準備金として次のサイクルへ繰り越されます。",
     "chartAria": "配分トラックの棒グラフ",
     "segments": {
       "signature": {
@@ -103,20 +94,21 @@
         "tooltip": "サイクルごとに公共財の受け手（Protocol Guild）へ送られます"
       },
       "next": {
-        "label": "次のサイクル",
+        "label": "累積準備金",
         "tooltip": "累積準備金として次のサイクルへ持ち越される残りの資金。"
       }
     }
   },
   "configuration": {
     "title": "プロトコル構成",
+    "description": "プロトコルのコントラクトが読み取っている現在のパラメーターです。",
     "cards": {
       "ethStep": {
         "label": "ETH一筆の費用の上げ幅",
         "tooltip": "ETH一筆の費用はこの上げ幅のパラメーターに従います。CST一筆の費用はライブのCST調律期間に従います。"
       },
       "timeIncrement": {
-        "label": "時間増分",
+        "label": "一筆あたりに加わる時間",
         "tooltip": "一筆ごとにこの時間がサイクル確定時刻に加わります。増分はサイクルごとに{percent}%ずつ大きくなります。"
       },
       "cstPreview": {
@@ -128,7 +120,7 @@
         "tooltip": "公開確定期間が誰にでも開かれる前に、最後の一筆の参加者がサイクルを確定できる時間"
       },
       "initial": {
-        "label": "初期時間増分",
+        "label": "初期サイクル期間",
         "tooltip": "最初の一筆が入れられたときに加わる初期のサイクル確定時刻"
       },
       "message": {
@@ -137,7 +129,7 @@
       },
       "v3CstDecline": {
         "label": "CST価格の下降レート",
-        "value": "{amount} CST/分",
+        "value": "{amount} CST/分",
         "tooltip": "CST調律期間中にCST一筆費用が下がる速さです。刻印される参加CSTは、上回られた参加者に全額付与されます。"
       },
       "v3SignatureNfts": {
@@ -148,53 +140,58 @@
         "label": "終盤一筆期間",
         "tooltip": "サイクル確定時刻の直前に設けられる期間で、一筆費用に指数的に増える割増（最大約5倍）が適用されます。"
       }
+    },
+    "groups": {
+      "gestures": "一筆",
+      "timing": "時間",
+      "selection": "星選"
     }
   },
   "parameters": {
-    "title": "調律期間と星選のパラメーター",
+    "windowsTitle": "調律期間",
+    "windowsDescription": "各期間は時間とともに一筆の費用を下げます。CSTの期間はCSTの一筆のたびに始まり直し、ETHの期間は各サイクルの始まりに開いて最初の一筆で閉じます。",
     "cstTitle": "CST調律期間",
     "ethTitle": "ETH調律期間",
     "duration": "長さ",
     "elapsed": "経過時間",
-    "ceiling": "調律上限",
+    "remaining": "残り",
+    "progress": "{percent}完了",
+    "state": {
+      "running": "進行中",
+      "complete": "完了",
+      "closed": "終了",
+      "notStarted": "未開始"
+    },
+    "ceiling": "開始時の費用",
     "cstDurationTooltip": "CST調律期間のライブの保存された長さ。CST一筆は約{increase}%長くし、ETH一筆は約{decrease}%短くします。",
-    "cstElapsedTooltip": "現在のCST調律期間ですでに経過した時間",
     "cstCeilingTooltip": "現在表示されているCST調律期間の開始時の一筆の費用。費用は保存された長さの間に線形に下がります。",
-    "ethDurationTooltip": "一筆の費用が時間とともに下がるETH調律期間の全体の長さ",
-    "ethElapsedTooltip": "現在のETH調律期間ですでに経過した時間",
-    "publicGoodsAddress": "公共財アドレス",
+    "publicGoodsAddress": "公共財の受け手",
     "publicGoodsAddressTooltip": "公共財金庫コントラクトから公共財配分を現在受け取っているオンチェーンアドレス",
-    "copyPublicGoodsAria": "公共財アドレスをコピー",
-    "viewPublicGoodsAria": "公共財アドレスをブロックエクスプローラーで見る",
     "selection": {
       "ethLabel": "ETH星選の受領者",
       "ethTooltip": "サイクルごとにETH配分を受け取るために無作為に選ばれる参加者の数",
       "nftLabel": "NFT星選（参加者）",
       "nftTooltip": "サイクルごとにCosmic Signature NFTを受け取るために無作為に選ばれる参加者の数",
       "anchorLabel": "NFT星選（係留RWLK）",
-      "anchorTooltip": "サイクルごとにCosmic Signature NFTを受け取るために無作為に選ばれるRandomWalk NFT係留者の数"
-    }
+      "anchorTooltip": "サイクルごとにCosmic Signature NFTを受け取るために無作為に選ばれるRandom Walk NFT係留者の数"
+    },
+    "cstComplete": "期間が最後まで経過したため、次のCSTの一筆で始まり直すまで、CSTの一筆の費用は最低値のままです。",
+    "ethClosed": "このサイクルの最初の一筆でこの期間は閉じました。以後、ETHの一筆の費用は一筆ごとに上がります。",
+    "ethComplete": "期間が最後まで経過したため、このサイクルの最初の一筆まで、ETHの一筆の費用は最低値のままです。"
   },
   "vault": {
-    "title": "公共財金庫の操作",
+    "title": "公共財",
+    "description": "各サイクルの公共財の割合は金庫に入り、金庫から公共財の受け手へ送られます。",
     "tooltip": "公共財金庫のsend()関数を呼び出し、金庫のETH残高を設定済みのProtocol Guildの受け手へ送ります。",
+    "vaultAddress": "金庫",
+    "share": "サイクルごとの割合",
     "balance": "現在の金庫残高",
-    "description": "金庫にある公共財の資金をProtocol Guildへ送ります。",
-    "descriptionWithBeneficiary": "金庫にある公共財の資金をProtocol Guild（{address}）へ送ります。",
-    "aria": "公共財金庫の残高をProtocol Guildへ送る"
+    "empty": "金庫は空のため、送れる資金はまだありません。",
+    "balanceUnavailable": "金庫の残高を読み取れなかったため、現在は送る操作を表示していません。",
+    "note": "誰でも金庫の残高を受け手へ送ることができ、かかるのはガス代だけです。"
   },
   "seo": {
-    "eyebrow": "検証済みコントラクト · Arbitrum",
     "heading": "Cosmic Signatureコントラクト",
-    "description": "Cosmic Signatureの公開Arbitrumコントラクトを確認できます。アプリに表示された内容を、オンチェーンの記録と照らし合わせて検証するための資料です。",
-    "partialFallback": "現在のコントラクトアドレスを取得できないため、以下にプロジェクトで公開しているプロキシと実装のアドレスを表示しています。",
-    "empty": "現在のコントラクトアドレスを取得できません。データが取得でき次第、下の一覧を更新します。",
-    "relatedAria": "コントラクトの信頼性に関するリソース",
-    "links": {
-      "code": "Cosmic Signatureのソースコードを確認する",
-      "security": "セキュリティの概要を読む",
-      "audits": "監査と検証を確認する",
-      "risk": "リスク開示を読む"
-    }
+    "partialFallback": "現在、ライブの数値を取得できません。下のアドレスは検証済みの一覧です。"
   }
 }

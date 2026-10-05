@@ -6,61 +6,6 @@
   "jsonLd": {
     "name": "Phòng trưng bày Cosmic Signature"
   },
-  "page": {
-    "eyebrowImprinted": "Bộ sưu tập · {count} NFT đã khắc",
-    "eyebrowLive": "Bộ sưu tập · Trực tiếp",
-    "title": "Phòng trưng bày NFT",
-    "subtitle": "Khám phá trọn bộ sưu tập Cosmic Signature NFT được khắc qua mọi chu kỳ"
-  },
-  "intro": {
-    "badge": "Kho lưu trữ tạo sinh",
-    "description": "Mỗi Cosmic Signature NFT là tác phẩm tạo sinh độc nhất, được tạo từ seed trên chuỗi bằng mô phỏng bài toán ba vật thể. Một chu kỳ điển hình khắc 24 NFT: bốn NFT dành cho các vai trò, mười NFT Tinh tuyển dành cho người tham gia và mười NFT qua Tinh tuyển NFT neo giữ dành cho người neo giữ RandomWalk NFT."
-  },
-  "featured": {
-    "viewAria": "Xem Cosmic Signature {id}",
-    "alt": "Tác phẩm Cosmic Signature {id}",
-    "emptyHint": "Tác phẩm trong bộ sưu tập sẽ xuất hiện tại đây sau khi dữ liệu NFT được cập nhật.",
-    "badgeImprint": "Tác phẩm nổi bật",
-    "badgeArchive": "Kho lưu trữ",
-    "awaitingMetadata": "Đang chờ siêu dữ liệu"
-  },
-  "hero": {
-    "totalImprinted": {
-      "label": "Tổng số đã khắc",
-      "tooltip": "Tổng số COSMIC NFT đã được khắc qua mọi chu kỳ"
-    },
-    "currentlyAnchored": {
-      "label": "Đang neo giữ",
-      "tooltip": "Các NFT đang neo giữ với giao thức và nhận phân phối cho chủ sở hữu"
-    },
-    "namedNfts": {
-      "label": "NFT đã đặt tên",
-      "tooltip": "Các NFT đã được chủ sở hữu đặt một tên tùy chỉnh độc nhất"
-    },
-    "cycles": {
-      "label": "Chu kỳ",
-      "tooltip": "Số chu kỳ riêng biệt đã tạo ra NFT"
-    }
-  },
-  "card": {
-    "alt": "Cosmic Signature {id}",
-    "unnamed": "Chưa đặt tên",
-    "age": {
-      "justNow": "vừa xong",
-      "minutes": "{count} phút trước",
-      "hours": "{count} giờ trước",
-      "days": "{count} ngày trước",
-      "months": "{count} tháng trước",
-      "years": "{count} năm trước"
-    },
-    "tooltips": {
-      "round": "Được khắc trong chu kỳ {round}",
-      "anchored": "Đang neo giữ và nhận phân phối neo giữ",
-      "customName": "NFT này có tên tùy chỉnh",
-      "identifier": "Mã định danh tuần tự độc nhất của COSMIC NFT này",
-      "mintedOn": "Được khắc vào {date}"
-    }
-  },
   "filters": {
     "ariaLabel": "Lọc NFT",
     "all": {
@@ -78,7 +23,6 @@
   },
   "sort": {
     "ariaLabel": "Thứ tự sắp xếp",
-    "tooltip": "Thay đổi thứ tự hiển thị NFT",
     "newest": "Mới nhất trước",
     "oldest": "Cũ nhất trước",
     "cycleDesc": "Chu kỳ (cao → thấp)",
@@ -108,13 +52,27 @@
     "list": "Xem dạng danh sách"
   },
   "pagination": {
-    "showing": "Đang hiển thị <value>{start}</value>–<value>{end}</value> trong số <value>{total}</value> NFT",
-    "perPage": "Mỗi trang",
-    "perPageAria": "Số mục mỗi trang",
-    "perPageTooltip": "Số NFT hiển thị trên mỗi trang"
+    "perPage": "Mỗi trang"
   },
   "empty": {
     "title": "Không tìm thấy NFT nào",
-    "description": "Hãy thử điều chỉnh tìm kiếm hoặc bộ lọc để tìm điều bạn cần."
+    "description": "Không có Signature nào khớp với các bộ lọc này. Xóa bộ lọc để xem toàn bộ bộ sưu tập.",
+    "collectionTitle": "Chưa có Signature nào",
+    "collectionDescription": "Mỗi Signature xuất hiện ở đây khi chu kỳ của nó hoàn tất và nó được khắc."
+  },
+  "about": {
+    "title": "Về bộ sưu tập",
+    "description": "Mỗi Cosmic Signature là một tác phẩm nghệ thuật tạo sinh độc nhất, được tạo từ seed trên chuỗi bằng mô phỏng vật lý ba vật thể. Ai cũng có thể tái tạo tác phẩm từ bản ghi giao thức, và mỗi tác phẩm thuộc về chu kỳ đã khắc nó. Một chu kỳ điển hình khắc 24 tác phẩm Signature mới: bốn dành cho những người giữ vai trò của chu kỳ, mười cho người tham gia được chọn qua Tinh tuyển, và mười cho người neo giữ Random Walk NFT."
+  },
+  "toolbar": {
+    "filters": "Bộ lọc",
+    "filtersWithCount": "Bộ lọc · {count}",
+    "show": "Hiển thị",
+    "showResults": "{count, plural, other {Hiển thị # NFT}}"
+  },
+  "results": {
+    "total": "{count, plural, other {# NFT}}",
+    "filtered": "{count, number} trong số {total, plural, other {# NFT}}",
+    "regionLabel": "Các Signature"
   }
 }

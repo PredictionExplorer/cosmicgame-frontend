@@ -30,47 +30,82 @@ beforeEach(() => jest.clearAllMocks());
 describe('StellarSelectionHolderTable', () => {
   it('renders empty state when list is empty', () => {
     render(<StellarSelectionHolderTable list={[]} />);
-    expect(screen.getByText('tables.empty.holders')).toBeInTheDocument();
+    expect(screen.getByText('tables.empty.stellarEntries')).toBeInTheDocument();
   });
 
-  it('renders loading state before processing', () => {
+  it('shows the pool without waiting for the selection counts', () => {
     render(<StellarSelectionHolderTable list={[createGesture()]} />);
-    expect(screen.getByText('tables.status.loading')).toBeInTheDocument();
+    expect(screen.getByRole('table')).not.toHaveAttribute('aria-busy');
+    expect(screen.getByText('100.0%')).toBeInTheDocument();
+    // Without the counts there is nothing to say about the draws.
+    expect(screen.queryByText(/tables\.stellarSelection\.draws/)).not.toBeInTheDocument();
   });
 
-  it('renders table headers when data is processed', () => {
+  it('has three short columns: participant, gestures this cycle and share of the pool', () => {
     render(
       <StellarSelectionHolderTable
         list={[createGesture()]}
-        numRaffleEthWinner={1}
-        numRaffleNFTWinner={1}
+        stellarEthSelections={3}
+        stellarNftSelections={10}
       />,
     );
-    expect(screen.getAllByText('tables.columns.holder').length).toBeGreaterThanOrEqual(1);
-    expect(
-      screen.getAllByText('tables.columns.numberOfStellarEntries').length,
-    ).toBeGreaterThanOrEqual(1);
+    const headers = screen.getAllByRole('columnheader').map((header) => header.textContent);
+    expect(headers).toEqual([
+      'tables.columns.participant',
+      'tables.columns.gesturesThisCycle',
+      'tables.columns.shareOfPool',
+    ]);
+    // Three compact columns stay a real table on a phone.
+    expect(screen.getByRole('table')).toHaveAttribute('data-layout', 'compact');
   });
 
-  it('calculates and renders probability percentages', () => {
+  it('shows each participant’s linear share of the pool, never a compounded chance', () => {
     const list = [
+      createGesture({ BidderAddr: '0x' + '1'.repeat(40) }),
       createGesture({ BidderAddr: '0x' + '1'.repeat(40) }),
       createGesture({ BidderAddr: '0x' + '1'.repeat(40) }),
       createGesture({ BidderAddr: '0x' + '2'.repeat(40) }),
     ];
     render(
-      <StellarSelectionHolderTable list={list} numRaffleEthWinner={1} numRaffleNFTWinner={1} />,
+      <StellarSelectionHolderTable
+        list={list}
+        stellarEthSelections={3}
+        stellarNftSelections={10}
+      />,
     );
-    expect(screen.getAllByText(/\d+\.\d+%/).length).toBeGreaterThanOrEqual(1);
+    // 3 of 4 gestures is 75% of the pool (compounded over 10 draws it would
+    // read 100.0%); 1 of 4 is 25%.
+    expect(screen.getByText('75.0%')).toBeInTheDocument();
+    expect(screen.getByText('25.0%')).toBeInTheDocument();
+    expect(screen.queryByText('100.0%')).not.toBeInTheDocument();
   });
 
-  it('shows "(You)" for current user', () => {
-    mockUseActiveWeb3React.mockReturnValue({ account: '0x' + 'a'.repeat(40) });
-    const list = [createGesture({ BidderAddr: '0x' + 'a'.repeat(40) })];
+  it('says how many selections finalization makes from the entries', () => {
     render(
-      <StellarSelectionHolderTable list={list} numRaffleEthWinner={1} numRaffleNFTWinner={1} />,
+      <StellarSelectionHolderTable
+        list={[createGesture()]}
+        stellarEthSelections={3}
+        stellarNftSelections={10}
+      />,
     );
-    expect(screen.getByText('tables.status.you')).toBeInTheDocument();
+    expect(screen.getByText('tables.stellarSelection.draws(eth=3,nft=10)')).toBeInTheDocument();
+  });
+
+  it('keeps your row at its true rank, marked You', () => {
+    mockUseActiveWeb3React.mockReturnValue({ account: '0x' + 'a'.repeat(40) });
+    const list = [
+      createGesture({ BidderAddr: '0x' + '1'.repeat(40) }),
+      createGesture({ BidderAddr: '0x' + '1'.repeat(40) }),
+      createGesture({ BidderAddr: '0x' + 'A'.repeat(40) }),
+    ];
+    const { container } = render(
+      <StellarSelectionHolderTable list={list} stellarEthSelections={1} stellarNftSelections={1} />,
+    );
+    const rows = container.querySelectorAll('tbody tr');
+    expect(rows[0]).not.toHaveAttribute('data-current');
+    expect(rows[1]).toHaveAttribute('data-current', 'true');
+    expect(screen.getAllByText('tables.status.youBadge').length).toBeGreaterThanOrEqual(1);
+    expect(screen.getByText('tables.currentRow.position(rank=2,total=2)')).toBeInTheDocument();
   });
 
   it('shows entry count per holder', () => {
@@ -80,7 +115,7 @@ describe('StellarSelectionHolderTable', () => {
       createGesture({ BidderAddr: '0x' + '1'.repeat(40) }),
     ];
     render(
-      <StellarSelectionHolderTable list={list} numRaffleEthWinner={1} numRaffleNFTWinner={1} />,
+      <StellarSelectionHolderTable list={list} stellarEthSelections={1} stellarNftSelections={1} />,
     );
     expect(screen.getAllByText('3').length).toBeGreaterThanOrEqual(1);
   });

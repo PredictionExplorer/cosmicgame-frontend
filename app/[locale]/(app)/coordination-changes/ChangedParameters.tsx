@@ -3,35 +3,49 @@
 import type { ReactNode } from 'react';
 import { useTranslations } from 'next-intl';
 
-import { PageHeader } from '@/components/layout/PageHeader';
-import { PageShell } from '@/components/ui/page-shell';
 import { useSystemModelist, useSystemEvents } from '@/hooks/useApiQuery';
-import { AdminEventsTable, type AdminEventRow } from '@/components/tables/AdminEventsTable';
+import { COORDINATION_EVENTS_END_ID, coordinationStartId } from '@/services/api/system';
+import { LedgerPage } from '@/components/ledger/LedgerPage';
+import { PageHeader } from '@/components/layout/PageHeader';
+import { AdminEventsTable } from '@/components/tables/AdminEventsTable';
 
-function ChangedParameters({ seoSummary }: { seoSummary?: ReactNode }) {
+/**
+ * Lists the admin events from the latest system-mode change onward
+ * (`coordinationStartId`), the same rows the server header counts, under
+ * the sentence that says who can change them and until when.
+ */
+function ChangedParameters({
+  seoSummary,
+}: {
+  /** The server-rendered page header, the page's only header. */
+  seoSummary?: ReactNode;
+}) {
   const t = useTranslations('coordination');
-  const { data: modeList, isLoading: isLoadingModeList } = useSystemModelist();
-  const startId = modeList != null ? ((modeList as { EvtLogId: number }[])[0]?.EvtLogId ?? 0) : -1;
-  const { data: events = [], isLoading: isLoadingEvents } = useSystemEvents(startId, 9999999999);
-  const loading = isLoadingModeList || isLoadingEvents;
+  const tTables = useTranslations('tables');
+  const modes = useSystemModelist();
+  // -1 holds the events query until the mode list is read.
+  const startId = modes.data != null ? coordinationStartId(modes.data) : -1;
+  const events = useSystemEvents(startId, COORDINATION_EVENTS_END_ID);
+  const loading = modes.isLoading || events.isLoading;
+  const failed = Boolean(modes.isError || events.isError);
 
   return (
-    <PageShell variant="data" backdrop="signature">
-      {seoSummary}
-      {!seoSummary && (
-        <PageHeader title={t('page.title')} titleLevel={2} subtitle={t('page.subtitle')} />
-      )}
-      <p className="text-sm text-muted-foreground leading-relaxed mb-8 max-w-3xl">
-        {t('page.description')}
-      </p>
-      {loading ? (
-        <p className="text-lg font-semibold" role="status">
-          {t('page.loading')}
-        </p>
-      ) : (
-        <AdminEventsTable list={events as AdminEventRow[]} />
-      )}
-    </PageShell>
+    <LedgerPage
+      header={
+        seoSummary ?? (
+          <PageHeader section="records" title={t('page.title')} subtitle={t('page.subtitle')} />
+        )
+      }
+    >
+      <AdminEventsTable
+        list={events.data ?? []}
+        loading={loading}
+        error={failed ? t('page.loadError') : undefined}
+        onRetry={() => void (modes.isError ? modes.refetch() : events.refetch())}
+        title={tTables('names.parameterChanges')}
+        description={t('page.description')}
+      />
+    </LedgerPage>
   );
 }
 

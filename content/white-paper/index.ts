@@ -91,6 +91,8 @@ function buildWhitePaperContent(locale: AppLocale, text: WhitePaperText): WhiteP
     },
     citation: WHITE_PAPER_SHARED.citation,
     licenseNote: text.licenseNote,
+    reading: text.reading,
+    figures: text.figures,
   };
 }
 

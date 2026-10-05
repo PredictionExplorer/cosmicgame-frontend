@@ -1,118 +1,65 @@
-'use client';
+import { ArrowDown } from 'lucide-react';
 
-import dynamic from 'next/dynamic';
-import { ArrowRight, ArrowUpRight, ChevronDown } from 'lucide-react';
-import { useLocale } from 'next-intl';
+import type { LandingContent } from '@/content/landing';
 
-import type { LandingContent, LandingLink } from '@/content/landing';
-
-import { Link } from '@/i18n/navigation';
-import { LanguageSwitcher } from '@/components/layout/LanguageSwitcher';
-import { BrandMark } from '@/components/layout/BrandMark';
-import { ThemeSwitcher } from '@/components/theme/ThemeSwitcher';
-import { ReducedMotionFallback } from '@/components/three/ReducedMotionFallback';
-import { useCanRenderHeroCanvas } from '@/components/three/hero-canvas-gate';
-import { localizeCrossHostHref } from '@/lib/hostRouting';
+import { cn } from '@/lib/utils';
+import { PhrasedText } from '@/components/ui/phrased-text';
 
 import { EventHorizonCountdown } from './EventHorizonCountdown';
 import { HeroArtShowcase } from './HeroArtShowcase';
+import { OpenAppLink } from './OpenAppLink';
+import { SectionLink } from './SectionLink';
 import styles from './Landing.module.css';
 
-const HeroCanvas = dynamic(
-  () => import('@/components/three/HeroCanvas').then((m) => m.HeroCanvas),
-  { ssr: false, loading: () => <ReducedMotionFallback /> },
-);
-
-function HeroBackdrop() {
-  // Keep the WebGL download out of phone and reduced-motion visits entirely.
-  const canRenderCanvas = useCanRenderHeroCanvas();
-  return canRenderCanvas ? <HeroCanvas /> : <ReducedMotionFallback />;
-}
-
-export function Hero({
-  hero,
-  navigation = [],
-}: {
-  hero: LandingContent['hero'];
-  navigation?: readonly LandingLink[];
-}) {
-  const locale = useLocale();
-
+/**
+ * The landing hero: the headline beside a Signature on its black plate, the
+ * loop in one sentence, one commit action and one quiet one, then the live
+ * cycle clock. The source order is the reading order (headline, lede,
+ * actions, then the exhibit), so keyboard and screen-reader users reach the
+ * primary action before the exhibit's controls; on phones the grid draws the
+ * plate directly under the headline, so the art is in the first screen. The
+ * header belongs to the landing shell, and the trust evidence lives with
+ * Verifiability, not here.
+ *
+ * A server component: only the exhibit and the clock hydrate.
+ */
+export function Hero({ hero }: { hero: LandingContent['hero'] }) {
   return (
     <section className={styles.hero} aria-labelledby="landing-headline">
-      <div className={styles.backdrop} aria-hidden="true">
-        <HeroBackdrop />
-      </div>
-      <header role="banner" className={styles.header}>
-        <Link href="/" className={styles.brand}>
-          <BrandMark className={styles.brandIcon} />
-          <span className={styles.brandName}>
-            Cosmic <span className={styles.brandSecond}>Signature</span>
-          </span>
-        </Link>
-        <nav className={styles.navigation}>
-          {navigation.map((item) => (
-            <Link key={item.href} href={item.href}>
-              {item.label}
-            </Link>
-          ))}
-        </nav>
-        <div className={styles.preferences}>
-          <ThemeSwitcher />
-          <LanguageSwitcher variant="compact" />
-        </div>
-      </header>
+      {/* The palette's atmosphere (::before) and a static starfield kept to the
+          gutters: no canvas, no motion, nothing behind a line of text. */}
+      <div className={cn('starfield', styles.starfield)} aria-hidden="true" />
 
-      <div className={styles.heroInner}>
+      <div className="site-container">
         <div className={styles.heroGrid}>
-          <div className={styles.heroCopy}>
-            <p className={styles.eyebrow}>
-              <span className={styles.signal} aria-hidden="true" />
-              {hero.eyebrow}
-            </p>
-            <h1 id="landing-headline" className={styles.headline}>
-              {hero.headlineLead}{' '}
-              <span className={styles.headlineAccent}>{hero.headlineAccent}</span>
-            </h1>
-            <p className={styles.subhead}>{hero.subhead}</p>
-            <div className={styles.actions}>
-              <Link
-                href={localizeCrossHostHref(hero.primaryCta.href, locale)}
-                className={styles.primaryAction}
-                rel="noopener"
-              >
-                {hero.primaryCta.label}
-                <ArrowUpRight size={18} aria-hidden="true" />
-              </Link>
-              <Link href={hero.secondaryCta.href} className={styles.secondaryAction}>
-                {hero.secondaryCta.label}
-                <ArrowRight size={17} aria-hidden="true" />
-              </Link>
-            </div>
-            <div className={styles.exploreLinks}>
-              {[hero.statisticsCta, hero.galleryCta].map((item) => (
-                <Link key={item.href} href={localizeCrossHostHref(item.href, locale)}>
-                  {item.label}
-                  <ArrowUpRight size={14} aria-hidden="true" />
-                </Link>
-              ))}
-            </div>
+          <p className={cn('type-eyebrow text-subtle', styles.heroEyebrow)}>{hero.eyebrow}</p>
+          <h1 id="landing-headline" className={cn('type-display-xl', styles.headline)}>
+            <PhrasedText>{hero.headlineLead}</PhrasedText>{' '}
+            <span className={styles.headlineAccent}>
+              <PhrasedText>{hero.headlineAccent}</PhrasedText>
+            </span>
+          </h1>
+          <p className={cn('type-body-md text-muted-foreground sm:type-lede', styles.subhead)}>
+            {hero.subhead}
+          </p>
+          <div className={styles.actions}>
+            <OpenAppLink variant="commit" size="xl" />
+            {/* A link that reads as one: it takes the view and focus to the cycle below. */}
+            <SectionLink
+              section={hero.secondaryCta.href.replace(/^#/, '')}
+              className="link-quiet type-body-md inline-flex min-h-11 items-center gap-1.5 font-medium text-foreground"
+            >
+              {hero.secondaryCta.label}
+              <ArrowDown aria-hidden className="size-4 text-subtle" />
+            </SectionLink>
           </div>
-          <HeroArtShowcase art={hero.art} />
+          <div className={styles.heroArt}>
+            <HeroArtShowcase art={hero.art} />
+          </div>
         </div>
 
         <div className={styles.clockBand}>
           <EventHorizonCountdown />
-        </div>
-        <div className={styles.credentials}>
-          <ul>
-            {hero.marqueeChips.map((chip) => (
-              <li key={chip}>{chip}</li>
-            ))}
-          </ul>
-          <a href="#cycle" aria-label={hero.scrollAriaLabel} className={styles.scrollLink}>
-            <ChevronDown size={20} aria-hidden="true" />
-          </a>
         </div>
       </div>
     </section>

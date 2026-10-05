@@ -137,9 +137,11 @@ export const ADMIN_EVENTS = [
     description: 'The ratio of the gesture cost increasement has been changed.',
   },
   {
+    // The slot keeps its V1 indexer name, but V2 fills it from
+    // MainPrizeTimeIncrementInMicroSecondsChanged: the value is in microseconds.
     name: 'NanoSecondsExtraChanged',
     messageKey: 'gestureTimeIncrement',
-    type: 'time',
+    type: 'microseconds',
     description:
       'The value for the increment of allocation time after every gesture has been changed.',
   },
@@ -165,7 +167,7 @@ export const ADMIN_EVENTS = [
   {
     name: 'RoundStartCSTAuctionLengthChanged',
     messageKey: 'cstCalibrationLength',
-    type: 'number',
+    type: 'time',
     description: 'The length of the starting CST Calibration Window has been changed.',
   },
   {

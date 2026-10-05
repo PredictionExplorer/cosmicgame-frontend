@@ -89,9 +89,10 @@ ICU message so that **every placeholder sits in the nominative** and needs no ag
 - **No space** before `: ; ? ! , .`; one space after.
 - **Percent:** no space before % (50%). This matches the on-screen formatters and the
   numeric-claims test that pins every percentage to `protocol-facts.ts`.
-- **Decimals in token amounts:** keep the dot the formatters print (0.0001 ETH, 1.5 CST)
-  so prose matches the UI and the numeric-claims regex. Ukrainian comma decimals appear
-  only where `Intl.NumberFormat('uk-UA')` produces them (tables, grouped numbers).
+- **Decimals in token amounts:** keep the dot the formatters print (0.0001 ETH, 1.5 CST,
+  12.5%) so prose matches the UI and the numeric-claims regex. The formatting layer
+  (`utils/format.ts`) prints the dot in every context, tables included, grouped with a
+  no-break space (12 096.2542), so a figure never reads two ways on one screen.
 - **Thousands** in prose: a no-break space (U+00A0), which is also what Intl produces —
   1 000 CST, 24 000 CST, 1 000 000. Never the English comma (1,000 reads as a decimal
   in Ukrainian). The numeric-claims test accepts both separators, so the guard still
@@ -121,9 +122,14 @@ Formatting is code, not copy (`i18n/localeConfig.ts` → `intlLocale: 'uk-UA'`,
 | Relative time                          | 2 години тому · 5 днів тому · щойно         |
 | Compact duration                       | 1д 2год 30хв 45с                            |
 | Countdown labels (`formats.countdown`) | ДН · ГОД · ХВ · С                           |
+| Clock captions under figures           | днів · годин · хвилин · секунд              |
 | Grouped number                         | 1 000 000 (Intl, no-break space)            |
 | Token amount                           | 1.2345 ETH · 12.50 CST (formatter output)   |
 | Week start                             | Monday (`weekStartsMonday: true`)           |
+
+A caption under a ticking figure names the unit, not the count: the genitive plural
+(днів, годин) reads right under any number, where дні or години would disagree with 05
+or 50 and a per-count form would change every second.
 
 In prose, write times as «48 годин», «2 тижні», «1 день» — always through the plural
 forms in §7 so the numeric-claims guard can find them (годин[аиу], тиж…, дн…).

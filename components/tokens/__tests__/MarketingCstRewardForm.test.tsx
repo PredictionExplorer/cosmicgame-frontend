@@ -1,362 +1,272 @@
-import { toast } from 'sonner';
+import userEvent from '@testing-library/user-event';
+import { QueryClient } from '@tanstack/react-query';
 
 import {
   TEST_APP_CONTRACT_ADDRESSES,
   TEST_MARKETING_WALLET,
 } from '@/test-utils/contractAddressesFixture';
+import { createFakeTxFlow } from '@/test-utils/txFlow';
 
-import { fireEvent, renderWithQuery, screen, waitFor } from '@/test-utils';
+import type { RecipientCheck } from '@/components/tokens/transfer/useRecipientFacts';
+
+import { checkA11y, renderWithQuery, screen, waitFor } from '@/test-utils';
 
 import { MarketingCstRewardForm } from '../MarketingCstRewardForm';
 
 const OWNER = '0x1111111111111111111111111111111111111111';
 const TREASURER = '0x2222222222222222222222222222222222222222';
-const OTHER_ACCOUNT = '0x3333333333333333333333333333333333333333';
 const RECIPIENT = '0x4444444444444444444444444444444444444444';
-const TX_HASH = '0xbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb';
+const TEN_CST = 10n * 10n ** 18n;
 
-const mockWriteContract = jest.fn();
 const mockReadContract = jest.fn();
-const mockWaitForTransactionReceipt = jest.fn();
-const mockInvalidateQueries = jest.fn();
-const mockReportError = jest.fn();
+let mockTx = createFakeTxFlow(TREASURER);
+const mockNotify = jest.fn();
+let mockCheck: RecipientCheck = { status: 'idle' };
 
-let mockAccount = TREASURER;
-let mockActive = true;
-let mockContractAddresses = TEST_APP_CONTRACT_ADDRESSES;
-
-jest.mock('@wagmi/core', () => ({
-  writeContract: (...args: unknown[]) => mockWriteContract(...args),
-}));
+// The form reads the balance through React Query: use the real one, not the empty stub.
+jest.mock('@tanstack/react-query', () => jest.requireActual('@tanstack/react-query'));
 
 jest.mock('wagmi', () => ({
-  useConfig: () => ({ id: 'test-config' }),
+  useConnection: () => ({ status: 'connected' }),
   usePublicClient: () => ({
     readContract: (...args: unknown[]) => mockReadContract(...args),
-    waitForTransactionReceipt: (...args: unknown[]) => mockWaitForTransactionReceipt(...args),
   }),
 }));
 
-jest.mock('@tanstack/react-query', () => {
-  const actual = jest.requireActual('@tanstack/react-query');
-  return {
-    ...actual,
-    useQueryClient: () => ({
-      invalidateQueries: (...args: unknown[]) => mockInvalidateQueries(...args),
-    }),
-  };
-});
+jest.mock('@/hooks/useTxFlow', () => ({
+  useTxFlow: () => mockTx.flow,
+  useTxStageLabel: () => () => null,
+}));
+
+jest.mock('@/components/wallet/NetworkGuard', () => ({
+  ChainGuard: ({ children }: { children: React.ReactNode }) => children,
+}));
+
+jest.mock('@/hooks/useNotify', () => ({
+  useNotify: () => ({ notify: mockNotify }),
+}));
+
+// The recipient check reads the chain; each test says what it found.
+jest.mock('@/components/tokens/transfer/useRecipientFacts', () => ({
+  ...jest.requireActual('@/components/tokens/transfer/useRecipientFacts'),
+  useRecipientFacts: (address: string | null) => (address ? mockCheck : { status: 'idle' }),
+}));
 
 jest.mock('../../../contexts/ContractAddressesContext', () => ({
-  useContractAddresses: () => mockContractAddresses,
+  useContractAddresses: () => TEST_APP_CONTRACT_ADDRESSES,
 }));
 
 jest.mock('../../../hooks/web3', () => ({
-  useActiveWeb3React: () => ({
-    account: mockAccount,
-    active: mockActive,
-  }),
+  useActiveWeb3React: () => ({ account: TREASURER, active: true }),
 }));
 
-const mockEnsureCorrectChain = jest.fn<Promise<boolean>, []>();
-jest.mock('../../../hooks/useRequireChain', () => ({
-  useRequireChain: () => ({
-    requiredChainId: 421614,
-    connectedChainId: 421614,
-    isWrongChain: false,
-    isConnected: true,
-    switchToRequiredChain: jest.fn(),
-    ensureCorrectChain: mockEnsureCorrectChain,
-  }),
-}));
-
-jest.mock('../../../utils/errors', () => {
-  const actual = jest.requireActual('../../../utils/errors');
-  return {
-    ...actual,
-    reportError: (...args: unknown[]) => mockReportError(...args),
-  };
-});
-
-jest.mock('sonner', () => ({
-  toast: {
-    error: jest.fn(),
-    info: jest.fn(),
-    success: jest.fn(),
-    warning: jest.fn(),
-  },
-}));
-
-function setupReadContracts(balance = 3000n * 10n ** 18n) {
-  mockReadContract.mockImplementation(({ functionName }: { functionName: string }) => {
-    if (functionName === 'decimals') return Promise.resolve(18);
-    if (functionName === 'balanceOf') return Promise.resolve(balance);
-    return Promise.resolve(null);
-  });
+function setupReads({ balance = TEN_CST } = {}) {
+  mockReadContract.mockImplementation(({ functionName }: { functionName: string }) =>
+    Promise.resolve(functionName === 'balanceOf' ? balance : null),
+  );
 }
 
-async function renderReadyForm(props: Partial<Parameters<typeof MarketingCstRewardForm>[0]> = {}) {
-  renderWithQuery(
+function renderForm() {
+  return renderWithQuery(
     <MarketingCstRewardForm
       marketingWalletAddress={TEST_MARKETING_WALLET}
       ownerAddress={OWNER}
       treasurerAddress={TREASURER}
       historyHref={`/cosmic-token-transfer/${TEST_MARKETING_WALLET}`}
-      {...props}
     />,
   );
-  await screen.findByText('3000.00 CST');
 }
 
-function fillRewardForm(amount = '12.5', recipient = RECIPIENT) {
-  fireEvent.change(screen.getByLabelText('Recipient address'), {
-    target: { value: recipient },
-  });
-  fireEvent.change(screen.getByLabelText('Amount'), {
-    target: { value: amount },
-  });
+async function fill(recipient: string, amount: string) {
+  const user = userEvent.setup();
+  const recipientField = screen.getByLabelText('forms.transfer.recipient.label');
+  const amountField = screen.getByLabelText(/forms\.transfer\.amount\.label/);
+  await user.clear(recipientField);
+  if (recipient) await user.type(recipientField, recipient);
+  await user.clear(amountField);
+  if (amount) await user.type(amountField, amount);
+  await user.click(screen.getByRole('button', { name: /^Send / }));
 }
 
-function submitRewardForm() {
-  const button = screen.getByRole('button', {
-    name: 'toasts.transfer.marketingCst.pay',
-  });
-  const form = button.closest('form');
-  expect(form).not.toBeNull();
-  fireEvent.submit(form!);
-}
+beforeEach(() => {
+  jest.clearAllMocks();
+  mockTx = createFakeTxFlow(TREASURER);
+  setupReads();
+  mockCheck = {
+    status: 'ready',
+    facts: { transactionCount: 4, isContract: false },
+    known: null,
+    warning: null,
+  };
+});
 
 describe('MarketingCstRewardForm', () => {
-  beforeEach(() => {
-    jest.clearAllMocks();
-    mockEnsureCorrectChain.mockResolvedValue(true);
-    mockAccount = TREASURER;
-    mockActive = true;
-    mockContractAddresses = TEST_APP_CONTRACT_ADDRESSES;
-    setupReadContracts();
-    mockWriteContract.mockResolvedValue(TX_HASH);
-    mockWaitForTransactionReceipt.mockResolvedValue({ status: 'success' });
-    mockInvalidateQueries.mockResolvedValue(undefined);
-  });
-
-  it('renders outreach reserve balance, owner, treasurer, and history link', async () => {
-    await renderReadyForm();
-
-    expect(screen.getByText('0x888888....888888')).toBeInTheDocument();
-    expect(screen.getByText('3000.00 CST')).toBeInTheDocument();
-    expect(screen.getByText('0x111111....111111')).toBeInTheDocument();
-    expect(screen.getByText('0x222222....222222')).toBeInTheDocument();
-    expect(
-      screen.getByRole('button', { name: 'toasts.transfer.marketingCst.pay' }),
-    ).toHaveTextContent('toasts.transfer.marketingCst.pay');
-    expect(screen.getByRole('link', { name: /view outreach reserve transfers/i })).toHaveAttribute(
+  it('shows the reserve, its balance, its roles and its transfer history', async () => {
+    renderForm();
+    expect(screen.getByRole('heading', { level: 2, name: 'Outreach Reserve' })).toBeInTheDocument();
+    const balance = await screen.findByText('10', { exact: false, selector: 'data' });
+    expect(balance.closest('[data-fact="balance"]')).toHaveTextContent('CST');
+    expect(screen.getByTitle(TREASURER)).toBeInTheDocument();
+    expect(screen.getByTitle(OWNER)).toBeInTheDocument();
+    expect(screen.getByRole('link', { name: /Outreach Reserve transfers/ })).toHaveAttribute(
       'href',
       `/cosmic-token-transfer/${TEST_MARKETING_WALLET}`,
     );
   });
 
-  it('shows the localized balance loading state', async () => {
-    mockReadContract.mockReturnValue(new Promise(() => {}));
+  it('names each mistake under its field and sends nothing', async () => {
+    renderForm();
+    await screen.findByText('10', { exact: false, selector: 'data' });
 
-    renderWithQuery(
-      <MarketingCstRewardForm
-        marketingWalletAddress={TEST_MARKETING_WALLET}
-        ownerAddress={OWNER}
-        treasurerAddress={TREASURER}
-      />,
+    await fill('not an address', '0');
+    expect(screen.getByText('forms.transfer.recipient.errors.invalid')).toBeVisible();
+    expect(screen.getByText('forms.transfer.amount.errors.zero')).toBeVisible();
+    expect(screen.getByLabelText('forms.transfer.recipient.label')).toHaveAttribute(
+      'aria-invalid',
+      'true',
     );
 
-    expect(await screen.findByText('toasts.transfer.marketingCst.loading')).toBeInTheDocument();
-  });
+    // The reserve cannot pay itself.
+    await fill(TEST_MARKETING_WALLET, '1');
+    expect(screen.getByText('forms.transfer.recipient.errors.self')).toBeVisible();
 
-  it('rejects invalid recipient, invalid amount, and over-balance amount before writing', async () => {
-    await renderReadyForm();
-    fillRewardForm('1', 'not-an-address');
-    submitRewardForm();
-    expect(toast.error).toHaveBeenCalledWith('toasts.transfer.common.invalidRecipient');
-
-    jest.clearAllMocks();
-    fillRewardForm('abc');
-    submitRewardForm();
-    expect(toast.error).toHaveBeenCalledWith('toasts.transfer.common.invalidAmount');
-
-    jest.clearAllMocks();
-    fillRewardForm('3000.01');
-    submitRewardForm();
-    expect(toast.error).toHaveBeenCalledWith('toasts.transfer.marketingCst.insufficientBalance');
-    expect(mockWriteContract).not.toHaveBeenCalled();
-  });
-
-  it('does not sign anything when the wallet is on the wrong chain', async () => {
-    mockEnsureCorrectChain.mockResolvedValue(false);
-    await renderReadyForm();
-    fillRewardForm('12.5');
-
-    submitRewardForm();
-
-    await waitFor(() => expect(mockEnsureCorrectChain).toHaveBeenCalled());
-    expect(mockWriteContract).not.toHaveBeenCalled();
-  });
-
-  it('requires the connected wallet to be the current treasurer', async () => {
-    mockAccount = OTHER_ACCOUNT;
-    await renderReadyForm();
-    fillRewardForm('1');
-
-    submitRewardForm();
-
-    expect(toast.error).toHaveBeenCalledWith('toasts.transfer.marketingCst.treasurerRequired');
-    expect(mockWriteContract).not.toHaveBeenCalled();
-  });
-
-  it('disables submit when the treasurer address is unavailable', async () => {
-    await renderReadyForm({ treasurerAddress: null });
-
-    expect(screen.getByRole('button', { name: 'toasts.transfer.marketingCst.pay' })).toBeDisabled();
-    expect(mockWriteContract).not.toHaveBeenCalled();
-  });
-
-  it('falls back to 18 decimals when token decimals cannot be read', async () => {
-    mockReadContract.mockImplementation(({ functionName }: { functionName: string }) => {
-      if (functionName === 'decimals') return Promise.reject(new Error('decimals failed'));
-      if (functionName === 'balanceOf') return Promise.resolve(3000n * 10n ** 18n);
-      return Promise.resolve(null);
-    });
-
-    await renderReadyForm();
-    fillRewardForm('1.5');
-    submitRewardForm();
-
-    await waitFor(() =>
-      expect(toast.warning).toHaveBeenCalledWith('toasts.transfer.marketingCst.decimalsWarning'),
-    );
-    await waitFor(() => expect(mockWriteContract).toHaveBeenCalled());
-    expect(mockReportError).toHaveBeenCalledWith(
-      expect.any(Error),
-      'MarketingWallet CST decimals read',
-    );
-  });
-
-  it('shows a balance error and disables submit when reserve balance cannot be read', async () => {
-    mockReadContract.mockImplementation(({ functionName }: { functionName: string }) => {
-      if (functionName === 'decimals') return Promise.resolve(18);
-      if (functionName === 'balanceOf') return Promise.reject(new Error('balance failed'));
-      return Promise.resolve(null);
-    });
-
-    renderWithQuery(
-      <MarketingCstRewardForm
-        marketingWalletAddress={TEST_MARKETING_WALLET}
-        ownerAddress={OWNER}
-        treasurerAddress={TREASURER}
-      />,
-    );
-
+    await fill(RECIPIENT, '11');
     expect(
-      await screen.findByText('toasts.transfer.marketingCst.balanceReadFailed'),
-    ).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: 'toasts.transfer.marketingCst.pay' })).toBeDisabled();
+      screen.getByText(/^forms\.transfer\.amount\.errors\.exceedsBalance\(amount=10/),
+    ).toBeVisible();
+    expect(mockTx.flow.run).not.toHaveBeenCalled();
   });
 
-  it('calls MarketingWallet payReward, waits for receipt, and invalidates related queries', async () => {
-    await renderReadyForm();
-    fillRewardForm('12.5');
+  it('names the typed amount on the send button before anything is sent', async () => {
+    const user = userEvent.setup();
+    renderForm();
+    await screen.findByText('10', { exact: false, selector: 'data' });
+    await user.type(screen.getByLabelText('forms.transfer.recipient.label'), RECIPIENT);
+    await user.type(screen.getByLabelText(/forms\.transfer\.amount\.label/), '2.5');
+    expect(screen.getByRole('button', { name: 'Send 2.5\u00a0CST' })).toBeInTheDocument();
+    expect(mockTx.flow.run).not.toHaveBeenCalled();
+  });
 
-    submitRewardForm();
+  // The transfer cannot be undone: an English operator typing "1,000" once sent 1 CST.
+  it('refuses a grouped amount like 1,000 and sends nothing', async () => {
+    renderForm();
+    await screen.findByText('10', { exact: false, selector: 'data' });
+    await fill(RECIPIENT, '1,000');
+    expect(
+      screen.getByText('forms.transfer.amount.errors.grouping(plain=1000,grouped=1,000)'),
+    ).toBeVisible();
+    expect(screen.queryByTestId('transfer-review')).toBeNull();
+    expect(mockTx.flow.run).not.toHaveBeenCalled();
+  });
 
-    await waitFor(() => expect(mockWriteContract).toHaveBeenCalledTimes(1));
-    expect(mockWriteContract).toHaveBeenCalledWith(
-      expect.objectContaining({ id: 'test-config' }),
+  it('sends payReward from the reserve and clears the form once it confirms', async () => {
+    const invalidate = jest.spyOn(QueryClient.prototype, 'invalidateQueries');
+    renderForm();
+    await screen.findByText('10', { exact: false, selector: 'data' });
+
+    await fill(RECIPIENT, '2.5');
+
+    await waitFor(() => expect(mockTx.flow.run).toHaveBeenCalledTimes(1));
+    expect(mockTx.writeContract).toHaveBeenCalledWith(
       expect.objectContaining({
         address: TEST_MARKETING_WALLET,
         functionName: 'payReward',
-        args: [RECIPIENT, 12500000000000000000n],
-        account: TREASURER,
-        chainId: 421614,
+        args: [RECIPIENT, 25n * 10n ** 17n],
       }),
     );
-    expect(mockWriteContract).not.toHaveBeenCalledWith(
-      expect.anything(),
-      expect.objectContaining({ functionName: 'transfer' }),
-    );
-    expect(mockWaitForTransactionReceipt).toHaveBeenCalledWith({ hash: TX_HASH });
-
+    expect(mockTx.lastSuccessMessage()).toBe('CST sent from the Outreach Reserve.');
     await waitFor(() =>
-      expect(toast.success).toHaveBeenCalledWith('toasts.transfer.marketingCst.confirmed'),
+      expect(screen.getByLabelText(/forms\.transfer\.amount\.label/)).toHaveValue(''),
     );
-    expect(mockInvalidateQueries).toHaveBeenCalledWith({
-      queryKey: ['userBalance', TEST_MARKETING_WALLET],
-    });
-    expect(mockInvalidateQueries).toHaveBeenCalledWith({ queryKey: ['userBalance', RECIPIENT] });
-    expect(mockInvalidateQueries).toHaveBeenCalledWith({
-      queryKey: ['ctTransfers', TEST_MARKETING_WALLET],
-    });
-    expect(mockInvalidateQueries).toHaveBeenCalledWith({ queryKey: ['ctTransfers', RECIPIENT] });
-    expect(mockInvalidateQueries).toHaveBeenCalledWith({ queryKey: ['ctBalancesDistribution'] });
-    expect(mockInvalidateQueries).toHaveBeenCalledWith({ queryKey: ['dashboardInfo'] });
-    expect(screen.getByText('toasts.transfer.marketingCst.confirmed')).toBeInTheDocument();
+    expect(screen.getByLabelText('forms.transfer.recipient.label')).toHaveValue('');
+    // The reserve panel and the form's cap share one balance read.
+    expect(invalidate).toHaveBeenCalledWith({ queryKey: ['cstBalance'] });
+    invalidate.mockRestore();
+  });
+
+  it('reviews the send and asks for an acknowledgement for an address with no history', async () => {
+    mockCheck = {
+      status: 'ready',
+      facts: { transactionCount: 0, isContract: false },
+      known: null,
+      warning: 'fresh',
+    };
+    const user = userEvent.setup();
+    renderForm();
+    await screen.findByText('10', { exact: false, selector: 'data' });
+
+    await fill(RECIPIENT, '2');
+    expect(screen.getByTestId('transfer-review')).toHaveTextContent('2');
+    expect(await screen.findByText('forms.transfer.review.acknowledgeRequired')).toBeVisible();
+    expect(mockTx.flow.run).not.toHaveBeenCalled();
+
+    await user.click(screen.getByLabelText('forms.transfer.review.acknowledge'));
+    await user.click(screen.getByRole('button', { name: /^Send / }));
+    await waitFor(() => expect(mockTx.flow.run).toHaveBeenCalledTimes(1));
+  });
+
+  it('holds the send until the recipient check answers (regression)', async () => {
+    mockCheck = { status: 'checking' };
+    const user = userEvent.setup();
+    renderForm();
+    await screen.findByText('10', { exact: false, selector: 'data' });
+
+    await user.type(screen.getByLabelText('forms.transfer.recipient.label'), RECIPIENT);
+    await user.type(screen.getByLabelText(/forms\.transfer\.amount\.label/), '1');
+    const checking = screen.getByRole('button', { name: /forms\.transfer\.review\.checking/ });
+    expect(checking).toHaveAttribute('aria-busy', 'true');
+    await user.click(checking);
+    expect(mockTx.flow.run).not.toHaveBeenCalled();
+  });
+
+  it('stops before the wallet opens when the signer is not the treasurer', async () => {
+    mockTx = createFakeTxFlow(OWNER);
+    renderForm();
+    await screen.findByText('10', { exact: false, selector: 'data' });
+
+    await fill(RECIPIENT, '1');
+    await waitFor(() =>
+      expect(mockNotify).toHaveBeenCalledWith(
+        'error',
+        'toasts.transfer.marketingCst.treasurerRequired',
+      ),
+    );
+    expect(mockTx.writeContract).not.toHaveBeenCalled();
+  });
+
+  it('says the balance could not be read, and reviews a send with that caveat', async () => {
+    const err = new Error('balance failed');
+    mockReadContract.mockImplementation(() => Promise.reject(err));
+    renderForm();
     expect(
-      screen.getByRole('link', { name: 'toasts.transfer.marketingCst.viewTransaction' }),
-    ).toHaveAttribute('href', expect.stringContaining(TX_HASH));
+      await screen.findByText('The reserve’s CST balance could not be read.'),
+    ).toBeInTheDocument();
+
+    const user = userEvent.setup();
+    await user.type(screen.getByLabelText('forms.transfer.recipient.label'), RECIPIENT);
+    await user.type(screen.getByLabelText(/forms\.transfer\.amount\.label/), '1');
+    expect(screen.getByTestId('transfer-review')).toHaveTextContent(
+      'forms.transfer.review.balanceUnchecked',
+    );
+    await user.click(screen.getByRole('button', { name: /^Send / }));
+    await waitFor(() => expect(mockTx.flow.run).toHaveBeenCalledTimes(1));
   });
 
-  it('shows an informational toast when the wallet rejects the reward transaction', async () => {
-    mockWriteContract.mockRejectedValue({ code: 4001 });
-    await renderReadyForm();
-    fillRewardForm('1');
-
-    submitRewardForm();
-
-    await waitFor(() =>
-      expect(toast.info).toHaveBeenCalledWith('toasts.walletTransactionCancelled'),
+  it('offers no send while the treasurer is unknown', async () => {
+    renderWithQuery(
+      <MarketingCstRewardForm
+        marketingWalletAddress={TEST_MARKETING_WALLET}
+        ownerAddress={OWNER}
+        treasurerAddress={null}
+      />,
     );
-    expect(mockWaitForTransactionReceipt).not.toHaveBeenCalled();
+    await screen.findByText('10', { exact: false, selector: 'data' });
+    expect(screen.getByRole('button', { name: 'Send CST' })).toBeDisabled();
   });
 
-  it('reports and displays MarketingWallet write failures', async () => {
-    const err = new Error('payReward failed');
-    mockWriteContract.mockRejectedValue(err);
-    await renderReadyForm();
-    fillRewardForm('1');
-
-    submitRewardForm();
-
-    await waitFor(() =>
-      expect(toast.error).toHaveBeenCalledWith('toasts.transfer.marketingCst.failed'),
-    );
-    expect(mockReportError).toHaveBeenCalledWith(err, 'MarketingWallet payReward');
-  });
-
-  it('reports a reverted receipt and shows the localized reward fallback', async () => {
-    mockWaitForTransactionReceipt.mockResolvedValueOnce({ status: 'reverted' });
-    await renderReadyForm();
-    fillRewardForm('1');
-
-    submitRewardForm();
-
-    await waitFor(() =>
-      expect(toast.error).toHaveBeenCalledWith('toasts.transfer.marketingCst.failed'),
-    );
-    expect(mockReportError).toHaveBeenCalledWith(expect.any(Error), 'MarketingWallet payReward');
-    expect(toast.success).not.toHaveBeenCalled();
-  });
-
-  it('shows the localized pending label while the reward transaction is awaiting approval', async () => {
-    let resolveWrite!: (hash: string) => void;
-    mockWriteContract.mockReturnValueOnce(
-      new Promise((resolve) => {
-        resolveWrite = resolve;
-      }),
-    );
-    await renderReadyForm();
-    fillRewardForm('1');
-
-    submitRewardForm();
-    expect(await screen.findByText('toasts.transfer.marketingCst.paying')).toBeInTheDocument();
-
-    resolveWrite(TX_HASH);
-    await waitFor(() =>
-      expect(toast.success).toHaveBeenCalledWith('toasts.transfer.marketingCst.confirmed'),
-    );
+  it('has no accessibility violations', async () => {
+    const { container } = renderForm();
+    await screen.findByText('10', { exact: false, selector: 'data' });
+    await checkA11y(container);
   });
 });

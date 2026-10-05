@@ -53,6 +53,10 @@ export interface MainStats {
   NumCSTokenMints: number;
   TotalRaffleEthDeposits: number;
   TotalCSTConsumedEth: number;
+  /**
+   * CST sent from the Outreach Reserve to contributors so far. Despite the `Eth` suffix this
+   * is a CST amount (18-decimal token units converted), not ETH and not a reserve balance.
+   */
   TotalMktRewardsEth: number;
   NumMktRewards: number;
   TotalRaffleEthWithdrawn: number;
@@ -107,12 +111,12 @@ export interface ContractAddresses {
 export interface DashboardInfo {
   CurNumBids: number;
   CurPrizeAmountEth: number;
+  /** The current ETH Gesture Cost (wire `BidPriceEth`, normalized in `normalizeDashboardWire`). */
   CurBidPriceEth?: number;
   CurRoundNum: number;
   PrizeClaimTs: number;
   TsRoundStart: number;
   LastBidderAddr: string;
-  GestureCostEth: number;
   StakingAmountEth: number;
   CurRoundPrizeTime?: number;
   MainStats: MainStats;
@@ -234,6 +238,11 @@ export interface RoundInfo {
   NumCSNfts?: number;
   /** All main-prize NFT ids (TokenId .. TokenId+NumCSNfts-1); provided by the V3-aware backend. */
   NftTokenIds?: number[];
+  /**
+   * The seed of the Signature the cycle imprinted (`MainPrize.Seed`): enough to
+   * draw it without reading the token or the whole collection.
+   */
+  TokenSeed?: string | number;
   TxHash: string;
   TimeStamp: number;
   DateTime: string;
@@ -486,6 +495,8 @@ export interface AnchoredTokenInfo {
     TokenId: number;
     Seed?: number;
     StakeActionId?: number;
+    /** The token's name; empty when it has none. */
+    TokenName?: string;
   };
   StakeTimeStamp: number;
   IsRWLK?: boolean;
@@ -561,7 +572,7 @@ export interface AttachedNFT extends TxInfo {
   NFTTokenURI?: string;
   TokenAddress?: string;
   Index?: number;
-  /** Stellar-selection wallet contract holding this attached NFT (claims must target it). */
+  /** Stellar-selection wallet contract holding this NFT (claims must target it). */
   WalletAddr?: string;
   [key: string]: unknown;
 }
@@ -665,8 +676,11 @@ export interface Participant {
 export interface Recipient {
   WinnerAid: string;
   WinnerAddr: string;
-  AllocationsCount: number;
+  /** Mapped from the wire's `PrizesCount` in `get_unique_winners`; undefined when absent. */
+  AllocationsCount?: number;
+  /** Largest Signature Allocation (main ETH) received; 0 for wallets that never received one. */
   MaxWinAmountEth: number;
+  /** Sum of every ETH allocation received. */
   PrizesSum: number;
   [key: string]: unknown;
 }
@@ -803,7 +817,8 @@ export interface NotifyRedBoxResult {
   ETHRaffleToClaim: number;
   ETHRaffleToClaimWei: number;
   NumDonatedNFTToClaim: number;
-  UnretrievedAnchorDistribution: number;
+  /** Mapped from the wire's `UnclaimedStakingReward` in `notify_red_box`. */
+  UnretrievedAnchorDistribution?: number;
   [key: string]: unknown;
 }
 
@@ -895,24 +910,6 @@ export interface BidFrequencyBucket {
   BucketTs: number;
   NumBids: number;
   UniqueBidders: number;
-}
-
-/**
- * Per-interval bid-type composition for the 100% stacked area chart. Counts are
- * the raw bids of each type within the window [BucketTs, BucketTs+interval); the
- * *Pct fields are those counts normalized to a windowed 100% of TotalBids. When
- * a window has no bids, TotalBids is 0 and all *Pct fields are 0.
- * Type mapping: ETH, RandomWalk (ETH-paid), CST.
- */
-export interface BidTypeRatioBucket {
-  BucketTs: number;
-  EthBids: number;
-  RwalkBids: number;
-  CstBids: number;
-  TotalBids: number;
-  EthPct: number;
-  RwalkPct: number;
-  CstPct: number;
 }
 
 export interface BidSpike {

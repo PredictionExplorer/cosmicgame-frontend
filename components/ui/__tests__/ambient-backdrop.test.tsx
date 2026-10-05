@@ -22,6 +22,35 @@ describe('AmbientBackdrop', () => {
 
     rerender(<AmbientBackdrop variant="hero" />);
     expect(container.querySelector('[data-ambient-backdrop="hero"]')).toBeInTheDocument();
+
+    rerender(<AmbientBackdrop variant="none" />);
+    expect(container.querySelector('[data-ambient-backdrop="none"]')).toBeInTheDocument();
+  });
+
+  it.each([
+    ['hero', '[--backdrop-strength:1]'],
+    ['subtle', '[--backdrop-strength:0.4]'],
+    ['signature', '[--backdrop-strength:0.4]'],
+    ['none', '[--backdrop-strength:0]'],
+  ] as const)('shows the %s share of the palette atmosphere', (variant, strength) => {
+    const { container } = render(<AmbientBackdrop variant={variant} />);
+    expect(container.querySelector('[data-ambient-backdrop]')).toHaveClass(strength);
+  });
+
+  it('draws the starfield on hero pages only', () => {
+    const { container, rerender } = render(<AmbientBackdrop variant="hero" />);
+    expect(container.querySelector('[data-starfield]')).toHaveClass('starfield');
+
+    for (const variant of ['subtle', 'signature', 'none'] as const) {
+      rerender(<AmbientBackdrop variant={variant} />);
+      expect(container.querySelector('[data-starfield]')).toBeNull();
+    }
+  });
+
+  it('is static: no canvas and no animation', () => {
+    const { container } = render(<AmbientBackdrop variant="hero" />);
+    expect(container.querySelector('canvas')).toBeNull();
+    expect(container.innerHTML).not.toMatch(/animate-/);
   });
 
   it('keeps its static atmosphere when motion is reduced', () => {

@@ -32,6 +32,13 @@ export const VI_TERMINOLOGY_RULES: readonly TerminologyRule[] = [
     variants: ['giá nét bút', 'mức giá nét bút', 'giá của nét bút', 'lệ phí nét bút'],
   },
   {
+    concept: 'Gesture method',
+    canonical: 'cách đặt nét bút',
+    // A gesture is not a purchase: the method selector never says "cách thanh
+    // toán". Paying a cost in ETH (thanh toán bằng ETH) stays legal.
+    variants: ['cách thanh toán'],
+  },
+  {
     concept: 'Performance Cycle',
     canonical: 'chu kỳ trình diễn (dense UI: chu kỳ)',
     variants: [

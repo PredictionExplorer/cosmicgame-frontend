@@ -12,6 +12,7 @@ import {
   get_unique_cst_stakers,
   get_unique_rwalk_stakers,
 } from '@/services/api/users';
+import { reportError } from '@/utils/errors';
 
 jest.mock('axios', () => {
   const actual = jest.requireActual<typeof import('axios')>('axios');
@@ -83,6 +84,35 @@ describe('users API', () => {
 
       expect(result?.Gestures).toHaveLength(1);
       expect(result?.Gestures[0]).toHaveProperty('TxHash', '0xabc');
+    });
+
+    it('reads the anchored Cosmic Signature NFTs from the per-collection map', async () => {
+      // Regression: the API keys anchored tokens by collection, and the flattener dropped
+      // the whole map, so a profile counted none of its anchored Cosmic Signature NFTs.
+      mockedAxios.get.mockResolvedValue({
+        data: {
+          Addr: '0x1234',
+          CurrentlyStakedTokens: {
+            CST: [{ TokenInfo: { TokenId: 0 }, Tx: { TxHash: '0xabc' } }],
+            RWalk: [{ TokenId: 7 }, { TokenId: 8 }],
+          },
+        },
+      });
+
+      const result = await get_user_info('0x1234');
+
+      expect(result?.CurrentlyStakedTokens).toHaveLength(1);
+      expect(result?.CurrentlyStakedTokens[0]).toHaveProperty('TxHash', '0xabc');
+    });
+
+    it('still reads a flat anchored-token list', async () => {
+      mockedAxios.get.mockResolvedValue({
+        data: { Addr: '0x1234', CurrentlyStakedTokens: [{ TokenId: 1 }, { TokenId: 2 }] },
+      });
+
+      const result = await get_user_info('0x1234');
+
+      expect(result?.CurrentlyStakedTokens).toHaveLength(2);
     });
 
     it('rejects a UserInfo block with non-numeric totals', async () => {
@@ -163,6 +193,57 @@ describe('users API', () => {
       );
     });
 
+    it('maps the wire UnclaimedStakingReward onto UnretrievedAnchorDistribution', async () => {
+      // Regression: the lexicon rename read the UI name off the wire, so the retrieval
+      // prompt never showed for wallets with unretrieved Anchor Distributions.
+      mockedAxios.get.mockResolvedValue({
+        data: { Winnings: { ETHRaffleToClaim: 0, UnclaimedStakingReward: 1.4054718307649714 } },
+      });
+
+      const result = await notify_red_box('0xuser');
+
+      expect(result?.UnretrievedAnchorDistribution).toBe(1.4054718307649714);
+    });
+
+    it('reads a wallet the indexer has not seen yet (Winnings: []) as nothing waiting', async () => {
+      // Regression: the production answer for a new wallet spread an empty array, so
+      // UnretrievedAnchorDistribution came back undefined and My Allocations showed a
+      // permanent "could not be loaded" error instead of "Nothing waiting".
+      mockedAxios.get.mockResolvedValue({
+        data: {
+          UserAddr: '0x1234567890123456789012345678901234567890',
+          UserAid: 0,
+          Winnings: [],
+          error: '',
+          status: 1,
+        },
+      });
+
+      expect(await notify_red_box('0x1234567890123456789012345678901234567890')).toEqual({
+        ETHRaffleToClaim: 0,
+        ETHRaffleToClaimWei: 0,
+        NumDonatedNFTToClaim: 0,
+        UnretrievedAnchorDistribution: 0,
+      });
+    });
+
+    it('keeps the anchor figure unknown when a notice lacks it', async () => {
+      mockedAxios.get.mockResolvedValue({ data: { Winnings: { ETHRaffleToClaim: 0 } } });
+      const result = await notify_red_box('0xuser');
+      expect(result).not.toBeNull();
+      expect(result?.UnretrievedAnchorDistribution).toBeUndefined();
+    });
+
+    it('returns null when the payload has no Winnings', async () => {
+      mockedAxios.get.mockResolvedValue({ data: {} });
+      expect(await notify_red_box('0xuser')).toBeNull();
+    });
+
+    it('returns null for a Winnings list it cannot read as a notice', async () => {
+      mockedAxios.get.mockResolvedValue({ data: { Winnings: [{ Amount: 1 }] } });
+      expect(await notify_red_box('0xuser')).toBeNull();
+    });
+
     it('returns null on 400 response', async () => {
       mockedAxios.get.mockRejectedValue(make400());
       expect(await notify_red_box('0xuser')).toBeNull();
@@ -184,6 +265,68 @@ describe('users API', () => {
       expect(result).toEqual(recipients);
       expect(mockedAxios.get).toHaveBeenCalledWith(
         expect.stringMatching(/statistics\/unique\/winners/),
+      );
+    });
+
+    it('maps the wire PrizesCount onto AllocationsCount', async () => {
+      // Regression: the column read AllocationsCount off the wire and rendered blank.
+      mockedAxios.get.mockResolvedValue({
+        data: {
+          UniqueWinners: [
+            {
+              WinnerAid: 980,
+              WinnerAddr: '0x7406',
+              PrizesCount: 39,
+              MaxWinAmountEth: 0,
+              PrizesSum: 3.5397,
+            },
+          ],
+        },
+      });
+
+      const [recipient] = await get_unique_winners();
+
+      expect(recipient?.AllocationsCount).toBe(39);
+      expect(recipient?.PrizesSum).toBe(3.5397);
+      expect(reportError).not.toHaveBeenCalled();
+    });
+
+    // Regression (V140): the schema required PrizesCount while the mapper also accepted
+    // AllocationsCount, so a renamed field reported a mismatch on every read.
+    it('accepts a row that already names the count AllocationsCount', async () => {
+      mockedAxios.get.mockResolvedValue({
+        data: {
+          UniqueWinners: [
+            {
+              WinnerAid: 980,
+              WinnerAddr: '0x7406',
+              AllocationsCount: 12,
+              MaxWinAmountEth: 0,
+              PrizesSum: 1,
+            },
+          ],
+        },
+      });
+
+      const [recipient] = await get_unique_winners();
+
+      expect(recipient?.AllocationsCount).toBe(12);
+      expect(reportError).not.toHaveBeenCalled();
+    });
+
+    it('leaves a missing count undefined rather than inventing one, and reports it', async () => {
+      mockedAxios.get.mockResolvedValue({
+        data: {
+          UniqueWinners: [{ WinnerAid: 1, WinnerAddr: '0x1', MaxWinAmountEth: 0, PrizesSum: 0 }],
+        },
+      });
+
+      const [recipient] = await get_unique_winners();
+
+      expect(recipient?.AllocationsCount).toBeUndefined();
+      expect(reportError).toHaveBeenCalledWith(
+        expect.objectContaining({ message: expect.stringContaining('uniqueWinners') }),
+        'schema:uniqueWinners',
       );
     });
 

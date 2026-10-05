@@ -2,8 +2,28 @@
   "page": {
     "title": "調整の変更履歴",
     "subtitle": "プロトコルのパラメーター変更と管理イベントの履歴",
-    "description": "Cosmic Signatureプロトコルのパラメーターは、サイクル有効化の待機期間中にコントラクト所有者が調整できます。この記録は、一筆の費用の上げ幅、時間の追加、係留配分の設定を含むすべての変更を完全に公開します。所有権が放棄されると、すべてのパラメーターは永久に変更不能になります。",
-    "loading": "読み込み中…"
+    "description": "パラメーターを変更できるのは、サイクル有効化の待機期間中だけです。一筆の費用の上げ幅、時間の追加、係留配分の設定などが対象です。",
+    "loadError": "調整の変更履歴を読み込めませんでした。"
+  },
+  "systemEvent": {
+    "title": "サイクル{cycle}より前の調整の変更",
+    "titleInitial": "最初のサイクルより前の調整の変更",
+    "lede": "サイクル{cycle}の開始前にコントラクト所有者が変更したプロトコルのパラメーターです。それぞれの新しい値とトランザクションを示します。",
+    "ledeInitial": "最初のサイクルの開始前にコントラクト所有者が設定したプロトコルのパラメーターです。それぞれの値とトランザクションを示します。",
+    "figures": {
+      "changes": "変更数",
+      "first": "最初の変更",
+      "latest": "最新の変更",
+      "changed": "変更日時"
+    },
+    "allChanges": "調整の変更履歴をすべて見る",
+    "loadError": "設定の変更を読み込めませんでした。",
+    "emptyDescription": "サイクル{cycle}の開始前にコントラクト所有者が変更した設定はありません。",
+    "invalidTitle": "この設定期間は存在しません",
+    "invalidDescription": "リンクのサイクルまたはイベントの範囲が正しくありません。",
+    "emptyDescriptionInitial": "最初のサイクルの開始前にコントラクト所有者が変更した設定はありません。",
+    "tableTitle": "変更",
+    "emptyTitle": "この期間の変更はありません"
   },
   "events": {
     "undefined": "未定義",
@@ -14,12 +34,12 @@
     "stellarEthRecipients": "サイクルあたりのETH星選受領者数の変更",
     "stellarNftRecipients": "サイクルあたりのNFT星選受領者数の変更",
     "cycleActivationDelay": "サイクル有効化前の遅延時間の変更",
-    "anchoredRandomWalkRecipients": "係留RandomWalk NFT星選受領者数の変更",
+    "anchoredRandomWalkRecipients": "係留Random Walk NFT星選受領者数の変更",
     "publicGoodsVaultAddress": "公共財金庫アドレスの変更",
-    "randomWalkContractAddress": "RandomWalk NFTコントラクトアドレスの変更",
+    "randomWalkContractAddress": "Random Walk NFTコントラクトアドレスの変更",
     "allocationsWalletAddress": "配分ウォレットアドレスの変更",
     "anchoringWalletAddress": "係留ウォレットアドレスの変更",
-    "randomWalkAnchoringWalletAddress": "RandomWalk NFT係留ウォレットアドレスの変更",
+    "randomWalkAnchoringWalletAddress": "Random Walk NFT係留ウォレットアドレスの変更",
     "outreachWalletAddress": "広報ウォレットアドレスの変更",
     "cstContractAddress": "CSTトークンコントラクトアドレスの変更",
     "cosmicSignatureNftAddress": "Cosmic Signature NFTコントラクトアドレスの変更",

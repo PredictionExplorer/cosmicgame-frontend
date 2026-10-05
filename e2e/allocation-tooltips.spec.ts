@@ -1,91 +1,107 @@
-import { expect, test } from '@playwright/test';
+import { expect, test, type Locator, type Page } from '@playwright/test';
 
-import { expectAllLabelTooltips } from './tooltip-helpers';
+import {
+  dismissOpenTooltips,
+  expectAllLabelTooltips,
+  expectTooltipFullyVisible,
+  openTooltip,
+} from './tooltip-helpers';
 
 const ALLOCATION_LIST_TOOLTIPS = [
   {
-    label: 'Finalized round records only',
-    expected: /Pending cycles and unrelated allocation retrieval records are not included/,
+    label: 'Finalized cycle records only',
+    expected: /Active cycles and separate allocation retrieval records are excluded/,
   },
+];
+
+/** Split legend entries and role names explain themselves: the word is the trigger. */
+const ALLOCATION_LIST_TERMS = [
   {
-    label: 'Cycle Reserve Split',
-    expected: /ETH reserve is allocated across protocol tracks/,
+    label: 'Signature Allocation',
+    expected: /retrieved by the participant who made the Final Gesture/,
   },
-  {
-    label: 'Signature',
-    expected: /main ETH allocation/,
-  },
-  {
-    label: 'Stellar ETH',
-    expected: /selection frequency/,
-  },
-  {
-    label: 'Next cycle',
-    expected: /compounds into the next Performance Cycle/,
-  },
+  { label: 'Stellar Selection', expected: /randomly selected participants/ },
+  { label: 'Compounding Cycle Reserve', expected: /roll forward into the next cycle/ },
 ];
 
 const ALLOCATION_DETAIL_TOOLTIPS = [
   {
-    label: 'Signature Allocation ETH',
+    label: 'Signature Allocation',
     expected: /ETH portion of the Signature Allocation retrieved by the participant/,
   },
   {
-    label: 'Public Goods',
-    expected: /Public Goods Beneficiary/,
+    label: 'Recipients',
+    expected: /received at least one allocation this cycle/,
   },
   {
-    label: 'Anchor Distribution',
-    expected: /distributed in proportion to each wallet's number of anchored Cosmic Signature NFTs/,
+    label: 'Cycle recipients',
+    expected: /Chrono-Warrior: held the Endurance Champion position/,
   },
   {
-    label: 'Stellar Selection Pool',
-    expected: /allocated to the Stellar Selection pool/,
+    label: 'Allocation distribution',
+    expected: /Each track’s share of the Cycle Reserve when this cycle was finalized/,
   },
   {
-    label: 'Total Gestures',
-    expected: /total number of gestures made during this cycle/,
-  },
-  {
-    label: 'Attached NFTs',
-    expected: /NFTs attached to gestures by participants/,
-  },
-  {
-    label: 'Total Contributed',
-    expected: /ERC-20 token contributions attached to gestures/,
-  },
-  {
-    label: 'Cycle Statistics',
-    expected: /Key metrics summarizing this cycle/,
-  },
-  {
-    label: 'Allocation Distribution',
-    expected: /Visual breakdown of how the cycle's Cycle Reserve/,
+    label: 'Direct contributions',
+    expected: /Direct ETH contributions from the community/,
   },
 ];
+
+/** The distribution legend's track names explain themselves. */
+const ALLOCATION_DETAIL_TERMS = [
+  { label: 'Chrono-Warrior', expected: /ETH allocation to the Chrono-Warrior/ },
+  { label: 'Public Goods', expected: /Public Goods Beneficiary/ },
+];
+
+async function expectTermTooltips(
+  page: Page,
+  terms: readonly { label: string; expected: RegExp }[],
+  scope: Page | Locator = page,
+): Promise<void> {
+  for (const { label, expected } of terms) {
+    await dismissOpenTooltips(page);
+    const trigger = scope.getByRole('button', { name: label, exact: true }).first();
+    await trigger.scrollIntoViewIfNeeded();
+    await openTooltip(trigger);
+    await expectTooltipFullyVisible(page, expected);
+    await dismissOpenTooltips(page);
+  }
+}
 
 test.describe('/allocation tooltips', () => {
   test('opens representative allocation list tooltips', async ({ page }) => {
     await page.goto('/allocation', { waitUntil: 'networkidle' });
     await page.emulateMedia({ reducedMotion: 'reduce' });
     await expectAllLabelTooltips(page, ALLOCATION_LIST_TOOLTIPS);
+    // The ledger leads (its column headers name the same tracks), so the terms are read in
+    // the split's own legend, after it.
+    const split = page.getByRole('region', { name: 'Cycle Reserve split' });
+    await expectTermTooltips(page, ALLOCATION_LIST_TERMS, split);
+    // The split is a constant: one sentence under its heading, after the ledger.
+    await expect(
+      split.getByText('ETH reserve is allocated across protocol tracks', { exact: false }),
+    ).toBeVisible();
   });
 
-  test('opens allocation list recipient tooltip from the Radix replacement for title=', async ({
-    page,
-  }) => {
+  test('gives each ledger recipient its full address and the way to its page', async ({ page }) => {
     await page.goto('/allocation', { waitUntil: 'networkidle' });
     await page.emulateMedia({ reducedMotion: 'reduce' });
 
-    const recipient = page.locator('main span.font-mono').filter({ hasText: /^0x/i }).first();
+    // The one address display (AddressChip): the short checksummed address, the full address
+    // on hover, and the recipient's page one click away, on every screen size.
+    const ledger = page.getByRole('table', { name: 'Finalized cycles' });
+    const recipient = ledger.getByRole('link', { name: /^0x[0-9a-fA-F]{4}…/ }).first();
     await recipient.scrollIntoViewIfNeeded();
-    await recipient.hover();
-    await expect(page.getByRole('tooltip', { name: /^0x[a-fA-F0-9]{40}$/ })).toBeVisible();
+    await expect(recipient).toBeVisible();
+    await expect(recipient).toHaveAttribute('title', /^0x[a-fA-F0-9]{40}$/);
+    const full = await recipient.getAttribute('title');
+    await expect(recipient).toHaveAttribute('href', `/user/${full}`);
   });
 
   test('opens representative allocation detail tooltips', async ({ page }) => {
     await page.goto('/allocation/1', { waitUntil: 'networkidle' });
     await page.emulateMedia({ reducedMotion: 'reduce' });
     await expectAllLabelTooltips(page, ALLOCATION_DETAIL_TOOLTIPS);
+    await expectTermTooltips(page, ALLOCATION_DETAIL_TERMS);
   });
 });

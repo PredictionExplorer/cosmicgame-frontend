@@ -75,8 +75,10 @@ is **đặt nét bút** ("to place a stroke"); the classifier is the noun itself
 | ETH gesture / CST gesture          | nét bút ETH / nét bút CST   |
 | Gesture with ETH (button)          | Đặt nét bút bằng ETH        |
 | Gesture Cost                       | chi phí nét bút             |
+| Gesture method (not thanh toán)    | cách đặt nét bút            |
 | Final Gesture                      | nét bút cuối cùng           |
 | Last Gesture (most recent)         | nét bút gần nhất            |
+| Your cycle standing (personal)     | Vị thế của bạn trong chu kỳ |
 | gesture count / Number of Gestures | số nét bút                  |
 | Total Gestures                     | tổng số nét bút             |
 | Live gestures                      | nét bút đang diễn ra        |
@@ -239,13 +241,13 @@ tiền (banned), never yêu cầu / claim (a demand), never thu hồi (to revoke
 (banned — the Vietnamese crypto word for _mint_), never phát hành (issuance — paperwork
 register), never tạo (to create — generic), never khắc ghi (to remember deeply — idiom).
 
-| English                | Tiếng Việt          |
-| ---------------------- | ------------------- |
-| Imprint (verb)         | khắc                |
-| Imprinted at           | thời điểm khắc      |
-| Imprint RandomWalk NFT | Khắc RandomWalk NFT |
-| Imprinted (trait)      | Đã khắc             |
-| premine                | khắc trước          |
+| English                 | Tiếng Việt           |
+| ----------------------- | -------------------- |
+| Imprint (verb)          | khắc                 |
+| Imprinted at            | thời điểm khắc       |
+| Imprint Random Walk NFT | Khắc Random Walk NFT |
+| Imprinted (trait)       | Đã khắc              |
+| premine                 | khắc trước           |
 
 ### Endurance Champion → Quán quân Bền bỉ; Chrono-Warrior → Chiến binh Thời gian
 
@@ -281,6 +283,7 @@ công**. Capitalized as a proper name.
 | ----------------------------------- | ------------------------------------ |
 | Public Goods                        | Hàng hóa công                        |
 | Public Goods Vault                  | Kho Hàng hóa công                    |
+| Public Goods Beneficiary            | đơn vị thụ hưởng Hàng hóa công       |
 | Protocol Public Goods contributions | đóng góp Hàng hóa công của giao thức |
 | voluntary contributions             | đóng góp tự nguyện                   |
 
@@ -333,7 +336,7 @@ Interface vocabulary — no coinage needed, but fixed for consistency:
 | Gallery                              | Phòng trưng bày                                       | the art word; never thư viện (a library)                    |
 | How It Works                         | Cách hoạt động                                        | never hướng dẫn sử dụng (a help page)                       |
 | FAQ / Clarifications                 | Câu hỏi thường gặp                                    | nav and page heading alike                                  |
-| Learn Hub                            | Trung tâm học tập                                     | nav short form: Học                                         |
+| Learn (was Learn Hub)                | Tìm hiểu                                              | quiz references: Học                                        |
 | About                                | Về Cosmic Signature                                   | nav short form: Giới thiệu                                  |
 | Statistics                           | Thống kê                                              |                                                             |
 | My Statistics / My Tokens            | Thống kê của tôi / NFT của tôi                        | "của tôi" after the noun                                    |

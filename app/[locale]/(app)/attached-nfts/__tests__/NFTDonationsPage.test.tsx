@@ -1,57 +1,122 @@
-import { checkA11y, render, screen } from '@/test-utils';
+import { checkA11y, fireEvent, render, screen } from '@/test-utils';
 
 import NFTDonationsPage from '../NFTDonationsPage';
 
 const mockUseDonationsNFTList = jest.fn();
-
-jest.mock('../../../../../hooks/useApiQuery', () => ({
-  useDonationsNFTList: (...args: unknown[]) => mockUseDonationsNFTList(...args),
+jest.mock('@/hooks/useApiQuery', () => ({
+  useDonationsNFTList: () => mockUseDonationsNFTList(),
 }));
 
-jest.mock('../../../../../components/attachments/AttachedNFTTable', () => ({
+jest.mock('@/components/attachments/AttachedNFT', () => ({
   __esModule: true,
-  default: ({ list }: { list: unknown[] }) => (
-    <div data-testid="nft-table">rows: {list.length}</div>
+  default: ({ nft, showRecord }: { nft: { NFTTokenId: number }; showRecord?: boolean }) => (
+    <article data-testid="attached-nft" data-record={showRecord ? 'true' : undefined}>
+      #{nft.NFTTokenId}
+    </article>
   ),
 }));
+
+const record = (id: number, time: number) => ({
+  RecordId: id,
+  TokenAddr: '0x1111111111111111111111111111111111111111',
+  NFTTokenId: id,
+  RoundNum: 0,
+  DonorAddr: '0x2222222222222222222222222222222222222222',
+  TimeStamp: time,
+});
+
+const state = (overrides = {}) => ({
+  data: undefined,
+  isLoading: false,
+  isError: false,
+  refetch: jest.fn(),
+  ...overrides,
+});
 
 beforeEach(() => jest.clearAllMocks());
 
 describe('NFTDonationsPage', () => {
-  it('renders the heading', () => {
-    mockUseDonationsNFTList.mockReturnValue({ data: null });
+  it('renders the fallback header without a server summary', () => {
+    mockUseDonationsNFTList.mockReturnValue(state({ data: [] }));
     render(<NFTDonationsPage />);
-    expect(screen.getByText('Attached NFT Contributions')).toBeInTheDocument();
+    expect(
+      screen.getByRole('heading', { level: 1, name: 'Attached NFT contributions' }),
+    ).toBeInTheDocument();
   });
 
-  it('shows loading when data is null', () => {
-    mockUseDonationsNFTList.mockReturnValue({ data: null });
+  it('hangs the attached NFTs as works, newest first, with their records', () => {
+    mockUseDonationsNFTList.mockReturnValue(state({ data: [record(1, 100), record(2, 300)] }));
     render(<NFTDonationsPage />);
-    expect(screen.getByText('Loading...')).toBeInTheDocument();
+    const cards = screen.getAllByTestId('attached-nft');
+    expect(cards.map((card) => card.textContent)).toEqual(['#2', '#1']);
+    expect(cards[0]).toHaveAttribute('data-record', 'true');
   });
 
-  it('renders the table when data is available', () => {
-    mockUseDonationsNFTList.mockReturnValue({
-      data: [{ id: 1 }, { id: 2 }],
-    });
+  it('pages twelve at a time', () => {
+    mockUseDonationsNFTList.mockReturnValue(
+      state({ data: Array.from({ length: 14 }, (_, i) => record(i + 1, i)) }),
+    );
     render(<NFTDonationsPage />);
-    expect(screen.getByTestId('nft-table')).toHaveTextContent('rows: 2');
+    expect(screen.getAllByTestId('attached-nft')).toHaveLength(12);
+    fireEvent.click(screen.getByRole('button', { name: 'tables.pagination.next' }));
+    expect(screen.getAllByTestId('attached-nft')).toHaveLength(2);
   });
 
-  it('renders empty table for empty array', () => {
-    mockUseDonationsNFTList.mockReturnValue({ data: [] });
+  it('shows square plate skeletons while loading', () => {
+    mockUseDonationsNFTList.mockReturnValue(state({ isLoading: true }));
     render(<NFTDonationsPage />);
-    expect(screen.getByTestId('nft-table')).toHaveTextContent('rows: 0');
+    expect(screen.getByRole('status', { name: 'tables.skeleton.loadingNft' })).toBeInTheDocument();
   });
 
-  it('does not show loading when data is an array', () => {
-    mockUseDonationsNFTList.mockReturnValue({ data: [] });
+  it('says what fills an empty page', () => {
+    mockUseDonationsNFTList.mockReturnValue(state({ data: [] }));
     render(<NFTDonationsPage />);
-    expect(screen.queryByText('Loading...')).not.toBeInTheDocument();
+    expect(
+      screen.getByRole('heading', { level: 2, name: 'No attached NFTs yet' }),
+    ).toBeInTheDocument();
+  });
+
+  it('offers a retry when the records cannot be read', () => {
+    const refetch = jest.fn();
+    mockUseDonationsNFTList.mockReturnValue(state({ isError: true, refetch }));
+    render(<NFTDonationsPage />);
+    fireEvent.click(screen.getByRole('button', { name: /Try again/ }));
+    expect(refetch).toHaveBeenCalled();
+  });
+
+  it('never says the wall is empty under a header that counted records', () => {
+    const refetch = jest.fn();
+    mockUseDonationsNFTList.mockReturnValue(state({ data: [], refetch }));
+    render(<NFTDonationsPage snapshotCount={4} />);
+    expect(screen.queryByRole('heading', { name: 'No attached NFTs yet' })).toBeNull();
+    expect(
+      screen.getByRole('heading', { level: 2, name: 'Attached NFTs could not be loaded' }),
+    ).toBeInTheDocument();
+    fireEvent.click(screen.getByRole('button', { name: /Try again/ }));
+    expect(refetch).toHaveBeenCalled();
+  });
+
+  // A failed background refetch keeps the data it had (TanStack sets isError).
+  it('keeps the wall when a refetch fails after a load', () => {
+    mockUseDonationsNFTList.mockReturnValue(state({ data: [record(1, 100)], isError: true }));
+    render(<NFTDonationsPage />);
+    expect(screen.getAllByTestId('attached-nft')).toHaveLength(1);
+    expect(screen.queryByRole('heading', { name: /could not be loaded/ })).toBeNull();
+  });
+
+  it('follows the page it is given and reports a page change', () => {
+    const onPageChange = jest.fn();
+    mockUseDonationsNFTList.mockReturnValue(
+      state({ data: Array.from({ length: 14 }, (_, i) => record(i + 1, i)) }),
+    );
+    render(<NFTDonationsPage page={2} onPageChange={onPageChange} />);
+    expect(screen.getAllByTestId('attached-nft')).toHaveLength(2);
+    fireEvent.click(screen.getByRole('button', { name: 'tables.pagination.previous' }));
+    expect(onPageChange).toHaveBeenCalledWith(1);
   });
 
   it('has no accessibility violations', async () => {
-    mockUseDonationsNFTList.mockReturnValue({ data: [] });
+    mockUseDonationsNFTList.mockReturnValue(state({ data: [record(1, 100)] }));
     const { container } = render(<NFTDonationsPage />);
     await checkA11y(container);
   });

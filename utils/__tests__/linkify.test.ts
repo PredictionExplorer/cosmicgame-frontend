@@ -1,4 +1,22 @@
-import { linkifyMessage } from '@/utils/linkify';
+import { hostOfSafeHref, linkifyMessage } from '@/utils/linkify';
+
+describe('lookalike hosts', () => {
+  it('links a Cyrillic lookalike as the punycode host it really opens', () => {
+    // "аpple.com" with a Cyrillic а (U+0430), as a participant could type it.
+    const [segment] = linkifyMessage('https://аpple.com/login');
+    expect(segment).toEqual({
+      type: 'url',
+      value: 'https://аpple.com/login',
+      href: 'https://xn--pple-43d.com/login',
+    });
+    expect(hostOfSafeHref(segment!.href!)).toBe('xn--pple-43d.com');
+  });
+
+  it('names the host with its port, and nothing for an unparsable href', () => {
+    expect(hostOfSafeHref('https://example.com:8080/a')).toBe('example.com:8080');
+    expect(hostOfSafeHref('not a url')).toBeNull();
+  });
+});
 
 describe('linkifyMessage', () => {
   it('returns an empty array for empty text', () => {
@@ -21,14 +39,14 @@ describe('linkifyMessage', () => {
 
   it('links http URLs', () => {
     expect(linkifyMessage('http://example.com')).toEqual([
-      { type: 'url', value: 'http://example.com', href: 'http://example.com' },
+      { type: 'url', value: 'http://example.com', href: 'http://example.com/' },
     ]);
   });
 
   it('prefixes bare www hosts with https', () => {
     expect(linkifyMessage('visit www.example.com today')).toEqual([
       { type: 'text', value: 'visit ' },
-      { type: 'url', value: 'www.example.com', href: 'https://www.example.com' },
+      { type: 'url', value: 'www.example.com', href: 'https://www.example.com/' },
       { type: 'text', value: ' today' },
     ]);
   });
@@ -48,7 +66,7 @@ describe('linkifyMessage', () => {
 
     expect(linkifyMessage('really? https://example.com!?')).toEqual([
       { type: 'text', value: 'really? ' },
-      { type: 'url', value: 'https://example.com', href: 'https://example.com' },
+      { type: 'url', value: 'https://example.com', href: 'https://example.com/' },
       { type: 'text', value: '!?' },
     ]);
   });
@@ -67,16 +85,16 @@ describe('linkifyMessage', () => {
 
   it('linkifies multiple URLs in one message', () => {
     expect(linkifyMessage('https://a.example and https://b.example')).toEqual([
-      { type: 'url', value: 'https://a.example', href: 'https://a.example' },
+      { type: 'url', value: 'https://a.example', href: 'https://a.example/' },
       { type: 'text', value: ' and ' },
-      { type: 'url', value: 'https://b.example', href: 'https://b.example' },
+      { type: 'url', value: 'https://b.example', href: 'https://b.example/' },
     ]);
   });
 
   it('handles URLs across multiline messages', () => {
     expect(linkifyMessage('line one\nhttps://example.com\nline three')).toEqual([
       { type: 'text', value: 'line one\n' },
-      { type: 'url', value: 'https://example.com', href: 'https://example.com' },
+      { type: 'url', value: 'https://example.com', href: 'https://example.com/' },
       { type: 'text', value: '\nline three' },
     ]);
   });

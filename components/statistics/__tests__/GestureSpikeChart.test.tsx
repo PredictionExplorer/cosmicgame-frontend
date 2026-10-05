@@ -1,0 +1,165 @@
+// lexicon-allow-start: analytics fixtures mirror sealed backend wire names
+import userEvent from '@testing-library/user-event';
+
+import type { BidSpike } from '@/services/api/types';
+
+import { checkA11y, render, screen, within } from '@/test-utils';
+
+import { defaultSpikeIndex, spikeSearchRange, spikeViewRange } from '../charts/activityRanges';
+import { GestureSpikeChart } from '../GestureSpikeChart';
+
+const mockUseBidTimeBounds = jest.fn();
+const mockUseBiddingActivity = jest.fn();
+const mockUseBidFrequency = jest.fn();
+
+jest.mock('../../../hooks/useApiQuery', () => ({
+  useBidTimeBounds: (...args: unknown[]) => mockUseBidTimeBounds(...args),
+  useBiddingActivity: (...args: unknown[]) => mockUseBiddingActivity(...args),
+  useBidFrequency: (...args: unknown[]) => mockUseBidFrequency(...args),
+}));
+jest.mock('recharts', () => require('@/test-utils/recharts').rechartsStub());
+
+const HOUR = 3600;
+/** 2026-08-12 00:00 UTC. */
+const AUG_12 = Date.UTC(2026, 7, 12) / 1000;
+const NOW_SEC = AUG_12 + 40 * 86_400;
+
+const spike = (index: number, peakTs: number, peak: number): BidSpike => ({
+  Index: index,
+  StartTs: peakTs - HOUR,
+  EndTs: peakTs + HOUR,
+  PeakTs: peakTs,
+  PeakNumBids: peak,
+  TotalBids: peak + 5,
+  BucketCount: 3,
+});
+
+const spikes = [
+  spike(0, AUG_12 + 9 * HOUR, 34),
+  spike(1, AUG_12 + 15 * HOUR, 20),
+  spike(2, AUG_12 + 20 * 86_400, 12),
+];
+
+const ok = <T,>(data: T) => ({ data, isLoading: false, isError: false, refetch: jest.fn() });
+
+beforeEach(() => {
+  jest.clearAllMocks();
+  mockUseBidTimeBounds.mockReturnValue(ok({ MinTs: AUG_12 - 86_400, MaxTs: NOW_SEC }));
+  mockUseBiddingActivity.mockReturnValue(ok({ Spikes: spikes, RecentSpikeIndex: -1 }));
+  mockUseBidFrequency.mockReturnValue(
+    ok([
+      { BucketTs: AUG_12 + 19 * 86_400, NumBids: 2 },
+      { BucketTs: AUG_12 + 20 * 86_400, NumBids: 12 },
+    ]),
+  );
+});
+
+describe('defaultSpikeIndex', () => {
+  it('prefers the recent spike, else the latest by start', () => {
+    expect(defaultSpikeIndex(spikes, 1)).toBe(1);
+    expect(defaultSpikeIndex(spikes, -1)).toBe(2);
+    expect(defaultSpikeIndex([], -1)).toBeNull();
+  });
+});
+
+describe('GestureSpikeChart', () => {
+  // The keys the page's server read seeds (activityRanges): the same ranges, so they are found.
+  it('asks for the ranges the page seeds for its spikes and the hours around one', () => {
+    render(<GestureSpikeChart label="Spikes" />);
+    const search = spikeSearchRange({ firstTs: AUG_12 - 86_400, lastTs: NOW_SEC });
+    expect(mockUseBiddingActivity).toHaveBeenCalledWith(
+      search.initTs,
+      search.finTs,
+      search.intervalSecs,
+      true,
+    );
+    const opened = spikes[defaultSpikeIndex(spikes, -1)!]!;
+    const view = spikeViewRange(opened);
+    expect(mockUseBidFrequency).toHaveBeenCalledWith(view.initTs, view.finTs, HOUR, true);
+  });
+
+  it('opens on the latest spike when none is recent, never on an empty frame', () => {
+    render(<GestureSpikeChart label="Gesture spikes" />);
+    expect(screen.getByRole('radio', { checked: true })).toHaveAccessibleName(
+      /^Spike on Sep 1, 2026/,
+    );
+    expect(screen.getByTestId('bar-chart')).toHaveAttribute('data-point-count', '2');
+    // The note says why an older spike is on screen, not that there are no spikes.
+    expect(
+      screen.getByText('No spike in recent activity; showing the latest one on record.'),
+    ).toBeInTheDocument();
+  });
+
+  const readoutOf = (name: string) =>
+    [...screen.getByRole('figure', { name }).querySelectorAll('figcaption dl > div')].map(
+      (item) => [item.querySelector('dt')?.textContent, item.querySelector('dd')?.textContent],
+    );
+
+  it('reads out the spike’s peak and its total', () => {
+    render(<GestureSpikeChart label="Gesture spikes" />);
+    expect(readoutOf('Gesture spikes')).toEqual([
+      ['Spike peak', '12'],
+      ['Gestures in the spike', '17'],
+    ]);
+  });
+
+  it('names the peak as the spike’s and never repeats it as the total of a one-hour spike', () => {
+    // Regression: a one-hour spike of 34 read "Busiest hour 34 · Gestures in the
+    // spike 34" above a window whose neighbouring spike drew a taller 35 bar.
+    const oneHour: BidSpike = {
+      ...spike(0, AUG_12 + 9 * HOUR, 34),
+      StartTs: AUG_12 + 9 * HOUR,
+      EndTs: AUG_12 + 9 * HOUR,
+      TotalBids: 34,
+      BucketCount: 1,
+    };
+    mockUseBiddingActivity.mockReturnValue(ok({ Spikes: [oneHour], RecentSpikeIndex: 0 }));
+    mockUseBidFrequency.mockReturnValue(
+      ok([
+        { BucketTs: AUG_12 + 3 * HOUR, NumBids: 35 },
+        { BucketTs: AUG_12 + 9 * HOUR, NumBids: 34 },
+      ]),
+    );
+    render(<GestureSpikeChart label="Gesture spikes" />);
+    expect(readoutOf('Gesture spikes')).toEqual([['Spike peak', '34']]);
+    expect(screen.queryByText('Busiest hour')).not.toBeInTheDocument();
+  });
+
+  it('names each spike by its date, and every one by its hour when two share a day', () => {
+    render(<GestureSpikeChart label="Gesture spikes" />);
+    const names = screen.getAllByRole('radio').map((el) => el.closest('label')?.textContent);
+    // Regression: "Sep 1" sat beside "Aug 12 09:00" in a second format.
+    expect(names).toEqual(['Aug 12 09:00', 'Aug 12 15:00', 'Sep 1 00:00']);
+    expect(screen.getByRole('radiogroup', { name: /Spikes \(3\)/ })).toBeInTheDocument();
+  });
+
+  it('loads the hours around the spike a reader picks', async () => {
+    const user = userEvent.setup();
+    render(<GestureSpikeChart label="Gesture spikes" />);
+    await user.click(screen.getByRole('radio', { name: /Aug 12.*09:00/ }));
+    const [from, to] = mockUseBidFrequency.mock.calls.at(-1)!;
+    expect(from as number).toBeLessThan(spikes[0]!.StartTs);
+    expect(to as number).toBeGreaterThan(spikes[0]!.EndTs);
+  });
+
+  it('lists the hours as a table on request', async () => {
+    const user = userEvent.setup();
+    render(<GestureSpikeChart label="Gesture spikes" />);
+    await user.click(screen.getByRole('button', { name: 'View as table' }));
+    expect(
+      within(screen.getByRole('table', { name: 'Gesture spikes' })).getByText('12'),
+    ).toBeInTheDocument();
+  });
+
+  it('says there are no spikes when the history has none', () => {
+    mockUseBiddingActivity.mockReturnValue(ok({ Spikes: [], RecentSpikeIndex: -1 }));
+    render(<GestureSpikeChart label="Gesture spikes" />);
+    expect(screen.getByText('No gesture spikes detected in indexed history.')).toBeInTheDocument();
+  });
+
+  it('has no axe violations', async () => {
+    const { container } = render(<GestureSpikeChart label="Gesture spikes" />);
+    await checkA11y(container);
+  });
+});
+// lexicon-allow-end

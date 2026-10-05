@@ -1,33 +1,28 @@
-import { ethDistributionFacts } from '@/content/protocol-facts';
+import { ethDistributionFacts, protocolFacts } from '@/content/protocol-facts';
 
-import { CST_GECKOTERMINAL_POOL_URL } from '@/config/geckoterminal';
-import { COSMIC_SIGNATURE_MARKETPLACE_URL } from '@/config/marketplace';
-import { CHAOS_ZERO_PREDICTIONS_URL } from '@/config/predictions';
-import { CST_UNISWAP_SWAP_URL } from '@/config/uniswap';
+import type { AllocationTrackId } from '@/config/allocationTracks';
 import { APP_ORIGIN } from '@/lib/hostRouting';
 
 import type {
-  LandingArtLoadingContent,
+  LandingArtFactId,
   LandingArtShowcaseContent,
-  LandingCouncilContent,
   LandingFaqContent,
   LandingHeroArtContent,
   LandingMetaContent,
-  LandingTrackTone,
-  LandingVerifiabilityContent,
 } from './types';
 
 /**
  * The locale-independent skeleton of the landing content.
  *
- * Section order, stage numbers, tones, CTA/link targets, and locale-invariant
- * value strings (percents, fact values) are declared once here; the per-locale
- * text modules (`text.en.ts`, `text.zh.ts`) provide only copy, keyed by these
- * IDs. A translation that misses or invents an ID fails to compile.
+ * Section order, step numbers, allocation shares, link targets and
+ * locale-invariant values are declared once here; the per-locale text modules
+ * (`text.en.ts`, `text.zh.ts`, …) provide only copy, keyed by these IDs. A
+ * translation that misses or invents an ID fails to compile.
  *
- * Percent/value strings live here ONLY when they are byte-identical across
- * locales. Anything locale-dependent (e.g. `~50%` vs `约 50%`, `10 NFTs` vs
- * `10 枚 NFT`, `on-chain` vs `链上`) stays in the text modules.
+ * Values live here ONLY when they are byte-identical across locales or are
+ * numbers the builder formats per locale (the ETH shares, from
+ * content/protocol-facts.ts). Anything locale-dependent (`~50%` vs `约 50%`,
+ * `10 NFTs` vs `10 枚 NFT`) stays in the text modules.
  */
 
 interface LandingStageStructure {
@@ -35,21 +30,30 @@ interface LandingStageStructure {
   readonly number: string;
 }
 
-interface LandingTrackItemStructure {
+interface LandingEthTrackStructure {
   readonly id: string;
-  readonly tone: LandingTrackTone;
-  /** Present only when the percent string is byte-identical across locales. */
-  readonly percent?: string;
+  /** The track's colour and place in every chart of the split (config/allocationTracks). */
+  readonly track: AllocationTrackId;
+  /** Percent of the ETH reserve; absent for the remainder that compounds. */
+  readonly share?: number;
+}
+
+interface LandingFixedTrackStructure {
+  readonly id: string;
+  /** How many recipients the track has each cycle (content/protocol-facts.ts). */
+  readonly recipients: number;
+}
+
+interface LandingKeyedStructure {
+  readonly id: string;
 }
 
 interface LandingArtFactStructure {
-  readonly id: string;
-  /**
-   * Present only when the value string is byte-identical across locales.
-   * Grouped numbers (1,000,000 vs 1 000 000) are locale-dependent and live in
-   * the text modules.
-   */
+  readonly id: LandingArtFactId;
+  /** Present only when the value string is byte-identical across locales. */
   readonly value?: string;
+  /** Read from the collection on the page, never written in copy. */
+  readonly live?: true;
 }
 
 interface LandingTableRowStructure {
@@ -58,30 +62,21 @@ interface LandingTableRowStructure {
   readonly value?: string;
 }
 
-interface LandingFooterLinkStructure {
-  readonly id: string;
-  readonly href: string;
-}
-
-interface LandingFooterColumnStructure {
-  readonly id: string;
-  readonly links: readonly LandingFooterLinkStructure[];
-}
+/** The app home's gesture panel carries the #make-gesture anchor. */
+const GESTURE_HREF = `${APP_ORIGIN}/#make-gesture`;
 
 export const LANDING_STRUCTURE = {
   hero: {
-    primaryCtaHref: APP_ORIGIN,
     secondaryCtaHref: '#cycle',
-    statisticsCtaHref: `${APP_ORIGIN}/statistics`,
-    galleryCtaHref: `${APP_ORIGIN}/gallery`,
   },
   cycle: {
-    stages: [
-      { id: 'opening', number: '01' },
-      { id: 'gestures', number: '02' },
-      { id: 'finalization', number: '03' },
-      { id: 'allocations', number: '04' },
+    steps: [
+      { id: 'gesture', number: '01' },
+      { id: 'extend', number: '02' },
+      { id: 'finalize', number: '03' },
     ],
+    gestureCtaHref: GESTURE_HREF,
+    guideCtaHref: `${APP_ORIGIN}/how-it-works`,
   },
   art: {
     stages: [
@@ -94,45 +89,55 @@ export const LANDING_STRUCTURE = {
       { id: 'signature', number: '07' },
     ],
     facts: [
-      { id: 'wavelength-bins', value: '64' },
-      { id: 'physics-steps' },
-      { id: 'candidate-orbits' },
+      { id: 'imprinted', live: true },
+      // Every Signature renders at 3456 × 2234 (components/ui/art-frame, ART_WIDTH/HEIGHT).
+      { id: 'resolution', value: '3456 × 2234' },
+      { id: 'animation' },
       { id: 'license', value: 'CC0 1.0' },
     ],
   },
   tracks: {
-    items: [
+    // In the order every chart of the split draws them (config/allocationTracks).
+    eth: [
       {
         id: 'signature-allocation',
-        tone: 'primary',
-        percent: `${ethDistributionFacts.mainEthPercentage}%`,
+        track: 'signature',
+        share: ethDistributionFacts.mainEthPercentage,
       },
-      { id: 'compounding-reserve', tone: 'aurora' },
       {
         id: 'chrono-warrior',
-        tone: 'rose',
-        percent: `${ethDistributionFacts.chronoWarriorEthPercentage}%`,
-      },
-      {
-        id: 'public-goods',
-        tone: 'impact',
-        percent: `${ethDistributionFacts.publicGoodsPercentage}%`,
-      },
-      {
-        id: 'anchor-distribution',
-        tone: 'nebula',
-        percent: `${ethDistributionFacts.anchorDistributionPercentage}%`,
+        track: 'chrono',
+        share: ethDistributionFacts.chronoWarriorEthPercentage,
       },
       {
         id: 'eth-stellar-selection',
-        tone: 'solar',
-        percent: `${ethDistributionFacts.stellarSelectionEthPercentage}%`,
+        track: 'stellar',
+        share: ethDistributionFacts.stellarSelectionEthPercentage,
       },
-      { id: 'participant-nft-stellar-selection', tone: 'default' },
-      { id: 'anchored-nft-stellar-selection', tone: 'default' },
-      // The CST badge is a grouped number, so each locale formats it itself.
-      { id: 'endurance-champion', tone: 'default' },
-      { id: 'final-cst-gesture', tone: 'default' },
+      {
+        id: 'anchor-distribution',
+        track: 'anchor',
+        share: ethDistributionFacts.anchorDistributionPercentage,
+      },
+      {
+        id: 'public-goods',
+        track: 'publicGoods',
+        share: ethDistributionFacts.publicGoodsPercentage,
+      },
+      { id: 'compounding-reserve', track: 'nextCycle' },
+    ],
+    fixed: [
+      {
+        id: 'participant-nft-stellar-selection',
+        recipients: protocolFacts.nftStellarSelectionRecipients,
+      },
+      {
+        id: 'anchored-nft-stellar-selection',
+        recipients: protocolFacts.anchoredRwlkNftSelectionRecipients,
+      },
+      // One Endurance Champion and one Final CST Gesture participant per cycle, by definition.
+      { id: 'endurance-champion', recipients: 1 },
+      { id: 'final-cst-gesture', recipients: 1 },
     ],
   },
   anchoring: {
@@ -147,102 +152,87 @@ export const LANDING_STRUCTURE = {
     ],
     ctaHref: 'https://protocol-guild.readthedocs.io',
   },
-  footer: {
-    columns: [
-      {
-        id: 'protocol',
-        links: [
-          { id: 'app', href: APP_ORIGIN },
-          { id: 'about', href: '/about' },
-          { id: 'learn', href: '/learn' },
-          { id: 'quiz', href: '/quiz' },
-          { id: 'how-it-works', href: `${APP_ORIGIN}/how-it-works` },
-          { id: 'contracts', href: `${APP_ORIGIN}/contracts` },
-          { id: 'code', href: `${APP_ORIGIN}/code` },
-          { id: 'audits', href: `${APP_ORIGIN}/audits` },
-        ],
-      },
-      {
-        id: 'ecosystem',
-        links: [
-          { id: 'marketplace', href: COSMIC_SIGNATURE_MARKETPLACE_URL },
-          { id: 'predictions', href: CHAOS_ZERO_PREDICTIONS_URL },
-          { id: 'uniswap', href: CST_UNISWAP_SWAP_URL },
-          { id: 'geckoterminal', href: CST_GECKOTERMINAL_POOL_URL },
-        ],
-      },
-      {
-        id: 'community',
-        links: [
-          { id: 'twitter', href: 'https://x.com/CosmicSignature' },
-          { id: 'discord', href: 'https://discord.gg/bGnPn96Qwt' },
-          { id: 'github', href: 'https://github.com/PredictionExplorer' },
-          { id: 'protocol-guild', href: 'https://protocol-guild.readthedocs.io' },
-        ],
-      },
-      {
-        id: 'legal',
-        links: [
-          { id: 'terms', href: `${APP_ORIGIN}/terms` },
-          { id: 'privacy', href: `${APP_ORIGIN}/privacy` },
-          { id: 'faq', href: '#faq' },
-        ],
-      },
-    ],
+  council: {
+    columns: [{ id: 'proposal' }, { id: 'weight' }, { id: 'quorum' }],
   },
-  notFound: {
-    code: '404',
-    ctaHref: '/',
+  verifiability: {
+    pillars: [{ id: 'cc0' }, { id: 'verification' }, { id: 'reproducible' }],
+  },
+  closing: {
+    galleryCtaHref: `${APP_ORIGIN}/gallery`,
   },
 } as const satisfies {
   readonly hero: {
-    readonly primaryCtaHref: string;
     readonly secondaryCtaHref: string;
-    readonly statisticsCtaHref: string;
-    readonly galleryCtaHref: string;
   };
-  readonly cycle: { readonly stages: readonly LandingStageStructure[] };
+  readonly cycle: {
+    readonly steps: readonly LandingStageStructure[];
+    readonly gestureCtaHref: string;
+    readonly guideCtaHref: string;
+  };
   readonly art: {
     readonly stages: readonly LandingStageStructure[];
     readonly facts: readonly LandingArtFactStructure[];
   };
-  readonly tracks: { readonly items: readonly LandingTrackItemStructure[] };
+  readonly tracks: {
+    readonly eth: readonly LandingEthTrackStructure[];
+    readonly fixed: readonly LandingFixedTrackStructure[];
+  };
   readonly anchoring: { readonly ctaHref: string };
   readonly publicGoods: {
     readonly cardPercentage: string;
     readonly cardTableRows: readonly LandingTableRowStructure[];
     readonly ctaHref: string;
   };
-  readonly footer: { readonly columns: readonly LandingFooterColumnStructure[] };
-  readonly notFound: { readonly code: string; readonly ctaHref: string };
+  readonly council: { readonly columns: readonly LandingKeyedStructure[] };
+  readonly verifiability: { readonly pillars: readonly LandingKeyedStructure[] };
+  readonly closing: { readonly galleryCtaHref: string };
 };
 
 type LandingStructure = typeof LANDING_STRUCTURE;
 
-type CycleStageStructure = LandingStructure['cycle']['stages'][number];
+type CycleStepStructure = LandingStructure['cycle']['steps'][number];
 type ArtStageStructure = LandingStructure['art']['stages'][number];
 type ArtFactStructure = LandingStructure['art']['facts'][number];
-type TrackItemStructure = LandingStructure['tracks']['items'][number];
+type EthTrackStructure = LandingStructure['tracks']['eth'][number];
+type FixedTrackStructure = LandingStructure['tracks']['fixed'][number];
 type TableRowStructure = LandingStructure['publicGoods']['cardTableRows'][number];
-type FooterColumnStructure = LandingStructure['footer']['columns'][number];
+type CouncilColumnStructure = LandingStructure['council']['columns'][number];
+type PillarStructure = LandingStructure['verifiability']['pillars'][number];
 
-export type LandingCycleStageId = CycleStageStructure['id'];
+export type LandingCouncilColumnId = CouncilColumnStructure['id'];
+export type LandingPillarId = PillarStructure['id'];
+
+/**
+ * A count phrase in each plural form the locale's `Intl.PluralRules` uses
+ * (`{count}` is the number): `other` always, and for Ukrainian `one`, `few`
+ * and `many` too. The builder picks the form for the structure's count.
+ */
+export type LandingPluralText = { readonly other: string } & Partial<
+  Readonly<Record<Exclude<Intl.LDMLPluralRule, 'other'>, string>>
+>;
+
+export type LandingCycleStepId = CycleStepStructure['id'];
 export type LandingArtStageId = ArtStageStructure['id'];
-export type LandingTrackId = TrackItemStructure['id'];
+export type LandingTrackId = EthTrackStructure['id'] | FixedTrackStructure['id'];
 
-/** Copy for one numbered stage, provided per locale. */
+/** Copy for one numbered stage or step, provided per locale. */
 export interface LandingStageText {
   readonly title: string;
   readonly body: string;
 }
 
 /**
- * Copy for one allocation track. The `percent` string is required here only
- * when the skeleton does not carry it (i.e. it differs across locales).
+ * Copy for one allocation track. The compounding remainder, which has no
+ * fixed share in the skeleton, writes its own approximate `percent` ("~50%"),
+ * because its wording differs across locales; the CST and NFT tracks take
+ * their recipient counts from the skeleton (`tracks.recipients` names them).
  */
-type LandingTrackItemText<Item> = Item extends { readonly percent: string }
+type LandingTrackItemText<Item> = Item extends { readonly share: number }
   ? { readonly title: string; readonly body: string }
-  : { readonly percent: string; readonly title: string; readonly body: string };
+  : Item extends { readonly track: AllocationTrackId }
+    ? { readonly percent: string; readonly title: string; readonly body: string }
+    : { readonly title: string; readonly body: string };
 
 /**
  * Copy for one public-goods table row. The `value` string is required here
@@ -252,8 +242,8 @@ type LandingTableRowText<Row> = Row extends { readonly value: string }
   ? { readonly label: string }
   : { readonly label: string; readonly value: string };
 
-/** Copy for one art-pipeline fact; same rule as table rows. */
-type LandingArtFactText<Fact> = Fact extends { readonly value: string }
+/** Copy for one art figure: a label, plus the value when neither live nor shared. */
+type LandingArtFactText<Fact> = Fact extends { readonly value: string } | { readonly live: true }
   ? { readonly label: string }
   : { readonly label: string; readonly value: string };
 
@@ -265,32 +255,25 @@ export type LandingText = {
   readonly meta: LandingMetaContent;
   readonly hero: {
     readonly eyebrow: string;
-    readonly headline: string;
     readonly headlineLead: string;
     readonly headlineAccent: string;
     readonly subhead: string;
-    readonly biologyDisclaimer: string;
-    readonly primaryCtaLabel: string;
     readonly secondaryCtaLabel: string;
-    readonly statisticsCtaLabel: string;
-    readonly galleryCtaLabel: string;
-    readonly scrollAriaLabel: string;
-    readonly marqueeChips: readonly string[];
     readonly art: LandingHeroArtContent;
   };
   readonly cycle: {
     readonly eyebrow: string;
     readonly heading: string;
-    readonly description: string;
-    readonly stages: {
-      readonly [Stage in CycleStageStructure as Stage['id']]: LandingStageText;
+    readonly steps: {
+      readonly [Step in CycleStepStructure as Step['id']]: LandingStageText;
     };
+    readonly gestureCtaLabel: string;
+    readonly guideCtaLabel: string;
   };
   readonly art: {
     readonly eyebrow: string;
     readonly heading: string;
     readonly description: string;
-    readonly loading: LandingArtLoadingContent;
     readonly showcase: LandingArtShowcaseContent;
     readonly stageLabel: string;
     readonly stages: {
@@ -304,9 +287,15 @@ export type LandingText = {
     readonly eyebrow: string;
     readonly heading: string;
     readonly description: string;
-    readonly cardLabel: string;
+    readonly ethLabel: string;
+    readonly fixedLabel: string;
+    readonly fixedEach: string;
+    /** "10 recipients": the count each CST and NFT track shows. */
+    readonly recipients: LandingPluralText;
     readonly items: {
-      readonly [Item in TrackItemStructure as Item['id']]: LandingTrackItemText<Item>;
+      readonly [Item in
+        | EthTrackStructure
+        | FixedTrackStructure as Item['id']]: LandingTrackItemText<Item>;
     };
   };
   readonly anchoring: {
@@ -331,27 +320,27 @@ export type LandingText = {
     };
     readonly ctaLabel: string;
   };
-  readonly council: LandingCouncilContent;
-  readonly verifiability: LandingVerifiabilityContent;
-  readonly faq: LandingFaqContent;
-  readonly footer: {
-    readonly brandName: string;
-    readonly logoAlt: string;
-    readonly tagline: string;
-    readonly columns: {
-      readonly [Column in FooterColumnStructure as Column['id']]: {
-        readonly heading: string;
-        readonly links: {
-          readonly [Link in Column['links'][number] as Link['id']]: string;
-        };
-      };
-    };
-    readonly copyright: string;
-    readonly colophon: string;
-  };
-  readonly notFound: {
+  readonly council: {
+    readonly eyebrow: string;
     readonly heading: string;
-    readonly description: string;
-    readonly ctaLabel: string;
+    readonly body: string;
+    readonly columns: {
+      readonly [Column in CouncilColumnStructure as Column['id']]: LandingStageText;
+    };
+  };
+  readonly verifiability: {
+    readonly eyebrow: string;
+    readonly heading: string;
+    readonly body: string;
+    readonly pillars: {
+      readonly [Pillar in PillarStructure as Pillar['id']]: LandingStageText;
+    };
+    readonly evidenceLabel: string;
+  };
+  readonly faq: LandingFaqContent;
+  readonly closing: {
+    readonly eyebrow: string;
+    readonly heading: string;
+    readonly body: string;
   };
 };

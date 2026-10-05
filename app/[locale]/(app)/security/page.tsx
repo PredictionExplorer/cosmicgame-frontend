@@ -1,43 +1,62 @@
-import type { Metadata } from 'next';
+import type { Metadata, ResolvingMetadata } from 'next';
 import { getTranslations, setRequestLocale } from 'next-intl/server';
 
 import { getSecurityCopy } from '@/content/legal';
-import { TrustPageContent } from '@/content/legal/TrustPageContent';
+import { getLegalDocumentLabels } from '@/content/legal/labels';
+import { OFFICIAL_CONTRACTS, type OfficialContractId } from '@/content/legal/officialAddresses';
+import { SecurityContent } from '@/content/legal/SecurityContent';
 
-import { PageShell } from '@/components/ui/page-shell';
 import { APP_ORIGIN, localeHref } from '@/lib/hostRouting';
 import { JsonLd, breadcrumbJsonLd, jsonLdInLanguage, webPageJsonLd } from '@/utils/jsonLd';
-import { createMetadata } from '@/utils/seo';
+import { createPageMetadata } from '@/utils/seo';
+
+import { readProtocolOwner } from './protocolOwner';
 
 interface PageProps {
   params: Promise<{ locale: string }>;
 }
 
-export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
+/** The owner is read from the chain; five minutes keeps it current without a read per visit. */
+export const revalidate = 300;
+
+export async function generateMetadata(
+  { params }: PageProps,
+  parent: ResolvingMetadata,
+): Promise<Metadata> {
   const { locale } = await params;
   const t = await getTranslations({ locale, namespace: 'meta' });
-  return createMetadata(t('security.title'), t('security.description'), undefined, '/security', {
-    locale,
-  });
+  return createPageMetadata(
+    parent,
+    t('security.title'),
+    t('security.description'),
+    undefined,
+    '/security',
+    { locale },
+  );
 }
 
 export default async function SecurityPage({ params }: PageProps) {
   const { locale } = await params;
   setRequestLocale(locale);
-  const [t, legal] = await Promise.all([
+  const [t, legal, contracts, labels, owner] = await Promise.all([
     getTranslations({ locale, namespace: 'meta' }),
     getTranslations({ locale, namespace: 'legal' }),
+    getTranslations({ locale, namespace: 'contracts' }),
+    getLegalDocumentLabels(locale),
+    readProtocolOwner(),
   ]);
+  const contractNames = Object.fromEntries(
+    OFFICIAL_CONTRACTS.map(({ id }) => [id, contracts(`entries.${id}.name`)]),
+  ) as Record<OfficialContractId, string>;
   const inLanguage = jsonLdInLanguage(locale);
   const pageUrl = localeHref(APP_ORIGIN, '/security', locale);
-  const copy = getSecurityCopy(locale);
 
   return (
-    <PageShell variant="form">
+    <>
       <JsonLd
         data={[
           webPageJsonLd({
-            name: copy.title,
+            name: t('security.title'),
             description: t('security.description'),
             url: pageUrl,
             inLanguage,
@@ -57,7 +76,14 @@ export default async function SecurityPage({ params }: PageProps) {
           ),
         ]}
       />
-      <TrustPageContent copy={copy} locale={locale} />
-    </PageShell>
+      <SecurityContent
+        copy={getSecurityCopy(locale)}
+        locale={locale}
+        labels={labels}
+        contractNames={contractNames}
+        implementationNote={contracts('entries.implementation.description')}
+        owner={owner}
+      />
+    </>
   );
 }

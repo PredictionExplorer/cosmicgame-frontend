@@ -1,5 +1,6 @@
+import type { ReactNode } from 'react';
 import type { Metadata } from 'next';
-import { Download } from 'lucide-react';
+import { ArrowUpRight, Download } from 'lucide-react';
 import { getTranslations, setRequestLocale } from 'next-intl/server';
 
 import {
@@ -7,12 +8,47 @@ import {
   WHITE_PAPER_VERSION,
   getWhitePaperContent,
   type WhitePaperBlock,
+  type WhitePaperContent,
   type WhitePaperSection,
   type WhitePaperSubsection,
 } from '@/content/white-paper';
+import { getLandingContent } from '@/content/landing';
 
-import { Link } from '@/i18n/navigation';
-import { LANDING_ORIGIN, localeHref } from '@/lib/hostRouting';
+import { PageHeader } from '@/components/layout/PageHeader';
+import { buttonVariants } from '@/components/ui/button';
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from '@/components/ui/table';
+import { AllocationBar, AllocationKey } from '@/components/reading/AllocationBar';
+import { ReadingContents } from '@/components/reading/ContentsNav';
+import { MetaItems } from '@/components/reading/MetaItems';
+import type { ContentsEntry } from '@/components/reading/contents';
+import {
+  BREAKOUT_CLASS,
+  Callout,
+  FormulaFigure,
+  NumberedFigure,
+  PROSE_CLASS,
+  READING_TABLE_CLASS,
+  READING_TEXT_EDGE_CLASS,
+  ReadingHeading,
+  RunInList,
+} from '@/components/reading/prose';
+import { ReadingMain } from '@/components/reading/ReadingMain';
+import { readingMinutes } from '@/components/reading/readingTime';
+import { SignaturePlate } from '@/components/reading/SignaturePlate';
+import { getSignaturePlateCopy } from '@/components/reading/signaturePlateCopy';
+import { SIGNATURE_PLATES } from '@/components/reading/signaturePlates';
+import { fillTemplate } from '@/components/reading/template';
+import { CycleTimeline } from '@/components/white-paper/CycleTimeline';
+import { referenceTargets, withReferences } from '@/components/white-paper/crossReferences';
+import { APP_ORIGIN, LANDING_ORIGIN, localeHref, localizeCrossHostHref } from '@/lib/hostRouting';
+import { cn } from '@/lib/utils';
 import { JsonLd, breadcrumbJsonLd, jsonLdInLanguage } from '@/utils/jsonLd';
 import { createMetadata } from '@/utils/seo';
 
@@ -20,12 +56,20 @@ interface PageProps {
   params: Promise<{ locale: string }>;
 }
 
+const TITLE_ID = 'white-paper-title';
+const ARTICLE_ID = 'white-paper-body';
+const CONTENTS_ID = 'contents';
+
+/** Lists whose items are the stages of a sequence, numbered in the web edition. */
+const ORDERED_LISTS = new Set(['art-pipeline']);
+
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const { locale } = await params;
   setRequestLocale(locale);
   const { metadata } = getWhitePaperContent(locale);
   const t = await getTranslations({ locale, namespace: 'meta' });
 
+  // The paper has its own share card (./opengraph-image.tsx).
   return createMetadata(
     t('whitePaper.title'),
     t('whitePaper.description'),
@@ -38,110 +82,227 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   );
 }
 
-function sectionTitle(section: WhitePaperSection): string {
-  return /^\d+$/.test(section.number) ? `${section.number}. ${section.heading}` : section.heading;
+/** "5. The Cycle Reserve…" in the contents; appendices keep their own lettered titles. */
+function isNumbered(section: WhitePaperSection): boolean {
+  return /^\d+$/.test(section.number);
 }
 
-function BlockView({ block }: { block: WhitePaperBlock }) {
+function contentsEntries(content: WhitePaperContent): ContentsEntry[] {
+  return [
+    ...content.sections.map((section) => ({
+      id: section.id,
+      label: section.heading,
+      number: section.number,
+      children: section.subsections?.map((subsection) => ({
+        id: subsection.id,
+        label: subsection.heading,
+        number: subsection.number,
+      })),
+    })),
+    { id: content.references.id, label: content.references.heading },
+  ];
+}
+
+/** Every reader-facing string of the paper, for its reading time. */
+function paperText(content: WhitePaperContent): string[] {
+  const blockText = (block: WhitePaperBlock): string[] => {
+    switch (block.kind) {
+      case 'paragraph':
+      case 'note':
+        return [block.text];
+      case 'list':
+        return [...block.items];
+      case 'formula':
+        return [block.caption ?? ''];
+      case 'table':
+        return block.table.rows.flat();
+    }
+  };
+  return [
+    ...content.abstract.paragraphs,
+    ...content.sections.flatMap((section) => [
+      section.heading,
+      ...section.blocks.flatMap(blockText),
+      ...(section.subsections ?? []).flatMap((subsection) => [
+        subsection.heading,
+        ...subsection.blocks.flatMap(blockText),
+      ]),
+    ]),
+  ];
+}
+
+/** A cell that is a figure ("25%", "1.73", "~50%"), set at the end in tabular numerals. */
+function isFigure(cell: string): boolean {
+  return /^[~≈]?\s?[\d][\d.,\u00a0\u202f ]*%?$/u.test(cell.trim());
+}
+
+interface BlockContext {
+  /** The id of the heading the block sits under, which names its tables. */
+  headingId: string;
+  /** The section or subsection the block belongs to. */
+  sectionId: string;
+  reading: WhitePaperContent['reading'];
+  /** Running text with its cross-references ("Section 5.2") linked. */
+  renderText: (text: string) => ReactNode;
+}
+
+function BlockView({ block, context }: { block: WhitePaperBlock; context: BlockContext }) {
   switch (block.kind) {
     case 'paragraph':
-      return <p className="text-base leading-8 text-muted-foreground">{block.text}</p>;
+      return <p className={PROSE_CLASS}>{context.renderText(block.text)}</p>;
     case 'list':
       return (
-        <ul className="list-disc space-y-3 pl-5 text-base leading-8 text-muted-foreground marker:text-white/40">
-          {block.items.map((item) => (
-            <li key={item}>{item}</li>
-          ))}
-        </ul>
+        <RunInList
+          items={block.items}
+          ordered={ORDERED_LISTS.has(context.sectionId)}
+          renderText={context.renderText}
+        />
       );
     case 'formula':
       return (
-        <figure className="rounded-xl border border-white/10 bg-white/[0.03] px-5 py-4">
-          <code className="block break-words font-mono text-sm text-white/85">{block.formula}</code>
-          {block.caption ? (
-            <figcaption className="mt-2 text-sm text-white/50">{block.caption}</figcaption>
-          ) : null}
-        </figure>
+        <FormulaFigure
+          label={context.reading.formulaLabel}
+          formula={block.formula}
+          notation={block.notation}
+          legend={block.legend}
+          expressionLabel={context.reading.contractExpressionLabel}
+          caption={block.caption}
+        />
       );
     case 'note':
-      return (
-        <p className="rounded-xl border border-white/[0.08] bg-white/[0.03] p-4 text-sm leading-6 text-white/60">
-          {block.text}
-        </p>
+      return <Callout label={context.reading.noteLabel}>{context.renderText(block.text)}</Callout>;
+    case 'table': {
+      const { columns, rows } = block.table;
+      const numeric = columns.map(
+        (_column, index) => index > 0 && rows.every((row) => isFigure(row[index] ?? '')),
       );
-    case 'table':
       return (
-        <div>
-          <div className="overflow-x-auto rounded-xl border border-white/10">
-            <table className="w-full min-w-[36rem] border-collapse text-left text-sm">
-              <thead>
-                <tr className="bg-white/[0.05]">
-                  {block.table.columns.map((column) => (
-                    <th
-                      key={column}
-                      scope="col"
-                      className="px-4 py-3 font-semibold tracking-tight text-white"
-                    >
-                      {column}
-                    </th>
-                  ))}
-                </tr>
-              </thead>
-              <tbody>
-                {block.table.rows.map((row) => (
-                  <tr key={row.join('|')} className="border-t border-white/[0.07] align-top">
-                    {row.map((cell, cellIndex) => (
-                      <td
-                        key={`${cellIndex}-${cell}`}
-                        className={
-                          cellIndex === 0
-                            ? 'px-4 py-3 font-medium text-white/85'
-                            : /^0x[0-9a-fA-F]{40}$/.test(cell)
-                              ? 'break-all px-4 py-3 font-mono text-xs leading-5 text-white/70'
-                              : 'px-4 py-3 leading-6 text-white/70'
-                        }
-                      >
-                        {cell}
-                      </td>
-                    ))}
-                  </tr>
+        <div className={BREAKOUT_CLASS}>
+          {/*
+           * The shared static ledger: on a phone each row becomes a record
+           * titled by its first cell (the row's own name, so it carries no
+           * column label), and anything still too wide scrolls in a
+           * keyboard-reachable region with a fading edge (styles/tables.css).
+           * Figures align at the end in tabular numerals, and a two-column
+           * table is held to the prose measure so its values sit near their
+           * names. The section heading names the table.
+           */}
+          <Table
+            labelledBy={context.headingId}
+            className={READING_TABLE_CLASS}
+            containerClassName={columns.length <= 2 ? 'max-w-[var(--measure-prose)]' : undefined}
+          >
+            <TableHeader>
+              <TableRow>
+                {columns.map((column, index) => (
+                  <TableHead key={column} align={numeric[index] ? 'end' : 'start'}>
+                    {column}
+                  </TableHead>
                 ))}
-              </tbody>
-            </table>
-          </div>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {rows.map((row) => (
+                <TableRow key={row.join('|')}>
+                  {row.map((cell, cellIndex) => (
+                    <TableCell
+                      key={`${cellIndex}-${cell}`}
+                      // On a phone each row is a record titled by its first
+                      // cell. A term and its description need no label; a
+                      // wider table labels each value with its column.
+                      phone={cellIndex === 0 ? 'title' : undefined}
+                      label={
+                        cellIndex === 0 || columns.length <= 2 ? undefined : columns[cellIndex]
+                      }
+                      stack={cellIndex === 0 || !numeric[cellIndex]}
+                      align={numeric[cellIndex] ? 'end' : 'start'}
+                      numeric={numeric[cellIndex]}
+                      className={
+                        cellIndex === 0
+                          ? 'font-medium text-foreground'
+                          : /^0x[0-9a-fA-F]{40}$/.test(cell)
+                            ? 'type-hash'
+                            : undefined
+                      }
+                    >
+                      {context.renderText(cell)}
+                    </TableCell>
+                  ))}
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
           {block.table.footnote ? (
-            <p className="mt-2 text-sm text-white/45">{block.table.footnote}</p>
+            <p className="mt-3 max-w-[var(--measure-prose)] type-caption text-subtle">
+              {context.renderText(block.table.footnote)}
+            </p>
           ) : null}
         </div>
       );
+    }
   }
 }
 
-function Blocks({ blocks }: { blocks: readonly WhitePaperBlock[] }) {
+function Blocks({
+  blocks,
+  context,
+  figure,
+}: {
+  blocks: readonly WhitePaperBlock[];
+  context: BlockContext;
+  /** A figure for this section, placed after its opening paragraphs. */
+  figure?: ReactNode;
+}) {
+  const leading = blocks.findIndex((block) => block.kind !== 'paragraph');
+  const split = figure ? (leading === -1 ? blocks.length : leading) : blocks.length;
   return (
-    <div className="space-y-5">
-      {blocks.map((block, index) => (
-        <BlockView key={`${index}-${block.kind}`} block={block} />
+    <div className="space-y-6">
+      {blocks.slice(0, split).map((block, index) => (
+        <BlockView key={`${index}-${block.kind}`} block={block} context={context} />
+      ))}
+      {figure ? <div className="py-4">{figure}</div> : null}
+      {blocks.slice(split).map((block, index) => (
+        <BlockView key={`${split + index}-${block.kind}`} block={block} context={context} />
       ))}
     </div>
   );
 }
 
-function SubsectionView({ subsection }: { subsection: WhitePaperSubsection }) {
+function SubsectionView({
+  subsection,
+  reading,
+  renderText,
+  figure,
+}: {
+  subsection: WhitePaperSubsection;
+  reading: WhitePaperContent['reading'];
+  renderText: BlockContext['renderText'];
+  figure?: ReactNode;
+}) {
+  const headingId = `${subsection.id}-heading`;
   return (
     <section
       id={subsection.id}
-      aria-labelledby={`${subsection.id}-heading`}
-      className="scroll-mt-28"
+      aria-labelledby={headingId}
+      className="scroll-mt-[var(--sticky-offset)]"
     >
-      <h3
-        id={`${subsection.id}-heading`}
-        className="font-display text-xl font-medium tracking-tight text-foreground"
+      <ReadingHeading
+        as="h3"
+        sectionId={subsection.id}
+        headingId={headingId}
+        number={subsection.number}
+        anchorLabel={fillTemplate(reading.headingLinkTemplate, {
+          title: [subsection.number, subsection.heading].join(' '),
+        })}
       >
-        {subsection.number} {subsection.heading}
-      </h3>
+        {subsection.heading}
+      </ReadingHeading>
       <div className="mt-4">
-        <Blocks blocks={subsection.blocks} />
+        <Blocks
+          blocks={subsection.blocks}
+          context={{ headingId, sectionId: subsection.id, reading, renderText }}
+          figure={figure}
+        />
       </div>
     </section>
   );
@@ -151,9 +312,14 @@ export default async function WhitePaperPage({ params }: PageProps) {
   const { locale } = await params;
   setRequestLocale(locale);
   const content = getWhitePaperContent(locale);
+  const { reading, figures } = content;
   const inLanguage = jsonLdInLanguage(locale);
   const pageUrl = localeHref(LANDING_ORIGIN, content.metadata.path, locale);
   const pdfUrl = `${LANDING_ORIGIN}${content.hero.downloadHref}`;
+  const plateCopy = await getSignaturePlateCopy(locale);
+  const minutes = readingMinutes(paperText(content), locale);
+  const targets = referenceTargets(content);
+  const renderText = (text: string) => withReferences(text, locale, targets);
 
   const articleJsonLd = {
     '@context': 'https://schema.org',
@@ -181,12 +347,89 @@ export default async function WhitePaperPage({ params }: PageProps) {
     mainEntityOfPage: pageUrl,
   };
 
+  const allocationTable = content.sections
+    .flatMap((section) => section.subsections ?? [])
+    .find((subsection) => subsection.id === 'distribution-at-finalization')
+    ?.blocks.find((block) => block.kind === 'table');
+  // The split as every page draws it (the landing's bar, the same order and
+  // colours), keyed with this paper's own track names: the §5.1 table lists
+  // the tracks in the bar's order and carries the figures.
+  const allocationTracks = getLandingContent(locale).tracks.eth.map((track, index) => ({
+    ...track,
+    title:
+      (allocationTable?.kind === 'table' ? allocationTable.table.rows[index]?.[0] : undefined) ??
+      track.title,
+  }));
+
+  // Figures in the reading order of the sections they illustrate, numbered in that order.
+  const figureList: ReadonlyArray<{
+    sectionId: string;
+    title: string;
+    caption: string;
+    body: ReactNode;
+  }> = [
+    {
+      sectionId: 'performance-cycle',
+      title: figures.cycle.title,
+      caption: figures.cycle.caption,
+      body: <CycleTimeline steps={figures.cycle.steps} />,
+    },
+    {
+      sectionId: 'distribution-at-finalization',
+      title: figures.allocation.title,
+      caption: figures.allocation.caption,
+      body: (
+        <>
+          <AllocationBar tracks={allocationTracks} density="inline" />
+          <AllocationKey tracks={allocationTracks} />
+        </>
+      ),
+    },
+    {
+      sectionId: 'the-art',
+      title: figures.art.title,
+      caption: figures.art.caption,
+      body: (
+        <div className="grid gap-x-6 gap-y-8 sm:grid-cols-2">
+          {[SIGNATURE_PLATES[23], SIGNATURE_PLATES[24]].map((art) => {
+            return (
+              <SignaturePlate
+                key={art.tokenId}
+                art={art}
+                href={localizeCrossHostHref(`${APP_ORIGIN}/detail/${art.tokenId}`, locale)}
+                sizes="(min-width: 1024px) 30rem, (min-width: 640px) 45vw, 100vw"
+                copy={{ ...plateCopy(art), seedLabel: figures.art.seedLabel }}
+              />
+            );
+          })}
+        </div>
+      ),
+    },
+  ];
+  const sectionFigures: Record<string, ReactNode> = Object.fromEntries(
+    figureList.map((figure, index) => [
+      figure.sectionId,
+      <NumberedFigure
+        key={figure.sectionId}
+        titleId={`figure-${figure.sectionId}-title`}
+        label={fillTemplate(reading.figureTemplate, { number: index + 1 })}
+        title={figure.title}
+        caption={renderText(figure.caption)}
+      >
+        {figure.body}
+      </NumberedFigure>,
+    ]),
+  );
+
+  const contentsCopy = {
+    railLabel: reading.railLabel,
+    openLabel: reading.openContentsLabel,
+    backToTopLabel: reading.backToTopLabel,
+  };
+  const entries = contentsEntries(content);
+
   return (
-    <main
-      id="main"
-      tabIndex={-1}
-      className="relative mx-auto max-w-4xl px-4 pb-16 pt-12 sm:px-6 lg:pb-20 lg:pt-20"
-    >
+    <ReadingMain>
       <JsonLd
         data={[
           breadcrumbJsonLd(
@@ -200,149 +443,200 @@ export default async function WhitePaperPage({ params }: PageProps) {
         ]}
       />
 
-      <nav aria-label={content.breadcrumbs.ariaLabel} className="mb-8 text-sm text-white/60">
-        <Link href="/" className="hover:text-white">
-          {content.breadcrumbs.homeLabel}
-        </Link>
-        <span className="mx-2">/</span>
-        <span className="text-white/80">{content.breadcrumbLabel}</span>
-      </nav>
-
-      <header>
-        <p className="type-eyebrow text-primary/80">{content.hero.eyebrow}</p>
-        <h1 className="mt-4 type-display-lg text-balance text-foreground">{content.hero.title}</h1>
-        <p className="mt-3 text-xl text-white/70">{content.hero.subtitle}</p>
-        <p className="mt-6 text-sm text-white/60">
-          {content.hero.authorName}
-          {' · '}
-          <a
-            href={`mailto:${content.hero.authorEmail}`}
-            className="text-primary underline-offset-4 hover:underline"
-          >
-            {content.hero.authorEmail}
-          </a>
-        </p>
-        <p className="mt-1 font-mono text-xs uppercase tracking-[0.18em] text-white/45">
-          {content.hero.versionLabel} · {content.hero.dateLabel}
-        </p>
-        <div className="mt-7">
+      <PageHeader
+        variant="reading"
+        host="landing"
+        eyebrow={content.hero.eyebrow}
+        title={content.hero.title}
+        titleId={TITLE_ID}
+        subtitle={content.hero.subtitle}
+        meta={
+          <span className="inline-flex flex-wrap items-center gap-x-2.5 gap-y-1">
+            <MetaItems
+              items={[
+                <span key="author">{content.hero.authorName}</span>,
+                <a key="email" href={`mailto:${content.hero.authorEmail}`} className="link-quiet">
+                  {content.hero.authorEmail}
+                </a>,
+                <span key="version" className="tabular-nums">
+                  {content.hero.versionLabel}
+                </span>,
+                <span key="date" className="tabular-nums">
+                  {content.hero.dateLabel}
+                </span>,
+                <span key="time" className="tabular-nums">
+                  {fillTemplate(reading.readingTimeTemplate, { minutes })}
+                </span>,
+              ]}
+            />
+          </span>
+        }
+        actions={
           <a
             href={content.hero.downloadHref}
             download
-            className="inline-flex items-center justify-center gap-2 rounded-full bg-white px-6 py-3 text-sm font-semibold text-[#0D0521] transition hover:bg-white/90"
+            className={buttonVariants({ variant: 'outline', size: 'lg' })}
           >
-            <Download className="h-4 w-4" aria-hidden />
+            <Download aria-hidden />
             {content.hero.downloadLabel}
           </a>
-        </div>
-      </header>
+        }
+      />
 
-      <section
-        aria-labelledby="abstract-heading"
-        className="mt-12 rounded-2xl border border-border bg-card p-6 sm:p-8"
-      >
-        <h2
-          id="abstract-heading"
-          className="font-display text-xl font-medium tracking-tight text-foreground"
-        >
-          {content.abstract.heading}
-        </h2>
-        <div className="mt-4 space-y-4 text-base leading-8 text-muted-foreground">
-          {content.abstract.paragraphs.map((paragraph) => (
-            <p key={paragraph}>{paragraph}</p>
-          ))}
-        </div>
-      </section>
-
-      <nav
-        aria-labelledby="toc-heading"
-        className="mt-10 rounded-2xl border border-border bg-card p-6 sm:p-8"
-      >
-        <h2
-          id="toc-heading"
-          className="font-display text-xl font-medium tracking-tight text-foreground"
-        >
-          {content.tocHeading}
-        </h2>
-        <ol className="mt-4 grid gap-x-8 gap-y-2 text-sm sm:grid-cols-2">
-          {content.sections.map((section) => (
-            <li key={section.id}>
+      <div className={cn(READING_TEXT_EDGE_CLASS, 'reading-grid')}>
+        <div className="lg:row-span-4">
+          <ReadingContents
+            entries={entries}
+            copy={contentsCopy}
+            articleId={ARTICLE_ID}
+            topId={TITLE_ID}
+            anchorId={CONTENTS_ID}
+            railFooter={
               <a
-                href={`#${section.id}`}
-                className="text-white/70 underline-offset-4 hover:text-white hover:underline"
+                href={content.hero.downloadHref}
+                download
+                className="link-quiet inline-flex min-h-6 items-center gap-1.5 type-label text-muted-foreground hover:text-foreground"
               >
-                {sectionTitle(section)}
+                <Download aria-hidden className="size-3.5" />
+                {content.hero.downloadLabel}
               </a>
-            </li>
-          ))}
-          <li>
-            <a
-              href={`#${content.references.id}`}
-              className="text-white/70 underline-offset-4 hover:text-white hover:underline"
-            >
-              {content.references.heading}
-            </a>
-          </li>
-        </ol>
-      </nav>
+            }
+          />
+        </div>
 
-      <article className="mt-14 space-y-14">
-        {content.sections.map((section) => (
-          <section
-            key={section.id}
-            id={section.id}
-            aria-labelledby={`${section.id}-heading`}
-            className="scroll-mt-28"
-          >
-            <h2 id={`${section.id}-heading`} className="type-display-sm text-foreground">
-              {sectionTitle(section)}
-            </h2>
-            {section.blocks.length > 0 ? (
-              <div className="mt-5">
-                <Blocks blocks={section.blocks} />
-              </div>
-            ) : null}
-            {section.subsections?.length ? (
-              <div className="mt-8 space-y-10">
-                {section.subsections.map((subsection) => (
-                  <SubsectionView key={subsection.id} subsection={subsection} />
-                ))}
-              </div>
-            ) : null}
-          </section>
-        ))}
-
-        <section
-          id={content.references.id}
-          aria-labelledby="references-heading"
-          className="scroll-mt-28"
-        >
-          <h2 id="references-heading" className="type-display-sm text-foreground">
-            {content.references.heading}
+        <section aria-labelledby="abstract-heading" className="min-w-0">
+          <h2 id="abstract-heading" className="type-eyebrow text-subtle">
+            {content.abstract.heading}
           </h2>
-          <ol className="mt-5 list-decimal space-y-3 pl-5 text-base leading-8 text-muted-foreground marker:text-white/40">
-            {content.references.items.map((reference) => (
-              <li key={reference.href}>
-                {reference.label}
-                {'. '}
+          <div className="mt-4 max-w-[var(--measure-prose)] space-y-4 type-body-lg text-foreground">
+            {content.abstract.paragraphs.map((paragraph) => (
+              <p key={paragraph}>{paragraph}</p>
+            ))}
+          </div>
+        </section>
+
+        <nav
+          id={CONTENTS_ID}
+          aria-labelledby="toc-heading"
+          className="mt-12 border-y border-rule py-6 lg:hidden"
+        >
+          <h2 id="toc-heading" className="type-eyebrow text-subtle">
+            {content.tocHeading}
+          </h2>
+          {/* Columns fill top to bottom, so both read 1, 2, 3 … down the page. */}
+          <ol className="mt-4 gap-x-10 type-body-sm sm:columns-2">
+            {entries.map((entry) => (
+              <li key={entry.id} className="break-inside-avoid">
                 <a
-                  href={reference.href}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="break-all text-primary underline-offset-4 hover:underline"
+                  href={`#${entry.id}`}
+                  className="link-quiet flex min-h-8 items-baseline gap-2.5 py-1 text-muted-foreground hover:text-foreground"
                 >
-                  {reference.href}
+                  <span aria-hidden className="w-5 shrink-0 tabular-nums text-subtle">
+                    {entry.number}
+                  </span>
+                  <span>{entry.label}</span>
                 </a>
               </li>
             ))}
           </ol>
-        </section>
-      </article>
+        </nav>
 
-      <footer className="mt-16 border-t border-white/10 pt-6 text-sm text-white/50">
-        <p>{content.citation}</p>
-        <p className="mt-2">{content.licenseNote}</p>
-      </footer>
-    </main>
+        <article id={ARTICLE_ID} aria-labelledby={TITLE_ID} className="min-w-0">
+          {content.sections.map((section, index) => {
+            const headingId = `${section.id}-heading`;
+            return (
+              <section
+                key={section.id}
+                id={section.id}
+                aria-labelledby={headingId}
+                className={cn(
+                  'scroll-mt-[var(--sticky-offset)]',
+                  index === 0
+                    ? 'mt-14 lg:mt-16'
+                    : 'mt-14 border-t border-rule-faint pt-12 lg:mt-16 lg:pt-14',
+                )}
+              >
+                <ReadingHeading
+                  as="h2"
+                  sectionId={section.id}
+                  headingId={headingId}
+                  number={isNumbered(section) ? section.number : undefined}
+                  anchorLabel={fillTemplate(reading.headingLinkTemplate, {
+                    title: section.heading,
+                  })}
+                >
+                  {section.heading}
+                </ReadingHeading>
+                {section.blocks.length > 0 ? (
+                  <div className="mt-5">
+                    <Blocks
+                      blocks={section.blocks}
+                      context={{ headingId, sectionId: section.id, reading, renderText }}
+                      figure={sectionFigures[section.id]}
+                    />
+                  </div>
+                ) : null}
+                {section.subsections?.length ? (
+                  <div className="mt-10 space-y-10">
+                    {section.subsections.map((subsection) => (
+                      <SubsectionView
+                        key={subsection.id}
+                        subsection={subsection}
+                        reading={reading}
+                        renderText={renderText}
+                        figure={sectionFigures[subsection.id]}
+                      />
+                    ))}
+                  </div>
+                ) : null}
+              </section>
+            );
+          })}
+
+          <section
+            id={content.references.id}
+            aria-labelledby="references-heading"
+            className="mt-14 scroll-mt-[var(--sticky-offset)] border-t border-rule-faint pt-12 lg:mt-16 lg:pt-14"
+          >
+            <ReadingHeading
+              as="h2"
+              sectionId={content.references.id}
+              headingId="references-heading"
+              anchorLabel={fillTemplate(reading.headingLinkTemplate, {
+                title: content.references.heading,
+              })}
+            >
+              {content.references.heading}
+            </ReadingHeading>
+            <ol className="mt-5 max-w-[var(--measure-prose)] list-decimal space-y-3 pl-5 type-body-md text-muted-foreground marker:tabular-nums marker:text-subtle">
+              {content.references.items.map((reference) => (
+                <li key={reference.href} className="pl-1">
+                  {reference.label}
+                  {'. '}
+                  <a
+                    href={reference.href}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="link inline break-all"
+                  >
+                    {reference.href}
+                    <span className="sr-only"> {reading.newTabNote}</span>
+                    <ArrowUpRight
+                      aria-hidden
+                      className="ml-0.5 inline size-3.5 -translate-y-px text-subtle"
+                    />
+                  </a>
+                </li>
+              ))}
+            </ol>
+          </section>
+
+          <footer className="mt-16 max-w-[var(--measure-prose)] space-y-2 border-t border-rule pt-6 type-caption text-subtle">
+            <p>{content.citation}</p>
+            <p>{content.licenseNote}</p>
+          </footer>
+        </article>
+      </div>
+    </ReadingMain>
   );
 }

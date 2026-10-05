@@ -1,23 +1,15 @@
 import '@testing-library/jest-dom';
+import userEvent from '@testing-library/user-event';
 
-import { convertTimestampToDateTime } from '@/utils';
-
-import RecipientHistoryTable from '@/components/tables/RecipientHistoryTable';
+import RecipientHistoryTable, { retrievalSection } from '@/components/tables/RecipientHistoryTable';
 import type { WinningHistoryEntry } from '@/services/api/types';
 
-import { render, screen, checkA11y } from '@/test-utils';
+import { render, screen, checkA11y, within } from '@/test-utils';
 
-const mockConvertTimestampToDateTime = jest.fn();
-jest.mock('@/utils', () => {
-  const actual = jest.requireActual<typeof import('@/utils')>('@/utils');
-  return {
-    ...actual,
-    convertTimestampToDateTime: (timestamp: number, showSecond?: boolean, locale?: string) => {
-      mockConvertTimestampToDateTime(timestamp, showSecond, locale);
-      return actual.convertTimestampToDateTime(timestamp, showSecond, locale);
-    },
-  };
-});
+const ALICE = '0x1234567890abcdef1234567890abcdef12345678';
+/** The backend's Anchor Distribution recipient placeholder (a sealed wire value). */
+const ALL_ANCHOR_HOLDERS = '(All CS NFT Stakers)'; // lexicon-allow-backend-type
+const BOB = '0xabcdefabcdefabcdefabcdefabcdefabcdefabcd';
 
 const createEntry = (overrides: Partial<WinningHistoryEntry> = {}): WinningHistoryEntry => ({
   EvtLogId: 1,
@@ -27,119 +19,310 @@ const createEntry = (overrides: Partial<WinningHistoryEntry> = {}): WinningHisto
   TimeStamp: 1701346718,
   DateTime: '2023-11-30T12:18:38Z',
   RecordType: 0,
-  RecipientAddr: '0x1234567890abcdef1234567890abcdef12345678',
+  WinnerAddr: ALICE,
   RoundNum: 42,
   AmountEth: 1.5,
   TokenAddress: '',
   TokenId: -1,
-  RecipientIndex: 0,
+  WinnerIndex: -1,
   Claimed: true,
   ...overrides,
 });
 
-beforeEach(() => jest.clearAllMocks());
-
 describe('RecipientHistoryTable', () => {
-  it('renders "No history yet." when list is empty', () => {
-    render(<RecipientHistoryTable winningHistory={[]} />);
+  it('renders the empty state when the list is empty', () => {
+    render(<RecipientHistoryTable allocationRecords={[]} />);
     expect(screen.getByText('tables.empty.history')).toBeInTheDocument();
   });
 
-  it('renders table headers', () => {
-    render(<RecipientHistoryTable winningHistory={[createEntry()]} />);
-    const headers = screen.getAllByText('tables.columns.recordType');
-    expect(headers.length).toBeGreaterThanOrEqual(1);
-    const datetimeHeaders = screen.getAllByText('tables.columns.datetime');
-    expect(datetimeHeaders.length).toBeGreaterThanOrEqual(1);
-  });
-
-  it('renders datetime from TxHash link', () => {
-    const entry = createEntry();
-    render(<RecipientHistoryTable winningHistory={[entry]} />);
-    expect(screen.getByText(convertTimestampToDateTime(entry.TimeStamp))).toBeInTheDocument();
-    expect(mockConvertTimestampToDateTime).toHaveBeenCalledWith(entry.TimeStamp, false, 'en');
-  });
-
-  it('renders record type text for Main ETH Allocation', () => {
-    render(<RecipientHistoryTable winningHistory={[createEntry({ RecordType: 0 })]} />);
-    expect(screen.getByText('tables.recipientHistory.types.mainEth')).toBeInTheDocument();
-  });
-
-  it('renders record type text for Final CST Gesture CS NFT', () => {
-    render(<RecipientHistoryTable winningHistory={[createEntry({ RecordType: 3, TokenId: 1 })]} />);
-    expect(screen.getByText('tables.recipientHistory.types.finalCstNft')).toBeInTheDocument();
-    expect(screen.getByText('tables.recipientHistory.notApplicable')).toBeInTheDocument();
-    expect(screen.getByRole('link', { name: '1' })).toHaveAttribute('href', '/detail/1');
-  });
-
-  it('renders record type text for Stellar Selection ETH', () => {
+  it('names each record by its allocation, with what it allocated', () => {
     render(
       <RecipientHistoryTable
-        winningHistory={[createEntry({ RecordType: 10, AmountEth: 0.329286 })]}
+        allocationRecords={[
+          createEntry({ RecordType: 0, AmountEth: 1.5 }),
+          createEntry({ RecordType: 11, AmountEth: 1000, TxHash: '0x2' }),
+          createEntry({ RecordType: 3, TokenId: 7, TxHash: '0x3' }),
+        ]}
       />,
     );
+
+    expect(screen.getByText('tables.recipientHistory.sources.signature')).toBeInTheDocument();
     expect(
-      screen.getByText('tables.recipientHistory.types.participantStellarEth'),
+      screen.getByText('tables.recipientHistory.sources.stellarSelection'),
     ).toBeInTheDocument();
-    expect(screen.getByText('0.3293 ETH')).toBeInTheDocument();
-  });
-
-  it('renders round number as link', () => {
-    const entry = createEntry({ RoundNum: 42 });
-    render(<RecipientHistoryTable winningHistory={[entry]} />);
-    expect(screen.getByText('42')).toBeInTheDocument();
-  });
-
-  it('renders amount in ETH for ETH record types', () => {
-    render(
-      <RecipientHistoryTable winningHistory={[createEntry({ RecordType: 0, AmountEth: 1.5 })]} />,
+    expect(screen.getByText('tables.recipientHistory.sources.finalCstGesture')).toBeInTheDocument();
+    expect(screen.getByText('1.5000').textContent).toBe('1.5000 ETH');
+    // A protocol amount of CST reads whole, grouped.
+    expect(screen.getByText('1,000').textContent).toBe('1,000 CST');
+    // An NFT names its token and links to it, never "N/A".
+    expect(screen.getByRole('link', { name: 'tables.recipientHistory.nft(id=7)' })).toHaveAttribute(
+      'href',
+      '/detail/7',
     );
-    expect(screen.getByText('1.5000 ETH')).toBeInTheDocument();
   });
 
-  it('renders CST amounts as whole numbers without decimals', () => {
-    render(
-      <RecipientHistoryTable winningHistory={[createEntry({ RecordType: 11, AmountEth: 1000 })]} />,
-    );
-    expect(screen.getByText('1000 CST')).toBeInTheDocument();
-    expect(screen.queryByText('1000.00 CST')).not.toBeInTheDocument();
-  });
-
-  it('sets rel="noopener noreferrer" on all target="_blank" links', () => {
-    const entry = createEntry({
-      TokenAddress: '0xTokenAddress1234567890abcdef12345678901234',
-      TokenId: 5,
-    });
-    render(<RecipientHistoryTable winningHistory={[entry]} />);
-    const links = screen.getAllByRole('link');
-    for (const link of links) {
-      if (link.getAttribute('target') === '_blank') {
-        expect(link).toHaveAttribute('rel', 'noopener noreferrer');
-      }
-    }
-  });
-
-  it('renders recipient address when showWinnerAddr is true', () => {
+  it('links each date to its transaction on the explorer', () => {
     const entry = createEntry();
-    render(<RecipientHistoryTable winningHistory={[entry]} showWinnerAddr={true} />);
-    const recipientHeaders = screen.getAllByText('tables.columns.recipient');
-    expect(recipientHeaders.length).toBeGreaterThanOrEqual(1);
+    render(<RecipientHistoryTable allocationRecords={[entry]} />);
+    const time = document.querySelector(
+      `time[datetime="${new Date(entry.TimeStamp * 1000).toISOString()}"]`,
+    );
+    const link = time?.closest('a');
+    expect(link).toHaveAttribute('href', expect.stringContaining(entry.TxHash));
+    expect(link).toHaveAttribute('target', '_blank');
+    expect(link).toHaveAttribute('rel', 'noopener noreferrer');
   });
 
-  it('hides recipient column when showWinnerAddr is false', () => {
-    render(<RecipientHistoryTable winningHistory={[createEntry()]} showWinnerAddr={false} />);
-    expect(screen.queryByText('tables.columns.recipient')).not.toBeInTheDocument();
+  it('links the cycle in the same tab, as "Cycle 42" rather than a bare number', () => {
+    render(<RecipientHistoryTable allocationRecords={[createEntry({ RoundNum: 42 })]} />);
+    const cycle = screen.getByRole('link', { name: 'tables.allocation.cycle(cycle=42)' });
+    expect(cycle).toHaveAttribute('href', '/allocation/42');
+    expect(cycle).not.toHaveAttribute('target');
   });
 
-  it('renders token ID link when TokenId >= 0', () => {
-    const entry = createEntry({ TokenId: 10 });
-    render(<RecipientHistoryTable winningHistory={[entry]} />);
-    const tokenLink = screen.getByText('10');
-    expect(tokenLink.closest('a')).toHaveAttribute('href', '/detail/10');
+  it('numbers only a Stellar Selection by its place among the selections, from 1', () => {
+    const { container } = render(
+      <RecipientHistoryTable
+        allocationRecords={[
+          createEntry({ RecordType: 0, WinnerIndex: 0, TxHash: '0x1' }),
+          createEntry({ RecordType: 12, TokenId: 30, WinnerIndex: 2, TxHash: '0x2' }),
+        ]}
+      />,
+    );
+    const positions = [
+      ...container.querySelectorAll('tbody td[data-label="tables.columns.position"]'),
+    ].map((cell) => cell.textContent);
+    // The Signature Allocation has no place to number; the selection was the third.
+    expect(positions).toEqual(['', '#3']);
+  });
+
+  it('drops the position column when no record is a Stellar Selection', () => {
+    render(<RecipientHistoryTable allocationRecords={[createEntry({ WinnerIndex: 0 })]} />);
+    expect(
+      screen.queryByRole('columnheader', { name: 'tables.columns.position' }),
+    ).not.toBeInTheDocument();
+  });
+
+  it('shows the recipient column only when asked', () => {
+    const { rerender } = render(
+      <RecipientHistoryTable allocationRecords={[createEntry()]} showRecipient />,
+    );
+    expect(
+      screen.getByRole('columnheader', { name: 'tables.columns.recipient' }),
+    ).toBeInTheDocument();
+
+    rerender(<RecipientHistoryTable allocationRecords={[createEntry()]} showRecipient={false} />);
+    expect(
+      screen.queryByRole('columnheader', { name: 'tables.columns.recipient' }),
+    ).not.toBeInTheDocument();
+  });
+
+  it('names Anchor Distribution rows for all anchor-holders instead of linking a placeholder', () => {
+    render(
+      <RecipientHistoryTable
+        allocationRecords={[createEntry({ RecordType: 15, WinnerAddr: ALL_ANCHOR_HOLDERS })]}
+      />,
+    );
+    expect(screen.getByText('tables.recipientHistory.allAnchorHolders')).toBeInTheDocument();
+    expect(screen.queryByText(ALL_ANCHOR_HOLDERS)).not.toBeInTheDocument();
+  });
+
+  describe('with retrieval status', () => {
+    it('marks an unretrieved allocation as ready, with a way to retrieve it', () => {
+      render(
+        <RecipientHistoryTable
+          allocationRecords={[createEntry({ RecordType: 10, Claimed: false, AmountEth: 0.2 })]}
+          showClaimedStatus
+          showRecipient={false}
+        />,
+      );
+      expect(screen.getByText('tables.recipientHistory.readyToRetrieve')).toBeInTheDocument();
+      expect(
+        screen.getByRole('link', { name: 'tables.recipientHistory.retrieve' }),
+      ).toHaveAttribute('href', '/my-allocations#eth');
+      // Good news is not an error: no alert, no destructive colour.
+      expect(document.querySelector('.text-destructive')).not.toBeInTheDocument();
+    });
+
+    it('marks a retrieved allocation quietly', () => {
+      render(
+        <RecipientHistoryTable
+          allocationRecords={[createEntry({ Claimed: true })]}
+          showClaimedStatus
+          showRecipient={false}
+        />,
+      );
+      expect(screen.getByText('tables.recipientHistory.retrieved')).toBeInTheDocument();
+    });
+
+    it('sends each record to the My Allocations section that retrieves it', () => {
+      expect(retrievalSection(10)).toBe('eth');
+      expect(retrievalSection(15)).toBe('anchors');
+      expect(retrievalSection(16)).toBe('nfts');
+      expect(retrievalSection(17)).toBe('erc20');
+    });
+
+    it('sums the history above the table', () => {
+      render(
+        <RecipientHistoryTable
+          allocationRecords={[
+            createEntry({ RecordType: 0, AmountEth: 1.5, RoundNum: 1 }),
+            createEntry({ RecordType: 1, AmountEth: 1000, RoundNum: 1, TxHash: '0x2' }),
+            createEntry({ RecordType: 2, TokenId: 3, RoundNum: 2, TxHash: '0x3' }),
+          ]}
+          showSummary
+        />,
+      );
+      const summary = screen.getByText('tables.recipientHistory.totals.eth').closest('dl');
+      expect(summary).not.toBeNull();
+      const figures = within(summary as HTMLElement);
+      expect(figures.getByText('1.5000')).toBeInTheDocument();
+      expect(figures.getByText('1,000')).toBeInTheDocument();
+      expect(figures.getByText('tables.recipientHistory.totals.cycles')).toBeInTheDocument();
+    });
+  });
+
+  describe('grouped by recipient', () => {
+    const ledger = [
+      createEntry({ RecordType: 0, AmountEth: 11.0616, WinnerAddr: ALICE, TxHash: '0x1' }),
+      createEntry({ RecordType: 1, AmountEth: 1000, WinnerAddr: ALICE, TxHash: '0x2' }),
+      createEntry({ RecordType: 2, TokenId: 24, WinnerAddr: ALICE, TxHash: '0x3' }),
+      createEntry({ RecordType: 10, AmountEth: 0.3, WinnerAddr: BOB, TxHash: '0x4' }),
+    ];
+
+    it('shows one row per recipient with what they received', () => {
+      const { container } = render(
+        <RecipientHistoryTable allocationRecords={ledger} groupBy="recipient" />,
+      );
+      const rows = container.querySelectorAll('tbody tr');
+      expect(rows).toHaveLength(2);
+      expect(rows[1]).toHaveTextContent('tables.recipientHistory.sources.stellarSelection');
+      // The disclosure column is named on screen.
+      expect(
+        screen.getByRole('columnheader', { name: 'tables.recipientHistory.recordsHeader' }),
+      ).toBeInTheDocument();
+    });
+
+    // Regression: ETH, CST and NFTs shared one right-justified cell, so the
+    // figures sat at different places row to row and could not be compared.
+    it('sets ETH, CST and NFTs in three aligned columns under one "Received" heading', () => {
+      const { container } = render(
+        <RecipientHistoryTable allocationRecords={ledger} groupBy="recipient" />,
+      );
+      const [groupRow, headerRow] = [...container.querySelectorAll('thead tr')];
+      const received = [...groupRow!.querySelectorAll('th')].find(
+        (th) => th.textContent === 'tables.columns.received',
+      );
+      expect(received).toHaveAttribute('colspan', '3');
+      // (The sorted header's arrow is joined to its word by U+2060.)
+      const headers = [...headerRow!.querySelectorAll('th')].map((th) =>
+        th.textContent?.replace(/\u2060/g, ''),
+      );
+      expect(headers).toEqual([
+        'tables.columns.recipient',
+        'tables.columns.source',
+        // The ETH column sorts the ledger, largest first, as it arrives.
+        'tables.recipientHistory.received.eth',
+        'tables.recipientHistory.received.cst',
+        'tables.recipientHistory.received.nfts',
+        'tables.recipientHistory.recordsHeader',
+      ]);
+
+      const cells = (row: number) =>
+        [...container.querySelectorAll(`tbody tr:nth-child(${row}) td`)].map((td) => ({
+          label: td.getAttribute('data-label'),
+          align: td.getAttribute('data-align'),
+          text: td.textContent,
+          empty: td.getAttribute('data-empty'),
+        }));
+      const [, , eth, cst, nfts] = cells(1);
+      expect(eth).toEqual({
+        label: 'tables.recipientHistory.totals.eth',
+        align: 'end',
+        text: '11.0616',
+        empty: null,
+      });
+      expect(cst).toMatchObject({ label: 'tables.recipientHistory.totals.cst', text: '1,000.00' });
+      // One NFT is a count like any other; the records name and link it.
+      expect(nfts).toMatchObject({ label: 'tables.recipientHistory.totals.nfts', text: '1' });
+      expect(container.querySelector('tbody tr:first-child a[href="/detail/24"]')).toBeNull();
+
+      // Bob received only ETH: his CST and NFT cells stay blank, and a phone
+      // record drops those lines.
+      const bob = [...container.querySelectorAll('tbody tr')][1]!;
+      const bobCells = [...bob.querySelectorAll('td')];
+      expect(bobCells[3]).toHaveAttribute('data-empty', 'true');
+      expect(bobCells[4]).toHaveAttribute('data-empty', 'true');
+      // The recipient opens each phone record.
+      expect(bobCells[0]).toHaveAttribute('data-phone', 'title');
+    });
+
+    it('turns the ledger around on the first click on ETH, since it arrives largest first', async () => {
+      const user = userEvent.setup();
+      const { container } = render(
+        <RecipientHistoryTable allocationRecords={ledger} groupBy="recipient" />,
+      );
+      const eth = screen.getByRole('columnheader', {
+        name: /tables\.recipientHistory\.received\.eth/,
+      });
+      expect(eth).toHaveAttribute('aria-sort', 'descending');
+
+      await user.click(within(eth).getByRole('button'));
+      expect(eth).toHaveAttribute('aria-sort', 'ascending');
+      expect(container.querySelector('tbody tr')).toHaveTextContent('0.3000');
+    });
+
+    it('counts several NFTs instead of listing every number in the row', () => {
+      const { container } = render(
+        <RecipientHistoryTable
+          allocationRecords={[
+            createEntry({ RecordType: 7, AmountEth: 3.5397, WinnerAddr: BOB, TxHash: '0x1' }),
+            ...[26, 27, 29, 30].map((id, index) =>
+              createEntry({ RecordType: 12, TokenId: id, WinnerAddr: BOB, TxHash: `0x${index}` }),
+            ),
+          ]}
+          groupBy="recipient"
+        />,
+      );
+      const row = container.querySelector('tbody tr');
+      expect(row).toHaveTextContent('3.5397');
+      expect(
+        row?.querySelector('td[data-label="tables.recipientHistory.totals.nfts"]'),
+      ).toHaveTextContent(/^4$/);
+      expect(row).not.toHaveTextContent('tables.recipientHistory.nft(id=26)');
+    });
+
+    it('tags an Anchored-NFT Stellar Selection by the short form the NFT pages use', () => {
+      const { container } = render(
+        <RecipientHistoryTable
+          allocationRecords={[createEntry({ RecordType: 13, TokenId: 31, WinnerAddr: BOB })]}
+          groupBy="recipient"
+        />,
+      );
+      const row = container.querySelector('tbody tr');
+      expect(row).toHaveTextContent('tables.recipientHistory.sourceTags.anchoredStellarSelection');
+      expect(row).not.toHaveTextContent('tables.recipientHistory.sources.anchoredStellarSelection');
+    });
+
+    it('expands a recipient to their individual records', async () => {
+      const user = userEvent.setup();
+      render(<RecipientHistoryTable allocationRecords={ledger} groupBy="recipient" />);
+
+      const toggle = screen.getByRole('button', {
+        name: /tables\.recipientHistory\.showRecords\(count=3\)/,
+      });
+      await user.click(toggle);
+      expect(toggle).toHaveAttribute('aria-expanded', 'true');
+      const details = document.getElementById(toggle.getAttribute('aria-controls') ?? '');
+      expect(details).not.toBeNull();
+      expect(within(details as HTMLElement).getAllByRole('listitem')).toHaveLength(3);
+    });
   });
 
   it('has no accessibility violations', async () => {
-    const { container } = render(<RecipientHistoryTable winningHistory={[]} />);
+    const { container } = render(
+      <RecipientHistoryTable allocationRecords={[createEntry()]} showClaimedStatus />,
+    );
     await checkA11y(container);
   });
 });

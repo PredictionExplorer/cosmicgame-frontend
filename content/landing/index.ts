@@ -1,6 +1,14 @@
-import { pickByLocale, type LocaleRecord } from '@/i18n/locale';
+import { withNextCycleShare } from '@/config/allocationTracks';
+import { pickByLocale, type AppLocale, type LocaleRecord } from '@/i18n/locale';
+import { getLocaleConfig } from '@/i18n/localeConfig';
+import { formatCount, formatPercent } from '@/utils/format/numbers';
 
-import { LANDING_STRUCTURE, type LandingStageText, type LandingText } from './structure';
+import {
+  LANDING_STRUCTURE,
+  type LandingPluralText,
+  type LandingStageText,
+  type LandingText,
+} from './structure';
 import { landingTextEn } from './text.en';
 import { landingTextJa } from './text.ja';
 import { landingTextKo } from './text.ko';
@@ -9,67 +17,98 @@ import { landingTextVi } from './text.vi';
 import { landingTextZh } from './text.zh';
 import { landingTextZhHk } from './text.zh-HK';
 import { landingTextZhTw } from './text.zh-TW';
-import type { LandingContent, LandingFooterColumn, LandingTrackItem } from './types';
+import type { LandingContent, LandingEthTrack, LandingFixedTrack } from './types';
 
 export * from './types';
 export * from './structure';
 
+type TrackText = {
+  readonly percent?: string;
+  readonly title: string;
+  readonly body: string;
+};
+
+/** A count in the locale's words: the plural form `Intl.PluralRules` picks, `{count}` formatted. */
+export function pluralPhrase(template: LandingPluralText, count: number, locale: string): string {
+  const category = new Intl.PluralRules(getLocaleConfig(locale).intlLocale).select(count);
+  return (template[category] ?? template.other).replace('{count}', formatCount(count, locale));
+}
+
 /** Composes the locale-independent skeleton with one locale's copy. */
-function buildLandingContent(text: LandingText): LandingContent {
+function buildLandingContent(text: LandingText, locale: AppLocale): LandingContent {
   // Parity is enforced by LandingText's literal keys; the builder itself only
   // needs plain string lookups.
-  const cycleStageTexts = text.cycle.stages as Readonly<Record<string, LandingStageText>>;
+  const stepTexts = text.cycle.steps as Readonly<Record<string, LandingStageText>>;
   const artStageTexts = text.art.stages as Readonly<Record<string, LandingStageText>>;
   const artFactTexts = text.art.facts as Readonly<
     Record<string, { label: string; value?: string }>
   >;
-  const trackItemTexts = text.tracks.items as Readonly<
-    Record<string, { percent?: string; title: string; body: string }>
-  >;
+  const trackTexts = text.tracks.items as Readonly<Record<string, TrackText>>;
   const tableRowTexts = text.publicGoods.card.tableRows as Readonly<
     Record<string, { label: string; value?: string }>
   >;
-  const footerColumnTexts = text.footer.columns as Readonly<
-    Record<string, { heading: string; links: Readonly<Record<string, string>> }>
-  >;
+
+  // The ETH shares come from protocol facts and the remainder that compounds
+  // completes them to exactly 100%, the same rule as every chart of the split.
+  const ethStructure = LANDING_STRUCTURE.tracks.eth;
+  const shares = withNextCycleShare(
+    ethStructure.flatMap((item) =>
+      'share' in item ? [{ id: item.track, percent: item.share }] : [],
+    ),
+  );
+  const eth = ethStructure.map((item): LandingEthTrack => {
+    const itemText = trackTexts[item.id]!;
+    const share = shares.find((entry) => entry.id === item.track)?.percent ?? 0;
+    return {
+      id: item.track,
+      share,
+      percent: 'share' in item ? formatPercent(item.share, locale) : itemText.percent!,
+      title: itemText.title,
+      body: itemText.body,
+    };
+  });
+  const fixed = LANDING_STRUCTURE.tracks.fixed.map((item): LandingFixedTrack => {
+    const itemText = trackTexts[item.id]!;
+    return {
+      id: item.id,
+      amount: pluralPhrase(text.tracks.recipients, item.recipients, locale),
+      title: itemText.title,
+      body: itemText.body,
+    };
+  });
+  const councilTexts = text.council.columns as Readonly<Record<string, LandingStageText>>;
+  const pillarTexts = text.verifiability.pillars as Readonly<Record<string, LandingStageText>>;
 
   return {
     meta: text.meta,
     hero: {
       eyebrow: text.hero.eyebrow,
-      headline: text.hero.headline,
       headlineLead: text.hero.headlineLead,
       headlineAccent: text.hero.headlineAccent,
       subhead: text.hero.subhead,
-      biologyDisclaimer: text.hero.biologyDisclaimer,
-      primaryCta: { label: text.hero.primaryCtaLabel, href: LANDING_STRUCTURE.hero.primaryCtaHref },
       secondaryCta: {
         label: text.hero.secondaryCtaLabel,
         href: LANDING_STRUCTURE.hero.secondaryCtaHref,
       },
-      statisticsCta: {
-        label: text.hero.statisticsCtaLabel,
-        href: LANDING_STRUCTURE.hero.statisticsCtaHref,
-      },
-      galleryCta: { label: text.hero.galleryCtaLabel, href: LANDING_STRUCTURE.hero.galleryCtaHref },
-      scrollAriaLabel: text.hero.scrollAriaLabel,
-      marqueeChips: text.hero.marqueeChips,
       art: text.hero.art,
     },
     cycle: {
       eyebrow: text.cycle.eyebrow,
       heading: text.cycle.heading,
-      description: text.cycle.description,
-      stages: LANDING_STRUCTURE.cycle.stages.map((stage) => ({
-        number: stage.number,
-        ...cycleStageTexts[stage.id]!,
+      steps: LANDING_STRUCTURE.cycle.steps.map((step) => ({
+        number: step.number,
+        ...stepTexts[step.id]!,
       })),
+      gestureCta: {
+        label: text.cycle.gestureCtaLabel,
+        href: LANDING_STRUCTURE.cycle.gestureCtaHref,
+      },
+      guideCta: { label: text.cycle.guideCtaLabel, href: LANDING_STRUCTURE.cycle.guideCtaHref },
     },
     art: {
       eyebrow: text.art.eyebrow,
       heading: text.art.heading,
       description: text.art.description,
-      loading: text.art.loading,
       showcase: text.art.showcase,
       stageLabel: text.art.stageLabel,
       stages: LANDING_STRUCTURE.art.stages.map((stage) => ({
@@ -77,24 +116,20 @@ function buildLandingContent(text: LandingText): LandingContent {
         ...artStageTexts[stage.id]!,
       })),
       facts: LANDING_STRUCTURE.art.facts.map((fact) => ({
+        id: fact.id,
         label: artFactTexts[fact.id]!.label,
-        value: 'value' in fact ? fact.value : artFactTexts[fact.id]!.value!,
+        value: 'live' in fact ? null : 'value' in fact ? fact.value : artFactTexts[fact.id]!.value!,
       })),
     },
     tracks: {
       eyebrow: text.tracks.eyebrow,
       heading: text.tracks.heading,
       description: text.tracks.description,
-      cardLabel: text.tracks.cardLabel,
-      items: LANDING_STRUCTURE.tracks.items.map((item): LandingTrackItem => {
-        const itemText = trackItemTexts[item.id]!;
-        return {
-          percent: 'percent' in item ? item.percent : itemText.percent!,
-          title: itemText.title,
-          body: itemText.body,
-          tone: item.tone,
-        };
-      }),
+      ethLabel: text.tracks.ethLabel,
+      fixedLabel: text.tracks.fixedLabel,
+      fixedEach: text.tracks.fixedEach,
+      eth,
+      fixed,
     },
     anchoring: {
       eyebrow: text.anchoring.eyebrow,
@@ -123,43 +158,50 @@ function buildLandingContent(text: LandingText): LandingContent {
       },
       cta: { label: text.publicGoods.ctaLabel, href: LANDING_STRUCTURE.publicGoods.ctaHref },
     },
-    council: text.council,
-    verifiability: text.verifiability,
-    faq: text.faq,
-    footer: {
-      brandName: text.footer.brandName,
-      logoAlt: text.footer.logoAlt,
-      tagline: text.footer.tagline,
-      columns: LANDING_STRUCTURE.footer.columns.map((column): LandingFooterColumn => {
-        const columnText = footerColumnTexts[column.id]!;
-        return {
-          heading: columnText.heading,
-          links: column.links.map((link) => ({
-            label: columnText.links[link.id]!,
-            href: link.href,
-          })),
-        };
-      }),
-      copyright: text.footer.copyright,
-      colophon: text.footer.colophon,
+    council: {
+      eyebrow: text.council.eyebrow,
+      heading: text.council.heading,
+      body: text.council.body,
+      columns: LANDING_STRUCTURE.council.columns.map((column) => ({
+        id: column.id,
+        ...councilTexts[column.id]!,
+      })),
     },
-    notFound: {
-      code: LANDING_STRUCTURE.notFound.code,
-      heading: text.notFound.heading,
-      description: text.notFound.description,
-      cta: { label: text.notFound.ctaLabel, href: LANDING_STRUCTURE.notFound.ctaHref },
+    verifiability: {
+      eyebrow: text.verifiability.eyebrow,
+      heading: text.verifiability.heading,
+      body: text.verifiability.body,
+      pillars: LANDING_STRUCTURE.verifiability.pillars.map((pillar) => ({
+        id: pillar.id,
+        ...pillarTexts[pillar.id]!,
+      })),
+      evidenceLabel: text.verifiability.evidenceLabel,
+    },
+    faq: text.faq,
+    closing: {
+      eyebrow: text.closing.eyebrow,
+      heading: text.closing.heading,
+      body: text.closing.body,
+      gestureCta: {
+        label: text.cycle.gestureCtaLabel,
+        href: LANDING_STRUCTURE.cycle.gestureCtaHref,
+      },
+      galleryCta: {
+        label: text.hero.art.galleryCta,
+        href: LANDING_STRUCTURE.closing.galleryCtaHref,
+      },
     },
   };
 }
 
-export const landingContentEn: LandingContent = buildLandingContent(landingTextEn);
-export const landingContentZh: LandingContent = buildLandingContent(landingTextZh);
-export const landingContentZhTw: LandingContent = buildLandingContent(landingTextZhTw);
-export const landingContentZhHk: LandingContent = buildLandingContent(landingTextZhHk);
-export const landingContentUk: LandingContent = buildLandingContent(landingTextUk);
-export const landingContentKo: LandingContent = buildLandingContent(landingTextKo);
-export const landingContentJa: LandingContent = buildLandingContent(landingTextJa);
-export const landingContentVi: LandingContent = buildLandingContent(landingTextVi);
+export const landingContentEn: LandingContent = buildLandingContent(landingTextEn, 'en');
+export const landingContentZh: LandingContent = buildLandingContent(landingTextZh, 'zh');
+export const landingContentZhTw: LandingContent = buildLandingContent(landingTextZhTw, 'zh-TW');
+export const landingContentZhHk: LandingContent = buildLandingContent(landingTextZhHk, 'zh-HK');
+export const landingContentUk: LandingContent = buildLandingContent(landingTextUk, 'uk');
+export const landingContentKo: LandingContent = buildLandingContent(landingTextKo, 'ko');
+export const landingContentJa: LandingContent = buildLandingContent(landingTextJa, 'ja');
+export const landingContentVi: LandingContent = buildLandingContent(landingTextVi, 'vi');
 
 const LANDING_CONTENT: LocaleRecord<LandingContent> = {
   en: landingContentEn,

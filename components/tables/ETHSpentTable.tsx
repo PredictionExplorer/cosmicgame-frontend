@@ -1,17 +1,12 @@
-import { useEffect, useState, type FC } from 'react';
+'use client';
+
+import { useMemo } from 'react';
 import { useTranslations } from 'next-intl';
 
-import {
-  TablePrimaryContainer,
-  TablePrimaryBody,
-  TablePrimaryCell,
-  TablePrimaryHead,
-  TablePrimaryRow,
-  TablePrimary,
-  TablePrimaryHeadCell,
-} from '@/components/styled';
-import { CustomPagination } from '@/components/common/CustomPagination';
-import { AddressLink } from '@/components/common/AddressLink';
+import { sameAddress } from '@/utils/format';
+import { Amount } from '@/components/ui/amount';
+import { DataTable, type DataTableColumn } from '@/components/ui/data-table';
+import type { LedgerStateProps } from '@/components/tables/ledger-props';
 import { useActiveWeb3React } from '@/hooks/web3';
 
 interface GestureEvent {
@@ -24,112 +19,68 @@ interface SpenderInfo {
   amount: number;
 }
 
-interface ETHSpentRowProps {
-  row: SpenderInfo;
-}
-
-const ETHSpentRow: FC<ETHSpentRowProps> = ({ row }) => {
-  const t = useTranslations('tables');
-  const { account } = useActiveWeb3React();
-
-  if (!row) {
-    return <TablePrimaryRow />;
-  }
-
-  const isCurrentUser = account === row.bidderAddr;
-
-  return (
-    <TablePrimaryRow className={isCurrentUser ? 'bg-white/[0.06]' : undefined}>
-      <TablePrimaryCell label={t('columns.userAddress')} align="left">
-        <AddressLink address={row.bidderAddr} url={`/user/${row.bidderAddr}`} />
-        &nbsp;
-        {isCurrentUser && t('status.you')}
-      </TablePrimaryCell>
-      <TablePrimaryCell label={t('columns.spentAmountEth')} align="center">
-        {(row.amount || 0).toFixed(4)} ETH
-      </TablePrimaryCell>
-    </TablePrimaryRow>
-  );
-};
-
-interface ETHSpentTableProps {
+interface ETHSpentTableProps extends LedgerStateProps {
   list: GestureEvent[];
 }
 
-const ETHSpentTable: FC<ETHSpentTableProps> = ({ list }) => {
+/**
+ * ETH each participant has spent on gestures this cycle, largest first. A
+ * CST gesture carries a negative ETH sentinel and counts as no ETH, so a
+ * participant who only gestured with CST is not listed.
+ */
+function totalsBySpender(list: readonly GestureEvent[]): SpenderInfo[] {
+  const totals = new Map<string, SpenderInfo>();
+  for (const gesture of list) {
+    const key = gesture.BidderAddr.toLowerCase();
+    const entry = totals.get(key) ?? { bidderAddr: gesture.BidderAddr, amount: 0 };
+    entry.amount += Math.max(0, gesture.EthPriceEth || 0);
+    totals.set(key, entry);
+  }
+  return [...totals.values()]
+    .filter((entry) => entry.amount > 0)
+    .sort((a, b) => b.amount - a.amount);
+}
+
+/**
+ * ETH spent per participant. The connected wallet's row stays in its place
+ * in the order, marked "You", with its position above the table.
+ */
+const ETHSpentTable = ({ list, ...state }: ETHSpentTableProps) => {
   const t = useTranslations('tables');
-  const perPage = 5;
-  const [page, setPage] = useState(1);
-  const [spenderList, setSpenderList] = useState<SpenderInfo[] | null>(null);
   const { account } = useActiveWeb3React();
+  const spenders = useMemo(() => totalsBySpender(list), [list]);
 
-  useEffect(() => {
-    const groupAndCountByParticipantAddr = (): SpenderInfo[] => {
-      const result: Record<string, number> = {};
-
-      list.forEach((event) => {
-        const ethPrice = event.EthPriceEth || 0;
-        result[event.BidderAddr] = (result[event.BidderAddr] ?? 0) + ethPrice;
-      });
-
-      const sortedResults: SpenderInfo[] = Object.entries(result)
-        .map(([bidderAddr, amount]) => ({ bidderAddr, amount }))
-        .sort((a, b) => b.amount - a.amount);
-
-      if (account) {
-        const userIndex = sortedResults.findIndex((item) => item.bidderAddr === account);
-        if (userIndex !== -1) {
-          const [userItem] = sortedResults.splice(userIndex, 1);
-          if (userItem) sortedResults.unshift(userItem);
-        }
-      }
-
-      return sortedResults;
-    };
-
-    const spender = groupAndCountByParticipantAddr();
-    // eslint-disable-next-line react-hooks/set-state-in-effect
-    setSpenderList(spender);
-  }, [list, account]);
-
-  if (list.length === 0) {
-    return <p>{t('empty.spenders')}</p>;
-  }
-
-  if (spenderList === null) {
-    return <p className="text-lg font-semibold">{t('status.loading')}</p>;
-  }
-
-  const startIndex = (page - 1) * perPage;
-  const endIndex = page * perPage;
-  const visibleRows = spenderList.slice(startIndex, endIndex);
+  const columns = useMemo<DataTableColumn<SpenderInfo>[]>(
+    () => [
+      {
+        id: 'participant',
+        kind: 'address',
+        header: t('columns.userAddress'),
+        label: t('columns.participant'),
+        value: (row) => row.bidderAddr,
+      },
+      {
+        id: 'spent',
+        kind: 'amount',
+        header: t('columns.spentAmountEth'),
+        value: (row) => row.amount,
+        showUnit: false,
+      },
+    ],
+    [t],
+  );
 
   return (
-    <>
-      <TablePrimaryContainer>
-        <TablePrimary>
-          <TablePrimaryHead>
-            <tr>
-              <TablePrimaryHeadCell align="left">{t('columns.userAddress')}</TablePrimaryHeadCell>
-              <TablePrimaryHeadCell align="center">
-                {t('columns.spentAmountEth')}
-              </TablePrimaryHeadCell>
-            </tr>
-          </TablePrimaryHead>
-          <TablePrimaryBody>
-            {visibleRows.map((row) => (
-              <ETHSpentRow key={row.bidderAddr} row={row} />
-            ))}
-          </TablePrimaryBody>
-        </TablePrimary>
-      </TablePrimaryContainer>
-      <CustomPagination
-        page={page}
-        setPage={setPage}
-        totalLength={spenderList.length}
-        perPage={perPage}
-      />
-    </>
+    <DataTable
+      data={spenders}
+      columns={columns}
+      ariaLabel={t('names.ethSpent')}
+      getRowKey={(row) => row.bidderAddr}
+      isCurrentRow={(row) => sameAddress(row.bidderAddr, account)}
+      currentRowSummary={(row) => <Amount value={row.amount} unit="ETH" context="table" />}
+      emptyTitle={t('empty.spenders')}
+      {...state}
+    />
   );
 };
 

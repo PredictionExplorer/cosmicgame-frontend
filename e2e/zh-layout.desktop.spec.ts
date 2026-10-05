@@ -31,7 +31,7 @@ test.describe('Sprint 1 Chinese layout QA', () => {
       if (viewport.width < 1024) {
         await page.getByRole('button', { name: '打开菜单' }).click();
         const drawer = page.getByRole('dialog');
-        await expect(drawer.getByText('协议', { exact: true })).toBeVisible();
+        await expect(drawer.getByText('参与', { exact: true })).toBeVisible();
         await expect(drawer.getByText('生态', { exact: true })).toBeVisible();
         await expect(drawer.getByText('画廊', { exact: true })).toBeVisible();
         await page.keyboard.press('Escape');
@@ -39,25 +39,30 @@ test.describe('Sprint 1 Chinese layout QA', () => {
         const primary = page.getByRole('navigation', { name: '主导航' });
         await expect(primary.getByText('画廊', { exact: true })).toBeVisible();
         await expect(primary.getByText('探索', { exact: true })).toBeVisible();
-        await expect(primary.getByText('帮助', { exact: true })).toBeVisible();
+        await expect(primary.getByText('学习', { exact: true })).toBeVisible();
       }
 
-      const footerProtocol = page.locator('footer').getByText('协议', { exact: true });
-      await expect(footerProtocol).toHaveCSS('letter-spacing', /^(normal|0px)$/);
-      await expect(footerProtocol).toHaveCSS('font-family', /Noto Sans SC/);
+      const footerSection = page
+        .locator('footer')
+        .getByRole('heading', { name: '参与', exact: true });
+      await expect(footerSection).toHaveCSS('letter-spacing', /^(normal|0px)$/);
+      await expect(footerSection).toHaveCSS('font-family', /Noto Sans SC/);
       await expectNoHorizontalOverflow(page);
 
       await page.goto('/zh/gallery');
-      await expect(page.getByRole('textbox', { name: '搜索 NFT' })).toBeVisible();
-      await expect(page.getByRole('button', { name: '搜索', exact: true })).toBeVisible();
+      // The gallery filters as the visitor types: a search field and the filter control.
+      await expect(page.getByRole('searchbox', { name: '搜索 NFT' })).toBeVisible();
+      await expect(page.getByRole('button', { name: '筛选' }).first()).toBeVisible();
       await expectNoHorizontalOverflow(page);
 
       await page.goto('/zh/site-map');
       await expect(page.getByRole('heading', { level: 1, name: '网站地图' })).toBeVisible();
-      await expect(page.getByText('个人工具', { exact: true })).toBeVisible();
-      await expect(page.getByText('公开协议页面', { exact: true })).toBeVisible();
-      await expect(page.getByText('协议数据页面', { exact: true })).toBeVisible();
-      await expect(page.getByText('生态', { exact: true }).last()).toBeVisible();
+      const siteMap = page.getByRole('main');
+      for (const section of ['参与', '记录', '信任', '账户', '生态']) {
+        await expect(
+          siteMap.getByRole('heading', { level: 2, name: section, exact: true }),
+        ).toBeVisible();
+      }
       await expectNoHorizontalOverflow(page);
 
       await testInfo.attach(`zh-site-map-${viewport.name}`, {
@@ -67,15 +72,15 @@ test.describe('Sprint 1 Chinese layout QA', () => {
 
       await page.goto('/zh/allocation');
       const allocationChrome = page
-        .getByRole('list', { name: '按周期排列的获配者列表' })
+        .getByRole('table', { name: '已收官周期' })
         .or(page.getByText('暂无获配者', { exact: true }))
         .or(page.getByRole('status', { name: '正在加载周期分配' }));
       await expect(allocationChrome.first()).toBeVisible();
       await expectNoHorizontalOverflow(page);
 
       await page.goto('/zh/this-page-does-not-exist');
-      await expect(page.getByRole('heading', { level: 1, name: '404：找不到页面' })).toBeVisible();
-      await expect(page.getByRole('link', { name: '返回首页' })).toBeVisible();
+      await expect(page.getByRole('heading', { level: 1, name: '找不到页面' })).toBeVisible();
+      await expect(page.getByRole('link', { name: '前往观测台' })).toBeVisible();
       await expectNoHorizontalOverflow(page);
     });
   }
@@ -111,9 +116,17 @@ test.describe('Sprint 3 Chinese layout QA', () => {
       });
 
       await page.goto('/zh/gallery');
-      // Visible gallery heading is an h2 (the h1 is the English SeoSummary until Sprint 7).
-      await expect(page.getByRole('heading', { name: 'NFT 画廊' })).toBeVisible();
-      await expect(page.getByText('铭刻总数', { exact: true }).first()).toBeVisible();
+      // One header: the server-rendered H1 with the collection's figures.
+      await expect(
+        page.getByRole('heading', { level: 1, name: 'Cosmic Signature 画廊' }),
+      ).toBeVisible();
+      // The facts line: "已铭刻 NFT", or the short "已铭刻" on a phone.
+      await expect(
+        page
+          .getByText(/^已铭刻( NFT)?$/)
+          .filter({ visible: true })
+          .first(),
+      ).toBeVisible();
       await expectNoHorizontalOverflow(page);
       await testInfo.attach(`zh-gallery-${viewport.name}`, {
         body: await page.screenshot({ fullPage: true }),
@@ -161,7 +174,7 @@ test.describe('Sprint 4 Chinese layout QA', () => {
 
       await page.goto('/zh/my-allocations');
       await expect(page.getByText('我的分配', { exact: true }).first()).toBeVisible();
-      await expect(page.getByText('连接钱包后即可查看并取回分配。', { exact: true })).toBeVisible();
+      await expect(page.getByText('连接钱包，查看你的分配', { exact: true })).toBeVisible();
       await expectNoHorizontalOverflow(page);
       await testInfo.attach(`zh-my-allocations-${viewport.name}`, {
         body: await page.screenshot({ fullPage: true }),
@@ -170,7 +183,7 @@ test.describe('Sprint 4 Chinese layout QA', () => {
 
       await page.goto('/zh/my-anchors');
       await expect(page.getByText('我的锚定', { exact: true }).first()).toBeVisible();
-      await expect(page.getByText('连接钱包后即可管理锚定。', { exact: true })).toBeVisible();
+      await expect(page.getByText('连接钱包，管理你的锚定', { exact: true })).toBeVisible();
       await expectNoHorizontalOverflow(page);
       await testInfo.attach(`zh-my-anchors-${viewport.name}`, {
         body: await page.screenshot({ fullPage: true }),
@@ -179,9 +192,7 @@ test.describe('Sprint 4 Chinese layout QA', () => {
 
       await page.goto('/zh/transfer-cst');
       await expect(page.getByRole('heading', { level: 1, name: '转账 CST' })).toBeVisible();
-      await expect(
-        page.getByText('连接钱包后即可从余额中转账 CST。', { exact: true }),
-      ).toBeVisible();
+      await expect(page.getByText('连接钱包，发送 CST', { exact: true })).toBeVisible();
       await expectNoHorizontalOverflow(page);
       await testInfo.attach(`zh-transfer-cst-${viewport.name}`, {
         body: await page.screenshot({ fullPage: true }),

@@ -2,10 +2,18 @@ import type { Metadata } from 'next';
 import { ArrowRight } from 'lucide-react';
 import { getTranslations, setRequestLocale } from 'next-intl/server';
 
+import { getLearnContent } from '@/content/learn';
 import { QUIZ_PATH, getQuizContent } from '@/content/quiz';
+import { WHITE_PAPER_PATH } from '@/content/white-paper';
 
+import { PageHeader } from '@/components/layout/PageHeader';
+import { DifficultyMeter } from '@/components/quiz/DifficultyMeter';
+import { QuizTierStatus } from '@/components/quiz/QuizTierStatus';
+import { RANK_BANDS, estimatedMinutes, fillTemplate } from '@/components/quiz/quizProgress';
+import { ReadingMain } from '@/components/reading/ReadingMain';
 import { Link } from '@/i18n/navigation';
 import { LANDING_ORIGIN, localeHref } from '@/lib/hostRouting';
+import { formatCount } from '@/utils/format/numbers';
 import { JsonLd, breadcrumbJsonLd, jsonLdInLanguage, webPageJsonLd } from '@/utils/jsonLd';
 import { createMetadata } from '@/utils/seo';
 
@@ -18,6 +26,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   setRequestLocale(locale);
   const t = await getTranslations({ locale, namespace: 'meta' });
 
+  // The quiz has its own share card (./opengraph-image.tsx), which its tiers inherit.
   return createMetadata(t('quiz.title'), t('quiz.description'), undefined, QUIZ_PATH, {
     canonicalHost: 'landing',
     locale,
@@ -27,21 +36,26 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 export default async function QuizHubPage({ params }: PageProps) {
   const { locale } = await params;
   setRequestLocale(locale);
-  const { hub, tiers } = getQuizContent(locale);
+  const { hub, ui, tiers } = getQuizContent(locale);
+  const learn = getLearnContent(locale);
+  // The reading path's first stage, which the "Start here" copy describes.
+  const startGuides = learn.articles
+    .map((article, index) => ({ article, number: index + 1 }))
+    .filter(({ article }) => article.group === 'start');
   const t = await getTranslations({ locale, namespace: 'meta' });
   const inLanguage = jsonLdInLanguage(locale);
+  const rankNames = Object.fromEntries(
+    RANK_BANDS.map(({ rank }) => [rank, ui.summary.ranks[rank].name]),
+  ) as Record<(typeof RANK_BANDS)[number]['rank'], string>;
 
   return (
-    <main
-      id="main"
-      tabIndex={-1}
-      className="relative mx-auto max-w-6xl px-4 pb-16 pt-12 sm:px-6 lg:pb-20 lg:pt-20"
-    >
+    <ReadingMain>
       <JsonLd
         data={[
           breadcrumbJsonLd(
             [
               { name: hub.breadcrumbs.homeLabel, path: '/' },
+              { name: learn.hub.breadcrumbs.learnLabel, path: '/learn' },
               { name: hub.breadcrumbs.quizLabel, path: QUIZ_PATH },
             ],
             localeHref(LANDING_ORIGIN, '/', locale),
@@ -55,34 +69,106 @@ export default async function QuizHubPage({ params }: PageProps) {
         ]}
       />
 
-      <p className="type-eyebrow text-primary/80">{hub.eyebrow}</p>
-      <h1 className="mt-4 type-display-lg text-balance text-foreground">{hub.h1}</h1>
-      <p className="mt-6 max-w-3xl type-body-lg text-muted-foreground">{hub.intro}</p>
+      <PageHeader
+        variant="reading"
+        host="landing"
+        breadcrumbs={[{ label: learn.hub.breadcrumbs.learnLabel, href: '/learn' }]}
+        title={hub.h1}
+        subtitle={hub.intro}
+      />
 
-      <div className="mt-12 grid gap-5 md:grid-cols-3">
-        {tiers.map((tier) => (
-          <Link
-            key={tier.id}
-            href={`${QUIZ_PATH}/${tier.id}`}
-            className="group flex flex-col rounded-2xl border border-border bg-card p-6 transition-colors hover:border-primary/25 hover:bg-primary/[0.04] sm:p-8"
-          >
-            <h2 className="font-display text-xl font-medium tracking-tight text-foreground">
-              {tier.title}
-            </h2>
-            <p className="mt-1 font-mono text-xs uppercase tracking-[0.18em] text-white/45">
-              {hub.questionCountTemplate.replace('{count}', String(tier.questions.length))}
-            </p>
-            <p className="mt-3 flex-1 text-sm leading-7 text-muted-foreground">{tier.tagline}</p>
-            <span className="mt-5 inline-flex items-center gap-1.5 text-sm font-semibold text-primary">
-              {hub.startLabel}
-              <ArrowRight
-                aria-hidden
-                className="h-4 w-4 transition-transform group-hover:translate-x-0.5"
-              />
-            </span>
-          </Link>
-        ))}
-      </div>
-    </main>
+      <ol className="grid gap-4 md:grid-cols-3 md:gap-5">
+        {tiers.map((tier, index) => {
+          const count = tier.questions.length;
+          return (
+            <li key={tier.id} className="min-w-0">
+              <Link
+                href={`${QUIZ_PATH}/${tier.id}`}
+                className="group flex h-full flex-col rounded-surface border border-rule bg-surface p-6 transition-colors duration-fast hover:border-input hover:bg-surface-raised sm:p-7"
+              >
+                <span className="flex items-center justify-between gap-4">
+                  <span aria-hidden className="type-label tabular-nums text-subtle">
+                    {String(index + 1).padStart(2, '0')}
+                  </span>
+                  <DifficultyMeter
+                    level={index + 1}
+                    max={tiers.length}
+                    label={fillTemplate(hub.difficultyTemplate, {
+                      level: index + 1,
+                      max: tiers.length,
+                    })}
+                  />
+                </span>
+                <h2 className="mt-6 type-heading-2 text-foreground">{tier.title}</h2>
+                <span className="mt-2 flex flex-wrap gap-x-3 gap-y-1 type-label tabular-nums text-subtle">
+                  <span>
+                    {fillTemplate(hub.questionCountTemplate, {
+                      count: formatCount(count, locale),
+                    })}
+                  </span>
+                  <span aria-hidden>·</span>
+                  <span>
+                    {fillTemplate(hub.durationTemplate, { minutes: estimatedMinutes(count) })}
+                  </span>
+                </span>
+                <span className="mt-4 flex-1 type-body-sm text-muted-foreground">
+                  {tier.tagline}
+                </span>
+                <QuizTierStatus
+                  tierId={tier.id}
+                  total={count}
+                  locale={locale}
+                  bestTemplate={hub.bestTemplate}
+                  inProgressTemplate={hub.inProgressTemplate}
+                  startLabel={hub.startLabel}
+                  resumeLabel={hub.resumeLabel}
+                  rankNames={rankNames}
+                />
+              </Link>
+            </li>
+          );
+        })}
+      </ol>
+
+      {/* Not ready for the questions yet: the way back into the reading path. */}
+      <section
+        aria-labelledby="quiz-start-here"
+        className="mt-16 border-t border-rule pt-10 lg:mt-20"
+      >
+        <h2 id="quiz-start-here" className="type-heading-2 text-foreground">
+          {learn.hub.groups.start.title}
+        </h2>
+        <p className="mt-3 max-w-[var(--measure-lede)] type-body-md text-muted-foreground">
+          {learn.hub.groups.start.description}
+        </p>
+        {/* Every guide the description promises, in reading order, then the full reference. */}
+        <ol className="mt-6 grid max-w-[46rem] border-t border-rule-faint sm:grid-cols-2 sm:gap-x-8">
+          {startGuides.map(({ article, number }) => (
+            <li key={article.slug} className="border-b border-rule-faint">
+              <Link
+                href={`/learn/${article.slug}`}
+                className="group flex min-h-12 items-center gap-3 py-2.5 type-body-md text-foreground hover:text-primary"
+              >
+                <span aria-hidden className="w-6 shrink-0 type-label tabular-nums text-subtle">
+                  {String(number).padStart(2, '0')}
+                </span>
+                <span className="min-w-0 flex-1">{article.cardTitle}</span>
+                <ArrowRight
+                  aria-hidden
+                  className="size-4 shrink-0 text-subtle transition-colors group-hover:text-primary"
+                />
+              </Link>
+            </li>
+          ))}
+        </ol>
+        <Link
+          href={WHITE_PAPER_PATH}
+          className="link-quiet mt-5 inline-flex min-h-11 items-center gap-1.5 type-body-md text-foreground"
+        >
+          {learn.hub.whitePaper.readLabel}
+          <ArrowRight aria-hidden className="size-4 text-subtle" />
+        </Link>
+      </section>
+    </ReadingMain>
   );
 }

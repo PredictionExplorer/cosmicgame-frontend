@@ -1,49 +1,52 @@
 'use client';
 
-import { memo, useState, useEffect, type ReactNode } from 'react';
+import { useState, useEffect, type ReactNode } from 'react';
 import dynamic from 'next/dynamic';
-import type { ISourceOptions } from '@tsparticles/engine';
 import { offchainLookupSignature } from 'viem/utils';
 import { WagmiProvider } from 'wagmi';
-import { QueryCache, QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { QueryClientProvider } from '@tanstack/react-query';
 import { useTranslations } from 'next-intl';
-import { CookiesProvider } from 'react-cookie';
-import { Toaster } from 'sonner';
 
-import { usePathname } from '@/i18n/navigation';
 import { wagmiConfig } from '@/config/wagmi';
 import { networkConfig, getEnvValidation } from '@/config/networks';
-import { NOTIFICATION_AUTO_HIDE_MS } from '@/config/constants';
 import ErrorBoundary from '@/components/layout/ErrorBoundary';
 import Header from '@/components/layout/Header';
-import Footer from '@/components/layout/Footer';
+import { LiveGameDataRefreshGate } from '@/components/layout/LiveGameDataRefresh';
+import { AppToaster } from '@/components/ui/app-toaster';
 import { SkipLink } from '@/components/ui/skip-link';
 import { TooltipProvider } from '@/components/ui/tooltip';
-import { AnchoredTokenProvider } from '@/contexts/AnchoredTokenContext';
+import { AccountDataProvider } from '@/contexts/AccountDataProvider';
 import { SystemModeProvider } from '@/contexts/SystemModeContext';
-import { ApiDataProvider } from '@/contexts/ApiDataContext';
 import { ContractAddressesProvider } from '@/contexts/ContractAddressesContext';
 import { NotificationProvider } from '@/contexts/NotificationContext';
 import { WalletUiProvider } from '@/contexts/WalletUiContext';
-import { useLiveGameDataRefresh } from '@/hooks/useLiveGameDataRefresh';
-import { reportError } from '@/utils/errors';
 import { installGlobalErrorHandlers } from '@/utils/globalErrorHandlers';
 import { getClientBuildInfo } from '@/lib/buildInfo';
-import { getApiBase, getApiOrigin, getRpcUrl } from '@/lib/serverRotation';
+import { makeQueryClient } from '@/lib/queryClient';
+import { getApiBase, getRpcUrl } from '@/lib/serverRotation';
+import { MEDIA_ORIGIN } from '@/utils/urls';
 
-// NOTE: RainbowKit (provider, modal, stylesheet) is intentionally NOT
-// imported here. It lives behind WalletUiProvider's dynamic import so the
-// wallet-modal chunk downloads only on connect intent — most sessions never
-// connect, and this was the largest chunk in the app-home bundle.
+// NOTE: what every app page downloads is kept to the wallet connection
+// (wagmi with the injected connector) and the query client. Everything else
+// loads when a page needs it:
+//   - RainbowKit (provider, modal, stylesheet): on connect intent, behind
+//     WalletUiProvider's dynamic import;
+//   - the connected wallet's reads (API client, schemas, contract hooks):
+//     while a wallet is connected (AccountDataProvider, the header's account);
+//   - the contract addresses: when a component asks for one
+//     (ContractAddressesProvider);
+//   - the chain-event refresh (RPC client, ABI): once the page observes live
+//     data (LiveGameDataRefreshGate);
+//   - the command palette: on idle, or when opened;
+//   - framer-motion: only with a page that animates. The route templates
+//     fade with the Web Animations API (components/layout/RouteEntrance), and
+//     each animated component honours reduced motion itself (lib/motion's
+//     useMotionVariants), so the shell sets no MotionConfig.
+// The legal pages, the FAQ and the site map download none of these.
 
 // Viem's `call()` dynamically imports CCIP helpers on revert paths; that async chunk
 // can fail after deploys or HMR and surfaces as a misleading contract read error.
 void offchainLookupSignature;
-
-const Particles = dynamic(
-  () => import('@tsparticles/react').then((mod) => ({ default: mod.default })),
-  { ssr: false },
-);
 
 // Local test-harness dev panel (scripts/harness). The literal env checks are
 // inlined at build time, so production builds (any non-local network, or no
@@ -53,106 +56,6 @@ const harnessUiEnabled =
 const HarnessPanel = harnessUiEnabled
   ? dynamic(() => import('@/components/dev/HarnessPanel'), { ssr: false })
   : null;
-
-const ParticleBackdrop = memo(function ParticleBackdrop() {
-  return (
-    <div
-      aria-hidden="true"
-      className="pointer-events-none fixed inset-0 -z-10 touch-none [contain:strict] motion-reduce:hidden print:hidden"
-    >
-      <Particles id="tsparticles" options={particleOptions} className="h-full w-full" />
-    </div>
-  );
-});
-
-function makeQueryClient() {
-  return new QueryClient({
-    // Surface failed reads in Sentry. `apiCall` already reports transport
-    // errors; this additionally catches queryFn-level failures (schema
-    // asserts, envelope errors) with the owning query key for context.
-    queryCache: new QueryCache({
-      onError: (error, query) => {
-        reportError(error, `query:${String(query.queryKey[0] ?? 'unknown')}`);
-      },
-    }),
-    defaultOptions: {
-      queries: {
-        staleTime: 30_000,
-        gcTime: 300_000,
-        refetchOnWindowFocus: false,
-        // Two retries (~3 attempts) balances resilience against slow error
-        // surfacing now that per-section error states are user-visible.
-        retry: 2,
-      },
-    },
-  });
-}
-
-function LiveGameDataRefresh() {
-  useLiveGameDataRefresh();
-  return null;
-}
-
-function scheduleIdleTask(task: () => void): () => void {
-  if (typeof window === 'undefined') return () => {};
-  if (typeof window.requestIdleCallback === 'function') {
-    const idleId = window.requestIdleCallback(task, { timeout: 2_500 });
-    return () => window.cancelIdleCallback(idleId);
-  }
-  const timeoutId = window.setTimeout(task, 1);
-  return () => window.clearTimeout(timeoutId);
-}
-
-const particleOptions: ISourceOptions = {
-  fullScreen: { enable: false },
-  background: { color: { value: 'transparent' } },
-  fpsLimit: 60,
-  interactivity: {
-    detectsOn: 'window',
-    events: {
-      onHover: { enable: false },
-      onClick: { enable: false },
-      resize: { enable: true },
-    },
-    modes: {
-      grab: { distance: 120, links: { opacity: 0.22 } },
-    },
-  },
-  particles: {
-    color: {
-      value: '#ffffff',
-      animation: {
-        enable: true,
-        speed: 20,
-        sync: true,
-        h: { enable: true, offset: 0, speed: 0.5, sync: false },
-        s: { enable: false, offset: 0, speed: 1, sync: true },
-        l: { enable: false, offset: 0, speed: 1, sync: true },
-      },
-    },
-    links: { color: '#ffffff', distance: 150, enable: true, opacity: 0.1, width: 1 },
-    collisions: { enable: false },
-    move: {
-      direction: 'none',
-      enable: true,
-      outModes: { default: 'out' },
-      random: true,
-      speed: 0.35,
-      straight: false,
-    },
-    number: { density: { enable: true, width: 1000, height: 1000 }, value: 20 },
-    opacity: {
-      value: { min: 0.1, max: 0.4 },
-      animation: { enable: true, speed: 0.5, startValue: 'min', sync: false },
-    },
-    shape: { type: 'circle' },
-    size: {
-      value: { min: 1, max: 3 },
-      animation: { enable: true, speed: 2, startValue: 'min', sync: false },
-    },
-  },
-  detectRetina: true,
-};
 
 const envValidation = getEnvValidation();
 
@@ -196,20 +99,16 @@ function EnvErrorScreen({ missing }: { missing: string[] }) {
 
 export function Providers({
   children,
-  showAppChrome = true,
+  footer,
 }: {
   children: ReactNode;
-  /** When false (marketing hosts), header/footer are hidden. */
-  showAppChrome?: boolean;
+  /**
+   * The footer, rendered by the (server) root layout: `<Footer>`. A slot
+   * keeps the footer's directory out of this client bundle.
+   */
+  footer: ReactNode;
 }) {
   const [queryClient] = useState(() => makeQueryClient());
-  const [engineReady, setEngineReady] = useState(false);
-
-  // Routes under /embed render a single artifact (e.g. a chart) with no app chrome
-  // or background, so they can be opened standalone in their own browser window.
-  const pathname = usePathname();
-  const bareEmbed = pathname === '/embed' || pathname.startsWith('/embed/');
-  const chrome = showAppChrome && !bareEmbed;
 
   useEffect(() => {
     installGlobalErrorHandlers();
@@ -251,7 +150,7 @@ export function Providers({
         `  Chain ID: ${networkConfig.chainId}\n` +
         `  RPC URL: ${rpcDisplay}\n` +
         `  API URL: ${networkConfig.apiUrl}\n` +
-        `  NFT media: ${getApiOrigin() || networkConfig.nftApiUrl} (follows API rotation)` +
+        `  NFT media: ${MEDIA_ORIGIN} (fixed; an image that fails retries the next server)` +
         buildLines,
     );
   }, []);
@@ -263,45 +162,6 @@ export function Providers({
     getApiBase();
   }, []);
 
-  useEffect(() => {
-    // The ambient particle backdrop is desktop polish. Phones pay for it
-    // twice — the engine chunks over the network and a persistent rAF loop
-    // on the main thread (worse INP on mid-range devices) — while the
-    // backdrop is barely visible behind content on small screens. Skip it
-    // for coarse pointers, small viewports, and reduced-motion preferences
-    // (the CSS `motion-reduce:hidden` only hides the canvas; this keeps the
-    // engine from ever booting).
-    if (bareEmbed) return undefined;
-    if (typeof window !== 'undefined' && typeof window.matchMedia === 'function') {
-      const skipParticles =
-        window.matchMedia('(pointer: coarse)').matches ||
-        window.matchMedia('(max-width: 767px)').matches ||
-        window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-      if (skipParticles) return undefined;
-    }
-
-    let cancelled = false;
-    const cancelIdleTask = scheduleIdleTask(() => {
-      void (async () => {
-        try {
-          const { initParticlesEngine } = await import('@tsparticles/react');
-          const { loadSlim } = await import('@tsparticles/slim');
-          await initParticlesEngine(async (engine) => {
-            await loadSlim(engine);
-          });
-          if (cancelled) return;
-          setEngineReady(true);
-        } catch (err) {
-          reportError(err, 'particlesInit');
-        }
-      })();
-    });
-    return () => {
-      cancelled = true;
-      cancelIdleTask();
-    };
-  }, [bareEmbed]);
-
   if (!envValidation.valid) {
     return <EnvErrorScreen missing={envValidation.missing} />;
   }
@@ -310,56 +170,28 @@ export function Providers({
     <WagmiProvider config={wagmiConfig}>
       <QueryClientProvider client={queryClient}>
         <ContractAddressesProvider>
-          <LiveGameDataRefresh />
+          <LiveGameDataRefreshGate />
           <WalletUiProvider>
-            {engineReady && !bareEmbed && <ParticleBackdrop />}
             <ErrorBoundary>
-              <CookiesProvider>
-                <AnchoredTokenProvider>
-                  <SystemModeProvider>
-                    <ApiDataProvider>
-                      <NotificationProvider>
-                        <TooltipProvider delayDuration={200} skipDelayDuration={300}>
-                          <div
-                            className={chrome ? 'site-shell flex min-h-screen flex-col' : undefined}
-                          >
-                            {!bareEmbed && <SkipLink />}
-                            {chrome && <Header />}
-                            <div className={chrome ? 'min-w-0 flex-1' : undefined}>
-                              <ErrorBoundary>{children}</ErrorBoundary>
-                            </div>
-                            {chrome && <Footer />}
-                          </div>
-                        </TooltipProvider>
-                      </NotificationProvider>
-                    </ApiDataProvider>
-                  </SystemModeProvider>
-                </AnchoredTokenProvider>
-              </CookiesProvider>
+              <AccountDataProvider>
+                <SystemModeProvider>
+                  <NotificationProvider>
+                    <TooltipProvider delayDuration={200} skipDelayDuration={300}>
+                      <div className="site-shell flex min-h-screen flex-col">
+                        <SkipLink />
+                        <Header />
+                        <div className="min-w-0 flex-1">
+                          <ErrorBoundary>{children}</ErrorBoundary>
+                        </div>
+                        {footer}
+                      </div>
+                    </TooltipProvider>
+                  </NotificationProvider>
+                </SystemModeProvider>
+              </AccountDataProvider>
             </ErrorBoundary>
             {HarnessPanel ? <HarnessPanel /> : null}
-            <Toaster
-              position="top-right"
-              theme="dark"
-              richColors
-              closeButton
-              toastOptions={{
-                duration: NOTIFICATION_AUTO_HIDE_MS,
-                className:
-                  'border border-white/[0.08] bg-card/95 backdrop-blur-md shadow-[var(--elevation-3)]',
-                classNames: {
-                  toast: 'group',
-                  title: 'type-body-md text-foreground',
-                  description: 'type-body-sm text-muted-foreground',
-                  actionButton: 'bg-primary text-primary-foreground',
-                  cancelButton: 'bg-muted text-muted-foreground',
-                  success: 'border-[rgb(var(--impact-green-rgb)/0.4)]',
-                  error: 'border-[rgb(var(--chrono-rose-rgb)/0.4)]',
-                  warning: 'border-[rgb(var(--solar-gold-rgb)/0.4)]',
-                  info: 'border-[rgb(var(--aurora-cyan-rgb)/0.4)]',
-                },
-              }}
-            />
+            <AppToaster />
           </WalletUiProvider>
         </ContractAddressesProvider>
       </QueryClientProvider>

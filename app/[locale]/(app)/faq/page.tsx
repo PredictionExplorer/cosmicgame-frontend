@@ -32,14 +32,14 @@ export default async function Page({ params }: PageProps) {
   ]);
 
   return (
-    <PageMessages namespaces={['faq']}>
+    <PageMessages namespaces={['faq', 'glossary']}>
       <>
         <JsonLd data={faqPageJsonLd(allItems, inLanguage)} />
         <JsonLd
           data={breadcrumbJsonLd(
             [
               { name: common('breadcrumbs.home'), path: '/' },
-              { name: faq('hero.titleHighlight'), path: '/faq' },
+              { name: faq('hero.breadcrumb'), path: '/faq' },
             ],
             localeHref(APP_ORIGIN, '/', locale),
           )}

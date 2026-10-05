@@ -16,12 +16,22 @@ export const quizTextEn = {
       quizLabel: 'Quiz',
     },
     questionCountTemplate: '{count} questions',
+    durationTemplate: 'About {minutes} min',
+    difficultyTemplate: 'Difficulty {level} of {max}',
+    bestTemplate: 'Best {correct} of {total}',
+    inProgressTemplate: 'In progress: question {current} of {total}',
     startLabel: 'Start',
+    resumeLabel: 'Resume',
   },
   ui: {
     intro: {
       keyboardHint: 'Tip: press 1\u20134 to answer, Enter to continue.',
       beginLabel: 'Begin',
+      resumeLabel: 'Resume',
+      startOverLabel: 'Start over',
+      ranksHeading: 'Ranks',
+      rankFromTemplate: 'From {percent}',
+      rankBelowTemplate: 'Below {percent}',
     },
     progressTemplate: 'Question {current} of {total}',
     correctFeedback: [
@@ -36,44 +46,51 @@ export const quizTextEn = {
       'Take a look at the explanation below.',
       'Not this time. The reference below explains the answer.',
     ],
+    correctAnswerTemplate: 'The correct answer is {letter}.',
+    yourAnswerLabel: 'Your answer',
+    correctAnswerLabel: 'Correct answer',
+    newTabNote: '(opens in a new tab)',
     streakTemplate: '{count} correct in a row',
     explanationHeading: 'Why',
     funFactHeading: 'Did you know?',
-    referenceLabel: 'Go deeper',
+    referenceTemplate: 'Go deeper: {section}',
     nextLabel: 'Next question',
     finishLabel: 'See your results',
     summary: {
       eyebrow: 'Quiz complete',
       scoreTemplate: '{correct} of {total} correct',
       rankLabel: 'Your standing',
+      rankTemplate: 'Your standing: {rank}',
       ranks: {
-        observer: {
-          name: 'Observer',
+        reader: {
+          name: 'Reader',
           line: 'You have made a start. The explanations below will help you build on it.',
         },
-        participant: {
-          name: 'Participant',
+        student: {
+          name: 'Student',
           line: 'You know the moving parts. The edge cases are where the design gets interesting.',
         },
-        enduranceChampion: {
-          name: 'Endurance Champion',
+        scholar: {
+          name: 'Scholar',
           line: 'You understand the mechanics well. Review the remaining questions to fill in the details.',
         },
-        chronoWarrior: {
-          name: 'Chrono-Warrior',
+        cartographer: {
+          name: 'Cartographer',
           line: 'You know the protocol in depth. The references below offer more to explore.',
         },
       },
-      studyHeading: 'What to explore next',
-      studyIntro: 'Review these questions and their references in the white paper:',
+      studyHeading: 'Questions to review',
+      studyIntro: 'Your answer, the correct one, and the rule that settles it.',
       noMissesNote: 'Nothing to review \u2014 every answer was correct.',
       restartLabel: 'Restart with a fresh shuffle',
       hubLabel: 'All tiers',
+      nextTierTemplate: 'Continue to {tier}',
     },
   },
   tiers: {
     basic: {
       title: 'Basic',
+      heading: 'Basic: the fundamentals',
       tagline: 'The shape of the protocol: cycles, gestures, allocations, and the art.',
       description:
         'Twenty-five questions on the fundamentals \u2014 what a gesture is, how a cycle ends, where the ETH goes, and what makes the artwork deterministic. If you are new here, start here.',
@@ -81,6 +98,7 @@ export const quizTextEn = {
     },
     medium: {
       title: 'Medium',
+      heading: 'Medium: the live mechanics',
       tagline: 'The live mechanics: Calibration Windows, persistence tracks, Council rules.',
       description:
         'Twenty-five questions on the machinery in motion \u2014 cost curves, the CST feedback loop, Endurance Champion versus Chrono-Warrior, Selection math, and Council parameters. For readers who have watched a cycle or two.',
@@ -88,6 +106,7 @@ export const quizTextEn = {
     },
     hard: {
       title: 'Hard',
+      heading: 'Hard: edge cases and forensics',
       tagline: 'Edge cases and forensics: hostile wallets, upgrade history, the art pipeline.',
       description:
         'Fifty questions for careful readers \u2014 post-expiry semantics, contracts that reject ETH, why V2 changed five things, what V3 reprices, how the randomness is built, and what a Yoshida integrator is doing in an art project.',

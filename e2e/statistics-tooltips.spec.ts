@@ -1,6 +1,11 @@
 import { test, expect } from '@playwright/test';
 
-import { expectAllLabelTooltips, expectLabelTooltip } from './tooltip-helpers';
+import {
+  expectAllLabelTooltips,
+  expectLabelTooltip,
+  expectTooltipFullyVisible,
+  openTooltip,
+} from './tooltip-helpers';
 
 const HUB_TOOLTIPS = [
   {
@@ -8,63 +13,36 @@ const HUB_TOOLTIPS = [
     expected: /current Performance Cycle number indexed/,
   },
   {
-    label: 'Active Cycle Gestures',
-    expected: /indexed gestures made in the active Performance Cycle/,
-  },
-  {
-    label: 'Protocol Contract Balance',
-    expected: /ETH currently held by the Cosmic Signature protocol contract/,
-  },
-  {
-    label: 'Cosmic Signature NFTs Imprinted',
-    expected: /Cumulative count of Cosmic Signature NFT ERC-721 tokens imprinted/,
-  },
-  {
-    label: 'Total Cycles',
-    expected: /Total Performance Cycles completed or currently indexed/,
-  },
-  {
-    label: 'Allocations Distributed',
+    label: 'Allocations distributed',
     expected: /Indexed allocation records across all cycles/,
   },
   {
-    label: 'NFTs Imprinted',
+    label: 'NFTs imprinted',
     expected: /Cumulative count of Cosmic Signature NFT ERC-721 tokens imprinted/,
   },
   {
-    label: 'Contract Balance',
+    label: 'Contract balance',
     expected: /ETH currently held by the Cosmic Signature protocol contract/,
-  },
-  {
-    label: 'Outreach Reserve',
-    expected: /CST imprinted for outreach and ecosystem contributors/,
-  },
-  {
-    label: 'Allocation Economy',
-    expected: /Cumulative allocation records and ETH flows/,
-  },
-  {
-    label: 'RandomWalk NFTs Used',
-    expected: /attached to ETH gestures for a one-time Gesture Cost reduction/,
   },
 ];
 
 const PARTICIPATION_TOOLTIPS = [
   {
-    label: 'Unique Participants',
+    label: 'Unique participants',
     expected: /Unique wallet addresses that have made at least one indexed gesture/,
   },
   {
-    label: 'Unique Recipients',
+    label: 'Unique recipients',
     expected: /received at least one indexed allocation/,
   },
   {
-    label: 'Unique ETH Contributors',
+    label: 'Unique ETH contributors',
     expected: /contributed ETH to the protocol/,
   },
   {
-    label: 'Unique Anchor-holders',
-    expected: /Combined unique wallets that have anchored Cosmic Signature NFTs or RandomWalk NFTs/,
+    label: 'Active anchor-holders',
+    expected:
+      /Distinct wallets that currently anchor at least one Cosmic Signature or Random Walk NFT/,
   },
 ];
 
@@ -81,26 +59,37 @@ test.describe('/statistics tooltips', () => {
     await expectAllLabelTooltips(page, PARTICIPATION_TOOLTIPS);
   });
 
-  test('opens anchoring tooltips', async ({ page }) => {
+  test('explains each anchoring figure by its own label', async ({ page }) => {
     await page.goto('/statistics/anchoring', { waitUntil: 'networkidle' });
     await page.emulateMedia({ reducedMotion: 'reduce' });
-    await expectAllLabelTooltips(page, [
-      {
-        label: 'Total Tokens Imprinted',
-        expected: /Indexed Cosmic Signature NFT imprint count associated/,
-      },
-    ]);
+    await page.getByRole('tab', { name: 'Random Walk NFT' }).click();
+    const panel = page.getByRole('tabpanel', { name: 'Random Walk NFT' });
+    // One definition mechanism: the label is the explained term (no Definitions disclosure).
+    await expect(panel.locator('details')).toHaveCount(0);
+    const trigger = panel.getByRole('button', {
+      name: 'More information about Cosmic Signature NFTs imprinted',
+    });
+    await trigger.scrollIntoViewIfNeeded();
+    await openTooltip(trigger);
+    await expectTooltipFullyVisible(
+      page,
+      /imprinted for Random Walk NFT anchor-holders through Anchored-NFT/,
+    );
   });
 
-  test('opens activity tooltips', async ({ page }) => {
+  test('explains each section once, in the page’s Definitions disclosure', async ({ page }) => {
     await page.goto('/statistics/activity', { waitUntil: 'networkidle' });
     await page.emulateMedia({ reducedMotion: 'reduce' });
-    await expectAllLabelTooltips(page, [
-      {
-        label: 'Cycle Activations',
-        expected: /System event windows that show when protocol cycles/,
-      },
-    ]);
+    // No info icon on every heading: the sections are explained in one place at the page's end.
+    await expect(
+      page.getByRole('button', { name: 'More information about Cycle activations' }),
+    ).toHaveCount(0);
+    const definitions = page.locator('details').filter({ hasText: 'Definitions' }).last();
+    await definitions.scrollIntoViewIfNeeded();
+    await definitions.locator('summary').click();
+    await expect(
+      definitions.getByText(/System event windows that show when protocol cycles/),
+    ).toBeVisible();
   });
 
   test('opens a representative table header tooltip', async ({ page }, testInfo) => {
@@ -108,43 +97,40 @@ test.describe('/statistics tooltips', () => {
     await page.emulateMedia({ reducedMotion: 'reduce' });
 
     if (testInfo.project.name !== 'Desktop Chrome') {
-      // The card layout hides the header row, so there is no header tooltip to
-      // open on a phone. What has to hold instead is that each value still
-      // carries its column name: the header text stays in `thead` for assistive
-      // tech, and every cell repeats it from `data-label` via CSS `::before`.
+      // A three-column table stays a compact table on a phone, header row
+      // included, so its column names are visible text.
       const participantsTable = page
         .getByRole('table')
-        .filter({ hasText: 'Participant Address' })
+        .filter({ hasText: 'Largest gesture (ETH)' })
         .first();
-      await expect(participantsTable.locator('thead th').first()).toContainText(
-        'Participant Address',
-      );
+      await participantsTable.scrollIntoViewIfNeeded();
+      await expect(participantsTable).toHaveAttribute('data-layout', 'compact');
+      await expect(participantsTable.locator('thead th').first()).toBeVisible();
 
-      const firstParticipantRow = participantsTable.locator('tbody tr').first();
-      await firstParticipantRow.scrollIntoViewIfNeeded();
-      await expect(firstParticipantRow.locator('td').first()).toHaveAttribute(
-        'data-label',
-        'Participant Address',
-      );
-      await expect(firstParticipantRow.locator('td').nth(1)).toHaveAttribute(
-        'data-label',
-        'Number of Gestures',
-      );
-
-      const renderedLabels = await firstParticipantRow
-        .locator('td')
-        .evaluateAll((cells) =>
-          cells.map((cell) => getComputedStyle(cell, '::before').content.replace(/^"|"$/g, '')),
-        );
-      expect(renderedLabels).toEqual(
-        expect.arrayContaining(['Participant Address', 'Number of Gestures']),
-      );
+      // The recipients ledger leaves its mostly blank "Largest Signature
+      // Allocation" off a phone, so it keeps the address, the count and the
+      // ETH received and stays a table like every other ledger on the page.
+      const recipientsTable = page
+        .getByRole('table')
+        .filter({ hasText: 'Allocations (all kinds)' })
+        .first();
+      await recipientsTable.scrollIntoViewIfNeeded();
+      await expect(recipientsTable).toHaveAttribute('data-layout', 'compact');
+      await expect(
+        recipientsTable.getByRole('columnheader', { name: 'ETH received' }),
+      ).toBeVisible();
+      await expect(recipientsTable.locator('thead th[data-priority="secondary"]')).toBeHidden();
       return;
     }
 
+    // Only a derived figure carries an explanation; a plain column does not.
     await expectLabelTooltip(page, {
-      label: 'Participant Address',
-      expected: /Wallet address that made at least one indexed gesture/,
+      label: 'ETH received',
+      expected: /NFT and CST allocations count toward Allocations \(all kinds\)/,
     });
+    const participantsHeader = page.getByRole('columnheader', { name: 'Participant', exact: true });
+    await expect(participantsHeader.locator('button[aria-label^="Explain column:"]')).toHaveCount(
+      0,
+    );
   });
 });

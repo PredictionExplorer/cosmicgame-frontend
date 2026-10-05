@@ -1,90 +1,59 @@
 import { getLocale, getTranslations } from 'next-intl/server';
 
-import { Link } from '@/i18n/navigation';
-import { get_dashboard_info } from '@/services/api/rounds';
-import { toIntlLocale } from '@/utils/format';
+import { PageHeader } from '@/components/layout/PageHeader';
 
-function formatNumber(value: unknown, locale: string, unavailable: string): string {
-  const numeric = Number(value);
-  return Number.isFinite(numeric)
-    ? new Intl.NumberFormat(toIntlLocale(locale)).format(numeric)
-    : unavailable;
-}
+import { DashboardFigure } from '../DashboardFigure';
+import { dashboardSeed, type DashboardMetric } from '../dashboardMetrics';
+import { readDashboard } from '../publicDataReads';
 
-function formatEth(value: unknown, locale: string, unavailable: string): string {
-  const numeric = Number(value);
-  return Number.isFinite(numeric)
-    ? `${new Intl.NumberFormat(toIntlLocale(locale), {
-        maximumFractionDigits: 4,
-      }).format(numeric)} ETH`
-    : unavailable;
-}
+import { CurrentCycleTitle } from './CurrentCycleTitle';
 
+/**
+ * The /current-cycle page header, rendered on the server: the page's name as
+ * the eyebrow, the cycle itself as the H1 ("Cycle 2"), a one-sentence lede
+ * and the cycle's live figures (gestures, and its opening time, which names
+ * its zone itself). The figures read the same polled dashboard query as the
+ * page body and start from this request's server read, so the server HTML
+ * holds them. They are plain labels: the page explains its coined words in
+ * place (dotted terms) and the allocations in one disclosure, so the first
+ * screen has one explanation pattern. The Signature Allocation is the Last
+ * Gesture's figure in the standings, shown once. The header sits in the
+ * page's hero row beside the clock, which draws the space under both; the
+ * related pages close the page (CurrentCycleRelated).
+ */
 export async function CurrentCycleSeoSummary() {
   const locale = await getLocale();
   const t = await getTranslations({ locale, namespace: 'seo' });
-  const unavailable = t('currentCycleSummary.unavailable');
-  // Resolve to null on transport failure so ISR builds never crash on a
-  // temporarily unreachable API; cards then render "Unavailable".
-  const data = await get_dashboard_info().catch(() => null);
+  const dashboard = await readDashboard();
+  const data = dashboard.data;
+  const figure = (metric: DashboardMetric) => (
+    <DashboardFigure metric={metric} seed={dashboardSeed(data, metric)} />
+  );
+  const pageName = t('currentCycleSummary.heading');
 
   return (
-    <section
-      aria-labelledby="current-cycle-seo-heading"
-      className="mb-12 border-b border-border pb-10"
-    >
-      <p className="type-eyebrow text-primary/80">{t('currentCycleSummary.eyebrow')}</p>
-      <h1 id="current-cycle-seo-heading" className="mt-4 type-display-lg text-foreground">
-        {t('currentCycleSummary.heading')}
-      </h1>
-      <p className="mt-4 max-w-3xl type-body-lg text-muted-foreground">
-        {t('currentCycleSummary.description')}
-      </p>
-      <dl className="mt-6 grid gap-3 sm:grid-cols-3">
-        <div className="rounded-xl border border-border bg-card p-4 sm:p-5">
-          <dt className="text-xs uppercase tracking-[0.18em] text-muted-foreground">
-            {t('currentCycleSummary.cards.cycle')}
-          </dt>
-          <dd className="mt-2 font-display text-2xl font-medium">
-            {formatNumber(data?.CurRoundNum, locale, unavailable)}
-          </dd>
-        </div>
-        <div className="rounded-xl border border-border bg-card p-4 sm:p-5">
-          <dt className="text-xs uppercase tracking-[0.18em] text-muted-foreground">
-            {t('currentCycleSummary.cards.gestures')}
-          </dt>
-          <dd className="mt-2 font-display text-2xl font-medium">
-            {formatNumber(data?.CurNumBids, locale, unavailable)}
-          </dd>
-        </div>
-        <div className="rounded-xl border border-border bg-card p-4 sm:p-5">
-          <dt className="text-xs uppercase tracking-[0.18em] text-muted-foreground">
-            {t('currentCycleSummary.cards.reserve')}
-          </dt>
-          <dd className="mt-2 font-display text-2xl font-medium">
-            {formatEth(data?.PrizeAmountEth ?? data?.CurPrizeAmountEth, locale, unavailable)}
-          </dd>
-        </div>
-      </dl>
-      <nav aria-label={t('currentCycleSummary.relatedAria')} className="mt-6">
-        <ul className="flex flex-wrap gap-3 text-sm">
-          <li>
-            <Link href="/how-it-works" className="text-primary underline-offset-4 hover:underline">
-              {t('currentCycleSummary.links.learn')}
-            </Link>
-          </li>
-          <li>
-            <Link href="/statistics" className="text-primary underline-offset-4 hover:underline">
-              {t('currentCycleSummary.links.statistics')}
-            </Link>
-          </li>
-          <li>
-            <Link href="/contracts" className="text-primary underline-offset-4 hover:underline">
-              {t('currentCycleSummary.links.contracts')}
-            </Link>
-          </li>
-        </ul>
-      </nav>
-    </section>
+    <PageHeader
+      section="explore"
+      eyebrow={pageName}
+      title={<CurrentCycleTitle seed={dashboardSeed(data, 'cycle')} fallback={pageName} />}
+      titleId="current-cycle-heading"
+      subtitle={t('currentCycleSummary.description')}
+      figures={[
+        {
+          id: 'gestures',
+          label: t('currentCycleSummary.cards.gestures'),
+          value: figure('gestures'),
+        },
+        {
+          id: 'opened',
+          label: t('currentCycleSummary.cards.opened'),
+          value: figure('opened'),
+          // A date is set a size down from the counts; it names its zone inline.
+          size: 'md',
+        },
+      ]}
+      // The section bar under the hero row (or its stand-in while the body loads) draws its rule.
+      className="mb-0 border-b-0 pb-0 sm:mb-0 sm:pb-0"
+    />
   );
 }

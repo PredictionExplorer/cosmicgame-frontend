@@ -1,8 +1,9 @@
 'use client';
 
-import { Check, ChevronDown, Globe } from 'lucide-react';
+import { ChevronDown, Globe } from 'lucide-react';
 import { useLocale, useTranslations } from 'next-intl';
 
+import { pickByLocale, type LocaleRecord } from '@/i18n/locale';
 import { usePathname, useRouter } from '@/i18n/navigation';
 import { LOCALE_LABELS, routing, type AppLocale } from '@/i18n/routing';
 import { cn } from '@/lib/utils';
@@ -17,18 +18,46 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 
-export type LanguageSwitcherVariant = 'pill' | 'compact' | 'list';
+export type LanguageSwitcherVariant = 'responsive' | 'drawer';
+
+/**
+ * Each language's short name for a narrow trigger, in its own script: a code
+ * for the Latin-script languages, the usual short form for the others.
+ * Ukrainian is "УКР", in Cyrillic: beside a globe, "UK" reads as the United
+ * Kingdom. The two Traditional Chinese editions name their region, so
+ * neither reads as the other's.
+ */
+export const LOCALE_SHORT_LABELS: LocaleRecord<string> = {
+  en: 'EN',
+  zh: '简中',
+  'zh-TW': '繁中（台）',
+  'zh-HK': '繁中（港）',
+  uk: 'УКР',
+  ko: '한국어',
+  ja: '日本語',
+  vi: 'VI',
+};
+
+/**
+ * `halt` sets full-width parentheses at half width, so a native name keeps
+ * its own characters (繁體中文（台灣）) without wide gaps.
+ */
+const NAME_CLASS = "[font-feature-settings:'halt']";
+
+const TRIGGER_CLASS =
+  'rounded-control border border-input bg-surface-sunken text-foreground hover:border-foreground/40 hover:bg-muted hover:text-foreground data-[state=open]:border-foreground/40 data-[state=open]:bg-muted data-[state=open]:text-foreground';
 
 interface LanguageSwitcherProps {
   className?: string;
   /**
-   * `pill` (default) — globe, the current language in its own name, and a
-   * chevron, opening a radio menu of every language. `compact` — the same
-   * menu behind an icon-only trigger for narrow headers. `list` — every
-   * language laid out as a radio group, for the mobile drawer, where a nested
-   * menu would hide the choice behind a second tap.
+   * `responsive` (the headers): the globe alone below 1280px, the short name
+   * (EN, 日本語) to 1536px, the full name from there. `drawer`: a full-width
+   * row for a drawer's preferences. Both open the same radio menu, where
+   * choosing a language is an explicit action (never a change of context on
+   * input), and both triggers are named "Language: <current language>" (the
+   * responsive one adds the short name it shows: "Language: English (EN)").
    */
-  variant?: LanguageSwitcherVariant;
+  variant: LanguageSwitcherVariant;
 }
 
 /**
@@ -38,13 +67,23 @@ interface LanguageSwitcherProps {
  * Option labels are never translated — each language is listed in itself,
  * tagged with its own `lang` so screen readers switch voices per option.
  */
-export function LanguageSwitcher({ className, variant = 'pill' }: LanguageSwitcherProps) {
+export function LanguageSwitcher({ className, variant }: LanguageSwitcherProps) {
   const t = useTranslations('common');
   const locale = useLocale();
   const router = useRouter();
   const pathname = usePathname();
   const label = t('languageSwitcher.label');
   const current = LOCALE_LABELS[locale as AppLocale] ?? locale;
+  const short = pickByLocale(LOCALE_SHORT_LABELS, locale);
+  // The visible name is the current language's, so the trigger's name
+  // carries it too (WCAG 2.5.3), and screen readers hear which language is
+  // active. The responsive trigger can show the short form ("UK", "简中"), so
+  // its name holds both forms whenever they differ.
+  const triggerName = t('languageSwitcher.current', { language: current });
+  const responsiveName =
+    short === current
+      ? triggerName
+      : t('languageSwitcher.currentShort', { language: current, short });
 
   const switchTo = (next: string) => {
     if (next === locale || !routing.locales.includes(next as AppLocale)) return;
@@ -54,71 +93,55 @@ export function LanguageSwitcher({ className, variant = 'pill' }: LanguageSwitch
     router.replace(`${pathname}${suffix}`, { locale: next as AppLocale });
   };
 
-  if (variant === 'list') {
-    return (
-      <div className={cn('space-y-2', className)}>
-        <p className="flex items-center gap-2 px-1 font-mono text-[10px] uppercase tracking-[0.3em] text-white/45">
-          <Globe className="h-3.5 w-3.5" aria-hidden />
-          {label}
-        </p>
-        <div role="radiogroup" aria-label={label} className="grid gap-1.5">
-          {routing.locales.map((option) => {
-            const selected = option === locale;
-            return (
-              <button
-                key={option}
-                type="button"
-                role="radio"
-                lang={option}
-                aria-checked={selected}
-                onClick={() => switchTo(option)}
-                className={cn(
-                  'flex min-h-11 items-center justify-between gap-2 rounded-xl border px-3.5 py-2 text-left text-sm transition-colors',
-                  selected
-                    ? 'border-secondary/40 bg-secondary/10 text-white'
-                    : 'border-white/[0.08] bg-white/[0.03] text-white/75 hover:border-white/[0.16] hover:bg-white/[0.06] hover:text-white',
-                )}
-              >
-                <span>{LOCALE_LABELS[option]}</span>
-                {selected && <Check className="h-4 w-4 shrink-0 text-secondary" aria-hidden />}
-              </button>
-            );
-          })}
-        </div>
-      </div>
-    );
-  }
-
-  const compact = variant === 'compact';
+  const trigger = {
+    responsive: (
+      <Button
+        variant="ghost"
+        size="icon"
+        aria-label={responsiveName}
+        className={cn(
+          TRIGGER_CLASS,
+          'size-11 shrink-0 gap-1.5 text-xs font-medium sm:size-10 xl:w-auto xl:pl-3 xl:pr-2.5',
+          className,
+        )}
+      >
+        <Globe className="shrink-0 text-muted-foreground" aria-hidden />
+        <span lang={locale} className={cn('hidden xl:inline 2xl:hidden', NAME_CLASS)}>
+          {short}
+        </span>
+        <span lang={locale} className={cn('hidden max-w-[9rem] truncate 2xl:inline', NAME_CLASS)}>
+          {current}
+        </span>
+        <ChevronDown className="hidden size-3.5 shrink-0 text-subtle xl:inline" aria-hidden />
+      </Button>
+    ),
+    drawer: (
+      <Button
+        variant="ghost"
+        aria-label={triggerName}
+        className={cn(
+          'h-11 w-full justify-start gap-3 rounded-control border border-input bg-surface-sunken px-3 text-sm font-normal text-foreground hover:border-foreground/40 hover:bg-muted data-[state=open]:border-secondary/40',
+          className,
+        )}
+      >
+        <Globe className="size-4 shrink-0 text-subtle" aria-hidden />
+        <span lang={locale} className={cn('min-w-0 flex-1 truncate text-left', NAME_CLASS)}>
+          {current}
+        </span>
+        <ChevronDown className="size-4 shrink-0 text-subtle" aria-hidden />
+      </Button>
+    ),
+  }[variant];
 
   return (
     <DropdownMenu>
-      <DropdownMenuTrigger asChild>
-        <Button
-          variant="ghost"
-          size={compact ? 'icon' : 'sm'}
-          aria-label={label}
-          className={cn(
-            'rounded-full border border-white/[0.12] bg-white/[0.05] text-white/85 shadow-[inset_0_1px_0_rgb(255_255_255/0.05)] hover:border-white/[0.22] hover:bg-white/[0.09] hover:text-white data-[state=open]:border-secondary/40 data-[state=open]:bg-secondary/10 data-[state=open]:text-white',
-            compact
-              ? 'h-11 w-11 shrink-0 sm:h-10 sm:w-10'
-              : 'h-11 gap-2 pl-3 pr-2.5 text-xs font-medium sm:h-9',
-            className,
-          )}
-        >
-          <Globe className="shrink-0 text-secondary/90" aria-hidden />
-          {!compact && (
-            <>
-              <span lang={locale} className="max-w-[9rem] truncate">
-                {current}
-              </span>
-              <ChevronDown className="h-3.5 w-3.5 shrink-0 text-white/55" aria-hidden />
-            </>
-          )}
-        </Button>
-      </DropdownMenuTrigger>
-      <DropdownMenuContent align="end" className="min-w-[13rem] p-1.5">
-        <DropdownMenuLabel className="flex items-center gap-2 px-2 py-1.5 font-mono text-[10px] font-normal uppercase tracking-[0.3em] text-white/45">
+      <DropdownMenuTrigger asChild>{trigger}</DropdownMenuTrigger>
+      <DropdownMenuContent
+        align={variant === 'drawer' ? 'start' : 'end'}
+        side={variant === 'drawer' ? 'top' : 'bottom'}
+        className="min-w-[13rem] p-1.5"
+      >
+        <DropdownMenuLabel className="type-eyebrow flex items-center gap-2 px-2 py-1.5 font-normal text-subtle">
           <Globe className="h-3.5 w-3.5" aria-hidden />
           {label}
         </DropdownMenuLabel>
@@ -129,7 +152,10 @@ export function LanguageSwitcher({ className, variant = 'pill' }: LanguageSwitch
               key={option}
               value={option}
               lang={option}
-              className="min-h-10 cursor-pointer rounded-lg py-2 pr-3 text-sm text-white/80 data-[state=checked]:bg-secondary/10 data-[state=checked]:text-white sm:min-h-9"
+              className={cn(
+                'min-h-11 cursor-pointer rounded-control py-2 pr-3 text-sm text-muted-foreground data-[state=checked]:bg-secondary/10 data-[state=checked]:text-foreground sm:min-h-9',
+                NAME_CLASS,
+              )}
             >
               {LOCALE_LABELS[option]}
             </DropdownMenuRadioItem>

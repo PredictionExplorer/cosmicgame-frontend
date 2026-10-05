@@ -6,6 +6,7 @@ import { useCallback } from 'react';
 import { useQuery, useQueryClient, type UseQueryResult } from '@tanstack/react-query';
 
 import api from '@/services/api';
+import { isRecordNotFound } from '@/services/api/readError';
 import {
   getLiveDataPollIntervalMs,
   getRemainingMsFromServerClock,
@@ -13,6 +14,7 @@ import {
 } from '@/lib/pollingCadence';
 import { useUxScenarioSnapshot } from '@/lib/uxCycleScenarios';
 import type {
+  ActionIdWithClaimInfo,
   AdminEventRow,
   BannedGesture,
   GestureEthCostInfo,
@@ -29,7 +31,6 @@ import type {
   CTPriceInfo,
   DashboardInfo,
   BidFrequencyBucket,
-  BidTypeRatioBucket,
   BiddingActivityResponse,
   BidTimeBounds,
   TopBidderActivePeriodsResponse,
@@ -38,6 +39,7 @@ import type {
   ETHDonation,
   MarketingReward,
   NameHistoryRecord,
+  NFTDonationStatsEntry,
   NotifyRedBoxResult,
   StellarSelectionETHDeposit,
   StellarSelectionNFTRecipient,
@@ -167,6 +169,16 @@ export function useRoundList() {
   });
 }
 
+/** Retries left after a failed read: the app default of two (see providers). */
+const READ_RETRIES = 2;
+
+/**
+ * A finalized cycle's record. The API answers 400 `record not found` for a
+ * cycle it holds no record of (the live cycle, one that has not started, one
+ * not indexed yet):
+ * that answer is final, so it is not retried, and pages read it with
+ * `isRecordNotFound(error)` to show "no record" instead of an error.
+ */
 export function useRoundInfo(roundNum: number) {
   return useQuery<RoundInfo | null>({
     queryKey: ['roundInfo', roundNum],
@@ -174,6 +186,7 @@ export function useRoundInfo(roundNum: number) {
     /** Backend serves `rounds/info/0`; the previous `> 0` guard broke first-cycle finalize UX. */
     enabled: Number.isFinite(roundNum) && roundNum >= 0,
     staleTime: 30_000,
+    retry: (failureCount, error) => !isRecordNotFound(error) && failureCount < READ_RETRIES,
   });
 }
 
@@ -222,12 +235,19 @@ export function useGestureList() {
   });
 }
 
+/**
+ * One gesture record. The API answers 400 `record not found` for an id it
+ * does not hold (mistyped, or not indexed yet): that answer is final, so it
+ * is not retried, and the page reads it with `isRecordNotFound(error)` to say
+ * "no record" instead of blaming the connection.
+ */
 export function useGestureInfo(evtLogId: number) {
   return useQuery<GestureInfo | null>({
     queryKey: ['gestureInfo', evtLogId],
     queryFn: ({ signal }) => api.get_bid_info(evtLogId, { signal }),
     enabled: evtLogId > 0,
     staleTime: 60_000,
+    retry: (failureCount, error) => !isRecordNotFound(error) && failureCount < READ_RETRIES,
   });
 }
 
@@ -273,11 +293,35 @@ export function useCurrentSpecialRecipients(
   return withUxScenarioData(query, scenario?.specialRecipients ?? undefined, scenario?.createdAtMs);
 }
 
-export function useBannedGestures() {
+export function useAllocationDepositsList() {
+  return useQuery<TxInfo[]>({
+    queryKey: ['prizeDepositsList'],
+    queryFn: ({ signal }) => api.get_prize_deposits_list({ signal }),
+    staleTime: 30_000,
+  });
+}
+
+export function useAllocationDepositsByCycle(round: number) {
+  return useQuery<TxInfo[]>({
+    queryKey: ['prizeDepositsByRound', round],
+    queryFn: ({ signal }) => api.get_prize_deposits_by_round(round, { signal }),
+    enabled: round >= 0,
+    staleTime: 30_000,
+  });
+}
+
+/**
+ * The gestures whose messages moderation has hidden. The read is strict (a
+ * failed read is an error, never an empty list), so read it through
+ * `useGestureModeration`, which holds messages back until the list is known.
+ * `enabled: false` where the messages arrive already moderated.
+ */
+export function useBannedGestures({ enabled = true }: { enabled?: boolean } = {}) {
   return useQuery<BannedGesture[]>({
     queryKey: ['bannedBids'],
     queryFn: ({ signal }) => api.get_banned_bids({ signal }),
     staleTime: 30_000,
+    enabled,
   });
 }
 
@@ -295,15 +339,27 @@ export function useGestureEthCost() {
   return withUxScenarioData(query, scenario?.ethCost ?? undefined, scenario?.createdAtMs);
 }
 
+export function useTimeUntilAllocation() {
+  return useQuery<number>({
+    queryKey: ['timeUntilPrize'],
+    queryFn: ({ signal }) => api.get_time_until_prize({ signal }),
+    staleTime: 5_000,
+    refetchInterval: 10_000,
+    refetchIntervalInBackground: false,
+    refetchOnWindowFocus: true,
+  });
+}
+
 // ---------------------------------------------------------------------------
 // Tokens (CST / CT)
 // ---------------------------------------------------------------------------
 
-export function useCSTList() {
+export function useCSTList({ enabled = true }: { enabled?: boolean } = {}) {
   return useQuery<CSTTokenInfo[]>({
     queryKey: ['cstList'],
     queryFn: ({ signal }) => api.get_cst_list({ signal }),
     staleTime: 30_000,
+    enabled,
   });
 }
 
@@ -316,15 +372,31 @@ export function useCSTTokensByUser(address: string | null | undefined) {
   });
 }
 
-export function useCSTInfo(tokenId: number | null | undefined, initialData?: CSTTokenInfo | null) {
+export interface CSTInfoOptions {
+  /**
+   * The seed may be older than the token's live state: an ISR page reads it
+   * once per regeneration window, so the owner, name and anchoring can have
+   * changed since. Dating it to epoch 0 keeps it for the first paint and
+   * refreshes it right after hydration. Leave it off where the seed only
+   * feeds immutable fields (the home hero's artwork, drawn from the seed).
+   */
+  seedIsStale?: boolean;
+}
+
+export function useCSTInfo(
+  tokenId: number | null | undefined,
+  initialData?: CSTTokenInfo | null,
+  { seedIsStale = false }: CSTInfoOptions = {},
+) {
   return useQuery<CSTTokenInfo | null>({
     queryKey: ['cstInfo', tokenId],
     queryFn: ({ signal }) => api.get_cst_info(tokenId!, { signal }),
     enabled: tokenId != null && tokenId >= 0,
     staleTime: 60_000,
-    // Server-rendered seed (e.g. the home hero artwork): keeps the first
-    // client render identical to the SSR HTML without an immediate refetch.
+    // A server-rendered seed keeps the first client render identical to the
+    // SSR HTML; unless it is marked stale it also counts as fresh.
     initialData: initialData ?? undefined,
+    initialDataUpdatedAt: initialData && seedIsStale ? 0 : undefined,
   });
 }
 
@@ -333,6 +405,15 @@ export function useNameHistory(tokenId: number | null | undefined) {
     queryKey: ['nameHistory', tokenId],
     queryFn: ({ signal }) => api.get_name_history(tokenId!, { signal }),
     enabled: tokenId != null && tokenId >= 0,
+    staleTime: 30_000,
+  });
+}
+
+export function useTokenByName(name: string | null | undefined) {
+  return useQuery<CSTTokenInfo[]>({
+    queryKey: ['tokenByName', name],
+    queryFn: ({ signal }) => api.get_token_by_name(name!, { signal }),
+    enabled: !!name,
     staleTime: 30_000,
   });
 }
@@ -436,20 +517,6 @@ export function useBidFrequency(
   });
 }
 
-export function useBidTypeRatio(
-  fromTs: number,
-  toTs: number,
-  intervalSecs: number,
-  enabled = true,
-) {
-  return useQuery<BidTypeRatioBucket[]>({
-    queryKey: ['bidTypeRatio', fromTs, toTs, intervalSecs],
-    queryFn: ({ signal }) => api.get_bid_type_ratio(fromTs, toTs, intervalSecs, { signal }),
-    enabled: enabled && fromTs > 0 && toTs > fromTs && intervalSecs > 0,
-    staleTime: 60_000,
-  });
-}
-
 export function useTopBidderActivePeriods(
   topN: number,
   initTs: number,
@@ -546,6 +613,18 @@ export function useAnchoredCSTokensByUser(address: string | null | undefined) {
     staleTime: 15_000,
     refetchInterval: 30_000,
     refetchIntervalInBackground: false,
+  });
+}
+
+export function useCSTActionIdsByDepositId(
+  address: string | null | undefined,
+  depositId: number | null | undefined,
+) {
+  return useQuery<ActionIdWithClaimInfo[] | null>({
+    queryKey: ['cstActionIdsByDeposit', address, depositId],
+    queryFn: ({ signal }) => api.get_cst_action_ids_by_deposit_id(address!, depositId!, { signal }),
+    enabled: !!address && depositId != null,
+    staleTime: 30_000,
   });
 }
 
@@ -701,6 +780,31 @@ export function useAnchoredRWLKTokensByUser(address: string | null | undefined) 
 // Donations – ETH
 // ---------------------------------------------------------------------------
 
+export function useDonationsCGSimpleList() {
+  return useQuery<ETHDonation[]>({
+    queryKey: ['donationsCGSimpleList'],
+    queryFn: ({ signal }) => api.get_donations_cg_simple_list({ signal }),
+    staleTime: 30_000,
+  });
+}
+
+export function useDonationsCGSimpleByRound(round: number) {
+  return useQuery<ETHDonation[]>({
+    queryKey: ['donationsCGSimpleByRound', round],
+    queryFn: ({ signal }) => api.get_donations_cg_simple_by_round(round, { signal }),
+    enabled: round >= 0,
+    staleTime: 30_000,
+  });
+}
+
+export function useDonationsCGWithInfoList() {
+  return useQuery<ETHDonation[]>({
+    queryKey: ['donationsCGWithInfoList'],
+    queryFn: ({ signal }) => api.get_donations_cg_with_info_list({ signal }),
+    staleTime: 30_000,
+  });
+}
+
 export function useDonationsCGWithInfoByRound(round: number) {
   return useQuery<ETHDonation[]>({
     queryKey: ['donationsCGWithInfoByRound', round],
@@ -716,6 +820,15 @@ export function useDonationsWithInfoById(id: number | null | undefined) {
     queryFn: ({ signal }) => api.get_donations_with_info_by_id(id!, { signal }),
     enabled: id != null && id >= 0,
     staleTime: 60_000,
+  });
+}
+
+export function useDonationsEthByUser(address: string | null | undefined) {
+  return useQuery<ETHDonation[]>({
+    queryKey: ['donationsEthByUser', address],
+    queryFn: ({ signal }) => api.get_donations_eth_by_user(address!, { signal }),
+    enabled: !!address,
+    staleTime: 30_000,
   });
 }
 
@@ -739,6 +852,14 @@ export function useDonationsBoth() {
 // ---------------------------------------------------------------------------
 // Donations – Charity
 // ---------------------------------------------------------------------------
+
+export function useCharityDonationsDeposits() {
+  return useQuery<ETHDonation[]>({
+    queryKey: ['charityDonationsDeposits'],
+    queryFn: ({ signal }) => api.get_charity_donations_deposits({ signal }),
+    staleTime: 60_000,
+  });
+}
 
 export function useCharityCGDeposits() {
   return useQuery<ETHDonation[]>({
@@ -776,12 +897,37 @@ export function useDonationsNFTList() {
   });
 }
 
+export function useDonatedNFTInfo(recordId: number | null | undefined) {
+  return useQuery<AttachedNFT | null>({
+    queryKey: ['donatedNFTInfo', recordId],
+    queryFn: ({ signal }) => api.get_donated_nft_info(recordId!, { signal }),
+    enabled: recordId != null && recordId >= 0,
+    staleTime: 60_000,
+  });
+}
+
+export function useDonatedNFTClaimsAll() {
+  return useQuery<AttachedNFT[]>({
+    queryKey: ['donatedNFTClaimsAll'],
+    queryFn: ({ signal }) => api.get_donated_nft_claims_all({ signal }),
+    staleTime: 30_000,
+  });
+}
+
 export function useClaimedDonatedNFTByUser(address: string | null | undefined) {
   return useQuery<AttachedNFT[]>({
     queryKey: ['claimedDonatedNFTByUser', address],
     queryFn: ({ signal }) => api.get_claimed_donated_nft_by_user(address!, { signal }),
     enabled: !!address,
     staleTime: 30_000,
+  });
+}
+
+export function useNFTDonationStats() {
+  return useQuery<NFTDonationStatsEntry[]>({
+    queryKey: ['nftDonationStats'],
+    queryFn: ({ signal }) => api.get_nft_donation_stats({ signal }),
+    staleTime: 60_000,
   });
 }
 
@@ -795,6 +941,15 @@ export function useDonationsNFTByRound(round: number) {
     refetchOnWindowFocus: true,
   });
   return withUxScenarioData(query, scenario?.donationsNft, scenario?.createdAtMs);
+}
+
+export function useDonationsNFTUnclaimedByRound(round: number) {
+  return useQuery<AttachedNFT[]>({
+    queryKey: ['donationsNFTUnclaimedByRound', round],
+    queryFn: ({ signal }) => api.get_donations_nft_unclaimed_by_round(round, { signal }),
+    enabled: round >= 0,
+    staleTime: 30_000,
+  });
 }
 
 export function useUnclaimedDonatedNFTByUser(address: string | null | undefined) {
@@ -835,11 +990,23 @@ export function useDonationsERC20ByUser(address: string | null | undefined) {
 // Users & Statistics
 // ---------------------------------------------------------------------------
 
+/**
+ * The one definition of a wallet's `user/info` read (key, fetcher, gate), so
+ * every hook that reads it shares one cache entry and cannot drift. Callers
+ * override only how often it refreshes.
+ */
+export function userInfoQueryOptions(address: string | null | undefined) {
+  return {
+    queryKey: ['userInfo', address] as const,
+    queryFn: ({ signal }: { signal: AbortSignal }): Promise<UserInfoWithLists | null> =>
+      api.get_user_info(address!, { signal }),
+    enabled: !!address,
+  };
+}
+
 export function useUserInfo(address: string | null | undefined) {
   return useQuery<UserInfoWithLists | null>({
-    queryKey: ['userInfo', address],
-    queryFn: ({ signal }) => api.get_user_info(address!, { signal }),
-    enabled: !!address,
+    ...userInfoQueryOptions(address),
     staleTime: 30_000,
     refetchInterval: 30_000,
     refetchIntervalInBackground: false,
@@ -933,6 +1100,14 @@ export function useUniqueRWLKAnchorHolders() {
   });
 }
 
+export function useUniqueBothAnchorHolders() {
+  return useQuery<UniqueAnchorHolderRWLK[]>({
+    queryKey: ['uniqueBothStakers'],
+    queryFn: ({ signal }) => api.get_unique_both_stakers({ signal }),
+    staleTime: 60_000,
+  });
+}
+
 // ---------------------------------------------------------------------------
 // Raffle
 // ---------------------------------------------------------------------------
@@ -946,6 +1121,15 @@ export function useStellarSelectionDepositsByUser(address: string | null | undef
   });
 }
 
+export function useChronoWarriorDepositsByUser(address: string | null | undefined) {
+  return useQuery<StellarSelectionETHDeposit[]>({
+    queryKey: ['chronoWarriorDepositsByUser', address],
+    queryFn: ({ signal }) => api.get_chrono_warrior_deposits_by_user(address!, { signal }),
+    enabled: !!address,
+    staleTime: 30_000,
+  });
+}
+
 export function useUnretrievedStellarSelectionDepositsByUser(address: string | null | undefined) {
   return useQuery<StellarSelectionETHDeposit[]>({
     queryKey: ['unclaimedRaffleDepositsByUser', address],
@@ -954,6 +1138,23 @@ export function useUnretrievedStellarSelectionDepositsByUser(address: string | n
     staleTime: 15_000,
     refetchInterval: 30_000,
     refetchIntervalInBackground: false,
+  });
+}
+
+export function useStellarSelectionNFTRecipientsList() {
+  return useQuery<StellarSelectionNFTRecipient[]>({
+    queryKey: ['raffleNFTWinnersList'],
+    queryFn: ({ signal }) => api.get_raffle_nft_winners_list({ signal }),
+    staleTime: 30_000,
+  });
+}
+
+export function useStellarSelectionNFTRecipientsByCycle(round: number) {
+  return useQuery<StellarSelectionNFTRecipient[]>({
+    queryKey: ['raffleNFTWinnersByRound', round],
+    queryFn: ({ signal }) => api.get_raffle_nft_winners_by_round(round, { signal }),
+    enabled: round >= 0,
+    staleTime: 30_000,
   });
 }
 

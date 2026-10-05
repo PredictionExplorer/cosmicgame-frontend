@@ -43,15 +43,23 @@ const catalogTooltipPaths = [...enCatalog.keys()].filter(
   (path) => /tooltip/i.test(path) && !/tooltipAria/i.test(path),
 );
 
-const enLongFormTooltips = asMap(
-  flattenStrings(howItWorksContentEn, 'howItWorks').filter(({ path }) => /tooltip/i.test(path)),
+// The explainer's long-form copy. Its rules once sat in hover cards on the
+// headings; they now live in the visible descriptions, bodies and step
+// highlights, so those are the fields that must be complete and Chinese.
+const LONG_FORM_FIELD = /(?:\.description|\.body|\.paragraph|\.highlights\[\d+\])$/;
+const enLongForm = asMap(
+  flattenStrings(howItWorksContentEn, 'howItWorks').filter(({ path }) =>
+    LONG_FORM_FIELD.test(path),
+  ),
 );
-const zhLongFormTooltips = asMap(
-  flattenStrings(howItWorksContentZh, 'howItWorks').filter(({ path }) => /tooltip/i.test(path)),
+const zhLongForm = asMap(
+  flattenStrings(howItWorksContentZh, 'howItWorks').filter(({ path }) =>
+    LONG_FORM_FIELD.test(path),
+  ),
 );
 
 const immutableAccessibleLabel =
-  /^(?:ETH|CST|NFT|RWLK|ERC-20|ERC-721|ETH \+ RWLK|Layer 2|NFT #\{id\}|URL|ID|English|中文|GitHub|Discord|Arbiscan|MetaMask|WalletConnect|Coinbase Wallet|Safe|Uniswap|Axiom Zero|Chaos Zero|X \(Twitter\)|Cosmic Signature(?: NFT)?|Random Walk NFT|Protocol Guild|Arbitrum(?: One)?|Ethereum|[0-9#.:+%/ -]+)$/;
+  /^(?:ETH|CST|NFT|RWLK|ERC-20|ERC-721|ETH \+ RWLK|ETH \+ Random Walk|Layer 2|NFT #\{id\}|URL|ID|English|中文|GitHub|Discord|Arbiscan|MetaMask|WalletConnect|Coinbase Wallet|Safe|Uniswap|GeckoTerminal|Axiom Zero|Chaos Zero|X \(Twitter\)|Cosmic Signature(?: NFT)?|Random Walk NFT|Protocol Guild|Arbitrum(?: One)?|Ethereum|[0-9#.:+%/ -]+)$/;
 
 describe('Sprint 8 catalog quality gates', () => {
   it('keeps every tooltip-family key present and translated', () => {
@@ -71,13 +79,13 @@ describe('Sprint 8 catalog quality gates', () => {
     }
   });
 
-  it('keeps structured long-form tooltip fields exhaustive and Chinese', () => {
-    expect(zhLongFormTooltips.keys()).toEqual(enLongFormTooltips.keys());
-    expect(zhLongFormTooltips.size).toBeGreaterThanOrEqual(10);
+  it('keeps the explainer’s structured long-form fields exhaustive and Chinese', () => {
+    expect([...zhLongForm.keys()]).toEqual([...enLongForm.keys()]);
+    expect(zhLongForm.size).toBeGreaterThanOrEqual(10);
 
-    for (const [path, zh] of zhLongFormTooltips) {
+    for (const [path, zh] of zhLongForm) {
       expect(zh).not.toBe('');
-      expect(zh).not.toBe(enLongFormTooltips.get(path));
+      expect(zh).not.toBe(enLongForm.get(path));
       expect(zh).toMatch(/[\u3400-\u9fff]/);
     }
   });

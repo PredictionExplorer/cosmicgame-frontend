@@ -1,6 +1,6 @@
 {
   "gallery": {
-    "placeholder": "Search by token ID or name...",
+    "placeholder": "Number or name",
     "ariaLabel": "Search NFTs",
     "clear": "Clear search",
     "submit": "Search",

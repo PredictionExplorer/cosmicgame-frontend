@@ -1,6 +1,18 @@
-import { getLandingContent, landingContentEn, landingContentZh } from '@/content/landing';
+import { readFileSync } from 'node:fs';
+import { join } from 'node:path';
+
+import {
+  getLandingContent,
+  landingContentEn,
+  landingContentZh,
+  pluralPhrase,
+} from '@/content/landing';
+import { landingTextUk } from '@/content/landing/text.uk';
+import { protocolFacts } from '@/content/protocol-facts';
 
 import { CST_GECKOTERMINAL_POOL_URL } from '@/config/geckoterminal';
+import { outboundLinks } from '@/config/siteNav';
+import { routing } from '@/i18n/routing';
 
 const landingContent = landingContentEn;
 
@@ -14,11 +26,11 @@ describe('landing content shape', () => {
   it('selects complete locale models without changing structural invariants', () => {
     expect(getLandingContent('en')).toBe(landingContentEn);
     expect(getLandingContent('zh-CN')).toBe(landingContentZh);
-    expect(landingContentZh.cycle.stages).toHaveLength(landingContentEn.cycle.stages.length);
+    expect(landingContentZh.cycle.steps).toHaveLength(landingContentEn.cycle.steps.length);
     expect(landingContentZh.art.stages).toHaveLength(landingContentEn.art.stages.length);
-    expect(landingContentZh.tracks.items).toHaveLength(landingContentEn.tracks.items.length);
+    expect(landingContentZh.tracks.eth).toHaveLength(landingContentEn.tracks.eth.length);
+    expect(landingContentZh.tracks.fixed).toHaveLength(landingContentEn.tracks.fixed.length);
     expect(landingContentZh.faq.items).toHaveLength(landingContentEn.faq.items.length);
-    expect(landingContentZh.footer.columns).toHaveLength(landingContentEn.footer.columns.length);
     expect(JSON.stringify(landingContentZh)).toMatch(/[\u3400-\u9fff]/);
   });
 
@@ -34,25 +46,42 @@ describe('landing content shape', () => {
       council: expect.any(Object),
       verifiability: expect.any(Object),
       faq: expect.any(Object),
-      footer: expect.any(Object),
+      closing: expect.any(Object),
     });
   });
 
-  it('hero declares the primary CTA as the app subdomain', () => {
-    expect(landingContent.hero.primaryCta.href).toBe('https://app.cosmicsignature.com');
+  it('keeps the closing gesture action consistent with The Cycle’s label and target', () => {
+    for (const locale of routing.locales) {
+      const { cycle, closing } = getLandingContent(locale);
+      expect(closing.gestureCta).toEqual(cycle.gestureCta);
+    }
+    expect(landingContent.cycle.gestureCta.href).toBe(
+      'https://app.cosmicsignature.com/#make-gesture',
+    );
   });
 
-  it('cycle section has exactly four ordered stages', () => {
-    expect(landingContent.cycle.stages).toHaveLength(4);
-    expect(landingContent.cycle.stages.map((s) => s.number)).toEqual(['01', '02', '03', '04']);
+  it('keeps the hero eyebrow separator with the word before it, in every locale', () => {
+    // The copy carries the no-break space; the component no longer edits translated text.
+    const noBreakSpace = String.fromCharCode(0xa0);
+    for (const locale of routing.locales) {
+      const { eyebrow } = getLandingContent(locale).hero;
+      expect(eyebrow).toContain(`${noBreakSpace}· `);
+      expect(eyebrow).not.toContain(' ·');
+    }
+  });
+
+  it('cycle section explains a cycle in exactly three ordered steps', () => {
+    expect(landingContent.cycle.steps.map((s) => s.number)).toEqual(['01', '02', '03']);
   });
 
   it('art section has exactly seven pipeline stages', () => {
     expect(landingContent.art.stages).toHaveLength(7);
   });
 
-  it('tracks list has ten allocation entries', () => {
-    expect(landingContent.tracks.items).toHaveLength(10);
+  it('tracks list six ETH shares that add up to 100% and four fixed allocations', () => {
+    expect(landingContent.tracks.eth).toHaveLength(6);
+    expect(landingContent.tracks.eth.reduce((total, track) => total + track.share, 0)).toBe(100);
+    expect(landingContent.tracks.fixed).toHaveLength(4);
   });
 
   it('public-goods section contains the required disclaimer verbiage', () => {
@@ -66,16 +95,24 @@ describe('landing content shape', () => {
     expect(landingContent.faq.items.length).toBeGreaterThanOrEqual(5);
   });
 
-  it('footer has exactly four link columns', () => {
-    expect(landingContent.footer.columns).toHaveLength(4);
+  it('leaves the footer copy to the one footer catalog both hosts read', () => {
+    expect(landingContent).not.toHaveProperty('footer');
+    for (const locale of routing.locales) {
+      const footer = JSON.parse(
+        readFileSync(join(process.cwd(), 'messages', locale, 'footer.json'), 'utf8'),
+      ) as Record<string, string>;
+      expect(footer.copyright).toContain('{year}');
+      expect(footer.tagline).toEqual(expect.any(String));
+      // A sourced claim, not a bare "Verified": the colophon links to /security.
+      expect(footer.colophon).not.toMatch(
+        /·\s*(Verified|已验证|已驗證|Верифіковано|검증됨|検証済み|Đã xác minh)\s*·/,
+      );
+    }
   });
 
-  it('footer ecosystem column links Axiom Zero, Chaos Zero, Uniswap, and GeckoTerminal', () => {
-    const ecosystem = landingContent.footer.columns.find(
-      (column) => column.heading === 'Ecosystem',
-    );
-    expect(ecosystem).toBeDefined();
-    const hrefs = ecosystem!.links.map((link) => link.href);
+  it('the shared footer ecosystem row links Axiom Zero, Chaos Zero, Uniswap, and GeckoTerminal', () => {
+    // Both footers render the taxonomy (config/siteNav.ts), not landing copy.
+    const hrefs = outboundLinks('ecosystem').map((link) => link.href);
     expect(hrefs).toContain('https://www.axiomzero.market/cosmic-signature');
     expect(hrefs).toContain('https://chaoszero.com');
     expect(hrefs.some((href) => href.startsWith('https://app.uniswap.org/'))).toBe(true);
@@ -93,7 +130,7 @@ describe('landing content contract accuracy', () => {
   });
 
   it('anchoring copy does not promise ETH to RandomWalk anchors', () => {
-    expect(landingContent.anchoring.body).toMatch(/no ETH/i);
+    expect(landingContent.anchoring.bullets.join(' ')).toMatch(/Random Walk.*no ETH/i);
   });
 
   it('council quorum copy matches GovernorCountingSimple (Support + Abstain only)', () => {
@@ -110,16 +147,92 @@ describe('landing content contract accuracy', () => {
     expect(landingContent.council.body).toMatch(/delegate/i);
   });
 
-  it('art facts match the open-source render pipeline (64 spectral bins)', () => {
-    const bins = landingContent.art.facts.find((fact) => fact.label === 'Wavelength bins');
-    expect(bins?.value).toBe('64');
+  it('art copy matches the open-source render pipeline (64 spectral bins, native size)', () => {
+    expect(JSON.stringify(landingContent.art.stages)).toMatch(/Sixty-four wavelength bins/);
     expect(JSON.stringify(landingContent.art)).not.toMatch(/\b16 wavelength|Sixteen wavelength/i);
+    expect(landingContent.art.facts.find((fact) => fact.id === 'resolution')?.value).toBe(
+      '3456 × 2234',
+    );
+    // The imprinted count is read live, never written into copy.
+    expect(landingContent.art.facts.find((fact) => fact.id === 'imprinted')?.value).toBeNull();
   });
 
-  it('marquee chips avoid unsupported audit claims', () => {
-    expect(landingContent.hero.marqueeChips).not.toContain('Audited Contracts');
-    expect(landingContent.hero.marqueeChips).not.toContain('Formally Verified');
-    expect(landingContent.hero.marqueeChips).toContain('Verified Contracts');
+  it('keeps trust claims off the hero (they live, linked, under Verifiability)', () => {
+    expect(JSON.stringify(landingContent.hero)).not.toMatch(
+      /Audited|Formally Verified|Verified Contracts/i,
+    );
+  });
+
+  it('describes the reserve split without claiming it reaches everyone who took part', () => {
+    expect(landingContent.meta.description).not.toMatch(/everyone who shaped/i);
+    expect(landingContent.meta.description).toMatch(/allocated across its tracks/);
+  });
+
+  it.each(routing.locales)(
+    '%s: claims no count of tracks the Allocation Tracks section does not show (V169)',
+    (locale) => {
+      const { meta, tracks, faq } = getLandingContent(locale);
+      const text = [meta.description, tracks.heading, ...faq.items.map((item) => item.answer)].join(
+        ' ',
+      );
+      expect(text).not.toMatch(/more than ten|十余|十餘|понад десят|열 개가 넘|10を超|hơn mười/i);
+    },
+  );
+
+  it.each(routing.locales)(
+    '%s: counts each CST and NFT track’s recipients from protocol facts, in the locale’s plural (V047)',
+    (locale) => {
+      const { fixed } = getLandingContent(locale).tracks;
+      const counts = fixed.map((track) => track.amount.match(/\d+/)?.[0]);
+      expect(counts).toEqual([
+        String(protocolFacts.nftStellarSelectionRecipients),
+        String(protocolFacts.anchoredRwlkNftSelectionRecipients),
+        '1',
+        '1',
+      ]);
+    },
+  );
+
+  it.each(routing.locales)(
+    '%s: states council rules, selection counts and the public-goods share as fact digits (V047)',
+    (locale) => {
+      const { council, tracks, faq } = getLandingContent(locale);
+      const proposal = council.columns.find((column) => column.id === 'proposal')!.body;
+      for (const figure of [
+        protocolFacts.councilProposalThresholdCst,
+        protocolFacts.councilVotingDelayDays,
+        protocolFacts.councilVotingPeriodWeeks,
+      ]) {
+        expect(proposal).toContain(String(figure));
+      }
+      const quorum = council.columns.find((column) => column.id === 'quorum')!.body;
+      expect(quorum).toContain(`${protocolFacts.councilQuorumPercent}%`);
+      const ethSelection = tracks.eth.find((track) => track.id === 'stellar')!;
+      expect(ethSelection.body).toContain(String(protocolFacts.ethStellarSelectionRecipients));
+      const answers = faq.items.map((item) => item.answer).join(' ');
+      expect(answers).toContain(`${protocolFacts.publicGoodsPercentage}%`);
+      // No spelled-out figure the numeric-claims guard cannot read.
+      expect(`${proposal} ${answers}`).not.toMatch(
+        /Сім відсотків|два дні|два тижні|Bảy phần trăm|hai ngày|hai tuần/,
+      );
+    },
+  );
+
+  it('picks every plural form Ukrainian needs for a recipient count', () => {
+    const phrase = (count: number) => pluralPhrase(landingTextUk.tracks.recipients, count, 'uk');
+    expect([1, 3, 10, 1.5].map(phrase)).toEqual([
+      '1\u00a0отримувач',
+      '3\u00a0отримувачі',
+      '10\u00a0отримувачів',
+      '2\u00a0отримувача',
+    ]);
+  });
+
+  it('says what the name is not (the COSMIC database) in the footer of both hosts', () => {
+    const footer = JSON.parse(
+      readFileSync(join(process.cwd(), 'messages', 'en', 'footer.json'), 'utf8'),
+    ) as Record<string, string>;
+    expect(footer.disambiguation).toMatch(/not related to the COSMIC/);
   });
 
   it('scopes CC0 claims to project-owned materials with third-party exceptions', () => {

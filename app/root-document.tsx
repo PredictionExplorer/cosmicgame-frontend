@@ -3,12 +3,14 @@ import Script from 'next/script';
 import { Analytics as VercelAnalytics } from '@vercel/analytics/next';
 import { SpeedInsights } from '@vercel/speed-insights/next';
 
+import { CompanionFontFaces } from '@/components/theme/CompanionFontFaces';
 import { ThemeSync } from '@/components/theme/ThemeSync';
 import { DEFAULT_SITE_THEME, THEME_INIT_SCRIPT } from '@/lib/theme/config';
 import { networkConfig } from '@/config/networks';
+import { pickByLocale } from '@/i18n/locale';
 import { getLocaleConfig } from '@/i18n/localeConfig';
 import { routing, type AppLocale } from '@/i18n/routing';
-import { FONT_VARIABLE_CLASS_NAMES } from '@/lib/fonts';
+import { FONT_VARIABLE_CLASS_NAMES, LOCALE_COMPANION_FONTS } from '@/lib/fonts';
 import { apiBaseUrls } from '@/lib/serverRotation';
 import { GA_TRACKING_ID } from '@/utils/analytics';
 
@@ -37,10 +39,11 @@ const MEDIA_PRECONNECT_ORIGINS: string[] = Array.from(
 );
 
 /**
- * Shared `<html>`/`<body>` document rendered by BOTH root layouts —
- * `app/[locale]/(app)/layout.tsx` and `app/[locale]/(landing)/layout.tsx`.
+ * Shared `<html>`/`<body>` document rendered by every root layout —
+ * `app/[locale]/(app)/layout.tsx`, `app/[locale]/(landing)/layout.tsx` and
+ * the chrome-free `app/[locale]/(embed)/layout.tsx`.
  *
- * Neither layout reads request state (no `headers()` / `cookies()`), which is
+ * No layout reads request state (no `headers()` / `cookies()`), which is
  * what allows content routes to be statically generated and CDN-cached. Host
  * separation is enforced entirely at the edge by proxy.ts, and the locale
  * arrives as a route param, so the layouts can be resolved from the URL path
@@ -57,6 +60,7 @@ export function RootDocument({
   /** App locale from the [locale] segment; also selects `<html dir>`. */
   locale?: AppLocale;
 }) {
+  const companionFace = pickByLocale(LOCALE_COMPANION_FONTS, locale);
   return (
     <html
       lang={locale}
@@ -92,6 +96,9 @@ export function RootDocument({
         )}
       </head>
       <body>
+        {/* The locale's companion face (Noto Sans CJK cut, Onest), and no
+            other locale's: see lib/fonts.ts. */}
+        <CompanionFontFaces face={companionFace?.id ?? null} />
         <ThemeSync />
         {children}
         <Suspense fallback={null}>

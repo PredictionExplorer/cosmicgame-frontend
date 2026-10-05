@@ -1,25 +1,18 @@
 {
-  "invalid": {
-    "title": "Mã token không hợp lệ"
+  "notFound": {
+    "title": "Signature này chưa được khắc",
+    "description": "Các Signature được đánh số theo thứ tự khắc.",
+    "newest": "Signature mới nhất là #{id}.",
+    "newestLink": "Xem Signature mới nhất"
   },
   "jsonLd": {
-    "productName": "Cosmic Signature NFT #{id}",
-    "productDescription": "Cosmic Signature NFT là tác phẩm tạo sinh độc nhất trên chuỗi, được tạo từ mô phỏng bài toán ba vật thể.",
-    "breadcrumbToken": "Token #{id}"
-  },
-  "breadcrumb": {
-    "tokenFallback": "Token {id}"
-  },
-  "hero": {
-    "unnamedToken": "Token chưa đặt tên"
+    "productDescription": "Cosmic Signature NFT là tác phẩm tạo sinh độc nhất trên chuỗi, được tạo từ mô phỏng bài toán ba vật thể."
   },
   "badges": {
     "stellarSelectionRecipient": "Người nhận Tinh tuyển",
     "anchorRecipient": "Người nhận neo giữ",
     "cycleRecipient": "Người nhận của chu kỳ",
     "enduranceChampion": "Quán quân Bền bỉ",
-    "receivedAsCycleRecipient": "Nhận phân bổ với vai trò người nhận của chu kỳ #{round}",
-    "receivedAs": "Nhận với vai trò {label}",
     "eligibleForAnchoring": "Đủ điều kiện neo giữ",
     "eligibleForAnchoringTooltip": "Cosmic Signature NFT này chưa từng được neo giữ và có thể nhận phân phối neo giữ bằng ETH khi được neo giữ.",
     "alreadyAnchored": "Đã neo giữ",
@@ -29,66 +22,66 @@
     "trigger": "Chia sẻ",
     "copyVideoLink": "Sao chép liên kết video",
     "copyImageLink": "Sao chép liên kết hình ảnh",
-    "copyPageLink": "Sao chép liên kết trang"
-  },
-  "actions": {
-    "buyOrSellNfts": "Mua hoặc bán NFT",
-    "viewCycleDetails": "Xem chi tiết chu kỳ #{round}"
+    "copyPageLink": "Sao chép liên kết trang",
+    "copyFailed": "Không sao chép được liên kết."
   },
   "navigation": {
-    "previousToken": "Token trước",
-    "nextToken": "Token sau"
+    "label": "Signature trước và sau"
   },
   "sections": {
     "nameHistory": "Lịch sử tên",
     "ownershipHistory": "Lịch sử sở hữu"
   },
-  "transferDialog": {
-    "title": "Xác nhận chuyển giao",
-    "description": "Địa chỉ người nhận dường như chưa có lịch sử giao dịch. Hãy kiểm tra kỹ địa chỉ trước khi xác nhận chuyển token.",
-    "confirm": "Có, chuyển giao"
-  },
   "ownerActions": {
     "title": "Quản lý token của bạn",
-    "titleTooltip": "Chủ sở hữu hiện tại có thể thêm token vào MetaMask, chuyển giao hoặc đặt tên token.",
-    "metaMaskHeading": "Hiển thị trong MetaMask",
+    "tabs": {
+      "name": "Đặt tên",
+      "transfer": "Chuyển giao"
+    },
+    "anchor": {
+      "button": "Neo giữ {id}",
+      "note": "NFT đang neo giữ cùng chia phân phối neo giữ của mỗi chu kỳ đã hoàn tất. Mỗi NFT chỉ được neo giữ một lần, nên khi đã gỡ neo thì không thể neo giữ lại."
+    },
     "metaMaskTooltip": "Yêu cầu tiện ích MetaMask trên trình duyệt hiển thị NFT này. Tính năng nhập NFT đang thử nghiệm và chưa có trên MetaMask Mobile.",
     "addToMetaMask": "Thêm NFT vào MetaMask",
     "addingToMetaMask": "Đang thêm NFT vào MetaMask…",
-    "transferHeading": "Chuyển giao",
-    "transferTooltip": "Gửi token này đến một địa chỉ Ethereum khác. Kiểm tra kỹ địa chỉ trước khi xác nhận — việc chuyển giao không thể đảo ngược.",
-    "recipientPlaceholder": "Địa chỉ người nhận (0x…)",
-    "transferButton": "Chuyển giao",
-    "nameHeading": "Đặt tên token",
-    "renameHeading": "Đổi tên token",
-    "nameTooltip": "Đặt cho token một tên tùy chỉnh (tối đa 32 byte). Token đã đặt tên xuất hiện trên trang NFT đã đặt tên.",
+    "nameLabel": "Tên",
+    "nameHint": "Tối đa {max} byte, được ghi trên chuỗi và ai cũng xem được.",
     "namePlaceholder": "Nhập tên token",
     "setName": "Đặt tên",
     "changeName": "Đổi tên",
     "clearName": "Xóa",
+    "transferButton": "Chuyển giao {id}",
     "namedTokensCount": "Hiện có {count} token đã được đặt tên.",
     "viewAllNamedTokens": "Xem tất cả token đã đặt tên"
   },
   "metadata": {
     "imprinted": "Đã khắc",
-    "imprintedTooltip": "Thời điểm token này được khắc lên chuỗi. Nhấn để xem giao dịch.",
     "cycle": "Chu kỳ",
-    "cycleTooltip": "Chu kỳ trình diễn trong đó token này được phân bổ. Nhấn để xem chi tiết chu kỳ.",
     "recipient": "Người nhận",
-    "recipientTooltip": "Địa chỉ đã nhận token này ban đầu trong chu kỳ trình diễn.",
     "owner": "Chủ sở hữu",
-    "ownerTooltip": "Người nắm giữ token này hiện tại. Có thể khác với người nhận nếu token đã được chuyển giao.",
-    "roundNumber": "Chu kỳ #{round}",
+    "roundNumber": "Chu kỳ {round}",
+    "anchoring": "Neo giữ",
     "seed": "Seed",
     "seedTooltip": "Seed ngẫu nhiên độc nhất được dùng để tạo tác phẩm và đặc tính của token này.",
     "copySeed": "Sao chép seed"
   },
-  "video": {
-    "watchAnimation": "Xem hoạt ảnh",
-    "watchAnimationTooltip": "Mỗi Cosmic Signature NFT có hoạt ảnh tạo sinh riêng, được tạo từ seed của tác phẩm. Nhấn để xem."
-  },
   "image": {
-    "defaultAlt": "NFT",
+    "rendering": "Đang kết xuất",
     "artworkUnavailable": "Tác phẩm không khả dụng"
+  },
+  "viewer": {
+    "modeLabel": "Chế độ xem tác phẩm",
+    "still": "Ảnh tĩnh",
+    "motion": "Chuyển động",
+    "play": "Phát hoạt ảnh",
+    "pause": "Tạm dừng hoạt ảnh",
+    "fullscreen": "Toàn màn hình",
+    "zoomIn": "Phóng to",
+    "zoomOut": "Vừa màn hình",
+    "zoomHint": "Chọn tác phẩm hoặc nhấn + để phóng to.",
+    "panHint": "Kéo hoặc dùng phím mũi tên để di chuyển quanh tác phẩm. Nhấn 0 để vừa màn hình.",
+    "motionError": "Không thể tải hoạt ảnh.",
+    "motionLabel": "Hoạt ảnh của {subject}"
   }
 }

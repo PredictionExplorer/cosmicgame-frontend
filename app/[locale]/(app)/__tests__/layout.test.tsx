@@ -39,6 +39,8 @@ jest.mock('../../../../utils/analytics', () => ({
 
 import type { Metadata } from 'next';
 
+import { BRAND_ICON_VERSION } from '@/lib/og/brandIcons';
+
 import { generateMetadata, viewport } from '../layout';
 import {
   generateMetadata as landingGenerateMetadata,
@@ -59,7 +61,6 @@ describe('Root layout metadata (shared by both route groups)', () => {
   it('shares copy defaults while keeping host-specific origins', () => {
     expect(landingMetadata.title).toEqual(metadata.title);
     expect(landingMetadata.description).toBe(metadata.description);
-    expect(landingMetadata.keywords).toEqual(metadata.keywords);
     expect(landingViewport).toBe(viewport);
     expect(metadata.metadataBase).toEqual(new URL('https://app.cosmicsignature.com'));
     expect(landingMetadata.metadataBase).toEqual(new URL('https://cosmicsignature.com'));
@@ -143,25 +144,41 @@ describe('Root layout metadata (shared by both route groups)', () => {
     expect((metadata.description as string).length).toBeLessThanOrEqual(320);
   });
 
-  it('exposes a robust keywords array', () => {
-    expect(Array.isArray(metadata.keywords)).toBe(true);
-    const keywords = metadata.keywords as readonly string[];
-    expect(keywords).toEqual(
-      expect.arrayContaining(['Cosmic Signature', 'Arbitrum', 'Protocol Guild', 'CC0']),
-    );
+  // One English keyword list served on every locale helped no search engine
+  // and carried a blanket "formally verified" claim; the landing home sets
+  // its own localized list.
+  it('sets no site-wide keywords', async () => {
+    expect(metadata.keywords).toBeUndefined();
+    expect(landingMetadata.keywords).toBeUndefined();
+    expect((await generateMetadata(paramsFor('ja'))).keywords).toBeUndefined();
   });
 
-  it('declares the same cache-busted SVG and ICO favicons for both hosts', () => {
+  it('declares the same cache-busted favicons and touch icon for both hosts', () => {
     const icons = metadata.icons as {
       icon: Array<{ url: string; type?: string; sizes?: string }>;
+      apple: Array<{ url: string; type?: string; sizes?: string }>;
     };
     const landingIcons = landingMetadata.icons as typeof icons;
 
     expect(landingIcons).toEqual(icons);
+    // Chromium keeps document order between an `any` icon and an exact size
+    // match: the SVG leads, and the ICO names only a size no tab asks for.
+    const v = `?v=${BRAND_ICON_VERSION}`;
     expect(icons.icon).toEqual([
-      { url: '/favicon.svg?v=20260825', type: 'image/svg+xml' },
-      { url: '/favicon.ico?v=20260825', sizes: 'any' },
+      { url: `/favicon.svg${v}`, type: 'image/svg+xml', sizes: 'any' },
+      { url: `/favicon.ico${v}`, sizes: '48x48' },
     ]);
+    expect(icons.apple).toEqual([
+      { url: `/apple-touch-icon.png${v}`, sizes: '180x180', type: 'image/png' },
+    ]);
+  });
+
+  // F312: installing from the marketing host turned the landing into a
+  // chromeless "app"; only the dApp links a (localized) manifest.
+  it('links the localized web manifest on the app host only', async () => {
+    expect(metadata.manifest).toBe('/en/manifest.webmanifest');
+    expect((await generateMetadata(paramsFor('ja'))).manifest).toBe('/ja/manifest.webmanifest');
+    expect(landingMetadata.manifest).toBeUndefined();
   });
 
   it('declares the Google Search Console verification token', () => {
@@ -196,8 +213,8 @@ describe('Root layout viewport', () => {
     expect(viewport.initialScale).toBe(1);
   });
 
-  it('exports viewport with themeColor', () => {
-    expect(viewport.themeColor).toBe('#15BFFD');
+  it("paints the browser chrome in the default palette's page colour", () => {
+    expect(viewport.themeColor).toBe('#090a11');
   });
 });
 
@@ -237,10 +254,11 @@ describe('RootDocument Vercel Analytics contract', () => {
     expect(bodyMatch![1]).toContain('<SpeedInsights />');
   });
 
-  it('neither root layout reads request headers (static-rendering contract)', () => {
+  it('no root layout reads request headers (static-rendering contract)', () => {
     for (const layoutPath of [
       resolvePath(__dirname, '..', 'layout.tsx'),
       resolvePath(__dirname, '..', '..', '(landing)', 'layout.tsx'),
+      resolvePath(__dirname, '..', '..', '(embed)', 'layout.tsx'),
     ]) {
       const source = readFileSync(layoutPath, 'utf-8');
       expect(source).not.toMatch(/next\/headers/);

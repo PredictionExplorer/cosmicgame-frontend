@@ -1,347 +1,520 @@
-import { useState, type ReactNode } from 'react';
-import { Trophy, Ticket, Heart, Layers, Coins, AlertTriangle } from 'lucide-react';
+'use client';
+
+import { useMemo, type ReactNode } from 'react';
+import { isAddress } from 'viem';
 import { useLocale, useTranslations } from 'next-intl';
 
-import { getExplorerUrl, shortenHex } from '@/utils';
-
-import { HydrationSafeDateTime } from '@/components/common/HydrationSafeDateTime';
-import { Link } from '@/i18n/navigation';
-import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
-import { CustomPagination } from '@/components/common/CustomPagination';
-import { useContractAddresses } from '@/contexts/ContractAddressesContext';
+import { formatAddress, formatCount, formatNumber } from '@/utils/format';
+import { getExplorerUrl } from '@/utils/urls';
 import {
-  TablePrimaryContainer,
-  TablePrimaryBody,
-  TablePrimaryCell,
-  TablePrimaryHead,
-  TablePrimaryRow,
-  TablePrimaryHeadCell,
-  TablePrimary,
-} from '@/components/styled';
-import { cn } from '@/lib/utils';
+  allocationAmountUnit,
+  recipientKey,
+  sumAllocatedEth,
+  CST_RECORD_TYPES,
+  NFT_RECORD_TYPES,
+  STELLAR_SELECTION_RECORD_TYPES,
+} from '@/utils/allocationRecords';
+import { toFiniteNumber } from '@/utils/finiteNumber';
+import { TOUCH_TARGET_TEXT_LINK_CLASS } from '@/lib/touch-target';
+import { AddressChip } from '@/components/ui/address-chip';
+import { Amount } from '@/components/ui/amount';
+import {
+  DataTable,
+  ExternalTableLink,
+  TableLink,
+  TableTag,
+  TxProofLink,
+  type DataTableColumn,
+} from '@/components/ui/data-table';
+import { DateTime } from '@/components/ui/date-time';
+import { UnknownValue } from '@/components/ui/unknown-value';
+import type { LedgerStateProps } from '@/components/tables/ledger-props';
+import { useCycleHref } from '@/components/tables/useCycleHref';
 import type { WinningHistoryEntry } from '@/services/api/types';
+
 export type { WinningHistoryEntry };
 
-/** Stellar Selection rows in `AllPrizes` / `cg_prize.ptype`. */
-export const STELLAR_SELECTION_RECORD_TYPES = new Set([10, 11, 12, 13, 14, 18]);
+/** The allocation a record belongs to, by its backend `RecordType` (`cg_prize.ptype`). */
+export type AllocationSource =
+  | 'signature'
+  | 'finalCstGesture'
+  | 'enduranceChampion'
+  | 'chronoWarrior'
+  | 'stellarSelection'
+  | 'anchoredStellarSelection'
+  | 'anchorDistribution'
+  | 'attachedNftTimeout'
+  | 'attachedErc20Timeout'
+  | 'stellarEthTimeout';
 
-/** Backend `cg_prize.ptype` / API `RecordType` — must match black-site prize history labels. */
-const RECORD_TYPE_MAP: Record<number, { icon: ReactNode; textKey: string }> = {
-  0: { icon: <Ticket className="h-5 w-5" />, textKey: 'recipientHistory.types.mainEth' },
-  1: { icon: <Coins className="h-5 w-5" />, textKey: 'recipientHistory.types.mainCst' },
-  2: { icon: <Heart className="h-5 w-5" />, textKey: 'recipientHistory.types.mainNft' },
-  3: { icon: <Ticket className="h-5 w-5" />, textKey: 'recipientHistory.types.finalCstNft' },
-  4: {
-    icon: <Coins className="h-5 w-5" />,
-    textKey: 'recipientHistory.types.finalCstRecognition',
-  },
-  5: { icon: <Trophy className="h-5 w-5" />, textKey: 'recipientHistory.types.enduranceNft' },
-  6: {
-    icon: <Coins className="h-5 w-5" />,
-    textKey: 'recipientHistory.types.enduranceRecognition',
-  },
-  7: { icon: <Trophy className="h-5 w-5" />, textKey: 'recipientHistory.types.chronoEth' },
-  8: { icon: <Coins className="h-5 w-5" />, textKey: 'recipientHistory.types.chronoCst' },
-  9: { icon: <Ticket className="h-5 w-5" />, textKey: 'recipientHistory.types.chronoNft' },
-  10: {
-    icon: <Trophy className="h-5 w-5" />,
-    textKey: 'recipientHistory.types.participantStellarEth',
-  },
-  11: {
-    icon: <Coins className="h-5 w-5" />,
-    textKey: 'recipientHistory.types.participantStellarCst',
-  },
-  12: {
-    icon: <Layers className="h-5 w-5" />,
-    textKey: 'recipientHistory.types.participantStellarNft',
-  },
-  13: {
-    icon: <Coins className="h-5 w-5" />,
-    textKey: 'recipientHistory.types.anchorStellarCst',
-  },
-  14: {
-    icon: <Layers className="h-5 w-5" />,
-    textKey: 'recipientHistory.types.anchorStellarNft',
-  },
-  15: {
-    icon: <Ticket className="h-5 w-5" />,
-    textKey: 'recipientHistory.types.anchorDistributionEth',
-  },
-  16: {
-    icon: <Heart className="h-5 w-5" />,
-    textKey: 'recipientHistory.types.attachedNftRetrieval',
-  },
-  17: {
-    icon: <Coins className="h-5 w-5" />,
-    textKey: 'recipientHistory.types.attachedErc20Retrieval',
-  },
-  18: {
-    icon: <Trophy className="h-5 w-5" />,
-    textKey: 'recipientHistory.types.stellarEthRetrieval',
-  },
+export const ALLOCATION_SOURCE_BY_RECORD_TYPE: Readonly<Record<number, AllocationSource>> = {
+  0: 'signature',
+  1: 'signature',
+  2: 'signature',
+  3: 'finalCstGesture',
+  4: 'finalCstGesture',
+  5: 'enduranceChampion',
+  6: 'enduranceChampion',
+  7: 'chronoWarrior',
+  8: 'chronoWarrior',
+  9: 'chronoWarrior',
+  10: 'stellarSelection',
+  11: 'stellarSelection',
+  12: 'stellarSelection',
+  13: 'anchoredStellarSelection',
+  14: 'anchoredStellarSelection',
+  15: 'anchorDistribution',
+  16: 'attachedNftTimeout',
+  17: 'attachedErc20Timeout',
+  18: 'stellarEthTimeout',
 };
 
-const ETH_RECORD_TYPES = new Set([0, 7, 10, 15, 18]);
-const CST_RECORD_TYPES = new Set([1, 4, 6, 8, 11, 13]);
-const NFT_RECORD_TYPES = new Set([2, 3, 5, 9, 12, 14, 16]);
+/** Anchor Distribution ETH: retrieved with the anchors, not the other ETH. */
+const ANCHOR_DISTRIBUTION_TYPE = 15;
+/** An attached NFT from any collection, not a Cosmic Signature NFT. */
+const ATTACHED_NFT_TYPE = 16;
 
-function formatAllocationAmount(
-  recordType: number,
-  amountEth: number | undefined,
-  notApplicable: string,
-): string {
-  if (NFT_RECORD_TYPES.has(recordType)) {
-    return notApplicable;
-  }
-  if (ETH_RECORD_TYPES.has(recordType)) {
-    return `${(amountEth ?? 0).toFixed(4)} ETH`;
-  }
-  if (recordType === 17) {
-    return `${(amountEth ?? 0).toFixed(4)} (ERC-20)`;
-  }
-  if (CST_RECORD_TYPES.has(recordType)) {
-    return `${Math.round(amountEth ?? 0)} CST`;
-  }
-  return ' ';
+/** The My Allocations section where a record is retrieved. */
+export function retrievalSection(recordType: number): 'eth' | 'anchors' | 'nfts' | 'erc20' {
+  if (recordType === ANCHOR_DISTRIBUTION_TYPE) return 'anchors';
+  const unit = allocationAmountUnit(recordType);
+  if (unit === 'nft') return 'nfts';
+  if (unit === 'erc20') return 'erc20';
+  return 'eth';
 }
 
-const WinningHistoryRow = ({
-  history,
-  showClaimedStatus,
-  showWinnerAddr,
-  showRoundColumn,
-}: {
-  history: WinningHistoryEntry;
-  showClaimedStatus: boolean;
-  showWinnerAddr: boolean;
-  showRoundColumn: boolean;
-}) => {
+const isWallet = (value: string | undefined): value is string =>
+  typeof value === 'string' && isAddress(value, { strict: false });
+
+/** What a record allocated: an amount in its unit, or the NFT it refers to. */
+function AllocationAsset({ record }: { record: WinningHistoryEntry }) {
   const t = useTranslations('tables');
   const locale = useLocale();
-  const { cosmicToken } = useContractAddresses();
-  if (!history) return <TablePrimaryRow />;
+  const tokenId = toFiniteNumber(record.TokenId);
 
-  const recordType = RECORD_TYPE_MAP[history.RecordType] || {
-    icon: null,
-    textKey: null,
-  };
+  switch (allocationAmountUnit(record.RecordType)) {
+    case 'eth':
+      return (
+        <Amount value={record.AmountEth} unit="ETH" context="table" unitClassName="text-subtle" />
+      );
+    case 'cst':
+      return (
+        <Amount value={record.AmountEth} unit="CST" context="card" unitClassName="text-subtle" />
+      );
+    case 'nft': {
+      if (tokenId === null || tokenId < 0) return <span>NFT</span>;
+      const label = t('recipientHistory.nft', { id: tokenId });
+      if (record.RecordType === ATTACHED_NFT_TYPE && record.TokenAddress) {
+        return (
+          <ExternalTableLink href={getExplorerUrl('token', record.TokenAddress)}>
+            {label}
+          </ExternalTableLink>
+        );
+      }
+      return <TableLink href={`/detail/${tokenId}`}>{label}</TableLink>;
+    }
+    case 'erc20':
+      return (
+        <span className="whitespace-nowrap">
+          {formatNumber(toFiniteNumber(record.AmountEth), locale, { maximumFractionDigits: 4 })}{' '}
+          {record.TokenAddress ? (
+            <ExternalTableLink href={getExplorerUrl('token', record.TokenAddress)}>
+              {formatAddress(record.TokenAddress)}
+            </ExternalTableLink>
+          ) : null}
+        </span>
+      );
+    case 'unknown':
+      return <UnknownValue label={t('status.unavailable')} />;
+  }
+}
 
-  return (
-    <TablePrimaryRow className={cn(!history.Claimed && showClaimedStatus && 'bg-white/[0.06]')}>
-      <TablePrimaryCell label={t('columns.recordType')}>
-        <div className="flex items-center">
-          {recordType.icon}&nbsp;
-          <span className="break-words">{recordType.textKey ? t(recordType.textKey) : ' '}</span>
-          &nbsp;
-          {!history.Claimed && showClaimedStatus && (
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <button
-                  aria-label={t('recipientHistory.unretrievedAria')}
-                  className="inline-flex items-center justify-center h-6 w-6 rounded-full hover:bg-white/10"
-                >
-                  <AlertTriangle className="h-4 w-4 text-destructive" />
-                </button>
-              </TooltipTrigger>
-              <TooltipContent>{t('recipientHistory.unretrievedHelp')}</TooltipContent>
-            </Tooltip>
-          )}
-        </div>
-      </TablePrimaryCell>
-      <TablePrimaryCell label={t('columns.datetime')}>
-        <a
-          href={getExplorerUrl('tx', history.TxHash)}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="text-inherit"
-        >
-          <HydrationSafeDateTime timestamp={history.TimeStamp} locale={locale} />
-        </a>
-      </TablePrimaryCell>
-      {showWinnerAddr && (
-        <TablePrimaryCell label={t('columns.recipient')} align="center">
-          {history.WinnerAddr ? (
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <Link
-                  href={`/user/${history.WinnerAddr}`}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="font-mono text-inherit break-all"
-                >
-                  {shortenHex(history.WinnerAddr, 6)}
-                </Link>
-              </TooltipTrigger>
-              <TooltipContent>{history.WinnerAddr}</TooltipContent>
-            </Tooltip>
-          ) : (
-            ' '
-          )}
-        </TablePrimaryCell>
-      )}
-      {showRoundColumn && (
-        <TablePrimaryCell label={t('columns.cycle')} align="center">
-          <Link
-            href={`/allocation/${history.RoundNum}`}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="text-inherit"
-          >
-            {history.RoundNum}
-          </Link>
-        </TablePrimaryCell>
-      )}
-      <TablePrimaryCell label={t('columns.amount')} align="right">
-        {formatAllocationAmount(
-          history.RecordType,
-          history.AmountEth,
-          t('recipientHistory.notApplicable'),
-        )}
-      </TablePrimaryCell>
-      <TablePrimaryCell label={t('columns.tokenAddress')} align="center">
-        {history.RecordType === 1 ? (
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <a
-                href={getExplorerUrl('address', cosmicToken)}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-inherit break-all"
-              >
-                {shortenHex(cosmicToken, 6)}
-              </a>
-            </TooltipTrigger>
-            <TooltipContent>{cosmicToken}</TooltipContent>
-          </Tooltip>
-        ) : history.TokenAddress ? (
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <a
-                href={getExplorerUrl('address', history.TokenAddress)}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-inherit break-all"
-              >
-                {shortenHex(history.TokenAddress, 6)}
-              </a>
-            </TooltipTrigger>
-            <TooltipContent>{history.TokenAddress}</TooltipContent>
-          </Tooltip>
-        ) : (
-          ' '
-        )}
-      </TablePrimaryCell>
-      <TablePrimaryCell label={t('columns.tokenId')} align="center">
-        {(history.TokenId ?? -1) >= 0 ? (
-          <Link
-            href={`/detail/${history.TokenId}`}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="text-inherit"
-          >
-            {history.TokenId}
-          </Link>
-        ) : (
-          ' '
-        )}
-      </TablePrimaryCell>
-      {/* An ordering index within the cycle; the card layout drops it to stay scannable. */}
-      <TablePrimaryCell label={t('columns.position')} align="right" priority="secondary">
-        {(history.WinnerIndex ?? -1) >= 0 ? history.WinnerIndex : ' '}
-      </TablePrimaryCell>
-    </TablePrimaryRow>
-  );
-};
-
-function WinningHistorySubTable({
-  winningHistory,
-  perPage,
-  curPage,
-  showClaimedStatus,
-  showWinnerAddr,
-  showRoundColumn,
-}: {
-  winningHistory: WinningHistoryEntry[];
-  perPage: number;
-  curPage: number;
-  showClaimedStatus: boolean;
-  showWinnerAddr: boolean;
-  showRoundColumn: boolean;
-}) {
+/** Whether a record is still waiting on the recipient, with the way to retrieve it. */
+function RetrievalStatus({ record }: { record: WinningHistoryEntry }) {
   const t = useTranslations('tables');
-
+  if (record.Claimed) return <span className="text-subtle">{t('recipientHistory.retrieved')}</span>;
   return (
-    <TablePrimaryContainer>
-      <TablePrimary>
-        <TablePrimaryHead>
-          <tr>
-            <TablePrimaryHeadCell align="left">{t('columns.recordType')}</TablePrimaryHeadCell>
-            <TablePrimaryHeadCell align="left">{t('columns.datetime')}</TablePrimaryHeadCell>
-            {showWinnerAddr && (
-              <TablePrimaryHeadCell>{t('columns.recipient')}</TablePrimaryHeadCell>
-            )}
-            {showRoundColumn && <TablePrimaryHeadCell>{t('columns.cycle')}</TablePrimaryHeadCell>}
-            <TablePrimaryHeadCell align="right">{t('columns.amount')}</TablePrimaryHeadCell>
-            <TablePrimaryHeadCell>{t('columns.tokenAddress')}</TablePrimaryHeadCell>
-            <TablePrimaryHeadCell>{t('columns.tokenId')}</TablePrimaryHeadCell>
-            <TablePrimaryHeadCell align="right" priority="secondary">
-              {t('columns.position')}
-            </TablePrimaryHeadCell>
-          </tr>
-        </TablePrimaryHead>
-        <TablePrimaryBody>
-          {winningHistory
-            .slice((curPage - 1) * perPage, curPage * perPage)
-            .map((history, index) => (
-              <WinningHistoryRow
-                key={`${curPage}-${index}-${history.TxHash ?? history.RecordType}-${history.WinnerIndex ?? index}`}
-                history={history}
-                showClaimedStatus={showClaimedStatus}
-                showWinnerAddr={showWinnerAddr}
-                showRoundColumn={showRoundColumn}
-              />
-            ))}
-        </TablePrimaryBody>
-      </TablePrimary>
-    </TablePrimaryContainer>
+    <span className="inline-flex flex-wrap items-center justify-end gap-x-3 gap-y-1">
+      <TableTag tone="accent">{t('recipientHistory.readyToRetrieve')}</TableTag>
+      <TableLink
+        href={`/my-allocations#${retrievalSection(record.RecordType)}`}
+        className={TOUCH_TARGET_TEXT_LINK_CLASS}
+      >
+        {t('recipientHistory.retrieve')}
+      </TableLink>
+    </span>
   );
 }
 
-export default function RecipientHistoryTable({
-  winningHistory,
-  showClaimedStatus = false,
-  showWinnerAddr = true,
-  showRoundColumn = true,
-  perPage = 5,
-}: {
-  winningHistory: WinningHistoryEntry[];
-  showClaimedStatus?: boolean;
-  showWinnerAddr?: boolean;
-  showRoundColumn?: boolean;
-  perPage?: number;
-}) {
-  const t = useTranslations('tables');
-  const [currentPage, setCurrentPage] = useState(1);
+/**
+ * A record's stable identity, whatever order the table shows it in: its
+ * event, transaction, kind, place among the cycle's selections and token.
+ * (Its position in the list changes with every sort, and a key built on it
+ * remounted every row.)
+ */
+export function allocationRecordKey(record: WinningHistoryEntry): string {
+  return [record.EvtLogId, record.TxHash, record.RecordType, record.WinnerIndex, record.TokenId]
+    .map((part) => part ?? '')
+    .join('-');
+}
 
-  if (!winningHistory || winningHistory.length === 0) {
-    return <p>{t('empty.history')}</p>;
+function Recipient({ address }: { address: string | undefined }) {
+  const t = useTranslations('tables');
+  if (isWallet(address)) return <AddressChip address={address} variant="plain" showCopy={false} />;
+  // Anchor Distribution rows name every anchor-holder at once instead of a wallet.
+  return address ? <span>{t('recipientHistory.allAnchorHolders')}</span> : null;
+}
+
+/** One recipient's allocations in a cycle, summarised. */
+interface RecipientGroup {
+  address: string;
+  records: WinningHistoryEntry[];
+  sources: AllocationSource[];
+  eth: number;
+  cst: number;
+  nfts: WinningHistoryEntry[];
+}
+
+function groupByRecipient(records: readonly WinningHistoryEntry[]): RecipientGroup[] {
+  const groups = new Map<string, RecipientGroup>();
+  for (const record of records) {
+    const address = record.WinnerAddr ?? '';
+    const key = recipientKey(record);
+    let group = groups.get(key);
+    if (!group) {
+      group = { address, records: [], sources: [], eth: 0, cst: 0, nfts: [] };
+      groups.set(key, group);
+    }
+    group.records.push(record);
+    const source = ALLOCATION_SOURCE_BY_RECORD_TYPE[record.RecordType];
+    if (source && !group.sources.includes(source)) group.sources.push(source);
+    if (CST_RECORD_TYPES.has(record.RecordType)) {
+      group.cst += toFiniteNumber(record.AmountEth) ?? 0;
+    }
+    if (NFT_RECORD_TYPES.has(record.RecordType)) group.nfts.push(record);
+  }
+  for (const group of groups.values()) group.eth = sumAllocatedEth(group.records);
+  // The largest ETH allocation leads, which puts the Signature Allocation first.
+  return [...groups.values()].sort((a, b) => b.eth - a.eth || b.cst - a.cst);
+}
+
+/** Totals across the history: ETH, CST and NFTs received, and the cycles they came from. */
+function HistorySummary({ records }: { records: readonly WinningHistoryEntry[] }) {
+  const t = useTranslations('tables');
+  const locale = useLocale();
+  const cst = records
+    .filter((record) => CST_RECORD_TYPES.has(record.RecordType))
+    .reduce((total, record) => total + (toFiniteNumber(record.AmountEth) ?? 0), 0);
+  const figures: { label: string; value: ReactNode }[] = [
+    {
+      label: t('recipientHistory.totals.eth'),
+      value: <Amount value={sumAllocatedEth(records)} unit="ETH" showUnit={false} />,
+    },
+    {
+      label: t('recipientHistory.totals.cst'),
+      value: <Amount value={cst} unit="CST" showUnit={false} />,
+    },
+    {
+      label: t('recipientHistory.totals.nfts'),
+      value: formatCount(
+        records.filter((record) => NFT_RECORD_TYPES.has(record.RecordType)).length,
+        locale,
+      ),
+    },
+    {
+      label: t('recipientHistory.totals.cycles'),
+      value: formatCount(new Set(records.map((record) => record.RoundNum)).size, locale),
+    },
+  ];
+
+  return (
+    <dl className="mb-6 grid grid-cols-2 gap-x-6 gap-y-4 sm:grid-cols-4 sm:gap-x-0 sm:divide-x sm:divide-rule">
+      {figures.map((figure) => (
+        <div key={figure.label} className="min-w-0 sm:px-6 sm:first:pl-0">
+          <dt className="type-label text-subtle">{figure.label}</dt>
+          <dd className="mt-1 type-figure-md text-foreground">{figure.value}</dd>
+        </div>
+      ))}
+    </dl>
+  );
+}
+
+interface RecipientHistoryTableProps extends LedgerStateProps {
+  /** The allocation records to list. */
+  allocationRecords: WinningHistoryEntry[];
+  /** Mark each record retrieved or ready to retrieve, with a Retrieve link (your own history). */
+  showClaimedStatus?: boolean;
+  /** Show the recipient of each record. Default `true`. */
+  showRecipient?: boolean;
+  /** Show each record's cycle. Default `true`. */
+  showRoundColumn?: boolean;
+  /** Rows per page. Default: the table default (20, or 10 as phone records). */
+  perPage?: number;
+  /**
+   * `recipient`: one row per recipient with what they received (ETH, CST
+   * and NFTs, each in its own aligned column) and from which allocations,
+   * expanding to the individual records (a cycle's ledger).
+   */
+  groupBy?: 'recipient';
+  /** Totals above the table: ETH, CST and NFTs received, and cycles. */
+  showSummary?: boolean;
+}
+
+/**
+ * Allocation records: which allocation each came from, what it was (an
+ * amount, or the NFT it refers to), when (linked to its transaction), and,
+ * for your own history, whether it is retrieved yet.
+ */
+export default function RecipientHistoryTable({
+  allocationRecords,
+  showClaimedStatus = false,
+  showRecipient = true,
+  showRoundColumn = true,
+  perPage,
+  groupBy,
+  showSummary = false,
+  ...state
+}: RecipientHistoryTableProps) {
+  const t = useTranslations('tables');
+  const cycleHref = useCycleHref();
+  const records = useMemo(() => allocationRecords ?? [], [allocationRecords]);
+  const sourceLabel = (recordType: number) => {
+    const source = ALLOCATION_SOURCE_BY_RECORD_TYPE[recordType];
+    return source ? t(`recipientHistory.sources.${source}`) : t('status.unknown');
+  };
+
+  const recordColumns = useMemo<DataTableColumn<WinningHistoryEntry>[]>(() => {
+    const label = (recordType: number) => {
+      const source = ALLOCATION_SOURCE_BY_RECORD_TYPE[recordType];
+      return source ? t(`recipientHistory.sources.${source}`) : t('status.unknown');
+    };
+    const all: (DataTableColumn<WinningHistoryEntry> | false)[] = [
+      {
+        id: 'source',
+        kind: 'text',
+        header: t('columns.source'),
+        value: (record) => label(record.RecordType),
+        cell: (record) => <span className="text-foreground">{label(record.RecordType)}</span>,
+        // A phone record opens on the allocation it is ("Signature Allocation").
+        phone: 'title',
+      },
+      {
+        id: 'datetime',
+        kind: 'datetime',
+        header: t('columns.datetime'),
+        value: (record) => record.TimeStamp,
+        txHash: (record) => record.TxHash,
+        sortable: true,
+      },
+      showRecipient && {
+        id: 'recipient',
+        kind: 'address',
+        header: t('columns.recipient'),
+        value: (record) => record.WinnerAddr,
+        cell: (record) => <Recipient address={record.WinnerAddr} />,
+      },
+      showRoundColumn && {
+        id: 'cycle',
+        kind: 'link',
+        header: t('columns.cycle'),
+        value: (record) => record.RoundNum,
+        // "Cycle 2", not a bare "2": a word-wide target that says where it
+        // leads, and the live cycle leads to its page, not to a record that
+        // does not exist yet.
+        cell: (record) =>
+          typeof record.RoundNum === 'number' ? (
+            <TableLink href={cycleHref(record.RoundNum)}>
+              {t('allocation.cycle', { cycle: record.RoundNum })}
+            </TableLink>
+          ) : null,
+        nowrap: true,
+        sortable: true,
+      },
+      {
+        id: 'received',
+        kind: 'amount',
+        header: t('columns.received'),
+        // Amounts sort by value; an NFT has no amount to compare.
+        value: (record) => {
+          const unit = allocationAmountUnit(record.RecordType);
+          return unit === 'eth' || unit === 'cst' ? toFiniteNumber(record.AmountEth) : null;
+        },
+        whenBlank: 'empty',
+        cell: (record) => <AllocationAsset record={record} />,
+      },
+      {
+        id: 'position',
+        kind: 'count',
+        header: t('columns.position'),
+        // Only a Stellar Selection has a place among the cycle's selections
+        // ("#3"); the API's index is 0-based, and every other allocation
+        // reports 0, which would read as a meaningless "Position 0".
+        value: (record) =>
+          STELLAR_SELECTION_RECORD_TYPES.has(record.RecordType) &&
+          typeof record.WinnerIndex === 'number' &&
+          record.WinnerIndex >= 0
+            ? record.WinnerIndex + 1
+            : null,
+        cell: (_record, { value }) =>
+          typeof value === 'number' ? <span className="tabular-nums">#{value}</span> : null,
+        whenBlank: 'empty',
+        hideWhenEmpty: true,
+        // An ordering index within the cycle; phone records drop it.
+        priority: 'secondary',
+      },
+      showClaimedStatus && {
+        id: 'status',
+        kind: 'text',
+        header: t('columns.status'),
+        align: 'end',
+        value: (record) => (record.Claimed ? 1 : 0),
+        cell: (record) => <RetrievalStatus record={record} />,
+      },
+    ];
+    return all.filter((column): column is DataTableColumn<WinningHistoryEntry> => Boolean(column));
+  }, [t, showRecipient, showRoundColumn, showClaimedStatus, cycleHref]);
+
+  const groups = useMemo(
+    () => (groupBy === 'recipient' ? groupByRecipient(records) : []),
+    [groupBy, records],
+  );
+
+  // What each recipient received sits in three aligned columns under one
+  // "Received" heading, one unit each, so the ETH, the CST and the NFT
+  // counts can each be read down and compared; a recipient who got none of
+  // a unit leaves its cell blank (and its phone record drops the line).
+  // Every NFT is a count here; the expanded records name and link each one.
+  const groupColumns = useMemo<DataTableColumn<RecipientGroup>[]>(() => {
+    const received = t('columns.received');
+    return [
+      {
+        id: 'recipient',
+        kind: 'address',
+        header: t('columns.recipient'),
+        value: (group) => group.address,
+        cell: (group) => <Recipient address={group.address} />,
+        phone: 'title',
+      },
+      {
+        id: 'sources',
+        kind: 'text',
+        header: t('columns.source'),
+        value: (group) => group.sources.length,
+        cell: (group) => (
+          <span className="inline-flex flex-wrap justify-end gap-1 sm:justify-start">
+            {group.sources.map((source) => (
+              <TableTag key={source}>
+                {/* A tag takes the short form the NFT pages use ("Anchored Selection"). */}
+                {source === 'anchoredStellarSelection'
+                  ? t('recipientHistory.sourceTags.anchoredStellarSelection')
+                  : t(`recipientHistory.sources.${source}`)}
+              </TableTag>
+            ))}
+          </span>
+        ),
+      },
+      {
+        id: 'eth',
+        kind: 'amount',
+        group: received,
+        header: t('recipientHistory.received.eth'),
+        label: t('recipientHistory.totals.eth'),
+        value: (group) => (group.eth > 0 ? group.eth : null),
+        showUnit: false,
+        whenBlank: 'empty',
+        sortable: true,
+      },
+      {
+        id: 'cst',
+        kind: 'amount',
+        unit: 'CST',
+        group: received,
+        header: t('recipientHistory.received.cst'),
+        label: t('recipientHistory.totals.cst'),
+        value: (group) => (group.cst > 0 ? group.cst : null),
+        showUnit: false,
+        whenBlank: 'empty',
+        sortable: true,
+      },
+      {
+        id: 'nfts',
+        kind: 'count',
+        group: received,
+        header: t('recipientHistory.received.nfts'),
+        label: t('recipientHistory.totals.nfts'),
+        value: (group) => (group.nfts.length > 0 ? group.nfts.length : null),
+        whenBlank: 'empty',
+        sortable: true,
+      },
+    ];
+  }, [t]);
+
+  const summary = showSummary && records.length > 0 ? <HistorySummary records={records} /> : null;
+
+  if (groupBy === 'recipient') {
+    return (
+      <div className={state.className}>
+        {summary}
+        <DataTable
+          data={groups}
+          columns={groupColumns}
+          ariaLabel={t('names.allocationsByRecipient')}
+          getRowKey={(group) => group.address.toLowerCase() || 'unknown'}
+          emptyTitle={t('empty.history')}
+          pageSize={perPage}
+          // The ledger arrives largest ETH first (the Signature Allocation
+          // leads); saying so puts the arrow on that header, and a first
+          // click turns the order around.
+          initialSort={{ id: 'eth', direction: 'desc' }}
+          layout="cards"
+          // The sources keep one line on a wide screen.
+          width="fill"
+          renderDetails={(group) => (
+            <ul className="divide-y divide-rule-faint">
+              {group.records.map((record) => (
+                <li
+                  key={allocationRecordKey(record)}
+                  className="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1 py-2 type-body-sm"
+                >
+                  <span className="text-muted-foreground">{sourceLabel(record.RecordType)}</span>
+                  <span className="flex flex-wrap items-baseline gap-x-4 gap-y-1 text-foreground">
+                    <AllocationAsset record={record} />
+                    {record.TxHash ? (
+                      <TxProofLink hash={record.TxHash} className="text-muted-foreground">
+                        <DateTime timestamp={record.TimeStamp} />
+                      </TxProofLink>
+                    ) : null}
+                  </span>
+                </li>
+              ))}
+            </ul>
+          )}
+          detailsLabel={(group, expanded) =>
+            expanded
+              ? t('recipientHistory.hideRecords')
+              : t('recipientHistory.showRecords', { count: group.records.length })
+          }
+          detailsHeader={t('recipientHistory.recordsHeader')}
+          {...state}
+          className={undefined}
+        />
+      </div>
+    );
   }
 
   return (
-    <div className="mt-4">
-      <WinningHistorySubTable
-        winningHistory={winningHistory}
-        showClaimedStatus={showClaimedStatus}
-        showWinnerAddr={showWinnerAddr}
-        showRoundColumn={showRoundColumn}
-        perPage={perPage}
-        curPage={currentPage}
-      />
-      <CustomPagination
-        page={currentPage}
-        setPage={setCurrentPage}
-        totalLength={winningHistory.length}
-        perPage={perPage}
+    <div className={state.className}>
+      {summary}
+      <DataTable
+        data={records}
+        columns={recordColumns}
+        ariaLabel={t('names.allocationRecords')}
+        getRowKey={allocationRecordKey}
+        emptyTitle={t('empty.history')}
+        pageSize={perPage}
+        layout="cards"
+        {...state}
+        className={undefined}
       />
     </div>
   );

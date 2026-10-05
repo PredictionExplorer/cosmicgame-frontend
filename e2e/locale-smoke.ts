@@ -7,28 +7,68 @@ type TranslatedLocale = (typeof TRANSLATED_LOCALES)[number];
 /**
  * Opens the header language menu (trigger named `label`) and returns it.
  *
- * The pill lives in the header only — the footer carries the crawlable
- * language directory — and the header is server-rendered in its desktop
- * layout, then re-rendered for phones once React has hydrated. A locator
- * resolved before that swap points at a detached button, and a click before
- * hydration is dropped by a menu that has not mounted yet, so the trigger is
- * re-resolved (visible instances only) and the click retried until the menu
- * is actually open.
+ * From 640px the header carries the language menu (a compact button, and a
+ * pill from 1536px; CSS shows one) — the footer carries the crawlable
+ * language directory. A click before hydration is dropped by a menu that has
+ * not mounted yet, so the trigger is re-resolved (visible instances only)
+ * and the click retried until the menu is actually open.
  */
 export async function openLanguageMenu(page: Page, label: string): Promise<Locator> {
   const menu = page.getByRole('menu');
   await expect(async () => {
-    const trigger = page.getByRole('button', { name: label }).filter({ visible: true }).first();
+    const trigger = page
+      .getByRole('banner')
+      .getByRole('button', { name: languageTriggerName(label) })
+      .filter({ visible: true })
+      .first();
     await trigger.click({ timeout: 5_000 });
     await expect(menu).toBeVisible({ timeout: 2_000 });
   }).toPass({ timeout: 30_000 });
   return menu;
 }
 
-/** Switches language through the header menu: `label` names the trigger, `option` the language. */
+/**
+ * Switches language the way a visitor would: `label` names the switcher,
+ * `option` the language. Phones keep the header for the wordmark and the
+ * wallet, so there the switcher is the select in the navigation drawer.
+ */
 export async function switchLanguage(page: Page, label: string, option: string): Promise<void> {
-  const menu = await openLanguageMenu(page, label);
+  const headerSwitcher = page
+    .getByRole('banner')
+    .getByRole('button', { name: languageTriggerName(label) })
+    .filter({ visible: true });
+  if ((await headerSwitcher.count()) > 0) {
+    const menu = await openLanguageMenu(page, label);
+    await menu.getByRole('menuitemradio', { name: option, exact: true }).click();
+    return;
+  }
+  const drawer = page.getByRole('dialog');
+  await expect(async () => {
+    // The drawer opens from the menu button at the header's end.
+    await page
+      .getByRole('banner')
+      .locator('button[aria-haspopup="dialog"]')
+      .last()
+      .click({ timeout: 5_000 });
+    await expect(drawer).toBeVisible({ timeout: 2_000 });
+  }).toPass({ timeout: 30_000 });
+  // The drawer's language control opens the same menu of explicit choices.
+  const menu = page.getByRole('menu');
+  await expect(async () => {
+    await drawer
+      .getByRole('button', { name: languageTriggerName(label) })
+      .click({ timeout: 5_000 });
+    await expect(menu).toBeVisible({ timeout: 2_000 });
+  }).toPass({ timeout: 30_000 });
   await menu.getByRole('menuitemradio', { name: option, exact: true }).click();
+}
+
+/**
+ * Every language control is named "<label>: <current language>" ("Language:
+ * English", "语言：简体中文"), so the current language is part of its name.
+ */
+export function languageTriggerName(label: string): RegExp {
+  return new RegExp(`^${label.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}\\s*[:：]`);
 }
 
 /**
@@ -80,7 +120,12 @@ export function defineLocaleSmoke(locale: TranslatedLocale): void {
         const drawer = page.getByRole('dialog');
         await expect(drawer.getByText(chrome.nav.gallery, { exact: true })).toBeVisible();
         await expect(drawer.getByText(chrome.nav.explore, { exact: true })).toBeVisible();
-        await expect(drawer.getByText(chrome.nav.help, { exact: true })).toBeVisible();
+        // About sits in the Learn section, after the host divider. The section
+        // is open on this FAQ page (the visitor is inside it); open it otherwise.
+        const learn = drawer.locator('details', {
+          has: page.locator('summary', { hasText: new RegExp(`^${chrome.nav.learn}$`) }),
+        });
+        if ((await learn.getAttribute('open')) === null) await learn.locator('summary').click();
         await expect(drawer.getByRole('link', { name: chrome.nav.aboutPattern })).toHaveAttribute(
           'href',
           `https://cosmicsignature.com${prefix}/about`,
@@ -89,9 +134,9 @@ export function defineLocaleSmoke(locale: TranslatedLocale): void {
         const primary = page.getByRole('navigation', { name: chrome.nav.primaryLabel });
         await expect(primary.getByText(chrome.nav.gallery, { exact: true })).toBeVisible();
         await expect(primary.getByText(chrome.nav.explore, { exact: true })).toBeVisible();
-        await expect(primary.getByText(chrome.nav.help, { exact: true })).toBeVisible();
-        await primary.getByRole('button', { name: chrome.nav.help }).click();
-        await expect(page.getByRole('menuitem', { name: chrome.nav.aboutPattern })).toHaveAttribute(
+        await expect(primary.getByText(chrome.nav.learn, { exact: true })).toBeVisible();
+        await primary.getByRole('button', { name: chrome.nav.learn }).click();
+        await expect(primary.getByRole('link', { name: chrome.nav.aboutPattern })).toHaveAttribute(
           'href',
           `https://cosmicsignature.com${prefix}/about`,
         );
@@ -104,8 +149,15 @@ export function defineLocaleSmoke(locale: TranslatedLocale): void {
         page.getByRole('heading', { level: 1, name: chrome.siteMap.heading }),
       ).toBeVisible();
       await expect(page).toHaveTitle(chrome.siteMap.title);
-      await expect(page.getByText(chrome.siteMap.section, { exact: true })).toBeVisible();
-      await expect(page.getByRole('link', { name: chrome.nav.aboutPattern })).toHaveAttribute(
+      const main = page.getByRole('main');
+      await expect(
+        main.getByRole('heading', { level: 2, name: chrome.siteMap.section, exact: true }),
+      ).toBeVisible();
+      // Phones fold each section behind its heading; open them all.
+      for (const toggle of await main.locator('button[aria-expanded="false"]:visible').all()) {
+        await toggle.click();
+      }
+      await expect(main.getByRole('link', { name: chrome.nav.aboutPattern })).toHaveAttribute(
         'href',
         `https://cosmicsignature.com${prefix}/about`,
       );
@@ -166,6 +218,16 @@ export function defineLocaleSmoke(locale: TranslatedLocale): void {
       context,
     }) => {
       await page.goto(`${prefix}/faq`);
+      // Phones fold the footer's groups behind their headings; unfold Language.
+      const toggle = page
+        .locator('footer')
+        .getByRole('button', { name: chrome.switcherLabel, exact: true });
+      if (await toggle.isVisible()) {
+        await expect(async () => {
+          if ((await toggle.getAttribute('aria-expanded')) !== 'true') await toggle.click();
+          await expect(toggle).toHaveAttribute('aria-expanded', 'true', { timeout: 1000 });
+        }).toPass();
+      }
       const directory = page.locator('footer').getByRole('navigation', {
         name: chrome.switcherLabel,
       });

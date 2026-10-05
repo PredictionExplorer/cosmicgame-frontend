@@ -1,9 +1,15 @@
 import { COSMIC_OG_SIZE } from '@/lib/og/CosmicOgCard';
-import { getOgCopy, getOgImageMetadata } from '@/lib/og/copy';
-import { createCosmicOgImage } from '@/lib/og/createCosmicOgImage';
+import { latestArtworkCard, ogImageMetadata } from '@/lib/og/cards';
+import { getOgCopy } from '@/lib/og/copy';
 
+/**
+ * The live cycle, beside the newest Signature (its wall label names the
+ * piece and the cycle it was imprinted in).
+ */
 export const contentType = 'image/png';
 export const size = COSMIC_OG_SIZE;
+// The card shows the newest Signature; regenerate as new ones are imprinted.
+export const revalidate = 3600;
 
 interface ImageProps {
   params: Promise<{ locale: string }>;
@@ -11,10 +17,10 @@ interface ImageProps {
 
 export async function generateImageMetadata({ params }: ImageProps) {
   const { locale } = await params;
-  return getOgImageMetadata(locale, 'currentCycle');
+  return ogImageMetadata(getOgCopy(locale, 'currentCycle').alt);
 }
 
 export default async function Image({ params }: ImageProps) {
   const { locale } = await params;
-  return createCosmicOgImage(locale, getOgCopy(locale, 'currentCycle'));
+  return latestArtworkCard(locale, 'currentCycle', 'app');
 }

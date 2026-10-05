@@ -1,43 +1,10 @@
 import userEvent from '@testing-library/user-event';
 
-import { render, screen, checkA11y } from '@/test-utils';
+import { faqContentEn } from '@/content/faq';
+
+import { render, screen, checkA11y, within } from '@/test-utils';
 
 import { PopularQuestions } from '../components/PopularQuestions';
-
-jest.mock('framer-motion', () => {
-  const React = require('react');
-  const cache: Record<string, React.ForwardRefExoticComponent<unknown>> = {};
-  return {
-    motion: new Proxy(
-      {},
-      {
-        get: (_target: unknown, prop: string) => {
-          if (!cache[prop]) {
-            const Comp = React.forwardRef(function MotionProxy(
-              props: Record<string, unknown>,
-              ref: React.Ref<HTMLElement>,
-            ) {
-              const {
-                initial: _i,
-                animate: _a,
-                whileInView: _w,
-                viewport: _v,
-                transition: _t,
-                variants: _va,
-                custom: _c,
-                ...rest
-              } = props;
-              return React.createElement(prop, { ...rest, ref });
-            });
-            Comp.displayName = `motion.${prop}`;
-            cache[prop] = Comp;
-          }
-          return cache[prop];
-        },
-      },
-    ),
-  };
-});
 
 describe('PopularQuestions', () => {
   const onQuestionClick = jest.fn();
@@ -46,61 +13,65 @@ describe('PopularQuestions', () => {
     onQuestionClick.mockClear();
   });
 
-  it('renders "Popular Questions" heading', () => {
-    render(<PopularQuestions onQuestionClick={onQuestionClick} />);
-    const heading = screen.getByRole('heading', { name: 'Popular Questions' });
-    expect(heading).toBeInTheDocument();
-    expect(heading.tagName).toBe('H2');
+  it('renders its heading as an H2', () => {
+    render(<PopularQuestions content={faqContentEn} onQuestionClick={onQuestionClick} />);
+    expect(
+      screen.getByRole('heading', { level: 2, name: 'Popular questions' }),
+    ).toBeInTheDocument();
   });
 
-  it('renders 4 question cards', () => {
-    render(<PopularQuestions onQuestionClick={onQuestionClick} />);
-
-    const cards = [
-      screen.getByRole('button', { name: /What is Cosmic Signature\?/i }),
-      screen.getByRole('button', { name: /What is the Signature Allocation\?/i }),
-      screen.getByRole('button', { name: /How does Stellar Selection work\?/i }),
-      screen.getByRole('button', { name: /How does Anchoring work\?/i }),
-    ];
-
-    expect(cards).toHaveLength(4);
+  it('lists the four popular questions as links to their answers', () => {
+    render(<PopularQuestions content={faqContentEn} onQuestionClick={onQuestionClick} />);
+    const list = screen.getByRole('list');
+    const links = within(list).getAllByRole('link');
+    expect(links).toHaveLength(4);
+    expect(links[0]).toHaveTextContent('How does a Performance Cycle work?');
+    expect(links[3]).toHaveAttribute('href', '#how-to-get-eth-on-arbitrum');
   });
 
-  it('renders correct question text for each card', () => {
-    render(<PopularQuestions onQuestionClick={onQuestionClick} />);
-    expect(screen.getByText('What is Cosmic Signature?')).toBeInTheDocument();
-    expect(screen.getByText('What is the Signature Allocation?')).toBeInTheDocument();
-    expect(screen.getByText('How does Stellar Selection work?')).toBeInTheDocument();
-    expect(screen.getByText('How does Anchoring work?')).toBeInTheDocument();
+  it('never repeats a question that opens its own category (D085)', () => {
+    for (const id of faqContentEn.popularQuestionIds) {
+      const category = faqContentEn.categories.find((entry) =>
+        entry.items.some((item) => item.id === id),
+      );
+      expect(category?.items[0]?.id).not.toBe(id);
+    }
   });
 
-  it('shows category label on each card', () => {
-    render(<PopularQuestions onQuestionClick={onQuestionClick} />);
-    expect(screen.getByText('Getting Started')).toBeInTheDocument();
-    expect(screen.getAllByText('Allocations & Distributions')).toHaveLength(3);
+  it('names each question’s category', () => {
+    render(<PopularQuestions content={faqContentEn} onQuestionClick={onQuestionClick} />);
+    expect(screen.getByText('Getting started')).toBeInTheDocument();
+    expect(screen.getAllByText('Allocations & distributions')).toHaveLength(2);
+    expect(screen.getByText('Arbitrum & technical')).toBeInTheDocument();
   });
 
-  it('calls onQuestionClick with correct arguments when clicked', async () => {
+  it('opens the answer in place instead of jumping', async () => {
     const user = userEvent.setup();
-    render(<PopularQuestions onQuestionClick={onQuestionClick} />);
-    const cosmicSignatureCard = screen.getByRole('button', {
-      name: /What is Cosmic Signature\?/i,
-    });
-    await user.click(cosmicSignatureCard);
-    expect(onQuestionClick).toHaveBeenCalledTimes(1);
-    expect(onQuestionClick).toHaveBeenCalledWith('what-is-cosmic-signature', 'getting-started');
+    render(<PopularQuestions content={faqContentEn} onQuestionClick={onQuestionClick} />);
+    await user.click(screen.getByRole('link', { name: /How does a Performance Cycle work\?/ }));
+    // lexicon-allow-start — a legacy public URL fragment id.
+    expect(onQuestionClick).toHaveBeenCalledWith(
+      'how-does-the-bidding-game-work',
+      'getting-started',
+    );
+    // lexicon-allow-end
   });
 
-  it('applies custom className', () => {
-    const { container } = render(
-      <PopularQuestions onQuestionClick={onQuestionClick} className="custom-class" />,
+  it('applies a custom className', () => {
+    render(
+      <PopularQuestions
+        content={faqContentEn}
+        onQuestionClick={onQuestionClick}
+        className="custom-class"
+      />,
     );
-    const section = container.querySelector('section');
-    expect(section).toHaveClass('custom-class');
+    expect(screen.getByRole('region', { name: 'Popular questions' })).toHaveClass('custom-class');
   });
 
   it('has no accessibility violations', async () => {
-    const { container } = render(<PopularQuestions onQuestionClick={onQuestionClick} />);
+    const { container } = render(
+      <PopularQuestions content={faqContentEn} onQuestionClick={onQuestionClick} />,
+    );
     await checkA11y(container);
   });
 });

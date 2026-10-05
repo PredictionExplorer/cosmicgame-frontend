@@ -1,14 +1,37 @@
-/* Landing-only composition: component styles cannot leak into the app host. */
+/*
+ * The landing home's composition. Type, colour, radius and spacing come from
+ * the design tokens (styles/tokens.css, styles/themes.css) and the type-*
+ * utilities; this module only places things. Nothing here starts hidden: the
+ * server HTML is the finished page, and only the art moves.
+ */
 .page {
+  /*
+   * The landing's own rhythm: sections sit about 96px apart at 1440px (the
+   * shared 120px, applied above and below every section, read as the same
+   * slide repeated with a blank screen between).
+   */
+  --section-gap: clamp(3.5rem, 2.5rem + 4vw, 6rem);
+  position: relative;
   background: hsl(var(--background));
   color: hsl(var(--foreground));
-  overflow-wrap: anywhere;
 }
+
+/*
+ * Japanese has no spaces to break at: the landing's short paragraphs and
+ * list items (the hero subhead at every breakpoint, step and stage bodies,
+ * legend rows) break between phrases, as headings and ledes already do
+ * site-wide. FAQ answers are running prose and keep normal breaking.
+ */
+.page :is(p, li):lang(ja):not(:global(.type-prose)) {
+  word-break: auto-phrase;
+}
+
+/* ── Hero ─────────────────────────────────────────────────────────────── */
 
 .hero {
   position: relative;
   isolation: isolate;
-  background: hsl(var(--background));
+  padding-block: clamp(1.5rem, 1rem + 3vw, 4rem) 0;
 }
 
 .hero::before {
@@ -18,563 +41,839 @@
   z-index: -1;
   pointer-events: none;
   background-image: var(--gradient-atmosphere);
-  opacity: var(--atmosphere-strength);
+  /* The hero always carries a visible atmosphere, even in Midnight's quiet 0.3. */
+  opacity: max(var(--atmosphere-strength), 0.65);
 }
 
-.backdrop {
+.starfield {
+  --starfield-column: 80rem;
   position: absolute;
   inset: 0;
   z-index: -1;
-  overflow: hidden;
-  opacity: 0.16;
   pointer-events: none;
-  mask-image: linear-gradient(#000, #000 50%, transparent);
+  opacity: var(--atmosphere-strength);
 }
 
-.header,
-.heroInner {
-  width: min(100% - 3rem, 80rem);
-  margin-inline: auto;
-}
-
-.header {
-  position: relative;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 1.5rem;
-  min-height: 5.25rem;
-  border-bottom: 1px solid hsl(var(--border));
-}
-
-.brand {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.75rem;
-  min-height: 44px;
-  flex-shrink: 0;
-  font-family: var(--font-family-display);
-  font-size: 1.125rem;
-  font-weight: 600;
-  letter-spacing: -0.03em;
-}
-
-.brandIcon {
-  width: 2.25rem;
-  height: 2.25rem;
-}
-.brandSecond {
-  color: hsl(var(--secondary));
-}
-.navigation {
-  display: flex;
-  align-items: center;
-  gap: clamp(1rem, 2.2vw, 2.5rem);
-}
-.navigation a {
-  display: inline-flex;
-  align-items: center;
-  min-height: 44px;
-  color: hsl(var(--muted-foreground));
-  font-size: 0.8125rem;
-  transition: color 180ms;
-}
-.navigation a:hover {
-  color: hsl(var(--foreground));
-}
-.preferences {
-  display: flex;
-  flex-shrink: 0;
-  align-items: center;
-  gap: 0.5rem;
-}
-.heroInner {
-  padding-top: clamp(2.5rem, 4vw, 4rem);
-}
+/*
+ * The source order is eyebrow, headline, lede, actions, art (the reading and
+ * focus order). Phones and tablets draw the art directly under the headline,
+ * in the first screen; from 64rem the copy takes five of twelve columns and
+ * the plate the other seven.
+ */
 .heroGrid {
   display: grid;
-  grid-template-columns: minmax(0, 1.06fr) minmax(0, 1fr);
-  align-items: center;
-  gap: clamp(2rem, 5vw, 5rem);
+  grid-template-columns: minmax(0, 1fr);
+  grid-template-areas:
+    'eyebrow'
+    'headline'
+    'art'
+    'subhead'
+    'actions';
 }
-.heroCopy {
-  min-width: 0;
+
+.heroEyebrow {
+  grid-area: eyebrow;
 }
-.eyebrow {
-  display: flex;
-  align-items: center;
-  gap: 0.65rem;
-  color: hsl(var(--muted-foreground));
-  font-size: 0.625rem;
-  font-weight: 500;
-  letter-spacing: 0.18em;
-  text-transform: uppercase;
-  line-height: 1.7;
-}
-.signal {
-  width: 6px;
-  height: 6px;
-  flex-shrink: 0;
-  border-radius: 50%;
-  background: hsl(var(--success));
-  box-shadow: 0 0 14px hsl(var(--success) / 0.25);
-}
+
 .headline {
-  margin-top: 1.5rem;
-  font-family: var(--font-family-display);
-  font-size: clamp(3.25rem, 5.5vw, 5.75rem);
-  font-weight: 500;
-  line-height: 1.035;
-  letter-spacing: -0.035em;
-  text-wrap: balance;
+  grid-area: headline;
+  margin-top: 1rem;
 }
+
 .headlineAccent {
   display: block;
   color: hsl(var(--secondary));
 }
-.subhead {
-  margin-top: 1.75rem;
-  max-width: 35rem;
-  color: hsl(var(--muted-foreground));
-  font-size: clamp(1rem, 1.15vw, 1.125rem);
-  line-height: 1.8;
-}
-.actions {
-  display: flex;
-  align-items: stretch;
-  flex-wrap: wrap;
-  gap: 0.75rem;
-  margin-top: 2rem;
-}
-.primaryAction,
-.secondaryAction {
-  display: inline-flex;
-  justify-content: center;
-  align-items: center;
-  gap: 1rem;
-  min-height: 3.5rem;
-  padding: 0.875rem 1.5rem;
-  border: 1px solid transparent;
-  border-radius: 0.625rem;
-  font-size: 0.875rem;
-  font-weight: 600;
-  transition:
-    background 180ms,
-    border-color 180ms,
-    filter 180ms;
-}
-.primaryAction {
-  background: var(--gradient-signature);
-  color: hsl(var(--primary-foreground));
-}
-.primaryAction:hover {
-  filter: brightness(1.1);
-}
-.secondaryAction {
-  border-color: hsl(var(--border));
-  background: hsl(var(--foreground) / 0.015);
-  color: hsl(var(--foreground));
-}
-.secondaryAction:hover {
-  border-color: hsl(var(--secondary) / 0.4);
-  background: hsl(var(--foreground) / 0.03);
-}
-.primaryAction svg,
-.secondaryAction svg {
-  flex-shrink: 0;
-}
-.exploreLinks {
-  display: flex;
-  flex-wrap: wrap;
-  column-gap: 1.5rem;
-  margin-top: 1rem;
-}
-.exploreLinks a {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.375rem;
-  min-height: 44px;
-  color: hsl(var(--muted-foreground));
-  font-size: 0.75rem;
-}
-.exploreLinks a:hover {
-  color: hsl(var(--primary));
-}
-.clockBand {
-  margin-top: clamp(2.5rem, 5vw, 4.5rem);
-}
-.credentials {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 1rem;
-  padding: 1.5rem 0 1.75rem;
-}
-.credentials ul {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  column-gap: 1.75rem;
-  row-gap: 0.75rem;
-}
-.credentials li {
-  display: flex;
-  align-items: center;
-  gap: 0.625rem;
-  color: hsl(var(--muted-foreground));
-  font-size: 0.625rem;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-}
-.credentials li::before {
-  content: '';
-  width: 3px;
-  height: 3px;
-  flex-shrink: 0;
-  border-radius: 50%;
-  background: hsl(var(--secondary));
-}
-.scrollLink {
-  display: grid;
-  place-items: center;
-  width: 44px;
-  height: 44px;
-  flex-shrink: 0;
-  border: 1px solid hsl(var(--border));
-  border-radius: 50%;
-  color: hsl(var(--muted-foreground));
+
+/*
+ * Chinese and Japanese set every glyph a full em wide, so the 72px display
+ * size overruns the five-column copy column (都在塑造艺术。 is 7em, the column
+ * about 6.9em) and balance strands 艺术。 on a third line. CJK headlines take
+ * 86% of the size beside the plate, and a line-final 。 gives up its empty
+ * half so it never forces a break.
+ */
+@media (width >= 64rem) {
+  html:is(:lang(zh), :lang(ja)) .headline {
+    font-size: calc(clamp(3rem, 0.75rem + 4.2vw, 4.5rem) * 0.86);
+  }
 }
 
-.artShowcase {
+html:is(:lang(zh), :lang(ja)) .headline {
+  text-spacing-trim: trim-both;
+}
+
+.heroArt {
+  grid-area: art;
+  min-width: 0;
+  margin-top: clamp(1.25rem, 1rem + 1.5vw, 2rem);
+}
+
+.subhead {
+  grid-area: subhead;
+  margin-top: clamp(1.25rem, 1rem + 1vw, 2rem);
+}
+
+.actions {
+  grid-area: actions;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.75rem 1rem;
+  margin-top: clamp(1.5rem, 1rem + 1vw, 2.25rem);
+}
+
+/* Narrow phones: the two actions stack at full width so no label wraps unevenly. */
+@media (width < 30rem) {
+  .actions {
+    flex-direction: column;
+    align-items: stretch;
+  }
+}
+
+.clockBand {
+  margin-top: clamp(2.5rem, 2rem + 3vw, 4.5rem);
+  padding-bottom: clamp(1rem, 2vw, 2rem);
+}
+
+@media (width >= 64rem) {
+  .heroGrid {
+    grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
+    grid-template-rows: 1fr auto auto auto auto 1fr;
+    grid-template-areas:
+      '. art'
+      'eyebrow art'
+      'headline art'
+      'subhead art'
+      'actions art'
+      '. art';
+    column-gap: clamp(2.5rem, 5vw, 5rem);
+  }
+
+  .heroArt {
+    margin-top: 0;
+    align-self: center;
+  }
+}
+
+/*
+ * Wide screens: the exhibit grows. From 100rem the hero and its clock reach
+ * into the right gutter (up to 20rem past the container, never into the
+ * page's own gutter) and the art column takes all of it, while the copy
+ * keeps the header's edge and the width it has at 80rem. PLATE_SIZES
+ * (HeroArtShowcase) follows this width.
+ */
+@media (width >= 100rem) {
+  .heroGrid,
+  .clockBand {
+    margin-inline-end: calc(-1 * min(50vw - 40rem - var(--gutter), 20rem));
+  }
+
+  .heroGrid {
+    grid-template-columns: minmax(0, 31.25rem) minmax(0, 1fr);
+  }
+}
+
+/* ── Art plates and wall labels ───────────────────────────────────────── */
+
+.showcase,
+.animationFigure {
   min-width: 0;
   margin: 0;
-  width: 100%;
-  max-width: 35rem;
-  justify-self: center;
 }
-.artEyebrow {
+
+/*
+ * The label and its controls share one row at every width: the label gives
+ * way (its caption line wraps) and the controls stay on the title's line.
+ */
+.wallLabel {
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   justify-content: space-between;
-  gap: 1rem;
-  margin-bottom: 0.875rem;
-  color: hsl(var(--muted-foreground));
-  font-size: 0.625rem;
-  letter-spacing: 0.16em;
-  text-transform: uppercase;
-}
-.artEyebrow svg {
-  color: hsl(var(--secondary) / 0.7);
-}
-.artFrame {
-  position: relative;
-  padding: 0.5rem;
-  border: 1px solid hsl(var(--border));
-  border-radius: 1rem;
-  background: linear-gradient(145deg, hsl(var(--foreground) / 0.03), hsl(var(--foreground) / 0.01));
-  box-shadow: 0 25px 90px -50px hsl(var(--secondary) / 0.3);
-}
-.artImage {
-  position: relative;
-  aspect-ratio: 1.3;
-  overflow: hidden;
-  border-radius: 0.625rem;
-  background: hsl(var(--surface-deep));
-}
-.artImage img {
-  height: 100%;
-  aspect-ratio: auto;
-  object-fit: contain;
-}
-.artImage a {
-  display: block;
-  height: 100%;
-}
-.artCaption {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  justify-content: space-between;
-  gap: 0.5rem 1rem;
-  padding: 1rem 0.5rem 0.5rem;
-  color: hsl(var(--muted-foreground));
-  font-family: ui-monospace, monospace;
-  font-size: 0.625rem;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-}
-.artCaption span:last-child {
-  color: hsl(var(--foreground));
-}
-.artNotes {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  justify-content: space-between;
-  gap: 0 1rem;
-  margin-top: 0.875rem;
-  font-size: 0.75rem;
-}
-.artNotes p {
-  max-width: 23rem;
-  color: hsl(var(--muted-foreground));
-  line-height: 1.7;
-}
-.artNotes a {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.4rem;
-  min-height: 44px;
-  color: hsl(var(--primary));
-}
-.section {
-  position: relative;
-  border-top: 1px solid hsl(var(--border) / 0.7);
-  background: hsl(var(--card));
-  padding-block: clamp(4rem, 7vw, 7rem);
-  scroll-margin-top: 1.5rem;
-}
-.sectionInner {
-  width: min(100% - 3rem, 80rem);
-  margin-inline: auto;
-}
-.sectionHeading {
-  max-width: 48rem;
-}
-.sectionEyebrow {
-  display: flex;
-  align-items: center;
   gap: 0.75rem;
-  font-family: ui-monospace, monospace;
-  color: hsl(var(--secondary));
-  font-size: 0.625rem;
-  font-weight: 500;
-  letter-spacing: 0.2em;
-  text-transform: uppercase;
-  line-height: 1.7;
+  padding-top: 0.875rem;
 }
-.sectionEyebrow::before {
-  content: '';
-  width: 1.75rem;
-  height: 1px;
-  flex-shrink: 0;
-  background: hsl(var(--secondary) / 0.7);
-}
-.sectionTitle {
-  margin-top: 1.25rem;
-  font-family: var(--font-family-display);
-  font-size: clamp(2rem, 3.5vw, 3.5rem);
-  font-weight: 500;
-  line-height: 1.12;
-  letter-spacing: -0.035em;
-  text-wrap: balance;
-}
-.sectionDescription {
-  margin-top: 1.25rem;
-  max-width: 43rem;
-  font-size: 1rem;
-  line-height: 1.8;
-  color: hsl(var(--muted-foreground));
-}
-.cycleGrid {
-  display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: 1.5rem;
-  margin-top: 3rem;
-}
-.cycleStage {
+
+.wallLabelText {
   min-width: 0;
-  padding-top: 1.5rem;
-  border-top: 1px solid hsl(var(--border));
+  flex: 1 1 auto;
 }
-.stageTop {
+
+/* Centred on the title's line: the buttons are taller than the text. */
+.wallControls {
   display: flex;
-  justify-content: space-between;
+  flex-shrink: 0;
   align-items: center;
-  color: hsl(var(--secondary));
-}
-.stageTop span {
-  font-family: ui-monospace, monospace;
-  font-size: 0.75rem;
-}
-.stageTop svg {
-  opacity: 0.65;
-}
-.cycleStage h3 {
-  margin-top: 1.5rem;
-  font-family: var(--font-family-display);
-  font-size: 1.5rem;
-  font-weight: 500;
-}
-.cycleStage p {
-  margin-top: 0.875rem;
-  font-size: 0.875rem;
-  line-height: 1.8;
-  color: hsl(var(--muted-foreground));
-}
-.disclaimer {
-  width: min(100% - 3rem, 80rem);
-  margin: 0 auto;
-  padding: 2rem 0;
-  border-top: 1px solid hsl(var(--border) / 0.75);
-  font-size: 0.75rem;
-  line-height: 1.8;
-  color: hsl(var(--muted-foreground));
+  gap: 0.25rem 1rem;
+  margin-block-start: -0.5rem;
+  margin-inline-end: -0.5rem;
 }
 
-@media (width < 64rem) {
-  .header {
-    flex-wrap: wrap;
-    gap: 0.5rem 1rem;
-    padding-block: 1rem;
-    min-height: auto;
-  }
-  .navigation {
-    order: 3;
-    width: 100%;
-    justify-content: flex-start;
-    flex-wrap: wrap;
-    column-gap: 1.5rem;
-    row-gap: 0;
-  }
-  .heroGrid {
-    gap: 2rem;
-  }
-  .headline {
-    font-size: clamp(2.75rem, 5.6vw, 4rem);
-  }
-  .eyebrow {
-    letter-spacing: 0.1em;
-  }
-  .cycleGrid {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 2rem;
-  }
-}
-
-@media (width < 48rem) {
-  .header,
-  .heroInner,
-  .sectionInner,
-  .disclaimer {
-    width: calc(100% - 2.5rem);
-  }
-  .header {
-    gap: 0.5rem;
-  }
-  .brand {
-    gap: 0.5rem;
-    font-size: 1rem;
-  }
-  .brandIcon {
-    width: 1.75rem;
-    height: 1.75rem;
-  }
-  .navigation {
-    justify-content: space-between;
-    column-gap: 0.75rem;
-  }
-  .navigation a {
-    font-size: 0.6875rem;
-  }
-  .heroGrid {
-    grid-template-columns: minmax(0, 1fr);
-    gap: 2.5rem;
-  }
-  .headline {
-    max-width: 35rem;
-    font-size: clamp(3rem, 9vw, 4.5rem);
-  }
-  .subhead {
-    font-size: 1rem;
-    line-height: 1.75;
-  }
-  .actions {
-    gap: 0.625rem;
-  }
-  .primaryAction,
-  .secondaryAction {
-    flex: 1 1 10rem;
-    padding-inline: 0.75rem;
-    gap: 0.375rem;
-    font-size: 0.8125rem;
-  }
-  .artShowcase {
-    max-width: 32rem;
-  }
-  .credentials {
-    align-items: flex-start;
-  }
-  .credentials ul {
-    column-gap: 1.25rem;
-  }
-  .cycleGrid {
-    grid-template-columns: minmax(0, 1fr);
-    gap: 1.75rem;
-  }
-  .cycleStage {
-    display: grid;
-    grid-template-columns: 2rem minmax(0, 1fr);
-    gap: 0 0.75rem;
-  }
-  .stageTop {
-    grid-row: span 2;
-    align-self: start;
-    padding-top: 0.25rem;
-  }
-  .stageTop svg {
+/*
+ * Controls that only work with JavaScript are not offered without it; the
+ * gallery link then ends the row, flush with the plate.
+ */
+@media (scripting: none) {
+  .scriptedControl {
     display: none;
   }
-  .cycleStage h3 {
+
+  .wallControls {
+    margin-inline-end: 0;
+  }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .plateEnter {
+    animation: plate-enter var(--duration-page) var(--ease-gallery) both;
+  }
+
+  .animation {
+    transition: opacity var(--duration-slow) var(--ease-gallery);
+  }
+}
+
+@keyframes plate-enter {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+/* The animation shows only once it is actually playing; the still holds until then. */
+.animation {
+  opacity: 0;
+}
+
+.animationVisible {
+  opacity: 1;
+}
+
+/* The plate and, while the animation runs, its progress hairline below it. */
+.animationStage {
+  position: relative;
+}
+
+/*
+ * Set in the gap above the wall label, so it appears and goes without moving
+ * anything: the sparse opening frames of the animation read as progress.
+ */
+.animationProgress {
+  position: absolute;
+  inset-inline: 0;
+  top: calc(100% + 0.375rem);
+  height: 1px;
+  overflow: hidden;
+  background: var(--rule-faint);
+}
+
+.animationProgress::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: hsl(var(--muted-foreground));
+  transform: scaleX(var(--progress, 0));
+  transform-origin: left center;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .animationProgress::after {
+    transition: transform var(--duration-base) linear;
+  }
+}
+
+/* ── The Art ──────────────────────────────────────────────────────────── */
+
+.artLayout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: clamp(2.5rem, 2rem + 2vw, 4rem);
+  margin-top: clamp(2.5rem, 2rem + 2vw, 4rem);
+}
+
+.artPlate {
+  min-width: 0;
+}
+
+.stages {
+  min-width: 0;
+}
+
+@media (width >= 64rem) {
+  .artLayout {
+    grid-template-columns: minmax(0, 7fr) minmax(0, 5fr);
+    column-gap: clamp(3rem, 5vw, 5rem);
+  }
+
+  /* The plate stays in view while the stages scroll past it. */
+  .artPlate {
+    position: sticky;
+    top: calc(4rem + env(safe-area-inset-top, 0px) + 2rem);
+    align-self: start;
+  }
+}
+
+/* One strip of figures divided by hairlines: 2 × 2 on phones, one row from 64rem. */
+.figureStrip {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  margin-top: clamp(3rem, 2.5rem + 2vw, 5rem);
+  border-top: 1px solid hsl(var(--rule));
+}
+
+.figure {
+  min-width: 0;
+  padding: 1.25rem 1rem 0.25rem 0;
+}
+
+.figure:nth-child(2n) {
+  padding-left: 1rem;
+  border-left: 1px solid var(--rule-faint);
+}
+
+.figure:nth-child(n + 3) {
+  margin-top: 1.25rem;
+  border-top: 1px solid var(--rule-faint);
+}
+
+.figureValue {
+  overflow-wrap: anywhere;
+}
+
+@media (width >= 64rem) {
+  .figureStrip {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+
+  .figure,
+  .figure:nth-child(2n) {
+    padding-inline: 1.5rem;
+    border-left: 1px solid var(--rule-faint);
+  }
+
+  .figure:first-child {
+    padding-left: 0;
+    border-left: 0;
+  }
+
+  .figure:nth-child(n + 3) {
+    margin-top: 0;
+    border-top: 0;
+  }
+}
+
+/* ── The Cycle ────────────────────────────────────────────────────────── */
+
+/*
+ * The heading, the steps, then the actions (the reading order). From 64rem
+ * the heading and the actions hold the left five columns and the steps run
+ * down the right seven, so the section opens on content, not on an empty
+ * right half.
+ */
+.cycleLayout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  grid-template-areas:
+    'intro'
+    'diagram'
+    'steps'
+    'actions';
+}
+
+.cycleIntro {
+  grid-area: intro;
+}
+
+/* The steps caption the drawing: on phones as numbered rows under it. */
+.steps {
+  grid-area: steps;
+  min-width: 0;
+  margin-top: clamp(1.5rem, 1rem + 1.5vw, 2.25rem);
+  border-bottom: 1px solid var(--rule-faint);
+}
+
+.step {
+  display: grid;
+  grid-template-columns: 2.5rem minmax(0, 1fr);
+  align-content: start;
+  column-gap: 1rem;
+  padding-block: 1.25rem;
+  border-top: 1px solid var(--rule-faint);
+}
+
+.cycleActions {
+  grid-area: actions;
+}
+
+/*
+ * The cycle drawn (./CycleDiagram.tsx): hairlines in the rule colour, the
+ * gestures and the latest extension in the accent, the fan in the tracks'
+ * own colours. Strokes keep their width however wide the drawing is.
+ */
+.cycleDiagram {
+  grid-area: diagram;
+  display: block;
+  width: 100%;
+  height: auto;
+  margin-top: clamp(2rem, 1.5rem + 2.5vw, 3.5rem);
+  overflow: visible;
+}
+
+.cycleDiagram :is(line, path, rect, circle) {
+  vector-effect: non-scaling-stroke;
+}
+
+.cycleAxis,
+.cycleTick,
+.cycleArc {
+  fill: none;
+  stroke: hsl(var(--rule));
+  stroke-width: 1;
+}
+
+.cycleArcLatest {
+  fill: none;
+  stroke: hsl(var(--primary));
+  stroke-width: 1.5;
+}
+
+.cycleGesture {
+  stroke: hsl(var(--primary));
+  stroke-width: 2;
+  stroke-linecap: round;
+}
+
+.cycleFinal {
+  fill: hsl(var(--background));
+  stroke: hsl(var(--foreground));
+  stroke-width: 2;
+}
+
+.cycleFan {
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.25;
+}
+
+.cycleSegment {
+  fill: currentColor;
+}
+
+.track-signature {
+  color: hsl(var(--track-signature));
+}
+
+.track-chrono {
+  color: hsl(var(--track-chrono));
+}
+
+.track-stellar {
+  color: hsl(var(--track-stellar-eth));
+}
+
+.track-anchor {
+  color: hsl(var(--track-anchoring));
+}
+
+.track-publicGoods {
+  color: hsl(var(--track-public-goods));
+}
+
+.track-nextCycle {
+  color: hsl(var(--track-compounding));
+}
+
+/* From 40rem the three steps caption the drawing's three zones, one column each. */
+@media (width >= 40rem) {
+  .steps {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    column-gap: clamp(1.5rem, 3vw, 3rem);
+    border-bottom: 0;
+  }
+
+  .step {
+    grid-template-columns: minmax(0, 1fr);
+    row-gap: 0.5rem;
+    padding-block: 1.25rem 0;
+    border-top: 1px solid hsl(var(--rule));
+  }
+}
+
+@media (width >= 64rem) {
+  .cycleLayout {
+    grid-template-columns: minmax(0, 1fr) auto;
+    grid-template-areas:
+      'intro actions'
+      'diagram diagram'
+      'steps steps';
+    column-gap: clamp(3rem, 6vw, 6rem);
+  }
+
+  .cycleActions {
+    align-self: end;
     margin-top: 0;
   }
 }
 
-@media (width < 26rem) {
-  .brandName {
-    line-height: 1.15;
+/*
+ * A heading beside its lede (SectionHeading layout="split"): from 64rem the
+ * eyebrow and H2 take seven columns and the lede the other five, set on the
+ * heading's last line.
+ */
+.splitHeading {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  row-gap: 1.25rem;
+}
+
+@media (width >= 64rem) {
+  .splitHeading {
+    grid-template-columns: minmax(0, 7fr) minmax(0, 5fr);
+    column-gap: clamp(3rem, 6vw, 6rem);
+    align-items: end;
   }
-  .brandSecond {
-    display: block;
+
+  .splitLede {
+    padding-bottom: 0.25rem;
   }
 }
 
+.sectionActions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.75rem 1.5rem;
+  margin-top: clamp(2.5rem, 2rem + 1.5vw, 3.5rem);
+}
+
+/*
+ * Narrow phones: a section's commit button and its quiet link stack like the
+ * hero's, the button at full width (The Cycle, the closing band).
+ */
+@media (width < 30rem) {
+  .sectionActions {
+    flex-direction: column;
+    align-items: stretch;
+  }
+}
+
+/* ── Allocation Tracks ────────────────────────────────────────────────── */
+
+.split {
+  margin-top: clamp(2.5rem, 2rem + 2vw, 4rem);
+}
+
+.legend {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  column-gap: clamp(2rem, 5vw, 5rem);
+  margin-top: 2rem;
+}
+
+.legendItem {
+  display: grid;
+  grid-template-columns: 0.75rem minmax(0, 1fr) auto;
+  align-items: baseline;
+  column-gap: 0.875rem;
+  padding-block: 1rem;
+  border-top: 1px solid var(--rule-faint);
+}
+
+.legendBody {
+  grid-column: 2 / -1;
+  margin-top: 0.375rem;
+}
+
+@media (width >= 48rem) {
+  .legend {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+.fixed {
+  margin-top: clamp(3rem, 2.5rem + 2vw, 4.5rem);
+}
+
+.fixedList {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  column-gap: clamp(1.5rem, 3vw, 2.5rem);
+  margin-top: 1rem;
+}
+
+.fixedItem {
+  min-width: 0;
+  padding-block: 1.25rem;
+  border-top: 1px solid var(--rule-faint);
+}
+
+@media (width >= 40rem) {
+  .fixedList {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (width >= 64rem) {
+  .fixedList {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+}
+
+/* ── Two-up sections (Public Goods, Anchoring) ────────────────────────── */
+
+.twoUp {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: clamp(2.5rem, 2rem + 3vw, 5rem);
+}
+
+/* When the plates cannot be shown, the words take the whole row. */
+.twoUp > :only-child {
+  grid-column: 1 / -1;
+}
+
+/* On phones the words lead and the art follows. */
+@media (width < 64rem) {
+  .twoUpReversed > :first-child {
+    order: 2;
+  }
+}
+
+@media (width >= 64rem) {
+  .twoUp {
+    grid-template-columns: minmax(0, 7fr) minmax(0, 5fr);
+    align-items: start;
+  }
+
+  .twoUpReversed {
+    grid-template-columns: minmax(0, 6fr) minmax(0, 6fr);
+    align-items: center;
+  }
+}
+
+.figurePanel {
+  min-width: 0;
+  padding-top: 1.5rem;
+  border-top: 1px solid hsl(var(--rule));
+}
+
+.specRows {
+  margin-top: 1.5rem;
+  border-block: 1px solid var(--rule-faint);
+}
+
+.specRow {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 1rem;
+  min-height: var(--row-h-dense);
+  padding-block: 0.75rem;
+}
+
+.specRow + .specRow {
+  border-top: 1px solid var(--rule-faint);
+}
+
+/* Kept to a reading measure, also when the plates are not drawn and the words take the row. */
+.checkList {
+  display: grid;
+  gap: 0.75rem;
+  max-inline-size: var(--measure-prose);
+  margin-top: 2rem;
+}
+
+.checkItem {
+  display: flex;
+  gap: 0.75rem;
+}
+
+/* ── Collection plates (Anchoring, the closing band) ──────────────────── */
+
+.collection {
+  display: grid;
+  gap: clamp(1rem, 2vw, 1.5rem);
+  min-width: 0;
+}
+
+.collectionItem {
+  min-width: 0;
+}
+
+/* One large plate over two: the anchored Signatures (two share a row; one fills it). */
+.anchoredPlates {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.anchoredPlates > .collectionItem:first-child:not(:nth-last-child(2)) {
+  grid-column: 1 / -1;
+}
+
+/* The newest six: two across on phones, three from 48rem. */
+.recentPlates {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  margin-top: clamp(2.5rem, 2rem + 2vw, 4rem);
+}
+
+@media (width >= 48rem) {
+  .recentPlates {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    column-gap: clamp(1.5rem, 3vw, 2.5rem);
+    row-gap: clamp(1.75rem, 3vw, 2.5rem);
+  }
+}
+
+/* ── The Council beside Verifiability ─────────────────────────────────── */
+
+.pair {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: clamp(3.5rem, 3rem + 3vw, 6rem);
+}
+
+/*
+ * Side by side, the two sections share their rows (heading, list, evidence),
+ * so both lists start level however long either heading runs.
+ */
+@media (width >= 64rem) {
+  .pair {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    column-gap: clamp(3rem, 6vw, 6rem);
+    row-gap: 0;
+  }
+
+  .pair > * {
+    display: grid;
+    grid-row: span 3;
+    grid-template-rows: subgrid;
+    align-content: start;
+  }
+}
+
+.rows {
+  margin-top: 2rem;
+}
+
+/* Under the claims' closing hairline (Steps framed), so no second rule. */
+.evidence {
+  margin-top: 1.25rem;
+}
+
+.evidenceLinks {
+  display: flex;
+  flex-wrap: wrap;
+  column-gap: 1.5rem;
+  margin-top: 0.5rem;
+}
+
+/* Phones: two by two, so a fourth link is never left alone on its line. */
+@media (width < 40rem) {
+  .evidenceLinks {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+/* ── FAQ ──────────────────────────────────────────────────────────────── */
+
+.faqLayout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 2.5rem;
+}
+
+@media (width >= 64rem) {
+  .faqLayout {
+    grid-template-columns: minmax(0, 4fr) minmax(0, 8fr);
+    column-gap: clamp(3rem, 6vw, 6rem);
+  }
+
+  .faqIntro {
+    position: sticky;
+    top: calc(4rem + env(safe-area-inset-top, 0px) + 2rem);
+    align-self: start;
+  }
+}
+
+.faqList {
+  min-width: 0;
+  border-bottom: 1px solid var(--rule-faint);
+}
+
+.faqItem {
+  border-top: 1px solid var(--rule-faint);
+}
+
+.faqQuestion {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1.5rem;
+  min-height: 3.5rem;
+  padding-block: 1.125rem;
+  cursor: pointer;
+  list-style: none;
+}
+
+.faqQuestion::-webkit-details-marker {
+  display: none;
+}
+
+.faqQuestion:hover {
+  color: hsl(var(--primary));
+}
+
+.faqChevron {
+  width: 1.25rem;
+  height: 1.25rem;
+  flex-shrink: 0;
+  margin-top: 0.125rem;
+  color: hsl(var(--subtle-foreground));
+  transition: rotate var(--duration-base) var(--ease-out-expo);
+}
+
+.faqItem[open] .faqChevron {
+  rotate: 180deg;
+}
+
+/* ── Closing band ─────────────────────────────────────────────────────── */
+
+.closing {
+  background: hsl(var(--surface-sunken));
+}
+
+.closingHead {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  align-items: end;
+  gap: 0 3rem;
+}
+
+.closingHead .sectionActions {
+  margin-top: 2rem;
+}
+
+@media (width >= 64rem) {
+  .closingHead {
+    grid-template-columns: minmax(0, 1fr) auto;
+  }
+
+  .closingHead .sectionActions {
+    margin-top: 0;
+  }
+}
+
+/* Only the art moves by itself, and not under reduced motion. */
 @media (prefers-reduced-motion: reduce) {
-  .page,
   .page *,
   .page *::before,
   .page *::after {
-    animation: none !important;
-    transition: none !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
     scroll-behavior: auto !important;
   }
-}
-
-.artControls {
-  display: flex;
-  align-items: center;
-  gap: 0.25rem;
-}
-.artControls > span {
-  margin-right: 0.5rem;
-  min-width: 7ch;
-}
-.artControls button {
-  display: grid;
-  place-items: center;
-  width: 44px;
-  height: 44px;
-  border: 1px solid hsl(var(--border));
-  border-radius: 50%;
-  color: hsl(var(--primary));
-  cursor: pointer;
-  transition: background 180ms;
-}
-.artControls button:hover {
-  background: hsl(var(--border) / 0.7);
-}
-
-.artImage a:focus-visible {
-  outline: 2px solid hsl(var(--secondary));
-  outline-offset: -4px;
 }

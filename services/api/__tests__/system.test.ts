@@ -2,7 +2,12 @@
 
 import axios from 'axios';
 
-import { get_current_time, get_system_modelist, get_system_events } from '@/services/api/system';
+import {
+  coordinationStartId,
+  get_current_time,
+  get_system_modelist,
+  get_system_events,
+} from '@/services/api/system';
 
 jest.mock('axios', () => {
   const actual = jest.requireActual<typeof import('axios')>('axios');
@@ -116,6 +121,18 @@ describe('system API', () => {
       mockedAxios.get.mockRejectedValue(new Error('Network Error'));
 
       await expect(get_system_events(0, 100)).rejects.toThrow('Network response was not OK');
+    });
+  });
+
+  describe('coordinationStartId', () => {
+    it('starts at the latest mode change (the list is newest first)', () => {
+      expect(coordinationStartId([{ EvtLogId: 26005 }, { EvtLogId: 12000 }])).toBe(26005);
+    });
+
+    it('starts at 0, listing every admin event, when no mode change is indexed', () => {
+      expect(coordinationStartId([])).toBe(0);
+      expect(coordinationStartId(null)).toBe(0);
+      expect(coordinationStartId([{ EvtLogId: Number.NaN }])).toBe(0);
     });
   });
 });

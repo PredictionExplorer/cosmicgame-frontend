@@ -1,12 +1,19 @@
-import type { Metadata } from 'next';
+import type { Metadata, ResolvingMetadata } from 'next';
 import { getTranslations, setRequestLocale } from 'next-intl/server';
 
 import { PageMessages } from '@/components/i18n/PageMessages';
 import { APP_ORIGIN, localeHref } from '@/lib/hostRouting';
-import { getCstInfoSeed, getDashboardInfoSeed } from '@/services/api/server';
-import type { CSTTokenInfo, DashboardInfo } from '@/services/api';
+import {
+  getCstInfoSeed,
+  getCurrentSpecialRecipientsSeed,
+  getDashboardInfoSeed,
+  getHomeTimingSeed,
+  getLatestGestureSeed,
+  getServerRenderTimeMs,
+} from '@/services/api/server';
+import type { CSTTokenInfo, DashboardInfo, GestureInfo } from '@/services/api';
 import { JsonLd, breadcrumbJsonLd, jsonLdInLanguage, webPageJsonLd } from '@/utils/jsonLd';
-import { createMetadata } from '@/utils/seo';
+import { createPageMetadata } from '@/utils/seo';
 
 import ExperimentalHomePage from './ExperimentalHomePage';
 
@@ -32,12 +39,16 @@ async function pickInitialBannerToken(
   return info?.Seed ? { id, info } : null;
 }
 
-export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
+export async function generateMetadata(
+  { params }: PageProps,
+  parent: ResolvingMetadata,
+): Promise<Metadata> {
   const { locale } = await params;
   setRequestLocale(locale);
   const t = await getTranslations({ locale, namespace: 'meta' });
 
-  return createMetadata(
+  return createPageMetadata(
+    parent,
     t('experimentalUi.title'),
     t('experimentalUi.description'),
     undefined,
@@ -49,9 +60,21 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 export default async function Page({ params }: PageProps) {
   const { locale } = await params;
   setRequestLocale(locale);
+  const initialRenderAtMs = getServerRenderTimeMs();
 
-  const initialDashboardData = await getDashboardInfoSeed();
-  const initialBannerToken = await pickInitialBannerToken(initialDashboardData);
+  // The same seed snapshot as the Observatory, so the clock, standings and
+  // latest Gesture are complete in the server HTML rather than 0s.
+  const [initialDashboardData, initialTimingSample] = await Promise.all([
+    getDashboardInfoSeed(),
+    getHomeTimingSeed(),
+  ]);
+  const [initialBannerToken, initialLatestGesture, initialSpecialRecipients] = await Promise.all([
+    pickInitialBannerToken(initialDashboardData),
+    initialDashboardData
+      ? getLatestGestureSeed(initialDashboardData.CurRoundNum)
+      : Promise.resolve<GestureInfo | null>(null),
+    getCurrentSpecialRecipientsSeed(),
+  ]);
   const [meta, experiment] = await Promise.all([
     getTranslations({ locale, namespace: 'meta' }),
     getTranslations({ locale, namespace: 'home' }),
@@ -61,7 +84,9 @@ export default async function Page({ params }: PageProps) {
   const localizedOrigin = localeHref(APP_ORIGIN, '/', locale);
 
   return (
-    <PageMessages namespaces={['currentCycle', 'detail', 'home', 'statistics', 'tables']}>
+    <PageMessages
+      namespaces={['currentCycle', 'detail', 'glossary', 'home', 'statistics', 'tables', 'traits']}
+    >
       <JsonLd
         data={[
           webPageJsonLd({
@@ -73,7 +98,7 @@ export default async function Page({ params }: PageProps) {
           breadcrumbJsonLd(
             [
               { name: 'Cosmic Signature', path: '/' },
-              { name: experiment('deck.experimentalUi'), path: '/experimental-ui' },
+              { name: experiment('deck.artViewTitle'), path: '/experimental-ui' },
             ],
             localizedOrigin,
           ),
@@ -82,6 +107,10 @@ export default async function Page({ params }: PageProps) {
       <ExperimentalHomePage
         initialDashboardData={initialDashboardData}
         initialBannerToken={initialBannerToken}
+        initialLatestGesture={initialLatestGesture}
+        initialSpecialRecipients={initialSpecialRecipients}
+        initialTimingSample={initialTimingSample}
+        initialRenderAtMs={initialRenderAtMs}
       />
     </PageMessages>
   );

@@ -53,6 +53,8 @@ compose perfectly: 每一笔，都在塑造签名 ("Every Gesture Shapes the Sig
 | ETH gesture / CST gesture          | ETH 落笔 / CST 落笔 |
 | Gesture Cost                       | 落笔价格            |
 | Final Gesture                      | 收官之笔            |
+| Last Gesture (the role)            | 最新落笔            |
+| Your cycle standing (personal)     | 你在本周期的位置    |
 | gesture count / Number of Gestures | 落笔次数            |
 | Live gestures                      | 实时落笔            |
 | Gestures with CST                  | CST 落笔            |
@@ -284,7 +286,7 @@ Interface vocabulary — no coinage needed, but fixed for consistency:
 | Gallery                              | 画廊                       | art gallery, not 图库                                |
 | How It Works                         | 运作原理                   |                                                      |
 | FAQ / Clarifications                 | 常见问题 / 释疑            | nav uses 常见问题; the FAQ page heading may use 释疑 |
-| Learn Hub                            | 学习中心                   |                                                      |
+| Learn (was Learn Hub)                | 学习                       | prose: 学习指南                                      |
 | About                                | 关于                       |                                                      |
 | Statistics                           | 统计                       |                                                      |
 | My Statistics / My Tokens            | 我的统计 / 我的代币        |                                                      |
@@ -366,7 +368,7 @@ The wire label `Round` maps to 周期, never 轮/轮次.
 | Chaos (index)                  | 混沌度              | 0–100                                                                                                                                                                    |
 | Syzygies                       | 连珠                | three-body alignments; 连珠 is the classical astronomical term                                                                                                           |
 | Imprinted (trait)              | 铭刻时间            |                                                                                                                                                                          |
-| Allocation (trait)             | 分配                | values reuse §2: 星选 · 锚定 NFT 星选 · 收官之笔 · 最后 CST 落笔 · 坚守冠军 · 时之勇士                                                                                   |
+| Allocation (trait)             | 分配                | values reuse §2: 星选 · 锚定 NFT 星选 · 收官之笔 · CST 收官之笔 · 坚守冠军 · 时之勇士                                                                                    |
 | structure vocabulary values    | 见 traits.json      | Orbit Ribbons 轨道绸带 · Time Chords 时间和弦 · Harmonic Weave 谐波织纹 · Tangent Caustics 切线焦散 · Stipple Constellation 点彩星群 · Nebula Veil 星云薄纱              |
 | Collection DNA (gallery strip) | 作品集基因          |                                                                                                                                                                          |
 | quick view                     | 快速预览            |                                                                                                                                                                          |

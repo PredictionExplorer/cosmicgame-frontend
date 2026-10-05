@@ -6,6 +6,7 @@ import {
   DEFAULT_SITE_THEME,
   isSiteTheme,
   THEME_CHANGE_EVENT,
+  THEME_CHROME,
   THEME_STORAGE_KEY,
   themeCookieString,
   themeFromCookie,
@@ -39,13 +40,11 @@ export function currentSiteTheme(): SiteTheme {
 
 function applyTheme(theme: SiteTheme) {
   document.documentElement.dataset.theme = theme;
-  // Keep mobile browser chrome aligned, including after a soft navigation.
-  const color = getComputedStyle(document.documentElement).getPropertyValue('--background').trim();
-  if (color) {
-    document.querySelectorAll('meta[name="theme-color"]').forEach((meta) => {
-      meta.setAttribute('content', `hsl(${color})`);
-    });
-  }
+  // Keep mobile browser chrome aligned, including after a soft navigation
+  // re-renders the viewport meta with the static default.
+  document.querySelectorAll('meta[name="theme-color"]').forEach((meta) => {
+    meta.setAttribute('content', THEME_CHROME[theme]);
+  });
 }
 
 export function restoreSiteTheme() {

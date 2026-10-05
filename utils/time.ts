@@ -61,13 +61,18 @@ const chineseRelativeTime = (units: Record<RelativeTimeUnit, string>, justNow: s
  * delegates too: Vietnamese has no plural inflection, and CLDR's spaced
  * "2 giờ trước" / "3 tháng trước" is exactly the style guide's form.
  */
-const intlRelativeTime = (locale: string) => ({
-  ago: (count: number, unit: RelativeTimeUnit) =>
-    new Intl.RelativeTimeFormat(getLocaleConfig(locale).intlLocale, { numeric: 'always' }).format(
-      -count,
-      unit,
-    ),
-});
+const intlRelativeTime = (locale: string) => {
+  // Built once per locale, on first use: construction is the expensive part.
+  let formatter: Intl.RelativeTimeFormat | undefined;
+  return {
+    ago: (count: number, unit: RelativeTimeUnit) => {
+      formatter ??= new Intl.RelativeTimeFormat(getLocaleConfig(locale).intlLocale, {
+        numeric: 'always',
+      });
+      return formatter.format(-count, unit);
+    },
+  };
+};
 const RELATIVE_TIME_LABELS: LocaleRecord<RelativeTimeLabels> = {
   en: {
     justNow: 'just now',
@@ -97,35 +102,6 @@ export function getRelativeTime(timestamp: number, nowSeconds?: number, locale =
   if (diff < MONTH) return labels.ago(Math.floor(diff / DAY), 'day');
   if (diff < YEAR) return labels.ago(Math.floor(diff / MONTH), 'month');
   return labels.ago(Math.floor(diff / YEAR), 'year');
-}
-
-/**
- * Formats an ISO `YYYY-MM-DD` date for display. English keeps the raw ISO
- * form (the historical byte-pinned rendering); other locales render their
- * long date form.
- */
-const longIsoDateLabel = (locale: string) => (isoDate: string) =>
-  new Intl.DateTimeFormat(getLocaleConfig(locale).intlLocale, {
-    year: 'numeric',
-    month: 'long',
-    day: 'numeric',
-    timeZone: 'UTC',
-  }).format(new Date(`${isoDate}T00:00:00Z`));
-
-const ISO_DATE_LABEL_FORMATS: LocaleRecord<(isoDate: string) => string> = {
-  en: (isoDate) => isoDate,
-  zh: longIsoDateLabel('zh'),
-  'zh-TW': longIsoDateLabel('zh-TW'),
-  'zh-HK': longIsoDateLabel('zh-HK'),
-  uk: longIsoDateLabel('uk'),
-  ko: longIsoDateLabel('ko'),
-  ja: longIsoDateLabel('ja'),
-  vi: longIsoDateLabel('vi'),
-};
-
-/** Locale-appropriate display form of an ISO `YYYY-MM-DD` date string. */
-export function formatIsoDateLabel(isoDate: string, locale: string = 'en'): string {
-  return pickByLocale(ISO_DATE_LABEL_FORMATS, locale)(isoDate);
 }
 
 export interface ServerTimingSample {

@@ -2,6 +2,9 @@ import { decodeErrorResult, formatEther, type Abi, type Hex } from 'viem';
 
 import { cosmicGameAbi } from '@/contracts/abis';
 
+import { SUPPLEMENTAL_ERROR_ABI } from '@/utils/cosmicGameContractCompat';
+import { formatAmount } from '@/utils/format/numbers';
+
 /**
  * Contract-revert error helpers.
  *
@@ -12,51 +15,30 @@ import { cosmicGameAbi } from '@/contracts/abis';
  * viem into their bundle.
  */
 
-/** Detects viem's `ContractFunctionExecutionError` (on-chain revert) by error name. */
-export function isContractRevertError(err: unknown): boolean {
-  return err instanceof Error && err.name === 'ContractFunctionExecutionError';
-}
-
-/** Detects reads against addresses with no bytecode in local/e2e environments. */
+/**
+ * Detects reads against addresses with no bytecode in local/e2e environments.
+ *
+ * Walks the `cause` chain once, iteratively, with a visited set. Calling
+ * viem's `walk` with this function as the predicate re-walked every tail of
+ * the chain from every link, which grows exponentially with the chain's
+ * depth and froze the page on a deeply wrapped read error.
+ */
 export function isEmptyContractReadError(err: unknown): boolean {
-  if (!(err instanceof Error)) return false;
-
-  const message = err.message;
-  if (
-    message.includes('Cannot decode zero data ("0x")') ||
-    message.includes('returned no data ("0x")')
-  ) {
-    return true;
-  }
-
-  const walkable = err as Error & { cause?: unknown; walk?: (fn: (e: Error) => boolean) => Error };
-  if (typeof walkable.walk === 'function') {
-    try {
-      const inner = walkable.walk((e: Error) => isEmptyContractReadError(e));
-      if (inner) return true;
-    } catch {
-      /* ignore */
+  const seen = new Set<unknown>();
+  let current: unknown = err;
+  while (current instanceof Error && !seen.has(current)) {
+    seen.add(current);
+    const message = current.message;
+    if (
+      message.includes('Cannot decode zero data ("0x")') ||
+      message.includes('returned no data ("0x")')
+    ) {
+      return true;
     }
+    current = (current as Error & { cause?: unknown }).cause;
   }
-
-  return isEmptyContractReadError(walkable.cause);
+  return false;
 }
-
-const CUSTOM_ERROR_MESSAGES: Record<string, string> = {
-  InsufficientReceivedBidAmount:
-    'The current Gesture Cost is greater than the amount you transferred.',
-  UsedRandomWalkNft: 'This RandomWalk NFT has already been used for a gesture.',
-  CallerIsNotNftOwner: 'You are not the owner of this NFT.',
-  RoundIsInactive: 'The current cycle is not active.',
-  TooLongBidMessage: 'Your gesture message is too long.',
-  WrongBidType: 'Wrong gesture type selected.',
-  FundTransferFailed: 'Fund transfer failed.',
-  MainPrizeEarlyClaim: 'Not enough time has elapsed to retrieve the Signature Allocation.',
-  MainPrizeClaimDenied:
-    'Only the Last Participant is permitted to retrieve the Signature Allocation.',
-  NoBidsPlacedInCurrentRound: 'No gestures have been made in the current cycle yet.',
-  BidHasBeenPlacedInCurrentRound: 'A gesture has already been made in the current cycle.',
-};
 
 const CUSTOM_ERROR_TRANSLATION_KEYS: Record<string, string> = {
   InsufficientReceivedBidAmount: 'gesture.contractErrors.insufficientReceivedBidAmount',
@@ -70,6 +52,7 @@ const CUSTOM_ERROR_TRANSLATION_KEYS: Record<string, string> = {
   MainPrizeClaimDenied: 'finalize.contractErrors.mainPrizeClaimDenied',
   NoBidsPlacedInCurrentRound: 'finalize.contractErrors.noGestures',
   BidHasBeenPlacedInCurrentRound: 'gesture.contractErrors.bidHasBeenPlacedInCurrentRound',
+  BidCstRewardAmountMinLimitNotReached: 'gesture.contractErrors.cstRewardBelowMinimum',
 };
 
 type GestureCurrency = 'ETH' | 'CST';
@@ -78,6 +61,12 @@ export interface ContractErrorOptions {
   gestureCurrency?: GestureCurrency;
   displayedPrice?: number;
   displayedPriceWei?: bigint | null;
+  /**
+   * Formats the amounts in a cost-changed message the way the form showed
+   * them (the `exact` precision, the locale's separators: vi "0,10211").
+   * Default `en`.
+   */
+  locale?: string;
 }
 
 export interface ContractErrorDescriptor {
@@ -87,32 +76,73 @@ export interface ContractErrorDescriptor {
   errorName: string;
 }
 
+/** Full ABI used only for decoding revert data (game ABI + supplemental V2 errors). */
+const ERROR_DECODE_ABI = [...cosmicGameAbi, ...SUPPLEMENTAL_ERROR_ABI] as Abi;
+
+interface DecodedRevert {
+  errorName: string;
+  args: readonly unknown[];
+  /** The error's ABI input names, aligned with `args`, when the decode knew them. */
+  inputs: readonly { name?: string }[];
+}
+
 /**
- * Extracts the custom error name from a viem `ContractFunctionRevertedError`
- * nested inside a `ContractFunctionExecutionError`.
+ * The custom error a contract revert carried, from anywhere in a viem/wagmi
+ * error chain. viem fills `ContractFunctionRevertedError.data` only when the
+ * ABI the call was made with defines the error; when it does not (a narrow
+ * function slice, an older ABI), the raw revert data is decoded here against
+ * the full game ABI plus the supplemental V2 errors. Built-in `Error(string)`
+ * and `Panic` reverts are not custom errors and return null.
  */
-function extractContractErrorName(err: unknown): string | null {
-  if (!(err instanceof Error)) return null;
-
-  const walkable = err as Error & { cause?: unknown; walk?: (fn: (e: Error) => boolean) => Error };
-
-  if (typeof walkable.walk === 'function') {
+function decodedRevertOf(err: unknown): DecodedRevert | null {
+  const walkable = err as { walk?: (fn: (e: Error) => boolean) => Error | null } | null;
+  if (typeof walkable?.walk === 'function') {
     try {
       const inner = walkable.walk((e: Error) => e.name === 'ContractFunctionRevertedError');
-      if (inner && 'data' in inner) {
-        const data = (inner as Error & { data?: { errorName?: string; args?: unknown[] } }).data;
-        if (data?.errorName) return data.errorName;
+      const data = (
+        inner as
+          | (Error & {
+              data?: { errorName?: string; args?: unknown; abiItem?: { inputs?: unknown } };
+            })
+          | null
+      )?.data;
+      if (data?.errorName) {
+        return {
+          errorName: data.errorName,
+          args: Array.isArray(data.args) ? (data.args as readonly unknown[]) : [],
+          inputs: Array.isArray(data.abiItem?.inputs)
+            ? (data.abiItem.inputs as readonly { name?: string }[])
+            : [],
+        };
       }
     } catch {
-      /* Fall through to the explicit cause chain. */
+      /* Fall through to the raw revert data. */
     }
   }
 
-  if (walkable.cause instanceof Error) {
-    return extractContractErrorName(walkable.cause);
+  const raw = extractRevertData(err);
+  if (!raw || raw === '0x') return null;
+  try {
+    const decoded = decodeErrorResult({ abi: ERROR_DECODE_ABI, data: raw });
+    if (decoded.errorName === 'Error' || decoded.errorName === 'Panic') return null;
+    return {
+      errorName: decoded.errorName,
+      args: (decoded.args ?? []) as readonly unknown[],
+      inputs: ((decoded.abiItem as { inputs?: { name?: string }[] } | undefined)?.inputs ??
+        []) as readonly { name?: string }[],
+    };
+  } catch {
+    return null;
   }
+}
 
-  return null;
+/**
+ * The name of the custom error a contract revert carried ("UsedRandomWalkNft"),
+ * or null. For logs and `TxErrorInfo.contractErrorName`; the UI shows the
+ * localized sentence from {@link getContractErrorDescriptor} instead.
+ */
+export function contractErrorNameOf(err: unknown): string | null {
+  return decodedRevertOf(err)?.errorName ?? null;
 }
 
 function normalizeContractErrorOptions(
@@ -124,10 +154,10 @@ function normalizeContractErrorOptions(
 }
 
 function getPriceChangeDescriptor(
-  err: unknown,
-  errorName: string,
+  revert: DecodedRevert,
   options: ContractErrorOptions,
 ): ContractErrorDescriptor | null {
+  const { errorName } = revert;
   if (
     errorName !== 'InsufficientReceivedBidAmount' ||
     (options.displayedPrice === undefined && options.displayedPriceWei == null)
@@ -135,29 +165,12 @@ function getPriceChangeDescriptor(
     return null;
   }
 
-  const walkable = err as Error & { walk?: (fn: (e: Error) => boolean) => Error };
-  if (typeof walkable.walk !== 'function') return null;
-
-  let inner: Error | null = null;
-  try {
-    inner = walkable.walk((e: Error) => e.name === 'ContractFunctionRevertedError');
-  } catch {
-    return null;
-  }
-  if (!inner || !('data' in inner)) return null;
-
-  const data = (
-    inner as Error & {
-      data?: { args?: readonly unknown[]; abiItem?: { inputs?: { name?: string }[] } };
-    }
-  ).data;
   // V3.1 dropped the leading `errStr` string from custom errors, shifting
   // `bidPrice` from args[1] to args[0]; resolve it by input name and fall
   // back to the first bigint arg for ABIs without input names.
-  const inputs = data?.abiItem?.inputs ?? [];
-  const byName = inputs.findIndex((i) => i?.name === 'bidPrice');
+  const byName = revert.inputs.findIndex((input) => input?.name === 'bidPrice');
   const requiredWei =
-    byName >= 0 ? data?.args?.[byName] : data?.args?.find((a) => typeof a === 'bigint');
+    byName >= 0 ? revert.args[byName] : revert.args.find((arg) => typeof arg === 'bigint');
   if (typeof requiredWei !== 'bigint') return null;
 
   const displayedPrice =
@@ -167,12 +180,23 @@ function getPriceChangeDescriptor(
   const delta = requiredAmount - displayedPrice;
   if (delta <= 0) return null;
 
-  if ((options.gestureCurrency ?? 'ETH') === 'CST') {
+  const currency = options.gestureCurrency ?? 'ETH';
+  // The catalog prints the unit after each placeholder, so the number goes
+  // in alone, through the one precision policy the form uses.
+  const amount = (value: number) =>
+    formatAmount(value, {
+      unit: currency,
+      context: 'exact',
+      locale: options.locale,
+      withUnit: false,
+    });
+
+  if (currency === 'CST') {
     return {
       key: 'gesture.contractErrors.cstCostChanged',
       values: {
-        required: requiredAmount.toFixed(6),
-        maximum: displayedPrice.toFixed(6),
+        required: amount(requiredAmount),
+        maximum: amount(displayedPrice),
       },
       errorName,
     };
@@ -181,8 +205,10 @@ function getPriceChangeDescriptor(
   return {
     key: 'gesture.contractErrors.ethCostChanged',
     values: {
-      increase: delta.toFixed(6),
-      required: requiredAmount.toFixed(6),
+      // The exact policy rounds to six places, which also drops the float
+      // noise a difference of two 18-decimal amounts carries.
+      increase: amount(delta),
+      required: amount(requiredAmount),
     },
     errorName,
   };
@@ -197,66 +223,16 @@ export function getContractErrorDescriptor(
   err: unknown,
   optionsOrDisplayedEthPrice?: number | ContractErrorOptions,
 ): ContractErrorDescriptor | null {
-  const errorName = extractContractErrorName(err);
-  if (!errorName) return null;
+  const revert = decodedRevertOf(err);
+  if (!revert) return null;
 
   const options = normalizeContractErrorOptions(optionsOrDisplayedEthPrice);
-  const priceChange = getPriceChangeDescriptor(err, errorName, options);
+  const priceChange = getPriceChangeDescriptor(revert, options);
   if (priceChange) return priceChange;
 
-  const key = CUSTOM_ERROR_TRANSLATION_KEYS[errorName];
-  return key ? { key, errorName } : null;
+  const key = CUSTOM_ERROR_TRANSLATION_KEYS[revert.errorName];
+  return key ? { key, errorName: revert.errorName } : null;
 }
-
-/**
- * Returns a user-friendly error message for contract revert failures.
- * Decodes known contract custom errors and detects gesture-cost-rose scenarios.
- *
- * @param err - The caught error
- * @param displayedEthPrice - The ETH price (in ETH, not wei) shown to the user
- *   before submitting; used to compute the price-rose delta for
- *   `InsufficientReceivedBidAmount`.
- * @returns A friendly message string, or `null` to fall back to generic handling.
- */
-export function getContractErrorMessage(
-  err: unknown,
-  optionsOrDisplayedEthPrice?: number | ContractErrorOptions,
-): string | null {
-  const descriptor = getContractErrorDescriptor(err, optionsOrDisplayedEthPrice);
-  if (!descriptor) return null;
-
-  if (descriptor.key === 'gesture.contractErrors.cstCostChanged') {
-    return (
-      `CST Gesture Cost changed while your transaction was in transit, likely because another gesture landed first. ` +
-      `The contract required ${descriptor.values?.required} CST, above your ${descriptor.values?.maximum} CST maximum. Refresh and try again.`
-    );
-  }
-  if (descriptor.key === 'gesture.contractErrors.ethCostChanged') {
-    return `Gesture Cost rose by ${descriptor.values?.increase} ETH while your transaction was in transit. The new required cost is ${descriptor.values?.required} ETH. Please try again.`;
-  }
-
-  return CUSTOM_ERROR_MESSAGES[descriptor.errorName] ?? null;
-}
-
-/**
- * Custom errors that the V2 bid paths can revert with but that are missing from
- * the generated `cosmicGameAbi` (the ABI has the V2 bid *functions* but not these
- * V2 error definitions). Regenerating the ABI from the V2 contracts would make
- * this list unnecessary — keep it in sync until then.
- */
-const SUPPLEMENTAL_ERROR_ABI = [
-  {
-    type: 'error',
-    name: 'BidCstRewardAmountMinLimitNotReached',
-    inputs: [
-      { name: 'bidCstRewardAmount', type: 'uint256', internalType: 'uint256' },
-      { name: 'bidCstRewardAmountMinLimit', type: 'uint256', internalType: 'uint256' },
-    ],
-  },
-] as const;
-
-/** Full ABI used only for decoding revert data (game ABI + supplemental V2 errors). */
-const ERROR_DECODE_ABI = [...cosmicGameAbi, ...SUPPLEMENTAL_ERROR_ABI] as Abi;
 
 /**
  * Some nodes expose the revert bytes as a nested object with a `.data` string,
@@ -276,10 +252,11 @@ function hexFromNestedData(value: unknown, depth = 0): Hex | undefined {
 }
 
 /**
- * Last-resort extraction: some providers (notably Hardhat behind the wallet's RPC
- * relay) surface the revert bytes ONLY inside the error's message text, e.g.
- * `...VM Exception... (return data: 0x16df8bd8...)`. Scan any string for a long
- * 0x-hex run whose length is consistent with an ABI-encoded custom error.
+ * Last-resort extraction: some providers (notably Hardhat behind the wallet's
+ * RPC relay) surface the revert bytes ONLY inside the error's message text,
+ * e.g. `...VM Exception... (return data: 0x16df8bd8...)`. Scan any string for
+ * a long 0x-hex run whose length is consistent with an ABI-encoded custom
+ * error.
  */
 function hexFromMessageText(err: unknown): Hex | undefined {
   const seen = new Set<unknown>();
@@ -310,8 +287,8 @@ function hexFromMessageText(err: unknown): Hex | undefined {
 }
 
 /** Pulls the raw revert data (`0x<selector><args>`) out of a viem/wagmi error chain.
- * Exported for unit testing (the surrounding `formatCustomContractError` relies on
- * viem's `decodeErrorResult`, which is mocked out in the jsdom test environment). */
+ * Exported for unit testing (the surrounding decode helpers rely on viem's
+ * `decodeErrorResult`, which is mocked out in the jsdom test environment). */
 export function extractRevertData(err: unknown): Hex | undefined {
   const seen = new Set<unknown>();
   let e: unknown = err;
@@ -321,8 +298,11 @@ export function extractRevertData(err: unknown): Hex | undefined {
     if (typeof node.raw === 'string' && node.raw.startsWith('0x') && node.raw.length >= 10) {
       return node.raw as Hex;
     }
-    const fromData = hexFromNestedData(node.data);
-    if (fromData) return fromData;
+    if (typeof node.data === 'string' && node.data.startsWith('0x') && node.data.length >= 10) {
+      return node.data as Hex;
+    }
+    const nested = hexFromNestedData(node.data);
+    if (nested) return nested;
     e = node.cause;
   }
   const walkable = err as { walk?: (fn: (e: unknown) => boolean) => unknown };
@@ -331,13 +311,16 @@ export function extractRevertData(err: unknown): Hex | undefined {
       const n = x as { raw?: unknown; data?: unknown };
       return (
         (typeof n?.raw === 'string' && n.raw.startsWith('0x')) ||
+        (typeof n?.data === 'string' && n.data.startsWith('0x')) ||
         hexFromNestedData(n?.data) !== undefined
       );
     }) as { raw?: unknown; data?: unknown } | null;
-    const hex = (found?.raw as string | undefined) ?? hexFromNestedData(found?.data);
+    const hex = ((found?.raw as string | undefined) ??
+      (typeof found?.data === 'string' ? found.data : hexFromNestedData(found?.data))) as
+      | string
+      | undefined;
     if (typeof hex === 'string' && hex.startsWith('0x') && hex.length >= 10) return hex as Hex;
   }
-  // Providers that only embed the bytes in the message string (Hardhat + MetaMask relay).
   return hexFromMessageText(err);
 }
 
@@ -362,7 +345,7 @@ function formatArgValue(v: unknown): string {
  * narrow per-function ABI slice with no error defs). Returns `null` when the
  * error is not a decodable contract revert.
  */
-export function formatCustomContractError(err: unknown): string | null {
+function formatCustomContractError(err: unknown): string | null {
   const data = extractRevertData(err);
   if (!data || data === '0x') return null;
   try {
@@ -384,4 +367,15 @@ export function formatCustomContractError(err: unknown): string | null {
   } catch {
     return null;
   }
+}
+
+/**
+ * A classified error's technical summary plus the decoded custom error with
+ * its named arguments, when the revert carried one. For "Copy details" and
+ * support only; the UI always shows a localized sentence instead.
+ */
+export function withDecodedContractError(details: string, err: unknown): string {
+  const decoded = formatCustomContractError(err);
+  if (!decoded || details.includes(decoded)) return details;
+  return details ? `${details}\n${decoded}` : decoded;
 }

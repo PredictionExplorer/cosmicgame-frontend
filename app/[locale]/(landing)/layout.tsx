@@ -1,14 +1,13 @@
 import type { ReactNode } from 'react';
 import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
-import { hasLocale, NextIntlClientProvider } from 'next-intl';
-import { getMessages, getTranslations, setRequestLocale } from 'next-intl/server';
+import { hasLocale } from 'next-intl';
+import { getTranslations, setRequestLocale } from 'next-intl/server';
 
 import { getLandingContent } from '@/content/landing';
 
 import { routing } from '@/i18n/routing';
 import { LANDING_ORIGIN, localeHref } from '@/lib/hostRouting';
-import { LANDING_CHROME_NAMESPACES, pickMessages } from '@/lib/i18n/clientMessages';
 import {
   JsonLd,
   artProtocolJsonLd,
@@ -20,7 +19,7 @@ import {
 import { RootDocument } from '../../root-document';
 import { createRootMetadata, rootViewport, openGraphLocale } from '../../root-metadata';
 
-import { LandingShell } from './landing-shell';
+import { LandingChrome } from './landing-chrome';
 
 interface LayoutProps {
   children: ReactNode;
@@ -70,14 +69,10 @@ export default async function LandingRootLayout({ children, params }: LayoutProp
     notFound();
   }
   setRequestLocale(locale);
-  const { meta, footer } = getLandingContent(locale);
+  const { meta } = getLandingContent(locale);
   const seo = await getTranslations({ locale, namespace: 'seo' });
   const inLanguage = jsonLdInLanguage(locale);
   const landingUrl = localeHref(LANDING_ORIGIN, '/', locale);
-  // The landing's page copy lives in content/** modules, so client
-  // components here only reach the small chrome set — scoping keeps the
-  // full ~300 KB catalog out of the marketing HTML.
-  const chromeMessages = pickMessages(await getMessages({ locale }), LANDING_CHROME_NAMESPACES);
 
   return (
     <RootDocument
@@ -106,9 +101,7 @@ export default async function LandingRootLayout({ children, params }: LayoutProp
         />
       }
     >
-      <NextIntlClientProvider messages={chromeMessages}>
-        <LandingShell footer={footer}>{children}</LandingShell>
-      </NextIntlClientProvider>
+      <LandingChrome locale={locale}>{children}</LandingChrome>
     </RootDocument>
   );
 }

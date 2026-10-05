@@ -8,8 +8,8 @@
     "wildcard": "Wildcard",
     "finish": "Finish",
     "palette": "Palette",
-    "spectralClass": "Spectral Class",
-    "massBalance": "Mass Balance",
+    "spectralClass": "Spectral class",
+    "massBalance": "Mass balance",
     "fate": "Fate",
     "chaos": "Chaos",
     "syzygies": "Syzygies",
@@ -74,7 +74,7 @@
       "stellarSelection": "Stellar Selection",
       "anchoredSelection": "Anchored Selection",
       "finalGesture": "Final Gesture",
-      "lastCstGesture": "Last CST Gesture",
+      "lastCstGesture": "Final CST Gesture",
       "enduranceChampion": "Endurance Champion",
       "chronoWarrior": "Chrono-Warrior"
     },
@@ -142,56 +142,46 @@
   },
   "card": {
     "chaosAria": "Chaos {value} of {max}",
-    "chaosShort": "Chaos {value}",
-    "syzygiesAria": "{count} syzygies",
-    "syzygiesShort": "{count} syzygies",
     "hueStripAria": "Palette hues of the three bodies",
     "spectralAria": "Spectral class {value}",
     "fateAria": "Fate: {value}",
     "quickView": "Quick view",
     "quickViewAria": "Quick view of Cosmic Signature {id}",
     "traitsPending": "Traits pending",
-    "traitsPendingTooltip": "Trait metadata has not been published for this Signature yet.",
-    "cycleShort": "C{n}",
+    "traitSummary": "{structure} · {palette}",
     "cycleLong": "Cycle {n}",
-    "cycleTooltip": "Imprinted in cycle {n}",
-    "viewCycle": "View cycle {n}"
+    "viewCycle": "View Cycle {n}",
+    "anchoredState": "Anchored"
   },
   "rarity": {
     "rank": "#{rank}",
     "rankLabel": "Rarity rank",
     "rankOf": "Rank {rank} of {total}",
-    "tooltip": "Rarity rank {rank} of {total}: how uncommon this Signature's traits are across the collection. Rarest trait: {trait}.",
-    "tooltipNoTrait": "Rarity rank {rank} of {total}: how uncommon this Signature's traits are across the collection.",
+    "tooltip": "Rarity rank {rank} of {total}: how uncommon this Signature’s traits are across the collection. Rarest trait: {trait}.",
+    "tooltipNoTrait": "Rarity rank {rank} of {total}: how uncommon this Signature’s traits are across the collection.",
     "rarest": "Rarest trait",
     "share": "{count} of {total} share this",
     "shareShort": "{count}/{total}",
-    "scoreLabel": "Rarity score",
     "unavailable": "Not ranked yet"
   },
   "facets": {
     "title": "Traits",
-    "toggle": "Traits",
-    "toggleWithCount": "Traits · {count}",
-    "toggleAria": "Filter by trait",
     "clearAll": "Clear all",
     "clearFacet": "Clear {trait}",
     "activeAria": "Active trait filters",
     "removeFilter": "Remove filter {trait}: {value}",
-    "optionAria": "{value}: {count} NFTs",
+    "optionAria": "{value}: {count} NFTs",
     "chaosRange": "Chaos range",
     "chaosMin": "Minimum chaos",
     "chaosMax": "Maximum chaos",
     "chaosValue": "{min} to {max}",
     "showMore": "Show {count} more",
     "showLess": "Show less",
-    "sheetTitle": "Filter by trait",
     "sheetDescription": "Narrow the archive by the composition, physics, and provenance of each Signature.",
     "loading": "Indexing traits…",
     "partial": "Trait index still filling in ({indexed} of {total})",
     "unavailable": "Trait filters are unavailable right now.",
-    "retry": "Retry",
-    "matches": "{count} NFTs match"
+    "retry": "Retry"
   },
   "quickView": {
     "title": "Cosmic Signature {id}",
@@ -249,9 +239,13 @@
   },
   "dna": {
     "title": "Collection DNA",
-    "subtitle": "The collection’s distribution across its defining traits. Select a segment to filter the gallery.",
-    "segmentAria": "{value}: {count} NFTs. Filter by this trait.",
-    "legendCount": "{count}",
-    "loading": "Reading the collection's traits…"
+    "subtitle": "How the collection splits across its defining traits. Select a trait to narrow the gallery.",
+    "segmentAria": "{value}: {count} NFTs. Filter by this trait.",
+    "loading": "Reading the collection’s traits…"
+  },
+  "alt": {
+    "subjectNamed": "“{name}”, Cosmic Signature {id}",
+    "withTraits": "{subject}: {structure} structure, {palette} palette",
+    "withTraitsAndClass": "{subject}: {structure} structure, {palette} palette, spectral class {spectralClass}"
   }
 }

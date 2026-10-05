@@ -1,63 +1,121 @@
 'use client';
 
 import type { ReactNode } from 'react';
-import { useLocale, useTranslations } from 'next-intl';
+import { useTranslations } from 'next-intl';
 
-import AttachedNFTTable, { type NFTRecord } from '@/components/attachments/AttachedNFTTable';
 import { useDonationsNFTList } from '@/hooks/useApiQuery';
-import { Spinner } from '@/components/ui/spinner';
+import { AttachedAssetsIcon } from '@/lib/conceptIcons';
 import { PageHeader } from '@/components/layout/PageHeader';
+import AttachedNFT from '@/components/attachments/AttachedNFT';
+import { PagedWall, wallReadFailed } from '@/components/nft/PagedWall';
+import { useWallPage } from '@/components/nft/useWallPage';
+import { EmptyState } from '@/components/ui/empty-state';
+import { ErrorState } from '@/components/ui/error-state';
 import { PageShell } from '@/components/ui/page-shell';
-import { SectionEyebrow } from '@/components/ui/section-eyebrow';
+import { Skeleton } from '@/components/ui/skeleton';
 
-const NFTDonationsPage = ({ seoSummary }: { seoSummary?: ReactNode }) => {
+import { ATTACHED_WALL_EAGER, ATTACHED_WALL_PAGE_SIZE, newestAttachedFirst } from './attachedWall';
+
+/** Four across from `lg`, the width a square plate reads well at. */
+const WALL_CLASS =
+  'grid grid-cols-2 gap-x-4 gap-y-8 sm:grid-cols-3 sm:gap-x-6 sm:gap-y-10 lg:grid-cols-4 lg:gap-x-8 lg:gap-y-12';
+
+export interface NFTDonationsPageProps {
+  /** The server-rendered page header, the page's only header. */
+  seoSummary?: ReactNode;
+  /**
+   * How many records the header's server snapshot counted (`null` when it
+   * could not read them). An empty list under a non-zero snapshot is a read
+   * that failed, not an empty collection.
+   */
+  snapshotCount?: number | null;
+  /** The page in the URL (`NFTDonationsRoute`); without it the page is local. */
+  page?: number;
+  onPageChange?: (page: number) => void;
+}
+
+/**
+ * The NFTs participants attached to their gestures, hung as works: each on a
+ * square black plate, with its collection, the cycle it went to, when, and
+ * who attached it. Newest first.
+ */
+const NFTDonationsPage = ({
+  seoSummary,
+  snapshotCount = null,
+  page,
+  onPageChange,
+}: NFTDonationsPageProps) => {
   const t = useTranslations('statistics');
-  const locale = useLocale();
-  const { data: nftDonations = null } = useDonationsNFTList();
+  const tTables = useTranslations('tables');
+  const { data, isLoading, isError, refetch } = useDonationsNFTList();
+  const records = newestAttachedFirst(data ?? []);
+  // The header counted records a moment ago: an empty refresh failed.
+  const refreshFailed = !isLoading && records.length === 0 && (snapshotCount ?? 0) > 0;
 
   return (
     <PageShell variant="data" backdrop="signature">
-      {seoSummary}
-      {seoSummary ? (
-        <div className="mb-8">
-          <SectionEyebrow tone="impact">
-            {t('attachedNfts.eyebrow', {
-              count: (nftDonations?.length ?? 0).toLocaleString(locale),
-            })}
-          </SectionEyebrow>
-        </div>
-      ) : (
+      {seoSummary ?? (
         <PageHeader
-          align="left"
-          eyebrow={
-            <SectionEyebrow tone="impact">
-              {t('attachedNfts.eyebrow', {
-                count: (nftDonations?.length ?? 0).toLocaleString(locale),
-              })}
-            </SectionEyebrow>
-          }
+          section="collection"
           title={t('attachedNfts.title')}
-          titleLevel={2}
           subtitle={t('attachedNfts.subtitle')}
         />
       )}
-      <p className="text-sm text-muted-foreground leading-relaxed mb-8 max-w-3xl">
-        {t('attachedNfts.description')}
-      </p>
 
-      {nftDonations === null ? (
-        <div className="flex justify-center py-8">
-          <Spinner />
-        </div>
-      ) : (
-        <AttachedNFTTable
-          list={(nftDonations ?? []) as NFTRecord[]}
-          handleClaim={undefined}
-          claimingTokens={[]}
-        />
-      )}
+      <PagedWall
+        items={records}
+        itemKey={(record) => String(record.RecordId ?? `${record.TokenAddr}-${record.NFTTokenId}`)}
+        renderItem={(record, { eager }) => <AttachedNFT nft={record} showRecord priority={eager} />}
+        pageSize={ATTACHED_WALL_PAGE_SIZE}
+        page={page}
+        onPageChange={onPageChange}
+        gridClassName={WALL_CLASS}
+        ariaLabel={t('attachedNfts.title')}
+        eagerCount={ATTACHED_WALL_EAGER}
+        loading={isLoading}
+        loadingState={
+          <div role="status" aria-label={tTables('skeleton.loadingNft')} className={WALL_CLASS}>
+            {Array.from({ length: 8 }, (_, index) => (
+              <div key={index} aria-hidden>
+                <Skeleton className="aspect-square w-full rounded-edge" />
+                <Skeleton className="mt-3 h-3.5 w-2/3" />
+                <Skeleton shine={false} className="mt-2 h-3 w-1/2" />
+              </div>
+            ))}
+          </div>
+        }
+        error={
+          wallReadFailed({ isError, data }, refreshFailed) ? (
+            <ErrorState
+              title={t('attachedNfts.loadErrorTitle')}
+              message={t('attachedNfts.loadErrorMessage')}
+              headingLevel={2}
+              onRetry={() => void refetch()}
+            />
+          ) : null
+        }
+        empty={
+          <EmptyState
+            icon={<AttachedAssetsIcon aria-hidden />}
+            title={t('attachedNfts.emptyTitle')}
+            description={t('attachedNfts.emptyDescription')}
+            headingLevel={2}
+            variant="page"
+          />
+        }
+      />
     </PageShell>
   );
 };
+
+/**
+ * The page with its page number in the URL (`?page=2`), so Back from a
+ * cycle or a participant returns to the same plates. The route renders it
+ * under Suspense with the first page as the prerendered fallback.
+ */
+export function NFTDonationsRoute(props: Omit<NFTDonationsPageProps, 'page' | 'onPageChange'>) {
+  const { page, setPage } = useWallPage();
+  return <NFTDonationsPage {...props} page={page} onPageChange={setPage} />;
+}
 
 export default NFTDonationsPage;

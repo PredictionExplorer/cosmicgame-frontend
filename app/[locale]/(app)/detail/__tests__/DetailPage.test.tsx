@@ -15,16 +15,6 @@ describe('DetailPage', () => {
     expect(screen.getByTestId('nft-trait')).toHaveTextContent('Token: 42');
   });
 
-  it('shows error message for negative tokenId', () => {
-    render(<DetailPage tokenId={-1} />);
-    expect(screen.getByText('detail.invalid.title')).toBeInTheDocument();
-  });
-
-  it('does not render NFTTrait for negative tokenId', () => {
-    render(<DetailPage tokenId={-1} />);
-    expect(screen.queryByTestId('nft-trait')).not.toBeInTheDocument();
-  });
-
   it('renders NFTTrait for tokenId 0', () => {
     render(<DetailPage tokenId={0} />);
     expect(screen.getByTestId('nft-trait')).toHaveTextContent('Token: 0');

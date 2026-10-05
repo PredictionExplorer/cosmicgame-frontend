@@ -35,7 +35,7 @@ export const mediumQuestionsTextEn = {
     explanation: `After the opening gesture, each ETH gesture raises the next ETH Gesture Cost by ${protocolFacts.ethGestureCostStepUpPercent}%, plus one wei. The current cost can be read from the contract before submitting a gesture, but it may change before the transaction executes.`,
     funFact:
       'The extra wei matters: it guarantees strict growth even when a cost is so small that a percentage of it rounds to zero.',
-    referenceLabel: 'White paper \u00a74.1 \u2014 ETH Gestures',
+    referenceLabel: 'White paper \u00a74.1 \u2014 ETH gestures',
   },
   'overpay-refund': {
     prompt:
@@ -48,7 +48,7 @@ export const mediumQuestionsTextEn = {
     },
     explanation:
       'Overpayment above the dust threshold is refunded in the same transaction. Smaller amounts stay in the reserve because sending them back would cost more in gas than the refund itself.',
-    referenceLabel: 'White paper \u00a74.1 \u2014 ETH Gestures',
+    referenceLabel: 'White paper \u00a74.1 \u2014 ETH gestures',
   },
   'cst-window-restart': {
     prompt: 'Lyra makes a CST gesture. What does that do to the CST Calibration Window?',
@@ -59,7 +59,7 @@ export const mediumQuestionsTextEn = {
       d: 'The window closes and CST gestures pause until the next cycle.',
     },
     explanation: `Every CST gesture restarts the window from its new starting value: ${protocolFacts.cstCalibrationCeilingMultiplier}x the last cost paid, with a floor of ${cst(protocolFacts.cstCalibrationCeilingMinCst)} CST on the starting point. From there the cost descends linearly to zero over the window\u2019s duration. The CST spent on each gesture is burned.`,
-    referenceLabel: 'White paper \u00a74.3 \u2014 CST Gestures',
+    referenceLabel: 'White paper \u00a74.3 \u2014 CST gestures',
   },
   'cst-free-quiet': {
     prompt:
@@ -72,7 +72,7 @@ export const mediumQuestionsTextEn = {
     },
     explanation:
       'The CST Gesture Cost can reach zero when the window fully elapses. A gesture still requires network gas and must satisfy the current cycle rules. Finalization also requires a transaction; the cycle does not finalize automatically.',
-    referenceLabel: 'White paper \u00a74.3 \u2014 CST Gestures',
+    referenceLabel: 'White paper \u00a74.3 \u2014 CST gestures',
   },
   'window-feedback-loop': {
     prompt:
@@ -84,7 +84,7 @@ export const mediumQuestionsTextEn = {
       d: 'The window resets to its original duration.',
     },
     explanation: `The window duration changes on-chain after each gesture. ETH gestures shorten it by about ${protocolFacts.cstCalibrationWindowDecreasePercentPerEthGesture}%, while CST gestures lengthen it by about ${protocolFacts.cstCalibrationWindowIncreasePercentPerCstGesture}%. Frequent ETH gestures therefore speed up the CST price decline, while frequent CST gestures slow it down.`,
-    referenceLabel: 'White paper \u00a74.3 \u2014 CST Gestures',
+    referenceLabel: 'White paper \u00a74.3 \u2014 CST gestures',
   },
   'participation-cst-timing': {
     prompt:
@@ -98,7 +98,7 @@ export const mediumQuestionsTextEn = {
     explanation: `Participation CST grows with the square root of the time since the previous gesture: a gesture arriving one second later imprints almost nothing (about ${oneSecondExample.cst} CST), while one that ends a day of silence imprints hundreds (about ${oneDayExample.cst} CST). The flat ${cst(100)} CST per gesture was the original V1 rule \u2014 it turned machine-speed sequences into free CST, which is exactly why V2 replaced it.`,
     funFact:
       'Longer gaps produce more Participation CST per gesture. Rapid successive gestures can imprint little or no Participation CST; Recognition CST and the Outreach Reserve are separate issuance mechanisms.',
-    referenceLabel: 'White paper \u00a77.1 \u2014 Imprint Rules',
+    referenceLabel: 'White paper \u00a77.1 \u2014 Imprint rules',
   },
   'cst-max-cost-protection': {
     prompt:
@@ -111,7 +111,7 @@ export const mediumQuestionsTextEn = {
     },
     explanation:
       'A participant submitting a CST gesture specifies the maximum cost they accept, so a gesture landing later than expected cannot spend more than authorized. It matters most right after another CST gesture restarts the window at a higher value.',
-    referenceLabel: 'White paper \u00a74.3 \u2014 CST Gestures',
+    referenceLabel: 'White paper \u00a74.3 \u2014 CST gestures',
   },
   'endurance-definition': {
     prompt:
@@ -159,7 +159,7 @@ export const mediumQuestionsTextEn = {
       d: `One NFT only, selected ${protocolFacts.typicalNftsPerCycle} times.`,
     },
     explanation: `The NFT Stellar Selection selects ${protocolFacts.nftStellarSelectionRecipients} entries; each carries ${cst(protocolFacts.specialAllocationCst)} CST and one NFT. Recognition CST always travels with its NFT \u2014 every NFT distribution at finalization pairs the two.`,
-    referenceLabel: 'White paper \u00a75.1 \u2014 Distribution at Finalization',
+    referenceLabel: 'White paper \u00a75.1 \u2014 Distribution at finalization',
   },
   'draws-with-replacement': {
     prompt: 'Can the same participant be selected more than once in a cycle’s Stellar Selections?',
@@ -206,7 +206,7 @@ export const mediumQuestionsTextEn = {
       d: 'It waits in escrow indefinitely until Juno appears.',
     },
     explanation: `Escrowed allocations and attached assets have a ${protocolFacts.secondaryRetrievalTimeoutWeeks}-week retrieval window. After that deadline, anyone can retrieve the remaining assets for themselves. Recipients should retrieve their allocations before the window closes.`,
-    referenceLabel: 'White paper \u00a75.4 \u2014 Delivery, Escrow, and Timeouts',
+    referenceLabel: 'White paper \u00a75.4 \u2014 Delivery, escrow, and timeouts',
   },
   'push-vs-pull': {
     prompt: 'Which ETH goes out directly during finalization, and which waits in escrow?',
@@ -218,7 +218,7 @@ export const mediumQuestionsTextEn = {
     },
     explanation:
       'Distribution is deliberately split between push and pull. The beneficiary\u2019s ETH and the Public Goods forwarding are pushed during finalization; secondary ETH allocations are placed in the Allocations Wallet for each recipient to retrieve. CST and NFTs are imprinted directly to their recipients.',
-    referenceLabel: 'White paper \u00a75.4 \u2014 Delivery, Escrow, and Timeouts',
+    referenceLabel: 'White paper \u00a75.4 \u2014 Delivery, escrow, and timeouts',
   },
   'council-proposal-threshold': {
     prompt: 'How much delegated CST weight does an address need to submit a Coordination Proposal?',
@@ -275,7 +275,7 @@ export const mediumQuestionsTextEn = {
       d: 'It shrinks as more participants join.',
     },
     explanation: `The increment grows by ${protocolFacts.cycleTimeIncrementIncreasePercentPerCycle}% with every finalized cycle. Larger increments tend to lengthen cycles and slow the pace of NFT imprinting; actual cycle duration also depends on participation.`,
-    referenceLabel: 'White paper \u00a73.2 \u2014 The Countdown',
+    referenceLabel: 'White paper \u00a73.2 \u2014 The countdown',
   },
   'typical-cst-fixed': {
     prompt: 'How much fixed CST does a typical cycle imprint, and how does it break down?',
@@ -286,7 +286,7 @@ export const mediumQuestionsTextEn = {
       d: 'It varies unpredictably from cycle to cycle.',
     },
     explanation: `The fixed flows are exact: ${protocolFacts.typicalNftsPerCycle} NFT-paired imprints of ${cst(protocolFacts.specialAllocationCst)} CST plus ${cst(protocolFacts.outreachReserveCst)} CST of outreach, totalling ${cst(protocolFacts.typicalCstImprintsPerCycle)} CST in a typical cycle. Dynamic Participation CST from individual gestures is additional and depends on timing.`,
-    referenceLabel: 'White paper \u00a77.1 \u2014 Imprint Rules',
+    referenceLabel: 'White paper \u00a77.1 \u2014 Imprint rules',
   },
   'attached-assets-destination': {
     prompt: 'Wren attaches an ERC-20 token to her gesture. Where does the attached asset go?',
@@ -298,7 +298,7 @@ export const mediumQuestionsTextEn = {
     },
     explanation:
       'Attached assets never join the ETH reserve. They are held by the Allocations Wallet, and the cycle\u2019s beneficiary has priority to retrieve them after finalization \u2014 subject to the same open retrieval timeout as every other escrowed allocation.',
-    referenceLabel: 'White paper \u00a74.4 \u2014 Messages and Attached Assets',
+    referenceLabel: 'White paper \u00a74.4 \u2014 Messages and attached assets',
   },
   'next-cycle-delay': {
     prompt: 'A cycle has just been finalized. When does the next one activate?',

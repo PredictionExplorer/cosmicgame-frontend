@@ -9,6 +9,7 @@ import {
 import { useNow } from '@/hooks/useNow';
 import type { LatestParticipantEvidence } from '@/lib/latestGesture';
 import type { SpecialRecipients } from '@/services/api/types';
+import { sameAddress } from '@/utils/format';
 
 export type { LatestParticipantEvidence } from '@/lib/latestGesture';
 
@@ -40,6 +41,16 @@ export interface ChronoChallengeState {
 
 export interface LatestGestureState {
   address: string | null;
+  /**
+   * Whether the hold figures below are measured: a real clock and a known
+   * time of the Last Gesture. Before hydration the shared ticker reads 0, and
+   * while the Last Gesture's transaction is still indexing its time is null;
+   * either way the hold, the seconds to the Endurance record and the
+   * progress are unknown, so render a pending value, never a confident "0s"
+   * or a "record forming" caption. `deriveChampionsState` always sets it; a
+   * hand-built state that omits it reads as known.
+   */
+  isTimeKnown?: boolean;
   holdDuration: number;
   latestGestureTime: number | null;
   isCurrentEnduranceChampion: boolean;
@@ -73,10 +84,6 @@ interface DeriveChampionsStateArgs {
 function cleanAddress(address: string | null | undefined): string | null {
   if (!address) return null;
   return address.toLowerCase() === ZERO_ADDRESS ? null : address;
-}
-
-function sameAddress(left: string | null, right: string | null): boolean {
-  return !!left && !!right && left.toLowerCase() === right.toLowerCase();
 }
 
 function nonNegativeSeconds(value: unknown): number {
@@ -134,15 +141,24 @@ export function deriveChampionsState({
   latestParticipantEvidence,
 }: DeriveChampionsStateArgs): ChampionsState {
   const nowSec = Math.floor(nowMs / 1000);
+  const clockKnown = Number.isFinite(nowMs) && nowMs > 0;
   const enduranceAddress = cleanAddress(data?.EnduranceChampionAddress);
   const chronoAddress = cleanAddress(data?.ChronoWarriorAddress);
   const latestGestureAddress = latestParticipantEvidence
     ? cleanAddress(latestParticipantEvidence.address)
     : cleanAddress(data?.LastBidderAddress);
   const lastCstAddress = cleanAddress(data?.LastCstBidderAddress);
+  // Fresh evidence names the participant; its time may still be indexing.
+  // The snapshot's time then stands in only when it is about the same
+  // participant, never someone else's older gesture.
+  const snapshotGestureTime = nonNegativeSeconds(data?.LastBidderLastBidTime);
   const latestGestureTime = latestParticipantEvidence
-    ? nonNegativeSeconds(latestParticipantEvidence.timestamp)
-    : nonNegativeSeconds(data?.LastBidderLastBidTime);
+    ? nonNegativeSeconds(latestParticipantEvidence.timestamp) ||
+      (sameAddress(latestGestureAddress, cleanAddress(data?.LastBidderAddress))
+        ? snapshotGestureTime
+        : 0)
+    : snapshotGestureTime;
+  const isTimeKnown = clockKnown && (!latestGestureAddress || latestGestureTime > 0);
 
   const enduranceLockedDuration = nonNegativeSeconds(data?.EnduranceChampionDuration);
   const chronoLockedDuration = nonNegativeSeconds(data?.ChronoWarriorDuration);
@@ -265,6 +281,7 @@ export function deriveChampionsState({
     },
     latestGesture: {
       address: latestGestureAddress,
+      isTimeKnown,
       holdDuration,
       latestGestureTime: latestGestureTime > 0 ? latestGestureTime : null,
       isCurrentEnduranceChampion: latestMatchesEndurance || latestBeatsEnduranceRecord,
@@ -278,14 +295,23 @@ export function deriveChampionsState({
   };
 }
 
-/** Reads the current special-recipient snapshot and adds precise live timer semantics for UI. */
+/**
+ * Reads the current special-recipient snapshot and adds precise live timer semantics for UI.
+ *
+ * `seededNowMs` is the page's own clock (the home passes the server-sampled
+ * time it already uses for the countdown): server rendering and the first
+ * client render then measure holds against the same instant instead of the
+ * ticker's pre-hydration 0. The live ticker takes over as soon as it runs.
+ */
 export function useChampions(
   initialData?: SpecialRecipients | null,
   latestParticipantEvidence?: LatestParticipantEvidence,
   enabled = true,
+  seededNowMs?: number,
 ): ChampionsState {
   const { snapshot, isLoading } = useSpecialAllocationSnapshot(initialData, enabled);
-  const nowMs = useNow(1000);
+  const tickingNowMs = useNow(1000);
+  const nowMs = tickingNowMs || seededNowMs || 0;
 
   return useMemo(
     () =>

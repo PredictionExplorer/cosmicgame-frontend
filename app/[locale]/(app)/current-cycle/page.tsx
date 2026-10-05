@@ -4,6 +4,9 @@ import { getTranslations, setRequestLocale } from 'next-intl/server';
 import { createMetadata } from '@/utils/seo';
 import { PageMessages } from '@/components/i18n/PageMessages';
 
+import { DashboardQuerySeed } from '../QuerySeed';
+
+import { CurrentCycleRelated } from './CurrentCycleRelated';
 import { CurrentCycleSeoSummary } from './CurrentCycleSeoSummary';
 import CurrentRoundPage from './CurrentRoundPage';
 
@@ -35,13 +38,19 @@ export default async function Page({ params }: PageProps) {
         'contracts',
         'currentCycle',
         'detail',
+        'glossary',
         'home',
         'marketing',
         'statistics',
         'tables',
       ]}
     >
-      <CurrentRoundPage seoSummary={<CurrentCycleSeoSummary />} />
+      <DashboardQuerySeed>
+        <CurrentRoundPage
+          seoSummary={<CurrentCycleSeoSummary />}
+          relatedPages={<CurrentCycleRelated />}
+        />
+      </DashboardQuerySeed>
     </PageMessages>
   );
 }

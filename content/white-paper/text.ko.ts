@@ -39,7 +39,7 @@ export const whitePaperTextKo = {
   abstract: {
     heading: '요약',
     paragraphs: [
-      'Cosmic Signature는 Arbitrum One 위에서 작동하는 절차적 아트 프로토콜입니다. 정해진 시간 동안 이어지는 퍼포먼스 사이클이 연속해서 진행됩니다. 사이클이 진행되는 동안 참여자는 ETH 또는 프로토콜의 ERC-20 토큰인 CST로 제스처를 남깁니다. 모든 제스처는 사이클의 카운트다운을 연장하고, 사이클의 별빛 선정에 자격 한 건을 기록하며, 새 CST를 각인할 수 있습니다. 카운트다운이 끝나고 사이클이 마감되면 프로토콜은 ETH 준비금을 10개가 넘는 배분 경로로 배분하고, 새 세대의 Cosmic Signature NFT를 각인하며, 고정된 몫을 이더리움 핵심 기여자 170여 명을 지원하는 자금 지원 메커니즘인 Protocol Guild로 전달합니다. 준비금의 약 절반은 다음 사이클로 이월됩니다. 이후 준비금의 규모는 참여 상황과 배분에 따라 달라집니다.',
+      'Cosmic Signature는 Arbitrum One 위에서 작동하는 절차적 아트 프로토콜입니다. 정해진 시간 동안 이어지는 퍼포먼스 사이클이 연속해서 진행됩니다. 사이클이 진행되는 동안 참여자는 ETH 또는 프로토콜의 ERC-20 토큰인 CST로 제스처를 남깁니다. 모든 제스처는 사이클의 카운트다운을 연장하고, 사이클의 별빛 선정에 자격 한 건을 기록하며, 새 CST를 각인할 수 있습니다. 카운트다운이 끝나고 사이클이 마감되면 프로토콜은 ETH 준비금을 정해진 배분 경로로 배분하고, 새 세대의 Cosmic Signature NFT를 각인하며, 고정된 몫을 이더리움 핵심 기여자 170여 명을 지원하는 자금 지원 메커니즘인 Protocol Guild로 전달합니다. 준비금의 약 절반은 다음 사이클로 이월됩니다. 이후 준비금의 규모는 참여 상황과 배분에 따라 달라집니다.',
       '각 Cosmic Signature NFT는 중력 삼체 문제를 결정론적으로 렌더링한 작품입니다. 온체인 시드에서 생성되며, 누구든 픽셀 단위까지 똑같이 재현할 수 있습니다. 어떤 신경망도 이미지에 관여하지 않습니다. 이 백서는 프로토콜의 메커니즘과 토큰 설계를 빠짐없이 설명하고, 현재 적용 중인 V2 업그레이드를 기록하며, 예정된 V3 업그레이드를 소개하고, 설계가 완성되는 즉시 배포 주소에서 모든 형태의 특권적 통제를 제거하겠다는 약속을 밝힙니다.',
     ],
   },
@@ -269,9 +269,9 @@ export const whitePaperTextKo = {
                     '수호 챔피언 자리를 가장 오래 지킨 참여자(5.2절).',
                   ],
                   [
-                    '공공재 배분',
-                    `${protocolFacts.publicGoodsPercentage}%`,
-                    'Protocol Guild. 공공재 금고를 거칩니다.',
+                    'ETH 별빛 선정',
+                    `${protocolFacts.stellarSelectionEthPercentage}%`,
+                    `사이클의 제스처 풀에서 선정된 자격 ${protocolFacts.ethStellarSelectionRecipients}건이 금액을 균등하게 나눕니다.`,
                   ],
                   [
                     '앵커링 지급',
@@ -279,9 +279,9 @@ export const whitePaperTextKo = {
                     '앵커링된 Cosmic Signature NFT. NFT 수에 비례해 나눕니다.',
                   ],
                   [
-                    'ETH 별빛 선정',
-                    `${protocolFacts.stellarSelectionEthPercentage}%`,
-                    `사이클의 제스처 풀에서 선정된 자격 ${protocolFacts.ethStellarSelectionRecipients}건이 금액을 균등하게 나눕니다.`,
+                    '공공재 배분',
+                    `${protocolFacts.publicGoodsPercentage}%`,
+                    'Protocol Guild. 공공재 금고를 거칩니다.',
                   ],
                   [
                     '누적 준비금',
@@ -458,6 +458,21 @@ export const whitePaperTextKo = {
             {
               kind: 'formula',
               formula: protocolFacts.dynamicCstRewardFormula,
+              notation: protocolFacts.participationCstNotation,
+              legend: [
+                {
+                  symbol: protocolFacts.participationCstSymbols[0],
+                  meaning: '직전 제스처 이후 경과한 초',
+                },
+                {
+                  symbol: protocolFacts.participationCstSymbols[1],
+                  meaning: '참여 CST 배수(컨트랙트 매개변수)',
+                },
+                {
+                  symbol: protocolFacts.participationCstSymbols[2],
+                  meaning: '현재 사이클 시간 증가량(마이크로초)',
+                },
+              ],
               caption:
                 '제스처 하나가 각인하는 참여 CST. 경과 시간은 직전 제스처부터 측정하며, 현재 사이클 시간 증가량에 맞춰 스케일을 조정합니다.',
             },
@@ -882,4 +897,55 @@ export const whitePaperTextKo = {
   },
   licenseNote:
     '이 백서는 프로젝트가 소유한 다른 모든 Cosmic Signature 자료와 마찬가지로 CC0 1.0에 따라 퍼블릭 도메인에 헌정됩니다.',
+  reading: {
+    railLabel: '이 페이지의 내용',
+    openContentsLabel: '목차',
+    backToTopLabel: '맨 위로',
+    headingLinkTemplate: '이 절로 연결: {title}',
+    formulaLabel: '공식',
+    noteLabel: '참고',
+    contractExpressionLabel: '컨트랙트의 원래 식',
+    figureTemplate: '그림 {number}',
+    readingTimeTemplate: '읽는 데 약 {minutes}분',
+    newTabNote: '(새 탭에서 열림)',
+  },
+  figures: {
+    cycle: {
+      title: '퍼포먼스 사이클의 흐름: 시작부터 다음 사이클까지',
+      caption: '시간은 출시 당시 매개변수 기준입니다. 정확한 규칙은 3.1~3.3절에 있습니다.',
+      steps: [
+        {
+          label: '시작',
+          detail: 'ETH 보정 구간은 첫 제스처가 나올 때까지 시작 비용을 낮춥니다.',
+        },
+        {
+          label: '제스처',
+          detail: `제스처마다 카운트다운에 시간 증가량이 더해집니다. 출시 당시에는 ${protocolFacts.initialCycleTimeIncrementHours}시간입니다.`,
+        },
+        {
+          label: '우선 마감 구간',
+          detail: `카운트다운이 끝나면 ${protocolFacts.finalGestureExclusivityHours}시간 동안 최종 제스처 참여자만 마감할 수 있습니다.`,
+        },
+        {
+          label: '공개 마감',
+          detail: '그 뒤에는 누구든 마감하고 수령자 역할을 이어받을 수 있습니다.',
+        },
+        {
+          label: '다음 사이클',
+          detail: `짧은 지연 뒤에 다음 사이클이 시작됩니다. 기본값은 ${protocolFacts.defaultNextCycleDelayMinutes}분입니다.`,
+        },
+      ],
+    },
+    allocation: {
+      title: '마감 때 사이클 준비금이 가는 곳',
+      caption:
+        '마감 시점 프로토콜 ETH 잔액에 대한 몫입니다. 나머지 약 절반은 다음 사이클로 누적됩니다.',
+    },
+    art: {
+      title: '컬렉션의 시그니처 두 점',
+      caption:
+        '각 이미지는 아래 적힌 시드로 파이프라인이 만들어 낸 결과이며, 누구나 픽셀 단위까지 다시 생성할 수 있습니다.',
+      seedLabel: '시드',
+    },
+  },
 } satisfies WhitePaperText;

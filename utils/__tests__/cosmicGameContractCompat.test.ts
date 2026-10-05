@@ -29,64 +29,6 @@ describe('cosmicGameContractCompat', () => {
     expect(isUnrecognizedSelectorError(new Error('insufficient funds'))).toBe(false);
   });
 
-  /**
-   * The nested error shape viem produces when `readContract` hits a revert: an outer
-   * ContractFunctionExecutionError whose cause is a ContractFunctionRevertedError. On an
-   * empty-data revert (missing selector behind the UUPS proxy on live geth/Arbitrum
-   * nodes) the inner error carries no reason, signature, or data, and both messages are
-   * just `The contract function "x" reverted.` — no Hardhat-style marker text.
-   */
-  function makeViemRevertError(
-    fields: { reason?: string; signature?: string; data?: unknown; raw?: string } = {},
-  ) {
-    const detail = fields.reason ? ` with the following reason:\n${fields.reason}` : '.';
-    const reverted = Object.assign(
-      new Error(`The contract function "mainPrizeNumCosmicSignatureNfts" reverted${detail}`),
-      { name: 'ContractFunctionRevertedError', ...fields },
-    );
-    return Object.assign(
-      new Error(
-        `The contract function "mainPrizeNumCosmicSignatureNfts" reverted${detail}\n\n` +
-          'Contract Call:\n  address:   0x6a714Ae7B5b6eA520F6BCA23d2E609C4Fd5863F2\n' +
-          '  function:  mainPrizeNumCosmicSignatureNfts()',
-        { cause: reverted },
-      ),
-      { name: 'ContractFunctionExecutionError' },
-    );
-  }
-
-  // Regression: this shape was reported on every production page load when the V3
-  // detection probe in useGestureForm ran against the live V2 contract.
-  test('isMissingFunctionReadError treats a reasonless live-node revert as selector absent', () => {
-    expect(isMissingFunctionReadError(makeViemRevertError())).toBe(true);
-    expect(isMissingFunctionReadError(makeViemRevertError({ raw: '0x' }))).toBe(true);
-  });
-
-  test('isMissingFunctionReadError keeps reporting reverts that carry a reason or data', () => {
-    expect(isMissingFunctionReadError(makeViemRevertError({ reason: 'RoundIsInactive' }))).toBe(
-      false,
-    );
-    expect(
-      isMissingFunctionReadError(
-        makeViemRevertError({ data: { errorName: 'RoundIsInactive', args: [] } }),
-      ),
-    ).toBe(false);
-    expect(isMissingFunctionReadError(new Error('insufficient funds'))).toBe(false);
-  });
-
-  test('isMissingFunctionReadError still accepts Hardhat-style reasonless reverts', () => {
-    expect(
-      isMissingFunctionReadError(new Error('Transaction reverted without a reason string')),
-    ).toBe(true);
-    expect(
-      isMissingFunctionReadError(
-        new Error('The contract function "x" returned no data ("0x")', {
-          cause: new Error('call revert exception'),
-        }),
-      ),
-    ).toBe(true);
-  });
-
   test('normalizeV1GestureArgs coerces randomWalk id to bigint', () => {
     expect(normalizeV1GestureArgs('bidWithEth', [-1, 'hello'])).toEqual([-1n, 'hello']);
   });
@@ -94,16 +36,15 @@ describe('cosmicGameContractCompat', () => {
   test('pickGestureWriteAbi selects overload by argument count', () => {
     const v1 = pickGestureWriteAbi('bidWithEth', [-1n, 'hello']);
     const v2 = pickGestureWriteAbi('bidWithEth', [-1n, 'hello', 0n]);
-    // Exactly one function fragment (the matched overload) — the rest are error
-    // definitions carried along so custom revert reasons decode into readable text.
-    const v1Functions = v1.filter((item) => item.type === 'function');
-    const v2Functions = v2.filter((item) => item.type === 'function');
-    expect(v1Functions).toHaveLength(1);
-    expect(v2Functions).toHaveLength(1);
-    expect((v1Functions[0] as AbiFunction).inputs?.length).toBe(2);
-    expect((v2Functions[0] as AbiFunction).inputs?.length).toBe(3);
-    expect(v1.some((item) => item.type === 'error' && item.name === 'RoundIsInactive')).toBe(true);
-    expect(v1.every((item) => item.type !== 'event')).toBe(true);
+    // One function per slice (no overload ambiguity) plus every custom error,
+    // so viem can decode a revert against the ABI the write was made with.
+    expect(v1.filter((item) => item.type === 'function')).toHaveLength(1);
+    expect(v2.filter((item) => item.type === 'function')).toHaveLength(1);
+    expect((v1[0] as AbiFunction).inputs?.length).toBe(2);
+    expect((v2[0] as AbiFunction).inputs?.length).toBe(3);
+    const errorNames = v2.flatMap((item) => (item.type === 'error' ? [item.name] : []));
+    expect(errorNames).toEqual(expect.arrayContaining(['UsedRandomWalkNft', 'TooLongBidMessage']));
+    expect(errorNames).toContain('BidCstRewardAmountMinLimitNotReached');
   });
 
   test('readCosmicGameWithFallback tries later readers after selector errors', async () => {
@@ -166,5 +107,63 @@ describe('cosmicGameContractCompat', () => {
     expect(result).toBe('0xok');
     expect(calls).toEqual([[100n, 'msg', 99n]]);
     expect(preferV2GestureArgsFirst()).toBe(true);
+  });
+
+  /**
+   * The nested error shape viem produces when `readContract` hits a revert: an outer
+   * ContractFunctionExecutionError whose cause is a ContractFunctionRevertedError. On an
+   * empty-data revert (missing selector behind the UUPS proxy on live geth/Arbitrum
+   * nodes) the inner error carries no reason, signature, or data, and both messages are
+   * just `The contract function "x" reverted.` — no Hardhat-style marker text.
+   */
+  function makeViemRevertError(
+    fields: { reason?: string; signature?: string; data?: unknown; raw?: string } = {},
+  ) {
+    const detail = fields.reason ? ` with the following reason:\n${fields.reason}` : '.';
+    const reverted = Object.assign(
+      new Error(`The contract function "mainPrizeNumCosmicSignatureNfts" reverted${detail}`),
+      { name: 'ContractFunctionRevertedError', ...fields },
+    );
+    return Object.assign(
+      new Error(
+        `The contract function "mainPrizeNumCosmicSignatureNfts" reverted${detail}\n\n` +
+          'Contract Call:\n  address:   0x6a714Ae7B5b6eA520F6BCA23d2E609C4Fd5863F2\n' +
+          '  function:  mainPrizeNumCosmicSignatureNfts()',
+        { cause: reverted },
+      ),
+      { name: 'ContractFunctionExecutionError' },
+    );
+  }
+
+  // Regression: this shape was reported on every production page load when the V3
+  // detection probe in useGestureForm ran against the live V2 contract.
+  test('isMissingFunctionReadError treats a reasonless live-node revert as selector absent', () => {
+    expect(isMissingFunctionReadError(makeViemRevertError())).toBe(true);
+    expect(isMissingFunctionReadError(makeViemRevertError({ raw: '0x' }))).toBe(true);
+  });
+
+  test('isMissingFunctionReadError keeps reporting reverts that carry a reason or data', () => {
+    expect(isMissingFunctionReadError(makeViemRevertError({ reason: 'RoundIsInactive' }))).toBe(
+      false,
+    );
+    expect(
+      isMissingFunctionReadError(
+        makeViemRevertError({ data: { errorName: 'RoundIsInactive', args: [] } }),
+      ),
+    ).toBe(false);
+    expect(isMissingFunctionReadError(new Error('insufficient funds'))).toBe(false);
+  });
+
+  test('isMissingFunctionReadError still accepts Hardhat-style reasonless reverts', () => {
+    expect(
+      isMissingFunctionReadError(new Error('Transaction reverted without a reason string')),
+    ).toBe(true);
+    expect(
+      isMissingFunctionReadError(
+        new Error('The contract function "x" returned no data ("0x")', {
+          cause: new Error('call revert exception'),
+        }),
+      ),
+    ).toBe(true);
   });
 });

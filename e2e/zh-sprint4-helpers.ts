@@ -131,8 +131,9 @@ const roundInfo = {
   AllPrizes: [],
 };
 
+// The server's own field name (see get_staking_cst_actions_info).
 const anchorAction = {
-  CombinedAnchorRecordInfo: {
+  CombinedStakingRecordInfo: {
     Stake: {
       Tx: mockTransaction(7_300),
       ActionId: SPRINT4_MOCK_ACTION_ID,
@@ -240,6 +241,13 @@ export async function mockSprint4Api(page: Page): Promise<void> {
     }
     if (path.includes('/staking/cst/rewards/by_user/by_token/details/')) {
       await route.fulfill({ json: rewardsByToken });
+      return;
+    }
+    // The anchor-holder's actions: where the token's anchor stands.
+    if (path.includes('/staking/cst/actions/by_user/')) {
+      await route.fulfill({
+        json: { StakingCSTActions: [anchorAction.CombinedStakingRecordInfo.Stake] },
+      });
       return;
     }
 

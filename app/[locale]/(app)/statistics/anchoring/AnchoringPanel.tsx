@@ -1,13 +1,15 @@
 'use client';
 
-import { Activity, ArrowRight, Coins, Lock, TrendingUp, Users } from 'lucide-react';
+import { ArrowRight } from 'lucide-react';
 import type { UseQueryResult } from '@tanstack/react-query';
-import { useLocale, useTranslations } from 'next-intl';
+import { useTranslations } from 'next-intl';
 
-import { formatEthValue, formatGroupedNumber } from '@/utils';
-
+import { countActiveAnchorHolders } from '@/utils/anchoringStats';
+import { toFiniteNumber } from '@/utils/finiteNumber';
+import { useFormat } from '@/hooks/useFormat';
 import { Link } from '@/i18n/navigation';
-import { formatDistributionPerAnchoredNftEth } from '@/utils/anchoringStats';
+import { TOUCH_TARGET_TEXT_LINK_CLASS } from '@/lib/touch-target';
+import { cn } from '@/lib/utils';
 import {
   useCSTAnchorActions,
   useDashboardInfo,
@@ -17,18 +19,18 @@ import {
   useUniqueCSTAnchorHolders,
   useUniqueRWLKAnchorHolders,
 } from '@/hooks/useApiQuery';
-import { Surface } from '@/components/ui/surface';
-import { SkeletonStatCard } from '@/components/ui/skeleton';
-import {
-  AnchoringHeroStats,
-  type AnchoringStatItem,
-} from '@/components/anchoring/AnchoringHeroStats';
+import { PageHeaderFigures, type PageHeaderFigure } from '@/components/layout/PageHeader';
+import { SectionHeader } from '@/components/ui/section-header';
+import { Skeleton } from '@/components/ui/skeleton';
 import {
   AnchoringSection,
   type AnchoringDataState,
 } from '@/components/statistics/AnchoringSection';
-import type { UniqueAnchorHolderCST } from '@/components/tables/UniqueAnchorHoldersCSTTable';
-import type { UniqueAnchorHolderRWLK } from '@/components/tables/UniqueAnchorHoldersRWLKTable';
+import type {
+  DashboardInfo,
+  UniqueAnchorHolderCST,
+  UniqueAnchorHolderRWLK,
+} from '@/services/api/types';
 
 function toDataState<T>(query: UseQueryResult<T[], Error>): AnchoringDataState<T> {
   return {
@@ -39,13 +41,29 @@ function toDataState<T>(query: UseQueryResult<T[], Error>): AnchoringDataState<T
   };
 }
 
-/** Anchoring snapshot cards plus the CST/RWLK anchoring detail tabs. */
-const AnchoringPanel = () => {
+/**
+ * The anchoring statistics. The page counts; the pool and what it means per
+ * NFT belong to the Anchor Distributions hub, one link away, so the two pages
+ * never lead with the same figures. First the counts of both collections as
+ * one hairline strip (the wallets anchoring either, then the NFTs anchored in
+ * each, named as the hub names them), then each collection's own figures and
+ * its anchor and release, anchored-NFT and anchor-holder ledgers. A figure
+ * waits as a skeleton while the dashboard loads and reads Unavailable when it
+ * fails; it is never a confident zero. The route reads the dashboard and the
+ * lists on the server, so the first HTML already holds the figures (from
+ * `initialDashboard`, until the browser's own read replaces it) and the
+ * ledgers (seeded).
+ */
+const AnchoringPanel = ({ initialDashboard }: { initialDashboard?: DashboardInfo | null }) => {
   const t = useTranslations('statistics');
-  const locale = useLocale();
-  const { data: dashboardData, isLoading: dashboardLoading } = useDashboardInfo(undefined, {
-    poll: false,
-  });
+  const tAnchoring = useTranslations('anchoring');
+  const format = useFormat();
+  const dashboardQuery = useDashboardInfo(undefined, { poll: false });
+  const dashboardData = dashboardQuery.data ?? initialDashboard ?? undefined;
+  const dashboard = {
+    data: dashboardData,
+    isLoading: dashboardQuery.isLoading && !dashboardData,
+  };
   const cstAnchorActionsQuery = useCSTAnchorActions();
   const rwlkAnchorActionsQuery = useRWLKAnchorActions();
   const anchoredCSTokensQuery = useGlobalAnchoredCSTokens();
@@ -53,105 +71,80 @@ const AnchoringPanel = () => {
   const uniqueCSTAnchorHoldersQuery = useUniqueCSTAnchorHolders();
   const uniqueRWLKAnchorHoldersQuery = useUniqueRWLKAnchorHolders();
 
-  const cstAnchorStats = dashboardData?.MainStats.StakeStatisticsCST;
-  const rwlkAnchorStats = dashboardData?.MainStats.StakeStatisticsRWalk;
-
-  const distributionPerCst = formatDistributionPerAnchoredNftEth(
-    dashboardData?.StakingAmountEth,
-    cstAnchorStats?.TotalTokensStaked,
+  const cstAnchorStats = dashboard.data?.MainStats.StakeStatisticsCST;
+  const rwlkAnchorStats = dashboard.data?.MainStats.StakeStatisticsRWalk;
+  // Distinct wallets anchoring either kind: the per-kind NumActiveStakers overlap, so their
+  // sum counted a wallet that anchors both kinds twice.
+  const activeAnchorHolders = countActiveAnchorHolders(
+    uniqueCSTAnchorHoldersQuery.data,
+    uniqueRWLKAnchorHoldersQuery.data,
   );
-  const totalActiveAnchorHolders =
-    (cstAnchorStats?.NumActiveStakers ?? 0) + (rwlkAnchorStats?.NumActiveStakers ?? 0);
+  const holdersLoading =
+    uniqueCSTAnchorHoldersQuery.isLoading || uniqueRWLKAnchorHoldersQuery.isLoading;
+  const pending = <Skeleton className="h-7 w-24" />;
+  const count = (value: unknown) => {
+    const known = toFiniteNumber(value);
+    return known === null ? null : format.count(known);
+  };
 
-  const anchoringSnapshotStats: AnchoringStatItem[] = [
+  const figures: PageHeaderFigure[] = [
     {
-      label: t('anchoringPage.snapshot.cosmicSignatureLabel'),
-      value: formatGroupedNumber(cstAnchorStats?.TotalTokensStaked ?? 0, locale),
-      tooltip: t('anchoringPage.snapshot.cosmicSignatureTooltip'),
-      icon: <Lock className="h-4 w-4" />,
-      featured: true,
-    },
-    {
-      label: t('anchoringPage.snapshot.randomWalkLabel'),
-      value: formatGroupedNumber(rwlkAnchorStats?.TotalTokensStaked ?? 0, locale),
-      tooltip: t('anchoringPage.snapshot.randomWalkTooltip'),
-      icon: <Activity className="h-4 w-4" />,
-      featured: true,
-    },
-    {
-      label: t('anchoringPage.snapshot.poolLabel'),
-      value: formatEthValue(dashboardData?.StakingAmountEth ?? 0),
-      tooltip: t('anchoringPage.snapshot.poolTooltip'),
-      icon: <Coins className="h-4 w-4" />,
-      gradient: true,
-    },
-    {
-      label: t('anchoringPage.snapshot.perNftLabel'),
-      value: distributionPerCst.value,
-      tooltip: distributionPerCst.indexedCountUnavailable
-        ? t('anchoringPage.snapshot.perNftTooltipUnavailable')
-        : t('anchoringPage.snapshot.perNftTooltip'),
-      icon: <TrendingUp className="h-4 w-4" />,
-    },
-    {
+      id: 'activeHolders',
       label: t('anchoringPage.snapshot.activeHoldersLabel'),
-      value: formatGroupedNumber(totalActiveAnchorHolders, locale),
-      tooltip: t('anchoringPage.snapshot.activeHoldersTooltip'),
-      icon: <Users className="h-4 w-4" />,
+      info: t('anchoringPage.snapshot.activeHoldersTooltip'),
+      value: holdersLoading ? pending : count(activeAnchorHolders),
+    },
+    {
+      id: 'anchoredCosmicSignature',
+      label: tAnchoring('flow.cosmicSignature.anchored.label'),
+      info: tAnchoring('flow.cosmicSignature.anchored.definition'),
+      value: dashboard.isLoading ? pending : count(cstAnchorStats?.TotalTokensStaked),
+    },
+    {
+      id: 'anchoredRandomWalk',
+      label: tAnchoring('flow.randomWalk.anchored.label'),
+      info: tAnchoring('flow.randomWalk.anchored.definition'),
+      value: dashboard.isLoading ? pending : count(rwlkAnchorStats?.TotalTokensStaked),
     },
   ];
 
   return (
     <div data-testid="anchoring-panel">
-      <Surface variant="gradient-border-accent" radius="xl" padding="lg" className="mb-8">
-        <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
-          <p className="max-w-3xl text-sm leading-6 text-muted-foreground">
-            {t('anchoringPage.description')}
-          </p>
-          <Link
-            href="/anchoring"
-            className="group inline-flex items-center gap-2 self-start whitespace-nowrap rounded-full border border-primary/25 bg-primary/10 px-4 py-2 text-sm font-semibold text-primary no-underline transition-colors hover:border-primary/45 hover:bg-primary/15 lg:self-auto"
-          >
-            {t('anchoringPage.historyLink')}
-            <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
-          </Link>
-        </div>
-        {dashboardLoading ? (
-          <div className="mt-6 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-5">
-            {Array.from({ length: 5 }).map((_, i) => (
-              <SkeletonStatCard key={i} />
-            ))}
-          </div>
-        ) : (
-          <AnchoringHeroStats
-            stats={anchoringSnapshotStats}
-            className="mt-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-5"
-          />
-        )}
-      </Surface>
-
-      <Surface variant="glass" radius="lg" padding="md" className="mb-6">
-        <p className="text-sm leading-6 text-muted-foreground">
-          {t('anchoringPage.tableDescription')}
-        </p>
-      </Surface>
-
-      <div className="gradient-border-card rounded-xl bg-white/[0.02] p-1">
-        <AnchoringSection
-          cstStats={cstAnchorStats ?? { NumActiveStakers: 0, TotalTokensStaked: 0 }}
-          rwlkStats={rwlkAnchorStats ?? { NumActiveStakers: 0, TotalTokensStaked: 0 }}
-          cstAnchorActions={toDataState(cstAnchorActionsQuery)}
-          rwlkAnchorActions={toDataState(rwlkAnchorActionsQuery)}
-          anchoredCSTokens={toDataState(anchoredCSTokensQuery)}
-          anchoredRWLKTokens={toDataState(anchoredRWLKTokensQuery)}
-          uniqueCSTAnchorHolders={
-            toDataState(uniqueCSTAnchorHoldersQuery) as AnchoringDataState<UniqueAnchorHolderCST>
-          }
-          uniqueRWLKAnchorHolders={
-            toDataState(uniqueRWLKAnchorHoldersQuery) as AnchoringDataState<UniqueAnchorHolderRWLK>
+      <section aria-labelledby="anchoring-now-heading">
+        <SectionHeader
+          headingId="anchoring-now-heading"
+          title={t('anchoringPage.nowTitle')}
+          actions={
+            <Link
+              href="/anchoring"
+              className={cn(
+                'link inline-flex items-center gap-1.5 type-body-sm',
+                TOUCH_TARGET_TEXT_LINK_CLASS,
+              )}
+            >
+              {t('anchoringPage.historyLink')}
+              <ArrowRight aria-hidden className="size-4" />
+            </Link>
           }
         />
-      </div>
+        <PageHeaderFigures figures={figures} className="mt-0 sm:mt-0" />
+      </section>
+
+      <AnchoringSection
+        cstStats={cstAnchorStats}
+        rwlkStats={rwlkAnchorStats}
+        statsLoading={dashboard.isLoading}
+        cstAnchorActions={toDataState(cstAnchorActionsQuery)}
+        rwlkAnchorActions={toDataState(rwlkAnchorActionsQuery)}
+        anchoredCSTokens={toDataState(anchoredCSTokensQuery)}
+        anchoredRWLKTokens={toDataState(anchoredRWLKTokensQuery)}
+        uniqueCSTAnchorHolders={
+          toDataState(uniqueCSTAnchorHoldersQuery) as AnchoringDataState<UniqueAnchorHolderCST>
+        }
+        uniqueRWLKAnchorHolders={
+          toDataState(uniqueRWLKAnchorHoldersQuery) as AnchoringDataState<UniqueAnchorHolderRWLK>
+        }
+      />
     </div>
   );
 };

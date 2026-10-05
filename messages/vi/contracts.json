@@ -4,14 +4,8 @@
     "contracts": "Hợp đồng"
   },
   "page": {
-    "eyebrow": "Hợp đồng đã xác minh · Arbitrum",
     "title": "Địa chỉ hợp đồng",
-    "subtitle": "Địa chỉ, cấu hình, mã nguồn và thông tin xác minh các hợp đồng của Cosmic Signature.",
-    "allocationAria": "Các luồng phân bổ",
-    "configurationAria": "Cấu hình giao thức",
-    "addressesAria": "Địa chỉ hợp đồng",
-    "addressesTitle": "Địa chỉ hợp đồng",
-    "parametersAria": "Tham số cửa sổ hiệu chỉnh và Tinh tuyển"
+    "subtitle": "Địa chỉ, cấu hình, mã nguồn và thông tin xác minh các hợp đồng của Cosmic Signature."
   },
   "network": {
     "chain": "Chuỗi {chainId}"
@@ -34,7 +28,7 @@
       "description": "Bộ sưu tập NFT ERC-721 được khắc làm phân bổ cho người nhận của mỗi chu kỳ"
     },
     "randomWalk": {
-      "name": "RandomWalk",
+      "name": "Random Walk NFT",
       "description": "Bộ sưu tập RandomWalk NFT có thể đính kèm vào nét bút ETH để được giảm giá một lần, hoặc neo giữ để thuộc diện Tinh tuyển NFT neo giữ"
     },
     "council": {
@@ -59,27 +53,24 @@
     },
     "rwalkAnchor": {
       "name": "Ví neo giữ RWLK",
-      "description": "Hợp đồng neo giữ dành cho RandomWalk NFT"
+      "description": "Hợp đồng neo giữ dành cho Random Walk NFT"
     }
   },
   "categories": {
     "core": "Hợp đồng cốt lõi",
-    "wallet": "Hợp đồng ví",
-    "anchoring": "Hợp đồng neo giữ"
+    "wallet": "Ví",
+    "anchoring": "Neo giữ"
   },
-  "search": {
-    "placeholder": "Tìm hợp đồng theo tên hoặc địa chỉ…",
-    "ariaLabel": "Tìm hợp đồng",
-    "clearAria": "Xóa tìm kiếm",
-    "empty": "Không có hợp đồng nào khớp với “{searchTerm}”"
-  },
-  "addressCard": {
-    "copyAria": "Sao chép địa chỉ {name}",
-    "explorerAria": "Xem {name} trên trình khám phá khối"
+  "addresses": {
+    "title": "Địa chỉ hợp đồng",
+    "description": "Mọi hợp đồng Cosmic Signature trên Arbitrum One. Sao chép địa chỉ, hoặc kiểm tra địa chỉ trên Arbiscan và mã nguồn trên Sourcify.",
+    "verified": "Mọi địa chỉ có liên kết Sourcify đều khớp chính xác trên đó, kiểm tra ngày {date}.",
+    "markets": "Thị trường",
+    "reported": "Bộ lập chỉ mục báo cáo địa chỉ {address}, địa chỉ này chưa được xác minh."
   },
   "funds": {
     "title": "Các luồng phân bổ",
-    "description": "Cách Dự trữ chu kỳ được phân phối qua các luồng phân bổ: phân bổ Signature, Chiến binh Thời gian, Tinh tuyển, Hàng hóa công, phân phối neo giữ và Dự trữ tích lũy.",
+    "description": "Cách Dự trữ chu kỳ được phân phối qua các luồng phân bổ: phân bổ Signature, Chiến binh Thời gian, Tinh tuyển, phân phối neo giữ và Hàng hóa công; phần còn lại chuyển sang chu kỳ tiếp theo thành Dự trữ tích lũy.",
     "chartAria": "Biểu đồ cột các luồng phân bổ",
     "segments": {
       "signature": {
@@ -103,20 +94,21 @@
         "tooltip": "Được chuyển đến đơn vị thụ hưởng Hàng hóa công (Protocol Guild) mỗi chu kỳ"
       },
       "next": {
-        "label": "Chu kỳ tiếp theo",
+        "label": "Dự trữ tích lũy",
         "tooltip": "Phần còn lại được chuyển sang chu kỳ tiếp theo dưới dạng Dự trữ tích lũy."
       }
     }
   },
   "configuration": {
     "title": "Cấu hình giao thức",
+    "description": "Các tham số hiện tại mà hợp đồng giao thức đang đọc.",
     "cards": {
       "ethStep": {
         "label": "Bước tăng chi phí nét bút ETH",
         "tooltip": "Chi phí nét bút ETH dùng tham số bước tăng này. Chi phí nét bút CST đi theo cửa sổ hiệu chỉnh CST trực tiếp."
       },
       "timeIncrement": {
-        "label": "Mức tăng thời gian",
+        "label": "Thời gian cộng thêm cho mỗi nét bút",
         "tooltip": "Mỗi nét bút cộng thêm khoảng thời gian này vào thời điểm hoàn tất chu kỳ. Mức tăng lớn thêm {percent}% sau mỗi chu kỳ."
       },
       "cstPreview": {
@@ -128,7 +120,7 @@
         "tooltip": "Khoảng thời gian người đặt nét bút cuối cùng có để hoàn tất chu kỳ trước khi cửa sổ hoàn tất mở ra cho bất kỳ ai"
       },
       "initial": {
-        "label": "Mức tăng thời gian ban đầu",
+        "label": "Thời lượng chu kỳ ban đầu",
         "tooltip": "Thời điểm hoàn tất chu kỳ ban đầu được cộng thêm khi nét bút đầu tiên được đặt"
       },
       "message": {
@@ -137,7 +129,7 @@
       },
       "v3CstDecline": {
         "label": "Tốc độ giảm giá CST",
-        "value": "{amount} CST/phút",
+        "value": "{amount} CST/phút",
         "tooltip": "Tốc độ giảm của chi phí nét bút CST trong cửa sổ hiệu chỉnh CST. Mỗi lượt khắc CST tham gia được ghi trọn cho người tham gia bị vượt."
       },
       "v3SignatureNfts": {
@@ -148,53 +140,58 @@
         "label": "Cửa sổ nét bút muộn",
         "tooltip": "Khoảng thời gian ngay trước thời điểm hoàn tất chu kỳ, trong đó chi phí nét bút chịu phần phụ trội tăng theo cấp số nhân (tối đa khoảng 5 lần)."
       }
+    },
+    "groups": {
+      "gestures": "Nét bút",
+      "timing": "Thời gian",
+      "selection": "Tinh tuyển"
     }
   },
   "parameters": {
-    "title": "Tham số cửa sổ hiệu chỉnh và Tinh tuyển",
+    "windowsTitle": "Các cửa sổ hiệu chỉnh",
+    "windowsDescription": "Mỗi cửa sổ giảm dần chi phí nét bút theo thời gian. Cửa sổ CST bắt đầu lại sau mỗi nét bút CST; cửa sổ ETH mở khi chu kỳ bắt đầu và đóng khi có nét bút đầu tiên.",
     "cstTitle": "Cửa sổ hiệu chỉnh CST",
     "ethTitle": "Cửa sổ hiệu chỉnh ETH",
     "duration": "Thời lượng",
     "elapsed": "Thời gian đã trôi qua",
-    "ceiling": "Trần hiệu chỉnh",
+    "remaining": "Còn lại",
+    "progress": "Hoàn tất {percent}",
+    "state": {
+      "running": "Đang chạy",
+      "complete": "Đã hoàn tất",
+      "closed": "Đã đóng",
+      "notStarted": "Chưa bắt đầu"
+    },
+    "ceiling": "Chi phí khởi điểm",
     "cstDurationTooltip": "Thời lượng hiện tại của cửa sổ hiệu chỉnh CST. Nét bút CST kéo dài cửa sổ khoảng {increase}%; nét bút ETH rút ngắn khoảng {decrease}%.",
-    "cstElapsedTooltip": "Thời gian đã trôi qua trong cửa sổ hiệu chỉnh CST hiện tại",
     "cstCeilingTooltip": "Chi phí nét bút khởi điểm của cửa sổ hiệu chỉnh CST đang hiển thị. Chi phí giảm tuyến tính trong suốt thời lượng đang được lưu.",
-    "ethDurationTooltip": "Tổng thời lượng của cửa sổ hiệu chỉnh ETH, trong đó chi phí nét bút giảm dần theo thời gian",
-    "ethElapsedTooltip": "Thời gian đã trôi qua trong cửa sổ hiệu chỉnh ETH hiện tại",
-    "publicGoodsAddress": "Địa chỉ Hàng hóa công",
+    "publicGoodsAddress": "Đơn vị thụ hưởng Hàng hóa công",
     "publicGoodsAddressTooltip": "Địa chỉ trên chuỗi hiện đang nhận phần phân bổ Hàng hóa công từ hợp đồng Kho Hàng hóa công",
-    "copyPublicGoodsAria": "Sao chép địa chỉ Hàng hóa công",
-    "viewPublicGoodsAria": "Xem địa chỉ Hàng hóa công trên trình khám phá khối",
     "selection": {
       "ethLabel": "Người nhận ETH Tinh tuyển",
       "ethTooltip": "Số người tham gia được chọn ngẫu nhiên để nhận phân bổ ETH mỗi chu kỳ",
       "nftLabel": "NFT Tinh tuyển (người tham gia)",
       "nftTooltip": "Số người tham gia được chọn ngẫu nhiên để nhận Cosmic Signature NFT mỗi chu kỳ",
       "anchorLabel": "NFT Tinh tuyển (RWLK neo giữ)",
-      "anchorTooltip": "Số người neo giữ RandomWalk NFT được chọn ngẫu nhiên để nhận Cosmic Signature NFT mỗi chu kỳ"
-    }
+      "anchorTooltip": "Số người neo giữ Random Walk NFT được chọn ngẫu nhiên để nhận Cosmic Signature NFT mỗi chu kỳ"
+    },
+    "cstComplete": "Cửa sổ đã chạy hết thời lượng, nên chi phí nét bút CST giữ ở mức sàn cho đến khi nét bút CST tiếp theo bắt đầu lại cửa sổ.",
+    "ethClosed": "Nét bút đầu tiên của chu kỳ đã đóng cửa sổ này; giờ chi phí nét bút ETH tăng theo từng nét bút.",
+    "ethComplete": "Cửa sổ đã chạy hết thời lượng, nên chi phí nét bút ETH giữ ở mức sàn cho đến nét bút đầu tiên của chu kỳ."
   },
   "vault": {
-    "title": "Thao tác Kho Hàng hóa công",
+    "title": "Hàng hóa công",
+    "description": "Mỗi chu kỳ gửi phần Hàng hóa công vào kho, rồi kho chuyển tiếp đến đơn vị thụ hưởng Hàng hóa công.",
     "tooltip": "Chuyển số dư ETH từ Kho Hàng hóa công đến đơn vị thụ hưởng đã cấu hình là Protocol Guild.",
+    "vaultAddress": "Kho",
+    "share": "Tỷ lệ mỗi chu kỳ",
     "balance": "Hiện có trong kho",
-    "description": "Chuyển khoản dành cho Hàng hóa công hiện có trong kho đến Protocol Guild.",
-    "descriptionWithBeneficiary": "Chuyển khoản dành cho Hàng hóa công hiện có trong kho đến Protocol Guild ({address}).",
-    "aria": "Chuyển số dư Kho Hàng hóa công đến Protocol Guild"
+    "empty": "Kho đang trống: chưa có gì để chuyển.",
+    "balanceUnavailable": "Không đọc được số dư của kho, nên hiện chưa thể chuyển.",
+    "note": "Bất kỳ ai cũng có thể chuyển số dư của kho đến đơn vị thụ hưởng; chỉ tốn phí gas."
   },
   "seo": {
-    "eyebrow": "Hợp đồng đã xác minh · Arbitrum",
     "heading": "Hợp đồng Cosmic Signature",
-    "description": "Tra cứu địa chỉ hợp đồng Cosmic Signature trên Arbitrum để kiểm tra mã nguồn, cấu hình và các giao dịch trên chuỗi.",
-    "partialFallback": "Chưa tải được danh sách địa chỉ hiện tại. Bên dưới là địa chỉ proxy và hợp đồng triển khai đã xác minh, được lưu trong cấu hình giao thức.",
-    "empty": "Tạm thời chưa tải được địa chỉ hợp đồng. Danh sách sẽ xuất hiện khi dịch vụ dữ liệu hoạt động trở lại.",
-    "relatedAria": "Mã nguồn, bảo mật và xác minh hợp đồng",
-    "links": {
-      "code": "Xem mã nguồn Cosmic Signature",
-      "security": "Đọc tổng quan bảo mật",
-      "audits": "Xem kiểm toán và xác minh",
-      "risk": "Đọc công bố rủi ro"
-    }
+    "partialFallback": "Hiện chưa lấy được số liệu trực tiếp. Các địa chỉ bên dưới lấy từ danh sách đã xác minh."
   }
 }

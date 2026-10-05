@@ -1,20 +1,21 @@
 'use client';
 
+import type { ReactNode } from 'react';
 import { useTranslations } from 'next-intl';
 
-import { formatEthValue } from '@/utils';
-
+import { cn } from '@/lib/utils';
+import { useFormat } from '@/hooks/useFormat';
+import { PageHeaderFigures, type PageHeaderFigure } from '@/components/layout/PageHeader';
+import { Amount } from '@/components/ui/amount';
+import { DataTableWidth } from '@/components/ui/data-table';
+import { Skeleton } from '@/components/ui/skeleton';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import { GlobalAnchorActionsTable } from '@/components/anchoring/GlobalAnchorActionsTable';
 import { GlobalAnchoredTokensTable } from '@/components/anchoring/GlobalAnchoredTokensTable';
-import { UniqueAnchorHoldersCSTTable } from '@/components/tables/UniqueAnchorHoldersCSTTable';
-import { UniqueAnchorHoldersRWLKTable } from '@/components/tables/UniqueAnchorHoldersRWLKTable';
-import type { UniqueAnchorHolderCST } from '@/components/tables/UniqueAnchorHoldersCSTTable';
-import type { UniqueAnchorHolderRWLK } from '@/components/tables/UniqueAnchorHoldersRWLKTable';
+import { AnchorHoldersTable } from '@/components/tables/AnchorHoldersTable';
 import type { AnchorAction, AnchoredTokenInfo } from '@/services/api';
+import type { UniqueAnchorHolderCST, UniqueAnchorHolderRWLK } from '@/services/api/types';
 
-import { StatisticsItem } from './StatisticsItem';
-import { StatisticsGroup } from './StatisticsGroup';
 import { StatsSection } from './StatsSection';
 
 /** Query-state bundle for one anchoring dataset. */
@@ -27,18 +28,20 @@ export interface AnchoringDataState<T> {
 
 /** Props for the anchoring statistics section. */
 export interface AnchoringSectionProps {
-  cstStats: {
-    NumActiveStakers: number;
+  /** The dashboard's Cosmic Signature anchoring figures; missing while loading or when unread. */
+  cstStats?: {
+    NumActiveStakers?: number;
     NumDeposits?: number;
     TotalRewardEth?: number;
-    TotalTokensStaked: number;
     UnclaimedRewardEth?: number;
-  };
-  rwlkStats: {
-    NumActiveStakers: number;
+  } | null;
+  /** The dashboard's Random Walk anchoring figures; missing while loading or when unread. */
+  rwlkStats?: {
+    NumActiveStakers?: number;
     TotalTokensMinted?: number;
-    TotalTokensStaked: number;
-  };
+  } | null;
+  /** The dashboard is still loading: the figures hold skeletons, not dashes or zeros. */
+  statsLoading?: boolean;
   cstAnchorActions: AnchoringDataState<AnchorAction>;
   rwlkAnchorActions: AnchoringDataState<AnchorAction>;
   anchoredCSTokens: AnchoringDataState<AnchoredTokenInfo>;
@@ -52,7 +55,7 @@ interface AnchoringTableSectionProps<T> {
   tooltip: string;
   state: AnchoringDataState<T>;
   emptyTitle: string;
-  children: React.ReactNode;
+  children: ReactNode;
 }
 
 function AnchoringTableSection<T>({
@@ -72,15 +75,53 @@ function AnchoringTableSection<T>({
       isEmpty={(state.data ?? []).length === 0}
       emptyTitle={emptyTitle}
     >
-      {children}
+      {/* The tab stacks five-column and four-column ledgers: every one runs
+          the full width, so they share a right edge. */}
+      <DataTableWidth value="fill">{children}</DataTableWidth>
     </StatsSection>
   );
 }
 
-/** CST and RWLK anchoring tabs with stats, actions, anchored tokens, and unique anchor-holders. */
+/**
+ * A tab's figure strip, a level under the page's "Anchoring now" figures:
+ * values at the inline-readout size (`type-figure-md`, never the strip's
+ * 32px), so "this collection" reads under "all anchoring". A label that wraps
+ * pushes nothing: each figure is a column whose label grows, so every value
+ * sits on the row's bottom line. The label stretches across its column
+ * (`self-stretch`): the header's `self-end` means "bottom" in its subgrid but
+ * "right" in a flex column, which pushed a one-line label to the far edge
+ * while its value stayed at the start.
+ */
+const FIGURES_LAYOUT = cn(
+  'mt-0 sm:mt-0 sm:[&>div]:flex sm:[&>div]:flex-col sm:[&>div>dt]:grow sm:[&>div>dt]:self-stretch',
+  '[&>div>dd:first-of-type]:type-figure-md lg:[&>div]:px-6',
+);
+
+/**
+ * The Cosmic Signature strip's four figures: 2 + 2 on a tablet, then one row
+ * of four from `lg`, never a lone fourth figure wrapped under three (the
+ * header strip's wrapping flex row does that at 1024px, and wider in
+ * Ukrainian). The two counts take less room than the two ETH amounts, and the
+ * columns pad a little less than the page header's, so an amount keeps its
+ * line at 1024px.
+ */
+const CST_FIGURES_LAYOUT = cn(
+  FIGURES_LAYOUT,
+  'sm:grid-cols-2 lg:grid lg:grid-cols-[repeat(2,minmax(0,4fr))_repeat(2,minmax(0,5fr))] lg:[&>div]:px-5',
+);
+
+/**
+ * The anchoring statistics, one segmented view per NFT kind (a view of one
+ * thing, not a second navigation row under the Statistics tabs): the kind's
+ * own figures, each label explaining itself (the anchored counts of both
+ * kinds lead the page above), then the actions, anchored NFTs and
+ * anchor-holders ledgers as sections. While the dashboard loads each figure
+ * holds a skeleton; one it could not read is the Unavailable dash.
+ */
 export function AnchoringSection({
   cstStats,
   rwlkStats,
+  statsLoading = false,
   cstAnchorActions,
   rwlkAnchorActions,
   anchoredCSTokens,
@@ -89,56 +130,69 @@ export function AnchoringSection({
   uniqueRWLKAnchorHolders,
 }: AnchoringSectionProps) {
   const t = useTranslations('statistics');
+  const format = useFormat();
+  const pending = <Skeleton className="h-7 w-20" />;
+  const count = (value: number | undefined) =>
+    statsLoading ? pending : typeof value === 'number' ? format.count(value) : null;
+  const eth = (value: number | undefined) =>
+    statsLoading ? pending : typeof value === 'number' ? <Amount value={value} unit="ETH" /> : null;
+
+  // Each label explains itself (the one definition mechanism of the page's figures), so the
+  // tabs need no separate Definitions disclosure.
+  const cstFigures: PageHeaderFigure[] = [
+    {
+      id: 'activeHolders',
+      label: t('anchoringPage.stats.activeHoldersCosmicSignature'),
+      info: t('anchoringTooltips.cstActiveAnchorHolders'),
+      value: count(cstStats?.NumActiveStakers),
+    },
+    {
+      id: 'deposits',
+      label: t('anchoringPage.stats.distributionDeposits'),
+      info: t('anchoringTooltips.cstAnchorDistributionDeposits'),
+      value: count(cstStats?.NumDeposits),
+    },
+    {
+      id: 'totalDistributions',
+      label: t('anchoringPage.stats.totalDistributions'),
+      info: t('anchoringTooltips.cstTotalAnchorDistributions'),
+      value: eth(cstStats?.TotalRewardEth),
+    },
+    {
+      id: 'unretrieved',
+      label: t('anchoringPage.stats.unretrievedDistributions'),
+      info: t('anchoringTooltips.cstUnretrievedAnchorDistributions'),
+      value: eth(cstStats?.UnclaimedRewardEth),
+    },
+  ];
+
+  const rwlkFigures: PageHeaderFigure[] = [
+    {
+      id: 'activeHolders',
+      label: t('anchoringPage.stats.activeHoldersRandomWalk'),
+      info: t('anchoringTooltips.rwlkActiveAnchorHolders'),
+      value: count(rwlkStats?.NumActiveStakers),
+    },
+    {
+      id: 'tokensImprinted',
+      label: t('anchoringPage.stats.tokensImprinted'),
+      info: t('anchoringTooltips.rwlkTotalTokensImprinted'),
+      value: count(rwlkStats?.TotalTokensMinted),
+    },
+  ];
 
   return (
-    <Tabs defaultValue="cst" className="mt-8">
-      <TabsList className="flex h-auto w-full flex-wrap justify-start gap-1 p-1 sm:inline-flex sm:w-auto sm:flex-nowrap">
-        <TabsTrigger
-          value="cst"
-          className="min-w-0 flex-1 whitespace-normal px-2 py-2 text-center text-sm font-semibold leading-tight sm:flex-none sm:whitespace-nowrap sm:px-3 sm:py-1.5 sm:text-lg"
-        >
-          {t('anchoringPage.tabs.cosmicSignature')}
-        </TabsTrigger>
-        <TabsTrigger
-          value="rwlk"
-          className="min-w-0 flex-1 whitespace-normal px-2 py-2 text-center text-sm font-semibold leading-tight sm:flex-none sm:whitespace-nowrap sm:px-3 sm:py-1.5 sm:text-lg"
-        >
-          {t('anchoringPage.tabs.randomWalk')}
-        </TabsTrigger>
+    <Tabs defaultValue="cst" className="mt-10">
+      <TabsList aria-label={t('anchoringPage.tabs.label')}>
+        <TabsTrigger value="cst">{t('anchoringPage.tabs.cosmicSignature')}</TabsTrigger>
+        <TabsTrigger value="rwlk">{t('anchoringPage.tabs.randomWalk')}</TabsTrigger>
       </TabsList>
 
-      <TabsContent value="cst" className="space-y-6 pt-4">
-        <StatisticsGroup
-          title={t('anchoringPage.groups.cosmicSignature')}
-          accentColor="blue"
-          tooltip={t('anchoringTooltips.cstGroup')}
-        >
-          <StatisticsItem
-            title={t('anchoringPage.stats.activeHolders')}
-            value={cstStats.NumActiveStakers}
-            tooltip={t('anchoringTooltips.cstActiveAnchorHolders')}
-          />
-          <StatisticsItem
-            title={t('anchoringPage.stats.distributionDeposits')}
-            value={cstStats.NumDeposits ?? '—'}
-            tooltip={t('anchoringTooltips.cstAnchorDistributionDeposits')}
-          />
-          <StatisticsItem
-            title={t('anchoringPage.stats.totalDistributions')}
-            value={formatEthValue(cstStats.TotalRewardEth ?? 0)}
-            tooltip={t('anchoringTooltips.cstTotalAnchorDistributions')}
-          />
-          <StatisticsItem
-            title={t('anchoringPage.stats.tokensAnchored')}
-            value={cstStats.TotalTokensStaked}
-            tooltip={t('anchoringTooltips.cstTotalTokensAnchored')}
-          />
-          <StatisticsItem
-            title={t('anchoringPage.stats.unretrievedDistributions')}
-            value={formatEthValue(cstStats.UnclaimedRewardEth ?? 0)}
-            tooltip={t('anchoringTooltips.cstUnretrievedAnchorDistributions')}
-          />
-        </StatisticsGroup>
+      <TabsContent value="cst" className="mt-8 space-y-12 sm:space-y-16">
+        {/* A wrapper takes the tab's rhythm: the strip's own negative margin would cancel it. */}
+        <div>
+          <PageHeaderFigures figures={cstFigures} className={CST_FIGURES_LAYOUT} />
+        </div>
 
         <AnchoringTableSection
           title={t('anchoringPage.tables.actions')}
@@ -164,32 +218,17 @@ export function AnchoringSection({
           state={uniqueCSTAnchorHolders}
           emptyTitle={t('anchoringPage.empty.holders')}
         >
-          <UniqueAnchorHoldersCSTTable list={uniqueCSTAnchorHolders.data ?? []} />
+          <AnchorHoldersTable
+            collection="cosmicSignature"
+            list={uniqueCSTAnchorHolders.data ?? []}
+          />
         </AnchoringTableSection>
       </TabsContent>
 
-      <TabsContent value="rwlk" className="space-y-6 pt-4">
-        <StatisticsGroup
-          title={t('anchoringPage.groups.randomWalk')}
-          accentColor="purple"
-          tooltip={t('anchoringTooltips.rwlkGroup')}
-        >
-          <StatisticsItem
-            title={t('anchoringPage.stats.activeHolders')}
-            value={rwlkStats.NumActiveStakers}
-            tooltip={t('anchoringTooltips.rwlkActiveAnchorHolders')}
-          />
-          <StatisticsItem
-            title={t('anchoringPage.stats.tokensImprinted')}
-            value={rwlkStats.TotalTokensMinted ?? '—'}
-            tooltip={t('anchoringTooltips.rwlkTotalTokensImprinted')}
-          />
-          <StatisticsItem
-            title={t('anchoringPage.stats.tokensAnchored')}
-            value={rwlkStats.TotalTokensStaked}
-            tooltip={t('anchoringTooltips.rwlkTotalTokensAnchored')}
-          />
-        </StatisticsGroup>
+      <TabsContent value="rwlk" className="mt-8 space-y-12 sm:space-y-16">
+        <div>
+          <PageHeaderFigures figures={rwlkFigures} className={FIGURES_LAYOUT} />
+        </div>
 
         <AnchoringTableSection
           title={t('anchoringPage.tables.actions')}
@@ -215,7 +254,7 @@ export function AnchoringSection({
           state={uniqueRWLKAnchorHolders}
           emptyTitle={t('anchoringPage.empty.holders')}
         >
-          <UniqueAnchorHoldersRWLKTable list={uniqueRWLKAnchorHolders.data ?? []} />
+          <AnchorHoldersTable collection="randomWalk" list={uniqueRWLKAnchorHolders.data ?? []} />
         </AnchoringTableSection>
       </TabsContent>
     </Tabs>

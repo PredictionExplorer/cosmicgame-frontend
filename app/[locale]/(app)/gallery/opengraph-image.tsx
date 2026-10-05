@@ -1,9 +1,14 @@
 import { COSMIC_OG_SIZE } from '@/lib/og/CosmicOgCard';
-import { getOgCopy, getOgImageMetadata } from '@/lib/og/copy';
-import { createCosmicOgImage } from '@/lib/og/createCosmicOgImage';
+import { galleryCard, ogImageMetadata } from '@/lib/og/cards';
+import { getOgCopy } from '@/lib/og/copy';
 
+/**
+ * The gallery: its title above the three newest Signatures.
+ */
 export const contentType = 'image/png';
 export const size = COSMIC_OG_SIZE;
+// The strip shows the newest Signatures; regenerate as new ones are imprinted.
+export const revalidate = 3600;
 
 interface ImageProps {
   params: Promise<{ locale: string }>;
@@ -11,10 +16,10 @@ interface ImageProps {
 
 export async function generateImageMetadata({ params }: ImageProps) {
   const { locale } = await params;
-  return getOgImageMetadata(locale, 'gallery');
+  return ogImageMetadata(getOgCopy(locale, 'gallery').alt);
 }
 
 export default async function Image({ params }: ImageProps) {
   const { locale } = await params;
-  return createCosmicOgImage(locale, getOgCopy(locale, 'gallery'));
+  return galleryCard(locale);
 }

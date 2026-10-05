@@ -4,72 +4,73 @@
     "help": "The gesture ID in the address must be a whole number, zero or greater."
   },
   "header": {
-    "title": "Gesture details",
-    "loadingSubtitle": "Loading gesture data…",
-    "positionLabel": "Gesture Position #{position}",
-    "positionFallback": "Gesture Position"
+    "title": "Gesture #{position}",
+    "fallback": "Gesture record {id}",
+    "explorer": "View transaction"
   },
   "empty": {
     "title": "No gesture information found.",
-    "help": "Check the gesture ID. A recent gesture may take a moment to appear."
+    "help": "Check the gesture ID. A recent gesture may take a moment to appear.",
+    "action": "See the current cycle"
+  },
+  "error": {
+    "title": "Gesture record didn’t load",
+    "message": "Check your connection and try again."
+  },
+  "figures": {
+    "cost": "Gesture Cost",
+    "participationCst": "Participation CST",
+    "held": "Time held",
+    "heldInfo": "How long this gesture was the Last Gesture: until the next gesture, or until the cycle finalized.",
+    "heldLive": "Still the Last Gesture"
+  },
+  "method": {
+    "eth": "ETH",
+    "ethRandomWalk": "ETH + Random Walk NFT",
+    "cst": "CST"
   },
   "sections": {
-    "transaction": {
-      "title": "Transaction and cycle",
-      "description": "When the gesture was made and which cycle it belongs to."
-    },
-    "cost": {
-      "title": "Cost and Participation CST",
-      "description": "What was paid and the Participation CST imprinted by this gesture."
-    },
-    "type": {
-      "title": "Gesture type",
-      "description": "Whether a Random Walk NFT or CST was used for this gesture."
-    },
-    "erc20": {
-      "title": "Attached ERC-20",
-      "description": "Optional ERC-20 token attached to this gesture."
-    },
-    "nft": {
-      "title": "Attached NFT",
-      "description": "Metadata for the NFT attached to this gesture, when present."
+    "details": {
+      "title": "Record"
     },
     "message": {
-      "title": "Message",
-      "description": "Message left by the participant with this gesture."
+      "title": "Message"
+    },
+    "nft": {
+      "title": "Attached NFT"
     }
   },
   "rows": {
-    "datetime": "Date and time",
-    "datetimeHelp": "Opens the transaction on the block explorer",
-    "participantAddress": "Participant address",
-    "cycleNumber": "Cycle number",
-    "cycleValue": "Cycle {round}",
-    "gestureCost": "Gesture cost",
-    "participationCst": "Participation CST",
-    "cstToOutbid": "To outbid participant",
-    "attachedRandomWalk": "Random Walk NFT used for this ETH gesture",
-    "paidWithCst": "Paid with CST (ERC-20)",
-    "randomWalkId": "Random Walk NFT ID",
-    "erc20Address": "Attached ERC-20 contract address",
+    "participant": "Participant",
+    "finalizationTime": "Finalization time after this gesture",
+    "clockExtended": "Extended by {duration}",
+    "transaction": "Transaction",
+    "copyHash": "Copy transaction hash",
+    "hashCopied": "Transaction hash copied",
+    "erc20": "Attached ERC-20",
     "erc20Amount": "Attached ERC-20 token amount",
-    "nftAddress": "Attached NFT contract address",
+    "nftContract": "Attached NFT contract address",
     "nftId": "Attached NFT ID",
-    "nftTokenUri": "NFT metadata URI"
+    "cstToOutbid": "To outbid participant"
   },
-  "values": {
-    "yes": "Yes",
-    "no": "No"
+  "nav": {
+    "aria": "Neighbouring gestures",
+    "previous": "Previous gesture",
+    "next": "Next gesture",
+    "all": "All gestures in Cycle {cycle}"
   },
   "nftPreview": {
-    "heading": "Preview and metadata",
     "collectionName": "Collection name",
     "artist": "Artist",
     "platform": "Platform",
     "description": "Description"
   },
   "randomWalk": {
-    "previewAria": "Random Walk NFT preview",
     "heading": "Random Walk NFT"
+  },
+  "rail": {
+    "position": "Gesture {position} of {total}",
+    "positionLive": "Gesture {position} of {total} so far",
+    "liveNote": "This cycle is still open. Its Signature is imprinted when it finalizes."
   }
 }

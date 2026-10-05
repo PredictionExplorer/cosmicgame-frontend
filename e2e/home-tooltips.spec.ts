@@ -13,11 +13,6 @@ const HOME_TOOLTIPS = [
     label: 'Allocation Tracks',
     expected: /Live view of every allocation track/,
   },
-  // Decision information is present without opening any disclosure.
-  {
-    label: 'Last Gesture',
-    expected: /latest gesture maker is building an endurance window/i,
-  },
 ];
 
 test.describe('/ tooltips', () => {
@@ -33,5 +28,22 @@ test.describe('/ tooltips', () => {
     await disclosure.locator('summary').click();
     await expect(disclosure).toHaveAttribute('open', '');
     await expectAllLabelTooltips(page, HOME_TOOLTIPS);
+  });
+
+  test('explains each standing role in place, without opening a disclosure', async ({ page }) => {
+    // The ledger's roles are explained terms: the word itself opens its
+    // definition, on hover or on a press (which pins it for touch).
+    const latest = page
+      .getByTestId('latest-participant-intel')
+      .getByRole('button', { name: 'Last Gesture', exact: true });
+    await latest.scrollIntoViewIfNeeded();
+    await latest.click();
+    await expect(page.getByRole('tooltip')).toContainText(/The most recent participant/);
+    await page.keyboard.press('Escape');
+    await expect(page.getByRole('tooltip')).toHaveCount(0);
+
+    const chrono = page.getByTestId('chrono-role-summary').getByRole('button').first();
+    await chrono.click();
+    await expect(page.getByRole('tooltip')).toBeVisible();
   });
 });

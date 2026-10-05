@@ -1,10 +1,8 @@
 {
-  "faqPage": {
-    "heading": "释疑",
-    "description": "坦率解答关于 Cosmic Signature 的重要问题：协议是什么、落笔如何运作，以及它不是什么。"
-  },
   "languageSwitcher": {
-    "label": "语言"
+    "label": "语言",
+    "current": "语言：{language}",
+    "currentShort": "语言：{language}，简称{short}"
   },
   "themeSwitcher": {
     "label": "配色",
@@ -42,12 +40,63 @@
     "home": "首页",
     "gallery": "画廊"
   },
+  "pageHeader": {
+    "snapshot": "数据快照：{date}",
+    "lastReviewed": "最后审阅：{date}",
+    "lastUpdated": "最后更新：{date}",
+    "relatedPages": "相关页面",
+    "readMore": "展开全文",
+    "readLess": "收起",
+    "crumbs": {
+      "participants": "参与者",
+      "allocationRecipients": "分配名录",
+      "cycle": "第 {cycle} 个周期"
+    }
+  },
   "status": {
     "loading": "加载中",
     "loadingEllipsis": "加载中…",
     "loadingDots": "加载中…",
-    "noData": "暂无数据",
-    "nothingHere": "暂无内容"
+    "unavailable": "暂不可用"
+  },
+  "liveStatus": {
+    "connecting": "连接中…",
+    "live": "实时",
+    "updated": "{age}更新",
+    "reconnecting": "重新连接中…",
+    "delayed": "更新延迟 · 最后更新：{age}",
+    "delayedCaveat": "更新延迟 · 最后更新：{age}。此后倒计时可能已被延长。",
+    "offline": "离线",
+    "offlineDetail": "网络已断开。最后更新：{age}。",
+    "offlineCaveat": "网络已断开。最后更新：{age}。此后倒计时可能已被延长。",
+    "age": {
+      "justNow": "刚刚",
+      "seconds": "{count} 秒前",
+      "minutes": "{count} 分钟前",
+      "hours": "{count} 小时前",
+      "days": "{count} 天前"
+    },
+    "delayedShort": "更新延迟"
+  },
+  "attention": {
+    "menuLabel": "提醒与声音",
+    "title": "提醒与声音",
+    "intro": "以下选项默认全部关闭，开启后仅保存在此浏览器中。",
+    "sound": {
+      "label": "有人在你之后落笔时播放提示音",
+      "description": "其他参与者在你最近一次落笔之后落笔时，播放一声短提示音。需要连接钱包并保持此标签页打开。"
+    },
+    "alert": {
+      "label": "收官前提醒",
+      "description": "在周期收官时间之前发送浏览器通知。请保持此标签页打开。",
+      "minutes": "{minutes} 分钟",
+      "blocked": "此网站的通知已被屏蔽。如需使用提醒，请在浏览器设置中允许通知。",
+      "unsupported": "此浏览器不支持通知。"
+    },
+    "tabTitle": {
+      "label": "在标签页标题中显示倒计时",
+      "description": "在周期的最后一小时，于浏览器标签页中显示剩余时间。"
+    }
   },
   "actions": {
     "copyAddress": "复制地址",
@@ -59,9 +108,15 @@
   "externalLink": {
     "title": "即将离开 Cosmic Signature",
     "description": "此链接来自参与者存储在链上的消息，未经审核或验证。请确认下方网址无误。",
+    "site": "网站",
     "copy": "复制链接",
     "copied": "已复制链接",
     "warning": "切勿在外部网站输入钱包助记词或私钥。",
     "open": "打开链接"
+  },
+  "signature": {
+    "untitled": "签名作品 {id}",
+    "cycle": "第 {n} 个周期",
+    "anchored": "已锚定"
   }
 }

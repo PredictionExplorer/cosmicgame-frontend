@@ -1,14 +1,13 @@
 'use client';
 
-import { useSyncExternalStore } from 'react';
-import { ArrowRight, Check, X } from 'lucide-react';
+import { ArrowRight, Check } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 
 import { Link } from '@/i18n/navigation';
 import { Button } from '@/components/ui/button';
-import { Surface } from '@/components/ui/surface';
+import { ScrollRail } from '@/components/ui/scroll-rail';
+import { SectionHeader } from '@/components/ui/section-header';
 import { getCycleState, type CyclePhase } from '@/lib/cycleState';
-import { TOUCH_TARGET_ICON_CLASS, TOUCH_TARGET_TEXT_LINK_CLASS } from '@/lib/touch-target';
 import { cn } from '@/lib/utils';
 import type { DashboardInfo } from '@/services/api';
 
@@ -20,25 +19,10 @@ interface CyclePhaseGuideProps {
   now: number;
   /** See useEndgameChainSync; omit for legacy local-clock behavior. */
   finalizationConfirmed?: boolean;
-  /** Merged onto the root section (e.g. `mb-0` where the parent owns spacing). */
   className?: string;
 }
 
-const explainerStorageKey = 'cosmic-cycle-explainer-dismissed';
-const explainerDismissedEvent = 'cosmic:explainer-dismissed';
-
-// localStorage as an external store: avoids setState-in-effect and renders
-// the dismissed state on the server so the explainer never flashes for
-// returning visitors.
-function subscribeToExplainerDismissal(onStoreChange: () => void): () => void {
-  window.addEventListener(explainerDismissedEvent, onStoreChange);
-  return () => window.removeEventListener(explainerDismissedEvent, onStoreChange);
-}
-const getExplainerDismissedSnapshot = (): boolean =>
-  window.localStorage.getItem(explainerStorageKey) === '1';
-const getExplainerDismissedServerSnapshot = (): boolean => true;
-
-const timelineSteps = [
+const TIMELINE_STEPS = [
   { id: 'opening-soon', messageKey: 'openingSoon' },
   { id: 'first-gesture', messageKey: 'firstGesture' },
   { id: 'open', messageKey: 'open' },
@@ -47,10 +31,12 @@ const timelineSteps = [
   { id: 'allocation', messageKey: 'allocation' },
 ] as const;
 
-function phaseToTimelineId(phase: CyclePhase): (typeof timelineSteps)[number]['id'] {
-  if (phase === 'opening-soon' || phase === 'loading' || phase === 'unavailable') {
-    return 'opening-soon';
-  }
+type TimelineStepId = (typeof TIMELINE_STEPS)[number]['id'];
+
+/** Where a step stands against the current one. */
+type StepState = 'passed' | 'now' | 'next' | 'later';
+
+export function phaseToTimelineId(phase: CyclePhase): TimelineStepId {
   if (phase === 'waiting-first-gesture') return 'first-gesture';
   if (phase === 'ready-to-finalize' || phase === 'confirming') return 'finalization';
   if (phase === 'final-hour' || phase === 'final-ten' || phase === 'final-minute') {
@@ -60,6 +46,22 @@ function phaseToTimelineId(phase: CyclePhase): (typeof timelineSteps)[number]['i
   return 'opening-soon';
 }
 
+function stepState(index: number, activeIndex: number): StepState {
+  if (index < activeIndex) return 'passed';
+  if (index === activeIndex) return 'now';
+  return index === activeIndex + 1 ? 'next' : 'later';
+}
+
+/**
+ * Where the Performance Cycle is now, as one rail of six phases divided by
+ * hairlines: the current phase is raised with a 2px primary rule and marked
+ * "Now", passed phases carry a check, the one after it is "Next" and the rest
+ * "Later". From 1280px every phase explains itself in its cell; below, the
+ * rail is compact (number, state and name) and scrolls sideways with the
+ * current phase kept in view, and the current phase's explanation reads as
+ * one line under it. It is the page's reading of the cycle's shape; the full
+ * walkthrough is one link away.
+ */
 export function CyclePhaseGuide({
   data,
   loading,
@@ -79,133 +81,107 @@ export function CyclePhaseGuide({
     finalizationConfirmed,
   }).phase;
   const activeStepId = phaseToTimelineId(phase);
-  const activeIndex = timelineSteps.findIndex((step) => step.id === activeStepId);
-  const explainerDismissed = useSyncExternalStore(
-    subscribeToExplainerDismissal,
-    getExplainerDismissedSnapshot,
-    getExplainerDismissedServerSnapshot,
-  );
-  const showExplainer = !explainerDismissed;
-
-  const dismissExplainer = () => {
-    window.localStorage.setItem(explainerStorageKey, '1');
-    window.dispatchEvent(new Event(explainerDismissedEvent));
+  const activeIndex = TIMELINE_STEPS.findIndex((step) => step.id === activeStepId);
+  const active = TIMELINE_STEPS[activeIndex] ?? TIMELINE_STEPS[0];
+  const stateLabel: Record<StepState, string> = {
+    passed: t('phaseGuide.stepState.passed'),
+    now: t('phaseGuide.stepState.now'),
+    next: t('phaseGuide.stepState.next'),
+    later: t('deck.phaseGuide.later'),
   };
 
   return (
-    <section aria-labelledby="cycle-phase-guide-title" className={cn('mb-8', className)}>
-      <Surface variant="glass-bordered" radius="xl" padding="none" className="p-4 sm:p-5">
-        <div className="flex flex-wrap items-start justify-between gap-4">
-          <div>
-            <p className="type-eyebrow text-muted-foreground">{t('phaseGuide.eyebrow')}</p>
-            <h2 id="cycle-phase-guide-title" className="mt-2 font-display text-xl font-bold">
-              {t('phaseGuide.title')}
-            </h2>
-          </div>
-          <Button asChild variant="secondary" size="sm" className="liquid-glass-control">
+    <section
+      aria-labelledby="cycle-phase-guide-title"
+      data-testid="cycle-phase-guide"
+      data-step={activeStepId}
+      className={cn('min-w-0', className)}
+    >
+      <SectionHeader
+        as="h2"
+        size="panel"
+        headingId="cycle-phase-guide-title"
+        eyebrow={t('phaseGuide.eyebrow')}
+        title={t('phaseGuide.title')}
+        actions={
+          <Button asChild variant="outline" size="sm">
             <Link href="/how-it-works">
               {t('phaseGuide.howItWorks')}
-              <ArrowRight className="h-4 w-4" />
+              <ArrowRight aria-hidden />
             </Link>
           </Button>
-        </div>
+        }
+      />
 
+      {/* The rail's cells hold no links, so while it scrolls the rail itself
+          takes the keyboard. */}
+      <ScrollRail
+        activeSelector='[aria-current="step"]'
+        label={t('phaseGuide.timelineAria')}
+        trackClassName="focus-ring-inset rounded-surface max-xl:snap-x max-xl:snap-mandatory"
+      >
         <ol
-          className="mt-4 grid gap-2.5 md:grid-cols-3 xl:grid-cols-6"
           aria-label={t('phaseGuide.timelineAria')}
+          className="flex w-full min-w-max gap-px overflow-hidden rounded-surface border border-rule-faint bg-rule-faint xl:grid xl:min-w-0 xl:grid-cols-6"
         >
-          {timelineSteps.map((step, index) => {
-            const isActive = step.id === activeStepId;
-            const isComplete = index < activeIndex;
+          {TIMELINE_STEPS.map((step, index) => {
+            const state = stepState(index, activeIndex);
+            const isActive = state === 'now';
             return (
               <li
                 key={step.id}
                 aria-current={isActive ? 'step' : undefined}
+                data-state={state}
                 className={cn(
-                  'relative rounded-2xl border p-3 transition-colors',
+                  'relative min-w-[9rem] flex-1 snap-start px-4 py-3.5 xl:min-w-0 xl:p-5',
                   isActive
-                    ? 'border-primary/40 bg-primary/[0.10] text-foreground shadow-[0_18px_70px_-56px_rgb(var(--aurora-cyan-rgb)/0.9)]'
-                    : isComplete
-                      ? 'border-emerald-300/20 bg-emerald-400/[0.045]'
-                      : 'border-white/[0.06] bg-white/[0.025]',
+                    ? 'bg-surface shadow-[inset_0_2px_0_hsl(var(--primary))]'
+                    : 'bg-background',
                 )}
               >
-                <span className="flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.16em] text-muted-foreground">
+                <p
+                  className={cn(
+                    'flex items-center gap-2 type-caption',
+                    isActive ? 'text-primary' : 'text-subtle',
+                  )}
+                >
                   <span
+                    aria-hidden
                     className={cn(
-                      'flex h-5 w-5 items-center justify-center rounded-full border text-[10px]',
-                      isActive
-                        ? 'border-primary/50 bg-primary/20 text-primary'
-                        : isComplete
-                          ? 'border-emerald-300/35 bg-emerald-400/10 text-emerald-300'
-                          : 'border-white/[0.10] bg-white/[0.03]',
+                      'inline-flex size-5 shrink-0 items-center justify-center rounded-pill border tabular-nums',
+                      isActive ? 'border-primary' : 'border-rule',
                     )}
                   >
-                    {isComplete ? <Check className="h-3 w-3" /> : index + 1}
+                    {state === 'passed' ? <Check className="size-3" /> : index + 1}
                   </span>
-                  {isActive
-                    ? t('phaseGuide.stepState.now')
-                    : isComplete
-                      ? t('phaseGuide.stepState.passed')
-                      : t('phaseGuide.stepState.next')}
-                </span>
-                <h3 className="mt-2 text-sm font-semibold">
+                  {stateLabel[state]}
+                </p>
+                <h3
+                  className={cn(
+                    'mt-2 type-title xl:mt-3',
+                    isActive ? 'text-foreground' : 'text-muted-foreground',
+                  )}
+                >
                   {t(`phaseGuide.steps.${step.messageKey}.label`)}
                 </h3>
-                <p className="mt-1.5 text-xs leading-relaxed text-muted-foreground">
+                {/* Every phase explains itself from 1280px; the compact rail
+                    keeps it for screen readers and shows the current one below. */}
+                <p className="mt-1 type-body-sm text-muted-foreground max-xl:sr-only">
                   {t(`phaseGuide.steps.${step.messageKey}.detail`)}
                 </p>
               </li>
             );
           })}
         </ol>
+      </ScrollRail>
 
-        {showExplainer && (
-          <div className="mt-4 rounded-2xl border border-white/[0.08] bg-white/[0.035] p-3.5">
-            <div className="flex items-start justify-between gap-3">
-              <div>
-                <h3 className="font-display text-base font-semibold">
-                  {t('phaseGuide.explainer.title')}
-                </h3>
-                <p className="mt-2 max-w-3xl text-sm leading-relaxed text-muted-foreground">
-                  {t('phaseGuide.explainer.body')}
-                </p>
-                <div className="mt-3 flex flex-wrap gap-3 text-sm">
-                  <Link
-                    className={cn(
-                      'text-primary underline-offset-4 hover:underline',
-                      TOUCH_TARGET_TEXT_LINK_CLASS,
-                    )}
-                    href="/faq"
-                  >
-                    {t('phaseGuide.explainer.faqLink')}
-                  </Link>
-                  <Link
-                    className={cn(
-                      'text-primary underline-offset-4 hover:underline',
-                      TOUCH_TARGET_TEXT_LINK_CLASS,
-                    )}
-                    href="/how-it-works"
-                  >
-                    {t('phaseGuide.explainer.walkthroughLink')}
-                  </Link>
-                </div>
-              </div>
-              <button
-                type="button"
-                aria-label={t('phaseGuide.explainer.dismissAria')}
-                onClick={dismissExplainer}
-                className={cn(
-                  'inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-full border border-white/[0.08] bg-white/[0.04] text-muted-foreground transition-colors hover:border-primary/30 hover:text-primary focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary',
-                  TOUCH_TARGET_ICON_CLASS,
-                )}
-              >
-                <X className="h-4 w-4" />
-              </button>
-            </div>
-          </div>
-        )}
-      </Surface>
+      <p
+        aria-hidden
+        data-testid="cycle-phase-guide-current"
+        className="mt-3 max-w-[var(--measure-lede)] type-body-sm text-muted-foreground xl:hidden"
+      >
+        {t(`phaseGuide.steps.${active.messageKey}.detail`)}
+      </p>
     </section>
   );
 }

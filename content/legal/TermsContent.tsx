@@ -1,21 +1,14 @@
-'use client';
+import { Fragment } from 'react';
 
-import { motion } from 'framer-motion';
-import {
-  AlertTriangle,
-  Coins,
-  FileText,
-  Scale,
-  Shield,
-  Users,
-  type LucideIcon,
-} from 'lucide-react';
+import type { LegalDocumentLabels } from '@/content/legal/labels';
 
-import { PageHeader } from '@/components/layout/PageHeader';
-import { Badge } from '@/components/ui/badge';
-import { Card, CardContent, CardHeader } from '@/components/ui/card';
-import { PageShell } from '@/components/ui/page-shell';
+import { LegalDocument } from '@/components/legal/LegalDocument';
+import { CITABLE_CLASS, LegalCallout, LegalClause, LegalList } from '@/components/legal/LegalProse';
+import { RichText } from '@/components/legal/RichText';
 import { cn } from '@/lib/utils';
+import { formatCount, formatPercent } from '@/utils/format';
+
+import { TERMS_ALLOCATION_ROWS, type TermsAllocationRow } from './termsAllocations';
 
 export type TermsSectionId =
   | 'acceptance'
@@ -25,26 +18,29 @@ export type TermsSectionId =
   | 'risks'
   | 'prohibited';
 
-export interface LegalParagraph {
+export interface TermsClause {
+  /** The clause's anchor inside its section: `/terms#<section>-<id>`. */
   readonly id: string;
   readonly subtitle?: string;
+  /** Rich text: `<tag>…</tag>` links a `LEGAL_LINKS` entry. */
   readonly text: string;
 }
 
 export interface TermsSection {
   readonly id: TermsSectionId;
   readonly title: string;
-  readonly content: readonly LegalParagraph[];
+  readonly content: readonly TermsClause[];
+  /** A list after the clauses (the prohibited activities), one item per entry. */
+  readonly bullets?: readonly string[];
 }
 
 export interface TermsCopy {
   readonly title: string;
   readonly subtitle: string;
-  readonly homeLabel: string;
-  readonly lastUpdated: string;
   readonly sections: readonly TermsSection[];
   readonly additionalTitle: string;
-  readonly additional: readonly Required<LegalParagraph>[];
+  readonly additional: readonly Required<TermsClause>[];
+  /** The warning a reader must not miss: shown above the first section. */
   readonly warning: {
     readonly title: string;
     readonly text: string;
@@ -53,120 +49,251 @@ export interface TermsCopy {
     readonly title: string;
     readonly text: string;
   };
+  /** The allocation tracks, each with its figures and its clause. */
+  readonly allocationsTable: {
+    readonly title: string;
+    /** `{percent}` shared by `{count}` Recipients. */
+    readonly sharedBy: string;
+    /** `{count}` Recipients each receive `{amount}`. */
+    readonly each: string;
+  };
 }
 
-const legalCard = 'rounded-2xl border border-border bg-card shadow-none';
+/** Clause ids of the allocation section that name a track (a row of the table). */
+const TRACK_IDS: ReadonlySet<string> = new Set(TERMS_ALLOCATION_ROWS.map((row) => row.id));
 
-const SECTION_ICONS: Record<TermsSectionId, LucideIcon> = {
-  acceptance: FileText,
-  eligibility: Users,
-  mechanics: Coins,
-  allocations: Scale,
-  risks: Shield,
-  prohibited: AlertTriangle,
-};
+/** The anchor of a clause, unique on the page. */
+export function clauseAnchor(sectionId: string, clauseId: string): string {
+  return `${sectionId}-${clauseId}`;
+}
 
-export function TermsContent({ copy }: { copy: TermsCopy }) {
+/**
+ * The allocation tracks as one list, each track once: its name (the clause's
+ * anchor, so the risk disclosures can cite it), its figures on one line
+ * ("ETH 25% · CST 1,000 · NFT 1", from `protocolFacts`), and the sentence
+ * that binds it. It replaces a table followed by the same eleven tracks
+ * again as clauses, which stated every figure twice.
+ */
+function AllocationTracks({
+  copy,
+  tracks,
+  locale,
+}: {
+  copy: TermsCopy['allocationsTable'];
+  tracks: readonly TermsClause[];
+  locale: string;
+}) {
+  const amountText = (value: number | undefined, row: TermsAllocationRow): string | null => {
+    if (value === undefined) return null;
+    const formatted = formatCount(value, locale);
+    return row.each
+      ? copy.each.replace('{count}', formatCount(row.each, locale)).replace('{amount}', formatted)
+      : formatted;
+  };
+  const ethText = (row: TermsAllocationRow): string | null => {
+    if (!row.eth) return null;
+    const percent = `${row.eth.approximate ? '≈ ' : ''}${formatPercent(row.eth.percent, locale)}`;
+    return row.eth.sharedBy
+      ? copy.sharedBy
+          .replace('{percent}', percent)
+          .replace('{count}', formatCount(row.eth.sharedBy, locale))
+      : percent;
+  };
+  const clauses = new Map(tracks.map((track) => [track.id, track]));
+
   return (
-    <PageShell variant="form" className="max-sm:pb-16">
-      <PageHeader
-        title={copy.title}
-        subtitle={copy.subtitle}
-        breadcrumbs={[{ label: copy.homeLabel, href: '/' }, { label: copy.title }]}
-        align="left"
-        className="mb-8"
-      />
-
-      <div className="mb-10 flex">
-        <Badge
-          variant="outline"
-          className="border-border bg-card px-3 py-1 text-xs font-medium text-muted-foreground"
-        >
-          {copy.lastUpdated}
-        </Badge>
-      </div>
-
-      <div className="mx-auto max-w-4xl space-y-8">
-        {copy.sections.map((section, index) => {
-          const Icon = SECTION_ICONS[section.id];
+    <div>
+      <h3 id="allocations-tracks-title" className="type-heading-3 text-foreground">
+        {copy.title}
+      </h3>
+      <dl
+        aria-labelledby="allocations-tracks-title"
+        data-allocation-tracks
+        className="mt-3 divide-y divide-rule-faint border-y border-rule-faint"
+      >
+        {TERMS_ALLOCATION_ROWS.map((row) => {
+          const clause = clauses.get(row.id);
+          if (!clause) return null;
+          // A track without a figure in a unit says nothing for it, rather than a dash.
+          const parts = [
+            { unit: 'ETH', value: ethText(row) },
+            { unit: 'CST', value: amountText(row.cst, row) },
+            { unit: 'NFT', value: amountText(row.nft, row) },
+          ].filter((part): part is { unit: string; value: string } => part.value !== null);
           return (
-            <motion.div
-              key={section.id}
-              initial={false}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ delay: index * 0.05 }}
+            <div
+              key={row.id}
+              id={clauseAnchor('allocations', row.id)}
+              className={cn(
+                'grid gap-x-8 gap-y-1.5 py-4 md:grid-cols-[minmax(0,13rem)_minmax(0,1fr)]',
+                CITABLE_CLASS,
+              )}
             >
-              <Card className={legalCard}>
-                <CardHeader>
-                  <h2 className="flex items-center gap-3 font-display text-xl font-semibold tracking-tight">
-                    <Icon className="h-6 w-6 shrink-0 text-primary" aria-hidden />
-                    <span>{section.title}</span>
-                  </h2>
-                </CardHeader>
-                <CardContent className="space-y-6">
-                  {section.content.map((item) => (
-                    <div key={item.id} className="space-y-2">
-                      {item.subtitle ? (
-                        <h3 className="font-semibold text-foreground">{item.subtitle}</h3>
+              <dt>
+                <span className="block type-title text-foreground">{clause.subtitle}</span>
+                <span
+                  data-track-figures
+                  className="mt-1 block type-figure-sm text-muted-foreground"
+                >
+                  {parts.map((part, index) => (
+                    <Fragment key={part.unit}>
+                      {index > 0 ? (
+                        <>
+                          {' '}
+                          <span aria-hidden className="text-subtle">
+                            ·
+                          </span>{' '}
+                        </>
                       ) : null}
-                      <p className="leading-8 text-muted-foreground">{item.text}</p>
-                    </div>
+                      <span className="whitespace-nowrap">
+                        <span className="text-subtle">{part.unit}</span> {part.value}
+                      </span>
+                    </Fragment>
                   ))}
-                </CardContent>
-              </Card>
-            </motion.div>
+                </span>
+              </dt>
+              <dd className="type-prose text-muted-foreground">
+                <RichText text={clause.text} locale={locale} />
+              </dd>
+            </div>
           );
         })}
+      </dl>
+    </div>
+  );
+}
 
-        <Card className={legalCard}>
-          <CardHeader>
-            <h2 className="font-display text-xl font-semibold tracking-tight">
-              {copy.additionalTitle}
-            </h2>
-          </CardHeader>
-          <CardContent className="space-y-6 text-muted-foreground">
-            {copy.additional.map((item) => (
-              <div key={item.id} className="space-y-2">
-                <h3 className="font-semibold text-foreground">{item.subtitle}</h3>
-                <p className="leading-relaxed">{item.text}</p>
-              </div>
-            ))}
-          </CardContent>
-        </Card>
+function TermsSectionBody({
+  section,
+  copy,
+  locale,
+  sectionLink,
+}: {
+  section: TermsSection;
+  copy: TermsCopy;
+  locale: string;
+  /** A clause heading link's name. */
+  sectionLink: LegalDocumentLabels['sectionLink'];
+}) {
+  const anchorLabel = (item: TermsClause) =>
+    item.subtitle ? sectionLink(item.subtitle) : undefined;
+  if (section.id !== 'allocations') {
+    return (
+      <>
+        {section.content.map((item) => (
+          <LegalClause
+            key={item.id}
+            id={clauseAnchor(section.id, item.id)}
+            heading={item.subtitle}
+            text={item.text}
+            locale={locale}
+            anchorLabel={anchorLabel(item)}
+          />
+        ))}
+        {section.bullets ? <LegalList items={section.bullets} locale={locale} /> : null}
+      </>
+    );
+  }
 
-        <Card
-          className={cn(
-            legalCard,
-            'border-amber-500/35 bg-amber-500/[0.06] dark:border-amber-400/25 dark:bg-amber-400/[0.06]',
-          )}
-        >
-          <CardContent className="p-6">
-            <div className="flex items-start gap-4">
-              <AlertTriangle
-                className="mt-0.5 h-6 w-6 shrink-0 text-amber-600 dark:text-amber-400"
-                aria-hidden
+  // Allocations: the opening clause, the tracks (each once, with its figures
+  // and its rule), then the retrieval and no-guarantee clauses.
+  const tracks = section.content.filter((item) => TRACK_IDS.has(item.id));
+  const [opening, ...rest] = section.content.filter((item) => !TRACK_IDS.has(item.id));
+  return (
+    <>
+      {opening ? (
+        <LegalClause
+          id={clauseAnchor(section.id, opening.id)}
+          heading={opening.subtitle}
+          text={opening.text}
+          locale={locale}
+          anchorLabel={anchorLabel(opening)}
+        />
+      ) : null}
+      <AllocationTracks copy={copy.allocationsTable} tracks={tracks} locale={locale} />
+      {rest.map((item) => (
+        <LegalClause
+          key={item.id}
+          id={clauseAnchor(section.id, item.id)}
+          heading={item.subtitle}
+          text={item.text}
+          locale={locale}
+          anchorLabel={anchorLabel(item)}
+        />
+      ))}
+    </>
+  );
+}
+
+/**
+ * The Terms of Service in the Trust Center template: the warning first, then
+ * each section with its clauses (every clause is an anchor, so support and
+ * the risk disclosures can cite `/terms#allocations-retrieval`, and a cited
+ * clause is marked), the allocation tracks as one list with their figures,
+ * the prohibited activities as a real list, and the acknowledgment last.
+ */
+export function TermsContent({
+  copy,
+  locale,
+  labels,
+}: {
+  copy: TermsCopy;
+  locale: string;
+  labels: LegalDocumentLabels;
+}) {
+  return (
+    <LegalDocument
+      page="terms"
+      numbered
+      labels={labels}
+      title={copy.title}
+      intro={copy.subtitle}
+      summary={
+        <LegalCallout
+          tone="attention"
+          title={copy.warning.title}
+          text={copy.warning.text}
+          locale={locale}
+        />
+      }
+      sections={[
+        ...copy.sections.map((section) => ({
+          id: section.id,
+          heading: section.title,
+          content: (
+            <TermsSectionBody
+              section={section}
+              copy={copy}
+              locale={locale}
+              sectionLink={labels.sectionLink}
+            />
+          ),
+        })),
+        {
+          id: 'additional',
+          heading: copy.additionalTitle,
+          content: (
+            <>
+              {copy.additional.map((item) => (
+                <LegalClause
+                  key={item.id}
+                  id={clauseAnchor('additional', item.id)}
+                  heading={item.subtitle}
+                  text={item.text}
+                  locale={locale}
+                  anchorLabel={labels.sectionLink(item.subtitle)}
+                />
+              ))}
+              <LegalCallout
+                title={copy.acknowledgment.title}
+                text={copy.acknowledgment.text}
+                locale={locale}
+                className="mt-10"
               />
-              <div className="space-y-2">
-                <h3 className="font-semibold text-foreground">{copy.warning.title}</h3>
-                <p className="leading-8 text-muted-foreground">{copy.warning.text}</p>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card className={cn(legalCard, 'border-primary/25 bg-primary/[0.06]')}>
-          <CardContent className="p-6">
-            <div className="flex items-start gap-4">
-              <Shield className="mt-0.5 h-6 w-6 shrink-0 text-primary" aria-hidden />
-              <div className="space-y-2">
-                <h3 className="font-semibold text-foreground">{copy.acknowledgment.title}</h3>
-                <p className="leading-8 text-muted-foreground">{copy.acknowledgment.text}</p>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-      </div>
-    </PageShell>
+            </>
+          ),
+        },
+      ]}
+    />
   );
 }
