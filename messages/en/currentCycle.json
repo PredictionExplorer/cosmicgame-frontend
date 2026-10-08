@@ -110,7 +110,7 @@
     },
     "stellarSelectionEntries": {
       "title": "Stellar Selection entries",
-      "tooltip": "Each gesture adds one entry to this cycle’s Stellar Selection, and every selection at finalization is made from all of the entries, so one entry can be selected more than once. The table shows each participant’s share of the entries."
+      "tooltip": "Every selection at finalization is made from all of this cycle’s gestures, so the same participant can be selected more than once. The table shows each participant’s share of the selection."
     },
     "topEthSpenders": {
       "title": "Top ETH spenders",
@@ -139,6 +139,7 @@
     "participationV3": "When you gesture, you may imprint <em>dynamic Participation CST</em>. The amount accrues at a steady rate based on how long it has been since the previous gesture.",
     "calibration": "ETH gestures shorten the CST Calibration Window by about {decreasePercent}%; CST gestures lengthen it by about {increasePercent}%.",
     "stellarSelection": "Each gesture records one Stellar Selection entry. {ethEntries} entries receive {rafflePercent}% of the Cycle Reserve. {nftEntries} additional Selection recipients and {anchorHolders} Random Walk NFT anchor-holders receive a Cosmic Signature NFT.",
+    "stellarSelectionV3": "Each gesture records a Stellar Selection entry weighted by its ETH cost at the moment it is made. {ethEntries} entries receive {rafflePercent}% of the Cycle Reserve. {nftEntries} additional Selection recipients and {anchorHolders} Random Walk NFT anchor-holders receive a Cosmic Signature NFT.",
     "publicGoods": "Protocol Guild receives {percent}% of the Cycle Reserve (at least {amount} ETH) each cycle.",
     "learnMore": "How a cycle works"
   },

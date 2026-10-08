@@ -939,12 +939,12 @@ describe('useGestureForm', () => {
     expect(result.current.isGesturing).toBe(false);
   });
 
-  it('always submits a zero minimum CST reward (the guard is nullified)', async () => {
-    // Under V3 the guarded amount is minted to the previous participant, so a
-    // nonzero limit only produces spurious BidCstRewardAmountMinLimitNotReached
-    // reverts. The hook therefore behaves as if the parameter did not exist,
-    // whatever tolerance the person selects.
-    const { result } = renderHook(() => useGestureForm());
+  it('submits a zero CST floor when the wallet is not the latest gesturer', async () => {
+    // Under V3 the Participation CST goes to the outbid previous participant,
+    // so for everyone but the latest gesturer a nonzero floor only produces
+    // spurious BidCstRewardAmountMinLimitNotReached reverts. The 'auto'
+    // choice therefore sends 0 here, whatever tolerance is dialed in.
+    const { result } = renderHook(() => useGestureForm({ lastGesturerAddress: '0xSomeoneElse' }));
     await flushAsyncWork();
 
     act(() => {
@@ -954,7 +954,7 @@ describe('useGestureForm', () => {
     await result.current.onGestureWithCST();
     await flushAsyncWork();
 
-    expect(result.current.gestureCstRewardAmountMinLimitWei).toBe(0n);
+    expect(result.current.cstRewardGuardActive).toBe(false);
     expect(mockTx.writeContract).toHaveBeenCalledWith(
       expect.objectContaining({
         functionName: 'bidWithCst',
@@ -966,18 +966,38 @@ describe('useGestureForm', () => {
     );
   });
 
-  it('submits zero minimum CST reward when accepting any reward', async () => {
-    const { result } = renderHook(() => useGestureForm());
+  it('preselects the guard for the latest gesturer and sends the preview minus the tolerance', async () => {
+    // The connected wallet IS the cycle's latest gesturer, so the imprint
+    // returns to it and the 'auto' choice guards the shown amount (100 CST)
+    // minus the default 1% tolerance.
+    const { result } = renderHook(() => useGestureForm({ lastGesturerAddress: '0xUser' }));
+    await flushAsyncWork();
+
+    expect(result.current.cstRewardGuardActive).toBe(true);
+
+    await result.current.onGestureWithCST();
+    await flushAsyncWork();
+
+    expect(mockTx.writeContract).toHaveBeenCalledWith(
+      expect.objectContaining({
+        functionName: 'bidWithCst',
+        args: [BigInt('1020000000000000000'), '', BigInt('99000000000000000000')],
+      }),
+    );
+  });
+
+  it('submits a zero CST floor when the latest gesturer explicitly accepts any amount', async () => {
+    const { result } = renderHook(() => useGestureForm({ lastGesturerAddress: '0xUser' }));
     await flushAsyncWork();
 
     act(() => {
-      result.current.setAcceptAnyCstReward(true);
+      result.current.setCstRewardGuardChoice('any');
     });
 
     await result.current.onGestureWithCST();
     await flushAsyncWork();
 
-    expect(result.current.gestureCstRewardAmountMinLimitWei).toBe(0n);
+    expect(result.current.cstRewardGuardActive).toBe(false);
     expect(mockTx.writeContract).toHaveBeenCalledWith(
       expect.objectContaining({
         functionName: 'bidWithCst',
@@ -1382,13 +1402,13 @@ describe('useGestureForm', () => {
   );
 
   it('gestures with a zero floor even when the Participation CST preview is missing', async () => {
-    // The floor is nullified (see the hook), so a failed reward read never
-    // blocks a gesture and no fresh read is required in prepare.
+    // With the guard off (the wallet is not the latest gesturer), a failed
+    // reward read never blocks a gesture and no fresh read is required.
     mockGetGestureCstRewardAmount.mockRejectedValue(new Error('execution reverted'));
     mockGetGestureCstRewardAmountAdvanced.mockRejectedValue(new Error('execution reverted'));
     const { result } = renderHook(() => useGestureForm());
     await flushAsyncWork();
-    expect(result.current.gestureCstRewardAmountMinLimitWei).toBe(0n);
+    expect(result.current.cstRewardGuardActive).toBe(false);
 
     const ok = await result.current.onGestureWithCST();
 
@@ -1403,10 +1423,10 @@ describe('useGestureForm', () => {
 
   it('needs no reward read when the person accepts any Participation CST', async () => {
     mockGetGestureCstRewardAmount.mockRejectedValue(new Error('execution reverted'));
-    const { result } = renderHook(() => useGestureForm());
+    const { result } = renderHook(() => useGestureForm({ lastGesturerAddress: '0xUser' }));
     await flushAsyncWork();
     act(() => {
-      result.current.setAcceptAnyCstReward(true);
+      result.current.setCstRewardGuardChoice('any');
     });
 
     const ok = await result.current.onGesture();
@@ -1415,6 +1435,23 @@ describe('useGestureForm', () => {
     expect(mockTx.writeContract).toHaveBeenCalledWith(
       expect.objectContaining({ functionName: 'bidWithEth', args: [-1n, '', 0n] }),
     );
+  });
+
+  it('stops a guarded gesture (and says why) when no Participation CST amount can be read', async () => {
+    mockGetGestureCstRewardAmount.mockRejectedValue(new Error('execution reverted'));
+    mockGetGestureCstRewardAmountAdvanced.mockRejectedValue(new Error('execution reverted'));
+    const { result } = renderHook(() => useGestureForm({ lastGesturerAddress: '0xUser' }));
+    await flushAsyncWork();
+    expect(result.current.cstRewardGuardActive).toBe(true);
+
+    const ok = await result.current.onGestureWithCST();
+
+    expect(ok).toBe(false);
+    expect(mockNotify).toHaveBeenCalledWith(
+      'error',
+      'toasts.gesture.validation.cstRewardUnavailable',
+    );
+    expect(mockTx.writeContract).not.toHaveBeenCalled();
   });
 });
 

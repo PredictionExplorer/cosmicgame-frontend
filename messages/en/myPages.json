@@ -130,7 +130,8 @@
       "title": "Stellar Selection share · Cycle {cycle}",
       "share": "{mine} of {total} gestures",
       "caption": "At finalization, {eth} ETH and {nft} NFT Stellar Selections are made from all of this cycle’s gestures. Each gesture is one entry and can be selected more than once.",
-      "captionGeneric": "At finalization, Stellar Selections are made from all of this cycle’s gestures. Each gesture is one entry and can be selected more than once."
+      "captionGeneric": "At finalization, Stellar Selections are made from all of this cycle’s gestures. Each gesture is one entry and can be selected more than once.",
+      "weightedNote": "On V3 cycles, shares of the ETH pool are weighted by each gesture’s ETH cost at the moment it was made."
     },
     "overview": {
       "title": "At a glance",

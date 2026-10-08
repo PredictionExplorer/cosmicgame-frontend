@@ -86,6 +86,34 @@ export interface EthGestureInfo {
 
 const CST_REWARD_PREVIEW_REFRESH_MS = 1_000;
 
+/**
+ * The V3 late-gesture window, as the form's live preview reads it once per
+ * second from the contract (never derived from the last paid price).
+ * Absent (null) on V1/V2 deployments and before the cycle's first gesture,
+ * where there is no premium and `nextEthBidPrice` is stale (Comment-202501022).
+ */
+export interface LateGestureWindowInfo {
+  /** `getRoundLateBidDuration()`: the window's length, in seconds. */
+  windowSeconds: number;
+  /**
+   * `getDurationUntilMainPrize()`: signed seconds until the finalization
+   * deadline; negative once it has passed. The window spans the last
+   * `windowSeconds` of it, so `secondsUntilMainPrize - windowSeconds` is the
+   * time until the window opens (≤ 0 while it is active).
+   */
+  secondsUntilMainPrize: number;
+  /**
+   * The live premium, `getNextEthBidPrice() - nextEthBidPrice()`, in wei;
+   * null outside the window (no premium applies there).
+   */
+  premiumWei: bigint | null;
+  /** When these figures were read (`Date.now()`), for staleness checks. */
+  readAtMs: number;
+}
+
+/** A contract-fresh ETH quote outlives one refresh tick, then the API quote rules again. */
+const CONTRACT_ETH_QUOTE_FRESH_MS = 5_000;
+
 interface LiveCstPreviewTestGlobals {
   expect?: unknown;
   __COSMIC_ENABLE_LIVE_CST_PREVIEW_TEST_TIMERS__?: boolean;
@@ -117,9 +145,20 @@ export interface UseGestureFormOptions {
    * ETH whatever was chosen before, for example CST in the previous cycle.
    */
   firstGesture?: boolean;
+  /**
+   * The cycle's latest gesturer (the dashboard's `LastBidderAddr`), for the
+   * Participation CST floor's preselection: when the connected wallet IS the
+   * latest gesturer, the next gesture imprints the accrued CST to that same
+   * wallet, so guarding a minimum protects it; for anyone else the imprint
+   * goes to a third party and a floor only invites spurious reverts.
+   */
+  lastGesturerAddress?: string | null;
 }
 
-export function useGestureForm({ firstGesture = false }: UseGestureFormOptions = {}) {
+export function useGestureForm({
+  firstGesture = false,
+  lastGesturerAddress = null,
+}: UseGestureFormOptions = {}) {
   const t = useTranslations('toasts');
   const locale = useLocale();
   const contractAddrs = useContractAddresses();
@@ -167,6 +206,15 @@ export function useGestureForm({ firstGesture = false }: UseGestureFormOptions =
     null,
   );
   const [contractCstPriceWei, setContractCstPriceWei] = useState<bigint | null>(null);
+  // The late-gesture window per the contract, refreshed with the live preview.
+  const [lateGestureWindow, setLateGestureWindow] = useState<LateGestureWindowInfo | null>(null);
+  // Inside the window the cost climbs every second, so the displayed ETH
+  // quote comes straight from the contract on each refresh tick ("re-quote
+  // every block near the deadline") instead of the API's 15-second poll.
+  const [contractEthQuote, setContractEthQuote] = useState<{
+    priceWei: bigint;
+    readAtMs: number;
+  } | null>(null);
   const [gestureCstRewardAmountWei, setGestureCstRewardAmountWei] = useState<bigint | null>(null);
   const [isCstRewardLoading, setIsCstRewardLoading] = useState(false);
   // The last read of the Participation CST preview failed. The preview keeps
@@ -174,7 +222,14 @@ export function useGestureForm({ firstGesture = false }: UseGestureFormOptions =
   // "Unavailable" instead of a skeleton that would pulse forever.
   const [cstRewardReadFailed, setCstRewardReadFailed] = useState(false);
   const [cstRewardTolerancePercent, setCstRewardTolerancePercent] = useState(1);
-  const [acceptAnyCstReward, setAcceptAnyCstReward] = useState(false);
+  /**
+   * The person's Participation CST floor choice: 'auto' preselects by whether
+   * the connected wallet is the cycle's latest gesturer (see
+   * `cstRewardGuardActive`); 'any' and 'guarded' are explicit picks.
+   */
+  const [cstRewardGuardChoice, setCstRewardGuardChoice] = useState<'auto' | 'any' | 'guarded'>(
+    'auto',
+  );
   /**
    * True on V3 contracts, where the entire per-gesture Participation CST is
    * imprinted to the outbid (previous) participant; the participant placing
@@ -281,15 +336,22 @@ export function useGestureForm({ firstGesture = false }: UseGestureFormOptions =
   }, [contractCstDurations, contractCstPriceWei, ctPriceData]);
 
   const ethGestureInfo = useMemo<EthGestureInfo | null>(() => {
-    if (!bidEthPriceData) return null;
-    const priceWei = BigInt(bidEthPriceData.ETHPrice);
+    // Inside the late-gesture window the contract is re-quoted every refresh
+    // tick, and that figure (base plus live premium) beats the API's slower
+    // poll. Never derived from the last paid price in either branch.
+    const liveQuote =
+      contractEthQuote && Date.now() - contractEthQuote.readAtMs < CONTRACT_ETH_QUOTE_FRESH_MS
+        ? contractEthQuote
+        : null;
+    if (!bidEthPriceData && !liveQuote) return null;
+    const priceWei = liveQuote ? liveQuote.priceWei : BigInt(bidEthPriceData!.ETHPrice);
     return {
-      AuctionDuration: parseInt(bidEthPriceData.AuctionDuration),
+      AuctionDuration: bidEthPriceData ? parseInt(bidEthPriceData.AuctionDuration) : 0,
       ETHPrice: parseFloat(formatEther(priceWei)),
       ETHPriceWei: priceWei,
-      SecondsElapsed: parseInt(bidEthPriceData.SecondsElapsed),
+      SecondsElapsed: bidEthPriceData ? parseInt(bidEthPriceData.SecondsElapsed) : 0,
     };
-  }, [bidEthPriceData]);
+  }, [bidEthPriceData, contractEthQuote]);
 
   const gestureCstRewardAmount = useMemo(() => {
     if (gestureCstRewardAmountWei == null) return null;
@@ -298,18 +360,22 @@ export function useGestureForm({ firstGesture = false }: UseGestureFormOptions =
   }, [gestureCstRewardAmountWei]);
 
   /**
-   * `bidCstRewardAmountMinLimit_` is intentionally nullified: we always pass 0.
-   * Under V3 the guarded amount is minted to the previous participant, so a
-   * nonzero limit only exposes honest gestures to spurious
-   * `BidCstRewardAmountMinLimitNotReached` reverts when another gesture lands
-   * first. The parameter is slated for removal from the contract signatures;
-   * until then the frontend behaves as if it did not exist. (The tolerance
-   * knobs remain in state so V2-era surfaces still render, but they no longer
-   * reach the chain.)
+   * The Participation CST floor (`bidCstRewardAmountMinLimit_`) offers two
+   * easy choices: accept any amount (0, the default) or guard the shown
+   * amount minus the tolerance. Under V3 the guarded amount is imprinted to
+   * the *previous* participant, so the guard is preselected exactly when the
+   * connected wallet IS the cycle's latest gesturer (the imprint would come
+   * back to it); for anyone else a nonzero floor only invites spurious
+   * `BidCstRewardAmountMinLimitNotReached` reverts when another gesture
+   * lands first (Comment-202605279). The contract ignores the value on the
+   * cycle's first gesture, and the form sends 0 there regardless.
    */
-  const gestureCstRewardAmountMinLimitWei = 0n;
-
-  const gestureCstRewardAmountMin = 0;
+  const connectedIsLatestGesturer =
+    !!account && !!lastGesturerAddress && sameAddress(account, lastGesturerAddress);
+  const cstRewardGuardActive =
+    !firstGesture &&
+    (cstRewardGuardChoice === 'guarded' ||
+      (cstRewardGuardChoice === 'auto' && connectedIsLatestGesturer));
 
   useEffect(() => {
     if (uxScenario) {
@@ -318,12 +384,18 @@ export function useGestureForm({ firstGesture = false }: UseGestureFormOptions =
       setGestureCstRewardAmountWei(100n * 10n ** 18n);
       setIsCstRewardLoading(false);
       setCstRewardReadFailed(false);
+      setLateGestureWindow(null);
+      setContractEthQuote(null);
       return;
     }
 
     const canReadDurations = !!publicClient && !!contractAddrs.cosmicGame;
     const canReadReward = !!cosmicGameContract;
     const canReadPrice = !!cosmicGameContract;
+    // The window exists on V3 only, and only once the cycle has a gesture:
+    // before it there is no premium and `nextEthBidPrice` is stale
+    // (Comment-202501022), so the difference must not be computed.
+    const canReadLateWindow = !!cosmicGameContract && cstRewardToOutbidBidder && !firstGesture;
 
     if (!canReadDurations) {
       setContractCstDurations(null);
@@ -335,13 +407,22 @@ export function useGestureForm({ firstGesture = false }: UseGestureFormOptions =
       setGestureCstRewardAmountWei(null);
       setIsCstRewardLoading(false);
     }
-    if (!canReadDurations && !canReadReward && !canReadPrice) {
+    if (!canReadLateWindow) {
+      setLateGestureWindow(null);
+      setContractEthQuote(null);
+    }
+    if (!canReadDurations && !canReadReward && !canReadPrice && !canReadLateWindow) {
       return;
     }
 
     let cancelled = false;
     let inFlight = false;
     let timeoutId: number | null = null;
+    // The window's length is an owner-set parameter: cache it and re-read it
+    // only once a minute, while the countdown itself refreshes every tick.
+    let windowSecondsCache: bigint | null = null;
+    let windowSecondsReadAtMs = 0;
+    const WINDOW_SECONDS_TTL_MS = 60_000;
 
     // The preview refresh polls continuously, so a transport failure (dev
     // server restart, network blip, machine waking from sleep) would emit one
@@ -432,6 +513,54 @@ export function useGestureForm({ firstGesture = false }: UseGestureFormOptions =
                   }
                 })
             : Promise.resolve(),
+          canReadLateWindow
+            ? (async () => {
+                try {
+                  const read = cosmicGameContract!.read;
+                  if (
+                    windowSecondsCache === null ||
+                    Date.now() - windowSecondsReadAtMs > WINDOW_SECONDS_TTL_MS
+                  ) {
+                    const windowSeconds = (await read.getRoundLateBidDuration?.()) as
+                      | bigint
+                      | undefined;
+                    if (windowSeconds === undefined) return;
+                    windowSecondsCache = windowSeconds;
+                    windowSecondsReadAtMs = Date.now();
+                  }
+                  // Signed on V3.1: negative once the deadline has passed
+                  // (the window, and its premium cap, then stay active).
+                  const remaining = (await read.getDurationUntilMainPrize?.()) as
+                    | bigint
+                    | undefined;
+                  if (remaining === undefined || cancelled) return;
+                  const inWindow = remaining <= windowSecondsCache;
+                  let premiumWei: bigint | null = null;
+                  if (inWindow) {
+                    const [quoted, base] = await Promise.all([
+                      read.getNextEthBidPrice?.() as Promise<bigint | undefined>,
+                      read.nextEthBidPrice?.() as Promise<bigint | undefined>,
+                    ]);
+                    if (!cancelled && quoted !== undefined) {
+                      setContractEthQuote({ priceWei: quoted, readAtMs: Date.now() });
+                      if (base !== undefined) premiumWei = quoted > base ? quoted - base : 0n;
+                    }
+                  } else {
+                    setContractEthQuote(null);
+                  }
+                  if (!cancelled) {
+                    setLateGestureWindow({
+                      windowSeconds: Number(windowSecondsCache),
+                      secondsUntilMainPrize: Number(remaining),
+                      premiumWei,
+                      readAtMs: Date.now(),
+                    });
+                  }
+                } catch (e) {
+                  if (!cancelled) reportPreviewError(e, 'late gesture window preview');
+                }
+              })()
+            : Promise.resolve(),
         ]);
       } finally {
         inFlight = false;
@@ -462,7 +591,14 @@ export function useGestureForm({ firstGesture = false }: UseGestureFormOptions =
       if (timeoutId !== null) window.clearTimeout(timeoutId);
       window.removeEventListener('cosmic:gesture-placed', handleGesturePlaced);
     };
-  }, [contractAddrs.cosmicGame, cosmicGameContract, publicClient, uxScenario]);
+  }, [
+    contractAddrs.cosmicGame,
+    cosmicGameContract,
+    publicClient,
+    uxScenario,
+    cstRewardToOutbidBidder,
+    firstGesture,
+  ]);
 
   // Amounts in validation and success messages follow the one precision
   // policy the form itself uses (`exact`: up to six places, the locale's
@@ -622,15 +758,40 @@ export function useGestureForm({ firstGesture = false }: UseGestureFormOptions =
   };
 
   /**
-   * The least Participation CST this gesture accepts (V2 entry points), from
-   * the person's tolerance: 0 with "accept any". Uses the live preview, or a
-   * fresh read when the preview has not arrived or failed, so a missing
-   * preview never silently drops the protection. Null when no reward can be
-   * read at all: the gesture then stops and says why.
+   * The least Participation CST this gesture accepts, from the person's
+   * choice and tolerance: 0 with "accept any" (and always 0 on the cycle's
+   * first gesture, where the contract ignores the value). When the guard is
+   * on, it uses the live preview, or a fresh read when the preview has not
+   * arrived or failed, so a missing preview never silently drops the
+   * protection. Null when no amount can be read at all: the gesture then
+   * stops and says why.
    */
   const resolveCstRewardFloor = async (): Promise<bigint | null> => {
-    // Always zero — see gestureCstRewardAmountMinLimitWei above.
-    return gestureCstRewardAmountMinLimitWei;
+    if (!cstRewardGuardActive) return 0n;
+    let amount = gestureCstRewardAmountWei;
+    if (amount == null) {
+      try {
+        amount =
+          (await readCosmicGameWithFallback<bigint>([
+            () => cosmicGameContract!.read.getBidCstRewardAmount?.() as Promise<bigint | undefined>,
+            () =>
+              cosmicGameContract!.read.getBidCstRewardAmountAdvanced?.([0n]) as Promise<
+                bigint | undefined
+              >,
+          ])) ?? null;
+      } catch (e) {
+        reportError(e, 'resolve Participation CST floor');
+        amount = null;
+      }
+    }
+    if (amount == null) return null;
+    // The tolerance absorbs the drift between this quote and the mined block
+    // (the amount keeps growing while you stay the latest gesturer, so the
+    // real risk is another gesture landing first, which no margin can cover).
+    const toleranceBasisPoints = BigInt(
+      Math.round(Math.min(100, Math.max(0, cstRewardTolerancePercent)) * 100),
+    );
+    return (amount * (10_000n - toleranceBasisPoints)) / 10_000n;
   };
 
   /**
@@ -1296,16 +1457,20 @@ export function useGestureForm({ firstGesture = false }: UseGestureFormOptions =
     cstGestureData,
     ethGestureInfo,
     gestureCstRewardAmount,
-    gestureCstRewardAmountMin,
-    gestureCstRewardAmountMinLimitWei,
     isCstRewardLoading,
     cstRewardReadFailed,
     /** V3: the gesture's Participation CST goes to the outbid previous participant. */
     cstRewardToOutbidBidder,
     cstRewardTolerancePercent,
     setCstRewardTolerancePercent: updateCstRewardTolerancePercent,
-    acceptAnyCstReward,
-    setAcceptAnyCstReward,
+    /** True when the next gesture sends a nonzero Participation CST floor. */
+    cstRewardGuardActive,
+    cstRewardGuardChoice,
+    setCstRewardGuardChoice,
+    /** The connected wallet is the cycle's latest gesturer (the floor's beneficiary). */
+    connectedIsLatestGesturer,
+    /** The V3 late-gesture window per the contract; null on V1/V2 or before the first gesture. */
+    lateGestureWindow,
     message,
     setMessage,
     /** The contract's cap on the message, in UTF-8 bytes (read live; the documented default until then). */

@@ -119,16 +119,26 @@ export interface GestureAdvancedProps {
   ethPrice: number | null;
   /** The method is ETH-based (the collision buffer does not apply to CST). */
   ethMethod: boolean;
+  /** The cycle has no gesture yet: the contract ignores the CST floor, so its group hides. */
+  firstGesture?: boolean;
 }
 
 /**
- * The optional transaction settings, in two groups separated by hairlines: an
- * asset to attach (nothing by default) and the collision buffer for ETH
- * gestures. Every field has a visible label linked to its control. There is no
- * minimum-CST protection group: under V3 the Participation CST goes to the
- * outbid previous participant, so the guarded limit is always zero.
+ * The optional transaction settings, in three groups separated by hairlines:
+ * an asset to attach (nothing by default), the collision buffer for ETH
+ * gestures, and the Participation CST floor — two easy choices, accept any
+ * amount (0) or guard the shown amount minus a tolerance. The guard is
+ * preselected exactly when the connected wallet is the cycle's latest
+ * gesturer, because under V3 the imprint goes to the outbid previous
+ * participant: only the latest gesturer's own accrual is at stake. Every
+ * field has a visible label linked to its control.
  */
-export function GestureAdvanced({ form, ethPrice, ethMethod }: GestureAdvancedProps) {
+export function GestureAdvanced({
+  form,
+  ethPrice,
+  ethMethod,
+  firstGesture = false,
+}: GestureAdvancedProps) {
   const t = useTranslations('home.form.advanced');
   const locale = useLocale();
   const {
@@ -145,8 +155,15 @@ export function GestureAdvanced({ form, ethPrice, ethMethod }: GestureAdvancedPr
     setTokenAmount,
     gestureCostPlus,
     setBidPricePlus,
+    cstRewardGuardChoice = 'auto',
+    setCstRewardGuardChoice,
+    cstRewardGuardActive = false,
+    connectedIsLatestGesturer = false,
+    cstRewardTolerancePercent = 1,
+    setCstRewardTolerancePercent,
   } = form;
   const attachLabelId = useId();
+  const cstFloorLabelId = useId();
 
   return (
     <div data-testid="gesture-advanced-fields" className="space-y-4">
@@ -274,6 +291,62 @@ export function GestureAdvanced({ form, ethPrice, ethMethod }: GestureAdvancedPr
           </Field>
           <p className="type-caption text-subtle">
             {t('collision.note', { percent: String(gestureCostPlus) })}
+          </p>
+        </Group>
+      )}
+
+      {/* The Participation CST floor: accept any amount (0) or guard the
+          shown amount minus a tolerance. Hidden on the cycle's first gesture,
+          where the contract ignores the value. */}
+      {!firstGesture && setCstRewardGuardChoice && (
+        <Group title={t('cstFloor.title')} titleId={cstFloorLabelId}>
+          <RadioGroup
+            name={cstFloorLabelId}
+            value={cstRewardGuardActive ? 'guarded' : 'any'}
+            aria-labelledby={cstFloorLabelId}
+            onValueChange={(value) =>
+              setCstRewardGuardChoice(value === 'guarded' ? 'guarded' : 'any')
+            }
+            className="space-y-2"
+          >
+            {(
+              [
+                ['any', t('cstFloor.any')],
+                ['guarded', t('cstFloor.guarded')],
+              ] as const
+            ).map(([value, label]) => (
+              <label
+                key={value}
+                className="flex min-h-11 cursor-pointer items-center gap-2 sm:min-h-8"
+              >
+                <RadioGroupItem value={value} data-testid={`cst-floor-${value}`} />
+                <span className="type-body-sm text-foreground">{label}</span>
+              </label>
+            ))}
+          </RadioGroup>
+          {cstRewardGuardActive && setCstRewardTolerancePercent && (
+            <Field label={t('cstFloor.toleranceLabel')} hint={t('cstFloor.toleranceHint')}>
+              {({ id, describedBy }) => (
+                <PercentInput
+                  id={id}
+                  describedBy={describedBy}
+                  testId="cst-floor-tolerance-input"
+                  value={cstRewardTolerancePercent}
+                  min={0}
+                  max={100}
+                  step={1}
+                  onChange={(value) => {
+                    const parsed = Number(value);
+                    if (Number.isFinite(parsed)) setCstRewardTolerancePercent(parsed);
+                  }}
+                />
+              )}
+            </Field>
+          )}
+          <p className="type-caption text-subtle">
+            {cstRewardGuardActive && connectedIsLatestGesturer && cstRewardGuardChoice === 'auto'
+              ? t('cstFloor.autoNote')
+              : t('cstFloor.note')}
           </p>
         </Group>
       )}

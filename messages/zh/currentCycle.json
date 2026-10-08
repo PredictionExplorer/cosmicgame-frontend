@@ -110,7 +110,7 @@
     },
     "stellarSelectionEntries": {
       "title": "星选资格",
-      "tooltip": "每次落笔都会在本周期的星选池中计入一次；周期收官时，每次星选都从整个池中选取，同一笔落笔可再次获选。下表列出每位参与者在池中的占比。"
+      "tooltip": "周期收官时，每次星选都从本周期的全部落笔中选取，同一位参与者可再次获选。下表列出每位参与者在星选中的占比。"
     },
     "topEthSpenders": {
       "title": "ETH 支出排行",
@@ -139,6 +139,7 @@
     "participationV3": "落笔时，你可能铭刻<em>动态的参与 CST</em>，具体数量随距上一笔经过的时间以恒定速率累积。",
     "calibration": "ETH 落笔会使 CST 校准窗口缩短约 {decreasePercent}%；CST 落笔则使其延长约 {increasePercent}%。",
     "stellarSelection": "每一笔都计入一次星选资格。周期收官时，周期储备的 {rafflePercent}% 将由程序化随机选出的 {ethEntries} 位 ETH 星选获配者均分；另有 {nftEntries} 位星选获配者与 {anchorHolders} 位 Random Walk NFT 锚定者，各获配一枚 Cosmic Signature NFT。",
+    "stellarSelectionV3": "每一笔都计入一次星选资格，其权重为落笔当时的 ETH 费用。周期收官时，周期储备的 {rafflePercent}% 将由程序化随机选出的 {ethEntries} 位 ETH 星选获配者均分；另有 {nftEntries} 位星选获配者与 {anchorHolders} 位 Random Walk NFT 锚定者，各获配一枚 Cosmic Signature NFT。",
     "publicGoods": "每个周期，Protocol Guild 都会收到周期储备的 {percent}%（至少 {amount} ETH）。",
     "learnMore": "了解周期如何运作"
   },

@@ -5,6 +5,7 @@ import { useLocale, useTranslations } from 'next-intl';
 
 import { formatCount, sameAddress } from '@/utils/format';
 import { getSelectionShare } from '@/lib/selectionStanding';
+import { poolShareOf, type SelectionPool } from '@/lib/selectionWeights';
 import { DataTable, type DataTableColumn } from '@/components/ui/data-table';
 import type { LedgerStateProps } from '@/components/tables/ledger-props';
 import { useActiveWeb3React } from '@/hooks/web3';
@@ -24,16 +25,25 @@ interface StellarSelectionHolderTableProps extends LedgerStateProps {
   stellarEthSelections?: number;
   /** NFT Stellar Selections drawn at finalization. */
   stellarNftSelections?: number;
+  /**
+   * The cycle's weighted pool from the V3 contract (hooks/useSelectionPool);
+   * null or absent keeps the V1/V2 count-based share.
+   */
+  selectionPool?: SelectionPool | null;
 }
 
 /**
- * Each participant's entries in this cycle's Stellar Selection pool (one per
- * gesture), most first, with their linear share of the pool. The share is
- * the count it comes from divided by every gesture of the cycle, computed in
- * lib/selectionStanding; it is never compounded into a chance of "at least
- * one" selection, which climbs toward 100% with every paid entry.
+ * Each participant's entries in this cycle's Stellar Selection pool, most
+ * first, with their share of the pool. On V1/V2 cycles the share is the
+ * count it comes from divided by every gesture of the cycle; on V3 cycles
+ * the ETH pool's share is weighted by each gesture's ETH cost, read from the
+ * contract (lib/selectionWeights). It is never compounded into a chance of
+ * "at least one" selection, which climbs toward 100% with every paid entry.
  */
-function poolEntriesFrom(list: readonly GestureInfo[]): PoolEntry[] {
+function poolEntriesFrom(
+  list: readonly GestureInfo[],
+  selectionPool?: SelectionPool | null,
+): PoolEntry[] {
   const counts = new Map<string, { userAddr: string; gestures: number }>();
   for (const gesture of list) {
     const key = gesture.BidderAddr.toLowerCase();
@@ -45,9 +55,11 @@ function poolEntriesFrom(list: readonly GestureInfo[]): PoolEntry[] {
     .map(({ userAddr, gestures }) => ({
       userAddr,
       gestures,
-      share: getSelectionShare({ totalGestures: list.length, myGestures: gestures })?.share ?? 0,
+      share: selectionPool
+        ? poolShareOf(selectionPool, userAddr)
+        : (getSelectionShare({ totalGestures: list.length, myGestures: gestures })?.share ?? 0),
     }))
-    .sort((a, b) => b.gestures - a.gestures);
+    .sort((a, b) => (b.share !== a.share ? b.share - a.share : b.gestures - a.gestures));
 }
 
 /**
@@ -61,13 +73,14 @@ const StellarSelectionHolderTable = ({
   list,
   stellarEthSelections,
   stellarNftSelections,
+  selectionPool = null,
   ...state
 }: StellarSelectionHolderTableProps) => {
   const t = useTranslations('tables');
   const locale = useLocale();
   const { account } = useActiveWeb3React();
 
-  const entries = useMemo(() => poolEntriesFrom(list), [list]);
+  const entries = useMemo(() => poolEntriesFrom(list, selectionPool), [list, selectionPool]);
 
   const columns = useMemo<DataTableColumn<PoolEntry>[]>(
     () => [
@@ -101,6 +114,16 @@ const StellarSelectionHolderTable = ({
     typeof stellarNftSelections === 'number' &&
     stellarNftSelections > 0;
 
+  const captionParts = [
+    drawsKnown
+      ? t('stellarSelection.draws', {
+          eth: formatCount(stellarEthSelections, locale),
+          nft: formatCount(stellarNftSelections, locale),
+        })
+      : null,
+    selectionPool ? t('stellarSelection.weightedNote') : null,
+  ].filter((part): part is string => part !== null);
+
   return (
     <DataTable
       data={entries}
@@ -109,14 +132,7 @@ const StellarSelectionHolderTable = ({
       getRowKey={(row) => row.userAddr}
       isCurrentRow={(row) => sameAddress(row.userAddr, account)}
       emptyTitle={t('empty.stellarEntries')}
-      caption={
-        drawsKnown
-          ? t('stellarSelection.draws', {
-              eth: formatCount(stellarEthSelections, locale),
-              nft: formatCount(stellarNftSelections, locale),
-            })
-          : undefined
-      }
+      caption={captionParts.length > 0 ? captionParts.join(' ') : undefined}
       {...state}
     />
   );

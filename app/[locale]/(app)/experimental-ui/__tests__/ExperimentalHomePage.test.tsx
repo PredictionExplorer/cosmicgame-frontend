@@ -198,6 +198,32 @@ jest.mock('@tanstack/react-query', () => ({
   }),
 }));
 
+// The weighted Stellar Selection pool reads the chain through react-query;
+// the page renders without a QueryClientProvider here, so serve the
+// count-based fallback (a null pool) directly.
+jest.mock('@/hooks/useSelectionPool', () => ({
+  useSelectionPool: () => ({ data: null }),
+}));
+
+// The chain-read allocation facts have their own hook; the page renders
+// without a QueryClientProvider here, so serve the static figures directly.
+jest.mock('@/hooks/useLiveAllocationFacts', () => {
+  const facts = jest.requireActual('@/content/protocol-facts');
+  return {
+    useLiveAllocationFacts: () => ({
+      mainEthPercentage: facts.ethDistributionFacts.mainEthPercentage,
+      chronoWarriorEthPercentage: facts.ethDistributionFacts.chronoWarriorEthPercentage,
+      stellarSelectionEthPercentage: facts.ethDistributionFacts.stellarSelectionEthPercentage,
+      anchorDistributionPercentage: facts.ethDistributionFacts.anchorDistributionPercentage,
+      publicGoodsPercentage: facts.ethDistributionFacts.publicGoodsPercentage,
+      signatureNftCount: facts.isV3Mechanics
+        ? facts.protocolFacts.v3.mainPrizeNftsPerCycleDefault
+        : 1,
+      live: false,
+    }),
+  };
+});
+
 let mockFreshness: { state: string; ageMs: number } = { state: 'live', ageMs: 0 };
 jest.mock('@/hooks/useLiveFreshness', () => ({
   useLiveFreshness: () => mockFreshness,
@@ -1046,7 +1072,10 @@ describe('ExperimentalHomePage', () => {
 
     // The form itself holds ETH, so a CST pick from the previous cycle can
     // neither leave the one radio unchecked nor send a CST first Gesture.
-    expect(mockUseGestureFormOptions).toHaveBeenLastCalledWith({ firstGesture: true });
+    expect(mockUseGestureFormOptions).toHaveBeenLastCalledWith({
+      firstGesture: true,
+      lastGesturerAddress: '0x0000000000000000000000000000000000000000',
+    });
     expect(
       within(screen.getByTestId('gesture-method-selector')).getAllByRole('radio'),
     ).toHaveLength(1);
@@ -1056,6 +1085,9 @@ describe('ExperimentalHomePage', () => {
   it('lets the form keep any method once the cycle has its first Gesture', () => {
     renderPage();
 
-    expect(mockUseGestureFormOptions).toHaveBeenLastCalledWith({ firstGesture: false });
+    expect(mockUseGestureFormOptions).toHaveBeenLastCalledWith({
+      firstGesture: false,
+      lastGesturerAddress: '0x1111111111111111111111111111111111111111',
+    });
   });
 });

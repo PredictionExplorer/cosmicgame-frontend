@@ -27,6 +27,12 @@ interface DeckPersonalStripProps {
   gestures: GestureInfo[];
   /** How many Gestures the cycle holds (the dashboard's count): the N of the share. */
   totalGestures: number | null | undefined;
+  /**
+   * The wallet's weighted share of this cycle's Stellar Selection (a 0..1
+   * fraction read from the Game contract), or null wherever the count-based
+   * share is the right one (V2 deployments, pre-V3 cycles, reads in flight).
+   */
+  weightedShare?: number | null;
   feedStatus: PersonalFeedStatus;
   className?: string;
 }
@@ -34,9 +40,10 @@ interface DeckPersonalStripProps {
 /**
  * The connected wallet's place in the cycle, in one line under the
  * standings: how many Gestures it made, what share of the cycle's Stellar
- * Selection entries those are (a plain k of N, never a compounded chance),
- * and whether anything is waiting to be retrieved. Whether the wallet holds
- * a standing is marked on the standings row itself.
+ * Selection those give it (the contract-read weighted share where weights
+ * exist, otherwise a plain k of N — never a compounded chance), and whether
+ * anything is waiting to be retrieved. Whether the wallet holds a standing
+ * is marked on the standings row itself.
  *
  * The count waits for the whole feed: counted from a partial list it would
  * read, say, "1 gesture · 100% of the entries" for whoever made the latest
@@ -47,6 +54,7 @@ export function DeckPersonalStrip({
   account,
   gestures,
   totalGestures,
+  weightedShare = null,
   feedStatus,
   className,
 }: DeckPersonalStripProps) {
@@ -62,9 +70,15 @@ export function DeckPersonalStrip({
   );
   const entryTotal =
     typeof totalGestures === 'number' && Number.isFinite(totalGestures) ? totalGestures : 0;
+  // The weighted fraction comes straight from the contract; the count ratio
+  // stands in wherever weights do not exist (V2, pre-V3 cycles).
   const entryShare =
-    feedStatus === 'ready' && entryTotal > 0 && myGestureCount > 0
-      ? (Math.min(myGestureCount, entryTotal) / entryTotal) * 100
+    feedStatus === 'ready' && myGestureCount > 0
+      ? weightedShare != null && weightedShare > 0
+        ? weightedShare * 100
+        : entryTotal > 0
+          ? (Math.min(myGestureCount, entryTotal) / entryTotal) * 100
+          : null
       : null;
 
   const waitingEth = apiData.ETHRaffleToClaim ?? 0;

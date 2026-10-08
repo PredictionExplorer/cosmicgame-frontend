@@ -24,7 +24,8 @@ import {
   useUnclaimedDonatedNFTByUser,
   useDonationsERC20ByUser,
 } from '@/hooks/useApiQuery';
-import { getSelectionShare } from '@/lib/selectionStanding';
+import { getSelectionShare, getWeightedSelectionShare } from '@/lib/selectionStanding';
+import { useSelectionPool } from '@/hooks/useSelectionPool';
 import { getDonatedErc20RawClaimAmount } from '@/utils/donatedErc20';
 import { toFiniteNumber } from '@/utils/finiteNumber';
 import { PageHeader } from '@/components/layout/PageHeader';
@@ -216,16 +217,37 @@ const UserStatisticsView = ({ address, isOwnProfile }: UserStatisticsViewProps) 
   }, [gestureHistory]);
 
   // This cycle's Stellar Selection share: the address's gestures in the live
-  // cycle out of all of them. One entry per gesture; never compounded into odds.
+  // cycle out of all of them. On V3 deployments the ETH pool's percentage is
+  // weighted by gesture cost, read from the contract's own getters; on V1/V2
+  // (and cycles finished before the upgrade) it stays one entry per gesture.
+  // Never compounded into a chance of selection.
   const currentCycle = toFiniteNumber(dashboardData?.CurRoundNum);
+  const { data: selectionPool } = useSelectionPool(currentCycle);
   const selectionShare = useMemo(() => {
     const cycleStarted = (toFiniteNumber(dashboardData?.TsRoundStart) ?? 0) > 0;
     if (currentCycle === null || !cycleStarted) return null;
-    return getSelectionShare({
-      totalGestures: toFiniteNumber(dashboardData?.CurNumBids) ?? 0,
-      myGestures: gestureHistory.filter((gesture) => gesture.RoundNum === currentCycle).length,
-    });
-  }, [currentCycle, dashboardData?.TsRoundStart, dashboardData?.CurNumBids, gestureHistory]);
+    const myGestures = gestureHistory.filter((gesture) => gesture.RoundNum === currentCycle).length;
+    const totalGestures = toFiniteNumber(dashboardData?.CurNumBids) ?? 0;
+    if (selectionPool && address) {
+      const key = address.toLowerCase();
+      const weighted = getWeightedSelectionShare({
+        // The contract's own figures are authoritative over the indexer's.
+        totalGestures: selectionPool.numGestures,
+        myGestures: selectionPool.countByAddress.get(key) ?? myGestures,
+        totalWeight: selectionPool.totalWeight,
+        myWeight: selectionPool.weightByAddress.get(key) ?? 0n,
+      });
+      if (weighted) return weighted;
+    }
+    return getSelectionShare({ totalGestures, myGestures });
+  }, [
+    currentCycle,
+    dashboardData?.TsRoundStart,
+    dashboardData?.CurNumBids,
+    gestureHistory,
+    selectionPool,
+    address,
+  ]);
 
   const totalAnchorDistributionEth = useMemo(
     () =>

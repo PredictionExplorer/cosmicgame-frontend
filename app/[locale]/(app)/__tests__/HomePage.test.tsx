@@ -267,6 +267,32 @@ jest.mock('@tanstack/react-query', () => ({
   }),
 }));
 
+// The weighted Stellar Selection pool reads the chain through react-query;
+// the page renders without a QueryClientProvider here, so serve the
+// count-based fallback (a null pool) directly.
+jest.mock('@/hooks/useSelectionPool', () => ({
+  useSelectionPool: () => ({ data: null }),
+}));
+
+// The chain-read allocation facts have their own hook; the page renders
+// without a QueryClientProvider here, so serve the static figures directly.
+jest.mock('@/hooks/useLiveAllocationFacts', () => {
+  const facts = jest.requireActual('@/content/protocol-facts');
+  return {
+    useLiveAllocationFacts: () => ({
+      mainEthPercentage: facts.ethDistributionFacts.mainEthPercentage,
+      chronoWarriorEthPercentage: facts.ethDistributionFacts.chronoWarriorEthPercentage,
+      stellarSelectionEthPercentage: facts.ethDistributionFacts.stellarSelectionEthPercentage,
+      anchorDistributionPercentage: facts.ethDistributionFacts.anchorDistributionPercentage,
+      publicGoodsPercentage: facts.ethDistributionFacts.publicGoodsPercentage,
+      signatureNftCount: facts.isV3Mechanics
+        ? facts.protocolFacts.v3.mainPrizeNftsPerCycleDefault
+        : 1,
+      live: false,
+    }),
+  };
+});
+
 /* ── child components with their own suites ─────────────────────── */
 
 // The wallet's cycle summary reads its full indexed history; the hooks have
@@ -1287,7 +1313,10 @@ describe('HomePage', () => {
 
     render(<HomePage />);
 
-    expect(mockUseGestureFormOptions).toHaveBeenLastCalledWith({ firstGesture: true });
+    expect(mockUseGestureFormOptions).toHaveBeenLastCalledWith({
+      firstGesture: true,
+      lastGesturerAddress: '0x0000000000000000000000000000000000000000',
+    });
   });
 
   it('submits an ETH gesture and refreshes live data optimistically', async () => {

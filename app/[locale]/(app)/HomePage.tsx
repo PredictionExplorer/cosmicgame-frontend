@@ -42,6 +42,7 @@ import { useChampions } from '@/hooks/useChampions';
 import { useAllocationFinalize } from '@/hooks/useAllocationFinalize';
 import { useCycleActions } from '@/hooks/useCycleActions';
 import { useCycleParticipation, useRetrieveStatus } from '@/hooks/useCycleParticipation';
+import { useSelectionPool } from '@/hooks/useSelectionPool';
 import { useVerifiedFinalizationAlert } from '@/hooks/useVerifiedFinalizationAlert';
 import { useAttentionPreferences } from '@/hooks/useAttentionPreferences';
 import { useBackgroundDeadlineRefresh } from '@/hooks/useDeadlineWatch';
@@ -69,6 +70,7 @@ import {
 import { deriveAllocationTrackAmounts } from '@/lib/allocationTracks';
 import { getCycleState, getDashboardActivationTime } from '@/lib/cycleState';
 import { resolveLatestGesture, type LatestParticipantEvidence } from '@/lib/latestGesture';
+import { poolShareOf } from '@/lib/selectionWeights';
 import { fetchEndgameChainSample, type EndgameChainSample } from '@/lib/rpcRace';
 import { cn } from '@/lib/utils';
 import { getStableClientTargetTime, type ServerTimingSample } from '@/utils/time';
@@ -278,7 +280,10 @@ const HomePage = ({
   const hasCurrentGesture = !!data && data.LastBidderAddr !== zeroAddress;
   // Before the cycle's first Gesture the form holds ETH, the only method the
   // contract accepts then, even if CST was chosen in the previous cycle.
-  const gestureForm = useGestureForm({ firstGesture: data?.LastBidderAddr === zeroAddress });
+  const gestureForm = useGestureForm({
+    firstGesture: data?.LastBidderAddr === zeroAddress,
+    lastGesturerAddress: data?.LastBidderAddr ?? null,
+  });
   // The page clock seeds the standings, so server rendering and hydration
   // measure holds against the same instant as the countdown (F007).
   const champions = useChampions(initialSpecialRecipients, latestEvidence, hasCurrentGesture, now);
@@ -473,6 +478,11 @@ const HomePage = ({
     moment: position.moment,
   });
   const participation = useCycleParticipation(account, data?.CurRoundNum);
+  // The weighted Stellar Selection pool, read from the Game contract; null
+  // wherever the count-based share is the one the cycle selects by.
+  const { data: selectionPool } = useSelectionPool(toFiniteNumber(data?.CurRoundNum));
+  const weightedSelectionShare =
+    selectionPool && account ? poolShareOf(selectionPool, account) : null;
   const retrieve = useRetrieveStatus(account);
   const cycleSpend = !account
     ? null
@@ -617,6 +627,7 @@ const HomePage = ({
       participation={participation}
       participationUpdating={ownGesturePending}
       totalGestures={data?.CurNumBids ?? null}
+      weightedShare={weightedSelectionShare}
       retrieve={retrieve}
       onGoToFinalize={scrollToClock}
     />

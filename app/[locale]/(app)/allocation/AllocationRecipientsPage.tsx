@@ -4,8 +4,7 @@ import type { ReactNode } from 'react';
 import { useMemo } from 'react';
 import { useTranslations } from 'next-intl';
 
-import { ethDistributionFacts } from '@/content/protocol-facts';
-
+import { useLiveAllocationFacts } from '@/hooks/useLiveAllocationFacts';
 import { ALLOCATION_TRACK_COPY_KEYS, withNextCycleShare } from '@/config/allocationTracks';
 import { PageHeader } from '@/components/layout/PageHeader';
 import { InfoTooltip } from '@/components/ui/info-tooltip';
@@ -34,15 +33,17 @@ const AllocationRecipientsPage = ({ seoSummary }: { seoSummary?: ReactNode }) =>
   // A failed read with nothing to show is an error, never "no finalized cycles".
   const failed = isError && rawPrizeClaims.length === 0;
 
+  // The split per the contract's own getters (the owner can retune it);
+  // the version-appropriate static figures stand in until the read lands.
+  const allocationFacts = useLiveAllocationFacts();
   const segments = useMemo(
     () =>
-      // Version-aware percentages: V3 reshapes the split (20% Signature, 5% anchor…).
       withNextCycleShare([
-        { id: 'signature', percent: ethDistributionFacts.mainEthPercentage },
-        { id: 'chrono', percent: ethDistributionFacts.chronoWarriorEthPercentage },
-        { id: 'stellar', percent: ethDistributionFacts.stellarSelectionEthPercentage },
-        { id: 'anchor', percent: ethDistributionFacts.anchorDistributionPercentage },
-        { id: 'publicGoods', percent: ethDistributionFacts.publicGoodsPercentage },
+        { id: 'signature', percent: allocationFacts.mainEthPercentage },
+        { id: 'chrono', percent: allocationFacts.chronoWarriorEthPercentage },
+        { id: 'stellar', percent: allocationFacts.stellarSelectionEthPercentage },
+        { id: 'anchor', percent: allocationFacts.anchorDistributionPercentage },
+        { id: 'publicGoods', percent: allocationFacts.publicGoodsPercentage },
       ]).map((share) => ({
         ...share,
         label: tContracts(`funds.segments.${ALLOCATION_TRACK_COPY_KEYS[share.id]}.label`),
@@ -50,7 +51,7 @@ const AllocationRecipientsPage = ({ seoSummary }: { seoSummary?: ReactNode }) =>
         // The remainder rolls into the next cycle: its size follows from the others.
         approximate: share.id === 'nextCycle',
       })),
-    [tContracts],
+    [tContracts, allocationFacts],
   );
 
   const allocationFinalizations = useMemo(

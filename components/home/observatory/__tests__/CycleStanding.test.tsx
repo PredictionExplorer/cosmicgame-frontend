@@ -41,6 +41,22 @@ describe('CycleStanding', () => {
     );
   });
 
+  it('prefers the contract-read weighted share over the count ratio', () => {
+    // 6 of 1,141 by count, but the wallet's gestures carry 2.5% of the
+    // cycle's Stellar Selection weight: the weighted figure is shown.
+    render(<CycleStanding {...baseProps} weightedShare={0.025} />);
+    expect(screen.getByTestId('personal-gesture-count')).toHaveTextContent(
+      /home\.observatory\.standing\.share\(percent=2\.5%\)/,
+    );
+  });
+
+  it('keeps the count ratio where no weights exist (V2, pre-V3 cycles)', () => {
+    render(<CycleStanding {...baseProps} weightedShare={null} />);
+    expect(screen.getByTestId('personal-gesture-count')).toHaveTextContent(
+      /home\.observatory\.standing\.share\(percent=0\.53%\)/,
+    );
+  });
+
   it('shows the hold while the wallet holds the Last Gesture', () => {
     render(<CycleStanding {...baseProps} isLatest holdSeconds={3 * 3600 + 16 * 60} />);
     const position = screen.getByTestId('personal-standing');

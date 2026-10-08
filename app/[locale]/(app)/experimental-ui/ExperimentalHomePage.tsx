@@ -57,6 +57,7 @@ import { useLiveFreshness } from '@/hooks/useLiveFreshness';
 import { useOwnGestureOverlay } from '@/hooks/useOwnGestureOverlay';
 import { usePendingChatMessages } from '@/hooks/usePendingChatMessages';
 import { usePositionMoment } from '@/hooks/usePositionMoment';
+import { useSelectionPool } from '@/hooks/useSelectionPool';
 import { useVerifiedFinalizationAlert } from '@/hooks/useVerifiedFinalizationAlert';
 import { invalidateLiveGameQueries } from '@/hooks/useLiveGameDataRefresh';
 import { useNow } from '@/hooks/useNow';
@@ -84,6 +85,7 @@ import { getCycleState, getDashboardActivationTime } from '@/lib/cycleState';
 import { headerRootMargin } from '@/lib/headerOffset';
 import { resolveLatestGesture, type LatestParticipantEvidence } from '@/lib/latestGesture';
 import { fetchEndgameChainSample, type EndgameChainSample } from '@/lib/rpcRace';
+import { poolShareOf } from '@/lib/selectionWeights';
 import { TOUCH_TARGET_TEXT_LINK_CLASS } from '@/lib/touch-target';
 import { cn } from '@/lib/utils';
 import {
@@ -345,7 +347,10 @@ const ExperimentalHomePage = ({
   // ── Cycle state ──────────────────────────────────────────────────────
   // Before the cycle's first Gesture the form holds ETH, the only method the
   // contract accepts then, even if CST was chosen in the previous cycle.
-  const gestureForm = useGestureForm({ firstGesture: data?.LastBidderAddr === zeroAddress });
+  const gestureForm = useGestureForm({
+    firstGesture: data?.LastBidderAddr === zeroAddress,
+    lastGesturerAddress: data?.LastBidderAddr ?? null,
+  });
   const hasCurrentGesture = !!data && data.LastBidderAddr !== zeroAddress;
   // The one champions derivation of the app, seeded with the page clock, so
   // the server HTML and the hydration render show the hold as of the sampled
@@ -597,6 +602,12 @@ const ExperimentalHomePage = ({
   const submitParts = getGestureSubmitParts(submitQuote);
 
   const trackAmounts = useMemo(() => deriveAllocationTrackAmounts(data), [data]);
+
+  // The weighted Stellar Selection pool, read from the Game contract; null
+  // wherever the count-based share is the one the cycle selects by.
+  const { data: selectionPool } = useSelectionPool(toFiniteNumber(data?.CurRoundNum));
+  const weightedSelectionShare =
+    selectionPool && account ? poolShareOf(selectionPool, account) : null;
 
   // The wallet's own moments: its Gesture landing, or its place taken.
   const position = usePositionMoment({
@@ -911,6 +922,7 @@ const ExperimentalHomePage = ({
                   account={account}
                   gestures={curGestureList}
                   totalGestures={data?.CurNumBids}
+                  weightedShare={weightedSelectionShare}
                   feedStatus={personalFeedStatus}
                   className="mt-3 border-t"
                 />

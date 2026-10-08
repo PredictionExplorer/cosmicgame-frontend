@@ -4,11 +4,9 @@ import type { ComponentType, ReactNode, SVGProps } from 'react';
 import { ArrowRight, ImageIcon } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 
-import { isV3Mechanics, protocolFacts } from '@/content/protocol-facts';
+import { protocolFacts } from '@/content/protocol-facts';
 
-/** Cosmic Signature NFTs in the Signature Allocation: V3 awards 3 sequential NFTs, V2 awards 1. */
-const signatureNftCount = isV3Mechanics ? protocolFacts.v3.mainPrizeNftsPerCycleDefault : 1;
-
+import { useLiveAllocationFacts } from '@/hooks/useLiveAllocationFacts';
 import {
   AnchorDistributionIcon,
   AnchoringIcon,
@@ -63,6 +61,9 @@ const ICON_TONE: Record<NonNullable<LedgerTrack['tone']> | 'default', string> = 
  * dashboard has not reported yet reads as pending, never as 0 ETH.
  */
 export function AllocationLedger({ data, className }: AllocationLedgerProps) {
+  // Cosmic Signature NFTs in the Signature Allocation, per the contract
+  // (V3's mainPrizeNumCosmicSignatureNfts(); the static figure until read).
+  const { signatureNftCount } = useLiveAllocationFacts();
   const t = useTranslations('home');
   const amounts = deriveAllocationTrackAmounts(data);
   const cstPlusNft = { text: t('observatory.standings.cstPlusNft') };

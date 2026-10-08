@@ -37,7 +37,8 @@ export function CycleRules({ data, headingId }: { data: DashboardInfo; headingId
       decreasePercent: protocolFacts.cstCalibrationWindowDecreasePercentPerEthGesture,
       increasePercent: protocolFacts.cstCalibrationWindowIncreasePercentPerCstGesture,
     }),
-    t('rules.stellarSelection', {
+    // V3 weighs each entry by the gesture's ETH cost; V2 weighed all equally.
+    t(isV3Mechanics ? 'rules.stellarSelectionV3' : 'rules.stellarSelection', {
       ethEntries: count(data.NumRaffleEthWinnersBidding),
       rafflePercent: count(data.RafflePercentage),
       nftEntries: count(data.NumRaffleNFTWinnersBidding),

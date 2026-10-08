@@ -110,7 +110,7 @@
     },
     "stellarSelectionEntries": {
       "title": "별빛 선정 자격",
-      "tooltip": "제스처 1건마다 이 사이클의 별빛 선정 풀에 1건이 기록되며, 사이클이 마감되면 모든 선정이 풀 전체에서 복원 추출 방식으로 이루어집니다. 표에는 참여자별 풀 비중이 표시됩니다."
+      "tooltip": "사이클이 마감되면 모든 선정이 이 사이클의 제스처 전체에서 복원 추출 방식으로 이루어지며, 같은 참여자가 여러 번 선정될 수 있습니다. 표에는 각 참여자의 선정 비중이 표시됩니다."
     },
     "topEthSpenders": {
       "title": "ETH 사용 상위 참여자",
@@ -139,6 +139,7 @@
     "participationV3": "제스처를 남기면 <em>동적 참여 CST</em>를 각인할 수 있습니다. 각인량은 이전 제스처 이후 흐른 시간에 따라 일정한 속도로 쌓입니다.",
     "calibration": "ETH 제스처는 CST 보정 구간을 약 {decreasePercent}% 단축하고, CST 제스처는 약 {increasePercent}% 연장합니다.",
     "stellarSelection": "제스처 한 건마다 별빛 선정 자격이 하나씩 기록됩니다. 선정된 {ethEntries}건의 자격에는 사이클 준비금의 {rafflePercent}%가 배분됩니다. 추가로 선정된 수령자 {nftEntries}명과 Random Walk NFT 앵커링 보유자 {anchorHolders}명은 Cosmic Signature NFT를 받습니다.",
+    "stellarSelectionV3": "제스처 한 건마다 별빛 선정 자격이 하나씩 기록되며, 각 자격의 가중치는 그 순간의 ETH 비용입니다. 선정된 {ethEntries}건의 자격에는 사이클 준비금의 {rafflePercent}%가 배분됩니다. 추가로 선정된 수령자 {nftEntries}명과 Random Walk NFT 앵커링 보유자 {anchorHolders}명은 Cosmic Signature NFT를 받습니다.",
     "publicGoods": "Protocol Guild는 사이클마다 사이클 준비금의 {percent}%(최소 {amount} ETH)를 받습니다.",
     "learnMore": "사이클 작동 원리"
   },

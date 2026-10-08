@@ -4,8 +4,7 @@ import { useId, type ReactNode } from 'react';
 import { CalendarPlus } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 
-import { isV3Mechanics, protocolFacts } from '@/content/protocol-facts';
-
+import { useLiveAllocationFacts } from '@/hooks/useLiveAllocationFacts';
 import {
   SmoothCountdown,
   type LocalizedCountdownRenderProps,
@@ -39,9 +38,6 @@ interface CycleMonumentProps {
   children?: ReactNode;
   className?: string;
 }
-
-/** Cosmic Signature NFTs in the Signature Allocation: V3 awards 3 sequential NFTs, V2 awards 1. */
-const signatureNftCount = isV3Mechanics ? protocolFacts.v3.mainPrizeNftsPerCycleDefault : 1;
 
 const BADGE_TONE: Record<Exclude<PhaseTone, 'neutral' | 'live'>, 'attention' | 'positive'> = {
   attention: 'attention',
@@ -115,6 +111,9 @@ export function CycleMonument({
 }: CycleMonumentProps) {
   const t = useTranslations('home');
   const tCommon = useTranslations('common');
+  // Cosmic Signature NFTs in the Signature Allocation, per the contract
+  // (V3's mainPrizeNumCosmicSignatureNfts(); the static figure until read).
+  const { signatureNftCount } = useLiveAllocationFacts();
   const tFormats = useTranslations('formats');
   const headingId = useId();
 

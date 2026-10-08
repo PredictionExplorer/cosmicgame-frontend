@@ -3,8 +3,9 @@
 import type { ReactNode } from 'react';
 import { useTranslations } from 'next-intl';
 
-import { ethDistributionFacts, protocolFacts } from '@/content/protocol-facts';
+import { protocolFacts } from '@/content/protocol-facts';
 
+import { useLiveAllocationFacts } from '@/hooks/useLiveAllocationFacts';
 import { toFiniteNumber } from '@/utils/finiteNumber';
 import { countActiveAnchorHolders, distributionPerAnchoredNft } from '@/utils/anchoringStats';
 import {
@@ -55,9 +56,11 @@ const AnchoringPage = ({ seoSummary, steps, questions, related }: AnchoringPageP
 
   const stats = dashboard.data?.MainStats;
   const flowLoading = dashboard.isLoading || cstHolders.isLoading || rwlkHolders.isLoading;
+  // The anchor distribution share per the contract's own getter (the owner
+  // can retune it); the version-aware static figure stands in until then.
+  const allocationFacts = useLiveAllocationFacts();
   const ledgerValues = {
-    // Version-aware: V3 routes 5% to the anchor distribution, V2 routed 6%.
-    percentage: ethDistributionFacts.anchorDistributionPercentage,
+    percentage: allocationFacts.anchorDistributionPercentage,
     count: protocolFacts.anchoredRwlkNftSelectionRecipients,
     cst: protocolFacts.specialAllocationCst,
   };

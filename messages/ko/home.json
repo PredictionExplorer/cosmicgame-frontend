@@ -315,7 +315,16 @@
         "note": "같은 블록에서 다른 제스처가 먼저 처리되어도 제스처가 성공하도록 보내는 금액에 여유분 {percent}%를 더합니다. 컨트랙트는 현재 제스처 비용만 받고 나머지는 같은 트랜잭션에서 돌려줍니다. 다만 차액이 가스비보다 작으면 돌려주지 않습니다."
       },
       "attachLabel": "자산 첨부",
-      "attachNone": "첨부 안 함"
+      "attachNone": "첨부 안 함",
+      "cstFloor": {
+        "title": "참여 CST 하한",
+        "any": "금액에 상관없이 진행",
+        "guarded": "표시된 금액에서 허용 오차를 뺀 값 이상을 요구",
+        "toleranceLabel": "허용 오차",
+        "toleranceHint": "이 견적과 트랜잭션 확정 사이의 변동을 허용합니다.",
+        "note": "제스처의 참여 CST는 추월당한 참여자에게 새겨지므로, 그 참여자가 본인일 때만 하한이 의미가 있습니다. 다른 제스처가 먼저 확정되면 하한 때문에 내 제스처가 되돌려질 수 있습니다.",
+        "autoNote": "자동 선택됨: 현재 내가 이 사이클의 최신 참여자이므로, 이 제스처의 참여 CST는 내 지갑으로 돌아옵니다."
+      }
     },
     "submit": {
       "eth": "ETH로 제스처 남기기 ({cost} ETH)",
@@ -343,7 +352,14 @@
     "message": {
       "add": "메시지 추가"
     },
-    "finalizeAtClock": "최근 제스처를 보유 중입니다. 시계 영역에서 사이클을 마감할 수 있습니다."
+    "finalizeAtClock": "최근 제스처를 보유 중입니다. 시계 영역에서 사이클을 마감할 수 있습니다.",
+    "lateWindow": {
+      "title": "비용 상승 구간",
+      "description": "마무리 마감 전 마지막 {duration} 동안 ETH 제스처 비용이 매초 상승합니다. 처음에는 완만하다가 막판에 가파르게, 기본 비용의 약 5배까지 오릅니다. CST 제스처 비용도 같은 방식으로 오르며, 구간이 활성화된 동안 위 견적은 실시간으로 갱신됩니다.",
+      "opensIn": "{duration} 후 시작",
+      "active": "활성 — 제스처 비용이 매초 오르고 있습니다.",
+      "premium": "현재 ETH 프리미엄:"
+    }
   },
   "calibration": {
     "defaultTitle": "보정 구간",
@@ -535,7 +551,7 @@
       "retrieve": "대기 중인 배분 회수",
       "nothingWaiting": "회수할 배분 없음",
       "cstPreview": "다음 제스처는 약 {amount} CST를 각인합니다",
-      "entryShare": "이번 사이클 별빛 선정 자격의 {share}"
+      "entryShare": "이번 사이클 별빛 선정의 {share}"
     },
     "introByPhase": {
       "openingSoon": "이 카운트다운이 끝나면 다음 사이클이 열립니다. 사이클의 첫 제스처가 마감 카운트다운을 시작합니다.",
@@ -647,7 +663,7 @@
       "goToFinalize": "마감하러 가기",
       "thisCycle": "이번 사이클",
       "gestures": "{count, plural, =0 {남긴 제스처 없음} other {{total}개 중 #개}}",
-      "share": "별빛 선정 참여 항목의 {percent}",
+      "share": "이번 사이클 별빛 선정의 {percent}",
       "updating": "제스처 반영 중",
       "checkFailed": "확인하지 못했습니다",
       "retry": "다시 시도",

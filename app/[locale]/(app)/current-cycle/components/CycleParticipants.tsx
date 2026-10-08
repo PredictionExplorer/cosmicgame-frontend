@@ -10,6 +10,8 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import ETHSpentTable from '@/components/tables/ETHSpentTable';
 import EnduranceChampionsTable from '@/components/tables/EnduranceChampionsTable';
 import StellarSelectionHolderTable from '@/components/tables/StellarSelectionHolderTable';
+import { useSelectionPool } from '@/hooks/useSelectionPool';
+import { toFiniteNumber } from '@/utils/finiteNumber';
 import type { DashboardInfo, GestureInfo } from '@/services/api/types';
 
 import { CYCLE_SECTION_SCROLL_MARGIN } from './CycleSectionNav';
@@ -45,6 +47,9 @@ export function CycleParticipants({
 }: CycleParticipantsProps) {
   const t = useTranslations('currentCycle');
   const locale = useLocale();
+  // The V3 contract's weighted pool for this cycle; null on V1/V2, where the
+  // entries ledger keeps its count-based share.
+  const { data: selectionPool } = useSelectionPool(toFiniteNumber(data.CurRoundNum));
   // Unique addresses, once the gesture list has loaded.
   const participantCount = useMemo(
     () => (loading || error ? null : new Set(gestures.map((gesture) => gesture.BidderAddr)).size),
@@ -98,6 +103,7 @@ export function CycleParticipants({
                 list={gestures}
                 stellarEthSelections={data.NumRaffleEthWinnersBidding}
                 stellarNftSelections={data.NumRaffleNFTWinnersBidding}
+                selectionPool={selectionPool}
                 {...state}
               />
             ) : view === 'topEthSpenders' ? (

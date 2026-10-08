@@ -17,7 +17,8 @@ import {
 } from '@/hooks/useApiQuery';
 import { useFormat } from '@/hooks/useFormat';
 import { StellarSelectionIcon } from '@/lib/conceptIcons';
-import { getSelectionShare } from '@/lib/selectionStanding';
+import { getSelectionShare, getWeightedSelectionShare } from '@/lib/selectionStanding';
+import { useSelectionPool } from '@/hooks/useSelectionPool';
 import { toFiniteNumber } from '@/utils/finiteNumber';
 
 import { STELLAR_SELECTION_FAQ_HREF, type StellarSelectionKind } from './StellarSelectionHeader';
@@ -55,15 +56,34 @@ export function StellarSelectionEmpty({ kind, address }: StellarSelectionEmptyPr
   const siblingRows = sibling === 'nft' ? siblingNfts.data : siblingEth.data;
 
   const cycle = toFiniteNumber(dashboard.data?.CurRoundNum);
+  // On V3 deployments the ETH pool's share is weighted by gesture cost, read
+  // from the contract; on V1/V2 (and pre-upgrade cycles) it is count-based.
+  const { data: selectionPool } = useSelectionPool(cycle);
   const share = useMemo(() => {
     const started = (toFiniteNumber(dashboard.data?.TsRoundStart) ?? 0) > 0;
     const gestures = user.data?.Gestures;
     if (cycle === null || !started || !gestures) return null;
-    return getSelectionShare({
-      totalGestures: toFiniteNumber(dashboard.data?.CurNumBids) ?? 0,
-      myGestures: gestures.filter((gesture) => gesture.RoundNum === cycle).length,
-    });
-  }, [cycle, dashboard.data?.CurNumBids, dashboard.data?.TsRoundStart, user.data?.Gestures]);
+    const myGestures = gestures.filter((gesture) => gesture.RoundNum === cycle).length;
+    const totalGestures = toFiniteNumber(dashboard.data?.CurNumBids) ?? 0;
+    if (selectionPool) {
+      const key = address.toLowerCase();
+      const weighted = getWeightedSelectionShare({
+        totalGestures: selectionPool.numGestures,
+        myGestures: selectionPool.countByAddress.get(key) ?? myGestures,
+        totalWeight: selectionPool.totalWeight,
+        myWeight: selectionPool.weightByAddress.get(key) ?? 0n,
+      });
+      if (weighted) return weighted;
+    }
+    return getSelectionShare({ totalGestures, myGestures });
+  }, [
+    cycle,
+    dashboard.data?.CurNumBids,
+    dashboard.data?.TsRoundStart,
+    user.data?.Gestures,
+    selectionPool,
+    address,
+  ]);
 
   const actions: ReactNode[] = [];
   if (siblingRows && siblingRows.length > 0) {

@@ -282,7 +282,8 @@
     "removed": "Token name was removed."
   },
   "stellarSelection": {
-    "draws": "At finalization, {eth} ETH and {nft} NFT Stellar Selections are made from these entries."
+    "draws": "At finalization, {eth} ETH and {nft} NFT Stellar Selections are made from these entries.",
+    "weightedNote": "Shares are weighted by each gesture’s ETH cost at the moment it was made."
   },
   "recipientHistory": {
     "sources": {

@@ -48,7 +48,7 @@
     "stellarSelection": {
       "term": "Stellar Selection",
       "short": "The protocol’s random selection at finalization, which distributes allocations among the recorded entries.",
-      "long": "Every gesture records one entry. At finalization the contract selects entries with on-chain randomness for ETH and Cosmic Signature NFT allocations, and anchored Random Walk NFTs take part in a separate selection. The same address can be selected more than once."
+      "long": "Every gesture records an entry; from protocol version 3 an entry weighs as much as the gesture’s ETH cost at the moment it was made, while earlier cycles weighed every entry equally. At finalization the contract selects entries with on-chain randomness for ETH and Cosmic Signature NFT allocations, and anchored Random Walk NFTs take part in a separate selection. The same address can be selected more than once."
     },
     "anchoring": {
       "term": "Anchoring",

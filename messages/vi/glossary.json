@@ -48,7 +48,7 @@
     "stellarSelection": {
       "term": "Tinh tuyển",
       "short": "Việc chọn ngẫu nhiên của giao thức khi hoàn tất, để xác định người nhận phân bổ trong số các lượt đã ghi nhận.",
-      "long": "Mỗi nét bút ghi nhận một lượt. Khi hoàn tất, hợp đồng dùng nguồn ngẫu nhiên trên chuỗi để chọn các lượt nhận phân bổ ETH và Cosmic Signature NFT; các Random Walk NFT đang neo giữ tham gia một đợt Tinh tuyển riêng. Cùng một địa chỉ có thể được chọn nhiều lần."
+      "long": "Mỗi nét bút ghi nhận một lượt; từ phiên bản giao thức 3, trọng số của mỗi lượt bằng chi phí ETH của nét bút tại thời điểm thực hiện, còn ở các chu kỳ trước đó mọi lượt có trọng số như nhau. Khi hoàn tất, hợp đồng dùng nguồn ngẫu nhiên trên chuỗi để chọn các lượt nhận phân bổ ETH và Cosmic Signature NFT; các Random Walk NFT đang neo giữ tham gia một đợt Tinh tuyển riêng. Cùng một địa chỉ có thể được chọn nhiều lần."
     },
     "anchoring": {
       "term": "Neo giữ",

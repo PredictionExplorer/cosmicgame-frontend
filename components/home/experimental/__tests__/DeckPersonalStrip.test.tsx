@@ -71,6 +71,16 @@ describe('DeckPersonalStrip', () => {
     );
   });
 
+  it('prefers the contract-read weighted share over the count ratio', () => {
+    // 3 of 100 by count, but the wallet's gestures carry 5.25% of the
+    // cycle's Stellar Selection weight: the weighted figure is shown.
+    renderStrip(3, 97, { weightedShare: 0.0525 });
+
+    expect(screen.getByTestId('personal-entry-share')).toHaveTextContent(
+      'home.deck.personal.entryShare(share=5.25%)',
+    );
+  });
+
   it('waits for the whole feed before it counts, never reading the seed as the cycle', () => {
     // The server seed: one row, the wallet's own latest Gesture.
     renderStrip(1, 0, { totalGestures: 40, feedStatus: 'loading' });

@@ -315,7 +315,16 @@
         "note": "Adds {percent}% to the amount sent so the gesture still succeeds if another lands first in the same block. The contract charges only the current Gesture Cost and refunds the rest in the same transaction, unless the difference is too small to cover the gas."
       },
       "attachLabel": "Attach an asset",
-      "attachNone": "Nothing"
+      "attachNone": "Nothing",
+      "cstFloor": {
+        "title": "Participation CST floor",
+        "any": "Accept any amount",
+        "guarded": "Require at least the shown amount, minus the tolerance",
+        "toleranceLabel": "Tolerance",
+        "toleranceHint": "Allows the amount to drift between this quote and your transaction landing.",
+        "note": "The gesture’s Participation CST is imprinted to the participant you outbid, so a floor matters only when that participant is you. If another gesture lands first, a floor can make yours revert.",
+        "autoNote": "Preselected: you are the cycle’s latest participant, so this gesture’s Participation CST returns to your wallet."
+      }
     },
     "submit": {
       "eth": "Gesture with ETH ({cost} ETH)",
@@ -343,7 +352,14 @@
     "message": {
       "add": "Add a message"
     },
-    "finalizeAtClock": "You hold the Last Gesture. Finalize the cycle at the clock."
+    "finalizeAtClock": "You hold the Last Gesture. Finalize the cycle at the clock.",
+    "lateWindow": {
+      "title": "Rising-cost window",
+      "description": "During the final {duration} before the finalization deadline, the ETH Gesture Cost climbs every second — slowly at first, then steeply, up to about five times the base. The CST Gesture Cost rises the same way, and the quotes above re-quote live while the window is active.",
+      "opensIn": "Opens in {duration}",
+      "active": "Active — the Gesture Cost is climbing every second.",
+      "premium": "Current ETH premium:"
+    }
   },
   "calibration": {
     "defaultTitle": "Calibration Window",
@@ -535,7 +551,7 @@
       "retrieve": "Retrieve waiting allocations",
       "nothingWaiting": "Nothing waiting to retrieve",
       "cstPreview": "The next gesture imprints ~{amount} CST",
-      "entryShare": "{share} of this cycle’s Stellar Selection entries"
+      "entryShare": "{share} of this cycle’s Stellar Selection"
     },
     "introByPhase": {
       "openingSoon": "The next cycle opens when this countdown ends. Its first gesture starts the finalization clock.",
@@ -647,7 +663,7 @@
       "goToFinalize": "Go to finalize",
       "thisCycle": "This cycle",
       "gestures": "{count, plural, =0 {None from you yet} one {# of {total} gestures} other {# of {total} gestures}}",
-      "share": "{percent} of Stellar Selection entries",
+      "share": "{percent} of this cycle’s Stellar Selection",
       "updating": "Updating after your gesture",
       "checkFailed": "Could not check",
       "retry": "Retry",

@@ -65,6 +65,7 @@ export function SelectionShare({
               nft: format.count(nftSelections),
             })
           : t('statistics.selection.captionGeneric')}
+        {share.weighted ? ` ${t('statistics.selection.weightedNote')}` : null}
       </p>
     </section>
   );

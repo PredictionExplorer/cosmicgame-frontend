@@ -315,7 +315,16 @@
         "note": "Cộng thêm {percent}% vào số tiền gửi để nét bút vẫn thành công nếu một nét bút khác trong cùng khối được ghi nhận trước. Hợp đồng chỉ thu chi phí nét bút hiện tại và hoàn lại phần còn lại trong cùng giao dịch, trừ khi khoản chênh lệch quá nhỏ so với phí gas."
       },
       "attachLabel": "Đính kèm tài sản",
-      "attachNone": "Không đính kèm"
+      "attachNone": "Không đính kèm",
+      "cstFloor": {
+        "title": "Mức sàn CST tham gia",
+        "any": "Chấp nhận mọi mức",
+        "guarded": "Yêu cầu tối thiểu bằng mức hiển thị, trừ dung sai",
+        "toleranceLabel": "Dung sai",
+        "toleranceHint": "Cho phép mức này dao động giữa lúc báo giá và lúc giao dịch được ghi nhận.",
+        "note": "CST tham gia của nét bút được khắc cho người tham gia bạn vừa vượt, nên mức sàn chỉ có ý nghĩa khi người đó là bạn. Nếu nét bút khác được ghi nhận trước, mức sàn có thể khiến nét bút của bạn bị hoàn tác.",
+        "autoNote": "Được chọn sẵn: bạn là người tham gia mới nhất của chu kỳ, nên CST tham gia của nét bút này sẽ trở về ví của bạn."
+      }
     },
     "submit": {
       "eth": "Đặt nét bút bằng ETH ({cost} ETH)",
@@ -343,7 +352,14 @@
     "message": {
       "add": "Thêm lời nhắn"
     },
-    "finalizeAtClock": "Bạn đang giữ Nét bút gần nhất. Hãy hoàn tất chu kỳ tại đồng hồ."
+    "finalizeAtClock": "Bạn đang giữ Nét bút gần nhất. Hãy hoàn tất chu kỳ tại đồng hồ.",
+    "lateWindow": {
+      "title": "Khung giờ tăng chi phí",
+      "description": "Trong {duration} cuối trước hạn hoàn tất chu kỳ, Chi phí nét bút ETH tăng từng giây — ban đầu chậm, về cuối tăng dốc, tới khoảng gấp năm lần mức gốc. Chi phí nét bút CST cũng tăng tương tự; khi khung giờ đang hiệu lực, báo giá phía trên được cập nhật trực tiếp.",
+      "opensIn": "Mở sau {duration}",
+      "active": "Đang hiệu lực — Chi phí nét bút đang tăng từng giây.",
+      "premium": "Phụ phí ETH hiện tại:"
+    }
   },
   "calibration": {
     "defaultTitle": "Cửa sổ hiệu chỉnh",
@@ -535,7 +551,7 @@
       "retrieve": "Nhận về các phân bổ đang chờ",
       "nothingWaiting": "Không có gì đang chờ nhận về",
       "cstPreview": "Nét bút kế tiếp sẽ ghi khoảng ~{amount} CST",
-      "entryShare": "{share} số lượt Tinh tuyển của chu kỳ này"
+      "entryShare": "{share} Tinh tuyển của chu kỳ này"
     },
     "introByPhase": {
       "openingSoon": "Chu kỳ tiếp theo mở khi đếm ngược này kết thúc. Nét bút đầu tiên của chu kỳ khởi động đếm ngược hoàn tất.",
@@ -647,7 +663,7 @@
       "goToFinalize": "Đến phần hoàn tất",
       "thisCycle": "Chu kỳ này",
       "gestures": "{count, plural, =0 {Bạn chưa có nét bút nào} other {# trên {total} nét bút}}",
-      "share": "{percent} số mục Tinh tuyển",
+      "share": "{percent} Tinh tuyển của chu kỳ này",
       "updating": "Đang cập nhật sau nét bút của bạn",
       "checkFailed": "Không thể kiểm tra",
       "retry": "Thử lại",

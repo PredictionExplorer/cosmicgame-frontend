@@ -48,7 +48,7 @@
     "stellarSelection": {
       "term": "星选",
       "short": "协议在收官时进行的随机选取，在已记录的资格之间发放分配。",
-      "long": "每一笔都会记录一次资格。收官时，合约借助链上随机源选取资格，发放 ETH 与 Cosmic Signature NFT 分配；已锚定的 Random Walk NFT 参与另一轮独立的星选。同一地址可能被多次选中。"
+      "long": "每一笔都会记录一次资格；自协议第 3 版起，每次资格的权重为落笔当时的 ETH 费用，此前的周期中所有资格权重相同。收官时，合约借助链上随机源选取资格，发放 ETH 与 Cosmic Signature NFT 分配；已锚定的 Random Walk NFT 参与另一轮独立的星选。同一地址可能被多次选中。"
     },
     "anchoring": {
       "term": "锚定",

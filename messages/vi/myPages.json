@@ -130,7 +130,8 @@
       "title": "Tỷ lệ Tinh tuyển · chu kỳ {cycle}",
       "share": "{mine} trong {total} nét bút",
       "caption": "Khi chu kỳ hoàn tất, {eth} lượt chọn ETH và {nft} lượt chọn NFT được thực hiện trong toàn bộ nét bút của chu kỳ này, có hoàn lại. Mỗi nét bút được tính một lần.",
-      "captionGeneric": "Khi chu kỳ hoàn tất, Tinh tuyển được thực hiện trong toàn bộ nét bút của chu kỳ này, có hoàn lại. Mỗi nét bút được tính một lần."
+      "captionGeneric": "Khi chu kỳ hoàn tất, Tinh tuyển được thực hiện trong toàn bộ nét bút của chu kỳ này, có hoàn lại. Mỗi nét bút được tính một lần.",
+      "weightedNote": "Từ các chu kỳ V3, phần trong quỹ ETH được tính theo trọng số là chi phí ETH của từng nét bút tại thời điểm thực hiện."
     },
     "overview": {
       "title": "Tổng quan",

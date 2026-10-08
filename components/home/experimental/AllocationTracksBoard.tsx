@@ -2,8 +2,7 @@
 
 import { useLocale, useTranslations } from 'next-intl';
 
-import { isV3Mechanics, protocolFacts } from '@/content/protocol-facts';
-
+import { useLiveAllocationFacts } from '@/hooks/useLiveAllocationFacts';
 import { Amount } from '@/components/ui/amount';
 import { ExplainedTerm } from '@/components/ui/explain-popover';
 import { SectionHeader } from '@/components/ui/section-header';
@@ -49,8 +48,9 @@ export function AllocationTracksBoard({ data, className }: AllocationTracksBoard
   const t = useTranslations('home');
   const tCommon = useTranslations('common');
   const locale = useLocale();
-  /** Cosmic Signature NFTs in the Signature Allocation: V3 awards 3 sequential NFTs, V2 awards 1. */
-  const signatureNftCount = isV3Mechanics ? protocolFacts.v3.mainPrizeNftsPerCycleDefault : 1;
+  // Cosmic Signature NFTs in the Signature Allocation, per the contract
+  // (V3's mainPrizeNumCosmicSignatureNfts(); the static figure until read).
+  const { signatureNftCount } = useLiveAllocationFacts();
   const amounts = deriveAllocationTrackAmounts(data);
   const recipients = (count: number) => t('allocation.recipientCount', { count });
   // Every recipient of a fixed track receives the whole 1,000 CST and an NFT:

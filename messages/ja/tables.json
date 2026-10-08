@@ -282,7 +282,8 @@
     "removed": "トークン名が削除されました。"
   },
   "stellarSelection": {
-    "draws": "サイクルの確定時に、このプールからETHの星選{eth}件とNFTの星選{nft}件が選ばれます。"
+    "draws": "サイクルの確定時に、このプールからETHの星選{eth}件とNFTの星選{nft}件が選ばれます。",
+    "weightedNote": "シェアは各一筆のその時点のETHコストで重み付けされます。"
   },
   "recipientHistory": {
     "sources": {

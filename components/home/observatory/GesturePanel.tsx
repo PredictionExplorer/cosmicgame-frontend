@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useId, useRef, useState, type ReactNode, type RefObject } from 'react';
-import { zeroAddress } from 'viem';
+import { formatEther, zeroAddress } from 'viem';
 import { ArrowRight, ChevronDown, PenLine, Settings2 } from 'lucide-react';
 import { useLocale, useTranslations } from 'next-intl';
 
@@ -25,7 +25,7 @@ import {
   gestureMessageBytes,
   isUsableRandomWalkToken,
 } from '@/components/home/gestureInput';
-import type { EthGestureInfo, RwlkListStatus } from '@/hooks/useGestureForm';
+import type { EthGestureInfo, LateGestureWindowInfo, RwlkListStatus } from '@/hooks/useGestureForm';
 import { useTxStageLabel, type TxStage } from '@/hooks/useTxFlow';
 import { cn } from '@/lib/utils';
 import type { DashboardInfo } from '@/services/api/types';
@@ -93,6 +93,17 @@ export interface GesturePanelFormState {
   cstRewardReadFailed?: boolean;
   /** True on V3 contracts: the whole per-gesture CST imprint goes to the outbid participant. */
   cstRewardToOutbidBidder?: boolean;
+  /** The V3 late-gesture window per the contract; null on V1/V2 or before the first gesture. */
+  lateGestureWindow?: LateGestureWindowInfo | null;
+  /** The person's Participation CST floor choice ('auto' preselects by wallet). */
+  cstRewardGuardChoice?: 'auto' | 'any' | 'guarded';
+  setCstRewardGuardChoice?: (value: 'auto' | 'any' | 'guarded') => void;
+  /** True when the next gesture sends a nonzero Participation CST floor. */
+  cstRewardGuardActive?: boolean;
+  /** The connected wallet is the cycle's latest gesturer (the floor's beneficiary). */
+  connectedIsLatestGesturer?: boolean;
+  cstRewardTolerancePercent?: number;
+  setCstRewardTolerancePercent?: (value: number) => void;
 }
 
 /** What the connected wallet spent this cycle, read from its indexed history. */
@@ -224,6 +235,7 @@ export function GesturePanel({
     isCstRewardLoading = false,
     cstRewardReadFailed = false,
     cstRewardToOutbidBidder = false,
+    lateGestureWindow = null,
   } = form;
 
   // The message recedes in the page form and opens in the sheet. A draft
@@ -376,6 +388,57 @@ export function GesturePanel({
         onSelect={onSelectGestureType}
         showLabel={isSheet}
       />
+
+      {/* The V3 rising-cost window, from the contract's own getters: when it
+          opens (mainPrizeTime − getRoundLateBidDuration()), and the live
+          premium once inside. Absent on V1/V2 and before the cycle's first
+          gesture, where no premium exists and the base quote is stale. */}
+      {lateGestureWindow && (
+        <div
+          data-testid="panel-late-window"
+          className="space-y-1 rounded-surface bg-surface-sunken px-4 py-3"
+        >
+          <p className="type-label text-foreground">
+            <ExplainedTerm
+              definition={t('form.lateWindow.description', {
+                duration: formatDuration(lateGestureWindow.windowSeconds, { locale }),
+              })}
+            >
+              {t('form.lateWindow.title')}
+            </ExplainedTerm>
+          </p>
+          {lateGestureWindow.secondsUntilMainPrize > lateGestureWindow.windowSeconds ? (
+            <p data-testid="panel-late-window-countdown" className="type-caption text-subtle">
+              {t('form.lateWindow.opensIn', {
+                duration: formatDuration(
+                  lateGestureWindow.secondsUntilMainPrize - lateGestureWindow.windowSeconds,
+                  { locale },
+                ),
+              })}
+            </p>
+          ) : (
+            <>
+              <p data-testid="panel-late-window-active" className="type-caption text-attention">
+                {t('form.lateWindow.active')}
+              </p>
+              {lateGestureWindow.premiumWei != null && (
+                <p
+                  data-testid="panel-late-window-premium"
+                  className="type-caption text-muted-foreground"
+                >
+                  {t('form.lateWindow.premium')}{' '}
+                  <Amount
+                    value={Number(formatEther(lateGestureWindow.premiumWei))}
+                    unit="ETH"
+                    context="table"
+                    signDisplay="exceptZero"
+                  />
+                </p>
+              )}
+            </>
+          )}
+        </div>
+      )}
 
       {/* The method's explanation above already says what the NFT does;
           the picker says only where the wallet's NFTs stand. */}
@@ -612,6 +675,7 @@ export function GesturePanel({
                 form={form}
                 ethPrice={hasEthQuote ? ethPrice : null}
                 ethMethod={ethMethod}
+                firstGesture={isFirstGesture}
               />
             )}
           </div>

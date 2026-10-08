@@ -52,6 +52,11 @@ jest.mock('@tanstack/react-query', () => ({
   ...jest.requireActual('@tanstack/react-query'),
   useQueryClient: () => ({ invalidateQueries: jest.fn() }),
 }));
+// The weighted selection pool reads the chain through react-query; this view
+// renders without a QueryClientProvider, so the count-based share stands.
+jest.mock('@/hooks/useSelectionPool', () => ({
+  useSelectionPool: () => ({ data: null }),
+}));
 jest.mock('../../contexts/AnchoredTokenContext', () => ({
   useAnchoredToken: () => ({ fetchData: jest.fn() }),
 }));

@@ -110,7 +110,7 @@
     },
     "stellarSelectionEntries": {
       "title": "星選資格",
-      "tooltip": "每次落筆都會在本週期的星選池中計入一次；週期收官時，每次星選都從整個池中選取，同一筆落筆可再次獲選。下表列出每位參與者在池中的佔比。"
+      "tooltip": "週期收官時，每次星選都從本週期的全部落筆中選取，同一位參與者可再次獲選。下表列出每位參與者在星選中的佔比。"
     },
     "topEthSpenders": {
       "title": "ETH 支出排行",
@@ -139,6 +139,7 @@
     "participationV3": "落筆時，你可能銘刻<em>動態的參與 CST</em>，具體數量隨距上一筆經過的時間以恆定速率累積。",
     "calibration": "ETH 落筆會使 CST 校準窗口縮短約 {decreasePercent}%；CST 落筆則使其延長約 {increasePercent}%。",
     "stellarSelection": "每一筆都計入一次星選資格。週期收官時，週期儲備的 {rafflePercent}% 將由程序化隨機選出的 {ethEntries} 位 ETH 星選獲配者均分；另有 {nftEntries} 位星選獲配者與 {anchorHolders} 位 Random Walk NFT 錨定者，各獲配一枚 Cosmic Signature NFT。",
+    "stellarSelectionV3": "每一筆都計入一次星選資格，其權重為落筆當時的 ETH 費用。週期收官時，週期儲備的 {rafflePercent}% 將由程序化隨機選出的 {ethEntries} 位 ETH 星選獲配者均分；另有 {nftEntries} 位星選獲配者與 {anchorHolders} 位 Random Walk NFT 錨定者，各獲配一枚 Cosmic Signature NFT。",
     "publicGoods": "每個週期，Protocol Guild 都會收到週期儲備的 {percent}%（至少 {amount} ETH）。",
     "learnMore": "了解週期如何運作"
   },

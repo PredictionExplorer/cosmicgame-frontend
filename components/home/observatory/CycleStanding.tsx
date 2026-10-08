@@ -34,6 +34,12 @@ export interface CycleStandingProps {
   participationUpdating?: boolean;
   /** All Gestures of this cycle; null while unknown. */
   totalGestures: number | null;
+  /**
+   * The wallet's weighted share of this cycle's Stellar Selection (a 0..1
+   * fraction read from the Game contract), or null wherever the count-based
+   * share is the right one (V2 deployments, pre-V3 cycles, reads in flight).
+   */
+  weightedShare?: number | null;
   retrieve: RetrieveStatus;
   /** Moves to the clock's Finalize action. */
   onGoToFinalize?: () => void;
@@ -86,6 +92,7 @@ export function CycleStanding({
   participation,
   participationUpdating = false,
   totalGestures,
+  weightedShare = null,
   retrieve,
   onGoToFinalize,
   className,
@@ -194,11 +201,21 @@ export function CycleStanding({
       };
     }
     const { gestures } = participation;
+    // The weighted fraction comes straight from the contract; the count
+    // ratio stands in wherever weights do not exist (V2, pre-V3 cycles).
+    const shareFraction =
+      gestures > 0
+        ? weightedShare != null && weightedShare > 0
+          ? weightedShare
+          : totalGestures != null && totalGestures > 0
+            ? gestures / totalGestures
+            : null
+        : null;
     const share =
-      totalGestures != null && totalGestures > 0 && gestures > 0
+      shareFraction != null
         ? t('share', {
-            percent: format.percent((gestures / totalGestures) * 100, {
-              maximumFractionDigits: gestures / totalGestures < 0.01 ? 2 : 1,
+            percent: format.percent(shareFraction * 100, {
+              maximumFractionDigits: shareFraction < 0.01 ? 2 : 1,
             }),
           })
         : undefined;
