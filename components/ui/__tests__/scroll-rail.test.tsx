@@ -128,12 +128,14 @@ describe('ScrollRail', () => {
       // A change of the current item runs the reveal.
       track.querySelector('[data-state]')!.setAttribute('data-state', 'inactive');
       track.querySelector('[data-state]')!.setAttribute('data-state', 'active');
-      await waitFor(() => expect(scrollTo).toHaveBeenCalled());
       // Scrolling just far enough (120) would leave "Risk Disclosures" cut in
       // two at the start, and the row's own end (80) would show 30px of
       // "Source code": the row moves on to "Risk Disclosures", whole at the
-      // start, with 30px of room after it.
-      expect(scrollTo).toHaveBeenLastCalledWith({ left: 110, behavior: 'smooth' });
+      // start, with 30px of room after it. Asserted as "was called", not
+      // "was called last": the mount reveal (instant, same target) runs in a
+      // requestAnimationFrame that a busy scheduler can deliver after the
+      // mutation-driven smooth reveal.
+      await waitFor(() => expect(scrollTo).toHaveBeenCalledWith({ left: 110, behavior: 'smooth' }));
       expect(track.style.getPropertyValue('--rail-end-room')).toBe('30px');
       // An underline row's hairline runs on under the room.
       expect(track).toHaveAttribute('data-end-rule');

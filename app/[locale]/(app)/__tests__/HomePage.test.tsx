@@ -1699,7 +1699,9 @@ describe('HomePage', () => {
     }
     await user.click(within(chat).getByRole('button', { name: 'home.chat.history.loadOlder' }));
     expect(mockLoadOlder).toHaveBeenCalledTimes(1);
-  });
+    // Renders a 50-message history and clicks through every show-more page;
+    // ~3.5s alone, past the 5s default when suites run in parallel.
+  }, 20_000);
 
   it('renders current-cycle gesture messages in the feed', () => {
     mockUseDashboardInfo.mockReturnValue({
