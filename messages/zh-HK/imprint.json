@@ -5,28 +5,51 @@
   },
   "page": {
     "title": "銘刻 Random Walk NFT",
-    "subtitle": "擁有 Random Walk NFT，可將一筆 ETH 落筆的價格降低 50%",
-    "description": "RandomWalk NFT 是獨特的數字藏品，可在 Cosmic Signature 協議中帶來策略優勢。將一枚 RandomWalk NFT 附加至 ETH 落筆，即可使 ETH 落筆價格降低 50%，在週期後段尤其顯著。每枚 RandomWalk NFT 只能使用一次，請審慎選擇時機。這種落筆附加與錨定 RandomWalk NFT 以取得錨定 NFT 星選資格是兩項獨立機制。",
+    "subtitle": "一枚 Random Walk NFT 可令一筆 ETH 落筆的價格降低 50%。在這裏銘刻，再把它附加到你選定的那一筆。",
     "currentCost": "目前銘刻價格",
+    "costBreakdown": "合約價格 {base} ETH，另加 {percent}% 餘量，以免確認前價格上漲導致銘刻失敗。",
     "submit": "銘刻",
-    "myNfts": "我的 Random Walk NFT"
+    "myNfts": "我的 Random Walk NFT",
+    "panelAria": "銘刻 Random Walk NFT",
+    "tokenAlt": "Random Walk NFT {id}",
+    "connect": "連接錢包即可銘刻 Random Walk NFT。連接本身不會簽署任何內容。",
+    "why": {
+      "title": "銘刻能帶來甚麼"
+    },
+    "benefits": {
+      "gesture": {
+        "title": "一筆 ETH 落筆減半",
+        "label": "按目前價格，一筆 ETH 落筆可節省",
+        "caption": "即目前 ETH 落筆價格 {cost} ETH 的一半。每枚 Random Walk NFT 僅可使用一次，用在你選定的那一筆。"
+      },
+      "anchoring": {
+        "title": "錨定 NFT 星選",
+        "body": "錨定後，Random Walk NFT 會參與錨定 NFT 星選：每次收官時選出 {count, number} 枚已錨定的 Random Walk NFT，每枚的持有者獲配 {cst} CST 與 1 枚 Cosmic Signature NFT。在落筆中使用過的 NFT 仍可錨定。",
+        "link": "了解錨定運作原理"
+      }
+    },
+    "latest": {
+      "meta": "最新銘刻",
+      "earlierAria": "此前的銘刻"
+    },
+    "success": {
+      "eyebrow": "銘刻完成",
+      "title": "Random Walk NFT {id} 已歸你所有",
+      "description": "將它附加到一筆 ETH 落筆，即可一次性降低 {percent}% 的落筆價格。",
+      "use": "用於落筆",
+      "again": "再銘刻一枚"
+    },
+    "owned": {
+      "used": "已使用",
+      "unused": "未使用",
+      "use": "用於落筆",
+      "checking": "核對中",
+      "unknownNote": "暫時無法核對這些 Random Walk NFT 是否已使用，因此還不會提供用於落筆的入口。",
+      "empty": "此錢包尚未持有 Random Walk NFT。",
+      "error": "無法讀取此錢包中的 Random Walk NFT。"
+    }
   },
   "seo": {
-    "eyebrow": "RandomWalk NFT 銘刻 · Arbitrum",
-    "heading": "銘刻 RandomWalk NFT",
-    "description": "銘刻用於參與 Cosmic Signature 的 RandomWalk NFT。每枚尚未使用的 RandomWalk NFT 都可附加至一筆 ETH 落筆，使落筆價格降低 50%。",
-    "source": "Cosmic Signature 公共協議配置 API",
-    "lastUpdated": "更新時間：{date}。數據來源：{source}。下方互動式內容會載入即時應用程式數據；此摘要直接寫入初始 HTML，便於搜尋引擎與 AI 抓取。",
-    "relatedAria": "RandomWalk NFT 銘刻相關頁面",
-    "cards": {
-      "cycle": "目前演繹週期",
-      "cost": "目前 ETH 落筆價格",
-      "discount": "RandomWalk 減免"
-    },
-    "links": {
-      "cycle": "打開目前演繹週期",
-      "learn": "了解落筆機制",
-      "used": "查看已使用的 RandomWalk NFT"
-    }
+    "heading": "銘刻 Random Walk NFT"
   }
 }

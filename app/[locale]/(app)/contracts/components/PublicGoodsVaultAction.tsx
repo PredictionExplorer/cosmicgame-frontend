@@ -1,150 +1,177 @@
 'use client';
 
-import { useState } from 'react';
 import { useLocale, useTranslations } from 'next-intl';
-import { writeContract } from '@wagmi/core';
-import { useQueryClient } from '@tanstack/react-query';
-import { ArrowUpRight, Loader2, SendHorizontal, Vault } from 'lucide-react';
-import { toast } from 'sonner';
-import { useConfig, usePublicClient } from 'wagmi';
+import { Inbox } from 'lucide-react';
 
-import { charityWalletAbi as CHARITY_WALLET_ABI } from '@/contracts/abis';
-import { formatEthValue, shortenHex } from '@/utils';
+import { protocolFacts } from '@/content/protocol-facts';
 
-import { getEthErrorMessage, isUserRejection, reportError } from '@/utils/errors';
-import { assertSuccessfulTransactionReceipt } from '@/utils/transactions';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { InfoTooltip } from '@/components/ui/info-tooltip';
-import { activeChain } from '@/config/chains';
-import { useActiveWeb3React } from '@/hooks/web3';
-import { useRequireChain } from '@/hooks/useRequireChain';
+import { cn } from '@/lib/utils';
+import { formatPercent, sameAddress } from '@/utils/format';
+import { toFiniteNumber } from '@/utils/finiteNumber';
+import { ForwardVaultFunds } from '@/components/donations/ForwardVaultFunds';
+import { useVaultBalance, vaultBalanceEth } from '@/components/donations/useVaultBalance';
+import { AddressChip } from '@/components/ui/address-chip';
+import { Amount } from '@/components/ui/amount';
+import { ExplainedTerm } from '@/components/ui/explain-popover';
+import { SectionHeader } from '@/components/ui/section-header';
+import { Skeleton } from '@/components/ui/skeleton';
+import { UnknownValue } from '@/components/ui/unknown-value';
 
-interface PublicGoodsVaultActionProps {
+export interface PublicGoodsVaultActionProps {
+  /** The Public Goods Vault contract. */
   vaultAddress: string;
-  beneficiaryAddress: string;
-  vaultBalanceEth?: number;
+  /** `charityAddress()` on the vault: `undefined` while it is read, `null` when it failed. */
+  beneficiaryAddress: string | null | undefined;
+  /**
+   * ETH in the vault as the dashboard reports it; `undefined` while it loads.
+   * The chain's own reading replaces it whenever the chain answers.
+   */
+  vaultBalanceEth: number | null | undefined;
+  /** The Public Goods share of each Cycle Reserve, percent. */
+  sharePercent: number | null | undefined;
 }
 
-function toDisplayBalance(value: number | undefined): number {
-  if (value == null || !Number.isFinite(value) || value <= 0) return 0;
-  return value;
-}
-
+/**
+ * Public Goods: the vault, its beneficiary and share, the balance waiting in
+ * the vault (read from the chain, so a forward that just happened is not
+ * offered again), and, only when there is a balance, the action that
+ * forwards it, in a well beside the figures. With nothing to forward, a
+ * caption under the balance says why and the figures take the width. A
+ * balance that could not be read is said as such: the panel neither calls
+ * the vault empty nor offers an action it cannot vouch for.
+ */
 export function PublicGoodsVaultAction({
   vaultAddress,
   beneficiaryAddress,
-  vaultBalanceEth,
+  vaultBalanceEth: dashboardBalanceEth,
+  sharePercent,
 }: PublicGoodsVaultActionProps) {
   const t = useTranslations('contracts');
-  const toastT = useTranslations('toasts');
+  const tCommon = useTranslations('common');
   const locale = useLocale();
-  const [submitting, setSubmitting] = useState(false);
-  const config = useConfig();
-  const publicClient = usePublicClient({ chainId: activeChain.id });
-  const queryClient = useQueryClient();
-  const { account, active } = useActiveWeb3React();
-  const { ensureCorrectChain } = useRequireChain();
+  const chainBalance = useVaultBalance(vaultAddress);
 
   if (!vaultAddress) return null;
 
-  const displayBalance = toDisplayBalance(vaultBalanceEth);
-  const hasFunds = displayBalance > 0;
-  const disabled = submitting || !hasFunds;
-  const buttonLabel = submitting
-    ? toastT('contribution.publicGoodsVault.forwarding')
-    : hasFunds
-      ? toastT('contribution.publicGoodsVault.forward')
-      : toastT('contribution.publicGoodsVault.nothing');
+  const unknown = <UnknownValue label={tCommon('status.unavailable')} />;
+  const balance = vaultBalanceEth(chainBalance, dashboardBalanceEth);
+  const hasFunds = typeof balance === 'number' && balance > 0;
+  const share = toFiniteNumber(sharePercent);
+  // Named only when it is the documented beneficiary; any other address reads as hex.
+  const { name: beneficiaryName, address: documentedBeneficiary } =
+    protocolFacts.publicGoodsBeneficiary;
 
-  const handleForward = async () => {
-    if (!hasFunds) {
-      toast.info(toastT('contribution.publicGoodsVault.none'));
-      return;
-    }
-
-    if (!active || !account) {
-      toast.error(toastT('contribution.publicGoodsVault.connectWallet'));
-      return;
-    }
-
-    if (!(await ensureCorrectChain())) return;
-
-    setSubmitting(true);
-    try {
-      const hash = await writeContract(config, {
-        address: vaultAddress as `0x${string}`,
-        abi: CHARITY_WALLET_ABI,
-        functionName: 'send',
-        args: [],
-        account: account as `0x${string}`,
-        chainId: activeChain.id,
-      });
-
-      const receipt = await publicClient?.waitForTransactionReceipt({ hash });
-      assertSuccessfulTransactionReceipt(receipt);
-      await queryClient.invalidateQueries({ queryKey: ['dashboardInfo'] });
-      toast.success(toastT('contribution.publicGoodsVault.forwarded'));
-    } catch (err) {
-      if (isUserRejection(err)) {
-        toast.info(toastT('walletTransactionCancelled'));
-        return;
-      }
-      reportError(err, 'forward public goods vault funds');
-      toast.error(
-        getEthErrorMessage(err, toastT('contribution.publicGoodsVault.failed'), { locale }),
-      );
-    } finally {
-      setSubmitting(false);
-    }
-  };
+  const rows = [
+    {
+      id: 'vault',
+      label: t('vault.vaultAddress'),
+      definition: t('vault.tooltip'),
+      value: <AddressChip address={vaultAddress} variant="plain" label={false} href={false} />,
+    },
+    {
+      id: 'beneficiary',
+      label: t('parameters.publicGoodsAddress'),
+      definition: t('parameters.publicGoodsAddressTooltip'),
+      value:
+        beneficiaryAddress === undefined ? (
+          <Skeleton className="h-4 w-28" />
+        ) : beneficiaryAddress === null ? (
+          unknown
+        ) : (
+          <AddressChip
+            address={beneficiaryAddress}
+            variant="plain"
+            href={false}
+            label={
+              sameAddress(beneficiaryAddress, documentedBeneficiary) ? beneficiaryName : undefined
+            }
+          />
+        ),
+    },
+    {
+      id: 'share',
+      label: t('vault.share'),
+      definition: null,
+      value:
+        sharePercent === undefined ? (
+          <Skeleton className="h-4 w-10" />
+        ) : share === null ? (
+          unknown
+        ) : (
+          formatPercent(share, locale)
+        ),
+    },
+    {
+      id: 'balance',
+      label: t('vault.balance'),
+      definition: null,
+      value:
+        balance === undefined ? (
+          <Skeleton className="h-4 w-20" />
+        ) : balance === null ? (
+          unknown
+        ) : (
+          <Amount value={balance} unit="ETH" />
+        ),
+    },
+  ];
 
   return (
-    <Card className="mt-4">
-      <CardHeader className="pb-3">
-        <div className="flex items-center gap-2">
-          <div className="flex h-7 w-7 items-center justify-center rounded-md bg-white/[0.06] text-primary/60">
-            <Vault className="h-4 w-4" />
-          </div>
-          <CardTitle className="text-base font-semibold">{t('vault.title')}</CardTitle>
-          <InfoTooltip content={t('vault.tooltip')} />
-        </div>
-      </CardHeader>
-      <CardContent>
-        <div className="grid gap-4 md:grid-cols-[1fr_auto] md:items-center">
-          <div className="space-y-2">
-            <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-sm">
-              <span className="text-muted-foreground">{t('vault.balance')}</span>
-              <span className="font-mono font-semibold text-foreground">
-                {formatEthValue(displayBalance)}
-              </span>
-            </div>
-            <p className="text-xs leading-relaxed text-muted-foreground">
-              {beneficiaryAddress
-                ? t('vault.descriptionWithBeneficiary', {
-                    address: shortenHex(beneficiaryAddress, 6),
-                  })
-                : t('vault.description')}
+    <section aria-labelledby="public-goods-heading">
+      <SectionHeader
+        headingId="public-goods-heading"
+        title={t('vault.title')}
+        description={t('vault.description')}
+      />
+      <div
+        className={cn(
+          'mt-6',
+          hasFunds &&
+            'grid gap-x-12 gap-y-6 lg:grid-cols-[minmax(0,1fr)_minmax(0,22rem)] lg:items-start',
+        )}
+      >
+        <div className={cn(!hasFunds && 'max-w-3xl')}>
+          <dl>
+            {rows.map((row) => (
+              <div
+                key={row.id}
+                data-row={row.id}
+                className="flex min-h-12 items-center justify-between gap-4 border-b border-rule-faint py-2.5"
+              >
+                <dt className="min-w-0 type-body-sm text-muted-foreground">
+                  {row.definition ? (
+                    <ExplainedTerm definition={row.definition} announce="moreInformation">
+                      {row.label}
+                    </ExplainedTerm>
+                  ) : (
+                    row.label
+                  )}
+                </dt>
+                <dd className="min-w-0 text-end type-figure-sm text-foreground">{row.value}</dd>
+              </div>
+            ))}
+          </dl>
+          {/* Why there is no action, said under the balance it is about. */}
+          {balance === null ? (
+            <p
+              data-testid="vault-balance-unavailable"
+              className="mt-3 type-caption text-muted-foreground"
+            >
+              {t('vault.balanceUnavailable')}
             </p>
-          </div>
-
-          <Button
-            type="button"
-            onClick={handleForward}
-            disabled={disabled}
-            aria-label={t('vault.aria')}
-            className="w-full md:w-auto"
-          >
-            {submitting ? (
-              <Loader2 className="h-4 w-4 animate-spin" aria-hidden />
-            ) : (
-              <SendHorizontal className="h-4 w-4" aria-hidden />
-            )}
-            {buttonLabel}
-            {!submitting && <ArrowUpRight className="h-4 w-4" aria-hidden />}
-          </Button>
+          ) : balance === 0 ? (
+            <p
+              data-testid="vault-empty"
+              className="mt-3 flex items-start gap-2 type-caption text-muted-foreground"
+            >
+              <Inbox aria-hidden className="mt-px size-3.5 shrink-0 text-subtle" />
+              {t('vault.empty')}
+            </p>
+          ) : null}
         </div>
-      </CardContent>
-    </Card>
+
+        {hasFunds ? <ForwardVaultFunds vaultAddress={vaultAddress} note={t('vault.note')} /> : null}
+      </div>
+    </section>
   );
 }

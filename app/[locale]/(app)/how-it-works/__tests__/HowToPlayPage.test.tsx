@@ -1,111 +1,96 @@
 import { howItWorksContentEn } from '@/content/how-it-works';
+import contractsMessages from '@/messages/en/contracts.json';
+
+import { ALLOCATION_TRACK_COPY_KEYS, ALLOCATION_TRACK_IDS } from '@/config/allocationTracks';
 
 import { render, screen, checkA11y } from '@/test-utils';
 
 import HowToPlayPage from '../HowToPlayPage';
 
-jest.mock('framer-motion', () => {
-  const React = require('react');
-  const cache: Record<string, React.ForwardRefExoticComponent<unknown>> = {};
-  return {
-    motion: new Proxy(
-      {},
-      {
-        get: (_target: unknown, prop: string) => {
-          if (!cache[prop]) {
-            const Comp = React.forwardRef(function MotionProxy(
-              props: Record<string, unknown>,
-              ref: React.Ref<HTMLElement>,
-            ) {
-              const {
-                initial: _i,
-                animate: _a,
-                whileInView: _w,
-                viewport: _v,
-                transition: _t,
-                variants: _va,
-                ...rest
-              } = props;
-              return React.createElement(prop, { ...rest, ref });
-            });
-            Comp.displayName = `motion.${prop}`;
-            cache[prop] = Comp;
-          }
-          return cache[prop];
-        },
-      },
-    ),
-  };
-});
+const segments: Record<string, { label: string }> = contractsMessages.funds.segments;
+const TRACK_LABELS_EN = Object.fromEntries(
+  ALLOCATION_TRACK_IDS.map((id) => [id, segments[ALLOCATION_TRACK_COPY_KEYS[id]]!.label]),
+) as Record<(typeof ALLOCATION_TRACK_IDS)[number], string>;
 
-jest.mock('next/link', () => ({
-  __esModule: true,
-  default: ({ children, ...props }: { children: React.ReactNode; href: string }) => (
-    <a {...props}>{children}</a>
-  ),
-}));
+const renderPage = () =>
+  render(
+    <HowToPlayPage
+      content={howItWorksContentEn}
+      trackLabels={TRACK_LABELS_EN}
+      locale="en"
+      unavailableLabel="Artwork unavailable"
+    />,
+  );
 
 describe('HowToPlayPage', () => {
-  it('renders the hero section', () => {
-    render(<HowToPlayPage content={howItWorksContentEn} />);
-    expect(screen.getByRole('heading', { level: 1 })).toHaveTextContent(
-      'How Cosmic Signature Works',
+  it('opens with one plain H1', () => {
+    renderPage();
+    const h1 = screen.getByRole('heading', { level: 1 });
+    expect(h1).toHaveTextContent(/^How Cosmic Signature works$/);
+    // One string: no markup but the span that holds the brand on one line (V425).
+    expect([...h1.querySelectorAll('*')].map((node) => node.textContent)).toEqual([
+      'Cosmic Signature',
+    ]);
+  });
+
+  it('draws the mechanism once, then what a gesture leads to and costs, how to start, what to know and one call to action', () => {
+    renderPage();
+    expect(screen.getAllByRole('heading', { level: 2 }).map((h) => h.textContent)).toEqual([
+      'Lifecycle of a Performance Cycle',
+      'What a gesture can lead to',
+      'What a gesture costs',
+      'Getting started',
+      'Good to know',
+      'Ready to make your first gesture?',
+    ]);
+    expect(screen.getAllByTestId('cycle-diagram')).toHaveLength(1);
+    // F231: no overview cards restating the lifecycle, and no second closing panel.
+    expect(screen.queryByText('How It Works')).not.toBeInTheDocument();
+    expect(screen.queryByText('Have Questions?')).not.toBeInTheDocument();
+  });
+
+  it('explains itself in the open: no heading hides its rule in a popover (D073)', () => {
+    renderPage();
+    // The only buttons are real actions; there are none on this static page.
+    expect(screen.queryByRole('button')).not.toBeInTheDocument();
+    for (const heading of screen.getAllByRole('heading', { level: 3 })) {
+      expect(heading.querySelector('[role="button"]')).toBeNull();
+    }
+  });
+
+  it('shows a real Signature as the payoff of the cycle', () => {
+    renderPage();
+    expect(
+      screen.getByRole('heading', { level: 3, name: 'Every cycle ends in a Signature' }),
+    ).toBeInTheDocument();
+    expect(screen.getByRole('link', { name: /View this Signature/ })).toHaveAttribute(
+      'href',
+      '/detail/24',
     );
   });
 
-  it('renders the game overview section', () => {
-    render(<HowToPlayPage content={howItWorksContentEn} />);
-    expect(screen.getByText('How It Works')).toBeInTheDocument();
+  it('says what a gesture costs right after what it can lead to, with the risk disclosures (D072)', () => {
+    renderPage();
+    const costs = screen.getByRole('region', { name: 'What a gesture costs' });
+    for (const item of howItWorksContentEn.costs.items) {
+      expect(costs).toHaveTextContent(item.title);
+      expect(costs).toHaveTextContent(item.body);
+    }
+    expect(screen.getByRole('link', { name: /Read the risk disclosures/ })).toHaveAttribute(
+      'href',
+      '/risk-disclosures',
+    );
   });
 
-  it('renders the reward breakdown section', () => {
-    render(<HowToPlayPage content={howItWorksContentEn} />);
-    expect(screen.getByText('What Every Gesture Imprints')).toBeInTheDocument();
-  });
-
-  it('renders the game cycle section', () => {
-    render(<HowToPlayPage content={howItWorksContentEn} />);
-    expect(screen.getByText('Lifecycle of a Performance Cycle')).toBeInTheDocument();
-  });
-
-  it('renders the step-by-step section', () => {
-    render(<HowToPlayPage content={howItWorksContentEn} />);
-    expect(screen.getByText('Getting Started')).toBeInTheDocument();
-  });
-
-  it('renders the pro tips section', () => {
-    render(<HowToPlayPage content={howItWorksContentEn} />);
-    expect(screen.getByText('Pro Tips & Strategy')).toBeInTheDocument();
-  });
-
-  it('renders the FAQ callout section', () => {
-    render(<HowToPlayPage content={howItWorksContentEn} />);
-    expect(screen.getByText('Have Questions?')).toBeInTheDocument();
-    expect(screen.getByRole('link', { name: /Browse FAQ/i })).toHaveAttribute('href', '/faq');
-  });
-
-  it('renders the CTA section', () => {
-    render(<HowToPlayPage content={howItWorksContentEn} />);
-    expect(screen.getByText('Ready to Make Your First Gesture?')).toBeInTheDocument();
-  });
-
-  it('has correct heading hierarchy with all section headings', () => {
-    render(<HowToPlayPage content={howItWorksContentEn} />);
-    const h1 = screen.getByRole('heading', { level: 1 });
-    expect(h1).toBeInTheDocument();
-
-    const h2s = screen.getAllByRole('heading', { level: 2 });
-    expect(h2s.length).toBeGreaterThanOrEqual(7);
-  });
-
-  it('renders section dividers between sections', () => {
-    const { container } = render(<HowToPlayPage content={howItWorksContentEn} />);
-    const dividers = container.querySelectorAll('[class*="bg-gradient-to-r"]');
-    expect(dividers.length).toBeGreaterThan(0);
+  it('closes with the gesture form and the FAQ in one section', () => {
+    renderPage();
+    const cta = screen.getByRole('region', { name: 'Ready to make your first gesture?' });
+    expect(cta).toContainElement(screen.getByRole('link', { name: 'Browse the FAQ' }));
+    expect(screen.getByRole('link', { name: 'Browse the FAQ' })).toHaveAttribute('href', '/faq');
   });
 
   it('has no accessibility violations', async () => {
-    const { container } = render(<HowToPlayPage content={howItWorksContentEn} />);
-    await checkA11y(container, { rules: { 'heading-order': { enabled: false } } });
+    const { container } = renderPage();
+    await checkA11y(container);
   });
 });

@@ -6,12 +6,15 @@ import { WHITE_PAPER_VERSION } from './types';
 const cst = (amount: number): string => amount.toLocaleString('zh-HK');
 
 /** protocolFacts stores the example gaps as English strings; render them in zh. */
-const ELAPSED_ZH_HK: Record<string, string> = {
-  '0 seconds': '0 秒',
-  '1 second': '1 秒',
-  '60 seconds': '60 秒',
-  '1 hour': '1 小時',
-  '1 day': '1 天',
+const ELAPSED_ZH_HK: Record<
+  (typeof protocolFacts.dynamicCstRewardExamples)[number]['elapsed'],
+  string
+> = {
+  '0 seconds': '0 秒',
+  '1 second': '1 秒',
+  '60 seconds': '60 秒',
+  '1 hour': '1 小時',
+  '1 day': '1 天',
 };
 
 /** 中文白皮書文案，以 structure.ts 中的骨架為鍵。 */
@@ -36,7 +39,7 @@ export const whitePaperTextZhHk = {
   abstract: {
     heading: '摘要',
     paragraphs: [
-      'Cosmic Signature 是部署在 Arbitrum One 上的程序化藝術協議，以一個個限時的演繹週期運轉。週期進行中，參與者以 ETH 或協議的 ERC-20 代幣 CST 落筆：每一筆都會延長收官倒數，計入一次星選資格，還可能銘刻新的 CST。倒數結束、週期收官後，協議將 ETH 儲備分配至十餘條軌道，銘刻新一代 Cosmic Signature NFT，並把固定份額轉撥給 Protocol Guild，即 170 餘位以太坊核心貢獻者的資助機制。約一半儲備滾入下一週期，每個新週期都以更大的儲備開場。',
+      'Cosmic Signature 是部署在 Arbitrum One 上的程序化藝術協議，以一個個限時的演繹週期運轉。週期進行中，參與者以 ETH 或協議的 ERC-20 代幣 CST 落筆：每一筆都會延長收官倒數，計入一次星選資格，還可能銘刻新的 CST。倒數結束、週期收官後，協議將 ETH 儲備分配至一組固定的軌道，銘刻新一代 Cosmic Signature NFT，並把固定份額轉撥給 Protocol Guild，即 170 餘位以太坊核心貢獻者的資助機制。約一半儲備滾入下一週期，儲備規模還取決於各週期新加入的 ETH。',
       '每枚 Cosmic Signature NFT 都是對引力三體問題的確定性渲染：作品由鏈上種子生成，任何人都能逐像素復現，全程沒有神經網絡參與。本文完整闡述協議機制與代幣設計，記錄已上線的 V2 升級，介紹規劃中的 V3 升級，並闡明一項承諾：待設計定稿，部署者地址將交出全部特權控制。',
     ],
   },
@@ -51,7 +54,7 @@ export const whitePaperTextZhHk = {
         },
         {
           kind: 'paragraph',
-          text: '由此而來的，是一個圍繞時間構建的協議。演繹週期開啟，在一次次落筆中延展，倒數歸零後落幕。落筆是一次小小的鏈上行為：攜帶 ETH 或 CST，可附上一句短訊息或一份資產，並把週期的收官時間向後推。倒數結束時，最後落下的那一筆就是收官之筆，其參與者可完成收官：發放儲備、銘刻本週期的 NFT，併為下一週期做好準備。',
+          text: '由此而來的，是一個圍繞時間構建的協議。演繹週期開啟，在一次次落筆中延展，倒數歸零後落幕。落筆是一次小小的鏈上行為：攜帶 ETH 或 CST，可附上一句短訊息或一份資產，並把週期的收官時間向後推。倒數結束時，最後落下的那一筆就是收官之筆，其參與者可完成收官：發放儲備、銘刻本週期的 NFT，並為下一週期做好準備。',
         },
         {
           kind: 'paragraph',
@@ -61,13 +64,13 @@ export const whitePaperTextZhHk = {
           kind: 'list',
           items: [
             '確定性。作品由銘刻時記錄在鏈上的種子計算而來。渲染管線開源，同一種子永遠產出同一圖像與影片，逐比特一致。',
-            '機械化發放。分配比例是已驗證合約中的常量。參與者與發放規則之間沒有任何自由裁量的帳戶，也沒有團隊錢包從落筆中收取 ETH。',
-            '有限的團隊角色。所有者權限範圍很窄，在週期運行期間全部鎖定，並將在剩餘升級完成後徹底移除。',
+            '機械化發放。分配由已驗證合約按鏈上規則執行。參與者與發放規則之間沒有任何自由裁量的帳戶，也沒有團隊錢包從落筆中收取 ETH。',
+            '有限的團隊角色。所有者權限範圍有限，核心參數在週期運作期間鎖定，並將在剩餘升級完成後徹底移除。',
           ],
         },
         {
           kind: 'paragraph',
-          text: '本文是協議的權威說明。第 2 節勾勒系統全貌；第 3 至 5 節定義週期、落筆與分配；第 6 節介紹藝術；第 7 至 10 節涵蓋 CST、錨定、宇宙議會與公共物品；第 11 節討論安全與可驗證性；第 12、13 節記錄升級歷史與全面去中心化路線；第 14 節直言協議不是什麼。文中引用的數字要麼是合約常量，要麼是鏈上參數的上線初始值；附錄 A 所列的已部署合約始終是最終依據。',
+          text: '本文是協議的權威說明。第 2 節勾勒系統全貌；第 3 至 5 節定義週期、落筆與分配；第 6 節介紹藝術；第 7 至 10 節涵蓋 CST、錨定、宇宙議會與公共物品；第 11 節討論安全與可驗證性；第 12、13 節記錄升級歷史與全面去中心化路線；第 14 節直言協議不是什麼。文中引用的數字要麼是合約常量，要麼是鏈上參數的上線初始值；附錄 A 所列的已部署合約始終是最終依據。',
         },
       ],
     },
@@ -118,7 +121,7 @@ export const whitePaperTextZhHk = {
       blocks: [
         {
           kind: 'paragraph',
-          text: '週期是一段時間之窗：以價格遞減的校準窗口開啟，在落筆中延展，倒數結束並有人收官後落幕。本節講清這座時鐘；落筆本身見第 4 節。',
+          text: '週期是一段時間之窗：以價格遞減的校準窗口開啟，在落筆中延展，倒數結束並有人收官後落幕。本節講清這座時鐘；落筆本身見第 4 節。',
         },
       ],
       subsections: {
@@ -140,7 +143,7 @@ export const whitePaperTextZhHk = {
           blocks: [
             {
               kind: 'paragraph',
-              text: `首筆落筆啟動時鐘，按上線參數將週期收官時間設在約 ${protocolFacts.initialCycleFinalizationHoursAtLaunch} 小時之後。此後每筆 ETH 或 CST 落筆，都會把目前時間增量加到鏈上收官時間上。增量上線時恰為 1 小時，並在每個週期收官後增長 ${protocolFacts.cycleTimeIncrementIncreasePercentPerCycle}%，週期因此逐漸變長，NFT 的銘刻節奏也隨歲月放緩。只要落筆不斷，週期長度沒有硬性上限；但落筆價格持續上行，無限延長在實踐中代價高昂。`,
+              text: `首筆落筆啟動時鐘，按上線參數將週期收官時間設在約 ${protocolFacts.initialCycleFinalizationHoursAtLaunch} 小時之後。此後每筆 ETH 或 CST 落筆，都會把目前時間增量加到鏈上收官時間上。增量上線時恰為 1 小時，並在每個週期收官後增長 ${protocolFacts.cycleTimeIncrementIncreasePercentPerCycle}%，週期因此逐漸變長，NFT 的銘刻節奏也隨歲月放緩。只要落筆不斷，週期長度沒有硬性上限；但落筆價格持續上行，無限延長在實踐中代價高昂。`,
             },
             {
               kind: 'paragraph',
@@ -153,11 +156,11 @@ export const whitePaperTextZhHk = {
           blocks: [
             {
               kind: 'paragraph',
-              text: '週期收官時間一到，收官之筆參與者即可收官。收官是一筆交易：讀取協議的 ETH 餘額，按第 5 節的軌道發放，銘刻本週期的 NFT 與 CST，為每件新作品記錄種子，並排定下一週期。',
+              text: '週期收官時間一到，收官之筆參與者即可收官。收官是一筆交易：讀取協議的 ETH 餘額，按第 5 節的軌道發放，銘刻本週期的 NFT 與 CST，為每件新作品記錄種子，並排定下一週期。',
             },
             {
               kind: 'paragraph',
-              text: `這項權利在 ${protocolFacts.finalGestureExclusivityHours} 小時內專屬於收官之筆參與者。窗口過後進入公開收官：任何人都可收官，合約會把實際收官者視為週期受益方，該角色的一切隨之歸屬，包括簽名分配的 ETH 份額、CST 銘刻、NFT，以及對已附加資產的優先權。這條規則刻意不留情面：即使參與者消失，協議照樣前行；疏忽也有價格，受益方兩天內不出手，角色就向第一位來者敞開。`,
+              text: `這項權利在 ${protocolFacts.finalGestureExclusivityHours} 小時內專屬於收官之筆參與者。窗口過後進入公開收官：任何人都可收官，合約會把實際收官者視為週期受益方，該角色的一切隨之歸屬，包括簽名分配的 ETH 份額、CST 銘刻、NFT，以及對已附加資產的優先權。這項期限讓協議能夠繼續運作：受益方若未在專屬窗口內收官，其他人即可接手並獲得該角色對應的分配。`,
             },
             {
               kind: 'paragraph',
@@ -172,7 +175,7 @@ export const whitePaperTextZhHk = {
       blocks: [
         {
           kind: 'paragraph',
-          text: '落筆是協議唯一的輸入。無論使用哪種貨幣，每一筆都會延長倒數、在參與者星選池中計入一次資格、更新第 5.2 節的堅守時鐘，還可能按第 7.1 節銘刻參與 CST。',
+          text: '落筆推動演繹週期。無論使用哪種貨幣，每一筆都會延長倒數、在參與者星選池中計入一次資格、更新第 5.2 節的堅守時鐘，還可能按第 7.1 節銘刻參與 CST。',
         },
       ],
       subsections: {
@@ -220,7 +223,7 @@ export const whitePaperTextZhHk = {
           blocks: [
             {
               kind: 'paragraph',
-              text: `落筆可攜帶最長 ${protocolFacts.gestureMessageMaxLength} 字節的訊息，與落筆一同記錄在鏈上；也可附加 ERC-20 代幣或一枚 ERC-721 NFT。附加資產不進入 ETH 儲備，而由分配錢包託管；週期收官後，受益方享有優先取回權，並受第 5.4 節的公開取回期限約束。`,
+              text: `落筆可攜帶最長 ${protocolFacts.gestureMessageMaxLength} 字節的訊息，與落筆一同記錄在鏈上；也可附加 ERC-20 代幣或一枚 ERC-721 NFT。附加資產不進入 ETH 儲備，而由分配錢包託管；週期收官後，受益方享有優先取回權，並受第 5.4 節的公開取回期限約束。`,
             },
           ],
         },
@@ -251,12 +254,12 @@ export const whitePaperTextZhHk = {
                   [
                     '時之勇士分配',
                     `${protocolFacts.chronoWarriorEthPercentage}%`,
-                    '在位最久的堅守冠軍（見第 5.2 節）。',
+                    '在位最久的堅守冠軍（見第 5.2 節）。',
                   ],
                   [
-                    '公共物品分配',
-                    `${protocolFacts.publicGoodsPercentage}%`,
-                    'Protocol Guild，經公共物品金庫轉撥。',
+                    'ETH 星選',
+                    `${protocolFacts.stellarSelectionEthPercentage}%`,
+                    `從本週期落筆資格池中選出 ${protocolFacts.ethStellarSelectionRecipients} 次，均分該份額。`,
                   ],
                   [
                     '錨定派發',
@@ -264,9 +267,9 @@ export const whitePaperTextZhHk = {
                     '已錨定的 Cosmic Signature NFT，按比例分攤。',
                   ],
                   [
-                    'ETH 星選',
-                    `${protocolFacts.stellarSelectionEthPercentage}%`,
-                    `從本週期落筆資格池中選出 ${protocolFacts.ethStellarSelectionRecipients} 次，均分該份額。`,
+                    '公共物品分配',
+                    `${protocolFacts.publicGoodsPercentage}%`,
+                    'Protocol Guild，經公共物品金庫轉撥。',
                   ],
                   [
                     '滾動儲備',
@@ -279,7 +282,7 @@ export const whitePaperTextZhHk = {
             },
             {
               kind: 'paragraph',
-              text: '五條發放軌道合計正好一半，其餘滾動累積：協議滾動累積，而非抽取，每個週期都以比上一週期更大的儲備開場。若收官時沒有任何已錨定的 Cosmic Signature NFT，該週期的錨定派發將跳過，這部分份額同樣滾入下一週期。',
+              text: '五條發放軌道合計正好一半，其餘滾動累積：協議滾動累積，而非抽取，下一週期的起始儲備來自這筆留存，其規模不保證逐週期增長。若收官時沒有任何已錨定的 Cosmic Signature NFT，該週期的錨定派發將跳過，這部分份額同樣滾入下一週期。',
             },
             {
               kind: 'table',
@@ -288,38 +291,38 @@ export const whitePaperTextZhHk = {
                 rows: [
                   [
                     '簽名分配',
-                    `${cst(protocolFacts.specialAllocationCst)} CST 與 1 枚 NFT`,
+                    `${cst(protocolFacts.specialAllocationCst)} CST 與 1 枚 NFT`,
                     '週期受益方。',
                   ],
                   [
                     '時之勇士',
-                    `${cst(protocolFacts.specialAllocationCst)} CST 與 1 枚 NFT`,
+                    `${cst(protocolFacts.specialAllocationCst)} CST 與 1 枚 NFT`,
                     '時之勇士。',
                   ],
                   [
                     '堅守冠軍',
-                    `${cst(protocolFacts.specialAllocationCst)} CST 與 1 枚 NFT`,
+                    `${cst(protocolFacts.specialAllocationCst)} CST 與 1 枚 NFT`,
                     '堅守冠軍。',
                   ],
                   [
                     'CST 收官之筆',
-                    `${cst(protocolFacts.specialAllocationCst)} CST 與 1 枚 NFT`,
+                    `${cst(protocolFacts.specialAllocationCst)} CST 與 1 枚 NFT`,
                     '本週期最後一筆 CST 落筆的參與者。',
                   ],
                   [
                     '參與者 NFT 星選',
-                    `${cst(protocolFacts.specialAllocationCst)} CST 與 1 枚 NFT，共 ${protocolFacts.nftStellarSelectionRecipients} 次`,
+                    `${cst(protocolFacts.specialAllocationCst)} CST 與 1 枚 NFT，共 ${protocolFacts.nftStellarSelectionRecipients} 次`,
                     '從落筆資格池中選出。',
                   ],
                   [
                     '錨定 NFT 星選',
-                    `${cst(protocolFacts.specialAllocationCst)} CST 與 1 枚 NFT，共 ${protocolFacts.anchoredRwlkNftSelectionRecipients} 次`,
+                    `${cst(protocolFacts.specialAllocationCst)} CST 與 1 枚 NFT，共 ${protocolFacts.anchoredRwlkNftSelectionRecipients} 次`,
                     '在已錨定的 Random Walk NFT 中選出。',
                   ],
                   [
                     '推廣儲備',
                     `${cst(protocolFacts.outreachReserveCst)} CST`,
-                    '社區推廣（見第 7.1 節）。',
+                    '社區推廣（見第 7.1 節）。',
                   ],
                 ],
               },
@@ -356,7 +359,7 @@ export const whitePaperTextZhHk = {
             },
             {
               kind: 'paragraph',
-              text: '這些選擇背後的隨機性在收官時於鏈上構造，其來源與邊界見第 11.3 節。',
+              text: '這些選擇背後的隨機性在收官時於鏈上構造，其來源與邊界見第 11.3 節。',
             },
           ],
         },
@@ -394,18 +397,18 @@ export const whitePaperTextZhHk = {
             {
               kind: 'list',
               items: [
-                '種子。銘刻時，合約從鏈上數據導出 32 字節種子（見第 11.3 節），並與 NFT 一同儲存。種子初始化一個 SHA3-256 隨機數生成器，此後的一切都是它的純函數。',
-                '模擬。十萬組候選構型分別透過四階 Yoshida 辛積分器演算，每組推進 1,000,000 個物理步；這種積分器能在長時間尺度上保持系統的能量行為。',
+                '種子。銘刻時，合約從鏈上數據導出 32 字節種子（見第 11.3 節），並與 NFT 一同儲存。種子初始化一個 SHA3-256 隨機數生成器，此後的一切都是它的純函數。',
+                '模擬。十萬組候選構型分別透過四階 Yoshida 辛積分器演算，每組推進 1,000,000 個物理步；這種積分器能在長時間尺度上保持系統的能量行為。',
                 '遴選。Borda 排序聚合按混沌程度與三角形的等邊程度為候選打分，選出視覺上最有意味的一條軌道。',
                 '鏡頭。緩慢的橢圓鏡頭漂移穿行於軌道之間，賦予每幅簽名電影般的視差。',
-                '色彩。色彩在 OKLab 感知色彩空間中混合，各天體色相相隔 120°，並由漂移與正弦波調製。',
-                '光譜渲染。從 380 至 700 納米劃分 64 個波長區間，以隨速度變化的線寬和景深渲染軌跡。',
+                '色彩。在 OKLab 感知色彩空間中混合，各天體色相相隔 120°，並由漂移與正弦波調製。',
+                '光譜渲染。從 380 至 700 納米劃分 64 個波長區間，以隨速度變化的線寬和景深渲染軌跡。',
                 '收尾。AgX 色調映射、輝光、OpenSimplex 星雲層與色彩分級共同完成畫面。',
               ],
             },
             {
               kind: 'paragraph',
-              text: '每枚 NFT 的最終輸出，是一張 16 位 PNG 與一段 30 秒 H.265 影片。',
+              text: '每枚 NFT 的最終輸出，是一張 16 位 PNG 與一段 30 秒 H.265 影片。',
             },
           ],
         },
@@ -443,6 +446,18 @@ export const whitePaperTextZhHk = {
             {
               kind: 'formula',
               formula: protocolFacts.dynamicCstRewardFormula,
+              notation: protocolFacts.participationCstNotation,
+              legend: [
+                { symbol: protocolFacts.participationCstSymbols[0], meaning: '距上一筆的秒數' },
+                {
+                  symbol: protocolFacts.participationCstSymbols[1],
+                  meaning: '參與 CST 乘數（合約參數）',
+                },
+                {
+                  symbol: protocolFacts.participationCstSymbols[2],
+                  meaning: '目前週期時間增量（微秒）',
+                },
+              ],
               caption: '一筆落筆銘刻的參與 CST。經過時間自上一筆起算，並按目前週期時間增量歸一化。',
             },
             {
@@ -454,7 +469,7 @@ export const whitePaperTextZhHk = {
               table: {
                 columns: ['距上一筆的時間', '參與 CST'],
                 rows: protocolFacts.dynamicCstRewardExamples.map((example) => [
-                  ELAPSED_ZH_HK[example.elapsed] ?? example.elapsed,
+                  ELAPSED_ZH_HK[example.elapsed],
                   example.cst,
                 ]),
                 footnote: `按上線時恰為 ${protocolFacts.dynamicCstRewardExamplesAssumeIncrementHours} 小時的時間增量計算。增量逐週期增長後，實際數額會略低於表中值；即時預覽與合約本身才是最終依據。`,
@@ -467,11 +482,11 @@ export const whitePaperTextZhHk = {
           blocks: [
             {
               kind: 'paragraph',
-              text: `CST 一經使用即離開流通：每筆 CST 落筆支付的全部價格都會銷燬。供應量因此由行為塑造：沉寂的週期銘刻的參與 CST 不多，活躍的 CST 使用又把供應量燒回去，固定的表彰與推廣兩條流則為每個典型週期穩定注入 ${cst(protocolFacts.typicalCstImprintsPerCycle)} CST。沒有上限，沒有預留份額，也沒有團隊分配。`,
+              text: `CST 一經使用即離開流通：每筆 CST 落筆支付的全部價格都會銷燬。供應量因此由行為塑造：沉寂的週期銘刻的參與 CST 不多，活躍的 CST 使用又把供應量燒回去，固定的表彰與推廣兩條流則為每個典型週期穩定注入 ${cst(protocolFacts.typicalCstImprintsPerCycle)} CST。沒有硬性供應上限，也沒有上線預留份額；推廣儲備則按上述規則逐週期銘刻。`,
             },
             {
               kind: 'paragraph',
-              text: '平方根公式本身就是一道供應閘門，由 V2 升級引入（見第 12.2 節）。最初的設計是每筆固定銘刻 100 CST，機器速度的連續落筆由此成了源源不斷的新 CST 來源。改用現行規則後，一串急促的落筆幾乎什麼都銘刻不到；創造供應的，是耐心的參與。',
+              text: '平方根公式本身就是一道供應閘門，由 V2 升級引入（見第 12.2 節）。最初的設計是每筆固定銘刻 100 CST，機器速度的連續落筆由此成了源源不斷的新 CST 來源。改用現行規則後，一串急促的落筆幾乎什麼都銘刻不到；創造供應的，是耐心的參與。',
             },
           ],
         },
@@ -480,7 +495,7 @@ export const whitePaperTextZhHk = {
           blocks: [
             {
               kind: 'paragraph',
-              text: 'CST 同時是宇宙議會（第 9 節）的權重代幣。權重在委託後生效：持有者把權重委託給自己或其他地址，此後每枚 CST 表達一個單位的協調權重。代幣採用基於時間戳的檢查點，提案快照對應的是鐘錶時間，而非區塊高度。',
+              text: 'CST 同時是宇宙議會（第 9 節）的權重代幣。權重在委託後生效：持有者把權重委託給自己或其他地址，此後每枚 CST 表達一個單位的協調權重。代幣採用基於時間戳的檢查點，提案快照對應的是鐘錶時間，而非區塊高度。',
             },
           ],
         },
@@ -495,11 +510,11 @@ export const whitePaperTextZhHk = {
         },
         {
           kind: 'paragraph',
-          text: '一生一次的規則，用一個不可逆的抉擇取代了常見的鎖定時間表，也讓已錨定的集合有了真實的退出成本。要不要繼續錨定，是每個週期都可以重新掂量的活問題；要不要解錨，則是永久的決定。',
+          text: '錨定沒有固定鎖定期，持有者可以自行決定何時解錨。不過，解錨會永久用盡這枚 NFT 的錨定資格，因此每次決定都需要同時考慮目前派發與今後的參與方式。',
         },
         {
           kind: 'paragraph',
-          text: `Random Walk NFT 的錨定自成一線，目的也不同：已錨定的 Random Walk NFT 參與錨定 NFT 星選（見第 5.3 節），每週期 ${protocolFacts.anchoredRwlkNftSelectionRecipients} 次，每次攜帶 ${cst(protocolFacts.specialAllocationCst)} CST 與一枚 Cosmic Signature NFT。Random Walk 錨定不含 ETH 派發。一生一次的規則同樣適用。`,
+          text: `Random Walk NFT 的錨定自成一線，目的也不同：已錨定的 Random Walk NFT 參與錨定 NFT 星選（見第 5.3 節），每週期 ${protocolFacts.anchoredRwlkNftSelectionRecipients} 次，每次攜帶 ${cst(protocolFacts.specialAllocationCst)} CST 與一枚 Cosmic Signature NFT。Random Walk 錨定不含 ETH 派發。一生一次的規則同樣適用。`,
         },
       ],
     },
@@ -516,7 +531,7 @@ export const whitePaperTextZhHk = {
         },
         {
           kind: 'paragraph',
-          text: '今天，議會與團隊範圍有限的所有者角色並行運作。待第 13 節的去中心化步驟完成，它就是協議僅存的協調層。',
+          text: '今天，議會與團隊範圍有限的所有者角色並行運作。待第 13 節的去中心化步驟完成，它就是協議僅存的協調層。',
         },
       ],
     },
@@ -548,11 +563,11 @@ export const whitePaperTextZhHk = {
           blocks: [
             {
               kind: 'paragraph',
-              text: '2025年末，Hacken 對 Cosmic Signature 合約完成了獨立安全審查，範圍覆蓋核心協議、CST 代幣、兩個 NFT 集成、錨定錢包，以及配套的錢包與系統管理合約。最終報告於2026年1月發佈，共列出 23 項發現：無嚴重級，無高危級，中危 3 項、低危 8 項、資訊級 12 項，其中多數是團隊已審閱並附書面理由接受的設計取捨。',
+              text: '2025年末，Hacken 對 Cosmic Signature 合約完成了獨立安全審查，範圍覆蓋核心協議、CST 代幣、兩個 NFT 集成、錨定錢包，以及配套的錢包與系統管理合約。最終報告於2026年1月發佈，共列出 23 項發現：無嚴重級，無高危級，中危 3 項、低危 8 項、資訊級 12 項，其中多數是團隊已審閱並附書面理由接受的設計取捨。',
             },
             {
               kind: 'paragraph',
-              text: '人工審查之外，Hacken 還對 14 項系統不變量做了模糊測試，例如協議持有的 ETH 總額必須始終等於存入減去發放。全部 14 項在 10,000 次運行中均保持成立。報告全文公開，連結見參考資料。',
+              text: '人工審查之外，Hacken 還對 14 項系統不變量做了模糊測試，例如協議持有的 ETH 總額必須始終等於存入減去發放。全部 14 項在 10,000 次運行中均保持成立。報告全文公開，連結見參考資料。',
             },
             {
               kind: 'paragraph',
@@ -569,7 +584,7 @@ export const whitePaperTextZhHk = {
                 '重入防護覆蓋核心合約的每個外部入口。',
                 '取回優先於送達：次級 ETH 分配與附加資產存入托管，而非在收官時直接發送，任何獲配方合約都無法藉此阻塞週期落幕。',
                 '容錯轉撥：公共物品轉帳若無法完成，收官照常進行，事件記錄在案，留待後續處理。',
-                '週期間鎖定：週期運行期間，核心參數不可更改，合約不可升級（見第 13 節）。',
+                '週期間鎖定：週期運行期間，核心參數不可更改，合約不可升級（見第 13 節）。',
               ],
             },
           ],
@@ -583,7 +598,7 @@ export const whitePaperTextZhHk = {
             },
             {
               kind: 'paragraph',
-              text: '這是有意的極簡：不引入預言機，不依賴外部委員會，也沒有任何可能讓週期擱淺的回調。取捨擺在明處：排序器理論上可以影響區塊級輸入，而設計限定了這種影響所能觸及的範圍。隨機性的消費者只有星選與藝術種子；倒數、落筆價格序列和第 5 節的每一個百分比都是確定性的。整個構造每次收官只使用一次，而收官本身是任何人都能提交的公開交易。',
+              text: '這是有意的極簡：不引入預言機，不依賴外部委員會，也沒有任何可能讓週期擱淺的回調。取捨擺在明處：排序器理論上可以影響區塊級輸入，而設計限定了這種影響所能觸及的範圍。只有星選與藝術種子使用這套隨機性；倒數、落筆價格序列和第 5 節的每一個百分比都是確定性的。整個構造每次收官只使用一次，而收官本身是任何人都能提交的公開交易。',
             },
           ],
         },
@@ -626,10 +641,10 @@ export const whitePaperTextZhHk = {
             {
               kind: 'list',
               items: [
-                '動態參與 CST。每筆固定 100 CST 改為第 7.1 節的平方根公式。固定銘刻曾讓高頻連續落筆淪為憑空生成 CST 的手段；新規則按耐心銘刻，而非按頻次。',
+                '動態參與 CST。每筆固定 100 CST 改為第 7.1 節的平方根公式。固定銘刻曾讓高頻連續落筆淪為憑空生成 CST 的手段；新規則按耐心銘刻，而非按頻次。',
                 '最低銘刻保護。每個落筆方法新增一項參數，用於指定參與者可接受的最低參與 CST 數額，避免簽名與執行之間的時間差造成損失。',
-                '活的 CST 校準窗口。窗口時長改為鏈上儲存值，隨落筆構成變化（見第 4.3 節），讓 ETH 與 CST 兩條路徑互相制衡。',
-                `更長的專屬窗口。收官之筆參與者的專屬收官窗口由 24 小時延長至 ${protocolFacts.finalGestureExclusivityHours} 小時。`,
+                '活的 CST 校準窗口。窗口時長改為鏈上儲存值，隨落筆構成變化（見第 4.3 節），讓 ETH 與 CST 兩條路徑互相制衡。',
+                `更長的專屬窗口。收官之筆參與者的專屬收官窗口由 24 小時延長至 ${protocolFacts.finalGestureExclusivityHours} 小時。`,
                 '時序與算術加固。倒數延長一律作用於鏈上儲存的收官時間，堵住了到期後用近乎免費的 CST 落筆反覆外推截止時間的漏洞；排定下一週期的算術同樣加固，任何參數組合，無論多麼極端，都無法阻止週期收官。',
               ],
             },
@@ -640,20 +655,20 @@ export const whitePaperTextZhHk = {
           blocks: [
             {
               kind: 'paragraph',
-              text: '正在公開儲存庫中開發的 V3 只改一件事：晚出手的代價。週期收官時間前的最後 20 分鐘內，一切落筆價格（ETH、附加 Random Walk NFT 的 ETH、CST）都會乘上一個溢價係數，從 1 倍按多項式攀升至 10 倍：到點即達 10 倍，超時落筆同樣按 10 倍計。',
+              text: '正在公開儲存庫中開發的 V3 只改一件事：晚出手的代價。週期收官時間前的最後 20 分鐘內，一切落筆價格（ETH、附加 Random Walk NFT 的 ETH、CST）都會乘上一個溢價係數，從 1 倍按多項式攀升至 10 倍：到點即達 10 倍，超時落筆同樣按 10 倍計。',
             },
             {
               kind: 'formula',
               formula: 'm(t) = 1 + 9 \u00b7 (t / T)^8\uff0c\u5176\u4e2d T = 20 \u5206\u949f',
-              caption: '臨近收官的價格溢價；t 為最後 20 分鐘窗口內已經過的時間。',
+              caption: '臨近收官的價格溢價；t 為最後 20 分鐘窗口內已經過的時間。',
             },
             {
               kind: 'paragraph',
-              text: '指數是關鍵。八次方的曲線讓溢價在窗口的大部分時間裏幾乎無感，只在最後陡然直立：距收官 10 分鐘約 1.04 倍，5 分鐘約 1.9 倍，1 分鐘約 7 倍，到點 10 倍。',
+              text: '指數是關鍵。八次方的曲線讓溢價在窗口的大部分時間裏幾乎無感，只在最後陡然直立：距收官 10 分鐘約 1.04 倍，5 分鐘約 1.9 倍，1 分鐘約 7 倍，到點 10 倍。',
             },
             {
               kind: 'paragraph',
-              text: '意圖是改寫終局。V2 之下，拖到最後幾秒落筆近乎零成本，週期可能在一陣低信號的卡點操作中收場。V3 之下，壓哨一筆成了昂貴的表態，貫穿週期的持續參與相對便宜，想在第 5.2 節的堅守軌道上偷襲得手，也難得多。參數在部署前仍可能微調，機制則如上所述。',
+              text: '意圖是改寫終局。V2 之下，拖到最後幾秒落筆近乎零成本，週期可能在一陣低信號的卡點操作中收場。V3 之下，壓哨一筆成了昂貴的表態，貫穿週期的持續參與相對便宜，想在第 5.2 節的堅守軌道上偷襲得手，也難得多。參數在部署前仍可能微調，機制則如上所述。',
             },
           ],
         },
@@ -694,7 +709,7 @@ export const whitePaperTextZhHk = {
             // lexicon-allow-start: 否認文案必須點名其否認的概念，與常見問題頁做法一致。
             {
               kind: 'paragraph',
-              text: 'Cosmic Signature 不是彩票，不是賭場，也不是賭博產品。這裏沒有莊家，沒有荷官，也沒有賭注。參與者以價值換取參與本身：每一筆都是塑造作品、延長週期並永久記錄在鏈上的表達行為。協議不留任何運營方抽成；第 5 節的每條分配軌道，流向的都是參與者、已錨定的 NFT、滾動儲備或公共物品。',
+              text: 'Cosmic Signature 不是彩票，不是賭場，也不是賭博產品。這裏沒有莊家，沒有荷官，也沒有賭注。參與者以價值換取參與本身：每一筆都是塑造作品、延長週期並永久記錄在鏈上的表達行為。協議不留任何運營方抽成；第 5 節的每條分配軌道，流向的都是參與者、已錨定的 NFT、滾動儲備或公共物品。',
             },
             {
               kind: 'paragraph',
@@ -710,9 +725,9 @@ export const whitePaperTextZhHk = {
               kind: 'list',
               items: [
                 '智能合約風險。合約經過審查、形式化分析與源碼驗證，但這些都不構成保證；任何持有價值的軟件都可能存在未知缺陷。',
-                '隨機性邊界。星選使用區塊衍生熵（見第 11.3 節），排序器理論上可施加影響；設計限定了後果的範圍，但無法徹底消除。',
+                '隨機性邊界。星選使用區塊衍生熵（見第 11.3 節），排序器理論上可施加影響；設計限定了後果的範圍，但無法徹底消除。',
                 `時限責任。${protocolFacts.finalGestureExclusivityHours} 小時收官窗口與 ${protocolFacts.secondaryRetrievalTimeoutWeeks} 週託管期限是真實的截止時間；逾期未取回的分配將向他人開放，這正是設計使然。`,
-                '參數變更。去中心化步驟完成之前，參數仍可能按第 13 節所述在週期間調整；每次變更都會在下一週期開始前公開。',
+                '參數變更。去中心化步驟完成之前，參數仍可能按第 13 節所述在週期間調整；每次變更都會在下一週期開始前公開。',
                 '資產波動。ETH、CST 與 NFT 的價值都會波動。參與需要花費真金白銀，應把落筆當作為參與和藝術付出的花費，而非獲取金錢的途徑。',
                 '監管不確定性。數字資產的法律定性因司法轄區而異，且仍在演變。',
               ],
@@ -754,7 +769,7 @@ export const whitePaperTextZhHk = {
               ['錨定錢包（Random Walk NFT）', protocolFacts.contractAddresses.rwlkAnchoringWallet],
             ],
             footnote:
-              '全部合約均已在 Sourcify 上完成精確匹配驗證（鏈 ID 42161）。代理地址是協議的永久地址；實現只會經由第 12、13 節所述的公開升級流程更替。',
+              '全部合約均已在 Sourcify 上完成精確匹配驗證（鏈 ID 42161）。代理地址是協議的永久地址；實現只會經由第 12、13 節所述的公開升級流程更替。',
           },
         },
       ],
@@ -864,4 +879,53 @@ export const whitePaperTextZhHk = {
     ],
   },
   licenseNote: '本文與 Cosmic Signature 全部項目自有材料一樣，依 CC0 1.0 獻入公有領域。',
+  reading: {
+    railLabel: '本頁內容',
+    openContentsLabel: '目錄',
+    backToTopLabel: '返回頁頂',
+    headingLinkTemplate: '本節連結：{title}',
+    formulaLabel: '公式',
+    noteLabel: '說明',
+    contractExpressionLabel: '合約中的原始表達式',
+    figureTemplate: '圖 {number}',
+    readingTimeTemplate: '約 {minutes} 分鐘讀完',
+    newTabNote: '（於新分頁開啟）',
+  },
+  figures: {
+    cycle: {
+      title: '一個演繹週期：由開場到下一週期',
+      caption: '時長為上線參數；具體規則見第 3.1 至 3.3 節。',
+      steps: [
+        {
+          label: '開場',
+          detail: 'ETH 校準窗口逐步壓低開場價格，直至有人落下第一筆。',
+        },
+        {
+          label: '落筆',
+          detail: `每一筆都為倒數加上一個時間增量，上線時為 ${protocolFacts.initialCycleTimeIncrementHours} 小時。`,
+        },
+        {
+          label: '專屬收官窗口',
+          detail: `倒數結束後的 ${protocolFacts.finalGestureExclusivityHours} 小時內，只有收官之筆參與者可以收官。`,
+        },
+        {
+          label: '公開收官',
+          detail: '此後任何人都可以收官，並接手週期受益方的角色。',
+        },
+        {
+          label: '下一週期',
+          detail: `短暫延遲後下一週期開啟，預設 ${protocolFacts.defaultNextCycleDelayMinutes} 分鐘。`,
+        },
+      ],
+    },
+    allocation: {
+      title: '收官時週期儲備的去向',
+      caption: '份額按收官時協議的 ETH 餘額計算；其餘約一半滾入下一週期。',
+    },
+    art: {
+      title: '藏品中的兩件簽名作品',
+      caption: '每幅圖像都是渲染管線按下方種子輸出的結果，任何人都能逐像素重新生成。',
+      seedLabel: '種子',
+    },
+  },
 } satisfies WhitePaperText;

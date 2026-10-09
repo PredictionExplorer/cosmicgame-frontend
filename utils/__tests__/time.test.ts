@@ -80,26 +80,9 @@ describe('getStableClientTargetTime', () => {
     ).toBe(0);
   });
 });
-import { formatIsoDateLabel, getRelativeTime } from '../time';
+import { getRelativeTime } from '../time';
 
 const NOW = 1_700_000_000;
-
-describe('formatIsoDateLabel', () => {
-  it('keeps the raw ISO date in English', () => {
-    expect(formatIsoDateLabel('2026-08-24')).toBe('2026-08-24');
-    expect(formatIsoDateLabel('2026-08-24', 'en-US')).toBe('2026-08-24');
-  });
-
-  it('renders the Chinese long date without shifting the day across time zones', () => {
-    expect(formatIsoDateLabel('2026-08-24', 'zh')).toBe('2026年8月24日');
-    expect(formatIsoDateLabel('2026-01-01', 'zh-CN')).toBe('2026年1月1日');
-  });
-
-  it('renders the Ukrainian long date with the genitive month and year marker', () => {
-    expect(formatIsoDateLabel('2026-08-24', 'uk')).toBe('24 серпня 2026 р.');
-    expect(formatIsoDateLabel('2026-01-01', 'uk-UA')).toBe('1 січня 2026 р.');
-  });
-});
 
 describe('getRelativeTime', () => {
   it('returns "just now" for timestamps less than a minute ago', () => {

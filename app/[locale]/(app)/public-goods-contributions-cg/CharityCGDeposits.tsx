@@ -1,36 +1,40 @@
 'use client';
 
+import type { ReactNode } from 'react';
 import { useTranslations } from 'next-intl';
 
-import { PageHeader } from '@/components/layout/PageHeader';
-import { PublicGoodsImpactCard } from '@/components/home/PublicGoodsImpactCard';
-import { PageShell } from '@/components/ui/page-shell';
+import { LedgerPage } from '@/components/ledger/LedgerPage';
 import {
   CharityDepositTable,
   type PublicGoodsContributionEntry,
 } from '@/components/tables/CharityDepositTable';
 import { useCharityCGDeposits, useDashboardInfo } from '@/hooks/useApiQuery';
 
-const CharityCGDeposits = () => {
+import { PublicGoodsVault } from './PublicGoodsVault';
+
+/**
+ * The protocol's Public Goods contributions: the vault they fill (what the
+ * live cycle will forward, what it holds, what has been retrieved), then
+ * every cycle's share forwarded to it. `header` is the server-rendered page
+ * header, with the group's tabs on its rule.
+ */
+const CharityCGDeposits = ({ header }: { header: ReactNode }) => {
   const t = useTranslations('publicGoods');
-  const { data: charityCGDeposits = [], isLoading: loading } = useCharityCGDeposits();
-  const { data: dashboardData } = useDashboardInfo(undefined, { poll: false });
+  const { data, isLoading, isError, refetch } = useCharityCGDeposits();
+  const dashboard = useDashboardInfo(undefined, { poll: false });
 
   return (
-    <PageShell variant="data" backdrop="signature">
-      <PageHeader title={t('protocol.title')} titleLevel={2} subtitle={t('protocol.subtitle')} />
-      <p className="text-sm text-muted-foreground leading-relaxed mb-8 max-w-3xl">
-        {t('protocol.description')}
-      </p>
-      <PublicGoodsImpactCard data={dashboardData ?? null} variant="compact" className="mb-8" />
-      {loading ? (
-        <p className="text-lg font-semibold" role="status">
-          {t('loading')}
-        </p>
-      ) : (
-        <CharityDepositTable list={charityCGDeposits as PublicGoodsContributionEntry[]} />
-      )}
-    </PageShell>
+    <LedgerPage header={header}>
+      <PublicGoodsVault dashboard={dashboard.data} loading={dashboard.isLoading} />
+      <CharityDepositTable
+        list={(data ?? []) as PublicGoodsContributionEntry[]}
+        loading={isLoading}
+        error={isError ? t('loadError') : undefined}
+        onRetry={() => void refetch()}
+        title={t('ledger.contributions')}
+        showContributor={false}
+      />
+    </LedgerPage>
   );
 };
 

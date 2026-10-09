@@ -1,19 +1,10 @@
-import { useMemo, useState, type FC } from 'react';
+'use client';
+
 import { useTranslations } from 'next-intl';
 
-import {
-  TablePrimary,
-  TablePrimaryBody,
-  TablePrimaryCell,
-  TablePrimaryContainer,
-  TablePrimaryHead,
-  TablePrimaryHeadCell,
-  TablePrimaryRow,
-} from '@/components/styled';
-import { CustomPagination } from '@/components/common/CustomPagination';
-import { TableHeaderHelp } from '@/components/tables/TableHeaderHelp';
-
-const PER_PAGE = 5;
+import { getExplorerUrl } from '@/utils/urls';
+import { formatAddress } from '@/utils/format';
+import { DataTable, ExternalTableLink, type DataTableColumn } from '@/components/ui/data-table';
 
 export interface NFTDistributionRowData {
   /** Field names follow the backend dashboard's MainStats.DonatedTokenDistribution rows. */
@@ -25,67 +16,45 @@ interface NFTDistributionTableProps {
   list: NFTDistributionRowData[];
 }
 
-const DonatedNFTDistributionTable: FC<NFTDistributionTableProps> = ({ list }) => {
+/**
+ * How many NFTs each collection has contributed through gesture attachments:
+ * the contract (on the explorer) and its count, most first.
+ */
+const DonatedNFTDistributionTable = ({ list }: NFTDistributionTableProps) => {
   const t = useTranslations('tables');
-  const [page, setPage] = useState(1);
 
-  const paginatedData = useMemo(
-    () => list.slice((page - 1) * PER_PAGE, page * PER_PAGE),
-    [list, page],
-  );
-
-  if (list.length === 0) {
-    return <p>{t('empty.attachedTokens')}</p>;
-  }
+  const columns: DataTableColumn<NFTDistributionRowData>[] = [
+    {
+      id: 'contract',
+      header: t('statisticsColumns.contractAddress'),
+      help: t('statisticsTooltips.attachedNftContractAddress'),
+      value: (row) => row.ContractAddr,
+      nowrap: true,
+      cell: (row) => (
+        <ExternalTableLink href={getExplorerUrl('address', row.ContractAddr)} className="type-mono">
+          {formatAddress(row.ContractAddr)}
+        </ExternalTableLink>
+      ),
+    },
+    {
+      id: 'count',
+      header: t('statisticsColumns.numberOfNfts'),
+      help: t('statisticsTooltips.attachedNftCount'),
+      kind: 'count',
+      value: (row) => row.NumDonatedTokens,
+    },
+  ];
 
   return (
-    <>
-      <TablePrimaryContainer>
-        <TablePrimary>
-          <TablePrimaryHead>
-            <tr>
-              <TablePrimaryHeadCell align="left">
-                <TableHeaderHelp
-                  desktop={t('statisticsColumns.contractAddress')}
-                  tooltip={t('statisticsTooltips.attachedNftContractAddress')}
-                />
-              </TablePrimaryHeadCell>
-              <TablePrimaryHeadCell align="right">
-                <TableHeaderHelp
-                  desktop={t('statisticsColumns.numberOfNfts')}
-                  tooltip={t('statisticsTooltips.attachedNftCount')}
-                />
-              </TablePrimaryHeadCell>
-            </tr>
-          </TablePrimaryHead>
-          <TablePrimaryBody>
-            {paginatedData.map((row, index) => {
-              const rowKey = `attached-nft-${(page - 1) * PER_PAGE + index}`;
-              if (!row) {
-                return <TablePrimaryRow key={rowKey} />;
-              }
-              return (
-                <TablePrimaryRow key={rowKey}>
-                  <TablePrimaryCell label={t('statisticsColumns.contractAddress')}>
-                    <span className="font-mono break-all">{row.ContractAddr}</span>
-                  </TablePrimaryCell>
-                  <TablePrimaryCell label={t('statisticsColumns.numberOfNfts')} align="right">
-                    {row.NumDonatedTokens}
-                  </TablePrimaryCell>
-                </TablePrimaryRow>
-              );
-            })}
-          </TablePrimaryBody>
-        </TablePrimary>
-      </TablePrimaryContainer>
-
-      <CustomPagination
-        page={page}
-        setPage={setPage}
-        totalLength={list.length}
-        perPage={PER_PAGE}
-      />
-    </>
+    <DataTable
+      data={list}
+      columns={columns}
+      ariaLabel={t('statisticsColumns.contractAddress')}
+      getRowKey={(row) => row.ContractAddr}
+      initialSort={{ id: 'count', direction: 'desc' }}
+      emptyTitle={t('empty.attachedTokens')}
+      headingLevel={3}
+    />
   );
 };
 

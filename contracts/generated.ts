@@ -2017,13 +2017,6 @@ export const cosmicGameAbi = [
     type: 'function',
     inputs: [],
     name: 'getDurationUntilMainPrize',
-    outputs: [{ name: '', internalType: 'uint256', type: 'uint256' }],
-    stateMutability: 'view',
-  },
-  {
-    type: 'function',
-    inputs: [],
-    name: 'getDurationUntilMainPrizeRaw',
     outputs: [{ name: '', internalType: 'int256', type: 'int256' }],
     stateMutability: 'view',
   },
@@ -2916,7 +2909,7 @@ export const cosmicGameAbi = [
         indexed: false,
       },
       {
-        name: 'cstDutchAuctionDuration',
+        name: 'cstBidPriceDeclineMultiplier',
         internalType: 'uint256',
         type: 'uint256',
         indexed: false,
@@ -2991,8 +2984,7 @@ export const cosmicGameAbi = [
     ],
     name: 'BidCstRewardAmountMinLimitNotReached',
   },
-  { type: 'error', inputs: [], name: 'BidPlacedWithinCurrentSecond' },
-  { type: 'error', inputs: [], name: 'ZeroValue' },
+  { type: 'error', inputs: [], name: 'NotImplemented' },
   {
     type: 'event',
     anonymous: false,
@@ -3005,6 +2997,32 @@ export const cosmicGameAbi = [
       },
     ],
     name: 'BidCstRewardAmountMultiplierChanged',
+  },
+  {
+    type: 'event',
+    anonymous: false,
+    inputs: [
+      {
+        name: 'newValue',
+        internalType: 'uint256',
+        type: 'uint256',
+        indexed: false,
+      },
+    ],
+    name: 'CstBidPriceDeclineMultiplierChangeDivisorChanged',
+  },
+  {
+    type: 'event',
+    anonymous: false,
+    inputs: [
+      {
+        name: 'newValue',
+        internalType: 'uint256',
+        type: 'uint256',
+        indexed: false,
+      },
+    ],
+    name: 'CstBidPriceDeclineMultiplierChanged',
   },
   {
     type: 'event',
@@ -3087,12 +3105,16 @@ export const cosmicGameAbi = [
   { type: 'fallback', stateMutability: 'payable' },
   {
     type: 'function',
-    inputs: [
-      { name: 'roundNum', internalType: 'uint256', type: 'uint256' },
-      { name: 'bidNum', internalType: 'uint256', type: 'uint256' },
-    ],
-    name: 'bidRaffleCumulativeWeights',
-    outputs: [{ name: 'cumulativeWeight', internalType: 'uint256', type: 'uint256' }],
+    inputs: [],
+    name: 'cstBidPriceDeclineMultiplier',
+    outputs: [{ name: '', internalType: 'uint256', type: 'uint256' }],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    inputs: [],
+    name: 'cstBidPriceDeclineMultiplierChangeDivisor',
+    outputs: [{ name: '', internalType: 'uint256', type: 'uint256' }],
     stateMutability: 'view',
   },
   {
@@ -3106,6 +3128,20 @@ export const cosmicGameAbi = [
     type: 'function',
     inputs: [{ name: 'newValue_', internalType: 'uint256', type: 'uint256' }],
     name: 'setBidCstRewardAmountMultiplier',
+    outputs: [],
+    stateMutability: 'nonpayable',
+  },
+  {
+    type: 'function',
+    inputs: [{ name: 'newValue_', internalType: 'uint256', type: 'uint256' }],
+    name: 'setCstBidPriceDeclineMultiplier',
+    outputs: [],
+    stateMutability: 'nonpayable',
+  },
+  {
+    type: 'function',
+    inputs: [{ name: 'newValue_', internalType: 'uint256', type: 'uint256' }],
+    name: 'setCstBidPriceDeclineMultiplierChangeDivisor',
     outputs: [],
     stateMutability: 'nonpayable',
   },
@@ -3150,6 +3186,149 @@ export const cosmicGameAbi = [
     name: 'setRoundLateBidPricePremiumAmountExponent',
     outputs: [],
     stateMutability: 'nonpayable',
+  },
+  {
+    type: 'function',
+    inputs: [
+      { name: 'roundNum_', internalType: 'uint256', type: 'uint256' },
+      { name: 'bidIndex_', internalType: 'uint256', type: 'uint256' },
+    ],
+    name: 'getBidInfoAt',
+    outputs: [
+      {
+        name: '',
+        internalType: 'struct ICosmicSignatureGameStorage.BidInfo',
+        type: 'tuple',
+        components: [
+          { name: 'bidderAddress', internalType: 'address', type: 'address' },
+          {
+            name: 'raffleCumulativeWeight',
+            internalType: 'uint256',
+            type: 'uint256',
+          },
+        ],
+      },
+    ],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    inputs: [{ name: 'roundNum', internalType: 'uint256', type: 'uint256' }],
+    name: 'bidsInfo',
+    outputs: [{ name: 'numItems', internalType: 'uint256', type: 'uint256' }],
+    stateMutability: 'view',
+  },
+  { type: 'error', inputs: [], name: 'BidHasBeenPlacedInCurrentRound' },
+  {
+    type: 'error',
+    inputs: [
+      { name: 'nftAddress', internalType: 'contract IERC721', type: 'address' },
+      { name: 'nftId', internalType: 'uint256', type: 'uint256' },
+      { name: 'callerAddress', internalType: 'address', type: 'address' },
+    ],
+    name: 'CallerIsNotNftOwner',
+  },
+  { type: 'error', inputs: [], name: 'FirstRound' },
+  {
+    type: 'error',
+    inputs: [
+      { name: 'bidPrice', internalType: 'uint256', type: 'uint256' },
+      { name: 'receivedAmount', internalType: 'uint256', type: 'uint256' },
+    ],
+    name: 'InsufficientReceivedBidAmount',
+  },
+  { type: 'error', inputs: [], name: 'InvalidOperationInCurrentState' },
+  {
+    type: 'error',
+    inputs: [
+      { name: 'lastBidderAddress', internalType: 'address', type: 'address' },
+      { name: 'beneficiaryAddress', internalType: 'address', type: 'address' },
+      {
+        name: 'durationUntilOperationIsPermitted',
+        internalType: 'uint256',
+        type: 'uint256',
+      },
+    ],
+    name: 'MainPrizeClaimDenied',
+  },
+  {
+    type: 'error',
+    inputs: [
+      { name: 'mainPrizeTime', internalType: 'uint256', type: 'uint256' },
+      { name: 'blockTimeStamp', internalType: 'uint256', type: 'uint256' },
+    ],
+    name: 'MainPrizeEarlyClaim',
+  },
+  { type: 'error', inputs: [], name: 'NoBidsPlacedInCurrentRound' },
+  {
+    type: 'error',
+    inputs: [
+      { name: 'roundActivationTime', internalType: 'uint256', type: 'uint256' },
+      { name: 'blockTimeStamp', internalType: 'uint256', type: 'uint256' },
+    ],
+    name: 'RoundIsActive',
+  },
+  {
+    type: 'error',
+    inputs: [
+      { name: 'roundActivationTime', internalType: 'uint256', type: 'uint256' },
+      { name: 'blockTimeStamp', internalType: 'uint256', type: 'uint256' },
+    ],
+    name: 'RoundIsInactive',
+  },
+  {
+    type: 'error',
+    inputs: [{ name: 'messageLength', internalType: 'uint256', type: 'uint256' }],
+    name: 'TooLongBidMessage',
+  },
+  {
+    type: 'error',
+    inputs: [{ name: 'randomWalkNftId', internalType: 'uint256', type: 'uint256' }],
+    name: 'UsedRandomWalkNft',
+  },
+  { type: 'error', inputs: [], name: 'WrongBidType' },
+  {
+    type: 'event',
+    anonymous: false,
+    inputs: [],
+    name: 'ArbGasInfoGetGasBacklogCallFailed',
+  },
+  {
+    type: 'event',
+    anonymous: false,
+    inputs: [],
+    name: 'ArbGasInfoGetL1PricingUnitsSinceUpdateCallFailed',
+  },
+  {
+    type: 'event',
+    anonymous: false,
+    inputs: [],
+    name: 'ArbSysArbBlockHashCallFailed',
+  },
+  {
+    type: 'event',
+    anonymous: false,
+    inputs: [],
+    name: 'ArbSysArbBlockNumberCallFailed',
+  },
+  {
+    type: 'event',
+    anonymous: false,
+    inputs: [
+      {
+        name: 'charityAddress',
+        internalType: 'address',
+        type: 'address',
+        indexed: true,
+      },
+      {
+        name: 'amount',
+        internalType: 'uint256',
+        type: 'uint256',
+        indexed: false,
+      },
+    ],
+    name: 'EthTransferToCharityFailed',
   },
 ] as const;
 
@@ -5612,13 +5791,6 @@ export const ethDonationsAbi = [
     type: 'function',
     inputs: [],
     name: 'getDurationUntilMainPrize',
-    outputs: [{ name: '', internalType: 'uint256', type: 'uint256' }],
-    stateMutability: 'view',
-  },
-  {
-    type: 'function',
-    inputs: [],
-    name: 'getDurationUntilMainPrizeRaw',
     outputs: [{ name: '', internalType: 'int256', type: 'int256' }],
     stateMutability: 'view',
   },
@@ -6418,6 +6590,118 @@ export const ethDonationsAbi = [
     name: 'bidWithCstAndDonateToken',
     outputs: [],
     stateMutability: 'nonpayable',
+  },
+  { type: 'error', inputs: [], name: 'BidHasBeenPlacedInCurrentRound' },
+  {
+    type: 'error',
+    inputs: [
+      { name: 'nftAddress', internalType: 'contract IERC721', type: 'address' },
+      { name: 'nftId', internalType: 'uint256', type: 'uint256' },
+      { name: 'callerAddress', internalType: 'address', type: 'address' },
+    ],
+    name: 'CallerIsNotNftOwner',
+  },
+  { type: 'error', inputs: [], name: 'FirstRound' },
+  {
+    type: 'error',
+    inputs: [
+      { name: 'bidPrice', internalType: 'uint256', type: 'uint256' },
+      { name: 'receivedAmount', internalType: 'uint256', type: 'uint256' },
+    ],
+    name: 'InsufficientReceivedBidAmount',
+  },
+  { type: 'error', inputs: [], name: 'InvalidOperationInCurrentState' },
+  {
+    type: 'error',
+    inputs: [
+      { name: 'lastBidderAddress', internalType: 'address', type: 'address' },
+      { name: 'beneficiaryAddress', internalType: 'address', type: 'address' },
+      {
+        name: 'durationUntilOperationIsPermitted',
+        internalType: 'uint256',
+        type: 'uint256',
+      },
+    ],
+    name: 'MainPrizeClaimDenied',
+  },
+  {
+    type: 'error',
+    inputs: [
+      { name: 'mainPrizeTime', internalType: 'uint256', type: 'uint256' },
+      { name: 'blockTimeStamp', internalType: 'uint256', type: 'uint256' },
+    ],
+    name: 'MainPrizeEarlyClaim',
+  },
+  { type: 'error', inputs: [], name: 'NoBidsPlacedInCurrentRound' },
+  {
+    type: 'error',
+    inputs: [
+      { name: 'roundActivationTime', internalType: 'uint256', type: 'uint256' },
+      { name: 'blockTimeStamp', internalType: 'uint256', type: 'uint256' },
+    ],
+    name: 'RoundIsActive',
+  },
+  {
+    type: 'error',
+    inputs: [
+      { name: 'roundActivationTime', internalType: 'uint256', type: 'uint256' },
+      { name: 'blockTimeStamp', internalType: 'uint256', type: 'uint256' },
+    ],
+    name: 'RoundIsInactive',
+  },
+  {
+    type: 'error',
+    inputs: [{ name: 'messageLength', internalType: 'uint256', type: 'uint256' }],
+    name: 'TooLongBidMessage',
+  },
+  {
+    type: 'error',
+    inputs: [{ name: 'randomWalkNftId', internalType: 'uint256', type: 'uint256' }],
+    name: 'UsedRandomWalkNft',
+  },
+  { type: 'error', inputs: [], name: 'WrongBidType' },
+  {
+    type: 'event',
+    anonymous: false,
+    inputs: [],
+    name: 'ArbGasInfoGetGasBacklogCallFailed',
+  },
+  {
+    type: 'event',
+    anonymous: false,
+    inputs: [],
+    name: 'ArbGasInfoGetL1PricingUnitsSinceUpdateCallFailed',
+  },
+  {
+    type: 'event',
+    anonymous: false,
+    inputs: [],
+    name: 'ArbSysArbBlockHashCallFailed',
+  },
+  {
+    type: 'event',
+    anonymous: false,
+    inputs: [],
+    name: 'ArbSysArbBlockNumberCallFailed',
+  },
+  {
+    type: 'event',
+    anonymous: false,
+    inputs: [
+      {
+        name: 'charityAddress',
+        internalType: 'address',
+        type: 'address',
+        indexed: true,
+      },
+      {
+        name: 'amount',
+        internalType: 'uint256',
+        type: 'uint256',
+        indexed: false,
+      },
+    ],
+    name: 'EthTransferToCharityFailed',
   },
 ] as const;
 
@@ -7257,6 +7541,70 @@ export const prizesWalletAbi = [
     name: 'withdrawEverything',
     outputs: [],
     stateMutability: 'nonpayable',
+  },
+  {
+    type: 'error',
+    inputs: [
+      { name: 'beneficiaryAddress', internalType: 'address', type: 'address' },
+      { name: 'index', internalType: 'uint256', type: 'uint256' },
+    ],
+    name: 'DonatedNftAlreadyClaimed',
+  },
+  {
+    type: 'error',
+    inputs: [
+      { name: 'beneficiaryAddress', internalType: 'address', type: 'address' },
+      { name: 'index', internalType: 'uint256', type: 'uint256' },
+      {
+        name: 'operationPermittedTime',
+        internalType: 'uint256',
+        type: 'uint256',
+      },
+      { name: 'blockTimeStamp', internalType: 'uint256', type: 'uint256' },
+    ],
+    name: 'DonatedNftClaimDenied',
+  },
+  {
+    type: 'error',
+    inputs: [
+      { name: 'roundNum', internalType: 'uint256', type: 'uint256' },
+      { name: 'beneficiaryAddress', internalType: 'address', type: 'address' },
+      {
+        name: 'tokenAddress',
+        internalType: 'contract IERC20',
+        type: 'address',
+      },
+      {
+        name: 'operationPermittedTime',
+        internalType: 'uint256',
+        type: 'uint256',
+      },
+      { name: 'blockTimeStamp', internalType: 'uint256', type: 'uint256' },
+    ],
+    name: 'DonatedTokenClaimDenied',
+  },
+  {
+    type: 'error',
+    inputs: [
+      { name: 'roundNum', internalType: 'uint256', type: 'uint256' },
+      { name: 'prizeWinnerAddress', internalType: 'address', type: 'address' },
+      { name: 'beneficiaryAddress', internalType: 'address', type: 'address' },
+      {
+        name: 'operationPermittedTime',
+        internalType: 'uint256',
+        type: 'uint256',
+      },
+      { name: 'blockTimeStamp', internalType: 'uint256', type: 'uint256' },
+    ],
+    name: 'EthWithdrawalDenied',
+  },
+  {
+    type: 'error',
+    inputs: [
+      { name: 'beneficiaryAddress', internalType: 'address', type: 'address' },
+      { name: 'index', internalType: 'uint256', type: 'uint256' },
+    ],
+    name: 'InvalidDonatedNftIndex',
   },
 ] as const;
 
@@ -9691,13 +10039,6 @@ export const systemManagementAbi = [
     type: 'function',
     inputs: [],
     name: 'getDurationUntilMainPrize',
-    outputs: [{ name: '', internalType: 'uint256', type: 'uint256' }],
-    stateMutability: 'view',
-  },
-  {
-    type: 'function',
-    inputs: [],
-    name: 'getDurationUntilMainPrizeRaw',
     outputs: [{ name: '', internalType: 'int256', type: 'int256' }],
     stateMutability: 'view',
   },
@@ -10497,5 +10838,117 @@ export const systemManagementAbi = [
     name: 'bidWithCstAndDonateToken',
     outputs: [],
     stateMutability: 'nonpayable',
+  },
+  { type: 'error', inputs: [], name: 'BidHasBeenPlacedInCurrentRound' },
+  {
+    type: 'error',
+    inputs: [
+      { name: 'nftAddress', internalType: 'contract IERC721', type: 'address' },
+      { name: 'nftId', internalType: 'uint256', type: 'uint256' },
+      { name: 'callerAddress', internalType: 'address', type: 'address' },
+    ],
+    name: 'CallerIsNotNftOwner',
+  },
+  { type: 'error', inputs: [], name: 'FirstRound' },
+  {
+    type: 'error',
+    inputs: [
+      { name: 'bidPrice', internalType: 'uint256', type: 'uint256' },
+      { name: 'receivedAmount', internalType: 'uint256', type: 'uint256' },
+    ],
+    name: 'InsufficientReceivedBidAmount',
+  },
+  { type: 'error', inputs: [], name: 'InvalidOperationInCurrentState' },
+  {
+    type: 'error',
+    inputs: [
+      { name: 'lastBidderAddress', internalType: 'address', type: 'address' },
+      { name: 'beneficiaryAddress', internalType: 'address', type: 'address' },
+      {
+        name: 'durationUntilOperationIsPermitted',
+        internalType: 'uint256',
+        type: 'uint256',
+      },
+    ],
+    name: 'MainPrizeClaimDenied',
+  },
+  {
+    type: 'error',
+    inputs: [
+      { name: 'mainPrizeTime', internalType: 'uint256', type: 'uint256' },
+      { name: 'blockTimeStamp', internalType: 'uint256', type: 'uint256' },
+    ],
+    name: 'MainPrizeEarlyClaim',
+  },
+  { type: 'error', inputs: [], name: 'NoBidsPlacedInCurrentRound' },
+  {
+    type: 'error',
+    inputs: [
+      { name: 'roundActivationTime', internalType: 'uint256', type: 'uint256' },
+      { name: 'blockTimeStamp', internalType: 'uint256', type: 'uint256' },
+    ],
+    name: 'RoundIsActive',
+  },
+  {
+    type: 'error',
+    inputs: [
+      { name: 'roundActivationTime', internalType: 'uint256', type: 'uint256' },
+      { name: 'blockTimeStamp', internalType: 'uint256', type: 'uint256' },
+    ],
+    name: 'RoundIsInactive',
+  },
+  {
+    type: 'error',
+    inputs: [{ name: 'messageLength', internalType: 'uint256', type: 'uint256' }],
+    name: 'TooLongBidMessage',
+  },
+  {
+    type: 'error',
+    inputs: [{ name: 'randomWalkNftId', internalType: 'uint256', type: 'uint256' }],
+    name: 'UsedRandomWalkNft',
+  },
+  { type: 'error', inputs: [], name: 'WrongBidType' },
+  {
+    type: 'event',
+    anonymous: false,
+    inputs: [],
+    name: 'ArbGasInfoGetGasBacklogCallFailed',
+  },
+  {
+    type: 'event',
+    anonymous: false,
+    inputs: [],
+    name: 'ArbGasInfoGetL1PricingUnitsSinceUpdateCallFailed',
+  },
+  {
+    type: 'event',
+    anonymous: false,
+    inputs: [],
+    name: 'ArbSysArbBlockHashCallFailed',
+  },
+  {
+    type: 'event',
+    anonymous: false,
+    inputs: [],
+    name: 'ArbSysArbBlockNumberCallFailed',
+  },
+  {
+    type: 'event',
+    anonymous: false,
+    inputs: [
+      {
+        name: 'charityAddress',
+        internalType: 'address',
+        type: 'address',
+        indexed: true,
+      },
+      {
+        name: 'amount',
+        internalType: 'uint256',
+        type: 'uint256',
+        indexed: false,
+      },
+    ],
+    name: 'EthTransferToCharityFailed',
   },
 ] as const;

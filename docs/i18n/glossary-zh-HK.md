@@ -4,7 +4,7 @@ The **single source of truth** for how Cosmic Signature's coined vocabulary is r
 Traditional Chinese for Hong Kong (`zh-HK`). One English term = one Chinese term, everywhere.
 Machine-enforced by `scripts/terminology/zh-HK.ts` (drift), `ZH_HANT_BANNED_TERMS` +
 `ZH_HK_BANNED_TERMS` in `scripts/lexicon-scan-core.ts` (banned register), and
-`scripts/i18n-script-conventions-core.ts` (script, character forms, quotation marks).
+`scripts/i18n-conventions-core.ts` (script, character forms, quotation marks).
 
 `zh-HK` is **written Hong Kong Chinese**: standard written Chinese with Hong Kong's own IT,
 finance, and civic vocabulary (網絡、軟件、用戶、智能合約、私隱、數碼、流動裝置、主頁), the
@@ -44,6 +44,8 @@ As in [glossary-zh.md §1](./glossary-zh.md#1-term-formation-rules造词规则),
 | Gesture (原 bid)           | 落筆 · 一筆 / 這一筆  |                | Make a Gesture → 落筆; ETH gesture → ETH 落筆; gesture count → 落筆次數; live → 即時落筆 |
 | Gesture Cost               | 落筆價格              |                |                                                                                          |
 | Final Gesture              | 收官之筆              |                |                                                                                          |
+| Last Gesture (the role)    | 最新落筆              |                | the standings role; never 最後落筆                                                       |
+| Your cycle standing        | 你在本週期的位置      |                | the wallet's own strip beside the Gesture form                                           |
 | Performance Cycle (round)  | 演繹週期 · 週期       |                | 週 with the 辵 radical; 週期 #N                                                          |
 | Finalize / Finalization    | 收官                  |                | familiar from Hong Kong sports and business writing (收官之戰)                           |
 | Finalization countdown     | 收官倒數              |                | 倒數 (新年倒數); 倒計時 reads mainland                                                   |
@@ -70,7 +72,7 @@ As in [glossary-zh.md §1](./glossary-zh.md#1-term-formation-rules造词规则),
 | Gallery                            | 畫廊                       | 畫廊                       |                                           |
 | How It Works                       | 運作原理                   | 運作原理                   |                                           |
 | FAQ / Clarifications               | 常見問題 / 釋疑            | 常見問題 / 釋疑            |                                           |
-| Learn Hub                          | 學習中心                   | 學習中心                   |                                           |
+| Learn (was Learn Hub)              | 學習                       | 學習                       | prose: 學習指南                           |
 | Home (nav, "back to")              | **主頁**                   | 首頁                       |                                           |
 | Site Map                           | 網站地圖                   | 網站導覽                   |                                           |
 | Statistics                         | 統計                       | 統計                       |                                           |
@@ -161,6 +163,6 @@ Style-level cautions (reviewer judgment): Cantonese colloquialisms in UI copy (�
 
 As [glossary-zh.md §6](./glossary-zh.md#6-change-process术语变更流程), sweeping
 `messages/zh-HK/**`, `content/**/*.zh-HK.ts`, `content/about/zh-HK.ts`, and updating
-`scripts/terminology/zh-HK.ts`, `ZH_HK_BANNED_TERMS`, or `SCRIPT_CONVENTIONS['zh-HK']` in
+`scripts/terminology/zh-HK.ts`, `ZH_HK_BANNED_TERMS`, or `LOCALE_CONVENTIONS['zh-HK']` in
 the same PR. A change to a term shared with Taiwan is made in both glossaries or
 deliberately not.

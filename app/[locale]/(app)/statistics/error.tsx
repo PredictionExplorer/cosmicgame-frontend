@@ -7,17 +7,17 @@ import { RouteError } from '@/components/layout/RouteError';
 /** Route-level error boundary for the statistics section pages. */
 export default function StatisticsError({
   error,
-  reset,
+  retry,
 }: {
   error: Error & { digest?: string };
-  reset: () => void;
+  retry: () => void;
 }) {
   const t = useTranslations('statistics');
 
   return (
     <RouteError
       error={error}
-      reset={reset}
+      retry={retry}
       context="statistics-route"
       title={t('routeError.title')}
       message={t('routeError.message')}

@@ -16,7 +16,10 @@
 import type { TranslatedLocale } from '../i18n/routing';
 
 import { buildTermPattern, type TermMatcher } from './locale-text-matchers';
+import { JA_TERMINOLOGY_RULES } from './terminology/ja';
+import { KO_TERMINOLOGY_RULES } from './terminology/ko';
 import { UK_TERMINOLOGY_RULES } from './terminology/uk';
+import { VI_TERMINOLOGY_RULES } from './terminology/vi';
 import { ZH_TERMINOLOGY_RULES } from './terminology/zh';
 import { ZH_HK_TERMINOLOGY_RULES } from './terminology/zh-HK';
 import { ZH_TW_TERMINOLOGY_RULES } from './terminology/zh-TW';
@@ -66,6 +69,27 @@ export const TERMINOLOGY_PACKS: Record<TranslatedLocale, TerminologyPack> = {
     glossary: 'docs/i18n/glossary-uk.md',
     matcher: 'unicode-stem',
     rules: UK_TERMINOLOGY_RULES,
+  },
+  ko: {
+    glossary: 'docs/i18n/glossary-ko.md',
+    // Hangul compounds join without spaces and particles attach to the noun,
+    // so drift is matched as substrings, as for the Chinese locales.
+    matcher: 'cjk-substring',
+    rules: KO_TERMINOLOGY_RULES,
+  },
+  ja: {
+    glossary: 'docs/i18n/glossary-ja.md',
+    // No word spaces and particles glued to the noun: substrings, as for
+    // Chinese and Korean.
+    matcher: 'cjk-substring',
+    rules: JA_TERMINOLOGY_RULES,
+  },
+  vi: {
+    glossary: 'docs/i18n/glossary-vi.md',
+    // Vietnamese has no inflection and spaces every syllable, so drift is
+    // matched as whole words (or phrases) under Unicode boundaries.
+    matcher: 'unicode-word',
+    rules: VI_TERMINOLOGY_RULES,
   },
 };
 

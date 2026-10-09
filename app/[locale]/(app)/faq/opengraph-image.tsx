@@ -1,7 +1,10 @@
 import { COSMIC_OG_SIZE } from '@/lib/og/CosmicOgCard';
-import { getOgCopy, getOgImageMetadata } from '@/lib/og/copy';
-import { createCosmicOgImage } from '@/lib/og/createCosmicOgImage';
+import { textCard, ogImageMetadata } from '@/lib/og/cards';
+import { getOgCopy } from '@/lib/og/copy';
 
+/**
+ * The FAQ's text card.
+ */
 export const contentType = 'image/png';
 export const size = COSMIC_OG_SIZE;
 
@@ -11,10 +14,10 @@ interface ImageProps {
 
 export async function generateImageMetadata({ params }: ImageProps) {
   const { locale } = await params;
-  return getOgImageMetadata(locale, 'faq');
+  return ogImageMetadata(getOgCopy(locale, 'faq').alt);
 }
 
 export default async function Image({ params }: ImageProps) {
   const { locale } = await params;
-  return createCosmicOgImage(locale, getOgCopy(locale, 'faq'));
+  return textCard(locale, 'faq', 'app');
 }

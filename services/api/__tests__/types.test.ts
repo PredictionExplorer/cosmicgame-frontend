@@ -275,6 +275,7 @@ describe('API types', () => {
         TimeStamp: 1700000000,
         TxHash: '0xabc',
         IntegerValue: 100,
+        FloatValue: 0,
         AddressValue: '0x123',
         StringValue: 'test',
       };

@@ -1,66 +1,112 @@
-'use client';
+import type { ComponentType, SVGProps } from 'react';
+import { ArrowRight, BadgeCheck, Repeat } from 'lucide-react';
+import { useLocale } from 'next-intl';
 
-import { motion } from 'framer-motion';
-import { FileCheck, ShieldCheck, Sparkles } from 'lucide-react';
+import type { LandingContent, LandingPillarId } from '@/content/landing';
 
-import type { LandingContent } from '@/content/landing';
+import { getSiteRoute, resolveRouteHref, type SiteRouteId } from '@/config/siteNav';
+import { SiteLink } from '@/components/layout/SiteLink';
+import { useSiteNavCopy } from '@/components/layout/siteNavCopy';
+import { Steps } from '@/components/ui/steps';
 
 import { SectionHeading } from './SectionHeading';
+import styles from './Landing.module.css';
 
-const ICONS = [FileCheck, ShieldCheck, Sparkles];
+/**
+ * The public-domain mark: a slashed zero in a circle, drawn like a lucide
+ * glyph (24px box, currentColor stroke). Lucide has no CC0 mark, and its
+ * Copyleft glyph stands for the opposite idea (share-alike, rights kept).
+ */
+function PublicDomainMark({ strokeWidth = 2, ...props }: SVGProps<SVGSVGElement>) {
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth={strokeWidth}
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      {...props}
+    >
+      <circle cx="12" cy="12" r="10" />
+      <ellipse cx="12" cy="12" rx="3.5" ry="5.5" />
+      <path d="M14.5 7.5 9.5 16.5" />
+    </svg>
+  );
+}
 
+/** Each pillar's glyph, by its structure id (content/landing/structure.ts). */
+const PILLAR_ICONS: Readonly<Record<LandingPillarId, ComponentType<SVGProps<SVGSVGElement>>>> = {
+  cc0: PublicDomainMark,
+  verification: BadgeCheck,
+  reproducible: Repeat,
+};
+
+const isPillarId = (id: string): id is LandingPillarId => id in PILLAR_ICONS;
+
+/** Where each claim can be checked: the trust pages in the app. */
+const EVIDENCE_ROUTES: readonly SiteRouteId[] = ['contracts', 'sourceCode', 'audits', 'security'];
+
+/**
+ * Verifiability, beside the Council: the three claims, then links to the
+ * pages that prove them. This is where the trust claims live; the hero
+ * makes none.
+ */
 export function Verifiability({
   verifiability,
 }: {
   verifiability: LandingContent['verifiability'];
 }) {
-  return (
-    <section className="relative border-t border-white/10 bg-[#0A0418] py-28 sm:py-40">
-      <div className="mx-auto max-w-7xl px-6 lg:px-12">
-        <SectionHeading
-          eyebrow={verifiability.eyebrow}
-          heading={verifiability.heading}
-          description={verifiability.body}
-        />
+  const locale = useLocale();
+  const copy = useSiteNavCopy();
 
-        <div className="mt-20 grid gap-6 md:grid-cols-3">
-          {verifiability.pillars.map((pillar, idx) => {
-            const Icon = ICONS[idx] ?? FileCheck;
+  return (
+    <section aria-labelledby="landing-verifiability-heading" className="min-w-0">
+      <SectionHeading
+        size="compact"
+        eyebrow={verifiability.eyebrow}
+        heading={verifiability.heading}
+        headingId="landing-verifiability-heading"
+        description={verifiability.body}
+      />
+      {/* The same rows as the Council's rules beside it, a glyph for each
+          claim in place of a number. */}
+      <Steps
+        ordered={false}
+        framed
+        className={styles.rows}
+        items={verifiability.pillars.map((pillar) => {
+          const Icon = isPillarId(pillar.id) ? PILLAR_ICONS[pillar.id] : BadgeCheck;
+          return {
+            id: pillar.id,
+            marker: <Icon aria-hidden className="size-5" strokeWidth={1.5} />,
+            title: pillar.title,
+            body: <p>{pillar.body}</p>,
+          };
+        })}
+      />
+      <div className={styles.evidence}>
+        <h3 className="type-label text-subtle" id="landing-evidence">
+          {verifiability.evidenceLabel}
+        </h3>
+        <ul aria-labelledby="landing-evidence" className={styles.evidenceLinks}>
+          {EVIDENCE_ROUTES.map((id) => {
+            const target = resolveRouteHref(getSiteRoute(id), 'landing', locale);
             return (
-              <motion.div
-                key={pillar.title}
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true, amount: 0.3 }}
-                transition={{ duration: 0.6, delay: idx * 0.08 }}
-                className="relative overflow-hidden rounded-2xl border border-white/10 bg-white/[0.02] p-8 transition hover:border-white/20"
-              >
-                <div
-                  aria-hidden
-                  className="pointer-events-none absolute -right-8 -top-8 h-32 w-32 rounded-full opacity-20 blur-3xl"
-                  style={{
-                    background:
-                      idx === 0
-                        ? 'radial-gradient(circle, rgb(var(--solar-gold-rgb) / 0.6), transparent)'
-                        : idx === 1
-                          ? 'radial-gradient(circle, rgb(var(--aurora-cyan-rgb) / 0.6), transparent)'
-                          : 'radial-gradient(circle, rgb(var(--nebula-violet-rgb) / 0.6), transparent)',
-                  }}
-                />
-                <Icon className="h-8 w-8 text-white/80" aria-hidden />
-                <h3
-                  className="mt-6 text-xl font-semibold text-white sm:text-2xl"
-                  style={{ fontFamily: 'var(--font-family-display)' }}
+              <li key={id}>
+                <SiteLink
+                  href={target.href}
+                  kind={target.kind}
+                  prefetch="intent"
+                  className="link-quiet type-body-sm inline-flex min-h-11 items-center gap-1.5 text-foreground sm:min-h-8"
                 >
-                  {pillar.title}
-                </h3>
-                <p className="mt-3 text-sm leading-relaxed text-white/70 sm:text-base">
-                  {pillar.body}
-                </p>
-              </motion.div>
+                  {copy.routeLabel(id)}
+                  <ArrowRight aria-hidden className="size-4 text-subtle" />
+                </SiteLink>
+              </li>
             );
           })}
-        </div>
+        </ul>
       </div>
     </section>
   );

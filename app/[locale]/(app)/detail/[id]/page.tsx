@@ -3,8 +3,9 @@ import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import { getTranslations, setRequestLocale } from 'next-intl/server';
 
-import { getAssetsUrl, logoImgUrl } from '@/utils';
+import { formatId, getAssetsUrl, logoImgUrl, parseTokenId } from '@/utils';
 
+import { capCacheWindow } from '@/lib/cacheWindow';
 import { APP_ORIGIN, localeHref } from '@/lib/hostRouting';
 import {
   fetchNftMetadata,
@@ -13,32 +14,36 @@ import {
   type CosmicSignatureMetadata,
   type TraitTranslator,
 } from '@/lib/nftMetadata';
-import { getAPIUrl } from '@/services/api/client';
+import { SERVER_READ_TIMEOUT_MS, flattenTx } from '@/services/api/client';
 import type { CSTTokenInfo } from '@/services/api/types';
 import { createMetadata } from '@/utils/seo';
 import { JsonLd, nftProductJsonLd, breadcrumbJsonLd } from '@/utils/jsonLd';
 import { PageMessages } from '@/components/i18n/PageMessages';
+import { notFoundMetadata } from '@/components/layout/notFoundMetadata';
+import { signatureTitle } from '@/components/nft/nftName';
 
 import DetailPage from './DetailPage';
+import { SignatureNotFound } from './SignatureNotFound';
+import { loadTokenInfo } from './tokenInfo';
 
 /**
- * ISR (was force-dynamic): token metadata is immutable once imprinted, so a
- * bounded staleness window is safe and turns every repeat visit into a CDN
- * hit instead of a serverless render. The original force-dynamic guarded
- * against og:image URLs surviving from an older build when CDN hosts change
- * per network — deploys purge the ISR cache, and in-between the 5-minute
- * window bounds any host-rotation staleness.
+ * No Signature renders at build time: each one renders on its first visit
+ * and is then served from the cache (ISR), so every repeat visit is a CDN
+ * hit instead of a serverless render. The art never changes once imprinted,
+ * but the page also shows the owner, the name and the anchoring, so a render
+ * is kept for the live window (`CACHE_WINDOW.live`, five minutes; the client
+ * refreshes the record right after hydration), and a number not imprinted
+ * yet, or a render whose record read failed, for a minute. Deploys purge the
+ * cache, and the window bounds any og:image host rotation in between.
  */
+export function generateStaticParams() {
+  return [];
+}
+
 export const revalidate = 300;
 
 interface PageProps {
   params: Promise<{ locale: string; id: string }>;
-}
-
-function parseTokenId(id: string): number | null {
-  if (!/^\d+$/.test(id)) return null;
-  const tokenId = Number(id);
-  return Number.isSafeInteger(tokenId) ? tokenId : null;
 }
 
 function tokenImageUrl(seed: string | number | undefined): string {
@@ -47,37 +52,19 @@ function tokenImageUrl(seed: string | number | undefined): string {
 }
 
 /**
- * `fetch` (not axios) so the read lands in the Next.js Data Cache, and
- * React `cache()` so generateMetadata and the page body share one request
- * per render instead of the two this page used to make.
- * Returns null for a confirmed missing token (404), undefined on transport
- * errors — callers 404 the page only on the former.
- */
-const loadTokenInfo = cache(async (tokenId: number): Promise<CSTTokenInfo | null | undefined> => {
-  try {
-    const response = await fetch(getAPIUrl(`cst/info/${tokenId}`), {
-      headers: { Accept: 'application/json' },
-      next: { revalidate: 300 },
-    });
-    if (response.status === 404) return null;
-    if (!response.ok) return undefined;
-    const data = (await response.json()) as { TokenInfo?: CSTTokenInfo | null };
-    return data.TokenInfo ?? null;
-  } catch {
-    return undefined;
-  }
-});
-
-/**
  * The token's metadata document (traits, palette, simulation), read once per
  * render for the JSON-LD and the client's first paint. `null` when the media
- * origin has no document for the id, `undefined` on transport errors — the
- * client then loads it itself; neither ever fails the prerender.
+ * origin has no document for the id, `undefined` on transport errors or
+ * after `SERVER_READ_TIMEOUT_MS` — the client then loads it itself; neither
+ * ever fails or holds up the prerender.
  */
 const loadTokenMetadata = cache(
   async (tokenId: number): Promise<CosmicSignatureMetadata | null | undefined> => {
     try {
-      return await fetchNftMetadata(tokenId, { next: { revalidate: 300 } });
+      return await fetchNftMetadata(tokenId, {
+        next: { revalidate: 300 },
+        signal: AbortSignal.timeout(SERVER_READ_TIMEOUT_MS),
+      });
     } catch {
       return undefined;
     }
@@ -93,17 +80,23 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   }
 
   const t = await getTranslations({ locale, namespace: 'meta' });
-  const title = t('tokenDetail.titleFor', { id });
-  const description = t('tokenDetail.descriptionFor', { id });
-
   const tokenInfo = await loadTokenInfo(tokenId);
-  if (tokenInfo === null) {
-    notFound();
-  }
+  // A number not imprinted yet: the 404's own title and `noindex, follow`.
+  if (tokenInfo === null) return notFoundMetadata(locale);
 
-  return createMetadata(title, description, tokenImageUrl(tokenInfo?.Seed), '/detail/' + id, {
-    locale,
-  });
+  // A named piece is shared by its name: `Twisted Mind · Cosmic Signature
+  // #000025`, the number as the H1 and the JSON-LD write it. The canonical
+  // is the one URL a Signature has (the layout moves /detail/025 there).
+  const number = formatId(tokenId).slice(1); // "000025": the catalog writes the "#"
+  const name = typeof tokenInfo?.TokenName === 'string' ? tokenInfo.TokenName.trim() : '';
+  const title = name
+    ? t('tokenDetail.titleWithName', { name, id: number })
+    : t('tokenDetail.titleFor', { id: number });
+  const description = t('tokenDetail.descriptionFor', { id: number });
+
+  // The share image is the co-located artwork card (./opengraph-image.tsx):
+  // a 1200×630 PNG of the piece on its black plate, never the multi-MB source.
+  return createMetadata(title, description, undefined, `/detail/${tokenId}`, { locale });
 }
 
 export default async function Page({ params }: PageProps) {
@@ -115,23 +108,31 @@ export default async function Page({ params }: PageProps) {
   }
 
   setRequestLocale(locale);
-  const [t, tCommon, seo, tTraits, tokenInfo, metadata] = await Promise.all([
+  const tokenInfo = await loadTokenInfo(tokenId);
+  // A number not imprinted yet: the Signature's not-found state, rendered on the server and
+  // kept a minute, since the number may be imprinted at the next finalization.
+  if (tokenInfo === null) {
+    await capCacheWindow('pending');
+    return <SignatureNotFound locale={locale} tokenId={tokenId} />;
+  }
+  // A record the server could not read is loaded by the browser: keep that render briefly.
+  if (tokenInfo === undefined) await capCacheWindow('pending');
+
+  const [t, tCommon, seo, tTraits, metadata] = await Promise.all([
     getTranslations({ locale, namespace: 'detail' }),
     getTranslations({ locale, namespace: 'common' }),
     getTranslations({ locale, namespace: 'seo' }),
     getTranslations({ locale, namespace: 'traits' }),
-    loadTokenInfo(tokenId),
     loadTokenMetadata(tokenId),
   ]);
 
-  const name = t('jsonLd.productName', { id });
   const description = t('jsonLd.productDescription');
-  const pageUrl = localeHref(APP_ORIGIN, `/detail/${id}`, locale);
+  const pagePath = `/detail/${tokenId}`;
+  const pageUrl = localeHref(APP_ORIGIN, pagePath, locale);
 
-  if (tokenInfo === null) {
-    notFound();
-  }
-
+  // The page's own title (the H1 and the end of its trail): the name, or
+  // "Cosmic Signature #000025" for an unnamed Signature.
+  const title = signatureTitle(tTraits, { id: formatId(tokenId), name: tokenInfo?.TokenName });
   const imageUrl = tokenImageUrl(tokenInfo?.Seed);
   const traitEntry = metadata ? normalizeTraitEntry(metadata, tokenId) : null;
   const additionalProperty = traitEntry?.hasArtTraits
@@ -144,7 +145,7 @@ export default async function Page({ params }: PageProps) {
         <JsonLd
           data={nftProductJsonLd({
             tokenId,
-            name,
+            name: title,
             description,
             imageUrl,
             url: pageUrl,
@@ -157,12 +158,18 @@ export default async function Page({ params }: PageProps) {
             [
               { name: tCommon('breadcrumbs.home'), path: '/' },
               { name: tCommon('breadcrumbs.gallery'), path: '/gallery' },
-              { name: t('jsonLd.breadcrumbToken', { id }), path: `/detail/${id}` },
+              { name: title, path: pagePath },
             ],
             localeHref(APP_ORIGIN, '/', locale),
           )}
         />
-        <DetailPage tokenId={tokenId} initialMetadata={metadata} />
+        <DetailPage
+          tokenId={tokenId}
+          initialMetadata={metadata}
+          // The same record the client reads, so the art and its wall label
+          // are in the first HTML paint instead of behind a skeleton.
+          initialToken={tokenInfo ? (flattenTx(tokenInfo) as CSTTokenInfo) : undefined}
+        />
       </>
     </PageMessages>
   );

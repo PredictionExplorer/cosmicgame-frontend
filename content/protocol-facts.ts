@@ -35,6 +35,16 @@ export const protocolFacts = {
     cosmicSignatureNftAnchoringWallet: '0x6308A405B4FF1eA890870Efe2a6D036750B81F7C',
     rwlkAnchoringWallet: '0x5EB3396092841E6c5b0b51141699F6711E830529',
   },
+  /**
+   * Where the Public Goods Vault sends its retrievals: `charityAddress()` on the
+   * vault (read 2026-09-23), which the site names Protocol Guild. The owner can
+   * change it, so pages name an address only when it matches this one and show
+   * any other address as hex.
+   */
+  publicGoodsBeneficiary: {
+    name: 'Protocol Guild',
+    address: '0xdddd576bAF106bAAe54bDE40BCac602bB4a7cf79',
+  },
   mainEthPercentage: 25,
   chronoWarriorEthPercentage: 8,
   stellarSelectionEthPercentage: 4,
@@ -45,6 +55,19 @@ export const protocolFacts = {
   anchoredRwlkNftSelectionRecipients: 10,
   dynamicCstRewardFormula:
     'floor(sqrt(elapsedSinceLastGesture * bidCstRewardAmountMultiplier / mainPrizeTimeIncrementInMicroSeconds))',
+  /**
+   * The same rule for readers, with neutral symbols: Δt is the seconds since
+   * the previous gesture, m the Participation CST multiplier and i the cycle
+   * time increment in microseconds. Reader-facing copy shows this and keeps
+   * the contract identifiers above for verification.
+   */
+  participationCstNotation: 'CST = ⌊√(Δt × m ÷ i)⌋',
+  /**
+   * The notation's symbols, in legend order. Copy interpolates them rather
+   * than typing Δ: the display face has no Greek, and copy modules must stay
+   * in the letters it covers (lib/__tests__/display-font-coverage.test.ts).
+   */
+  participationCstSymbols: ['Δt', 'm', 'i'],
   /**
    * Computed at the launch parameters (time increment = exactly 1 hour).
    * The increment grows 1% per cycle, so live amounts drift slightly lower
@@ -119,15 +142,15 @@ export const protocolFacts = {
    * new getters) should prefer these once the upgrade lands; the top-level facts above
    * keep describing the live V2 deployment until then.
    *
-   * Verified against the v3-2026-07-24 branch Solidity defaults at commit 0bc80af0
-   * (`CosmicSignatureConstants.sol`). That commit reverted the CST Calibration
-   * Window to the exact V2 behavior, so the shared window facts above apply to
-   * V3 unchanged and are deliberately not restated here.
+   * Verified against the v3-2026-07-24 branch Solidity defaults at commit 51221556
+   * (`CosmicSignatureConstants.sol`, `docs/v3-vs-v2-changes.md`).
    */
   v3: {
     /** Linear Participation CST (replaces the V2 sqrt formula). */
     dynamicCstRewardFormula:
       'elapsedSinceLastGesture * bidCstRewardAmountMultiplier / mainPrizeTimeIncrementInMicroSeconds',
+    /** Reader notation of the linear rule, same symbols as `participationCstSymbols`. */
+    participationCstNotation: 'CST = Δt × m ÷ i',
     /**
      * Computed at the launch parameters (time increment = exactly 1 hour,
      * accrual ~1 CST per minute). The increment grows 1% per cycle, so live
@@ -155,8 +178,10 @@ export const protocolFacts = {
     stellarSelectionEthPercentage: 5,
     anchorDistributionPercentage: 5,
     publicGoodsPercentage: 5,
-    /** At most one gesture per contract per second (BidPlacedWithinCurrentSecond). */
-    oneGesturePerSecond: true,
+    /** CST Gesture Cost declines ~1 CST per minute at launch (cstBidPriceDeclineMultiplier ≈ 1 ether / 60 per second). */
+    cstGestureCostDeclinePerMinuteAtLaunch: 1,
+    /** The decline speed shifts ~1% per gesture (change divisor 100): up on ETH gestures, down on CST gestures. */
+    cstGestureCostDeclineChangePercentPerGesture: 1,
     /** The CST Calibration ceiling floor drops from 200 CST to 1 CST at reinitialize. */
     cstCalibrationCeilingMinCst: 1,
     /** Signature Allocation recipient receives this many sequential Cosmic Signature NFTs. */
@@ -230,17 +255,24 @@ export const ethDistributionFacts: {
 
 export const cstRewardFacts: {
   formula: string;
-  examples: readonly { elapsed: string; cst: string }[];
+  /** Reader notation of the rule; the symbols are `protocolFacts.participationCstSymbols` in both versions. */
+  notation: string;
+  /** Keeps the literal elapsed labels so locale copy can index its translation map by them. */
+  examples:
+    | typeof protocolFacts.dynamicCstRewardExamples
+    | typeof protocolFacts.v3.dynamicCstRewardExamples;
   /** 'sqrt' = V2 (sublinear, slowing growth); 'linear' = V3 (constant accrual rate). */
   curve: 'sqrt' | 'linear';
 } = isV3Mechanics
   ? {
       formula: protocolFacts.v3.dynamicCstRewardFormula,
+      notation: protocolFacts.v3.participationCstNotation,
       examples: protocolFacts.v3.dynamicCstRewardExamples,
       curve: 'linear',
     }
   : {
       formula: protocolFacts.dynamicCstRewardFormula,
+      notation: protocolFacts.participationCstNotation,
       examples: protocolFacts.dynamicCstRewardExamples,
       curve: 'sqrt',
     };

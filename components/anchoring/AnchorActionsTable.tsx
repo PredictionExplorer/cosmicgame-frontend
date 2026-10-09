@@ -1,113 +1,78 @@
-import { useState } from 'react';
-import { useLocale, useTranslations } from 'next-intl';
+'use client';
 
-import { Link, useRouter } from '@/i18n/navigation';
-import { HydrationSafeDateTime } from '@/components/common/HydrationSafeDateTime';
-import { TABLE_ROW_LINK_CLASS } from '@/components/ui/responsive-table';
-import {
-  TablePrimary,
-  TablePrimaryBody,
-  TablePrimaryCell,
-  TablePrimaryContainer,
-  TablePrimaryHead,
-  TablePrimaryHeadCell,
-  TablePrimaryRow,
-} from '@/components/styled';
-import { CustomPagination } from '@/components/common/CustomPagination';
+import { useMemo } from 'react';
+import { useTranslations } from 'next-intl';
+
+import { DataTable, type DataTableColumn } from '@/components/ui/data-table';
 import type { AnchorAction } from '@/services/api';
 
-const AnchorActionsRow = ({ row, IsRwalk }: { row: AnchorAction; IsRwalk: boolean }) => {
+import { TokenCell } from './TokenCell';
+import { anchorActionHref } from './anchorLinks';
+import type { AnchoringLedgerProps } from './ledgerProps';
+
+interface AnchorActionsTableProps extends AnchoringLedgerProps {
+  list: AnchorAction[];
+  IsRwalk: boolean;
+}
+
+/**
+ * One wallet's anchor and release actions for one collection, newest first.
+ * Each row leads to the action's record.
+ */
+const AnchorActionsTable = ({
+  list,
+  IsRwalk,
+  headingLevel = 3,
+  ...state
+}: AnchorActionsTableProps) => {
   const t = useTranslations('anchoring');
-  const locale = useLocale();
-  const router = useRouter();
+  const collection = IsRwalk ? 'randomWalk' : 'cosmicSignature';
 
-  if (!row) {
-    return <TablePrimaryRow />;
-  }
-
-  const actionHref = `/anchor-action/${IsRwalk ? 1 : 0}/${row.ActionId}`;
-
-  const handleRowClick = () => {
-    router.push(actionHref);
-  };
-
-  return (
-    <TablePrimaryRow onActivate={handleRowClick}>
-      <TablePrimaryCell label={t('tables.anchorActions.columns.datetime')}>
-        <Link
-          href={actionHref}
-          className={TABLE_ROW_LINK_CLASS}
-          aria-label={t('anchorActionDetail.breadcrumbs.action', { id: row.ActionId })}
-        >
-          <HydrationSafeDateTime timestamp={row.TimeStamp} locale={locale} />
-        </Link>
-      </TablePrimaryCell>
-
-      <TablePrimaryCell label={t('tables.anchorActions.columns.type')} align="center">
-        {row.ActionType === 1 ? t('common.release') : t('common.anchor')}
-      </TablePrimaryCell>
-
-      <TablePrimaryCell label={t('tables.anchorActions.columns.tokenId')} align="center">
-        {IsRwalk ? (
-          <a href={`https://randomwalknft.com/detail/${row.TokenId}`} className="text-inherit">
-            {row.TokenId}
-          </a>
-        ) : (
-          <Link href={`/detail/${row.TokenId}`} className="text-inherit">
-            {row.TokenId}
-          </Link>
-        )}
-      </TablePrimaryCell>
-
-      <TablePrimaryCell label={t('tables.anchorActions.columns.nftCount')} align="center">
-        {row.NumStakedNFTs}
-      </TablePrimaryCell>
-    </TablePrimaryRow>
+  const columns = useMemo<DataTableColumn<AnchorAction>[]>(
+    () => [
+      {
+        id: 'datetime',
+        kind: 'datetime',
+        header: t('tables.anchorActions.columns.datetime'),
+        value: (row) => row.TimeStamp as number | undefined,
+      },
+      {
+        id: 'type',
+        kind: 'text',
+        header: t('tables.anchorActions.columns.type'),
+        value: (row) => (row.ActionType === 1 ? t('common.release') : t('common.anchor')),
+        nowrap: true,
+      },
+      {
+        id: 'token',
+        kind: 'link',
+        header: t('tables.anchorActions.columns.tokenId'),
+        value: (row) => row.TokenId,
+        cell: (row) => <TokenCell collection={collection} tokenId={row.TokenId} />,
+      },
+      {
+        id: 'nfts',
+        kind: 'count',
+        header: t('tables.anchorActions.columns.nftCount'),
+        value: (row) => row.NumStakedNFTs,
+      },
+    ],
+    [collection, t],
   );
-};
-
-const AnchorActionsTable = ({ list, IsRwalk }: { list: AnchorAction[]; IsRwalk: boolean }) => {
-  const t = useTranslations('anchoring');
-  const perPage = 5;
-  const [page, setPage] = useState(1);
-
-  if (list.length === 0) {
-    return <p className="text-muted-foreground">{t('common.empty.actions')}</p>;
-  }
-
-  const startIndex = (page - 1) * perPage;
-  const endIndex = page * perPage;
-  const currentData = list.slice(startIndex, endIndex);
 
   return (
-    <>
-      <TablePrimaryContainer>
-        <TablePrimary>
-          <TablePrimaryHead>
-            <tr>
-              <TablePrimaryHeadCell align="left">
-                {t('tables.anchorActions.columns.datetime')}
-              </TablePrimaryHeadCell>
-              <TablePrimaryHeadCell>{t('tables.anchorActions.columns.type')}</TablePrimaryHeadCell>
-              <TablePrimaryHeadCell>
-                {t('tables.anchorActions.columns.tokenId')}
-              </TablePrimaryHeadCell>
-              <TablePrimaryHeadCell>
-                {t('tables.anchorActions.columns.nftCount')}
-              </TablePrimaryHeadCell>
-            </tr>
-          </TablePrimaryHead>
-
-          <TablePrimaryBody>
-            {currentData.map((row) => (
-              <AnchorActionsRow key={row.EvtLogId} row={row} IsRwalk={IsRwalk} />
-            ))}
-          </TablePrimaryBody>
-        </TablePrimary>
-      </TablePrimaryContainer>
-
-      <CustomPagination page={page} setPage={setPage} totalLength={list.length} perPage={perPage} />
-    </>
+    <DataTable
+      data={list}
+      columns={columns}
+      ariaLabel={t('tables.anchorActions.label')}
+      getRowKey={(row) => row.EvtLogId ?? row.ActionId}
+      getRowHref={(row) => anchorActionHref(collection, row.ActionId)}
+      getRowLabel={(row) => t('anchorActionDetail.breadcrumbs.action', { id: row.ActionId })}
+      emptyTitle={t('common.empty.actions.title')}
+      emptyDescription={t('common.empty.actions.description')}
+      headingLevel={headingLevel}
+      {...state}
+    />
   );
 };
 

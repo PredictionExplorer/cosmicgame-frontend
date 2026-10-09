@@ -16,64 +16,81 @@ export const quizTextZhTw = {
       quizLabel: '知識測驗',
     },
     questionCountTemplate: '{count} 道題',
+    durationTemplate: '約 {minutes} 分鐘',
+    difficultyTemplate: '難度 {level}/{max}',
+    bestTemplate: '最佳成績 {correct}/{total}',
+    inProgressTemplate: '進行中：第 {current} 題，共 {total} 題',
     startLabel: '開始',
+    resumeLabel: '繼續作答',
   },
   ui: {
     intro: {
       keyboardHint: '提示：按 1–4 作答，按 Enter 繼續。',
       beginLabel: '開始作答',
+      resumeLabel: '繼續作答',
+      startOverLabel: '重新開始',
+      ranksHeading: '理解程度',
+      rankFromTemplate: '{percent} 起',
+      rankBelowTemplate: '低於 {percent}',
     },
     progressTemplate: '第 {current} 題，共 {total} 題',
     correctFeedback: [
-      '答對了——軌道穩穩當當。',
-      '完全正確。',
-      '答對了——你讀協議，就像種子讀物理。',
-      '正確——一條幹淨的軌跡。',
+      '答對了。',
+      '正確，來看這條規則的依據。',
+      '回答正確。',
+      '沒錯，下面是完整說明。',
     ],
     incorrectFeedback: [
-      '不太對——協議實際是這樣做的。',
-      '一個常見的誤解——機制並非如此。',
-      '軌道很近，天體不對。規則在這裡。',
-      '這次沒對——白皮書一錘定音。',
+      '這題答錯了，看看下面的說明。',
+      '還不完全正確，可以對照規則再想一想。',
+      '答案不同，關鍵在下面這條規則。',
+      '這次未答對，下面附有白皮書說明。',
     ],
+    correctAnswerTemplate: '正確答案是 {letter}。',
+    yourAnswerLabel: '你的答案',
+    correctAnswerLabel: '正確答案',
+    newTabNote: '（在新分頁中開啟）',
     streakTemplate: '連對 {count} 題',
     explanationHeading: '為什麼',
     funFactHeading: '你知道嗎？',
-    referenceLabel: '深入閱讀',
+    referenceTemplate: '深入閱讀：{section}',
     nextLabel: '下一題',
     finishLabel: '檢視結果',
     summary: {
       eyebrow: '作答完成',
       scoreTemplate: '答對 {correct} 題，共 {total} 題',
-      rankLabel: '你的段位',
+      rankLabel: '理解程度',
+      rankTemplate: '理解程度：{rank}',
       ranks: {
-        observer: {
-          name: '觀察者',
-          line: '你看到了表面。白皮書值得一次更近的環繞。',
+        reader: {
+          name: '讀者',
+          line: '可以從白皮書的協議概覽開始，再逐步了解各項機制。',
         },
-        participant: {
-          name: '參與者',
-          line: '你認得每個部件。邊界情形才是設計最有意思的地方。',
+        student: {
+          name: '學生',
+          line: '已掌握不少基礎概念，接下來可以多留意特殊情況。',
         },
-        enduranceChampion: {
-          name: '堅守冠軍',
-          line: '對機制的把握綿長而穩定，少有間隔能撐過你。',
+        scholar: {
+          name: '學者',
+          line: '對協議機制已有扎實理解，可透過參考章節補齊細節。',
         },
-        chronoWarrior: {
-          name: '時之勇士',
-          line: '對協議近乎全盤掌握。下面的參考章節是消遣，不是補課。',
+        cartographer: {
+          name: '製圖師',
+          line: '對協議已有全面理解，也可以再讀參考章節，核對細節。',
         },
       },
-      studyHeading: '規劃你的下一條軌道',
-      studyIntro: '你答錯的題目，各自附上一錘定音的章節：',
-      noMissesNote: '無需複習——每一題都答對了。',
-      restartLabel: '重新洗題再來一次',
+      studyHeading: '需要複習的題目',
+      studyIntro: '你的答案、正確答案，以及講清這條規則的原文章節。',
+      noMissesNote: '全部答對了。',
+      restartLabel: '重新排列題目再答一次',
       hubLabel: '全部層級',
+      nextTierTemplate: '繼續挑戰{tier}',
     },
   },
   tiers: {
     basic: {
       title: '基礎',
+      heading: '基礎：核心概念',
       tagline: '協議的輪廓：週期、落筆、分配與藝術。',
       description:
         '二十五道基礎題——什麼是落筆、週期如何落幕、ETH 流向哪裡、作品為何是確定性的。初來乍到，從這裡開始。',
@@ -81,6 +98,7 @@ export const quizTextZhTw = {
     },
     medium: {
       title: '進階',
+      heading: '進階：運轉中的機制',
       tagline: '運轉中的機制：校準窗口、堅守軌道、議會規則。',
       description:
         '二十五道進階題——價格曲線、CST 回饋迴路、堅守冠軍與時之勇士之辨、星選算術與議會參數。適合看過一兩個週期的讀者。',
@@ -88,6 +106,7 @@ export const quizTextZhTw = {
     },
     hard: {
       title: '高階',
+      heading: '高階：邊界情形與推演',
       tagline: '邊界情形與推演：惡意錢包、升級歷史、渲染管線。',
       description:
         '五十道高階題，獻給細心的讀者——到期後的語義、拒收 ETH 的合約、V2 為何改了五處、V3 重新定價了什麼、隨機性如何構造，以及一台 Yoshida 積分器在藝術專案裡做什麼。',

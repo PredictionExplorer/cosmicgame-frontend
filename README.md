@@ -11,7 +11,7 @@ The app serves two hosts from one codebase: the marketing site (`cosmicsignature
 - **Web3:** wagmi v3, viem v2, RainbowKit v2; typed ABIs generated with `@wagmi/cli`
 - **Data:** TanStack React Query v5 for all data fetching, Axios for HTTP, Zod for runtime API validation
 - **Charts:** Recharts
-- **3D / effects:** three.js + react-three-fiber (marketing hero), tsparticles (app backdrop, idle-deferred)
+- **Backdrops:** static CSS on both hosts (`AmbientBackdrop`, the landing hero's atmosphere and starfield); only the artwork moves
 - **Testing:** Jest + React Testing Library (unit), Playwright (E2E), jest-axe / axe-core (a11y)
 - **Quality:** ESLint 9 (flat config), Prettier, Husky, lint-staged, commitlint, Sentry
 
@@ -106,7 +106,7 @@ The app serves two hosts from one codebase: the marketing site (`cosmicsignature
 │   ├── home/         Homepage sections (observatory/ control desk: CycleClock,
 │   │                 participant intel, GesturePanel, AllocationLedger, ActionDock)
 │   ├── layout/       Header, Footer, ErrorBoundary
-│   ├── nft/          NFT display (NFTTrait, NFTImage, LatestNFTs, grids)
+│   ├── nft/          NFT display (NFTImage, SignatureCard, PagedWall, SignatureViewer)
 │   ├── anchoring/    Anchoring (staking) tables and actions
 │   ├── attachments/  Attached NFT / ERC-20 showcases
 │   ├── tables/       Data tables (gestures, allocations, recipients, ...)
@@ -135,6 +135,7 @@ The app serves two hosts from one codebase: the marketing site (`cosmicsignature
 - **Error handling:** Errors are reported to Sentry via `utils/errors.ts`. Wallet errors use `isUserRejection()` to silently handle user-cancelled transactions.
 - **SEO:** Per-page metadata via `createMetadata()` (`utils/seo.ts`), JSON-LD via `utils/jsonLd.tsx`, host-aware sitemap/robots, dynamic OG images.
 - **State:** Wallet state via wagmi, server state via React Query, shared app state via React contexts.
+- **Color schemes:** Shared palette tokens, accessible previews, and a cross-subdomain preference; see [Theme system](docs/theme-system.md).
 
 ## Networks
 
@@ -165,6 +166,48 @@ type(scope): description
 ```
 
 Common types: `feat`, `fix`, `chore`, `docs`, `style`, `refactor`, `test`, `ci`.
+
+### Dependencies
+
+The project installs with npm only (`packageManager` pins it; npm ignores a `resolutions` field, so pins belong in `overrides`). npm's default peer-dependency semantics apply: do not reintroduce `legacy-peer-deps` or `--force`; a genuine peer mismatch is settled with a targeted override, as below.
+
+```bash
+npm run deps:audit
+```
+
+`deps:audit` runs on pre-push and in CI and fails when any of the following holds:
+
+- an advisory is reachable from a production dependency, at any severity;
+- a high or critical advisory is reachable anywhere, including development tooling (moderate and low tooling advisories are printed, not blocking);
+- the lockfile violates a declared range (`npm ls --all` reports `invalid` or `missing`);
+- a nested override that names a root dependency drifts from the root's spec.
+
+There is no standing list of accepted advisories. Fix them in this order, and stop at the first step that works:
+
+1. `npm update <package>` — when the patched release is inside the range the consumer already declares. This is the whole fix most of the time.
+2. Bump the consuming package — when a newer release of the consumer declares a patched range.
+3. Pin in `overrides` — only when the consumer pins the vulnerable version itself. Add a row to the table below so the pin can be retired when upstream catches up.
+4. `audit-exceptions.json` at the repo root — last resort, when no patched release exists anywhere. The file does not exist while the tree is clean. Each entry needs `id`, `package`, `reason`, and `expires` (a calendar date at most 90 days out for tooling, 30 for production scope); expired, stale, or mistyped entries fail the gate, so the list cannot rot.
+
+```json
+[
+  {
+    "id": "GHSA-xxxx-xxxx-xxxx",
+    "package": "some-tool",
+    "reason": "Reached only through the e2e runner; upstream fix is in review at <link>.",
+    "expires": "2026-10-01"
+  }
+]
+```
+
+Every override is a debt with a reason and a retirement condition:
+
+| Override                         | Why it exists                                                                                                                                                                                                                                                                   | Retire when                                                                                                        |
+| -------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------ |
+| `@noble/hashes`                  | Dedupes the wallet stack onto one copy; `@base-org/account` and `@walletconnect/relay-auth` pin older 1.x releases that would otherwise nest.                                                                                                                                   | Both consumers declare a range that meets at one version.                                                          |
+| `axios`                          | `@coinbase/cdp-sdk` (via `@base-org/account`) pins `axios@1.16.0` exactly, which carries a high advisory; the app's own axios is already patched.                                                                                                                               | `@coinbase/cdp-sdk` declares a patched axios range.                                                                |
+| `@coinbase/cdp-sdk`              | Advisory-patched releases (1.56.0+) statically import optional `@x402/*` packages that are not installed, breaking the Turbopack build. 1.49.1 predates both the advisory range (1.49.2–1.55.0) and the x402 imports, and sits inside `@base-org/account`'s declared `^1.48.3`. | Upstream guards its `@x402/*` imports behind resolvable modules, or `@base-org/account` bumps past such a release. |
+| `@rainbow-me/rainbowkit > wagmi` | RainbowKit 2.x declares `wagmi@^2.9.0` as a peer and the app runs wagmi 3; the override repeats the root spec so npm places one wagmi.                                                                                                                                          | RainbowKit publishes a release whose peer range includes wagmi 3.                                                  |
 
 ### Testing
 

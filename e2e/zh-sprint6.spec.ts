@@ -1,6 +1,10 @@
 import { expect, test, type Page } from '@playwright/test';
 
 async function mockSprint6Api(page: Page): Promise<void> {
+  // Keep capability probes inside this synthetic legacy backend as well.
+  await page.route('**/api/v2/cosmicgame/**', (route) =>
+    route.fulfill({ status: 404, json: { error: 'V2 API unavailable in legacy fixture' } }),
+  );
   await page.route('**/api/cosmicgame/**', async (route) => {
     const path = new URL(route.request().url()).pathname;
     if (path.endsWith('/statistics/dashboard')) {
@@ -57,9 +61,9 @@ test.describe('zh Sprint 6 — FAQ, legal, trust, contracts, code, and imprint',
     const routes: Array<[string, string]> = [
       ['/zh/terms', '服务条款'],
       ['/zh/privacy', '隐私政策'],
-      ['/zh/risk-disclosures', 'Cosmic Signature 风险披露'],
-      ['/zh/security', 'Cosmic Signature 安全'],
-      ['/zh/audits', 'Cosmic Signature 审计'],
+      ['/zh/risk-disclosures', '风险披露'],
+      ['/zh/security', '安全'],
+      ['/zh/audits', '审计'],
     ];
 
     for (const [path, heading] of routes) {
@@ -70,16 +74,24 @@ test.describe('zh Sprint 6 — FAQ, legal, trust, contracts, code, and imprint',
 
   test('renders Chinese contracts, code, and imprint surfaces', async ({ page }) => {
     await openZh(page, '/zh/contracts');
-    await expect(page.getByRole('heading', { name: 'Cosmic Signature 合约' })).toBeVisible();
-    await expect(page.getByText('合约地址', { exact: true }).first()).toBeVisible();
+    await expect(page.getByRole('heading', { level: 1, name: '合约', exact: true })).toBeVisible();
+    await expect(page.getByRole('heading', { name: '核心合约', exact: true })).toBeVisible();
 
     await openZh(page, '/zh/code');
-    await expect(page.getByRole('heading', { name: 'Cosmic Signature 源代码' })).toBeVisible();
+    await expect(
+      page.getByRole('heading', { level: 1, name: '源代码', exact: true }),
+    ).toBeVisible();
     await expect(page.getByText('代码查看器', { exact: true })).toBeVisible();
 
     await openZh(page, '/zh/imprint');
-    await expect(page.getByRole('heading', { name: '铭刻 RandomWalk NFT' }).first()).toBeVisible();
-    await expect(page.getByRole('button', { name: '铭刻' })).toBeVisible();
+    await expect(page.getByRole('heading', { name: '铭刻 Random Walk NFT' }).first()).toBeVisible();
+    // A disconnected visitor is asked to connect instead of being offered an imprint (F091).
+    const panel = page.getByRole('region', { name: '铭刻 Random Walk NFT' });
+    await expect(panel.getByRole('button', { name: '连接钱包' })).toBeVisible();
+    await expect(
+      panel.getByText('连接钱包即可铭刻 Random Walk NFT。', { exact: false }),
+    ).toBeVisible();
+    await expect(panel.getByRole('button', { name: '铭刻', exact: true })).toHaveCount(0);
   });
 
   test('preserves locale through the source-code alias redirect', async ({ page }) => {

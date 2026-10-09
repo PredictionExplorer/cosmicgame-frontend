@@ -1,21 +1,18 @@
-import { useState } from 'react';
-import { useLocale, useTranslations } from 'next-intl';
+'use client';
 
-import { getExplorerUrl } from '@/utils';
+import { useCallback, useMemo } from 'react';
+import { useTranslations } from 'next-intl';
 
-import { HydrationSafeDateTime } from '@/components/common/HydrationSafeDateTime';
-import { Link } from '@/i18n/navigation';
+import { Amount } from '@/components/ui/amount';
 import {
-  TablePrimary,
-  TablePrimaryBody,
-  TablePrimaryCell,
-  TablePrimaryContainer,
-  TablePrimaryHead,
-  TablePrimaryHeadCell,
-  TablePrimaryRow,
-} from '@/components/styled';
-import { CustomPagination } from '@/components/common/CustomPagination';
-import { AddressLink } from '@/components/common/AddressLink';
+  DataTable,
+  KindValue,
+  TableLink,
+  type DataTableColumn,
+  type PhoneRecordContent,
+} from '@/components/ui/data-table';
+import type { LedgerStateProps } from '@/components/tables/ledger-props';
+import { useCycleHref } from '@/components/tables/useCycleHref';
 
 export interface PublicGoodsContributionEntry {
   EvtLogId: number;
@@ -26,90 +23,117 @@ export interface PublicGoodsContributionEntry {
   AmountEth: number;
 }
 
-interface ContributionRowProps {
-  entry: PublicGoodsContributionEntry;
-}
-
-interface CharityDepositTableProps {
+interface CharityDepositTableProps extends LedgerStateProps {
   list: PublicGoodsContributionEntry[];
+  /**
+   * Show who contributed. The protocol's own ledger hides it: every row
+   * there is the protocol forwarding a cycle's share, which the section
+   * already says, and a column repeating it adds a line to every phone
+   * record. Default `true`.
+   */
+  showContributor?: boolean;
 }
 
-const ContributionRow = ({ entry }: ContributionRowProps) => {
+/**
+ * ETH that reached the Public Goods Vault. Each date links to its
+ * transaction, and the protocol's own contract reads by name. Voluntary
+ * contributions carry no cycle, so that column appears only when a row has one.
+ * On a phone each is a two-line record: the date and the amount, then who
+ * contributed and the cycle, with no label repeated.
+ */
+export const CharityDepositTable = ({
+  list,
+  showContributor = true,
+  ...state
+}: CharityDepositTableProps) => {
   const t = useTranslations('tables');
-  const locale = useLocale();
-  if (!entry) {
-    return <TablePrimaryRow />;
-  }
+  const cycleHref = useCycleHref();
 
-  return (
-    <TablePrimaryRow>
-      <TablePrimaryCell label={t('columns.datetime')}>
-        <a
-          className="text-inherit"
-          href={getExplorerUrl('tx', entry.TxHash)}
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <HydrationSafeDateTime timestamp={entry.TimeStamp} locale={locale} />
-        </a>
-      </TablePrimaryCell>
-      <TablePrimaryCell label={t('columns.cycleNumber')} align="center">
-        {entry.RoundNum < 0 ? (
-          ' '
-        ) : (
-          <Link
-            className="text-inherit"
-            href={`/allocation/${entry.RoundNum}`}
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            {entry.RoundNum}
-          </Link>
-        )}
-      </TablePrimaryCell>
-      <TablePrimaryCell label={t('columns.contributorAddress')} align="center">
-        <AddressLink address={entry.DonorAddr} url={`/user/${entry.DonorAddr}`} />
-      </TablePrimaryCell>
-      <TablePrimaryCell label={t('columns.contributionAmountEth')} align="right">
-        {entry.AmountEth.toFixed(6)}
-      </TablePrimaryCell>
-    </TablePrimaryRow>
+  // "Cycle 2", not a bare "2": a word-wide target that says where it leads.
+  const cycleLink = useCallback(
+    (row: PublicGoodsContributionEntry) =>
+      row.RoundNum >= 0 ? (
+        <TableLink href={cycleHref(row.RoundNum)}>
+          {t('allocation.cycle', { cycle: row.RoundNum })}
+        </TableLink>
+      ) : null,
+    [t, cycleHref],
   );
-};
 
-export const CharityDepositTable = ({ list }: CharityDepositTableProps) => {
-  const t = useTranslations('tables');
-  const perPage = 10;
-  const [page, setPage] = useState(1);
+  const phoneRecord = useCallback(
+    (row: PublicGoodsContributionEntry): PhoneRecordContent => ({
+      title: <KindValue kind="datetime" value={row.TimeStamp} txHash={row.TxHash} year="always" />,
+      titleEnd: (
+        <Amount value={row.AmountEth} unit="ETH" context="table" unitClassName="text-subtle" />
+      ),
+      details: [
+        showContributor ? (
+          <KindValue key="contributor" kind="address" value={row.DonorAddr} />
+        ) : null,
+        cycleLink(row),
+      ],
+    }),
+    [cycleLink, showContributor],
+  );
 
-  if (list.length === 0) {
-    return <p>{t('empty.contributions')}</p>;
-  }
-
-  const currentData = list.slice((page - 1) * perPage, page * perPage);
+  const columns = useMemo<DataTableColumn<PublicGoodsContributionEntry>[]>(() => {
+    // The phone record says all but the date, which opens it.
+    const all: (DataTableColumn<PublicGoodsContributionEntry> | false)[] = [
+      {
+        id: 'datetime',
+        kind: 'datetime',
+        header: t('columns.datetime'),
+        value: (row) => row.TimeStamp,
+        txHash: (row) => row.TxHash,
+        year: 'always',
+        sortable: true,
+        phone: 'title',
+      },
+      {
+        id: 'cycle',
+        kind: 'link',
+        header: t('columns.cycle'),
+        value: (row) => (row.RoundNum >= 0 ? row.RoundNum : null),
+        cell: cycleLink,
+        nowrap: true,
+        hideWhenEmpty: true,
+        phone: 'omit',
+      },
+      showContributor && {
+        id: 'contributor',
+        kind: 'address',
+        // The header names who, not the form: a protocol contract reads by name.
+        header: t('columns.contributor'),
+        value: (row) => row.DonorAddr,
+        phone: 'omit',
+      },
+      {
+        id: 'amount',
+        kind: 'amount',
+        header: t('columns.amountEth'),
+        value: (row) => row.AmountEth,
+        showUnit: false,
+        sortable: true,
+        phone: 'omit',
+      },
+    ];
+    return all.filter((column): column is DataTableColumn<PublicGoodsContributionEntry> =>
+      Boolean(column),
+    );
+  }, [t, showContributor, cycleLink]);
 
   return (
-    <>
-      <TablePrimaryContainer>
-        <TablePrimary>
-          <TablePrimaryHead>
-            <tr>
-              <TablePrimaryHeadCell align="left">{t('columns.datetime')}</TablePrimaryHeadCell>
-              <TablePrimaryHeadCell>{t('columns.cycleNumber')}</TablePrimaryHeadCell>
-              <TablePrimaryHeadCell>{t('columns.contributorAddress')}</TablePrimaryHeadCell>
-              <TablePrimaryHeadCell align="right">
-                {t('columns.contributionAmountEth')}
-              </TablePrimaryHeadCell>
-            </tr>
-          </TablePrimaryHead>
-          <TablePrimaryBody>
-            {currentData.map((entry) => (
-              <ContributionRow entry={entry} key={entry.EvtLogId} />
-            ))}
-          </TablePrimaryBody>
-        </TablePrimary>
-      </TablePrimaryContainer>
-      <CustomPagination page={page} setPage={setPage} totalLength={list.length} perPage={perPage} />
-    </>
+    <DataTable
+      data={list}
+      columns={columns}
+      phoneRecord={phoneRecord}
+      // The page's own title names it (voluntary and protocol ledgers differ).
+      ariaLabel={
+        typeof state.title === 'string' ? state.title : t('names.publicGoodsContributions')
+      }
+      getRowKey={(row) => row.EvtLogId}
+      emptyTitle={t('empty.contributions')}
+      {...state}
+    />
   );
 };

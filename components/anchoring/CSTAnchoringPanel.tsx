@@ -1,98 +1,223 @@
+'use client';
+
+import { useMemo } from 'react';
 import { useTranslations } from 'next-intl';
 
-import type { CSTTokenInfo, AnchoredTokenInfo, AnchorAction, RewardsByToken } from '@/services/api';
-import AnchorActionsTable from '@/components/anchoring/AnchorActionsTable';
-import { AnchorDistributionsTable } from '@/components/anchoring/AnchorDistributionsTable';
-import { AnchoredTokensTable } from '@/components/anchoring/AnchoredTokensTable';
-import { CSTokensTable } from '@/components/tokens/CSTokensTable';
-import { InfoTooltip } from '@/components/ui/info-tooltip';
+import { useFormat } from '@/hooks/useFormat';
+import { isAnchorable } from '@/utils/anchoringStats';
+import type { TxResult } from '@/hooks/useTxFlow';
+import type { TxStage } from '@/lib/txStage';
+import type { AnchorAction, AnchoredTokenInfo, CSTTokenInfo, RewardsByToken } from '@/services/api';
+import { Link } from '@/i18n/navigation';
+import { SectionHeader } from '@/components/ui/section-header';
+import { buttonVariants } from '@/components/ui/button';
 
-/** Props for the Cosmic Signature NFT anchoring panel. */
+import AnchorActionsTable from './AnchorActionsTable';
+import { AnchoredOn } from './AnchoredOn';
+import { AnchorDistributionsTable } from './AnchorDistributionsTable';
+import { AnchorTokenGrid, type AnchorGridItem } from './AnchorTokenGrid';
+import { SECTION_READY, type SectionRead } from './sectionRead';
+
+/** The grid ids of this panel, which own the page's one wallet flow in turn. */
+export const CST_GRIDS = { anchored: 'cst-anchored', available: 'cst-available' } as const;
+
 export interface CSTAnchoringPanelProps {
   account: string;
-  stakingActions: AnchorAction[];
-  userTokens: CSTTokenInfo[];
-  anchoredTokens: AnchoredTokenInfo[];
-  anchorDistributions: RewardsByToken[];
-  handleStake: (tokenId: number) => Promise<unknown>;
-  handleStakeMany: (tokenIds: number[]) => Promise<unknown>;
-  handleUnstake: (actionId: number) => Promise<unknown>;
-  handleUnstakeMany: (actionIds: number[]) => Promise<unknown>;
+  anchoredTokens: readonly AnchoredTokenInfo[];
+  /**
+   * The wallet's Cosmic Signature NFTs as the indexer lists them, anchored
+   * ones included: only those that can be anchored (`isAnchorable`) are
+   * offered, so "Select all" never puts an anchored or released NFT into a
+   * batch the contract would revert.
+   */
+  availableTokens: readonly CSTTokenInfo[];
+  /**
+   * The wallet's per-NFT Anchor Distributions summary; `null` while it loads
+   * or when the read failed. It lists only NFTs that have received a deposit,
+   * so an anchored NFT without a row has accrued 0 ETH.
+   */
+  anchorDistributions: readonly RewardsByToken[] | null;
+  /**
+   * The summary could not be read: its ledger shows an error with a retry, and each anchored
+   * NFT says its accrued ETH is unavailable, instead of reading as an empty history.
+   */
+  distributionsError?: boolean;
+  onRetryDistributions?: () => void;
+  actions: AnchorAction[];
+  /** The wallet's anchored NFTs. */
+  anchoredRead?: SectionRead;
+  /** The wallet's NFTs (the anchorable ones are offered). */
+  availableRead?: SectionRead;
+  /** The Anchor Distributions summary (its failure is `distributionsError`). */
+  distributionsLoading?: boolean;
+  /** The wallet's anchor and release history. */
+  historyRead?: SectionRead;
+  /** Anchors token ids; resolves with the transaction's outcome. */
+  onAnchor: (tokenIds: number[]) => Promise<TxResult>;
+  /** Releases anchor action ids; resolves with the transaction's outcome. */
+  onRelease: (actionIds: number[]) => Promise<TxResult>;
+  /** The stage of a grid's own transaction (idle for a grid that did not start it). */
+  stageFor: (gridId: string) => TxStage;
+  walletBusy: boolean;
 }
 
-function SectionHeader({ title, tooltip }: { title: string; tooltip: string }) {
-  return (
-    <div className="flex items-center gap-2 mb-4">
-      <h3 className="text-base font-semibold leading-none">{title}</h3>
-      <InfoTooltip content={tooltip} />
-    </div>
-  );
-}
-
-/** Displays Cosmic Signature NFT Anchor Distributions, actions, available tokens, and anchored tokens. */
+/**
+ * Cosmic Signature anchoring for the connected wallet: what it has anchored
+ * (with the ETH each NFT has accrued), what it can still anchor, each NFT's
+ * Anchor Distributions and the history of its actions.
+ */
 export function CSTAnchoringPanel({
   account,
-  stakingActions,
-  userTokens,
   anchoredTokens,
+  availableTokens,
   anchorDistributions,
-  handleStake,
-  handleStakeMany,
-  handleUnstake,
-  handleUnstakeMany,
+  distributionsError = false,
+  onRetryDistributions,
+  actions,
+  anchoredRead = SECTION_READY,
+  availableRead = SECTION_READY,
+  distributionsLoading = false,
+  historyRead = SECTION_READY,
+  onAnchor,
+  onRelease,
+  stageFor,
+  walletBusy,
 }: CSTAnchoringPanelProps) {
   const t = useTranslations('anchoring');
+  const tCommon = useTranslations('common');
+  const tTables = useTranslations('tables');
+  const format = useFormat();
+
+  const accruedByToken = useMemo(
+    () =>
+      anchorDistributions === null
+        ? null
+        : new Map(anchorDistributions.map((row) => [row.TokenId, row.RewardToCollectEth ?? 0])),
+    [anchorDistributions],
+  );
+
+  // Oldest anchor first: the order the NFTs joined, as the contract counts them.
+  const anchoredItems = useMemo<AnchorGridItem[]>(
+    () =>
+      [...anchoredTokens]
+        .sort((a, b) => a.StakeTimeStamp - b.StakeTimeStamp)
+        .flatMap((row) => {
+          const info = row.TokenInfo;
+          const actionId = info?.StakeActionId ?? row.StakeActionId;
+          if (!info || typeof actionId !== 'number') return [];
+          // Unknown until the summary is read; after that, no row means no deposit yet.
+          const accruedEth =
+            accruedByToken === null ? null : (accruedByToken.get(info.TokenId) ?? 0);
+          return [
+            {
+              key: actionId,
+              tokenId: info.TokenId,
+              seed: info.Seed ?? null,
+              name: info.TokenName ?? null,
+              accruedEth,
+              meta: [<AnchoredOn key="anchored" timestamp={row.StakeTimeStamp} />],
+              detail:
+                accruedEth === null
+                  ? distributionsError
+                    ? tCommon('status.unavailable')
+                    : null
+                  : t('picker.accrued', {
+                      amount: format.amount(accruedEth, { unit: 'ETH', context: 'card' }),
+                    }),
+            },
+          ];
+        }),
+    [accruedByToken, anchoredTokens, distributionsError, format, t, tCommon],
+  );
+
+  const availableItems = useMemo<AnchorGridItem[]>(
+    () =>
+      availableTokens.filter(isAnchorable).map((token) => ({
+        key: token.TokenId,
+        tokenId: token.TokenId,
+        seed: token.Seed ?? null,
+        name: token.TokenName ?? null,
+        meta: [
+          typeof token.RoundNum === 'number'
+            ? tTables('allocation.cycle', { cycle: token.RoundNum })
+            : null,
+        ],
+      })),
+    [availableTokens, tTables],
+  );
 
   return (
-    <>
-      <div>
-        <SectionHeader
-          title={t('panels.shared.anchoredTokens')}
-          tooltip={t('panels.cosmicSignature.anchoredTooltip')}
-        />
-        <AnchoredTokensTable
-          list={anchoredTokens}
-          handleUnstake={async (actionId) => {
-            await handleUnstake(actionId);
-          }}
-          handleUnstakeMany={async (actionIds) => {
-            await handleUnstakeMany(actionIds);
-          }}
-          IsRwalk={false}
-        />
-      </div>
+    <div className="space-y-[var(--block-gap)] sm:space-y-16">
+      <AnchorTokenGrid
+        id={CST_GRIDS.anchored}
+        collection="cosmicSignature"
+        mode="release"
+        items={anchoredItems}
+        title={t('panels.shared.anchoredTokens')}
+        description={t('panels.cosmicSignature.anchoredDescription')}
+        emptyTitle={t('panels.shared.anchoredEmpty.title')}
+        emptyDescription={t('panels.shared.anchoredEmpty.description')}
+        onCommit={onRelease}
+        stage={stageFor(CST_GRIDS.anchored)}
+        walletBusy={walletBusy}
+        loading={anchoredRead.loading}
+        failed={anchoredRead.failed}
+        onRetry={anchoredRead.onRetry}
+      />
 
-      <div className="mt-12">
-        <SectionHeader
-          title={t('panels.shared.available')}
-          tooltip={t('panels.cosmicSignature.availableTooltip')}
-        />
-        <CSTokensTable
-          list={userTokens}
-          handleStake={async (tokenId) => {
-            await handleStake(tokenId);
-          }}
-          handleStakeMany={async (tokenIds) => {
-            await handleStakeMany(tokenIds);
-          }}
-        />
-      </div>
+      <AnchorTokenGrid
+        id={CST_GRIDS.available}
+        collection="cosmicSignature"
+        mode="anchor"
+        items={availableItems}
+        title={t('panels.shared.available')}
+        description={t('panels.cosmicSignature.availableDescription')}
+        emptyTitle={t('panels.cosmicSignature.availableEmpty.title')}
+        emptyDescription={t('panels.cosmicSignature.availableEmpty.description')}
+        emptyAction={
+          <Link href="/gallery" className={buttonVariants({ variant: 'outline', size: 'sm' })}>
+            {t('panels.cosmicSignature.availableEmpty.action')}
+          </Link>
+        }
+        onCommit={onAnchor}
+        stage={stageFor(CST_GRIDS.available)}
+        walletBusy={walletBusy}
+        loading={availableRead.loading}
+        failed={availableRead.failed}
+        onRetry={availableRead.onRetry}
+      />
 
-      <div className="mt-12">
+      <section aria-labelledby="cst-distributions-heading">
         <SectionHeader
+          headingId="cst-distributions-heading"
           title={t('panels.cosmicSignature.distributions')}
-          tooltip={t('panels.cosmicSignature.distributionsTooltip')}
+          description={t('panels.cosmicSignature.distributionsDescription')}
         />
-        <AnchorDistributionsTable list={anchorDistributions} address={account} />
-      </div>
+        <AnchorDistributionsTable
+          list={[...(anchorDistributions ?? [])]}
+          address={account}
+          loading={distributionsLoading}
+          error={distributionsError ? t('overview.errorMessage') : undefined}
+          errorTitle={t('overview.errorTitle')}
+          onRetry={onRetryDistributions}
+        />
+      </section>
 
-      <div className="mt-12">
+      <section aria-labelledby="cst-history-heading">
         <SectionHeader
+          headingId="cst-history-heading"
           title={t('panels.shared.history')}
-          tooltip={t('panels.shared.historyTooltip')}
+          description={t('panels.shared.historyDescription')}
         />
-        <AnchorActionsTable list={stakingActions} IsRwalk={false} />
-      </div>
-    </>
+        <AnchorActionsTable
+          list={actions}
+          IsRwalk={false}
+          loading={historyRead.loading}
+          error={historyRead.failed ? t('overview.errorMessage') : undefined}
+          errorTitle={t('overview.errorTitle')}
+          onRetry={historyRead.onRetry}
+        />
+      </section>
+    </div>
   );
 }

@@ -1,56 +1,63 @@
-import { formatId } from '@/utils';
+import { Check } from 'lucide-react';
 
+import { formatId } from '@/utils/format/ids';
 import { cn } from '@/lib/utils';
 import { useRWLKNFT } from '@/hooks/useRWLKNFT';
-import { NFTSkeleton } from '@/components/styled';
+import { MEDIA_PLATE_CLASS } from '@/components/ui/art-frame';
+import { Skeleton } from '@/components/ui/skeleton';
 
 import NFTImage from './NFTImage';
 
-const RandomWalkNFT = ({
-  tokenId,
-  selected = false,
-  selectable = true,
-}: {
+interface RandomWalkNFTProps {
   tokenId: number | string;
   selected?: boolean;
-  selectable?: boolean;
-}) => {
-  const nft = useRWLKNFT(tokenId);
-  const idLabel = formatId(tokenId);
+  /**
+   * The image and the number are decorative because a parent control (the
+   * picker's toggle button) already names the token.
+   */
+  decorative?: boolean;
+}
 
-  const content = (
-    <div className="relative">
-      {!nft ? <NFTSkeleton /> : <NFTImage src={nft.black_image_thumb} />}
-      <div
-        className={cn(
-          'pointer-events-none absolute bottom-2 right-2 z-[1] rounded-md px-2 py-1',
-          'bg-black/75 font-mono text-[11px] font-semibold tabular-nums text-white shadow-sm',
-          'ring-1 ring-white/10',
-        )}
-        aria-hidden
-      >
-        {idLabel}
-      </div>
-    </div>
-  );
+/**
+ * A Random Walk NFT as the gesture picker offers it: the render whole on its
+ * black plate, with nothing drawn over it, and a label row under the plate
+ * with the token number and, once chosen, a check. A chosen card also draws
+ * the plate's print edge in the accent, so the choice never rests on colour
+ * alone.
+ */
+const RandomWalkNFT = ({ tokenId, selected = false, decorative = false }: RandomWalkNFTProps) => {
+  const nft = useRWLKNFT(tokenId);
 
   return (
-    <div
-      className={cn(
-        'border rounded-lg overflow-hidden relative',
-        selected ? 'border-white' : 'border-[#181F64]',
-      )}
-    >
-      {selectable ? (
-        <div className="cursor-pointer">{content}</div>
-      ) : (
-        <a
-          href={`https://www.randomwalknft.com/detail/${tokenId}`}
-          className="block cursor-pointer"
-        >
-          {content}
-        </a>
-      )}
+    <div className="min-w-0" data-selected={selected || undefined}>
+      <div
+        className={cn(
+          MEDIA_PLATE_CLASS,
+          'aspect-art',
+          selected &&
+            'after:shadow-[inset_0_0_0_2px_var(--color-primary)] hover:after:shadow-[inset_0_0_0_2px_var(--color-primary)]',
+        )}
+      >
+        {nft ? (
+          <NFTImage
+            src={nft.black_image_thumb}
+            alt={decorative ? '' : undefined}
+            density="compact"
+            className="h-full w-full bg-transparent object-contain"
+          />
+        ) : (
+          <Skeleton className="size-full rounded-none" />
+        )}
+      </div>
+      <p
+        aria-hidden={decorative || undefined}
+        className="mt-2 flex min-h-5 items-center justify-between gap-2"
+      >
+        <span className="type-mono text-foreground">{formatId(tokenId)}</span>
+        {selected ? (
+          <Check aria-hidden className="size-4 shrink-0 text-primary" strokeWidth={2.5} />
+        ) : null}
+      </p>
     </div>
   );
 };

@@ -1,9 +1,16 @@
-import type { Metadata } from 'next';
+import type { Metadata, ResolvingMetadata } from 'next';
+import { ArrowDown } from 'lucide-react';
 import { getTranslations, setRequestLocale } from 'next-intl/server';
 
-import { createMetadata } from '@/utils/seo';
+import { createPageMetadata } from '@/utils/seo';
 import { PageMessages } from '@/components/i18n/PageMessages';
+import { buttonVariants } from '@/components/ui/button';
+import { LedgerPage } from '@/components/ledger/LedgerPage';
+import { HowItWorks } from '@/components/marketing/HowItWorks';
+import { MarketingCTA } from '@/components/marketing/MarketingCTA';
+import { OutreachRules } from '@/components/marketing/OutreachRules';
 
+import { PublicDataQuerySeed } from '../PublicDataQuerySeed';
 import { PublicDataRouteSeoSummary } from '../PublicDataRouteSeoSummary';
 
 import MarketingRewards from './MarketingRewards';
@@ -12,26 +19,65 @@ interface PageProps {
   params: Promise<{ locale: string }>;
 }
 
-export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
+export async function generateMetadata(
+  { params }: PageProps,
+  parent: ResolvingMetadata,
+): Promise<Metadata> {
   const { locale } = await params;
   const t = await getTranslations({ locale, namespace: 'meta' });
-  return createMetadata(t('outreach.title'), t('outreach.description'), undefined, '/marketing', {
-    locale,
-  });
+  return createPageMetadata(
+    parent,
+    t('outreach.title'),
+    t('outreach.description'),
+    undefined,
+    '/marketing',
+    { locale },
+  );
 }
 
 export const revalidate = 300;
 
+/**
+ * The Outreach Reserve: the server-rendered header with the programme's
+ * figures, then the records — the top contributors and every allocation —
+ * leading the body, followed by how it works and the programme's rules. The
+ * invitation (the email) stands alone beside them from `lg`, short enough to
+ * stay in view while it is sticky, so the one real action is never below
+ * the fold; on narrower screens it follows the rules it links to, and the
+ * header offers a jump to how it works. Only the two ledgers and the copy
+ * button run on the client.
+ */
 export default async function Page({ params }: PageProps) {
   const { locale } = await params;
   setRequestLocale(locale);
+  const t = await getTranslations({ locale, namespace: 'marketing' });
 
   return (
     <PageMessages namespaces={['marketing', 'tables']}>
-      <>
-        <PublicDataRouteSeoSummary route="marketing" />
-        <MarketingRewards />
-      </>
+      <PublicDataQuerySeed route="marketing">
+        <LedgerPage
+          header={
+            <PublicDataRouteSeoSummary
+              route="marketing"
+              actions={
+                // From lg the invitation is already beside the ledgers.
+                <a
+                  href="#how-it-works"
+                  className={buttonVariants({ variant: 'outline', className: 'lg:hidden' })}
+                >
+                  {t('learnHow')}
+                  <ArrowDown aria-hidden />
+                </a>
+              }
+            />
+          }
+          aside={<MarketingCTA />}
+        >
+          <MarketingRewards />
+          <HowItWorks />
+          <OutreachRules />
+        </LedgerPage>
+      </PublicDataQuerySeed>
     </PageMessages>
   );
 }

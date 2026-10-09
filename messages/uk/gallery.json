@@ -6,61 +6,6 @@
   "jsonLd": {
     "name": "Галерея Cosmic Signature"
   },
-  "page": {
-    "eyebrowImprinted": "Колекція · закарбовано {count} NFT",
-    "eyebrowLive": "Колекція · наживо",
-    "title": "Галерея NFT",
-    "subtitle": "Досліджуйте повну колекцію Cosmic Signature NFT, закарбованих упродовж усіх циклів"
-  },
-  "intro": {
-    "badge": "Генеративний архів",
-    "description": "Кожен Cosmic Signature NFT — це унікальний твір генеративного мистецтва, породжений ончейн-сідом через фізичну симуляцію задачі трьох тіл. У типовому циклі закарбовується 24 нові NFT: чотири NFT за ролі, десять NFT зоряного відбору серед учасників і десять NFT зоряного відбору закріплених NFT для власників закріплень RandomWalk NFT."
-  },
-  "featured": {
-    "viewAria": "Переглянути Cosmic Signature {id}",
-    "alt": "Твір Cosmic Signature {id}",
-    "emptyHint": "Справжні твори колекції з’являться тут, коли стануть доступні проіндексовані NFT.",
-    "badgeImprint": "Вибране закарбування",
-    "badgeArchive": "Архів",
-    "awaitingMetadata": "Очікування метаданих"
-  },
-  "hero": {
-    "totalImprinted": {
-      "label": "Усього закарбовано",
-      "tooltip": "Загальна кількість Cosmic Signature NFT, закарбованих упродовж усіх циклів"
-    },
-    "currentlyAnchored": {
-      "label": "Зараз закріплено",
-      "tooltip": "NFT, закріплені в протоколі; їхні власники отримують надходження за закріплення"
-    },
-    "namedNfts": {
-      "label": "Іменовані NFT",
-      "tooltip": "NFT, яким власники дали унікальне власне ім’я"
-    },
-    "cycles": {
-      "label": "Цикли",
-      "tooltip": "Кількість унікальних циклів, у яких створено NFT"
-    }
-  },
-  "card": {
-    "alt": "Cosmic Signature {id}",
-    "unnamed": "Без імені",
-    "age": {
-      "justNow": "щойно",
-      "minutes": "{count}хв тому",
-      "hours": "{count}год тому",
-      "days": "{count}д тому",
-      "months": "{count} міс. тому",
-      "years": "{count} р. тому"
-    },
-    "tooltips": {
-      "round": "Закарбовано в циклі {round}",
-      "anchored": "Зараз закріплено; отримує надходження за закріплення",
-      "customName": "Цей NFT має власне ім’я",
-      "identifier": "Унікальний порядковий ідентифікатор цього Cosmic Signature NFT",
-      "mintedOn": "Закарбовано {date}"
-    }
-  },
   "filters": {
     "ariaLabel": "Фільтрувати NFT",
     "all": {
@@ -78,7 +23,6 @@
   },
   "sort": {
     "ariaLabel": "Порядок сортування",
-    "tooltip": "Змінити порядок показу NFT",
     "newest": "Спочатку нові",
     "oldest": "Спочатку старі",
     "cycleDesc": "Цикл (спадання)",
@@ -108,13 +52,27 @@
     "list": "Список"
   },
   "pagination": {
-    "showing": "Показано <value>{start}</value>–<value>{end}</value> з <value>{total}</value> NFT",
-    "perPage": "На сторінці",
-    "perPageAria": "Елементів на сторінці",
-    "perPageTooltip": "Кількість NFT на сторінці"
+    "perPage": "На сторінці"
   },
   "empty": {
     "title": "NFT не знайдено",
-    "description": "Спробуйте змінити пошуковий запит або фільтри."
+    "description": "Жодна Сигнатура не відповідає цим фільтрам. Очистьте їх, щоб побачити всю колекцію.",
+    "collectionTitle": "Сигнатур поки немає",
+    "collectionDescription": "Кожна Сигнатура з’являється тут, щойно її цикл завершено й її закарбовано."
+  },
+  "about": {
+    "title": "Про колекцію",
+    "description": "Кожна Сигнатура — унікальний твір генеративного мистецтва, створений з ончейн-сіду фізичною симуляцією трьох тіл. Будь-хто може відтворити її із записів протоколу, і кожна належить циклу, у якому її закарбовано. У типовому циклі закарбовується 24 нові Сигнатури: чотири отримують власники ролей циклу, десять — учасники, обрані зоряним відбором, і ще десять — власники закріплених Random Walk NFT."
+  },
+  "toolbar": {
+    "filters": "Фільтри",
+    "filtersWithCount": "Фільтри · {count}",
+    "show": "Показати",
+    "showResults": "{count, plural, one {Показати # NFT} few {Показати # NFT} many {Показати # NFT} other {Показати # NFT}}"
+  },
+  "results": {
+    "total": "{count, plural, one {# NFT} few {# NFT} many {# NFT} other {# NFT}}",
+    "filtered": "{count, number} з {total, plural, one {# NFT} few {# NFT} many {# NFT} other {# NFT}}",
+    "regionLabel": "Сигнатури"
   }
 }

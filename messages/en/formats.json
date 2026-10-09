@@ -6,17 +6,36 @@
     "minutes": "MIN",
     "seconds": "SEC"
   },
-  "countdownLong": {
-    "days": "Days",
-    "hours": "Hours",
-    "minutes": "Min",
-    "seconds": "Sec"
-  },
   "durationCompact": {
     "days": "d",
     "hours": "h",
     "minutes": "m",
-    "seconds": "s",
-    "leftPattern": "{duration} left"
+    "seconds": "s"
+  },
+  "address": {
+    "zero": "Zero address",
+    "imprinted": "Imprinted",
+    "consumed": "Consumed",
+    "self": "This address",
+    "known": {
+      "protocol": "Cosmic Signature Protocol",
+      "implementation": "Implementation contract",
+      "cst": "Cosmic Signature CST Token",
+      "nft": "Cosmic Signature NFT",
+      "randomWalk": "Random Walk NFT",
+      "council": "Cosmic Council",
+      "publicGoods": "Public Goods Vault",
+      "outreach": "Outreach Reserve",
+      "allocations": "Allocations Wallet",
+      "cosmicAnchor": "Cosmic Signature NFT Anchoring Wallet",
+      "rwalkAnchor": "RWLK Anchoring Wallet"
+    }
+  },
+  "dateTime": {
+    "timeZone": "Time zone: {zone}"
+  },
+  "allocationSplit": {
+    "label": "{label}: {items}",
+    "item": "{track} {share}"
   }
 }

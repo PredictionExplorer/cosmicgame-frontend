@@ -1,0 +1,409 @@
+{
+  "shared": {
+    "unavailable": "Không khả dụng",
+    "cycleNumber": "Chu kỳ {cycle}"
+  },
+  "allocations": {
+    "title": "Phân bổ của tôi",
+    "subtitle": "Mọi phân bổ giao thức dành cho ví này, nhận về tất cả tại một nơi.",
+    "loadErrorTitle": "Không tải được phân bổ của bạn",
+    "loadErrorMessage": "Không tải được các phân bổ đang chờ. Hãy thử lại sau giây lát.",
+    "anchorLoadError": {
+      "title": "Không tải được phân phối neo giữ của bạn",
+      "message": "Phân phối neo giữ của ví này tạm thời không khả dụng. Hãy thử lại sau giây lát."
+    },
+    "summary": {
+      "title": "Sẵn sàng nhận về",
+      "description": "Một giao dịch nhận về ETH, NFT đính kèm và token đính kèm đang chờ ví này.",
+      "eth": "Phân bổ ETH",
+      "nfts": "NFT đính kèm",
+      "tokens": "Token đính kèm",
+      "anchor": "Phân phối neo giữ",
+      "cycles": "{count, plural, other {Từ # chu kỳ}}",
+      "anchorCaption": "Nhận về riêng ở bên dưới",
+      "retrieveEverything": "Nhận về ETH, NFT và token",
+      "retrieveBy": "Hãy nhận về trước <date></date>. Sau thời điểm đó, bất kỳ ai cũng có thể nhận về.",
+      "expired": "Hạn nhận về đã qua vào <date></date>. Bạn vẫn có thể nhận về cho đến khi có người khác nhận trước.",
+      "success": "Đã nhận về tất cả vào ví của bạn."
+    },
+    "nothing": {
+      "title": "Hiện chưa có gì để nhận về",
+      "description": "Khi một chu kỳ đã hoàn tất phân bổ ETH, NFT hoặc token cho ví này, chúng sẽ chờ ở đây cho đến khi bạn nhận về."
+    },
+    "sections": {
+      "eth": "Phân bổ ETH",
+      "ethDescription": "ETH từ Tinh tuyển và Chiến binh Thời gian được giữ theo từng chu kỳ cho đến khi bạn nhận về.",
+      "anchors": "Phân phối neo giữ",
+      "anchorsDescription": "ETH mà hợp đồng neo giữ trả cho các Cosmic Signature NFT bạn đang neo giữ.",
+      "nfts": "NFT đính kèm",
+      "erc20": "Token ERC-20 đính kèm"
+    },
+    "retrieveAll": "Nhận về tất cả",
+    "lookup": {
+      "label": "Tra cứu một địa chỉ bất kỳ",
+      "hint": "Các phân bổ đều công khai: xem một địa chỉ bất kỳ đã nhận những gì.",
+      "submit": "Tra cứu",
+      "invalid": "Hãy nhập địa chỉ đầy đủ: bắt đầu bằng 0x, theo sau là 40 ký tự thập lục phân (0–9, a–f)."
+    }
+  },
+  "anchors": {
+    "title": "Neo giữ của tôi",
+    "subtitle": "Neo giữ NFT của bạn, theo dõi những gì chúng nhận được và gỡ neo khi bạn sẵn sàng.",
+    "tabs": {
+      "label": "Bộ sưu tập",
+      "cosmicSignature": "Cosmic Signature",
+      "randomWalk": "Random Walk",
+      "anchoredCount": "{count, plural, other {Đã neo giữ #}}"
+    },
+    "stats": {
+      "unretrieved": {
+        "label": "Phân phối chưa nhận về",
+        "tooltip": "Phân phối neo giữ ETH được phân bổ cho các Cosmic Signature NFT bạn đang neo giữ nhưng chưa nhận về. Gỡ neo một Cosmic Signature NFT sẽ tự động nhận về các khoản phân phối đã tích lũy của nó. Gỡ neo không thể hoàn tác: NFT đã gỡ neo sẽ không thể neo giữ lại.",
+        "caption": "Nhận về khi gỡ neo. Gỡ neo không thể hoàn tác."
+      },
+      "distributionPerNft": {
+        "label": "Mỗi NFT đang neo giữ",
+        "tooltip": "Phân phối neo giữ ETH hiện tại trên mỗi Cosmic Signature NFT đang neo giữ, tính bằng tổng quỹ neo giữ (trên chuỗi) chia cho số Cosmic Signature NFT neo giữ đã lập chỉ mục.",
+        "noneAnchored": "Chưa lập chỉ mục Cosmic Signature NFT nào đang neo giữ"
+      }
+    }
+  },
+  "statistics": {
+    "page": {
+      "invalidAddress": "Địa chỉ không hợp lệ",
+      "ownTitle": "Thống kê của tôi",
+      "ownSubtitle": "Nét bút của bạn và chi phí của chúng, những gì bạn nhận được, NFT và neo giữ của bạn qua mọi chu kỳ trình diễn.",
+      "userSubtitle": "Nét bút của địa chỉ này và chi phí của chúng, những gì địa chỉ đã nhận, NFT và neo giữ của địa chỉ qua mọi chu kỳ trình diễn.",
+      "emptyTitle": "Chưa có hoạt động",
+      "emptyDescription": "Địa chỉ này chưa có nét bút, phân bổ hay neo giữ nào.",
+      "sections": {
+        "gestureHistory": "Nét bút",
+        "recipientHistory": "Phân bổ đã nhận",
+        "anchoring": "Neo giữ",
+        "artworks": "Cosmic Signature NFT",
+        "outreachAllocations": "Phân bổ truyền thông",
+        "claimableAssets": "Tài sản đính kèm"
+      },
+      "participant": "Người tham gia",
+      "loadErrorTitle": "Không tải được thống kê của địa chỉ này",
+      "loadErrorMessage": "Dịch vụ thống kê không phản hồi. Hãy thử lại sau ít phút.",
+      "sectionLoadErrorTitle": "Phần này chưa tải được",
+      "nav": {
+        "label": "Mục lục hồ sơ",
+        "overview": "Tổng quan",
+        "nfts": "NFT",
+        "gestures": "Nét bút",
+        "allocations": "Phân bổ",
+        "anchoring": "Neo giữ",
+        "outreach": "Truyền thông",
+        "attached": "Tài sản đính kèm"
+      }
+    },
+    "figures": {
+      "gestures": {
+        "label": "Nét bút",
+        "caption": "{count, plural, other {qua # chu kỳ}}"
+      },
+      "spent": {
+        "label": "Đã chi cho nét bút",
+        "caption": "và {amount}",
+        "info": "ETH mà địa chỉ này đã trả cho các nét bút bằng ETH. Nét bút bằng CST được trả bằng CST, hiển thị bên dưới. Chi phí nét bút không được hoàn lại."
+      },
+      "received": {
+        "label": "Đã nhận",
+        "caption": "{count, plural, other {từ # phân bổ}}",
+        "info": "ETH mà địa chỉ này nhận được qua các phân bổ: Phân bổ Signature, Chiến binh Thời gian và Tinh tuyển. CST, NFT và phân phối neo giữ được liệt kê bên dưới."
+      },
+      "balance": {
+        "label": "Số dư ví"
+      }
+    },
+    "titles": {
+      "label": "Danh hiệu",
+      "signatureAllocation": "Phân bổ Signature",
+      "enduranceChampion": "Quán quân Bền bỉ",
+      "chronoWarrior": "Chiến binh Thời gian",
+      "finalCstGesture": "Nét bút CST cuối cùng",
+      "entry": "{title} · {count, plural, other {chu kỳ {cycles}}}"
+    },
+    "selection": {
+      "title": "Tỷ lệ Tinh tuyển · chu kỳ {cycle}",
+      "share": "{mine} trong {total} nét bút",
+      "caption": "Khi chu kỳ hoàn tất, {eth} lượt chọn ETH và {nft} lượt chọn NFT được thực hiện trong toàn bộ nét bút của chu kỳ này, có hoàn lại. Mỗi nét bút được tính một lần.",
+      "captionGeneric": "Khi chu kỳ hoàn tất, Tinh tuyển được thực hiện trong toàn bộ nét bút của chu kỳ này, có hoàn lại. Mỗi nét bút được tính một lần.",
+      "weightedNote": "Từ các chu kỳ V3, phần trong quỹ ETH được tính theo trọng số là chi phí ETH của từng nét bút tại thời điểm thực hiện."
+    },
+    "overview": {
+      "title": "Tổng quan",
+      "gestures": {
+        "title": "Nét bút",
+        "largest": "Nét bút ETH lớn nhất",
+        "firstCycle": "Chu kỳ đầu tiên",
+        "latest": "Nét bút gần nhất"
+      },
+      "stellarSelection": {
+        "title": "Tinh tuyển",
+        "ethSelections": "Lượt chọn ETH",
+        "ethAllocated": "ETH được phân bổ",
+        "ethRetrieved": "ETH đã nhận về",
+        "nfts": "NFT qua Tinh tuyển"
+      },
+      "nfts": {
+        "title": "Cosmic Signature NFT",
+        "received": "Đã nhận",
+        "toRetrieve": "NFT đính kèm chưa nhận về",
+        "transfers": "Chuyển giao",
+        "heldOrAnchored": "Đang nắm giữ hoặc neo giữ: {count, number}"
+      },
+      "anchoring": {
+        "title": "Neo giữ",
+        "anchoredNow": "Đang neo giữ",
+        "actions": "Thao tác neo giữ và gỡ neo",
+        "distributions": "Phân phối neo giữ",
+        "byKind": "{cosmicSignature, number} Cosmic Signature · {randomWalk, number} Random Walk"
+      },
+      "definitions": {
+        "label": "Định nghĩa",
+        "largest": "Nét bút ETH đơn lẻ lớn nhất mà địa chỉ này đã đặt.",
+        "ethAllocated": "ETH được phân bổ cho địa chỉ này qua Tinh tuyển trong mọi chu kỳ, dù đã nhận về hay chưa.",
+        "selectionNfts": "Cosmic Signature NFT được khắc cho địa chỉ này qua Tinh tuyển.",
+        "nftsReceived": "Cosmic Signature NFT mà địa chỉ này đã nhận trong mọi chu kỳ, từ bất kỳ phân bổ nào.",
+        "toRetrieve": "NFT đính kèm được phân bổ cho địa chỉ này cùng phân bổ Signature và chưa được nhận về.",
+        "distributions": "Phân phối neo giữ bằng ETH từ việc neo giữ Cosmic Signature NFT, dù đã nhận về hay chưa."
+      }
+    },
+    "artworks": {
+      "emptyTitle": "Không nắm giữ Cosmic Signature NFT nào",
+      "emptyDescription": "Cosmic Signature NFT mà địa chỉ này nắm giữ sẽ hiển thị ở đây.",
+      "showAll": "Hiện tất cả {count}",
+      "showFewer": "Thu gọn"
+    },
+    "quickActions": {
+      "anchor": {
+        "label": "Neo giữ NFT",
+        "description": "Neo giữ Cosmic Signature NFT để nhận phân phối ETH hoặc Random Walk NFT để thuộc diện Tinh tuyển"
+      },
+      "gesture": {
+        "label": "Đặt nét bút",
+        "description": "Tham gia chu kỳ đang diễn ra"
+      },
+      "transfers": {
+        "label": "Chuyển giao NFT",
+        "description": "Lịch sử chuyển giao Cosmic Signature NFT"
+      },
+      "stellarSelection": {
+        "label": "Lịch sử Tinh tuyển",
+        "description": "Phân bổ Tinh tuyển và các khoản nạp ETH của bạn"
+      },
+      "label": "Bước tiếp theo"
+    },
+    "anchoring": {
+      "tabs": {
+        "label": "Loại NFT",
+        "cosmicSignature": "Cosmic Signature NFT",
+        "randomWalk": "Random Walk NFT"
+      },
+      "empty": {
+        "cosmicSignatureTitle": "Chưa có hoạt động neo giữ",
+        "cosmicSignatureDescription": "Cosmic Signature NFT đang neo giữ cùng chia phân phối neo giữ ETH của mỗi chu kỳ.",
+        "randomWalkTitle": "Chưa neo giữ Random Walk",
+        "randomWalkDescription": "Random Walk NFT đang neo giữ tham gia Tinh tuyển NFT neo giữ."
+      },
+      "stats": {
+        "anchorActions": "Thao tác neo giữ",
+        "releaseActions": "Thao tác gỡ neo",
+        "totalDistributions": "Phân phối neo giữ",
+        "unretrievedDistributions": "Chưa nhận về",
+        "nftsAnchored": "Đang neo giữ",
+        "nftsImprinted": "NFT đã khắc",
+        "acrossNfts": "{count, plural, other {trên # NFT}}"
+      },
+      "sections": {
+        "actions": "Thao tác neo giữ / gỡ neo",
+        "distributionsByToken": "Phân phối neo giữ theo token",
+        "anchoredNftSelection": "Tinh tuyển NFT neo giữ"
+      },
+      "showDeposits": "Hiện các đợt nạp",
+      "hideDeposits": "Ẩn các đợt nạp",
+      "depositsHeader": "Đợt nạp",
+      "nothingRetrieved": "Chưa nhận về khoản nào: phân phối neo giữ của một NFT được nhận về khi gỡ neo."
+    },
+    "donatedAssets": {
+      "nfts": {
+        "title": "NFT đính kèm đã nhận",
+        "tooltip": "Các NFT do người tham gia khác đính kèm vào nét bút và được phân bổ cho địa chỉ này cùng phân bổ Signature. Người nhận có thể nhận về những NFT chưa nhận.",
+        "unclaimed": "{count} chưa nhận về",
+        "claimAll": "Nhận về tất cả NFT",
+        "emptyTitle": "Không có NFT đính kèm",
+        "emptyDescription": "Chưa có NFT đính kèm nào được phân bổ cho địa chỉ này."
+      },
+      "erc20": {
+        "title": "Token ERC20 đính kèm",
+        "tooltip": "Các token ERC20 do người tham gia khác đính kèm vào nét bút và được phân bổ cho địa chỉ này. Người nhận có thể nhận về những token chưa nhận.",
+        "unclaimed": "{count} chưa nhận về",
+        "claimAll": "Nhận về tất cả token",
+        "emptyTitle": "Không có token đính kèm",
+        "emptyDescription": "Chưa có token ERC20 đính kèm nào được phân bổ cho địa chỉ này."
+      }
+    },
+    "viewAddress": {
+      "label": "Xem một địa chỉ bất kỳ",
+      "hint": "Thống kê của người tham gia là công khai: bạn có thể xem bất kỳ địa chỉ nào mà không cần kết nối ví.",
+      "placeholder": "0x…",
+      "submit": "Xem",
+      "invalid": "Hãy nhập địa chỉ đầy đủ: 0x và 40 chữ cái, chữ số theo sau."
+    }
+  },
+  "tokens": {
+    "page": {
+      "title": "NFT của tôi",
+      "subtitle": "Các Cosmic Signature NFT trong ví bạn kết nối",
+      "newestCaption": "Những Signature mới nhất. Signature của bạn cũng sẽ được treo ở đây.",
+      "anchorLink": "Neo giữ NFT",
+      "loadErrorTitle": "Không tải được token",
+      "loadErrorMessage": "Không tải được Cosmic Signature NFT.",
+      "ownedTitle": "Cosmic Signature NFT tôi sở hữu",
+      "transferTitle": "Chuyển giao NFT",
+      "figures": {
+        "owned": "Trong ví này",
+        "anchored": "Đang neo giữ"
+      },
+      "emptyTitle": "Ví này chưa có Signature nào",
+      "emptyDescription": "Các Signature bạn nhận được qua phân bổ hoặc mua trên sàn sẽ hiện ở đây."
+    }
+  },
+  "transferCst": {
+    "page": {
+      "title": "Chuyển CST",
+      "subtitle": "Gửi CST từ ví đã kết nối của bạn đến một địa chỉ khác trên {network}."
+    },
+    "form": {
+      "send": "Gửi CST",
+      "sendAmount": "Gửi {amount}"
+    },
+    "guide": {
+      "from": "Gửi từ",
+      "history": "Lịch sử chuyển CST của bạn",
+      "title": "Trước khi gửi",
+      "final": "Không thể hoàn tác giao dịch chuyển. CST gửi nhầm địa chỉ sẽ không thể khôi phục.",
+      "network": "Chỉ gửi đến địa chỉ có thể giữ token trên {network}.",
+      "paste": "Hãy sao chép địa chỉ từ ví nhận thay vì tự gõ."
+    }
+  },
+  "nftTransfer": {
+    "pickerTitle": "Chọn NFT để chuyển giao",
+    "pickerSummary": "Đã chọn {selected} trong {total} NFT có thể chuyển giao.",
+    "selectAll": "Chọn tất cả",
+    "selectAria": "Chọn NFT {id}",
+    "statusLabels": {
+      "anchored": "Đang neo giữ - gỡ neo trước khi chuyển giao",
+      "ownerChanged": "Chủ sở hữu đã thay đổi - tải lại trước khi chuyển giao"
+    },
+    "progress": {
+      "transferred": "Đã chuyển giao {completed} trong {total} NFT",
+      "stopped": "Đã dừng sau {completed}/{total}, tại NFT {id}. Các NFT chưa gửi vẫn được chọn."
+    },
+    "sending": "Đang gửi…",
+    "send": "Gửi NFT đã chọn",
+    "viewHistory": "Xem lịch sử chuyển giao NFT",
+    "review": {
+      "count": "{count, plural, other {# NFT}}"
+    },
+    "sendCount": "{count, plural, other {Gửi # NFT}}"
+  },
+  "transferHistory": {
+    "nft": {
+      "title": "Lịch sử chuyển giao NFT",
+      "empty": "Chưa có lần chuyển giao NFT nào.",
+      "lede": "Các Cosmic Signature NFT được khắc cho địa chỉ này, cùng mọi NFT nó đã nhận hoặc gửi.",
+      "emptyDescription": "NFT đến một địa chỉ khi được khắc cho nó hoặc được gửi từ ví khác.",
+      "figures": {
+        "imprinted": "Đã khắc",
+        "received": "Đã nhận",
+        "sent": "Đã gửi",
+        "anchoring": "Neo giữ hoặc gỡ neo"
+      }
+    },
+    "cst": {
+      "title": "Lịch sử chuyển CST",
+      "empty": "Chưa có lần chuyển CST nào.",
+      "lede": "CST được khắc cho địa chỉ này, CST địa chỉ này nhận và gửi, cùng CST bị tiêu thụ bởi các nét bút CST của nó.",
+      "emptyDescription": "CST đến một địa chỉ khi một nét bút khắc CST cho nó hoặc một ví khác gửi đến.",
+      "figures": {
+        "received": "Tổng vào",
+        "sent": "Tổng ra",
+        "net": "Thay đổi ròng",
+        "imprintedCaption": "Đã khắc: {amount}",
+        "consumedCaption": "Đã tiêu thụ: {amount}"
+      }
+    },
+    "switcherLabel": "Lịch sử chuyển của địa chỉ này",
+    "artUnavailable": "Tác phẩm không khả dụng",
+    "viewOnExplorer": "Xem trên {explorer}",
+    "error": "Không tải được lịch sử chuyển của địa chỉ này.",
+    "count": "{count, plural, other {# giao dịch}}",
+    "activity": {
+      "imprinted": "Đã khắc",
+      "received": "Đã nhận",
+      "sent": "Đã gửi",
+      "consumed": "Đã tiêu thụ",
+      "anchored": "Đã neo giữ",
+      "released": "Đã gỡ neo"
+    },
+    "filter": {
+      "label": "Hiển thị",
+      "all": "Tất cả",
+      "in": "Chuyển vào",
+      "out": "Chuyển ra",
+      "empty": "Chưa có giao dịch nào theo chiều này.",
+      "transfers": "Giữa các ví"
+    },
+    "columns": {
+      "activity": "Hoạt động",
+      "counterparty": "Địa chỉ đối ứng"
+    },
+    "invalidAddress": {
+      "title": "Địa chỉ không hợp lệ",
+      "description": "Liên kết cần một địa chỉ đầy đủ: 0x và 40 chữ cái, chữ số theo sau.",
+      "action": "Xem danh sách người tham gia"
+    }
+  },
+  "ethAllocations": {
+    "columns": {
+      "cycle": "Chu kỳ",
+      "source": "Nguồn",
+      "allocated": "Thời điểm phân bổ",
+      "amount": "Số tiền",
+      "deadline": "Hạn nhận về",
+      "status": "Trạng thái"
+    },
+    "cycle": "Chu kỳ {cycle}",
+    "sources": {
+      "stellarSelection": "Tinh tuyển",
+      "chronoWarrior": "Chiến binh Thời gian"
+    },
+    "status": {
+      "retrieved": "Đã nhận về",
+      "waiting": "Chưa nhận về"
+    },
+    "deadline": {
+      "remaining": "còn {remaining}",
+      "expired": "Đã hết hạn",
+      "help": "Trước thời điểm này, chỉ người nhận mới có thể nhận về ETH. Sau đó, bất kỳ ai cũng có thể nhận về."
+    }
+  },
+  "attached": {
+    "columns": {
+      "nft": "NFT",
+      "token": "Token",
+      "cycle": "Chu kỳ",
+      "contributor": "Người đính kèm",
+      "attached": "Thời điểm đính kèm",
+      "amount": "Số lượng",
+      "action": "Thao tác"
+    },
+    "tokenNumber": "Token #{id}",
+    "retrieve": "Nhận về",
+    "retrieveItem": "Nhận về {item}"
+  }
+}

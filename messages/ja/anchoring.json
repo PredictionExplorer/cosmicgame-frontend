@@ -1,0 +1,400 @@
+{
+  "common": {
+    "anchor": "係留",
+    "release": "解除",
+    "yes": "はい",
+    "no": "いいえ",
+    "empty": {
+      "actions": {
+        "title": "まだ係留操作はありません",
+        "description": "係留と解除がオンチェーンに記録されると、ここに表示されます。"
+      },
+      "distributions": {
+        "title": "まだ係留配分はありません",
+        "description": "Cosmic Signature NFTが係留されている間、サイクルが確定するたびにここへ積立が追加されます。"
+      },
+      "unretrieved": {
+        "title": "未受け取りの係留配分はありません",
+        "description": "このアドレスが参加している係留配分の積立は、すべて受け取り済みです。"
+      },
+      "imprints": {
+        "title": "まだ星選の刻印はありません",
+        "description": "サイクルの確定時に係留中のRandom Walk NFTが選ばれると、その刻印がここに表示されます。"
+      },
+      "tokens": {
+        "title": "現在係留中のNFTはありません",
+        "description": "係留されている間、NFTがここに表示されます。"
+      }
+    }
+  },
+  "art": {
+    "unavailable": "アートワークを利用できません",
+    "signatureTitle": "Cosmic Signature {id}",
+    "randomWalkTitle": "Random Walk {id}"
+  },
+  "status": {
+    "anchored": "係留中",
+    "released": "解除済み"
+  },
+  "overview": {
+    "errorTitle": "この一覧を読み込めませんでした",
+    "errorMessage": "係留の記録を一時的に取得できません。しばらくしてからもう一度お試しください。",
+    "title": "係留配分",
+    "subtitle": "係留の全体の動きと、すべての係留配分の履歴です。",
+    "start": "係留を始める",
+    "howItWorks": {
+      "title": "係留の仕組み",
+      "description": "NFTを係留すると、解除するまで毎サイクルに参加します。"
+    }
+  },
+  "steps": {
+    "anchor": {
+      "title": "NFTを係留する",
+      "body": "<link>自分の係留</link>で、ウォレットにあるCosmic SignatureまたはRandom Walk NFTを選びます。初回は、ウォレットがまずそのコレクションの係留コントラクトの承認を求め、次に係留の確認を求めます。",
+      "bodyHere": "ウォレットを接続し、係留するCosmic SignatureまたはRandom Walk NFTを選びます。初回は、ウォレットがまずそのコレクションの係留コントラクトの承認を求め、次に係留の確認を求めます。"
+    },
+    "receive": {
+      "title": "毎サイクル受け取る",
+      "body": "係留中のCosmic Signature NFTは、各サイクルのサイクル準備金の{percentage}%をETHで分け合います。係留中のRandom Walk NFTは星選に参加し、毎サイクルそのうち{selections}件が選ばれます。"
+    },
+    "release": {
+      "title": "解除して受け取る",
+      "body": "解除すると、NFTはそれまでに積み上がったETHとともにウォレットへ戻ります。解除は取り消せません。各NFTを係留できるのは一度だけです。"
+    }
+  },
+  "flow": {
+    "caption": "各サイクルが係留中のNFTに届く流れと、現在の数値",
+    "unavailable": "取得できません",
+    "dividedBy": "割る",
+    "equals": "イコール",
+    "then": "次に",
+    "cosmicSignature": {
+      "title": "Cosmic Signature NFTはETHを分け合います",
+      "pool": {
+        "label": "係留配分プール",
+        "definition": "このサイクルが係留中のCosmic Signature NFTのために取り分けるETHです。サイクルの確定時に積み立てられ、係留者ごとの係留数に比例して配分されます。",
+        "caption": "現在のサイクル準備金の{percentage}%、サイクル確定時に積立"
+      },
+      "anchored": {
+        "label": "係留中のCosmic Signature NFT",
+        "definition": "すべての係留者が現在係留しているCosmic Signature NFTです。"
+      },
+      "perNft": {
+        "label": "係留NFTごと",
+        "definition": "プールを、インデクサーが数えた係留中のCosmic Signature NFTの数で割った値です。いまサイクルが確定した場合に各NFTが受け取る額を示します。",
+        "caption": "いまサイクルが確定した場合",
+        "noneAnchored": "係留中のCosmic Signature NFTはまだインデックスされていません"
+      }
+    },
+    "randomWalk": {
+      "title": "Random Walk NFTは星選に参加します",
+      "anchored": {
+        "label": "係留中のRandom Walk NFT",
+        "definition": "現在係留中のRandom Walk NFTです。確定のたびに係留NFT星選に参加します。"
+      },
+      "selections": {
+        "label": "毎サイクルの星選",
+        "caption": "オンチェーンで選ばれ、同じNFTが複数回選ばれることもあります"
+      },
+      "allocation": {
+        "label": "選ばれた1件が受け取るもの",
+        "caption": "新たに刻印されたCosmic Signature NFTも受け取ります"
+      }
+    },
+    "holders": {
+      "label": "活動中の係留者",
+      "definition": "Cosmic SignatureまたはRandom Walk NFTを1点以上係留している、重複のないウォレットの数です。両方を係留しているウォレットは1つと数えます。"
+    }
+  },
+  "questions": {
+    "title": "係留についての質問",
+    "description": "係留したNFTがどうなるのか、解除とは何を意味するのかを説明します。",
+    "items": {
+      "whatIsAnchoring": {
+        "question": "係留とは？",
+        "answer": "係留とは、NFTをプロトコルのコントラクトに置くことです。Cosmic Signature NFTはETHの係留配分、Random Walk NFTは係留NFT星選の対象になります。いつでも解除してNFTをウォレットに戻せます。Cosmic Signature NFTの場合は、累積したETHも解除時に受け取ります。各NFTを係留できるのは一度だけです。一度解除すると、同じNFTを再び係留することはできません。"
+      },
+      "cosmicSignature": {
+        "question": "Cosmic Signature NFTの係留はどのような仕組みですか？",
+        "answer": "Cosmic Signature NFTを係留すると、係留配分プールからETHを受け取れます。サイクルごとに、サイクル準備金の{percentage}%が、係留しているNFTの数に基づいてすべてのCosmic Signature NFT係留者へ比例配分されます。配分は自動的に累積し、係留を解除したときに支払われます。サイクルが確定した時点でCosmic Signature NFTが一つも係留されていなければ、そのサイクルの分はサイクル準備金に残ります。"
+      },
+      "randomWalk": {
+        "question": "Random Walk NFTの係留はどのような仕組みですか？",
+        "answer": "Random Walk NFTを係留すると、係留NFT星選に参加できます。サイクルごとに、係留中のRandom Walk NFTの中からオンチェーンの無作為選定で{selections}件が選ばれ、選ばれるたびにそのNFTの係留者が{cst, number} CSTと新たに刻印されたCosmic Signature NFT 1点を受け取ります。同じNFTが1サイクルに複数回選ばれることもあります。Random Walkの係留はETHを受け取りません。"
+      },
+      "calculation": {
+        "question": "配分はどのように計算されますか？",
+        "answer": "Cosmic Signature NFTの係留配分は比例配分です。係留中のCosmic Signature NFT全体の10分の1を係留していれば、各ETH配分の積立の10分の1を受け取ります。Random Walk NFTの係留は係留NFT星選のためにオンチェーンの無作為選定の仕組みを使うので、Random Walk NFTを多く係留するほど、ETH配分の分け前ではなく選ばれる可能性が高まります。"
+      },
+      "anchorOnce": {
+        "question": "解除したNFTをもう一度係留できますか？",
+        "answer": "できません。係留コントラクトは係留されたことのあるすべてのNFTを記録し、NFTを係留できるのは一度だけです。係留を解除すると、累積したETHの配分（Cosmic Signature NFTの場合）が支払われ、NFTはウォレットに戻りますが、そのNFTの係留資格は永久に終わります。そのNFTの係留を完全にやめたいときにだけ解除してください。"
+      }
+    }
+  },
+  "ledgers": {
+    "distributions": {
+      "title": "ETHの係留配分",
+      "description": "確定したサイクルごとに、サイクル準備金の{percentage}%が係留中のCosmic Signature NFTのために積み立てられます。サイクルを開くと、係留者ごとの取り分が見られます。"
+    },
+    "imprints": {
+      "title": "係留NFT星選の刻印",
+      "description": "毎サイクル、係留中のRandom Walk NFTから{count}件が選ばれます。選ばれるたびに、その係留者へ{cst, number} CSTと新しいCosmic Signature NFTが刻印されます。",
+      "selections": "{count, plural, other {星選#件}}"
+    }
+  },
+  "picker": {
+    "selectAll": "すべて選択（{count, number}件）",
+    "clearSelection": "選択を解除",
+    "clear": "クリア",
+    "selected": "{count, plural, other {#件を選択中}}",
+    "selectionLabel": "選択：{title}",
+    "anchorSelected": "{count, plural, other {#件のNFTを係留}}",
+    "releaseSelected": "{count, plural, other {#件のNFTを解除}}",
+    "approvalNote": "初回はウォレットが2回確認します。まず係留コントラクトがこのコレクションのNFTを預かることを承認し、次に係留を確定します。",
+    "releaseNote": "解除は取り消せません。ウォレットが開く前に、次の画面でもう一度確認します。",
+    "anchoredOn": "<date></date>に係留",
+    "accrued": "{amount}を積立済み",
+    "cycle": "サイクル{cycle}",
+    "open": "{title}を開く",
+    "loadError": {
+      "title": "これらのNFTを読み込めませんでした",
+      "message": "一覧を一時的に取得できません。しばらくしてからもう一度お試しください。"
+    },
+    "settled": {
+      "anchored": "係留済み・更新中",
+      "released": "解除済み・更新中"
+    }
+  },
+  "release": {
+    "title": "{count, plural, other {#件の係留を解除しますか？}}",
+    "description": {
+      "cosmicSignature": "{count, plural, other {解除すると、選択した#件のNFTがウォレットに戻り、積み上がったETHの係留配分も受け取ります。}}",
+      "randomWalk": "{count, plural, other {解除すると、選択した#件のNFTがウォレットに戻り、係留NFT星選から外れます。}}"
+    },
+    "tokensLabel": "解除するNFT",
+    "more": "{count, plural, other {ほか#件}}",
+    "eth": {
+      "label": "受け取るETH",
+      "approximately": "約",
+      "unknown": "取得できません",
+      "note": "インデックスされた積立からの推定額です。正確な額はコントラクトが支払います。"
+    },
+    "warning": "<b>取り消せない操作です。</b>解除したNFTは二度と係留できません。",
+    "keep": "係留を続ける",
+    "confirm": "{count, plural, other {#件のNFTを解除}}"
+  },
+  "anchorActionDetail": {
+    "title": "係留操作 #{id}",
+    "errorTitle": "この係留操作を読み込めませんでした",
+    "error": "係留の記録を一時的に取得できません。しばらくしてからもう一度お試しください。",
+    "breadcrumbs": {
+      "action": "操作 #{id}"
+    },
+    "empty": {
+      "title": "操作#{id}の記録はありません",
+      "description": "インデクサーにこの番号の係留操作がありません。まだ同期中か、リンクが誤っている可能性があります。",
+      "browse": "係留配分を見る",
+      "statistics": "係留統計"
+    },
+    "record": {
+      "title": "記録",
+      "holder": "係留者",
+      "transaction": "トランザクション"
+    },
+    "timeline": {
+      "title": "タイムライン",
+      "anchored": "係留",
+      "anchoredCount": "この操作後の全体の係留数：{count, plural, other {#件}}",
+      "released": "解除",
+      "retrieved": "{amount}を受け取り済み",
+      "stillAnchored": "係留中",
+      "stillAnchoredCosmicSignature": "毎サイクルのETHの係留配分を分け合っています。",
+      "stillAnchoredRandomWalk": "毎サイクルの係留NFT星選に参加しています。"
+    },
+    "next": {
+      "title": "次のステップ",
+      "distributions": "このNFTの係留配分",
+      "token": "アートワークを見る",
+      "allActions": "すべての係留操作"
+    }
+  },
+  "distributionsByToken": {
+    "title": "Cosmic Signature {id}の係留配分",
+    "subtitle": "このNFTが係留中に参加した、ETHの係留配分の積立すべてです。",
+    "label": "係留配分の積立",
+    "error": "このNFTの積立を読み込めませんでした。しばらくしてからもう一度お試しください。",
+    "holder": "係留者",
+    "figures": {
+      "deposits": "積立回数",
+      "distributed": "配分済み",
+      "unretrieved": "未受け取り",
+      "unretrievedCaption": "係留の解除時に受け取ります"
+    },
+    "details": {
+      "anchoredDatetime": "係留日時",
+      "releasedDatetime": "解除日時",
+      "distribution": "受け取り額",
+      "action": "係留操作"
+    },
+    "anchor": {
+      "status": "状態",
+      "notAnchored": "このアドレスはこのNFTを係留していません"
+    },
+    "columns": {
+      "depositDatetime": "積立日時",
+      "cycle": "サイクル",
+      "depositId": "積立ID",
+      "retrieved": "受け取り",
+      "distributionEth": "配分（ETH）"
+    },
+    "empty": {
+      "title": "このNFTの係留配分はまだありません",
+      "description": "NFTが係留されている間、サイクルが確定するたびにここへ積立が追加されます。",
+      "action": "係留配分を見る",
+      "viewAction": "係留操作#{id}を見る"
+    }
+  },
+  "tables": {
+    "globalAnchorActions": {
+      "label": "係留と解除の操作",
+      "headers": {
+        "anchorDatetime": {
+          "desktop": "日時",
+          "mobile": "日時"
+        },
+        "actionType": {
+          "desktop": "操作"
+        },
+        "tokenId": {
+          "desktop": "NFT",
+          "mobile": "NFT"
+        },
+        "holderAddress": {
+          "desktop": "係留者",
+          "mobile": "係留者"
+        },
+        "nftCount": {
+          "desktop": "全体の係留数",
+          "mobile": "NFT",
+          "tooltip": "この操作後の係留中NFT数。"
+        }
+      }
+    },
+    "globalAnchoredTokens": {
+      "label": "係留中のNFT",
+      "headers": {
+        "tokenId": {
+          "desktop": "NFT"
+        },
+        "anchorDatetime": {
+          "desktop": "係留日時",
+          "mobile": "日時"
+        },
+        "actionId": {
+          "desktop": "係留操作",
+          "mobile": "操作"
+        },
+        "holderAddress": {
+          "desktop": "係留者",
+          "mobile": "係留者"
+        }
+      }
+    },
+    "globalDistributions": {
+      "label": "サイクル別のETHの係留配分",
+      "showRecipients": "受領者を表示",
+      "hideRecipients": "受領者を隠す",
+      "recipientsError": "このサイクルの係留者を読み込めませんでした。",
+      "columns": {
+        "cycle": "サイクル",
+        "depositDatetime": "積立日時",
+        "totalAnchoredTokens": "係留中のNFT",
+        "totalDepositedEth": "積立総額（ETH）",
+        "pendingEth": "未受け取り（ETH）"
+      }
+    },
+    "randomWalkImprints": {
+      "label": "係留NFT星選の刻印",
+      "columns": {
+        "tokenId": "刻印されたNFT",
+        "recipient": "受領者",
+        "cycle": "サイクル",
+        "datetime": "日時"
+      }
+    },
+    "anchorActions": {
+      "label": "係留と解除の履歴",
+      "columns": {
+        "datetime": "日時",
+        "type": "操作",
+        "tokenId": "NFT",
+        "nftCount": "全体の係留数"
+      }
+    },
+    "tokenDistributions": {
+      "label": "NFT別の係留配分",
+      "columns": {
+        "tokenId": "NFT",
+        "retrievedEth": "受け取り済み（ETH）",
+        "retrievableEth": "受け取れる額（ETH）"
+      }
+    },
+    "unretrievedDistributions": {
+      "label": "未受け取りの係留配分",
+      "error": "未受け取りの係留配分を読み込めませんでした。しばらくしてからもう一度お試しください。",
+      "anchoredOfTotal": "{count, number} / {total, number}",
+      "summary": "未受け取りの係留配分",
+      "releaseAll": "すべて解除して受け取る",
+      "columns": {
+        "depositDatetime": "積立日時",
+        "depositId": "積立ID",
+        "anchoredTokens": "係留中のNFT（このアドレス / 全体）",
+        "unretrievedTokens": "未受け取りのNFT",
+        "depositAmountEth": "積立額（ETH）",
+        "distributionAmountEth": "配分額（ETH）",
+        "unretrievedAmountEth": "未受け取り額（ETH）"
+      }
+    },
+    "distributionsByDeposit": {
+      "columns": {
+        "totalDepositAmount": "積立額（ETH）",
+        "totalAnchoredNfts": "係留中のNFT"
+      }
+    }
+  },
+  "panels": {
+    "shared": {
+      "anchoredTokens": "係留中",
+      "available": "係留できるトークン",
+      "history": "係留 / 解除の履歴",
+      "historyDescription": "このウォレットのすべての係留と解除です。開くと記録を確認できます。",
+      "anchoredEmpty": {
+        "title": "まだ係留しているNFTはありません",
+        "description": "「係留できるトークン」からNFTを選んで始めましょう。"
+      }
+    },
+    "cosmicSignature": {
+      "anchoredDescription": "これらのNFTは毎サイクルのETHの係留配分を分け合います。解除するとETHとともにNFTが戻り、そのNFTの係留は永久に終わります。",
+      "availableDescription": "ウォレットにあるCosmic Signature NFTのうち、一度も係留していないものです。",
+      "availableEmpty": {
+        "title": "係留できるCosmic Signature NFTはありません",
+        "description": "ウォレットにあるCosmic Signature NFTがここに表示されます。各NFTを係留できるのは一度だけです。",
+        "action": "ギャラリーを見る"
+      },
+      "distributions": "NFT別の係留配分",
+      "distributionsDescription": "係留した各NFTの受け取り済みの額と、受け取れる額です。開くとすべての積立を確認できます。"
+    },
+    "randomWalk": {
+      "anchoredDescription": "これらのNFTは毎サイクルの星選に参加します。解除するとNFTが戻り、そのNFTの係留は永久に終わります。",
+      "availableDescription": "ウォレットにあるRandom Walk NFTのうち、一度も係留していないものです。",
+      "availableEmpty": {
+        "title": "係留できるRandom Walk NFTはありません",
+        "description": "ウォレットにあるRandom Walk NFTのうち、一度も係留していないものがここに表示されます。"
+      },
+      "selection": "星選の刻印",
+      "selectionDescription": "このウォレットが係留したRandom Walk NFTが選ばれたときに刻印された、Cosmic Signature NFTとCSTです。",
+      "selectionEmpty": "まだ選ばれていません"
+    }
+  }
+}

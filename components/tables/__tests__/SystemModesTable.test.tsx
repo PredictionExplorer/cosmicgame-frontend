@@ -1,8 +1,5 @@
 import '@testing-library/jest-dom';
 import { fireEvent } from '@testing-library/react';
-import userEvent from '@testing-library/user-event';
-
-import { convertTimestampToDateTime } from '@/utils';
 
 import { checkA11y, render, screen } from '@/test-utils';
 
@@ -12,7 +9,7 @@ jest.mock('next/navigation', () => ({
 }));
 
 // eslint-disable-next-line import/order
-import { SystemModesTable } from '@/components/tables/SystemModesTable';
+import { SystemModesTable, activationEnds } from '@/components/tables/SystemModesTable';
 
 const createEvent = (overrides = {}) => ({
   RoundNum: 5,
@@ -37,17 +34,19 @@ describe('SystemModesTable', () => {
     expect(screen.getAllByText('tables.columns.ended').length).toBeGreaterThanOrEqual(1);
   });
 
-  it('adds localized help to system event headers', async () => {
-    const user = userEvent.setup();
+  it('carries no info button on headers that say what they hold', () => {
     render(<SystemModesTable list={[createEvent()]} />);
-    const triggers = screen.getAllByRole('button', {
-      name: /^tables\.tableHeaderHelp\.explainColumn/,
+    expect(
+      screen.queryAllByRole('button', { name: /^tables\.tableHeaderHelp\.explainColumn/ }),
+    ).toHaveLength(0);
+  });
+
+  it('names each row link by what it shows, then where it leads', () => {
+    render(<SystemModesTable list={[createEvent({ RoundNum: 5 })]} />);
+    const link = screen.getByRole('link', {
+      name: 'tables.allocation.cycle(cycle=5) tables.systemModes.viewEvent',
     });
-    expect(triggers.length).toBeGreaterThanOrEqual(3);
-    await user.hover(triggers[2]!);
-    expect(await screen.findByRole('tooltip')).toHaveTextContent(
-      'tables.statisticsTooltips.systemEnded',
-    );
+    expect(link).toHaveAttribute('href', '/system-event/5/100/200');
   });
 
   it('shows "Deployment" for RoundNum 0', () => {
@@ -67,25 +66,40 @@ describe('SystemModesTable', () => {
     ];
     render(<SystemModesTable list={list} />);
     expect(screen.getByText('tables.status.currentlyActive')).toBeInTheDocument();
-    expect(
-      screen.getAllByText(convertTimestampToDateTime(1701346718)).length,
-    ).toBeGreaterThanOrEqual(1);
+    expect(screen.getAllByText('Nov 30, 2023, 12:18').length).toBeGreaterThanOrEqual(1);
   });
 
   it('navigates on row click with correct URL', () => {
     render(
       <SystemModesTable list={[createEvent({ RoundNum: 5, EvtLogId: 100, NextEvtLogId: 200 })]} />,
     );
-    const row = screen.getByText('5').closest('tr');
+    const row = screen.getByText('tables.allocation.cycle(cycle=5)').closest('tr');
     fireEvent.click(row!);
     expect(mockPush).toHaveBeenCalledWith('/system-event/5/100/200');
   });
 
-  it('renders only first page of results (perPage=5)', () => {
-    const list = Array.from({ length: 8 }, (_, i) => createEvent({ EvtLogId: i, RoundNum: i + 1 }));
-    render(<SystemModesTable list={list} />);
-    expect(screen.getByText('5')).toBeInTheDocument();
-    expect(screen.queryByText('6')).not.toBeInTheDocument();
+  it('shows 20 rows a page with the row range', () => {
+    const list = Array.from({ length: 25 }, (_, i) =>
+      createEvent({ EvtLogId: i, RoundNum: i + 1 }),
+    );
+    const { container } = render(<SystemModesTable list={list} />);
+    expect(container.querySelectorAll('tbody tr')).toHaveLength(20);
+    expect(screen.getByText('tables.pagination.range(from=1,to=20,total=25)')).toBeInTheDocument();
+  });
+
+  // Regression: "Ended" read the row before it in the sorted list, so any
+  // order but newest first showed wrong end dates.
+  it('ends each activation when the next one in time began, whatever the order', () => {
+    const events = [
+      createEvent({ EvtLogId: 1, TimeStamp: 100 }),
+      createEvent({ EvtLogId: 3, TimeStamp: 300 }),
+      createEvent({ EvtLogId: 2, TimeStamp: 200 }),
+    ];
+    const ends = activationEnds(events);
+    expect(ends.get(1)).toBe(200);
+    expect(ends.get(2)).toBe(300);
+    expect(ends.get(3)).toBeNull();
+    expect(activationEnds([...events].reverse())).toEqual(ends);
   });
 
   it('has no accessibility violations', async () => {

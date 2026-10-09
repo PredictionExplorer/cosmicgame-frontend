@@ -1,0 +1,47 @@
+{
+  "generic": "Đã xảy ra lỗi. Vui lòng thử lại.",
+  "walletNotConnected": "Kết nối ví Web3 để đặt nét bút.",
+  "insufficientEth": "Ví không đủ ETH cho nét bút này.",
+  "state": {
+    "title": "Đã xảy ra lỗi",
+    "retry": "Thử lại"
+  },
+  "boundary": {
+    "title": "Đã xảy ra lỗi",
+    "description": "Đã xảy ra lỗi ngoài dự kiến.",
+    "home": "Về trang chủ"
+  },
+  "route": {
+    "message": "Không thể hiển thị trang này. Hãy thử lại hoặc quay lại sau ít phút.",
+    "titles": {
+      "app": "Không tải được trang này",
+      "allocation": "Không tải được chi tiết phân bổ",
+      "anchoring": "Không tải được phân phối neo giữ",
+      "gallery": "Không tải được phòng trưng bày",
+      "myAllocations": "Không tải được phân bổ của bạn",
+      "myAnchors": "Không tải được neo giữ của bạn",
+      "myTokens": "Không tải được token của bạn",
+      "myStatistics": "Không tải được thống kê của bạn"
+    }
+  },
+  "global": {
+    "title": "Ứng dụng gặp lỗi ngoài dự kiến",
+    "message": "Ứng dụng không thể hiển thị trang. Hãy tải lại để thử khắc phục.",
+    "retry": "Tải lại"
+  },
+  "environment": {
+    "title": "Không thể chạy vì các biến môi trường chưa được thiết lập.",
+    "description": "Cần thiết lập mạng và URL API chính xác để ứng dụng hoạt động.",
+    "missing": "Thiếu hoặc không hợp lệ:",
+    "resolution": "Hãy thiết lập chúng trong shell hoặc trong tệp .env, rồi khởi động lại máy chủ phát triển."
+  },
+  "unexpected": "Đã xảy ra lỗi ngoài dự kiến. Vui lòng thử lại.",
+  "notFound": {
+    "code": "Lỗi 404",
+    "title": "Không tìm thấy trang",
+    "description": "Đường dẫn có thể bị gõ sai, hoặc trang đã được chuyển đi. Hãy tiếp tục từ một trong các trang dưới đây.",
+    "primaryCta": "Đến Đài quan sát",
+    "secondaryCta": "Xem phòng trưng bày",
+    "suggestedPages": "Trang gợi ý"
+  }
+}

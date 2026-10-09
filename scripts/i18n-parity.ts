@@ -1,19 +1,20 @@
 #!/usr/bin/env tsx
 /**
- * Message-catalog integrity report and gate (docs/i18n/README.md §7).
+ * Translation integrity report and gate (docs/i18n/README.md §7).
  *
- * Compares every translated locale in `routing.locales` against the
- * default-locale catalogs in messages/en/ and reports, per namespace, key
- * parity, ICU syntax, placeholder/tag parity, plural completeness for the
- * locale's CLDR categories, and verbatim-copy (untranslated) catalogs. The
- * checks themselves live in ./i18n-parity-core.ts and also run under jest
- * (i18n/__tests__/catalog-integrity.test.ts).
+ * Compares every translated locale in `routing.locales` against the default
+ * locale and reports, per message namespace, key parity, ICU syntax,
+ * placeholder/tag parity, plural completeness for the locale's CLDR
+ * categories, and verbatim-copy (untranslated) catalogs; then, per long-form
+ * content area (./i18n-content-areas.ts), how much prose still equals the
+ * English source. The checks themselves live in ./i18n-parity-core.ts and
+ * also run under jest (i18n/__tests__/catalog-integrity.test.ts).
  *
  * Exit code:
  *   0  in report mode (default) unless catalogs are malformed or the
  *      messages/ directory disagrees with routing.locales.
  *   1  with --strict [ns ...] when the listed namespaces (or all, if none
- *      listed) have any problem.
+ *      listed) have any problem, or when a content area is untranslated.
  */
 /* eslint-disable no-console -- CLI report output. This file is a Node script
    run via `npm run i18n:parity` and never ships to the browser. */
@@ -23,13 +24,17 @@ import { join, resolve } from 'node:path';
 import { getLocaleConfig } from '../i18n/localeConfig';
 import { routing, TRANSLATED_LOCALES } from '../i18n/routing';
 
+import { CONTENT_AREAS } from './i18n-content-areas';
 import {
   checkSourceNamespace,
+  compareContent,
   compareNamespace,
+  flattenMessages,
   isPlainObject,
   strictProblems,
   type Messages,
 } from './i18n-parity-core';
+import { sourceTokens, unreferencedKeys } from './i18n-unused-keys-core';
 
 const MESSAGES_DIR = resolve(process.cwd(), 'messages');
 const DEFAULT_LOCALE = routing.defaultLocale;
@@ -93,15 +98,28 @@ console.log(
   `i18n parity — comparing ${TRANSLATED_LOCALES.join(', ') || '(no locales)'} against ${DEFAULT_LOCALE}\n`,
 );
 
-// The source catalog must itself be well-formed ICU with complete plurals.
+// The source catalog must itself be well-formed ICU with complete plurals,
+// and every key must be one some code can reach (./i18n-unused-keys-core.ts).
+const tokens = sourceTokens(process.cwd());
 for (const namespaceFile of enNamespaces) {
   const namespace = namespaceFile.replace(/\.json$/, '');
+  const source = readNamespace(DEFAULT_LOCALE, namespaceFile);
   const report = checkSourceNamespace(
     namespace,
-    readNamespace(DEFAULT_LOCALE, namespaceFile),
+    source,
     getLocaleConfig(DEFAULT_LOCALE).intlLocale,
   );
-  const problems = [...report.syntaxErrors, ...report.pluralGaps];
+  const problems = [
+    ...unreferencedKeys(namespace, source, tokens).map(
+      (key) => `unused: ${key} (no code spells every segment; delete it in every locale)`,
+    ),
+    ...report.empty.map((key) => `empty: ${key}`),
+    ...report.invalidValues.map((key) => `not a string: ${key}`),
+    ...report.syntaxErrors,
+    ...report.pluralGaps,
+    ...report.unitSpacing,
+    ...report.typography,
+  ];
   if (problems.length) {
     console.log(`  ${DEFAULT_LOCALE}/${namespace}: ${problems.length} source problem(s)`);
     for (const problem of problems) console.log(`      · ${problem}`);
@@ -121,7 +139,7 @@ for (const locale of TRANSLATED_LOCALES) {
     const source = readNamespace(DEFAULT_LOCALE, namespaceFile);
 
     if (!localeNamespaces.has(namespaceFile)) {
-      const size = Object.keys(source).length;
+      const size = flattenMessages(source).size;
       console.log(`  ${locale}/${namespace}: MISSING FILE (${size} keys fall back)`);
       localeTotal += size;
       localeMissing += size;
@@ -135,17 +153,18 @@ for (const locale of TRANSLATED_LOCALES) {
       translation: readNamespace(locale, namespaceFile),
       intlLocale,
     });
-    const translated = report.total - report.missing.length - report.empty.length;
+    const populated =
+      report.total - report.missing.length - report.empty.length - report.invalidValues.length;
     localeTotal += report.total;
-    localeMissing += report.missing.length + report.empty.length;
+    localeMissing += report.missing.length + report.empty.length + report.invalidValues.length;
     localeIdentical += report.identical.length;
 
     const problems = strictProblems(report);
     if (isStrict(namespace) && problems.length > 0) failures += 1;
 
-    const pct = report.total === 0 ? 100 : Math.round((translated / report.total) * 100);
+    const pct = report.total === 0 ? 100 : Math.round((populated / report.total) * 100);
     console.log(
-      `  ${locale}/${namespace}: ${translated}/${report.total} translated (${pct}%)` +
+      `  ${locale}/${namespace}: ${populated}/${report.total} populated (${pct}%)` +
         (report.identical.length ? ` — ${report.identical.length} identical to source` : '') +
         (report.untranslated ? ' — UNTRANSLATED' : '') +
         (problems.length ? ` — ${problems.length} problem(s)` : ''),
@@ -157,7 +176,7 @@ for (const locale of TRANSLATED_LOCALES) {
   const done = localeTotal - localeMissing;
   const pct = localeTotal === 0 ? 100 : Math.round((done / localeTotal) * 100);
   console.log(
-    `\n  ${locale} TOTAL: ${done}/${localeTotal} (${pct}%), ${localeIdentical} identical to source\n`,
+    `\n  ${locale} TOTAL: ${done}/${localeTotal} populated (${pct}%), ${localeIdentical} identical to source\n`,
   );
 
   const extraNamespaces = [...localeNamespaces].filter((file) => !enNamespaces.includes(file));
@@ -165,6 +184,28 @@ for (const locale of TRANSLATED_LOCALES) {
     console.log(`  ${locale}/${file}: EXTRA FILE (no ${DEFAULT_LOCALE} counterpart)`);
     if (flags.strict) failures += 1;
   }
+
+  // Long-form content: the mapped types guarantee shape, so the only question
+  // is whether the prose was translated. Only whole namespaces are strict
+  // targets on the command line; content areas fail strict mode as a group.
+  let contentIdentical = 0;
+  let contentTotal = 0;
+  for (const { area, read } of CONTENT_AREAS) {
+    const report = compareContent(area, read(DEFAULT_LOCALE), read(locale));
+    contentTotal += report.total;
+    contentIdentical += report.identical.length;
+    const translated = report.total - report.identical.length;
+    const areaPct = report.total === 0 ? 100 : Math.round((translated / report.total) * 100);
+    console.log(
+      `  ${locale} content/${area}: ${translated}/${report.total} different from source (${areaPct}%)` +
+        (report.identical.length ? ` — ${report.identical.length} identical to source` : '') +
+        (report.untranslated ? ' — UNTRANSLATED' : ''),
+    );
+    if (report.untranslated && flags.strict && flags.strictNamespaces.length === 0) failures += 1;
+  }
+  console.log(
+    `\n  ${locale} CONTENT: ${contentTotal - contentIdentical}/${contentTotal} different from source, ${contentIdentical} identical to source\n`,
+  );
 }
 
 if (flags.strict && failures > 0) {
@@ -172,3 +213,4 @@ if (flags.strict && failures > 0) {
   process.exit(1);
 }
 console.log('✅  i18n parity report complete');
+console.log('Coverage and source differences do not measure translation accuracy or fluency.');

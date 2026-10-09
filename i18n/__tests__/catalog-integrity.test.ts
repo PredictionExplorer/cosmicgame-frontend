@@ -1,12 +1,15 @@
 import { readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 
+import { CONTENT_AREAS } from '../../scripts/i18n-content-areas';
 import {
   checkSourceNamespace,
+  compareContent,
   compareNamespace,
   strictProblems,
   type Messages,
 } from '../../scripts/i18n-parity-core';
+import { sourceTokens, unreferencedKeys } from '../../scripts/i18n-unused-keys-core';
 import { getLocaleConfig } from '../localeConfig';
 import { NAMESPACES } from '../request';
 import { routing, TRANSLATED_LOCALES } from '../routing';
@@ -32,6 +35,25 @@ describe('source catalogs', () => {
     );
     expect(report.syntaxErrors).toEqual([]);
     expect(report.pluralGaps).toEqual([]);
+    expect(report.unitSpacing).toEqual([]);
+    expect(report.typography).toEqual([]);
+    expect(report.empty).toEqual([]);
+    expect(report.invalidValues).toEqual([]);
+  });
+
+  // V138: 96 keys (and 47 more in whole dead subtrees) outlived the code that
+  // rendered them, each still translated in eight locales.
+  describe('reachability', () => {
+    let tokens: Set<string>;
+    beforeAll(() => {
+      tokens = sourceTokens(process.cwd());
+    });
+
+    it.each(NAMESPACES)('%s has no key that no code can reach', (namespace) => {
+      expect(
+        unreferencedKeys(namespace, readCatalog(routing.defaultLocale, namespace), tokens),
+      ).toEqual([]);
+    });
   });
 });
 
@@ -50,4 +72,16 @@ describe.each(TRANSLATED_LOCALES)('%s catalogs', (locale) => {
       expect(strictProblems(report)).toEqual([]);
     },
   );
+});
+
+describe.each(TRANSLATED_LOCALES)('%s long-form content', (locale) => {
+  // The mapped types make a partial module a compile error; this is the
+  // runtime half — a scaffolded module that still reads as English must not
+  // ship as a translation.
+  it.each(CONTENT_AREAS.map((entry) => entry.area))('%s is translated', (area) => {
+    const { read } = CONTENT_AREAS.find((entry) => entry.area === area)!;
+    const report = compareContent(area, read(routing.defaultLocale), read(locale));
+    expect(report.total).toBeGreaterThan(0);
+    expect(report.untranslated).toBe(false);
+  });
 });

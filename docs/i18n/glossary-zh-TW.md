@@ -4,7 +4,7 @@ The **single source of truth** for how Cosmic Signature's coined vocabulary is r
 Traditional Chinese for Taiwan (`zh-TW`). One English term = one Chinese term, everywhere.
 Machine-enforced by `scripts/terminology/zh-TW.ts` (drift), `ZH_HANT_BANNED_TERMS` +
 `ZH_TW_BANNED_TERMS` in `scripts/lexicon-scan-core.ts` (banned register), and
-`scripts/i18n-script-conventions-core.ts` (script, character forms, quotation marks).
+`scripts/i18n-conventions-core.ts` (script, character forms, quotation marks).
 
 `zh-TW` is **not** a character conversion of `zh`. The coined terms were re-decided for a
 Taipei reader; the everyday vocabulary follows Taiwan usage (網路、軟體、資訊、使用者、
@@ -42,6 +42,8 @@ As in [glossary-zh.md §1](./glossary-zh.md#1-term-formation-rules造词规则),
 | Gesture (原 bid)           | 落筆 · 一筆 / 這一筆  |                | Make a Gesture → 落筆; ETH gesture → ETH 落筆; gesture count → 落筆次數; live → 即時落筆    |
 | Gesture Cost               | 落筆價格              |                | never 成本                                                                                  |
 | Final Gesture              | 收官之筆              |                |                                                                                             |
+| Last Gesture (the role)    | 最新落筆              |                | the standings role; never 最後落筆                                                          |
+| Your cycle standing        | 你在本週期的位置      |                | the wallet's own strip beside the Gesture form                                              |
 | Performance Cycle (round)  | 演繹週期 · 週期       |                | 週 with the 辵 radical, never 周期 (mainland form); a cycle number is 第 N 個週期 / 週期 #N |
 | Finalize / Finalization    | 收官                  |                | from Go (圍棋); familiar in Taiwan media (收官戰)                                           |
 | Finalization countdown     | 收官倒數              |                | 倒數 is the Taiwan word; 倒計時 reads mainland                                              |
@@ -70,7 +72,7 @@ Interface vocabulary, fixed for consistency. The zh-HK column is a reviewer's ai
 | Gallery                            | 畫廊                             | 畫廊                       | not 圖庫                                            |
 | How It Works                       | 運作原理                         | 運作原理                   |                                                     |
 | FAQ / Clarifications               | 常見問題 / 釋疑                  | 常見問題 / 釋疑            |                                                     |
-| Learn Hub                          | 學習中心                         | 學習中心                   |                                                     |
+| Learn (was Learn Hub)              | 學習                             | 學習                       | prose: 學習指南                                     |
 | Home (nav, "back to")              | 首頁                             | 主頁                       |                                                     |
 | Site Map                           | **網站導覽**                     | 網站地圖                   | the Taiwan convention for a site map page           |
 | Statistics                         | 統計                             | 統計                       |                                                     |
@@ -138,7 +140,7 @@ identical in zh-HK unless noted. The wire label `Round` maps to 週期, never �
 | Fate               | 命運 — Eternal Dance 永恆之舞 · Ejection 逃逸                                                                                                                      |
 | Chaos / Syzygies   | 混沌度 / 連珠                                                                                                                                                      |
 | Imprinted (trait)  | 銘刻時間                                                                                                                                                           |
-| Allocation (trait) | 分配 — 星選 · 錨定 NFT 星選 · 收官之筆 · 最後 CST 落筆 · 堅守冠軍 · 時之勇士                                                                                       |
+| Allocation (trait) | 分配 — 星選 · 錨定 NFT 星選 · 收官之筆 · CST 收官之筆 · 堅守冠軍 · 時之勇士                                                                                        |
 | Collection DNA     | 作品集基因                                                                                                                                                         |
 
 ## 4. Keep in English（保留英文）
@@ -188,5 +190,5 @@ Style-level cautions (reviewer judgment): 行銷 (marketing — use 推廣), 回
 As [glossary-zh.md §6](./glossary-zh.md#6-change-process术语变更流程), sweeping
 `messages/zh-TW/**`, `content/**/*.zh-TW.ts`, `content/about/zh-TW.ts`, and updating
 `scripts/terminology/zh-TW.ts` (drift), `ZH_TW_BANNED_TERMS` (register), or
-`SCRIPT_CONVENTIONS['zh-TW']` (characters) in the same PR. A change to a term shared with
+`LOCALE_CONVENTIONS['zh-TW']` (characters) in the same PR. A change to a term shared with
 Hong Kong is made in both glossaries or deliberately not.

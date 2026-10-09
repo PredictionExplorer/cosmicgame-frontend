@@ -21,7 +21,7 @@ const routes = [
   { path: '/', label: 'Home' },
   {
     path: '/experimental-ui?uxScenario=live-mid-cycle',
-    label: 'Experimental UI',
+    label: 'Observatory art view',
   },
   { path: '/allocation', label: 'Allocation' },
   { path: '/gallery', label: 'Gallery' },
@@ -63,7 +63,7 @@ const zhRoutes: ReadonlyArray<{
     path: '/zh/gallery',
     label: 'core dApp',
     assertAccessibleName: async (page) =>
-      expect(page.getByRole('textbox', { name: '搜索 NFT' })).toBeVisible(),
+      expect(page.getByRole('searchbox', { name: '搜索 NFT' })).toBeVisible(),
   },
   {
     path: '/zh/anchoring',
@@ -75,19 +75,19 @@ const zhRoutes: ReadonlyArray<{
     path: '/zh/statistics',
     label: 'statistics',
     assertAccessibleName: async (page) =>
-      expect(page.getByRole('heading', { name: 'Cosmic Signature 协议统计' })).toBeVisible(),
+      expect(page.getByRole('heading', { name: '协议统计' })).toBeVisible(),
   },
   {
     path: '/zh/faq',
     label: 'FAQ and trust',
     assertAccessibleName: async (page) =>
-      expect(page.getByRole('textbox', { name: '搜索常见问题' })).toBeVisible(),
+      expect(page.getByRole('searchbox', { name: '搜索常见问题' })).toBeVisible(),
   },
   {
     path: '/zh/eth-contribution',
     label: 'long-tail contribution',
     assertAccessibleName: async (page) =>
-      expect(page.getByRole('heading', { name: 'ETH 贡献', exact: true }).first()).toBeVisible(),
+      expect(page.getByRole('heading', { level: 1, name: '直接 ETH 贡献' })).toBeVisible(),
   },
 ];
 
@@ -111,6 +111,39 @@ test.describe('A11y smoke (WCAG 2.1 AA)', () => {
       expect(seriousOrCritical, JSON.stringify(seriousOrCritical, null, 2)).toEqual([]);
     });
   }
+
+  test('site chrome landmarks sit at the top level on both hosts and the 404', async ({
+    page,
+    context,
+  }) => {
+    // The landing header and footer once rendered inside <main>; the shells
+    // now own them on every page, the home and the 404 included.
+    for (const { path, landing } of [
+      { path: '/', landing: true },
+      { path: '/about', landing: true },
+      { path: '/learn/quality-assurance-not-found', landing: true },
+      { path: '/', landing: false },
+      { path: '/quality-assurance-route-not-found', landing: false },
+    ]) {
+      await context.setExtraHTTPHeaders(landing ? LANDING_HEADERS : {});
+      await page.goto(path, { waitUntil: 'domcontentloaded' });
+      await expect(page.getByRole('main')).toHaveCount(1);
+      const results = await new AxeBuilder({ page })
+        .withRules([
+          'landmark-banner-is-top-level',
+          'landmark-contentinfo-is-top-level',
+          'landmark-main-is-top-level',
+          'landmark-no-duplicate-banner',
+          'landmark-no-duplicate-contentinfo',
+          'landmark-no-duplicate-main',
+        ])
+        .analyze();
+      expect(
+        results.violations,
+        `${landing ? 'landing' : 'app'} ${path}: ${JSON.stringify(results.violations, null, 2)}`,
+      ).toEqual([]);
+    }
+  });
 
   test('skip link jumps to #main on Tab+Enter', async ({ page }) => {
     await page.goto('/', { waitUntil: 'domcontentloaded' });
@@ -182,7 +215,7 @@ test.describe('A11y smoke (WCAG 2.1 AA)', () => {
       path: '/uk/gallery',
       label: 'core dApp',
       assertAccessibleName: async (page) =>
-        expect(page.getByRole('textbox', { name: 'Пошук NFT' })).toBeVisible(),
+        expect(page.getByRole('searchbox', { name: 'Пошук NFT' })).toBeVisible(),
     },
     {
       path: '/uk/anchoring',
@@ -194,23 +227,21 @@ test.describe('A11y smoke (WCAG 2.1 AA)', () => {
       path: '/uk/statistics',
       label: 'statistics',
       assertAccessibleName: async (page) =>
-        expect(
-          page.getByRole('heading', { name: 'Статистика протоколу Cosmic Signature' }),
-        ).toBeVisible(),
+        expect(page.getByRole('heading', { name: 'Статистика протоколу' })).toBeVisible(),
     },
     {
       path: '/uk/faq',
       label: 'FAQ and trust',
       assertAccessibleName: async (page) =>
-        expect(page.getByRole('textbox', { name: 'Пошук серед поширених запитань' })).toBeVisible(),
+        expect(
+          page.getByRole('searchbox', { name: 'Пошук серед поширених запитань' }),
+        ).toBeVisible(),
     },
     {
       path: '/uk/eth-contribution',
       label: 'long-tail contribution',
       assertAccessibleName: async (page) =>
-        expect(
-          page.getByRole('heading', { name: 'Внески ETH', exact: true }).first(),
-        ).toBeVisible(),
+        expect(page.getByRole('heading', { level: 1, name: 'Прямі внески ETH' })).toBeVisible(),
     },
   ];
 

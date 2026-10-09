@@ -1,0 +1,8 @@
+[
+  {
+    "id": "GHSA-VFJ7-8CJW-P6XM",
+    "package": "braces",
+    "reason": "Tooling-only (lint-staged > micromatch); no patched release exists — the advisory covers every version through the latest 3.0.3. Glob patterns come from our own lint-staged config, never untrusted input.",
+    "expires": "2027-01-02"
+  }
+]

@@ -1,91 +1,81 @@
 {
-  "loadingAria": "Loading marketing rewards",
-  "hero": {
-    "title": "E<legacy>arn</legacy> Rewards by <highlight>Spreading the Word</highlight>",
-    "description": "Promote Cosmic Signature and receive CST distributions for every verified outreach activity.",
-    "learnHow": "Learn How"
-  },
-  "stats": {
-    "heading": "Outreach Program Statistics",
-    "infoAria": "Info about {label}",
-    "valueAria": "{label}: {value}{suffix}",
-    "totalAllocations": {
-      "label": "Total Allocations",
-      "tooltip": "Total CST tokens forwarded to all outreach contributors since launch"
-    },
-    "activeContributors": {
-      "label": "Active Outreach Contributors",
-      "tooltip": "Number of unique wallet addresses that have received outreach allocations"
-    },
-    "transactions": {
-      "label": "Allocation Transactions",
-      "tooltip": "Total number of individual allocation payouts processed"
-    }
-  },
   "howItWorks": {
-    "title": "How It Works",
-    "infoAria": "Info about how it works",
-    "tooltip": "Three simple steps to start receiving outreach distributions with Cosmic Signature",
-    "stepInfoAria": "More info about {title}",
+    "title": "How it works",
     "steps": {
       "promote": {
         "title": "Promote",
-        "description": "Share Cosmic Signature across social media, blogs, and communities.",
-        "tooltip": "Create content, share referral links, write blog posts, or produce videos about Cosmic Signature to qualify."
+        "description": "Tell people about Cosmic Signature on social media, blogs and in communities.",
+        "detail": "Posts, referral links, articles and videos all count."
       },
       "verify": {
-        "title": "Get Verified",
-        "description": "Our team reviews and verifies your promotional activity.",
-        "tooltip": "The marketing team evaluates reach, quality, and authenticity of your promotional efforts before approving rewards."
+        "title": "Get verified",
+        "description": "Our team checks your outreach.",
+        "detail": "It looks at reach, quality and authenticity before approving an allocation."
       },
       "receive": {
         "title": "Receive CST",
-        "description": "Receive CST token allocations directly to your wallet.",
-        "tooltip": "Once verified, CST tokens are sent on-chain to your wallet address. Allocations scale with the impact of your outreach."
+        "description": "The allocation arrives as CST in your wallet.",
+        "detail": "It is sent on-chain once your outreach is verified, and its size reflects the outreach’s impact."
       }
-    }
+    },
+    "description": "Three steps, from telling people about Cosmic Signature to CST in your wallet."
   },
   "leaderboard": {
-    "title": "Top Marketers",
-    "infoAria": "Info about top marketers",
-    "tooltip": "Rankings based on total CST earned from marketing activities",
-    "empty": "No marketers yet.",
-    "rewardCountOne": "{count} reward",
-    "rewardCountOther": "{count} rewards"
+    "title": "Top outreach contributors",
+    "empty": "No outreach contributors yet.",
+    "description": "Ranked by the CST each has received for outreach.",
+    "columns": {
+      "rank": "Rank",
+      "contributor": "Contributor",
+      "share": "Share",
+      "shareHelp": "Their part of all the CST allocated for outreach so far.",
+      "received": "CST received",
+      "allocations": "Allocations"
+    }
   },
   "history": {
-    "title": "Reward History",
-    "infoAria": "Info about reward history",
-    "tooltip": "Complete chronological log of all marketing reward distributions",
-    "showingOne": "Showing <strong>{count}</strong> reward",
-    "showingOther": "Showing <strong>{count}</strong> rewards",
-    "emptyTitle": "No rewards distributed yet",
-    "emptyDescription": "Rewards will appear here once marketing activities are verified and paid out."
+    "title": "Allocation history",
+    "emptyDescription": "Approved outreach allocations appear here after they are sent.",
+    "description": "Every allocation sent from the Outreach Reserve, each linked to its transaction."
   },
   "cta": {
-    "title": "Ready to Contribute?",
+    "title": "Ready to spread the word?",
     "description": "Join our outreach program and receive CST distributions for promoting Cosmic Signature to the world.",
-    "contact": "Contact Marketing Team",
-    "contactTooltip": "Reach out to discuss promotional opportunities and reward structures",
-    "infoAria": "Info about contacting the marketing team",
-    "infoTooltip": "Our team will help you get started with promotional materials and discuss reward tiers"
+    "contact": "Email the outreach team",
+    "note": "The team can help with outreach materials and explain how allocations are decided.",
+    "copyEmail": "Copy email address",
+    "emailCopied": "Email address copied",
+    "rulesLink": "Read the program rules before you email the team"
   },
   "address": {
-    "invalid": "Invalid Ethereum Address",
-    "heading": "Marketing Rewards for User",
-    "loading": "Loading...",
-    "outreachWallet": "Marketing Wallet"
+    "parent": "Outreach allocations",
+    "title": "Outreach allocations received",
+    "lede": "CST this address has received from the Outreach Reserve.",
+    "profile": "Participant profile",
+    "figures": {
+      "total": "CST received",
+      "allocations": "Allocations",
+      "first": "First allocation",
+      "latest": "Latest allocation",
+      "allocated": "Allocated on",
+      "rank": "Rank",
+      "rankValue": "{rank} of {total}",
+      "shareCaption": "{share} of all outreach CST"
+    },
+    "emptyDescription": "Allocations appear here once the outreach team sends CST to this address.",
+    "invalidAddress": {
+      "title": "Invalid address",
+      "description": "The link needs a full address: 0x followed by 40 letters and digits.",
+      "action": "All outreach allocations"
+    }
   },
-  "transferForm": {
-    "title": "Pay CST Reward",
-    "description": "Calls the outreach reserve contract's `payReward` function. The connected wallet must be the current treasurer.",
-    "reserveLabel": "Outreach reserve",
-    "availableLabel": "Available CST",
-    "ownerLabel": "Owner",
-    "treasurerLabel": "Treasurer",
-    "unavailable": "Unavailable",
-    "recipientLabel": "Recipient address",
-    "amountLabel": "Amount",
-    "historyLink": "View outreach reserve transfers"
+  "learnHow": "Learn how",
+  "loadError": "The outreach allocations couldn’t be loaded.",
+  "rules": {
+    "title": "Program rules",
+    "review": "Anyone can propose outreach; the team reviews each proposal before any allocation.",
+    "discretion": "Allocations are at the team’s discretion: it decides whether to approve outreach, when to send CST and how much. Outreach that isn’t approved receives nothing.",
+    "excluded": "Spam, bought followers or engagement, and misleading claims, including claims about what CST is worth, don’t count.",
+    "disclose": "Say that you may receive CST whenever you post about Cosmic Signature."
   }
 }

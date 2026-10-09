@@ -1,47 +1,15 @@
-import { expect, test, type Locator, type Page } from '@playwright/test';
+import { expect, test } from '@playwright/test';
 
 import { dismissOpenTooltips, expectTooltipFullyVisible, openTooltip } from './tooltip-helpers';
 
 /**
- * Sprint 3 Chinese coverage (docs/i18n/progress.md): the core dApp routes —
+ * Sprint 3 Chinese coverage (docs/i18n/progress-zh.md): the core dApp routes —
  * home, current-cycle, gallery, detail, gesture, how-it-works — render
  * translated copy under /zh, including tooltips.
  *
  * Runs on localhost (neither configured host), which serves the dApp routes
  * without host redirects — same assumption as the other e2e suites.
  */
-
-/**
- * InfoTooltip triggers carry translated aria-labels on /zh
- * (tooltips.moreInformation* in messages/zh/tooltips.json), so the shared
- * English-prefix helper in tooltip-helpers.ts cannot locate them.
- */
-function zhTooltipTriggerForLabel(page: Page, label: string): Locator {
-  const zhTooltipButtonSelector = [
-    'button[aria-label^="更多信息"]',
-    'button[aria-label^="查看“"]',
-    'button[aria-label^="说明“"]',
-  ].join(', ');
-
-  return page
-    .getByText(label, { exact: true })
-    .first()
-    .locator('xpath=ancestor::*[.//button][1]')
-    .locator(zhTooltipButtonSelector)
-    .first();
-}
-
-async function expectZhLabelTooltip(page: Page, label: string, expected: RegExp): Promise<void> {
-  await dismissOpenTooltips(page);
-  const trigger = zhTooltipTriggerForLabel(page, label);
-  await trigger.evaluate((element) => {
-    element.scrollIntoView({ block: 'center', inline: 'center' });
-  });
-  await expect(trigger, `trigger for "${label}" must be visible`).toBeVisible();
-  await openTooltip(trigger);
-  await expectTooltipFullyVisible(page, expected);
-  await dismissOpenTooltips(page);
-}
 
 test.describe('zh Sprint 3 — core dApp routes', () => {
   test('/zh home renders the Chinese gesture console', async ({ page }) => {
@@ -70,32 +38,56 @@ test.describe('zh Sprint 3 — core dApp routes', () => {
     await page.emulateMedia({ reducedMotion: 'reduce' });
     await expect(page.locator('html')).toHaveAttribute('lang', 'zh');
     await expect(page).toHaveTitle('当前演绎周期 · Cosmic Signature');
-    await expect(page.getByRole('heading', { name: /第 \d+ 个周期/ }).first()).toBeVisible();
-    await expect(page.getByRole('link', { name: '返回首页' })).toBeVisible();
+    // The H1 is the cycle itself, under the page's name as the eyebrow.
+    await expect(page.getByRole('heading', { level: 1, name: /^第 \d+ 个周期$/ })).toBeVisible();
+    await expect(page.getByText('当前演绎周期', { exact: true }).first()).toBeVisible();
 
+    // One explanation pattern (D079): the header figures and the cycle's own
+    // labels are plain words; the coined Cycle Reserve explains itself in place.
     await expect(page.getByText('落笔总次数', { exact: true }).first()).toBeVisible();
-    await expectZhLabelTooltip(page, '落笔总次数', /本周期的落笔总次数/);
-    await expectZhLabelTooltip(page, '星选池', /程序化随机选出/);
+    await expect(
+      page
+        .getByRole('main')
+        .locator('header')
+        .first()
+        .getByRole('button', { name: /^更多信息/ }),
+    ).toHaveCount(0);
+    await expect(page.getByRole('button', { name: 'ETH 贡献' })).toHaveCount(0);
+    await dismissOpenTooltips(page);
+    const reserve = page
+      .getByRole('main')
+      .getByRole('button', { name: '周期储备', exact: true })
+      .first();
+    await reserve.scrollIntoViewIfNeeded();
+    await openTooltip(reserve);
+    await expectTooltipFullyVisible(page, /为当前周期持有的 ETH/);
   });
 
   test('/zh/gallery renders Chinese archive controls', async ({ page }) => {
     await page.goto('/zh/gallery', { waitUntil: 'networkidle' });
     await page.emulateMedia({ reducedMotion: 'reduce' });
     await expect(page.locator('html')).toHaveAttribute('lang', 'zh');
-    await expect(page).toHaveTitle('Cosmic Signature 画廊 · 确定性三体 NFT 艺术');
-    // The visible gallery heading is an h2; the page's h1 belongs to the
-    // crawler-facing SeoSummary (still English until Sprint 7).
-    await expect(page.getByRole('heading', { name: 'NFT 画廊' })).toBeVisible();
-    await expect(page.getByRole('textbox', { name: '搜索 NFT' })).toBeVisible();
-    await expect(page.getByText('全部', { exact: true }).first()).toBeVisible();
-
-    // GalleryHero wraps the whole stat card in a TooltipTrigger (no info
-    // button), so hover the label itself — same as gallery-tooltips.spec.ts.
-    const totalImprinted = page.getByText('铭刻总数', { exact: true }).first();
-    await totalImprinted.scrollIntoViewIfNeeded();
-    await totalImprinted.hover();
-    await expectTooltipFullyVisible(page, /所有周期累计铭刻/);
-    await dismissOpenTooltips(page);
+    await expect(page).toHaveTitle('画廊：确定性三体 NFT 艺术 · Cosmic Signature');
+    // One header: the server-rendered H1 with the collection's figures.
+    await expect(
+      page.getByRole('heading', { level: 1, name: 'Cosmic Signature 画廊' }),
+    ).toBeVisible();
+    // The facts line: "已铭刻 NFT", or the short "已铭刻" on a phone.
+    await expect(
+      page
+        .getByText(/^已铭刻( NFT)?$/)
+        .filter({ visible: true })
+        .first(),
+    ).toBeVisible();
+    await expect(page.getByRole('searchbox', { name: '搜索 NFT' })).toBeVisible();
+    // The status filter sits in the toolbar from lg and in the Filters sheet
+    // on smaller screens.
+    if ((page.viewportSize()?.width ?? 0) < 1024) {
+      await page.getByRole('button', { name: '筛选', exact: true }).click();
+    }
+    const all = page.getByRole('radio', { name: '全部', exact: true }).filter({ visible: true });
+    await expect(all).toHaveCount(1);
+    await expect(all).toHaveAttribute('aria-checked', 'true');
   });
 
   test('gallery card navigates to a Chinese detail page', async ({ page }) => {
@@ -152,15 +144,21 @@ test.describe('zh Sprint 3 — core dApp routes', () => {
 
     await page.goto('/zh/gesture/9101', { waitUntil: 'networkidle' });
     await expect(page.locator('html')).toHaveAttribute('lang', 'zh');
-    await expect(page.getByText('落笔详情', { exact: true }).first()).toBeVisible();
-    await expect(page.getByText('交易与周期', { exact: true }).first()).toBeVisible();
-    await expect(page.getByText('落笔价格与参与 CST', { exact: true }).first()).toBeVisible();
+    // The mock carries no cycle position, so the H1 names the record by its id.
+    await expect(
+      page.getByRole('heading', { level: 1, name: '落笔记录 9101', exact: true }),
+    ).toBeVisible();
+    await expect(
+      page.getByRole('main').getByRole('heading', { level: 2, name: '记录', exact: true }),
+    ).toBeVisible();
+    await expect(page.locator('[data-figure="cost"]')).toContainText('落笔价格');
+    await expect(page.locator('[data-figure="participationCst"]')).toContainText('参与 CST');
   });
 
   test('/zh/how-it-works renders the Chinese protocol guide', async ({ page }) => {
     await page.goto('/zh/how-it-works');
     await expect(page.locator('html')).toHaveAttribute('lang', 'zh');
-    await expect(page).toHaveTitle('Cosmic Signature 运作原理 · 演绎周期、落笔与 NFT');
+    await expect(page).toHaveTitle('运作原理：演绎周期、落笔与 NFT · Cosmic Signature');
     await expect(page.getByRole('heading', { level: 1, name: /运作原理/ })).toBeVisible();
     await expect(page.getByText('演绎周期的完整历程', { exact: true })).toBeVisible();
   });
@@ -168,12 +166,14 @@ test.describe('zh Sprint 3 — core dApp routes', () => {
   test('English core routes are unchanged (regression net)', async ({ page }) => {
     await page.goto('/gallery');
     await expect(page.locator('html')).toHaveAttribute('lang', 'en');
-    await expect(page.getByRole('heading', { name: 'NFT Gallery' })).toBeVisible();
+    await expect(
+      page.getByRole('heading', { level: 1, name: 'Cosmic Signature Gallery' }),
+    ).toBeVisible();
 
     await page.goto('/how-it-works');
     await expect(page.locator('html')).toHaveAttribute('lang', 'en');
     await expect(
-      page.getByRole('heading', { level: 1, name: /How Cosmic Signature Works/ }),
+      page.getByRole('heading', { level: 1, name: 'How Cosmic Signature works' }),
     ).toBeVisible();
   });
 });

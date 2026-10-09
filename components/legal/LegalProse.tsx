@@ -1,0 +1,324 @@
+import type { ReactNode } from 'react';
+import {
+  AlertTriangle,
+  ArrowRight,
+  ArrowUpRight,
+  Info,
+  Link2,
+  type LucideIcon,
+} from 'lucide-react';
+
+import type { LegalLinkId } from '@/content/legal/links';
+import { LEGAL_LINKS } from '@/content/legal/links';
+
+import { cn } from '@/lib/utils';
+
+import { LegalLink, RichText } from './RichText';
+
+/*
+ * The reading blocks of the Trust Center documents. All server-safe; body
+ * copy is `type-prose` (17px, 66ch, 1.65; CJK and Cyrillic tuned by the
+ * utility) in the muted tier, headings and emphasis in foreground, and every
+ * piece of copy goes through `RichText`, so its tags become links. Blocks
+ * take the document's width (`--measure-document`, set by LegalDocument), so
+ * rules, ledgers and lists share one edge; only paragraphs stop at the prose
+ * measure inside it.
+ */
+
+/**
+ * A clause a link can cite (`/terms#allocations-retrieval`): it lands a
+ * little below the sticky header, and while it is the target a 2px primary
+ * rule stands just outside its start edge, so the reader sees which of
+ * thirty clauses was meant. The rule is a pseudo-element in the margin, so
+ * nothing moves and no row's hairline shifts; it does not animate.
+ */
+export const CITABLE_CLASS =
+  "relative scroll-mt-6 before:pointer-events-none before:absolute before:inset-y-0 before:-start-3 before:w-0.5 before:rounded-pill before:bg-primary before:opacity-0 before:content-[''] target:before:opacity-100";
+
+/**
+ * A numbered document (Terms, Privacy) numbers its sections and the clauses
+ * under them ("3.", "3.2") with CSS counters, so a clause can be cited by
+ * number while the heading's own text, and every catalog, stay the copy's
+ * words. LegalDocument marks the document (`group/legal`, `data-numbered`)
+ * and each section counts `legal-section` and restarts `legal-clause`.
+ */
+export const NUMBERED_SECTION_CLASS =
+  '[counter-increment:legal-section] [counter-reset:legal-clause]';
+
+/** A section heading's number: the text face in the subtle tier, tabular. */
+export const SECTION_NUMBER_CLASS =
+  "before:me-3 before:font-normal before:tabular-nums before:text-subtle before:content-[counter(legal-section)'.'] before:[font-family:var(--body-font-stack)]";
+
+/** A clause counts only inside a numbered document. */
+const CLAUSE_COUNT_CLASS = 'group-data-[numbered=true]/legal:[counter-increment:legal-clause]';
+
+const CLAUSE_NUMBER_CLASS =
+  "group-data-[numbered=true]/legal:before:me-2 group-data-[numbered=true]/legal:before:font-normal group-data-[numbered=true]/legal:before:tabular-nums group-data-[numbered=true]/legal:before:text-subtle group-data-[numbered=true]/legal:before:content-[counter(legal-section)'.'counter(legal-clause)]";
+
+/**
+ * A heading's own link, beside the heading rather than inside it, so the
+ * heading's name is its text: it shows while the heading (`group/anchor`)
+ * is hovered or the link has focus, and phones, which reach every section
+ * from the contents list, leave it out.
+ */
+export function HeadingAnchor({
+  href,
+  label,
+  className,
+}: {
+  href: string;
+  /** Its accessible name ("Link to Eligibility"). */
+  label: string;
+  className?: string;
+}) {
+  return (
+    <a
+      href={href}
+      aria-label={label}
+      className={cn(
+        'inline-flex size-7 shrink-0 items-center justify-center rounded-control text-subtle opacity-0 transition-opacity duration-[var(--duration-fast)] group-hover/anchor:opacity-100 hover:text-primary focus-visible:opacity-100 max-sm:hidden',
+        className,
+      )}
+    >
+      <Link2 aria-hidden className="size-4" />
+    </a>
+  );
+}
+
+const PARAGRAPH_SIZES = {
+  /** Body copy: 17px at the prose measure. */
+  prose: 'type-prose text-muted-foreground',
+  /** A source line or footnote under a block: 14px, subtle, on the prose measure. */
+  note: 'max-w-[var(--measure-prose)] type-body-sm text-subtle',
+} as const;
+
+/** A paragraph of legal copy. */
+export function LegalParagraph({
+  text,
+  locale,
+  size = 'prose',
+  className,
+}: {
+  text: string;
+  locale: string;
+  size?: keyof typeof PARAGRAPH_SIZES;
+  className?: string;
+}) {
+  return (
+    <p className={cn(PARAGRAPH_SIZES[size], className)}>
+      <RichText text={text} locale={locale} />
+    </p>
+  );
+}
+
+/**
+ * A clause: an H3 (with its own anchor, `<section>-<clause>`, and in a
+ * numbered document its number) over its text. Clauses of one section are
+ * separated by space, not boxes; a cited clause is marked while it is the
+ * target (`CITABLE_CLASS`), and its heading carries a link to itself, so a
+ * reader can copy the reference.
+ */
+export function LegalClause({
+  id,
+  heading,
+  text,
+  locale,
+  anchorLabel,
+  children,
+}: {
+  id?: string;
+  heading?: string;
+  text?: string;
+  locale: string;
+  /** The heading link's name ("Link to Retrieval"); without it the heading has no link. */
+  anchorLabel?: string;
+  children?: ReactNode;
+}) {
+  return (
+    <div
+      id={id}
+      className={cn('space-y-2 pt-1', id && CITABLE_CLASS, heading && CLAUSE_COUNT_CLASS)}
+    >
+      {heading ? (
+        <div className="group/anchor flex items-start gap-1">
+          <h3 className={cn('min-w-0 type-heading-3 text-foreground', CLAUSE_NUMBER_CLASS)}>
+            {heading}
+          </h3>
+          {id && anchorLabel ? (
+            <HeadingAnchor href={`#${id}`} label={anchorLabel} className="-mt-0.5" />
+          ) : null}
+        </div>
+      ) : null}
+      {text ? <LegalParagraph text={text} locale={locale} /> : null}
+      {children}
+    </div>
+  );
+}
+
+/** A real list (bulleted, or numbered steps), never typed bullet glyphs. */
+export function LegalList({
+  items,
+  locale,
+  ordered = false,
+  className,
+}: {
+  items: readonly string[];
+  locale: string;
+  ordered?: boolean;
+  className?: string;
+}) {
+  const List = ordered ? 'ol' : 'ul';
+  return (
+    <List
+      className={cn(
+        'type-prose space-y-2.5 ps-6 text-muted-foreground marker:text-subtle',
+        ordered ? 'list-decimal marker:tabular-nums' : 'list-disc',
+        className,
+      )}
+    >
+      {items.map((item) => (
+        <li key={item} className="ps-1">
+          <RichText text={item} locale={locale} />
+        </li>
+      ))}
+    </List>
+  );
+}
+
+const CALLOUT_TONES = {
+  note: { icon: Info, rule: 'border-primary', iconClass: 'text-primary' },
+  attention: { icon: AlertTriangle, rule: 'border-attention', iconClass: 'text-attention' },
+} satisfies Record<string, { icon: LucideIcon; rule: string; iconClass: string }>;
+
+/**
+ * A callout: a 2px rule on the inline start, the title as a label with its
+ * icon, and the text below at the full width of the column. `attention`
+ * carries the one warning a document must not let a reader miss. It is a
+ * note (`role="note"`), not an `<aside>`: callouts sit inside the document's
+ * sections, where a complementary landmark would not be top level.
+ */
+export function LegalCallout({
+  tone = 'note',
+  title,
+  text,
+  locale,
+  className,
+}: {
+  tone?: keyof typeof CALLOUT_TONES;
+  title: string;
+  text: string;
+  locale: string;
+  className?: string;
+}) {
+  const { icon: Icon, rule, iconClass } = CALLOUT_TONES[tone];
+  return (
+    <div role="note" className={cn('border-s-2 py-1 ps-5', rule, className)}>
+      <p className="flex items-center gap-2 type-title text-foreground">
+        <Icon aria-hidden className={cn('size-4 shrink-0', iconClass)} />
+        {title}
+      </p>
+      {/* Below 40rem the body type, so a long warning is not a wall of 17px lines. */}
+      <p className="mt-2 type-prose text-muted-foreground max-sm:type-body-md">
+        <RichText text={text} locale={locale} />
+      </p>
+    </div>
+  );
+}
+
+export interface LegalLedgerRow {
+  key: string;
+  term: ReactNode;
+  detail: ReactNode;
+}
+
+/**
+ * A spec-sheet ledger under a small heading: the term on the left, its
+ * detail on the right (stacked on phones), each row under a hairline. For
+ * values a reader checks, such as addresses and handles. `note` says once,
+ * under the heading and before the rows, what the whole list proves. The
+ * list ends open: a section's own rule below never doubles a closing one.
+ */
+export function LegalLedger({
+  heading,
+  note,
+  rows,
+  className,
+}: {
+  heading?: string;
+  note?: ReactNode;
+  rows: readonly LegalLedgerRow[];
+  className?: string;
+}) {
+  return (
+    <div className={className}>
+      {heading ? <h3 className="type-heading-3 text-foreground">{heading}</h3> : null}
+      {note ? <div className={heading ? 'mt-2' : undefined}>{note}</div> : null}
+      <dl
+        className={cn(
+          'divide-y divide-rule-faint border-t border-rule-faint',
+          heading || note ? 'mt-3' : undefined,
+        )}
+      >
+        {rows.map(({ key, term, detail }) => (
+          <div
+            key={key}
+            className="grid gap-x-8 gap-y-1.5 py-3.5 sm:grid-cols-[minmax(0,15rem)_minmax(0,1fr)] sm:items-baseline"
+          >
+            <dt className="min-w-0 type-body-sm font-medium text-foreground">{term}</dt>
+            <dd className="min-w-0 type-body-sm text-muted-foreground">{detail}</dd>
+          </div>
+        ))}
+      </dl>
+    </div>
+  );
+}
+
+export interface LegalResource {
+  /** A `LEGAL_LINKS` entry. */
+  link: LegalLinkId;
+  label: string;
+  /** One line on what the reader will find there. */
+  description?: string;
+}
+
+/**
+ * Where to verify a claim: one row per resource between hairlines, an
+ * arrow saying whether it stays on this site (→) or opens a source (↗).
+ */
+export function LegalResourceList({
+  resources,
+  locale,
+}: {
+  resources: readonly LegalResource[];
+  locale: string;
+}) {
+  return (
+    <ul className="divide-y divide-rule-faint border-t border-rule-faint">
+      {resources.map(({ link, label, description }) => {
+        const external = LEGAL_LINKS[link].kind === 'external';
+        const Arrow = external ? ArrowUpRight : ArrowRight;
+        return (
+          <li key={`${link}-${label}`}>
+            <LegalLink
+              id={link}
+              locale={locale}
+              externalIcon={false}
+              className="group focus-ring-inset flex min-h-14 flex-col justify-center gap-1 py-3.5 no-underline"
+            >
+              <span className="inline-flex items-center gap-1.5 type-title text-foreground transition-colors duration-[var(--duration-fast)] group-hover:text-primary">
+                {label}
+                <Arrow
+                  aria-hidden
+                  className="size-4 shrink-0 text-subtle transition-[color,transform] duration-[var(--duration-fast)] group-hover:text-primary motion-safe:group-hover:translate-x-0.5"
+                />
+              </span>
+              {description ? (
+                <span className="type-body-sm text-muted-foreground">{description}</span>
+              ) : null}
+            </LegalLink>
+          </li>
+        );
+      })}
+    </ul>
+  );
+}

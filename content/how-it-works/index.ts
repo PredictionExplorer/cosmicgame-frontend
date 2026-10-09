@@ -2,7 +2,10 @@ import { pickByLocale, type LocaleRecord } from '@/i18n/locale';
 
 import { HOW_IT_WORKS_STRUCTURE, type HowItWorksText } from './structure';
 import { howItWorksTextEn } from './text.en';
+import { howItWorksTextJa } from './text.ja';
+import { howItWorksTextKo } from './text.ko';
 import { howItWorksTextUk } from './text.uk';
+import { howItWorksTextVi } from './text.vi';
 import { howItWorksTextZh } from './text.zh';
 import { howItWorksTextZhHk } from './text.zh-HK';
 import { howItWorksTextZhTw } from './text.zh-TW';
@@ -23,37 +26,50 @@ function buildHowItWorksContent(text: HowItWorksText): HowItWorksContent {
     jsonLd: text.jsonLd,
     breadcrumbs: text.breadcrumbs,
     hero: {
-      badge: text.hero.badge,
-      headingLead: text.hero.headingLead,
-      headingAccent: text.hero.headingAccent,
+      heading: text.hero.heading,
       paragraph: text.hero.paragraph,
       primaryCta: { label: text.hero.primaryCtaLabel, href: structure.hero.primaryCtaHref },
       secondaryCta: { label: text.hero.secondaryCtaLabel, href: structure.hero.secondaryCtaHref },
     },
-    overview: {
-      heading: text.overview.heading,
-      subhead: text.overview.subhead,
-      cards: [
-        { number: structure.overviewCardNumbers[0], ...text.overview.cards[0] },
-        { number: structure.overviewCardNumbers[1], ...text.overview.cards[1] },
-        { number: structure.overviewCardNumbers[2], ...text.overview.cards[2] },
-      ],
-    },
     rewardBreakdown: text.rewardBreakdown,
-    gameCycle: text.gameCycle,
-    stepByStep: text.stepByStep,
-    proTips: text.proTips,
-    faqCallout: {
-      heading: text.faqCallout.heading,
-      body: text.faqCallout.body,
-      cta: { label: text.faqCallout.ctaLabel, href: structure.faqCalloutCtaHref },
+    costs: {
+      heading: text.costs.heading,
+      subhead: text.costs.subhead,
+      items: text.costs.items,
+      note: text.costs.note,
+      riskLink: { label: text.costs.riskLinkLabel, href: structure.costs.riskHref },
     },
+    gameCycle: text.gameCycle,
+    payoff: {
+      heading: text.payoff.heading,
+      body: text.payoff.body,
+      link: {
+        label: text.payoff.linkLabel,
+        href: `/detail/${structure.payoffSample.tokenId}`,
+      },
+      sample: structure.payoffSample,
+    },
+    stepByStep: {
+      heading: text.stepByStep.heading,
+      subhead: text.stepByStep.subhead,
+      stepLabel: text.stepByStep.stepLabel,
+      steps: text.stepByStep.steps,
+      funding: {
+        text: text.stepByStep.fundingText,
+        link: { label: text.stepByStep.fundingLinkLabel, href: structure.stepByStep.fundingHref },
+      },
+    },
+    proTips: text.proTips,
     callToAction: {
       heading: text.callToAction.heading,
       body: text.callToAction.body,
       primaryCta: {
         label: text.callToAction.primaryCtaLabel,
         href: structure.callToAction.primaryCtaHref,
+      },
+      faqCta: {
+        label: text.callToAction.faqCtaLabel,
+        href: structure.callToAction.faqCtaHref,
       },
       discordCta: {
         label: text.callToAction.discordCtaLabel,
@@ -72,6 +88,9 @@ export const howItWorksContentZh: HowItWorksContent = buildHowItWorksContent(how
 export const howItWorksContentZhTw: HowItWorksContent = buildHowItWorksContent(howItWorksTextZhTw);
 export const howItWorksContentZhHk: HowItWorksContent = buildHowItWorksContent(howItWorksTextZhHk);
 export const howItWorksContentUk: HowItWorksContent = buildHowItWorksContent(howItWorksTextUk);
+export const howItWorksContentKo: HowItWorksContent = buildHowItWorksContent(howItWorksTextKo);
+export const howItWorksContentJa: HowItWorksContent = buildHowItWorksContent(howItWorksTextJa);
+export const howItWorksContentVi: HowItWorksContent = buildHowItWorksContent(howItWorksTextVi);
 
 const HOW_IT_WORKS_CONTENT: LocaleRecord<HowItWorksContent> = {
   en: howItWorksContentEn,
@@ -79,6 +98,9 @@ const HOW_IT_WORKS_CONTENT: LocaleRecord<HowItWorksContent> = {
   'zh-TW': howItWorksContentZhTw,
   'zh-HK': howItWorksContentZhHk,
   uk: howItWorksContentUk,
+  ko: howItWorksContentKo,
+  ja: howItWorksContentJa,
+  vi: howItWorksContentVi,
 };
 
 export function getHowItWorksContent(locale: string): HowItWorksContent {

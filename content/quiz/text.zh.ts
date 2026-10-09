@@ -16,64 +16,81 @@ export const quizTextZh = {
       quizLabel: '知识测验',
     },
     questionCountTemplate: '{count} 道题',
+    durationTemplate: '约 {minutes} 分钟',
+    difficultyTemplate: '难度 {level}/{max}',
+    bestTemplate: '最佳成绩 {correct}/{total}',
+    inProgressTemplate: '进行中：第 {current} 题，共 {total} 题',
     startLabel: '开始',
+    resumeLabel: '继续作答',
   },
   ui: {
     intro: {
       keyboardHint: '提示：按 1–4 作答，按 Enter 继续。',
       beginLabel: '开始作答',
+      resumeLabel: '继续作答',
+      startOverLabel: '重新开始',
+      ranksHeading: '理解程度',
+      rankFromTemplate: '{percent} 起',
+      rankBelowTemplate: '低于 {percent}',
     },
     progressTemplate: '第 {current} 题，共 {total} 题',
     correctFeedback: [
-      '答对了——轨道稳稳当当。',
-      '完全正确。',
-      '答对了——你读协议，就像种子读物理。',
-      '正确——一条干净的轨迹。',
+      '答对了。',
+      '正确，来看这条规则的依据。',
+      '回答正确。',
+      '没错，下面是完整解释。',
     ],
     incorrectFeedback: [
-      '不太对——协议实际是这样做的。',
-      '一个常见的误解——机制并非如此。',
-      '轨道很近，天体不对。规则在这里。',
-      '这次没对——白皮书一锤定音。',
+      '这题答错了，看看下面的解释。',
+      '还不准确，可以对照规则再想一想。',
+      '答案不同，关键在下面这条规则。',
+      '这次未答对，下面附有白皮书说明。',
     ],
+    correctAnswerTemplate: '正确答案是 {letter}。',
+    yourAnswerLabel: '你的答案',
+    correctAnswerLabel: '正确答案',
+    newTabNote: '（在新标签页中打开）',
     streakTemplate: '连对 {count} 题',
     explanationHeading: '为什么',
     funFactHeading: '你知道吗？',
-    referenceLabel: '深入阅读',
+    referenceTemplate: '深入阅读：{section}',
     nextLabel: '下一题',
     finishLabel: '查看结果',
     summary: {
       eyebrow: '作答完成',
       scoreTemplate: '答对 {correct} 题，共 {total} 题',
-      rankLabel: '你的段位',
+      rankLabel: '理解程度',
+      rankTemplate: '理解程度：{rank}',
       ranks: {
-        observer: {
-          name: '观察者',
-          line: '你看到了表面。白皮书值得一次更近的环绕。',
+        reader: {
+          name: '读者',
+          line: '可以从白皮书的协议概览开始，再逐步了解各项机制。',
         },
-        participant: {
-          name: '参与者',
-          line: '你认得每个部件。边界情形才是设计最有意思的地方。',
+        student: {
+          name: '学生',
+          line: '已掌握不少基础概念，接下来可以多留意边界情形。',
         },
-        enduranceChampion: {
-          name: '坚守冠军',
-          line: '对机制的把握绵长而稳定，少有间隔能撑过你。',
+        scholar: {
+          name: '学者',
+          line: '对协议机制已有扎实理解，可通过参考章节补齐细节。',
         },
-        chronoWarrior: {
-          name: '时之勇士',
-          line: '对协议近乎全盘掌握。下面的参考章节是消遣，不是补课。',
+        cartographer: {
+          name: '制图师',
+          line: '对协议已有全面理解，也可以再读参考章节，核对细节。',
         },
       },
-      studyHeading: '规划你的下一条轨道',
-      studyIntro: '你答错的题目，各自附上一锤定音的章节：',
-      noMissesNote: '无需复习——每一题都答对了。',
-      restartLabel: '重新洗题再来一次',
+      studyHeading: '需要复习的题目',
+      studyIntro: '你的答案、正确答案，以及讲清这条规则的原文章节。',
+      noMissesNote: '全部答对了。',
+      restartLabel: '重新排列题目再答一次',
       hubLabel: '全部层级',
+      nextTierTemplate: '继续挑战{tier}',
     },
   },
   tiers: {
     basic: {
       title: '基础',
+      heading: '基础：核心概念',
       tagline: '协议的轮廓：周期、落笔、分配与艺术。',
       description:
         '二十五道基础题——什么是落笔、周期如何落幕、ETH 流向哪里、作品为何是确定性的。初来乍到，从这里开始。',
@@ -81,6 +98,7 @@ export const quizTextZh = {
     },
     medium: {
       title: '进阶',
+      heading: '进阶：运转中的机制',
       tagline: '运转中的机制：校准窗口、坚守轨道、议会规则。',
       description:
         '二十五道进阶题——价格曲线、CST 反馈回路、坚守冠军与时之勇士之辨、星选算术与议会参数。适合看过一两个周期的读者。',
@@ -88,6 +106,7 @@ export const quizTextZh = {
     },
     hard: {
       title: '高阶',
+      heading: '高阶：边界情形与推演',
       tagline: '边界情形与推演：恶意钱包、升级历史、渲染管线。',
       description:
         '五十道高阶题，献给细心的读者——到期后的语义、拒收 ETH 的合约、V2 为何改了五处、V3 重新定价了什么、随机性如何构造，以及一台 Yoshida 积分器在艺术项目里做什么。',

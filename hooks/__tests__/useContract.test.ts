@@ -1,5 +1,5 @@
 import { renderHook } from '@testing-library/react';
-import { usePublicClient, useWalletClient } from 'wagmi';
+import { usePublicClient, useWalletClient, useConnectorClient } from 'wagmi';
 import { getContract, type Abi } from 'viem';
 
 import { reportError } from '@/utils/errors';
@@ -22,6 +22,7 @@ jest.mock('../../utils/errors', () => ({
 
 const mockUsePublicClient = usePublicClient as jest.Mock;
 const mockUseWalletClient = useWalletClient as jest.Mock;
+const mockUseConnectorClient = useConnectorClient as jest.Mock;
 const mockGetContract = getContract as unknown as jest.Mock;
 const mockReportError = reportError as jest.Mock;
 
@@ -95,18 +96,14 @@ describe('useContract', () => {
       });
     });
 
-    it('passes both public and wallet clients when wallet is connected', () => {
-      const mockWalletClient = { account: { address: TEST_ADDRESS } };
-      mockUseWalletClient.mockReturnValue({ data: mockWalletClient });
+    it('keeps no wallet-client query, so another network logs no chain mismatch', () => {
+      renderHook(() => useContract(TEST_ADDRESS, TEST_ABI));
 
-      const { result } = renderHook(() => useContract(TEST_ADDRESS, TEST_ABI));
-
-      expect(result.current).toBe(mockContract);
-      expect(mockGetContract).toHaveBeenCalledWith({
-        address: TEST_ADDRESS,
-        abi: TEST_ABI,
-        client: { public: mockPublicClient, wallet: mockWalletClient },
-      });
+      expect(mockUseWalletClient).not.toHaveBeenCalled();
+      expect(mockUseConnectorClient).not.toHaveBeenCalled();
+      expect(mockGetContract).toHaveBeenCalledWith(
+        expect.objectContaining({ client: mockPublicClient }),
+      );
     });
 
     it('memoises the contract across re-renders with the same inputs', () => {
@@ -127,38 +124,6 @@ describe('useContract', () => {
     const mockPublicClient2 = { chain: { id: 2 }, request: jest.fn() };
     const contract1 = { read: {}, id: 1 };
     const contract2 = { read: {}, id: 2 };
-
-    it('recalculates when walletClient connects', () => {
-      mockUsePublicClient.mockReturnValue(mockPublicClient1);
-      mockUseWalletClient.mockReturnValue({ data: undefined });
-      mockGetContract.mockReturnValueOnce(contract1).mockReturnValueOnce(contract2);
-
-      const { result, rerender } = renderHook(() => useContract(TEST_ADDRESS, TEST_ABI));
-      expect(result.current).toBe(contract1);
-
-      const mockWalletClient = { account: { address: TEST_ADDRESS } };
-      mockUseWalletClient.mockReturnValue({ data: mockWalletClient });
-      rerender();
-
-      expect(result.current).toBe(contract2);
-      expect(mockGetContract).toHaveBeenCalledTimes(2);
-    });
-
-    it('recalculates when walletClient disconnects', () => {
-      const mockWalletClient = { account: { address: TEST_ADDRESS } };
-      mockUsePublicClient.mockReturnValue(mockPublicClient1);
-      mockUseWalletClient.mockReturnValue({ data: mockWalletClient });
-      mockGetContract.mockReturnValueOnce(contract1).mockReturnValueOnce(contract2);
-
-      const { result, rerender } = renderHook(() => useContract(TEST_ADDRESS, TEST_ABI));
-      expect(result.current).toBe(contract1);
-
-      mockUseWalletClient.mockReturnValue({ data: undefined });
-      rerender();
-
-      expect(result.current).toBe(contract2);
-      expect(mockGetContract).toHaveBeenCalledTimes(2);
-    });
 
     it('recalculates when publicClient changes', () => {
       mockUsePublicClient.mockReturnValue(mockPublicClient1);
@@ -188,6 +153,21 @@ describe('useContract', () => {
 
       rerender({ addr: OTHER_ADDRESS });
       expect(result.current).toBe(contract2);
+    });
+  });
+
+  describe('no second write path', () => {
+    it('returns the read-only contract as viem builds it, with no write proxy', () => {
+      const readOnly = { read: {}, address: TEST_ADDRESS, abi: TEST_ABI };
+      mockUsePublicClient.mockReturnValue({ chain: { id: 421614 } });
+      mockGetContract.mockReturnValue(readOnly);
+
+      const { result } = renderHook(() => useContract(TEST_ADDRESS, TEST_ABI));
+
+      // Every write goes through useTxFlow's ctx.writeContract (target check,
+      // simulation, lifecycle toast); a contract.write here would skip it.
+      expect(result.current).toBe(readOnly);
+      expect(result.current).not.toHaveProperty('write');
     });
   });
 

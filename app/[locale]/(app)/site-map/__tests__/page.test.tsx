@@ -1,5 +1,6 @@
 import zhMeta from '@/messages/zh/meta.json';
 import { expectedLanguageAlternates } from '@/test-utils/i18n';
+import { documentTitleOf, resolvingMetadata } from '@/test-utils/metadata';
 
 import { APP_ORIGIN } from '@/lib/hostRouting';
 
@@ -14,11 +15,12 @@ jest.mock('../SiteMapPage', () => ({
 
 describe('localized site-map route', () => {
   it('activates Chinese canonical and hreflang metadata', async () => {
-    const metadata = await generateMetadata({
-      params: Promise.resolve({ locale: 'zh' }),
-    });
+    const metadata = await generateMetadata(
+      { params: Promise.resolve({ locale: 'zh' }) },
+      resolvingMetadata(),
+    );
 
-    expect(metadata.title).toBe(zhMeta.siteMap.title);
+    expect(documentTitleOf(metadata)).toBe(`${zhMeta.siteMap.title} · Cosmic Signature`);
     expect(metadata.description).toBe(zhMeta.siteMap.description);
     expect(metadata.alternates).toEqual({
       canonical: `${APP_ORIGIN}/zh/site-map`,

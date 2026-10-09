@@ -1,58 +1,13 @@
 import '@testing-library/jest-dom';
 import React from 'react';
-import { render, screen, waitFor } from '@testing-library/react';
-import { CookiesProvider } from 'react-cookie';
+import { render, screen } from '@testing-library/react';
 
 import { checkA11y } from '@/test-utils';
 
 import { Providers } from '../providers';
 import { NOTIFICATION_AUTO_HIDE_MS } from '../../../../config/constants';
 
-const mockInitParticlesEngine = jest.fn<Promise<void>, [(engine: unknown) => Promise<void>]>();
-const mockLoadSlim = jest.fn().mockResolvedValue(undefined);
-
-jest.mock('next/dynamic', () =>
-  jest.fn(() => {
-    const MockParticles = (props: Record<string, unknown>) => {
-      const options = props.options as
-        | {
-            fullScreen?: { enable?: boolean };
-            interactivity?: {
-              detectsOn?: string;
-              events?: {
-                onHover?: { enable?: boolean };
-                onClick?: { enable?: boolean };
-              };
-            };
-          }
-        | undefined;
-
-      return (
-        <div
-          data-testid="particles"
-          data-fullscreen-enabled={String(options?.fullScreen?.enable)}
-          data-detects-on={options?.interactivity?.detectsOn}
-          data-hover-enabled={String(options?.interactivity?.events?.onHover?.enable)}
-          data-click-enabled={String(options?.interactivity?.events?.onClick?.enable)}
-          {...props}
-        />
-      );
-    };
-    MockParticles.displayName = 'MockParticles';
-    return MockParticles;
-  }),
-);
-
-jest.mock('@tsparticles/react', () => ({
-  __esModule: true,
-  default: () => null,
-  initParticlesEngine: (...args: unknown[]) =>
-    mockInitParticlesEngine(args[0] as (engine: unknown) => Promise<void>),
-}));
-
-jest.mock('@tsparticles/slim', () => ({
-  loadSlim: (...args: unknown[]) => mockLoadSlim(...args),
-}));
+const mockPathname = jest.spyOn(jest.requireMock('next/navigation'), 'usePathname');
 
 jest.mock('wagmi');
 jest.mock('@rainbow-me/rainbowkit');
@@ -61,6 +16,7 @@ jest.mock('@tanstack/react-query');
 jest.mock('sonner', () => ({
   Toaster: (props: {
     position?: string;
+    style?: Record<string, string>;
     toastOptions?: { duration?: number; className?: string };
   }) => (
     <div
@@ -68,27 +24,23 @@ jest.mock('sonner', () => ({
       data-position={props.position}
       data-duration={props.toastOptions?.duration}
       data-classname={props.toastOptions?.className}
+      data-normal-bg={props.style?.['--normal-bg']}
+      data-error-border={props.style?.['--error-border']}
     />
   ),
 }));
 
 jest.mock('../../../../config/wagmi', () => ({ wagmiConfig: {} }));
 
-jest.mock('../../../../contexts/AnchoredTokenContext', () => ({
-  AnchoredTokenProvider: ({ children }: { children: React.ReactNode }) => (
-    <div data-testid="staked-token-provider">{children}</div>
+jest.mock('../../../../contexts/AccountDataProvider', () => ({
+  AccountDataProvider: ({ children }: { children: React.ReactNode }) => (
+    <div data-testid="account-data-provider">{children}</div>
   ),
 }));
 
 jest.mock('../../../../contexts/SystemModeContext', () => ({
   SystemModeProvider: ({ children }: { children: React.ReactNode }) => (
     <div data-testid="system-mode-provider">{children}</div>
-  ),
-}));
-
-jest.mock('../../../../contexts/ApiDataContext', () => ({
-  ApiDataProvider: ({ children }: { children: React.ReactNode }) => (
-    <div data-testid="api-data-provider">{children}</div>
   ),
 }));
 
@@ -103,11 +55,6 @@ jest.mock('../../../../components/layout/Header', () => ({
   default: () => <header data-testid="header">Header</header>,
 }));
 
-jest.mock('../../../../components/layout/Footer', () => ({
-  __esModule: true,
-  default: () => <footer data-testid="footer">Footer</footer>,
-}));
-
 jest.mock('../../../../components/layout/ErrorBoundary', () => ({
   __esModule: true,
   default: ({ children }: { children: React.ReactNode }) => (
@@ -115,43 +62,18 @@ jest.mock('../../../../components/layout/ErrorBoundary', () => ({
   ),
 }));
 
-// CookiesProvider is intentionally NOT mocked.
-// It validates that react-cookie v8's functional CookiesProvider
-// works correctly with React 19 JSX types — the core fix for task 4b.
-
-describe('CookiesProvider (react-cookie v8 + React 19)', () => {
-  it('renders as a JSX component without type errors', () => {
-    const { getByText } = render(
-      <CookiesProvider>
-        <span>Cookie child</span>
-      </CookiesProvider>,
-    );
-    expect(getByText('Cookie child')).toBeInTheDocument();
-  });
-
-  it('passes children through to the DOM', () => {
-    render(
-      <CookiesProvider>
-        <div data-testid="a">A</div>
-        <div data-testid="b">B</div>
-      </CookiesProvider>,
-    );
-    expect(screen.getByTestId('a')).toBeInTheDocument();
-    expect(screen.getByTestId('b')).toBeInTheDocument();
-  });
-});
+/** The server-rendered footer the root layout hands Providers as a slot. */
+const footerSlot = <footer data-testid="footer">Footer</footer>;
 
 describe('Providers', () => {
   beforeEach(() => {
     jest.clearAllMocks();
-    // Default: engine never initializes, preventing act() warnings
-    // in tests that only care about the provider structure.
-    mockInitParticlesEngine.mockImplementation(() => new Promise(() => {}));
+    mockPathname.mockReturnValue('/');
   });
 
   it('renders children', () => {
     render(
-      <Providers>
+      <Providers footer={footerSlot}>
         <div data-testid="child">Hello</div>
       </Providers>,
     );
@@ -161,7 +83,7 @@ describe('Providers', () => {
 
   it('renders multiple children', () => {
     render(
-      <Providers>
+      <Providers footer={footerSlot}>
         <div data-testid="first">First</div>
         <div data-testid="second">Second</div>
       </Providers>,
@@ -172,7 +94,7 @@ describe('Providers', () => {
 
   it('renders Header and Footer', () => {
     render(
-      <Providers>
+      <Providers footer={footerSlot}>
         <div>Content</div>
       </Providers>,
     );
@@ -180,9 +102,24 @@ describe('Providers', () => {
     expect(screen.getByTestId('footer')).toBeInTheDocument();
   });
 
+  it.each(['/experimental-ui', '/gallery', '/statistics/participation'])(
+    'keeps full site navigation on %s',
+    (pathname) => {
+      mockPathname.mockReturnValue(pathname);
+      render(
+        <Providers footer={footerSlot}>
+          <main id="main">Content</main>
+        </Providers>,
+      );
+      expect(screen.getByTestId('header')).toBeInTheDocument();
+      expect(screen.getByTestId('footer')).toBeInTheDocument();
+      expect(document.querySelector('a[href="#main"]')).toBeInTheDocument();
+    },
+  );
+
   it('places Header before children and Footer after in DOM order', () => {
     render(
-      <Providers>
+      <Providers footer={footerSlot}>
         <div data-testid="child">Content</div>
       </Providers>,
     );
@@ -196,7 +133,7 @@ describe('Providers', () => {
 
   it('renders Toaster with top-right position', () => {
     render(
-      <Providers>
+      <Providers footer={footerSlot}>
         <div>Content</div>
       </Providers>,
     );
@@ -205,7 +142,7 @@ describe('Providers', () => {
 
   it('configures Toaster duration from NOTIFICATION_AUTO_HIDE_MS', () => {
     render(
-      <Providers>
+      <Providers footer={footerSlot}>
         <div>Content</div>
       </Providers>,
     );
@@ -217,19 +154,22 @@ describe('Providers', () => {
 
   it('configures Toaster className for theme styling', () => {
     render(
-      <Providers>
+      <Providers footer={footerSlot}>
         <div>Content</div>
       </Providers>,
     );
-    // The Toaster mock spreads className onto data-classname; the value
-    // changed when we themed the toast to brand tokens (border, glass bg,
-    // elevation shadow). Assert the recipe is applied, not the exact string.
-    expect(screen.getByTestId('toaster').getAttribute('data-classname')).toMatch(/bg-card/);
+    // Sonner's stylesheet outranks a class on the toast, so the palette
+    // reaches it through sonner's variables: the raised surface, and a state
+    // edge in the palette's own state colour. The float shadow is the class.
+    const toaster = screen.getByTestId('toaster');
+    expect(toaster.getAttribute('data-classname')).toMatch(/shadow-float/);
+    expect(toaster).toHaveAttribute('data-normal-bg', 'hsl(var(--popover))');
+    expect(toaster.getAttribute('data-error-border')).toMatch(/--critical/);
   });
 
   it('wraps content in two ErrorBoundary layers', () => {
     render(
-      <Providers>
+      <Providers footer={footerSlot}>
         <div data-testid="child">Content</div>
       </Providers>,
     );
@@ -238,7 +178,7 @@ describe('Providers', () => {
 
   it('wraps children inside the inner ErrorBoundary', () => {
     render(
-      <Providers>
+      <Providers footer={footerSlot}>
         <div data-testid="child">Content</div>
       </Providers>,
     );
@@ -248,121 +188,35 @@ describe('Providers', () => {
 
   it('nests context providers in the correct order', () => {
     render(
-      <Providers>
+      <Providers footer={footerSlot}>
         <div data-testid="child">Content</div>
       </Providers>,
     );
 
-    const anchoredToken = screen.getByTestId('staked-token-provider');
+    const accountData = screen.getByTestId('account-data-provider');
     const systemMode = screen.getByTestId('system-mode-provider');
-    const apiData = screen.getByTestId('api-data-provider');
     const notification = screen.getByTestId('notification-provider');
 
-    expect(anchoredToken).toContainElement(systemMode);
-    expect(systemMode).toContainElement(apiData);
-    expect(apiData).toContainElement(notification);
+    expect(accountData).toContainElement(systemMode);
+    expect(systemMode).toContainElement(notification);
     expect(notification).toContainElement(screen.getByTestId('child'));
   });
 
-  it('does not render particles before engine is ready', () => {
-    render(
-      <Providers>
+  it('draws no animated backdrop of its own', () => {
+    // The white particle plexus drew lines through text and cards and ignored
+    // the palette. The atmosphere is the static, palette-aware AmbientBackdrop
+    // that PageShell renders; nothing here runs a canvas or a frame loop.
+    const { container } = render(
+      <Providers footer={footerSlot}>
         <div>Content</div>
       </Providers>,
     );
-    expect(screen.queryByTestId('particles')).not.toBeInTheDocument();
-  });
-
-  it('renders particles after engine initializes', async () => {
-    mockInitParticlesEngine.mockImplementation(async (cb) => {
-      await cb({});
-    });
-
-    render(
-      <Providers>
-        <div>Content</div>
-      </Providers>,
-    );
-    await waitFor(() => {
-      expect(screen.getByTestId('particles')).toBeInTheDocument();
-    });
-  });
-
-  it('wraps particles in an inert aria-hidden backdrop', async () => {
-    mockInitParticlesEngine.mockImplementation(async (cb) => {
-      await cb({});
-    });
-
-    render(
-      <Providers>
-        <div>Content</div>
-      </Providers>,
-    );
-    await waitFor(() => {
-      const backdrop = screen.getByTestId('particles').parentElement;
-      expect(backdrop).toHaveAttribute('aria-hidden', 'true');
-      expect(backdrop).toHaveClass(
-        'pointer-events-none',
-        'fixed',
-        'inset-0',
-        '-z-10',
-        'touch-none',
-      );
-    });
-  });
-
-  it('configures particles as non-fullscreen and non-interactive', async () => {
-    mockInitParticlesEngine.mockImplementation(async (cb) => {
-      await cb({});
-    });
-
-    render(
-      <Providers>
-        <div>Content</div>
-      </Providers>,
-    );
-    await waitFor(() => {
-      const particles = screen.getByTestId('particles');
-      expect(particles).toHaveAttribute('data-fullscreen-enabled', 'false');
-      expect(particles).toHaveAttribute('data-detects-on', 'window');
-      expect(particles).toHaveAttribute('data-hover-enabled', 'false');
-      expect(particles).toHaveAttribute('data-click-enabled', 'false');
-    });
-  });
-
-  it('calls initParticlesEngine on mount', async () => {
-    mockInitParticlesEngine.mockImplementation(async (cb) => {
-      await cb({});
-    });
-
-    render(
-      <Providers>
-        <div>Content</div>
-      </Providers>,
-    );
-    await waitFor(() => {
-      expect(mockInitParticlesEngine).toHaveBeenCalledTimes(1);
-    });
-  });
-
-  it('calls loadSlim during engine initialization', async () => {
-    mockInitParticlesEngine.mockImplementation(async (cb) => {
-      await cb({});
-    });
-
-    render(
-      <Providers>
-        <div>Content</div>
-      </Providers>,
-    );
-    await waitFor(() => {
-      expect(mockLoadSlim).toHaveBeenCalledTimes(1);
-    });
+    expect(container.querySelector('canvas')).toBeNull();
   });
 
   it('has no accessibility violations', async () => {
     const { container } = render(
-      <Providers>
+      <Providers footer={footerSlot}>
         <div>Content</div>
       </Providers>,
     );

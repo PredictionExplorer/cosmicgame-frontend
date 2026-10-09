@@ -1,0 +1,41 @@
+{
+  "liveCycleCountdown": "Đếm ngược trực tiếp của chu kỳ trình diễn",
+  "countdown": {
+    "days": "NGÀY",
+    "hours": "GIỜ",
+    "minutes": "PHÚT",
+    "seconds": "GIÂY"
+  },
+  "durationCompact": {
+    "days": " ngày",
+    "hours": " giờ",
+    "minutes": " phút",
+    "seconds": " giây"
+  },
+  "address": {
+    "zero": "Địa chỉ 0",
+    "imprinted": "Đã khắc",
+    "consumed": "Đã tiêu thụ",
+    "self": "Địa chỉ này",
+    "known": {
+      "protocol": "Giao thức Cosmic Signature",
+      "implementation": "Hợp đồng triển khai",
+      "cst": "Token CST của Cosmic Signature",
+      "nft": "Cosmic Signature NFT",
+      "randomWalk": "Random Walk NFT",
+      "council": "Hội đồng Vũ trụ",
+      "publicGoods": "Kho Hàng hóa công",
+      "outreach": "Dự trữ truyền thông",
+      "allocations": "Ví phân bổ",
+      "cosmicAnchor": "Ví neo giữ Cosmic Signature NFT",
+      "rwalkAnchor": "Ví neo giữ RWLK"
+    }
+  },
+  "dateTime": {
+    "timeZone": "Múi giờ: {zone}"
+  },
+  "allocationSplit": {
+    "label": "{label}: {items}",
+    "item": "{track} {share}"
+  }
+}

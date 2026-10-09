@@ -1,91 +1,228 @@
-import { render, screen, checkA11y } from '@/test-utils';
+import { formatDuration } from '@/utils/format';
+import { allocationSharesFromDashboard as allocationShares } from '@/config/allocationTracks';
+
+import { checkA11y, render, screen, within } from '@/test-utils';
 
 import AdminSettingsPage from '../AdminSettingsPage';
 
-const mockUseDashboardInfo = jest.fn().mockReturnValue({
-  data: undefined,
-  isLoading: false,
-  error: null,
-});
+const mockUseDashboardInfo = jest.fn();
+const mockRefetch = jest.fn();
 
 jest.mock('../../../../../../hooks/useApiQuery', () => ({
   useDashboardInfo: (...args: unknown[]) => mockUseDashboardInfo(...args),
 }));
 
-jest.mock('../../../../../../components/ui/button', () => ({
-  Button: ({ children, ...props }: React.PropsWithChildren<Record<string, unknown>>) => (
-    <button {...props}>{children}</button>
-  ),
+// A fixed "now" after the activation below, so the cycle reads as active.
+jest.mock('../../../../../../hooks/useNow', () => ({
+  useNow: () => Date.UTC(2026, 8, 1),
 }));
 
-jest.mock('../../../../../../components/ui/input', () => ({
-  Input: (props: Record<string, unknown>) => <input {...props} />,
-}));
+// Field names as the live dashboard sends them; the page once read RaffleWalletAddr,
+// NumRaffleEthWinners and friends, which the API never sends, and showed blank rows.
+const dashboard = {
+  ContractAddrs: {
+    CosmicGameAddr: '0x6a714Ae7B5b6eA520F6BCA23d2E609C4Fd5863F2',
+    CosmicSignatureAddr: '0xbb84Be3500A63581d3F2d5AC3bdF8685AAedad25',
+    CosmicTokenAddr: '0xAD91843e6A58Ba560F577E676986AFb1dba6FBA0',
+    CosmicDaoAddr: '0xF3D52E1c681949be7E624778dB13DaD7F8c729db',
+    CharityWalletAddr: '0x96bB0ADB414d5350f435E52f94946B6C7A0760a9',
+    PrizesWalletAddr: '0xE1b619e9B39ea4109D2F429Ea5eAA307759b0011',
+    RandomWalkAddr: '0x895a6F444BE4ba9d124F61DF736605792B35D66b',
+    StakingWalletCSTAddr: '0x6308A405B4FF1eA890870Efe2a6D036750B81F7C',
+    StakingWalletRWalkAddr: '0x5EB3396092841E6c5b0b51141699F6711E830529',
+    MarketingWalletAddr: '0xa3802c799f5e3D3D3562A9B513a41C6aAF92e25e',
+  },
+  NumRaffleEthWinnersBidding: 3,
+  NumRaffleNFTWinnersBidding: 10,
+  NumRaffleNFTWinnersStakingRWalk: 10,
+  PrizePercentage: 25,
+  ChronoWarriorPercentage: 8,
+  CharityPercentage: 7,
+  RafflePercentage: 4,
+  StakingPercentage: 6,
+  TimeIncrease: '100',
+  PriceIncrease: '100',
+  TimeoutClaimPrize: 172800,
+  MainPrizeTimeIncrementInMicroSeconds: '3672360000',
+  InitialSecondsUntilPrize: 41667,
+  RoundStartCSTAuctionLength: 29487,
+  CurRoundStats: { TotalBids: 0, ActivationTime: 1786477106 },
+};
 
-jest.mock('../../../../../../components/ui/select', () => ({
-  Select: ({ children }: React.PropsWithChildren) => <div>{children}</div>,
-  SelectContent: ({ children }: React.PropsWithChildren) => <div>{children}</div>,
-  SelectItem: ({ children }: React.PropsWithChildren) => <div>{children}</div>,
-  SelectTrigger: ({ children }: React.PropsWithChildren) => <div>{children}</div>,
-  SelectValue: () => <span />,
-}));
+/** The value cell of a parameter row, by the row's label. */
+const valueOf = (label: string) => {
+  const term = screen.getByText(label, { selector: 'dt' });
+  return term.nextElementSibling as HTMLElement;
+};
 
-beforeEach(() => jest.clearAllMocks());
+beforeEach(() => {
+  jest.clearAllMocks();
+  mockUseDashboardInfo.mockReturnValue({
+    data: dashboard,
+    isLoading: false,
+    isError: false,
+    refetch: mockRefetch,
+  });
+});
 
 describe('AdminSettingsPage', () => {
-  it('shows loading state when query is loading', () => {
-    mockUseDashboardInfo.mockReturnValue({ data: undefined, isLoading: true, error: null });
+  it('is a read-only sheet: no inputs, no Set buttons, no mode switch', () => {
     render(<AdminSettingsPage />);
-    expect(screen.getByText('Loading...')).toBeInTheDocument();
+    expect(screen.queryByRole('textbox')).not.toBeInTheDocument();
+    expect(screen.queryByRole('spinbutton')).not.toBeInTheDocument();
+    expect(screen.queryByRole('combobox')).not.toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: /^set/i })).not.toBeInTheDocument();
   });
 
-  it('shows loading when data is not available', () => {
-    mockUseDashboardInfo.mockReturnValue({ data: undefined, isLoading: false, error: null });
+  // The groups /contracts also shows carry its names, and every tool's
+  // sections share one title tier (Moderation's).
+  it('groups the parameters under the /contracts names, at the section tier', () => {
     render(<AdminSettingsPage />);
-    expect(screen.getByText('Loading...')).toBeInTheDocument();
+    const headings = screen.getAllByRole('heading', { level: 2 });
+    expect(headings.map((h) => h.textContent)).toEqual([
+      'Contracts',
+      'Allocation tracks',
+      'Stellar Selection',
+      'Timing',
+      'Gesture Cost',
+    ]);
+    for (const heading of headings) expect(heading).toHaveClass('type-section');
   });
 
-  it('renders settings form with data', () => {
+  it('lists every protocol address under its Contracts page name, with explorer evidence', () => {
+    render(<AdminSettingsPage />);
+    const allocations = valueOf('Allocations Wallet');
+    expect(allocations).toHaveTextContent(dashboard.ContractAddrs.PrizesWalletAddr);
+    expect(within(allocations).getByRole('link', { name: /Arbiscan/ })).toHaveAttribute(
+      'href',
+      expect.stringContaining(`/address/${dashboard.ContractAddrs.PrizesWalletAddr}`),
+    );
+    expect(valueOf('RWLK Anchoring Wallet')).toHaveTextContent(
+      dashboard.ContractAddrs.StakingWalletRWalkAddr,
+    );
+    expect(valueOf('Cosmic Council')).toHaveTextContent(dashboard.ContractAddrs.CosmicDaoAddr);
+  });
+
+  it('reads the Stellar Selection recipient counts under the names /contracts uses', () => {
+    render(<AdminSettingsPage />);
+    expect(valueOf('ETH Stellar Selection recipients')).toHaveTextContent('3');
+    expect(valueOf('NFT Stellar Selection recipients')).toHaveTextContent('10');
+    // RandomWalk anchor-holders, not "NFT holders" (regression).
+    expect(valueOf('Anchored-NFT Stellar Selection recipients')).toHaveTextContent('10');
+  });
+
+  // The shares group listed four tracks adding to 42%: Chrono-Warrior and the
+  // remainder carried to the next cycle, which /contracts draws, were missing.
+  it('lists the whole Cycle Reserve split, every track /contracts draws', () => {
+    render(<AdminSettingsPage />);
+    const shares = screen.getByRole('region', { name: 'Allocation tracks' });
+    const rows = Array.from(shares.querySelectorAll('[data-parameter]'));
+    expect(rows.map((row) => row.querySelector('dt')?.textContent)).toEqual([
+      'Signature Allocation',
+      'Chrono-Warrior',
+      'Stellar Selection',
+      'Anchor Distribution',
+      'Public Goods',
+      'Compounding Cycle Reserve',
+    ]);
+    expect(valueOf('Chrono-Warrior')).toHaveTextContent('8%');
+    expect(valueOf('Compounding Cycle Reserve')).toHaveTextContent('50%');
+  });
+
+  it('builds shares that add up to 100%', () => {
+    const shares = allocationShares(dashboard);
+    expect(shares.reduce((total, share) => total + (share.percent ?? 0), 0)).toBe(100);
+    // An unreadable share leaves the remainder unknown rather than a wrong figure.
+    expect(allocationShares({ ...dashboard, RafflePercentage: 'n/a' }).at(-1)?.percent).toBeNull();
+  });
+
+  it('shows divisors as the percentage they apply and durations as durations', () => {
+    render(<AdminSettingsPage />);
+    expect(valueOf('Time increment growth per cycle')).toHaveTextContent('1% (divisor 100)');
+    expect(valueOf('ETH Gesture Cost step-up')).toHaveTextContent('1% (divisor 100)');
+    // Units converted by the page (microseconds, the misnamed divisor), spelled by the
+    // shared duration formatter.
+    expect(valueOf('Time added per gesture').textContent).toBe(
+      formatDuration(3672.36, { locale: 'en' }),
+    );
+    expect(valueOf('Finalization timeout').textContent).toBe(
+      formatDuration(172800, { locale: 'en' }),
+    );
+    // A duration, named as one on both pages (it was "Initial time increment").
+    expect(valueOf('Initial cycle duration').textContent).toBe(
+      formatDuration(88135, { locale: 'en' }),
+    );
+  });
+
+  it('marks the cycle active once its activation time has passed', () => {
+    render(<AdminSettingsPage />);
+    const activation = valueOf('Activation time');
+    expect(activation.querySelector('time')).toHaveAttribute(
+      'dateTime',
+      new Date(1786477106 * 1000).toISOString(),
+    );
+    expect(activation).toHaveTextContent('Active');
+  });
+
+  // Two rows could only apologise ("Not reported by the dashboard API"): a
+  // value the page cannot read is not a setting to show.
+  it('lists only the parameters it can read', () => {
+    render(<AdminSettingsPage />);
+    expect(screen.queryByText(/Not reported/)).toBeNull();
+    expect(screen.queryByText('ETH to CST Gesture ratio')).toBeNull();
+    expect(screen.queryByText('Initial Gesture Cost fraction')).toBeNull();
+  });
+
+  // A long value once kept its full width (shrink-0) and squeezed the label to a
+  // syllable per line on phones, clipping the value at the row's edge.
+  it.each(['Time increment growth per cycle', 'Activation time'])(
+    'lets the %s value wrap beside a label that keeps its room',
+    (label) => {
+      render(<AdminSettingsPage />);
+      const term = screen.getByText(label, { selector: 'dt' });
+      const value = valueOf(label);
+      expect(value).not.toHaveClass('shrink-0');
+      expect(value).toHaveClass('min-w-0', 'max-w-[60%]', 'text-end');
+      expect(term).toHaveClass('min-w-0', 'flex-1');
+    },
+  );
+
+  it('shows a dash, announced as unavailable, for a reported field it cannot read', () => {
     mockUseDashboardInfo.mockReturnValue({
-      data: {
-        ContractAddrs: {
-          CosmicSignatureAddr: '0xCST',
-          CosmicTokenAddr: '0xCT',
-          CharityWalletAddr: '0xCharity',
-          RandomWalkAddr: '0xRWLK',
-          RaffleWalletAddr: '0xRaffle',
-          StakingWalletAddr: '0xStaking',
-          MarketingWalletAddr: '0xMarketing',
-          BusinessLogicAddr: '0xBL',
-        },
-        NumRaffleEthWinners: 5,
-        NumRaffleNFTWinners: 3,
-        NumHolderNFTWinners: 2,
-        PrizePercentage: 25,
-        CharityPercentage: 10,
-        RafflePercentage: 15,
-        StakingPercentage: 20,
-        TimeIncrease: 300,
-        PriceIncrease: 10,
-        NanosecondsExtra: 5000000,
-      },
+      data: { ...dashboard, TimeIncrease: 'n/a' },
       isLoading: false,
-      error: null,
+      isError: false,
+      refetch: mockRefetch,
     });
     render(<AdminSettingsPage />);
-    expect(screen.getByText('Cosmic Signature Contract')).toBeInTheDocument();
-    expect(screen.getByDisplayValue('0xCST')).toBeInTheDocument();
-    expect(screen.getByDisplayValue('5')).toBeInTheDocument();
+    expect(valueOf('Time increment growth per cycle')).toHaveTextContent(
+      'common.status.unavailable',
+    );
   });
 
-  it('renders the page title', () => {
-    mockUseDashboardInfo.mockReturnValue({ data: null, isLoading: false, error: null });
+  it('shows placeholder rows while the dashboard loads', () => {
+    mockUseDashboardInfo.mockReturnValue({ data: undefined, isLoading: true, isError: false });
     render(<AdminSettingsPage />);
-    expect(screen.getByText('Administrative methods')).toBeInTheDocument();
+    expect(screen.getByRole('status')).toBeInTheDocument();
+    expect(screen.queryByText('Contracts')).not.toBeInTheDocument();
+  });
+
+  it('offers a retry when the dashboard cannot be read', () => {
+    mockUseDashboardInfo.mockReturnValue({
+      data: undefined,
+      isLoading: false,
+      isError: true,
+      refetch: mockRefetch,
+    });
+    render(<AdminSettingsPage />);
+    expect(
+      screen.getByRole('heading', { level: 2, name: 'The contract settings could not be loaded.' }),
+    ).toBeInTheDocument();
+    screen.getByRole('button', { name: 'Try again' }).click();
+    expect(mockRefetch).toHaveBeenCalled();
   });
 
   it('has no accessibility violations', async () => {
-    mockUseDashboardInfo.mockReturnValue({ data: [], isLoading: false, error: null });
     const { container } = render(<AdminSettingsPage />);
     await checkA11y(container);
   });

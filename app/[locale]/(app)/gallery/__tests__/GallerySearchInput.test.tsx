@@ -1,92 +1,67 @@
-import { render, screen, fireEvent, checkA11y, act } from '@/test-utils';
+import { act, checkA11y, fireEvent, render, screen } from '@/test-utils';
 
-import { GallerySearchInput } from '../components/GallerySearchInput';
+import { GallerySearchInput, SEARCH_DEBOUNCE_MS } from '../components/GallerySearchInput';
+
+const field = () => screen.getByRole('searchbox', { name: 'search.gallery.ariaLabel' });
 
 beforeEach(() => jest.useFakeTimers());
 afterEach(() => jest.useRealTimers());
 
-const defaultProps = {
-  value: '',
-  onChange: jest.fn(),
-  onSearch: jest.fn(),
-};
-
 describe('GallerySearchInput', () => {
-  it('renders the search input', () => {
-    render(<GallerySearchInput {...defaultProps} />);
-    expect(screen.getByLabelText('search.gallery.ariaLabel')).toBeInTheDocument();
+  it('shows the search from the URL', () => {
+    render(<GallerySearchInput value="numba" onCommit={jest.fn()} />);
+    expect(field()).toHaveValue('numba');
   });
 
-  it('renders search button', () => {
-    render(<GallerySearchInput {...defaultProps} />);
-    expect(screen.getByRole('button', { name: 'search.gallery.submit' })).toBeInTheDocument();
+  it('commits after a pause in typing, not per keystroke', () => {
+    const onCommit = jest.fn();
+    render(<GallerySearchInput value="" onCommit={onCommit} />);
+    fireEvent.change(field(), { target: { value: 'nu' } });
+    fireEvent.change(field(), { target: { value: 'numba' } });
+    expect(onCommit).not.toHaveBeenCalled();
+    act(() => {
+      jest.advanceTimersByTime(SEARCH_DEBOUNCE_MS);
+    });
+    expect(onCommit).toHaveBeenCalledTimes(1);
+    expect(onCommit).toHaveBeenCalledWith('numba');
   });
 
-  it('debounces onChange calls', () => {
-    render(<GallerySearchInput {...defaultProps} />);
-    const input = screen.getByLabelText('search.gallery.ariaLabel');
-    fireEvent.change(input, { target: { value: 'hello' } });
-    expect(defaultProps.onChange).not.toHaveBeenCalled();
-    act(() => jest.advanceTimersByTime(300));
-    expect(defaultProps.onChange).toHaveBeenCalledWith('hello');
+  it('commits at once on Enter and when cleared', () => {
+    const onCommit = jest.fn();
+    render(<GallerySearchInput value="" onCommit={onCommit} />);
+    fireEvent.change(field(), { target: { value: '#47 ' } });
+    fireEvent.keyDown(field(), { key: 'Enter' });
+    expect(onCommit).toHaveBeenLastCalledWith('#47');
+    fireEvent.click(screen.getByRole('button', { name: 'search.gallery.clear' }));
+    expect(onCommit).toHaveBeenLastCalledWith('');
+    act(() => {
+      jest.advanceTimersByTime(SEARCH_DEBOUNCE_MS);
+    });
+    expect(onCommit).toHaveBeenCalledTimes(2);
   });
 
-  it('calls onSearch immediately on enter key', () => {
-    render(<GallerySearchInput {...defaultProps} />);
-    const input = screen.getByLabelText('search.gallery.ariaLabel');
-    fireEvent.change(input, { target: { value: 'test' } });
-    fireEvent.keyDown(input, { key: 'Enter' });
-    expect(defaultProps.onSearch).toHaveBeenCalledWith('test');
+  it('keeps typing that is newer than its own commit', () => {
+    const onCommit = jest.fn();
+    const { rerender } = render(<GallerySearchInput value="" onCommit={onCommit} />);
+    fireEvent.change(field(), { target: { value: 'num' } });
+    act(() => {
+      jest.advanceTimersByTime(SEARCH_DEBOUNCE_MS);
+    });
+    fireEvent.change(field(), { target: { value: 'numba' } });
+    // The first commit reaches the URL while the reader is still typing.
+    rerender(<GallerySearchInput value="num" onCommit={onCommit} />);
+    expect(field()).toHaveValue('numba');
   });
 
-  it('calls onSearch on button click', () => {
-    render(<GallerySearchInput {...defaultProps} />);
-    const input = screen.getByLabelText('search.gallery.ariaLabel');
-    fireEvent.change(input, { target: { value: 'query' } });
-    fireEvent.click(screen.getByRole('button', { name: 'search.gallery.submit' }));
-    expect(defaultProps.onSearch).toHaveBeenCalledWith('query');
-  });
-
-  it('shows clear button when input has value', () => {
-    render(<GallerySearchInput {...defaultProps} />);
-    const input = screen.getByLabelText('search.gallery.ariaLabel');
-    expect(screen.queryByLabelText('search.gallery.clear')).not.toBeInTheDocument();
-    fireEvent.change(input, { target: { value: 'text' } });
-    expect(screen.getByLabelText('search.gallery.clear')).toBeInTheDocument();
-  });
-
-  it('clears input on clear button click', () => {
-    render(<GallerySearchInput {...defaultProps} />);
-    const input = screen.getByLabelText('search.gallery.ariaLabel');
-    fireEvent.change(input, { target: { value: 'text' } });
-    fireEvent.click(screen.getByLabelText('search.gallery.clear'));
-    expect(input).toHaveValue('');
-    expect(defaultProps.onChange).toHaveBeenCalledWith('');
-  });
-
-  it('calls onChange with empty string immediately on clear', () => {
-    render(<GallerySearchInput {...defaultProps} />);
-    const input = screen.getByLabelText('search.gallery.ariaLabel');
-    fireEvent.change(input, { target: { value: 'some text' } });
-    act(() => jest.advanceTimersByTime(300));
-    jest.clearAllMocks();
-    fireEvent.change(input, { target: { value: '' } });
-    expect(defaultProps.onChange).toHaveBeenCalledWith('');
-  });
-
-  it('shows result count badge when filtered', () => {
-    render(<GallerySearchInput {...defaultProps} resultCount={5} totalCount={100} />);
-    expect(screen.getByText('search.gallery.results(count=5)')).toBeInTheDocument();
-  });
-
-  it('does not show result count badge when counts are equal', () => {
-    render(<GallerySearchInput {...defaultProps} resultCount={100} totalCount={100} />);
-    expect(screen.queryByText('search.gallery.results(count=100)')).not.toBeInTheDocument();
+  it('follows a URL change it did not make (Back, "Clear all")', () => {
+    const { rerender } = render(<GallerySearchInput value="numba" onCommit={jest.fn()} />);
+    rerender(<GallerySearchInput value="" onCommit={jest.fn()} />);
+    expect(field()).toHaveValue('');
   });
 
   it('has no accessibility violations', async () => {
     jest.useRealTimers();
-    const { container } = render(<GallerySearchInput {...defaultProps} />);
+    const { container } = render(<GallerySearchInput value="47" onCommit={jest.fn()} />);
     await checkA11y(container);
   });
 });

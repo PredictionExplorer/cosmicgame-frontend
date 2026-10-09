@@ -9,71 +9,88 @@ export const quizTextEn = {
     eyebrow: 'Knowledge quiz',
     h1: 'How well do you know Cosmic Signature?',
     intro:
-      'One hundred questions across three tiers, drawn from the white paper: cycles, gestures, allocations, the art pipeline, and the edge cases that only careful readers catch. Every answer comes with an explanation and a pointer to the exact section that teaches the rule \u2014 answering is a way of reading.',
+      'Explore the protocol through one hundred questions at three difficulty levels. Topics include cycles, gestures, allocations, the art pipeline, and less familiar cases. Each answer includes an explanation and a reference to the white paper.',
     breadcrumbs: {
       ariaLabel: 'Breadcrumb',
       homeLabel: 'Home',
       quizLabel: 'Quiz',
     },
     questionCountTemplate: '{count} questions',
+    durationTemplate: 'About {minutes} min',
+    difficultyTemplate: 'Difficulty {level} of {max}',
+    bestTemplate: 'Best {correct} of {total}',
+    inProgressTemplate: 'In progress: question {current} of {total}',
     startLabel: 'Start',
+    resumeLabel: 'Resume',
   },
   ui: {
     intro: {
       keyboardHint: 'Tip: press 1\u20134 to answer, Enter to continue.',
       beginLabel: 'Begin',
+      resumeLabel: 'Resume',
+      startOverLabel: 'Start over',
+      ranksHeading: 'Ranks',
+      rankFromTemplate: 'From {percent}',
+      rankBelowTemplate: 'Below {percent}',
     },
     progressTemplate: 'Question {current} of {total}',
     correctFeedback: [
-      'Correct \u2014 the orbit holds.',
+      'Correct.',
       'Exactly right.',
-      'Correct \u2014 you read the protocol like a seed reads physics.',
-      'Right \u2014 a clean trajectory.',
+      'That is how the protocol works.',
+      'You have it.',
     ],
     incorrectFeedback: [
-      'Not quite \u2014 here is what the protocol actually does.',
-      'A common misconception \u2014 the mechanics say otherwise.',
-      'Close orbit, wrong body. Here is the rule.',
-      'Not this time \u2014 the white paper settles it.',
+      'Not quite. The explanation below walks through the rule.',
+      'This one is easy to mix up. Here is how it works.',
+      'Take a look at the explanation below.',
+      'Not this time. The reference below explains the answer.',
     ],
+    correctAnswerTemplate: 'The correct answer is {letter}.',
+    yourAnswerLabel: 'Your answer',
+    correctAnswerLabel: 'Correct answer',
+    newTabNote: '(opens in a new tab)',
     streakTemplate: '{count} correct in a row',
     explanationHeading: 'Why',
     funFactHeading: 'Did you know?',
-    referenceLabel: 'Go deeper',
+    referenceTemplate: 'Go deeper: {section}',
     nextLabel: 'Next question',
-    finishLabel: 'See your reading',
+    finishLabel: 'See your results',
     summary: {
-      eyebrow: 'Reading complete',
+      eyebrow: 'Quiz complete',
       scoreTemplate: '{correct} of {total} correct',
       rankLabel: 'Your standing',
+      rankTemplate: 'Your standing: {rank}',
       ranks: {
-        observer: {
-          name: 'Observer',
-          line: 'You have seen the surface. The white paper rewards a closer orbit.',
+        reader: {
+          name: 'Reader',
+          line: 'You have made a start. The explanations below will help you build on it.',
         },
-        participant: {
-          name: 'Participant',
+        student: {
+          name: 'Student',
           line: 'You know the moving parts. The edge cases are where the design gets interesting.',
         },
-        enduranceChampion: {
-          name: 'Endurance Champion',
-          line: 'A long, steady grasp of the mechanics. Few gaps survived you.',
+        scholar: {
+          name: 'Scholar',
+          line: 'You understand the mechanics well. Review the remaining questions to fill in the details.',
         },
-        chronoWarrior: {
-          name: 'Chrono-Warrior',
-          line: 'Near-total command of the protocol. The reference sections below are for pleasure, not repair.',
+        cartographer: {
+          name: 'Cartographer',
+          line: 'You know the protocol in depth. The references below offer more to explore.',
         },
       },
-      studyHeading: 'Chart your next orbit',
-      studyIntro: 'The questions you missed, each with the section that settles it:',
+      studyHeading: 'Questions to review',
+      studyIntro: 'Your answer, the correct one, and the rule that settles it.',
       noMissesNote: 'Nothing to review \u2014 every answer was correct.',
       restartLabel: 'Restart with a fresh shuffle',
       hubLabel: 'All tiers',
+      nextTierTemplate: 'Continue to {tier}',
     },
   },
   tiers: {
     basic: {
       title: 'Basic',
+      heading: 'Basic: the fundamentals',
       tagline: 'The shape of the protocol: cycles, gestures, allocations, and the art.',
       description:
         'Twenty-five questions on the fundamentals \u2014 what a gesture is, how a cycle ends, where the ETH goes, and what makes the artwork deterministic. If you are new here, start here.',
@@ -81,6 +98,7 @@ export const quizTextEn = {
     },
     medium: {
       title: 'Medium',
+      heading: 'Medium: the live mechanics',
       tagline: 'The live mechanics: Calibration Windows, persistence tracks, Council rules.',
       description:
         'Twenty-five questions on the machinery in motion \u2014 cost curves, the CST feedback loop, Endurance Champion versus Chrono-Warrior, Selection math, and Council parameters. For readers who have watched a cycle or two.',
@@ -88,6 +106,7 @@ export const quizTextEn = {
     },
     hard: {
       title: 'Hard',
+      heading: 'Hard: edge cases and forensics',
       tagline: 'Edge cases and forensics: hostile wallets, upgrade history, the art pipeline.',
       description:
         'Fifty questions for careful readers \u2014 post-expiry semantics, contracts that reject ETH, why V2 changed five things, what V3 reprices, how the randomness is built, and what a Yoshida integrator is doing in an art project.',

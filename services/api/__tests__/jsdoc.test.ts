@@ -7,6 +7,7 @@ const SERVICE_DIR = resolve(__dirname, '..');
 
 const SERVICE_FILES = [
   'client.ts',
+  'rateLimit.ts',
   'rounds.ts',
   'tokens.ts',
   'anchoring.ts',
@@ -58,15 +59,16 @@ const files: FileEntry[] = SERVICE_FILES.map((name) => {
 });
 
 const EXPECTED_COUNTS: Record<string, number> = {
-  'client.ts': 21,
-  'rounds.ts': 15,
+  'client.ts': 22,
+  'rateLimit.ts': 5,
+  'rounds.ts': 18,
   'tokens.ts': 18,
   'anchoring.ts': 20,
-  'donations.ts': 14,
-  'users.ts': 11,
-  'stellarSelection.ts': 3,
+  'donations.ts': 22,
+  'users.ts': 12,
+  'stellarSelection.ts': 6,
   'marketing.ts': 2,
-  'system.ts': 3,
+  'system.ts': 5,
 };
 
 describe('API service JSDoc coverage', () => {
@@ -90,9 +92,9 @@ describe('API service JSDoc coverage', () => {
   });
 
   describe('no function is missing from the inventory', () => {
-    it('total exported functions across all service files is 107', () => {
+    it('total exported functions across all service files is 130', () => {
       const total = files.reduce((sum, f) => sum + f.exports.length, 0);
-      expect(total).toBe(107);
+      expect(total).toBe(130);
     });
   });
 

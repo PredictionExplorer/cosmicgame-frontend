@@ -6,12 +6,15 @@ import { WHITE_PAPER_VERSION } from './types';
 const cst = (amount: number): string => amount.toLocaleString('zh-CN');
 
 /** protocolFacts stores the example gaps as English strings; render them in zh. */
-const ELAPSED_ZH: Record<string, string> = {
-  '0 seconds': '0 秒',
-  '1 second': '1 秒',
-  '60 seconds': '60 秒',
-  '1 hour': '1 小时',
-  '1 day': '1 天',
+const ELAPSED_ZH: Record<
+  (typeof protocolFacts.dynamicCstRewardExamples)[number]['elapsed'],
+  string
+> = {
+  '0 seconds': '0 秒',
+  '1 second': '1 秒',
+  '60 seconds': '60 秒',
+  '1 hour': '1 小时',
+  '1 day': '1 天',
 };
 
 /** 中文白皮书文案，以 structure.ts 中的骨架为键。 */
@@ -36,7 +39,7 @@ export const whitePaperTextZh = {
   abstract: {
     heading: '摘要',
     paragraphs: [
-      'Cosmic Signature 是部署在 Arbitrum One 上的程序化艺术协议，以一个个限时的演绎周期运转。周期进行中，参与者以 ETH 或协议的 ERC-20 代币 CST 落笔：每一笔都会延长收官倒计时，计入一次星选资格，还可能铭刻新的 CST。倒计时结束、周期收官后，协议将 ETH 储备分配至十余条轨道，铭刻新一代 Cosmic Signature NFT，并把固定份额转拨给 Protocol Guild，即 170 余位以太坊核心贡献者的资助机制。约一半储备滚入下一周期，每个新周期都以更大的储备开场。',
+      'Cosmic Signature 是部署在 Arbitrum One 上的程序化艺术协议，以一个个限时的演绎周期运转。周期进行中，参与者以 ETH 或协议的 ERC-20 代币 CST 落笔：每一笔都会延长收官倒计时，计入一次星选资格，还可能铭刻新的 CST。倒计时结束、周期收官后，协议将 ETH 储备分配至一组固定的轨道，铭刻新一代 Cosmic Signature NFT，并把固定份额转拨给 Protocol Guild，即 170 余位以太坊核心贡献者的资助机制。约一半储备滚入下一周期，储备规模还取决于各周期新加入的 ETH。',
       '每枚 Cosmic Signature NFT 都是对引力三体问题的确定性渲染：作品由链上种子生成，任何人都能逐像素复现，全程没有神经网络参与。本文完整阐述协议机制与代币设计，记录已上线的 V2 升级，介绍规划中的 V3 升级，并阐明一项承诺：待设计定稿，部署者地址将交出全部特权控制。',
     ],
   },
@@ -61,13 +64,13 @@ export const whitePaperTextZh = {
           kind: 'list',
           items: [
             '确定性。作品由铭刻时记录在链上的种子计算而来。渲染管线开源，同一种子永远产出同一图像与视频，逐比特一致。',
-            '机械化发放。分配比例是已验证合约中的常量。参与者与发放规则之间没有任何自由裁量的账户，也没有团队钱包从落笔中收取 ETH。',
-            '有限的团队角色。所有者权限范围很窄，在周期运行期间全部锁定，并将在剩余升级完成后彻底移除。',
+            '机械化发放。分配由已验证合约按链上规则执行。参与者与发放规则之间没有任何自由裁量的账户，也没有团队钱包从落笔中收取 ETH。',
+            '有限的团队角色。所有者权限范围有限，核心参数在周期运行期间锁定，并将在剩余升级完成后彻底移除。',
           ],
         },
         {
           kind: 'paragraph',
-          text: '本文是协议的权威说明。第 2 节勾勒系统全貌；第 3 至 5 节定义周期、落笔与分配；第 6 节介绍艺术；第 7 至 10 节涵盖 CST、锚定、宇宙议会与公共物品；第 11 节讨论安全与可验证性；第 12、13 节记录升级历史与全面去中心化路线；第 14 节直言协议不是什么。文中引用的数字要么是合约常量，要么是链上参数的上线初始值；附录 A 所列的已部署合约始终是最终依据。',
+          text: '本文是协议的权威说明。第 2 节勾勒系统全貌；第 3 至 5 节定义周期、落笔与分配；第 6 节介绍艺术；第 7 至 10 节涵盖 CST、锚定、宇宙议会与公共物品；第 11 节讨论安全与可验证性；第 12、13 节记录升级历史与全面去中心化路线；第 14 节直言协议不是什么。文中引用的数字要么是合约常量，要么是链上参数的上线初始值；附录 A 所列的已部署合约始终是最终依据。',
         },
       ],
     },
@@ -118,7 +121,7 @@ export const whitePaperTextZh = {
       blocks: [
         {
           kind: 'paragraph',
-          text: '周期是一段时间之窗：以价格递减的校准窗口开启，在落笔中延展，倒计时结束并有人收官后落幕。本节讲清这座时钟；落笔本身见第 4 节。',
+          text: '周期是一段时间之窗：以价格递减的校准窗口开启，在落笔中延展，倒计时结束并有人收官后落幕。本节讲清这座时钟；落笔本身见第 4 节。',
         },
       ],
       subsections: {
@@ -140,7 +143,7 @@ export const whitePaperTextZh = {
           blocks: [
             {
               kind: 'paragraph',
-              text: `首笔落笔启动时钟，按上线参数将周期收官时间设在约 ${protocolFacts.initialCycleFinalizationHoursAtLaunch} 小时之后。此后每笔 ETH 或 CST 落笔，都会把当前时间增量加到链上收官时间上。增量上线时恰为 1 小时，并在每个周期收官后增长 ${protocolFacts.cycleTimeIncrementIncreasePercentPerCycle}%，周期因此逐渐变长，NFT 的铭刻节奏也随岁月放缓。只要落笔不断，周期长度没有硬性上限；但落笔价格持续上行，无限延长在实践中代价高昂。`,
+              text: `首笔落笔启动时钟，按上线参数将周期收官时间设在约 ${protocolFacts.initialCycleFinalizationHoursAtLaunch} 小时之后。此后每笔 ETH 或 CST 落笔，都会把当前时间增量加到链上收官时间上。增量上线时恰为 1 小时，并在每个周期收官后增长 ${protocolFacts.cycleTimeIncrementIncreasePercentPerCycle}%，周期因此逐渐变长，NFT 的铭刻节奏也随岁月放缓。只要落笔不断，周期长度没有硬性上限；但落笔价格持续上行，无限延长在实践中代价高昂。`,
             },
             {
               kind: 'paragraph',
@@ -153,11 +156,11 @@ export const whitePaperTextZh = {
           blocks: [
             {
               kind: 'paragraph',
-              text: '周期收官时间一到，收官之笔参与者即可收官。收官是一笔交易：读取协议的 ETH 余额，按第 5 节的轨道发放，铭刻本周期的 NFT 与 CST，为每件新作品记录种子，并排定下一周期。',
+              text: '周期收官时间一到，收官之笔参与者即可收官。收官是一笔交易：读取协议的 ETH 余额，按第 5 节的轨道发放，铭刻本周期的 NFT 与 CST，为每件新作品记录种子，并排定下一周期。',
             },
             {
               kind: 'paragraph',
-              text: `这项权利在 ${protocolFacts.finalGestureExclusivityHours} 小时内专属于收官之笔参与者。窗口过后进入公开收官：任何人都可收官，合约会把实际收官者视为周期受益方，该角色的一切随之归属，包括签名分配的 ETH 份额、CST 铭刻、NFT，以及对已附加资产的优先权。这条规则刻意不留情面：即使参与者消失，协议照样前行；疏忽也有价格，受益方两天内不出手，角色就向第一位来者敞开。`,
+              text: `这项权利在 ${protocolFacts.finalGestureExclusivityHours} 小时内专属于收官之笔参与者。窗口过后进入公开收官：任何人都可收官，合约会把实际收官者视为周期受益方，该角色的一切随之归属，包括签名分配的 ETH 份额、CST 铭刻、NFT，以及对已附加资产的优先权。这项期限让协议能够继续运作：受益方若未在专属窗口内收官，其他人即可接手并获得该角色对应的分配。`,
             },
             {
               kind: 'paragraph',
@@ -172,7 +175,7 @@ export const whitePaperTextZh = {
       blocks: [
         {
           kind: 'paragraph',
-          text: '落笔是协议唯一的输入。无论使用哪种货币，每一笔都会延长倒计时、在参与者星选池中计入一次资格、更新第 5.2 节的坚守时钟，还可能按第 7.1 节铭刻参与 CST。',
+          text: '落笔推动演绎周期。无论使用哪种货币，每一笔都会延长倒计时、在参与者星选池中计入一次资格、更新第 5.2 节的坚守时钟，还可能按第 7.1 节铭刻参与 CST。',
         },
       ],
       subsections: {
@@ -220,7 +223,7 @@ export const whitePaperTextZh = {
           blocks: [
             {
               kind: 'paragraph',
-              text: `落笔可携带最长 ${protocolFacts.gestureMessageMaxLength} 字节的消息，与落笔一同记录在链上；也可附加 ERC-20 代币或一枚 ERC-721 NFT。附加资产不进入 ETH 储备，而由分配钱包托管；周期收官后，受益方享有优先取回权，并受第 5.4 节的公开取回期限约束。`,
+              text: `落笔可携带最长 ${protocolFacts.gestureMessageMaxLength} 字节的消息，与落笔一同记录在链上；也可附加 ERC-20 代币或一枚 ERC-721 NFT。附加资产不进入 ETH 储备，而由分配钱包托管；周期收官后，受益方享有优先取回权，并受第 5.4 节的公开取回期限约束。`,
             },
           ],
         },
@@ -251,12 +254,12 @@ export const whitePaperTextZh = {
                   [
                     '时之勇士分配',
                     `${protocolFacts.chronoWarriorEthPercentage}%`,
-                    '在位最久的坚守冠军（见第 5.2 节）。',
+                    '在位最久的坚守冠军（见第 5.2 节）。',
                   ],
                   [
-                    '公共物品分配',
-                    `${protocolFacts.publicGoodsPercentage}%`,
-                    'Protocol Guild，经公共物品金库转拨。',
+                    'ETH 星选',
+                    `${protocolFacts.stellarSelectionEthPercentage}%`,
+                    `从本周期落笔资格池中选出 ${protocolFacts.ethStellarSelectionRecipients} 次，均分该份额。`,
                   ],
                   [
                     '锚定派发',
@@ -264,9 +267,9 @@ export const whitePaperTextZh = {
                     '已锚定的 Cosmic Signature NFT，按比例分摊。',
                   ],
                   [
-                    'ETH 星选',
-                    `${protocolFacts.stellarSelectionEthPercentage}%`,
-                    `从本周期落笔资格池中选出 ${protocolFacts.ethStellarSelectionRecipients} 次，均分该份额。`,
+                    '公共物品分配',
+                    `${protocolFacts.publicGoodsPercentage}%`,
+                    'Protocol Guild，经公共物品金库转拨。',
                   ],
                   [
                     '滚动储备',
@@ -279,7 +282,7 @@ export const whitePaperTextZh = {
             },
             {
               kind: 'paragraph',
-              text: '五条发放轨道合计正好一半，其余滚动累积：协议滚动累积，而非抽取，每个周期都以比上一周期更大的储备开场。若收官时没有任何已锚定的 Cosmic Signature NFT，该周期的锚定派发将跳过，这部分份额同样滚入下一周期。',
+              text: '五条发放轨道合计正好一半，其余滚动累积：协议滚动累积，而非抽取，下一周期的起始储备来自这笔留存，其规模不保证逐周期增长。若收官时没有任何已锚定的 Cosmic Signature NFT，该周期的锚定派发将跳过，这部分份额同样滚入下一周期。',
             },
             {
               kind: 'table',
@@ -288,38 +291,38 @@ export const whitePaperTextZh = {
                 rows: [
                   [
                     '签名分配',
-                    `${cst(protocolFacts.specialAllocationCst)} CST 与 1 枚 NFT`,
+                    `${cst(protocolFacts.specialAllocationCst)} CST 与 1 枚 NFT`,
                     '周期受益方。',
                   ],
                   [
                     '时之勇士',
-                    `${cst(protocolFacts.specialAllocationCst)} CST 与 1 枚 NFT`,
+                    `${cst(protocolFacts.specialAllocationCst)} CST 与 1 枚 NFT`,
                     '时之勇士。',
                   ],
                   [
                     '坚守冠军',
-                    `${cst(protocolFacts.specialAllocationCst)} CST 与 1 枚 NFT`,
+                    `${cst(protocolFacts.specialAllocationCst)} CST 与 1 枚 NFT`,
                     '坚守冠军。',
                   ],
                   [
                     'CST 收官之笔',
-                    `${cst(protocolFacts.specialAllocationCst)} CST 与 1 枚 NFT`,
+                    `${cst(protocolFacts.specialAllocationCst)} CST 与 1 枚 NFT`,
                     '本周期最后一笔 CST 落笔的参与者。',
                   ],
                   [
                     '参与者 NFT 星选',
-                    `${cst(protocolFacts.specialAllocationCst)} CST 与 1 枚 NFT，共 ${protocolFacts.nftStellarSelectionRecipients} 次`,
+                    `${cst(protocolFacts.specialAllocationCst)} CST 与 1 枚 NFT，共 ${protocolFacts.nftStellarSelectionRecipients} 次`,
                     '从落笔资格池中选出。',
                   ],
                   [
                     '锚定 NFT 星选',
-                    `${cst(protocolFacts.specialAllocationCst)} CST 与 1 枚 NFT，共 ${protocolFacts.anchoredRwlkNftSelectionRecipients} 次`,
+                    `${cst(protocolFacts.specialAllocationCst)} CST 与 1 枚 NFT，共 ${protocolFacts.anchoredRwlkNftSelectionRecipients} 次`,
                     '在已锚定的 Random Walk NFT 中选出。',
                   ],
                   [
                     '推广储备',
                     `${cst(protocolFacts.outreachReserveCst)} CST`,
-                    '社区推广（见第 7.1 节）。',
+                    '社区推广（见第 7.1 节）。',
                   ],
                 ],
               },
@@ -356,7 +359,7 @@ export const whitePaperTextZh = {
             },
             {
               kind: 'paragraph',
-              text: '这些选择背后的随机性在收官时于链上构造，其来源与边界见第 11.3 节。',
+              text: '这些选择背后的随机性在收官时于链上构造，其来源与边界见第 11.3 节。',
             },
           ],
         },
@@ -394,18 +397,18 @@ export const whitePaperTextZh = {
             {
               kind: 'list',
               items: [
-                '种子。铭刻时，合约从链上数据导出 32 字节种子（见第 11.3 节），并与 NFT 一同存储。种子初始化一个 SHA3-256 随机数生成器，此后的一切都是它的纯函数。',
-                '模拟。十万组候选构型分别通过四阶 Yoshida 辛积分器演算，每组推进 1,000,000 个物理步；这种积分器能在长时间尺度上保持系统的能量行为。',
+                '种子。铭刻时，合约从链上数据导出 32 字节种子（见第 11.3 节），并与 NFT 一同存储。种子初始化一个 SHA3-256 随机数生成器，此后的一切都是它的纯函数。',
+                '模拟。十万组候选构型分别通过四阶 Yoshida 辛积分器演算，每组推进 1,000,000 个物理步；这种积分器能在长时间尺度上保持系统的能量行为。',
                 '遴选。Borda 排序聚合按混沌程度与三角形的等边程度为候选打分，选出视觉上最有意味的一条轨道。',
                 '镜头。缓慢的椭圆镜头漂移穿行于轨道之间，赋予每幅签名电影般的视差。',
                 '色彩。色彩在 OKLab 感知色彩空间中混合，各天体色相相隔 120°，并由漂移与正弦波调制。',
-                '光谱渲染。从 380 至 700 纳米划分 64 个波长区间，以随速度变化的线宽和景深渲染轨迹。',
+                '光谱渲染。从 380 至 700 纳米划分 64 个波长区间，以随速度变化的线宽和景深渲染轨迹。',
                 '收尾。AgX 色调映射、辉光、OpenSimplex 星云层与色彩分级共同完成画面。',
               ],
             },
             {
               kind: 'paragraph',
-              text: '每枚 NFT 的最终输出，是一张 16 位 PNG 与一段 30 秒 H.265 视频。',
+              text: '每枚 NFT 的最终输出，是一张 16 位 PNG 与一段 30 秒 H.265 视频。',
             },
           ],
         },
@@ -443,6 +446,18 @@ export const whitePaperTextZh = {
             {
               kind: 'formula',
               formula: protocolFacts.dynamicCstRewardFormula,
+              notation: protocolFacts.participationCstNotation,
+              legend: [
+                { symbol: protocolFacts.participationCstSymbols[0], meaning: '距上一笔的秒数' },
+                {
+                  symbol: protocolFacts.participationCstSymbols[1],
+                  meaning: '参与 CST 乘数（合约参数）',
+                },
+                {
+                  symbol: protocolFacts.participationCstSymbols[2],
+                  meaning: '当前周期时间增量（微秒）',
+                },
+              ],
               caption: '一笔落笔铭刻的参与 CST。经过时间自上一笔起算，并按当前周期时间增量归一化。',
             },
             {
@@ -454,7 +469,7 @@ export const whitePaperTextZh = {
               table: {
                 columns: ['距上一笔的时间', '参与 CST'],
                 rows: protocolFacts.dynamicCstRewardExamples.map((example) => [
-                  ELAPSED_ZH[example.elapsed] ?? example.elapsed,
+                  ELAPSED_ZH[example.elapsed],
                   example.cst,
                 ]),
                 footnote: `按上线时恰为 ${protocolFacts.dynamicCstRewardExamplesAssumeIncrementHours} 小时的时间增量计算。增量逐周期增长后，实际数额会略低于表中值；实时预览与合约本身才是最终依据。`,
@@ -467,11 +482,11 @@ export const whitePaperTextZh = {
           blocks: [
             {
               kind: 'paragraph',
-              text: `CST 一经使用即离开流通：每笔 CST 落笔支付的全部价格都会销毁。供应量因此由行为塑造：沉寂的周期铭刻的参与 CST 不多，活跃的 CST 使用又把供应量烧回去，固定的表彰与推广两条流则为每个典型周期稳定注入 ${cst(protocolFacts.typicalCstImprintsPerCycle)} CST。没有上限，没有预留份额，也没有团队分配。`,
+              text: `CST 一经使用即离开流通：每笔 CST 落笔支付的全部价格都会销毁。供应量因此由行为塑造：沉寂的周期铭刻的参与 CST 不多，活跃的 CST 使用又把供应量烧回去，固定的表彰与推广两条流则为每个典型周期稳定注入 ${cst(protocolFacts.typicalCstImprintsPerCycle)} CST。没有硬性供应上限，也没有上线预留份额；推广储备则按上述规则逐周期铭刻。`,
             },
             {
               kind: 'paragraph',
-              text: '平方根公式本身就是一道供应闸门，由 V2 升级引入（见第 12.2 节）。最初的设计是每笔固定铭刻 100 CST，机器速度的连续落笔由此成了源源不断的新 CST 来源。改用现行规则后，一串急促的落笔几乎什么都铭刻不到；创造供应的，是耐心的参与。',
+              text: '平方根公式本身就是一道供应闸门，由 V2 升级引入（见第 12.2 节）。最初的设计是每笔固定铭刻 100 CST，机器速度的连续落笔由此成了源源不断的新 CST 来源。改用现行规则后，一串急促的落笔几乎什么都铭刻不到；创造供应的，是耐心的参与。',
             },
           ],
         },
@@ -480,7 +495,7 @@ export const whitePaperTextZh = {
           blocks: [
             {
               kind: 'paragraph',
-              text: 'CST 同时是宇宙议会（第 9 节）的权重代币。权重在委托后生效：持有者把权重委托给自己或其他地址，此后每枚 CST 表达一个单位的协调权重。代币采用基于时间戳的检查点，提案快照对应的是钟表时间，而非区块高度。',
+              text: 'CST 同时是宇宙议会（第 9 节）的权重代币。权重在委托后生效：持有者把权重委托给自己或其他地址，此后每枚 CST 表达一个单位的协调权重。代币采用基于时间戳的检查点，提案快照对应的是钟表时间，而非区块高度。',
             },
           ],
         },
@@ -495,11 +510,11 @@ export const whitePaperTextZh = {
         },
         {
           kind: 'paragraph',
-          text: '一生一次的规则，用一个不可逆的抉择取代了常见的锁定时间表，也让已锚定的集合有了真实的退出成本。要不要继续锚定，是每个周期都可以重新掂量的活问题；要不要解锚，则是永久的决定。',
+          text: '锚定没有固定锁定期，持有者可以自行决定何时解锚。不过，解锚会永久用尽这枚 NFT 的锚定资格，因此每次决定都需要同时考虑当前派发与今后的参与方式。',
         },
         {
           kind: 'paragraph',
-          text: `Random Walk NFT 的锚定自成一线，目的也不同：已锚定的 Random Walk NFT 参与锚定 NFT 星选（见第 5.3 节），每周期 ${protocolFacts.anchoredRwlkNftSelectionRecipients} 次，每次携带 ${cst(protocolFacts.specialAllocationCst)} CST 与一枚 Cosmic Signature NFT。Random Walk 锚定不含 ETH 派发。一生一次的规则同样适用。`,
+          text: `Random Walk NFT 的锚定自成一线，目的也不同：已锚定的 Random Walk NFT 参与锚定 NFT 星选（见第 5.3 节），每周期 ${protocolFacts.anchoredRwlkNftSelectionRecipients} 次，每次携带 ${cst(protocolFacts.specialAllocationCst)} CST 与一枚 Cosmic Signature NFT。Random Walk 锚定不含 ETH 派发。一生一次的规则同样适用。`,
         },
       ],
     },
@@ -516,7 +531,7 @@ export const whitePaperTextZh = {
         },
         {
           kind: 'paragraph',
-          text: '今天，议会与团队范围有限的所有者角色并行运作。待第 13 节的去中心化步骤完成，它就是协议仅存的协调层。',
+          text: '今天，议会与团队范围有限的所有者角色并行运作。待第 13 节的去中心化步骤完成，它就是协议仅存的协调层。',
         },
       ],
     },
@@ -548,11 +563,11 @@ export const whitePaperTextZh = {
           blocks: [
             {
               kind: 'paragraph',
-              text: '2025年末，Hacken 对 Cosmic Signature 合约完成了独立安全审查，范围覆盖核心协议、CST 代币、两个 NFT 集成、锚定钱包，以及配套的钱包与系统管理合约。最终报告于2026年1月发布，共列出 23 项发现：无严重级，无高危级，中危 3 项、低危 8 项、信息级 12 项，其中多数是团队已审阅并附书面理由接受的设计取舍。',
+              text: '2025年末，Hacken 对 Cosmic Signature 合约完成了独立安全审查，范围覆盖核心协议、CST 代币、两个 NFT 集成、锚定钱包，以及配套的钱包与系统管理合约。最终报告于2026年1月发布，共列出 23 项发现：无严重级，无高危级，中危 3 项、低危 8 项、信息级 12 项，其中多数是团队已审阅并附书面理由接受的设计取舍。',
             },
             {
               kind: 'paragraph',
-              text: '人工审查之外，Hacken 还对 14 项系统不变量做了模糊测试，例如协议持有的 ETH 总额必须始终等于存入减去发放。全部 14 项在 10,000 次运行中均保持成立。报告全文公开，链接见参考资料。',
+              text: '人工审查之外，Hacken 还对 14 项系统不变量做了模糊测试，例如协议持有的 ETH 总额必须始终等于存入减去发放。全部 14 项在 10,000 次运行中均保持成立。报告全文公开，链接见参考资料。',
             },
             {
               kind: 'paragraph',
@@ -569,7 +584,7 @@ export const whitePaperTextZh = {
                 '重入防护覆盖核心合约的每个外部入口。',
                 '取回优先于送达：次级 ETH 分配与附加资产存入托管，而非在收官时直接发送，任何获配方合约都无法借此阻塞周期落幕。',
                 '容错转拨：公共物品转账若无法完成，收官照常进行，事件记录在案，留待后续处理。',
-                '周期间锁定：周期运行期间，核心参数不可更改，合约不可升级（见第 13 节）。',
+                '周期间锁定：周期运行期间，核心参数不可更改，合约不可升级（见第 13 节）。',
               ],
             },
           ],
@@ -583,7 +598,7 @@ export const whitePaperTextZh = {
             },
             {
               kind: 'paragraph',
-              text: '这是有意的极简：不引入预言机，不依赖外部委员会，也没有任何可能让周期搁浅的回调。取舍摆在明处：排序器理论上可以影响区块级输入，而设计限定了这种影响所能触及的范围。随机性的消费者只有星选与艺术种子；倒计时、落笔价格序列和第 5 节的每一个百分比都是确定性的。整个构造每次收官只使用一次，而收官本身是任何人都能提交的公开交易。',
+              text: '这是有意的极简：不引入预言机，不依赖外部委员会，也没有任何可能让周期搁浅的回调。取舍摆在明处：排序器理论上可以影响区块级输入，而设计限定了这种影响所能触及的范围。只有星选与艺术种子使用这套随机性；倒计时、落笔价格序列和第 5 节的每一个百分比都是确定性的。整个构造每次收官只使用一次，而收官本身是任何人都能提交的公开交易。',
             },
           ],
         },
@@ -626,10 +641,10 @@ export const whitePaperTextZh = {
             {
               kind: 'list',
               items: [
-                '动态参与 CST。每笔固定 100 CST 改为第 7.1 节的平方根公式。固定铭刻曾让高频连续落笔沦为凭空生成 CST 的手段；新规则按耐心铭刻，而非按频次。',
+                '动态参与 CST。每笔固定 100 CST 改为第 7.1 节的平方根公式。固定铭刻曾让高频连续落笔沦为凭空生成 CST 的手段；新规则按耐心铭刻，而非按频次。',
                 '最低铭刻保护。每个落笔方法新增一项参数，用于指定参与者可接受的最低参与 CST 数额，避免签名与执行之间的时间差造成损失。',
-                '活的 CST 校准窗口。窗口时长改为链上存储值，随落笔构成变化（见第 4.3 节），让 ETH 与 CST 两条路径互相制衡。',
-                `更长的专属窗口。收官之笔参与者的专属收官窗口由 24 小时延长至 ${protocolFacts.finalGestureExclusivityHours} 小时。`,
+                '活的 CST 校准窗口。窗口时长改为链上存储值，随落笔构成变化（见第 4.3 节），让 ETH 与 CST 两条路径互相制衡。',
+                `更长的专属窗口。收官之笔参与者的专属收官窗口由 24 小时延长至 ${protocolFacts.finalGestureExclusivityHours} 小时。`,
                 '时序与算术加固。倒计时延长一律作用于链上存储的收官时间，堵住了到期后用近乎免费的 CST 落笔反复外推截止时间的漏洞；排定下一周期的算术同样加固，任何参数组合，无论多么极端，都无法阻止周期收官。',
               ],
             },
@@ -640,20 +655,20 @@ export const whitePaperTextZh = {
           blocks: [
             {
               kind: 'paragraph',
-              text: '正在公开仓库中开发的 V3 只改一件事：晚出手的代价。周期收官时间前的最后 20 分钟内，一切落笔价格（ETH、附加 Random Walk NFT 的 ETH、CST）都会乘上一个溢价系数，从 1 倍按多项式攀升至 10 倍：到点即达 10 倍，超时落笔同样按 10 倍计。',
+              text: '正在公开仓库中开发的 V3 只改一件事：晚出手的代价。周期收官时间前的最后 20 分钟内，一切落笔价格（ETH、附加 Random Walk NFT 的 ETH、CST）都会乘上一个溢价系数，从 1 倍按多项式攀升至 10 倍：到点即达 10 倍，超时落笔同样按 10 倍计。',
             },
             {
               kind: 'formula',
               formula: 'm(t) = 1 + 9 \u00b7 (t / T)^8\uff0c\u5176\u4e2d T = 20 \u5206\u949f',
-              caption: '临近收官的价格溢价；t 为最后 20 分钟窗口内已经过的时间。',
+              caption: '临近收官的价格溢价；t 为最后 20 分钟窗口内已经过的时间。',
             },
             {
               kind: 'paragraph',
-              text: '指数是关键。八次方的曲线让溢价在窗口的大部分时间里几乎无感，只在最后陡然直立：距收官 10 分钟约 1.04 倍，5 分钟约 1.9 倍，1 分钟约 7 倍，到点 10 倍。',
+              text: '指数是关键。八次方的曲线让溢价在窗口的大部分时间里几乎无感，只在最后陡然直立：距收官 10 分钟约 1.04 倍，5 分钟约 1.9 倍，1 分钟约 7 倍，到点 10 倍。',
             },
             {
               kind: 'paragraph',
-              text: '意图是改写终局。V2 之下，拖到最后几秒落笔近乎零成本，周期可能在一阵低信号的卡点操作中收场。V3 之下，压哨一笔成了昂贵的表态，贯穿周期的持续参与相对便宜，想在第 5.2 节的坚守轨道上偷袭得手，也难得多。参数在部署前仍可能微调，机制则如上所述。',
+              text: '意图是改写终局。V2 之下，拖到最后几秒落笔近乎零成本，周期可能在一阵低信号的卡点操作中收场。V3 之下，压哨一笔成了昂贵的表态，贯穿周期的持续参与相对便宜，想在第 5.2 节的坚守轨道上偷袭得手，也难得多。参数在部署前仍可能微调，机制则如上所述。',
             },
           ],
         },
@@ -694,7 +709,7 @@ export const whitePaperTextZh = {
             // lexicon-allow-start: 否认文案必须点名其否认的概念，与常见问题页做法一致。
             {
               kind: 'paragraph',
-              text: 'Cosmic Signature 不是彩票，不是赌场，也不是赌博产品。这里没有庄家，没有荷官，也没有赌注。参与者以价值换取参与本身：每一笔都是塑造作品、延长周期并永久记录在链上的表达行为。协议不留任何运营方抽成；第 5 节的每条分配轨道，流向的都是参与者、已锚定的 NFT、滚动储备或公共物品。',
+              text: 'Cosmic Signature 不是彩票，不是赌场，也不是赌博产品。这里没有庄家，没有荷官，也没有赌注。参与者以价值换取参与本身：每一笔都是塑造作品、延长周期并永久记录在链上的表达行为。协议不留任何运营方抽成；第 5 节的每条分配轨道，流向的都是参与者、已锚定的 NFT、滚动储备或公共物品。',
             },
             {
               kind: 'paragraph',
@@ -710,9 +725,9 @@ export const whitePaperTextZh = {
               kind: 'list',
               items: [
                 '智能合约风险。合约经过审查、形式化分析与源码验证，但这些都不构成保证；任何持有价值的软件都可能存在未知缺陷。',
-                '随机性边界。星选使用区块衍生熵（见第 11.3 节），排序器理论上可施加影响；设计限定了后果的范围，但无法彻底消除。',
+                '随机性边界。星选使用区块衍生熵（见第 11.3 节），排序器理论上可施加影响；设计限定了后果的范围，但无法彻底消除。',
                 `时限责任。${protocolFacts.finalGestureExclusivityHours} 小时收官窗口与 ${protocolFacts.secondaryRetrievalTimeoutWeeks} 周托管期限是真实的截止时间；逾期未取回的分配将向他人开放，这正是设计使然。`,
-                '参数变更。去中心化步骤完成之前，参数仍可能按第 13 节所述在周期间调整；每次变更都会在下一周期开始前公开。',
+                '参数变更。去中心化步骤完成之前，参数仍可能按第 13 节所述在周期间调整；每次变更都会在下一周期开始前公开。',
                 '资产波动。ETH、CST 与 NFT 的价值都会波动。参与需要花费真金白银，应把落笔当作为参与和艺术付出的花费，而非获取金钱的途径。',
                 '监管不确定性。数字资产的法律定性因司法辖区而异，且仍在演变。',
               ],
@@ -754,7 +769,7 @@ export const whitePaperTextZh = {
               ['锚定钱包（Random Walk NFT）', protocolFacts.contractAddresses.rwlkAnchoringWallet],
             ],
             footnote:
-              '全部合约均已在 Sourcify 上完成精确匹配验证（链 ID 42161）。代理地址是协议的永久地址；实现只会经由第 12、13 节所述的公开升级流程更替。',
+              '全部合约均已在 Sourcify 上完成精确匹配验证（链 ID 42161）。代理地址是协议的永久地址；实现只会经由第 12、13 节所述的公开升级流程更替。',
           },
         },
       ],
@@ -864,4 +879,53 @@ export const whitePaperTextZh = {
     ],
   },
   licenseNote: '本文与 Cosmic Signature 全部项目自有材料一样，依 CC0 1.0 献入公有领域。',
+  reading: {
+    railLabel: '本页内容',
+    openContentsLabel: '目录',
+    backToTopLabel: '回到顶部',
+    headingLinkTemplate: '本节链接：{title}',
+    formulaLabel: '公式',
+    noteLabel: '说明',
+    contractExpressionLabel: '合约中的原始表达式',
+    figureTemplate: '图 {number}',
+    readingTimeTemplate: '约 {minutes} 分钟读完',
+    newTabNote: '（在新标签页中打开）',
+  },
+  figures: {
+    cycle: {
+      title: '一个演绎周期：从开场到下一周期',
+      caption: '时长为上线参数；具体规则见第 3.1 至 3.3 节。',
+      steps: [
+        {
+          label: '开场',
+          detail: 'ETH 校准窗口逐步压低开场价格，直到有人落下第一笔。',
+        },
+        {
+          label: '落笔',
+          detail: `每一笔都为倒计时加上一个时间增量，上线时为 ${protocolFacts.initialCycleTimeIncrementHours} 小时。`,
+        },
+        {
+          label: '专属收官窗口',
+          detail: `倒计时结束后的 ${protocolFacts.finalGestureExclusivityHours} 小时内，只有收官之笔参与者可以收官。`,
+        },
+        {
+          label: '公开收官',
+          detail: '此后任何人都可以收官，并接手周期受益方的角色。',
+        },
+        {
+          label: '下一周期',
+          detail: `短暂延迟后下一周期开启，默认 ${protocolFacts.defaultNextCycleDelayMinutes} 分钟。`,
+        },
+      ],
+    },
+    allocation: {
+      title: '收官时周期储备的去向',
+      caption: '份额按收官时协议的 ETH 余额计算；其余约一半滚入下一周期。',
+    },
+    art: {
+      title: '藏品中的两件签名作品',
+      caption: '每幅图像都是渲染管线按下方种子输出的结果，任何人都能逐像素重新生成。',
+      seedLabel: '种子',
+    },
+  },
 } satisfies WhitePaperText;

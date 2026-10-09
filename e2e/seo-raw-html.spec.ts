@@ -1,5 +1,9 @@
 import { expect, test } from '@playwright/test';
 
+import { getAboutContent } from '../content/about';
+import { getLandingContent } from '../content/landing';
+import { BRAND_ICON_URLS } from '../lib/og/brandIcons';
+
 import { LOCALE_CHROME, LOCALE_SEO, TRANSLATED_LOCALES } from './locale-fixtures';
 
 const APP_HOST = 'app.cosmicsignature.com';
@@ -8,7 +12,13 @@ const LANDING_HOST = 'cosmicsignature.com';
 interface PublicPage {
   path: string;
   host: string;
-  h1: string | RegExp;
+  /** Text the raw HTML must contain (the H1's text). */
+  h1: string;
+  /**
+   * The H1 is one rich message (the accent in a span inside it): `h1` is then
+   * its exact text once the tags are stripped.
+   */
+  richH1?: true;
   /** JSON-LD @type values that must be present in the raw HTML. */
   jsonLd?: string[];
 }
@@ -17,27 +27,32 @@ const publicPages: PublicPage[] = [
   {
     path: '/',
     host: LANDING_HOST,
-    h1: 'Cosmic Signature:',
+    h1: getLandingContent('en').hero.headlineLead,
     jsonLd: ['Organization', 'WebSite', 'CreativeWork'],
   },
-  { path: '/about', host: LANDING_HOST, h1: 'About Cosmic Signature', jsonLd: ['AboutPage'] },
+  {
+    path: '/about',
+    host: LANDING_HOST,
+    h1: getAboutContent('en').heading,
+    jsonLd: ['AboutPage'],
+  },
   { path: '/learn', host: LANDING_HOST, h1: 'Learn Cosmic Signature', jsonLd: ['BreadcrumbList'] },
   {
     path: '/learn/collecting-and-trading-cosmic-signature',
     host: LANDING_HOST,
-    h1: 'Collecting and Trading Cosmic Signature',
+    h1: 'Collecting and trading Cosmic Signature',
     jsonLd: ['Article', 'BreadcrumbList'],
   },
   {
     path: '/zh',
     host: LANDING_HOST,
-    h1: 'Cosmic Signature：程序化链上艺术',
+    h1: getLandingContent('zh').hero.headlineLead,
     jsonLd: ['Organization', 'WebSite', 'CreativeWork'],
   },
   {
     path: '/zh/about',
     host: LANDING_HOST,
-    h1: '关于 Cosmic Signature',
+    h1: getAboutContent('zh').heading,
     jsonLd: ['AboutPage'],
   },
   {
@@ -55,13 +70,13 @@ const publicPages: PublicPage[] = [
   {
     path: '/uk',
     host: LANDING_HOST,
-    h1: 'Cosmic Signature: процедурне ончейн-мистецтво',
+    h1: getLandingContent('uk').hero.headlineLead,
     jsonLd: ['Organization', 'WebSite', 'CreativeWork'],
   },
   {
     path: '/uk/about',
     host: LANDING_HOST,
-    h1: 'Про Cosmic Signature',
+    h1: getAboutContent('uk').heading,
     jsonLd: ['AboutPage'],
   },
   {
@@ -87,33 +102,35 @@ const publicPages: PublicPage[] = [
   {
     path: '/statistics',
     host: APP_HOST,
-    h1: 'Cosmic Signature Protocol Statistics',
+    h1: 'Protocol statistics',
     jsonLd: ['WebPage', 'Dataset'],
   },
   {
     path: '/faq',
     host: APP_HOST,
     h1: 'Cosmic Signature FAQ',
+    richH1: true,
     jsonLd: ['FAQPage', 'BreadcrumbList'],
   },
   {
     path: '/how-it-works',
     host: APP_HOST,
-    h1: 'How Cosmic Signature Works',
+    h1: 'How Cosmic Signature works',
+    richH1: true,
     jsonLd: ['WebPage', 'BreadcrumbList'],
   },
   { path: '/anchoring', host: APP_HOST, h1: 'Anchor Distributions' },
-  { path: '/allocation', host: APP_HOST, h1: 'Allocation Recipients' },
+  { path: '/allocation', host: APP_HOST, h1: 'Allocation recipients' },
   {
     path: '/contracts',
     host: APP_HOST,
-    h1: 'Cosmic Signature Contracts',
+    h1: 'Contracts',
     jsonLd: ['WebPage', 'BreadcrumbList'],
   },
   {
     path: '/code',
     host: APP_HOST,
-    h1: 'Cosmic Signature Source Code',
+    h1: 'Source code',
     jsonLd: ['WebPage', 'BreadcrumbList'],
   },
   {
@@ -125,13 +142,14 @@ const publicPages: PublicPage[] = [
   {
     path: '/zh/statistics',
     host: APP_HOST,
-    h1: 'Cosmic Signature 协议统计',
+    h1: '协议统计',
     jsonLd: ['Organization', 'WebSite', 'WebApplication', 'WebPage', 'Dataset'],
   },
   {
     path: '/zh/faq',
     host: APP_HOST,
     h1: 'Cosmic Signature 常见问题',
+    richH1: true,
     jsonLd: ['Organization', 'WebSite', 'WebApplication', 'FAQPage', 'BreadcrumbList'],
   },
   {
@@ -149,14 +167,14 @@ const publicPages: PublicPage[] = [
   {
     path: '/uk/statistics',
     host: APP_HOST,
-    h1: 'Статистика протоколу Cosmic Signature',
+    h1: 'Статистика протоколу',
     jsonLd: ['Organization', 'WebSite', 'WebApplication', 'WebPage', 'Dataset'],
   },
   {
     path: '/uk/faq',
     host: APP_HOST,
-    // The hero h1 renders the prefix and the gradient highlight as siblings.
-    h1: /Cosmic Signature[\s\S]{0,200}Поширені запитання/,
+    h1: 'Поширені запитання про Cosmic Signature',
+    richH1: true,
     jsonLd: ['Organization', 'WebSite', 'WebApplication', 'FAQPage', 'BreadcrumbList'],
   },
   {
@@ -175,6 +193,16 @@ const publicPages: PublicPage[] = [
 
 function hostHeaders(host: string) {
   return { Host: host, 'X-Forwarded-Host': host };
+}
+
+/** The first H1's text with its tags stripped and whitespace collapsed. */
+function extractH1Text(html: string): string {
+  const inner = html.match(/<h1[^>]*>([\s\S]*?)<\/h1>/)?.[1] ?? '';
+  return inner
+    .replace(/<[^>]+>/g, '')
+    .replaceAll('&amp;', '&')
+    .replace(/\s+/g, ' ')
+    .trim();
 }
 
 function countMatches(text: string, pattern: RegExp): number {
@@ -218,6 +246,19 @@ function extractTitle(html: string): string {
   return html.match(/<title>([^<]+)<\/title>/)?.[1] ?? '';
 }
 
+/**
+ * A 404's own head, in the HTML crawlers read: the error's title (not the
+ * site default) and no "index, follow" beside the `noindex` Next.js adds.
+ */
+function expectNotFoundHead(html: string, path: string): void {
+  const title = extractTitle(html);
+  expect(title, `${path} names the error in its title`).toMatch(/ · Cosmic Signature$/);
+  expect(title, `${path} does not keep the site default title`).not.toBe('Cosmic Signature');
+  expect(html, `${path} has no indexable robots line`).not.toMatch(
+    /name="robots"[^>]+content="index/i,
+  );
+}
+
 function extractDescription(html: string): string {
   return html.match(/<meta[^>]+name="description"[^>]+content="([^"]+)"/)?.[1] ?? '';
 }
@@ -251,10 +292,12 @@ test.describe('raw HTML SEO', () => {
       expect(html).toMatch(/<title>[^<]{10,}<\/title>/);
       expect(html).toMatch(/<meta[^>]+name="description"[^>]+content="[^"]{30,}"/);
       expect(html).toMatch(/<link[^>]+rel="canonical"[^>]+href="https?:\/\//);
-      if (typeof page.h1 === 'string') {
-        expect(html).toContain(page.h1);
+      if (page.richH1) {
+        expect(extractH1Text(html)).toBe(page.h1);
       } else {
-        expect(html).toMatch(page.h1);
+        // Tag-agnostic: a Chinese or Japanese heading glues each closing mark
+        // to its character in a nowrap span (PhrasedText).
+        expect(extractH1Text(html)).toContain(page.h1);
       }
       expect(countMatches(html, /<h1[\s>]/g)).toBe(1);
       expect(html).not.toMatch(/name="robots"[^>]+content="[^"]*noindex/i);
@@ -293,7 +336,7 @@ test.describe('raw HTML SEO', () => {
         expect(html).toMatch(/hreflang="en"/i);
         expect(html).toMatch(new RegExp(`hreflang="${locale}"`, 'i'));
         expect(html).toContain(`"inLanguage":"${seo.inLanguage}"`);
-        expect(html).toContain(page.h1);
+        expect(extractH1Text(html)).toContain(page.h1);
       }
     });
 
@@ -358,7 +401,7 @@ test.describe('raw HTML SEO', () => {
   }
 
   test('both hosts emit and serve the same versioned favicon assets', async ({ request }) => {
-    const expectedHrefs = ['/favicon.svg?v=20260825', '/favicon.ico?v=20260825'];
+    const expectedHrefs = [BRAND_ICON_URLS.faviconSvg, BRAND_ICON_URLS.faviconIco];
     let baselineAssets: Buffer[] | undefined;
 
     for (const host of [APP_HOST, LANDING_HOST]) {
@@ -390,6 +433,35 @@ test.describe('raw HTML SEO', () => {
           expect(asset.equals(baselineAssets?.[index] ?? Buffer.alloc(0))).toBe(true);
         });
       }
+    }
+  });
+
+  test('only the app host links its localized web manifest, served as JSON', async ({
+    request,
+  }) => {
+    const manifestHref = (html: string) =>
+      html
+        .match(/<link\b[^>]*rel=["']manifest["'][^>]*>/i)?.[0]
+        .match(/href=["']([^"']+)["']/)?.[1];
+
+    const landing = await request.get('/', { headers: hostHeaders(LANDING_HOST) });
+    expect(manifestHref(await landing.text())).toBeUndefined();
+
+    for (const [path, href, lang] of [
+      ['/', '/en/manifest.webmanifest', 'en'],
+      ['/ja', '/ja/manifest.webmanifest', 'ja'],
+    ] as const) {
+      const page = await request.get(path, { headers: hostHeaders(APP_HOST) });
+      expect(manifestHref(await page.text())).toBe(href);
+      const manifest = await request.get(href, {
+        headers: hostHeaders(APP_HOST),
+        maxRedirects: 0,
+      });
+      expect(manifest.status()).toBe(200);
+      expect(manifest.headers()['content-type']).toContain('application/manifest+json');
+      expect(await manifest.json()).toEqual(
+        expect.objectContaining({ id: '/', lang, theme_color: '#090A11' }),
+      );
     }
   });
 
@@ -427,7 +499,7 @@ test.describe('raw HTML SEO', () => {
     const cases = [
       {
         path: '/allocation/42',
-        title: 'Cycle #42 Allocation Information | Cosmic Signature',
+        title: 'Cycle 42 Allocation Information · Cosmic Signature',
         canonical: `https://${APP_HOST}/allocation/42`,
       },
       {
@@ -468,6 +540,7 @@ test.describe('raw HTML SEO', () => {
       expect(response.status(), `${path} must be a real 404`).toBe(404);
       const html = await response.text();
       expect(html).toMatch(/name="robots"[^>]+content="[^"]*noindex/i);
+      expectNotFoundHead(html, path);
       expect(html).not.toContain(`rel="canonical" href="https://${APP_HOST}${path}"`);
     }
   });
@@ -520,19 +593,23 @@ test.describe('raw HTML SEO', () => {
     }
   });
 
-  test('Learn hub and articles inherit the localized Learn image generator', async ({
-    request,
-  }) => {
+  test('the Learn hub and each guide have their own localized share card', async ({ request }) => {
     const imageUrls: string[] = [];
-    for (const path of ['/zh/learn', '/zh/learn/what-is-cosmic-signature']) {
+    for (const [path, pattern] of [
+      ['/zh/learn', /^\/zh\/learn\/opengraph-image/],
+      [
+        '/zh/learn/what-is-cosmic-signature',
+        /^\/zh\/learn\/what-is-cosmic-signature\/opengraph-image/,
+      ],
+      ['/zh/learn/how-gestures-work', /^\/zh\/learn\/how-gestures-work\/opengraph-image/],
+    ] as const) {
       const response = await request.get(path, { headers: hostHeaders(LANDING_HOST) });
       expect(response.status()).toBe(200);
       const imageUrl = extractOgImageUrl(await response.text());
-      const parsed = new URL(imageUrl);
-      expect(parsed.pathname).toMatch(/^\/zh\/learn\/opengraph-image/);
+      expect(new URL(imageUrl).pathname).toMatch(pattern);
       imageUrls.push(imageUrl);
     }
-    expect(new Set(imageUrls).size).toBe(1);
+    expect(new Set(imageUrls).size).toBe(3);
   });
 
   test('public pages have unique titles and meta descriptions', async ({ request }) => {
@@ -620,6 +697,23 @@ test.describe('raw HTML SEO', () => {
   test('invalid token detail routes return a real 404', async ({ request }) => {
     const response = await request.get('/detail/not-a-token', { headers: hostHeaders(APP_HOST) });
     expect(response.status()).toBe(404);
+    expectNotFoundHead(await response.text(), '/detail/not-a-token');
+  });
+
+  // One URL per Signature: a zero-padded number is not a second indexable page.
+  test('zero-padded token detail routes move to the canonical number', async ({ request }) => {
+    const response = await request.get('/zh/detail/0001', {
+      headers: hostHeaders(APP_HOST),
+      maxRedirects: 0,
+    });
+    expect(response.status()).toBe(308);
+    expect(new URL(response.headers().location ?? '', 'http://x').pathname).toBe('/zh/detail/1');
+  });
+
+  test('malformed gesture routes return a real 404', async ({ request }) => {
+    const response = await request.get('/gesture/12abc', { headers: hostHeaders(APP_HOST) });
+    expect(response.status()).toBe(404);
+    expectNotFoundHead(await response.text(), '/gesture/12abc');
   });
 
   test('unknown top-level routes return a real 404 with branded content', async ({ request }) => {
@@ -628,7 +722,10 @@ test.describe('raw HTML SEO', () => {
     });
     expect(response.status()).toBe(404);
     const html = await response.text();
-    expect(html).toContain('Page Not Found');
+    // The heading is written in sentence case ("Page not found").
+    expect(html).toMatch(/Page not found/i);
+    expect(html).toContain('<title>Page not found · Cosmic Signature</title>');
+    expectNotFoundHead(html, '/this-route-does-not-exist');
   });
 
   test('static content pages are CDN-cacheable (no forced dynamic rendering)', async ({

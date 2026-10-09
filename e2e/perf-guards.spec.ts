@@ -1,6 +1,7 @@
 import { expect, test, type Locator, type Page } from '@playwright/test';
 
 import { LOCALE_PREFIXES } from './locale-fixtures';
+import { MOBILE_AUDIT_SAMPLE_TEXT, mockMobileAuditApi } from './mobile-audit-fixtures';
 
 /**
  * Performance guardrails distilled from the RES-82 investigation. Each test
@@ -13,8 +14,10 @@ import { LOCALE_PREFIXES } from './locale-fixtures';
  *    (measured CLS was 1.0: the footer travelled a full viewport).
  * 3. Fonts must stay subsetted (a full-range 352KB body font used to be
  *    preloaded on every page).
- * 4. Phones must never mount the WebGL hero (its three.js chunk is ~320KB
- *    of gzip that small viewports render nothing with).
+ * 4. No viewport mounts a WebGL hero: its three.js chunk was ~320KB of
+ *    gzip and a GPU loop, replaced by the static atmosphere and the art.
+ * 5. A participant profile must hold its layout while its reads arrive
+ *    (measured CLS was 0.49 at 1440x900: the footer again).
  */
 
 const LANDING_HEADERS = { 'X-Forwarded-Host': 'cosmicsignature.com' };
@@ -71,6 +74,8 @@ test.describe('LCP text paints from server HTML without JavaScript', () => {
     await page.setExtraHTTPHeaders(LANDING_HEADERS);
     await page.goto('/');
     const heading = page.locator('main h1').first();
+    // The lede follows the headline in the source (the grid draws the art
+    // between them on phones).
     const subhead = page.locator('main h1 + p').first();
     await expect(heading).toBeVisible();
     expect(await isHiddenByOpacity(heading)).toBe(false);
@@ -97,6 +102,63 @@ test.describe('app home layout stability', () => {
     await page.goto('/', { waitUntil: 'load' });
     // Let the delayed data land, sections hydrate, and fonts settle.
     await page.waitForTimeout(2_500);
+
+    const cls = await page.evaluate(() => window.__perfGuards?.cls ?? 0);
+    expect(cls).toBeLessThan(0.1);
+  });
+});
+
+// lexicon-allow-start: the fixture mirrors sealed backend wire keys.
+/** A participant with a profile record, so every profile section renders once it arrives. */
+const POPULATED_PROFILE = {
+  UserInfo: {
+    Address: MOBILE_AUDIT_SAMPLE_TEXT.longAddress,
+    NumBids: 12_345,
+    NumPrizes: 87,
+    MaxBidAmount: 1.2345678,
+    MaxWinAmount: 123.4567891,
+    CosmicSignatureNumTransfers: 42,
+    TotalCSTokensWon: 1_234_567.891,
+    SumRaffleEthWinnings: 12.3456789,
+    SumRaffleEthWithdrawal: 98.7654321,
+    UnclaimedNFTs: 3,
+    NumRaffleEthWinnings: 64,
+    RaffleNFTsCount: 21,
+    RewardNFTsCount: 9,
+    StakingStatisticsRWalk: {
+      TotalNumStakeActions: 30,
+      TotalNumUnstakeActions: 12,
+      TotalTokensStaked: 18,
+      TotalTokensMinted: 5,
+    },
+  },
+  Gestures: [],
+};
+// lexicon-allow-end
+
+test.describe('participant profile layout stability', () => {
+  test('the profile keeps its layout while its reads arrive', async ({ page, isMobile }) => {
+    // Regression: at 1440x900 the loading profile was short enough to show the footer, and
+    // the sections pushed it a screen down when the profile arrived (CLS 0.49). The header
+    // holds its final height (figures, captions, the address row) and the loading body a
+    // screen's. Phones run at the project's own viewport.
+    if (!isMobile) await page.setViewportSize({ width: 1440, height: 900 });
+    await mockMobileAuditApi(page);
+    // Registered last, so it runs first: every read arrives late, the profile populated.
+    await page.route('**/api/cosmicgame/**', async (route) => {
+      await new Promise((resolve) => setTimeout(resolve, 800));
+      if (new URL(route.request().url()).pathname.includes('/user/info/')) {
+        await route.fulfill({ json: POPULATED_PROFILE });
+        return;
+      }
+      await route.fallback();
+    });
+
+    await installClsObserver(page);
+    await page.goto(`/user/${MOBILE_AUDIT_SAMPLE_TEXT.longAddress}`, { waitUntil: 'load' });
+    // The profile has landed once its sections replace the loading skeleton.
+    await expect(page.getByTestId('statistics-loading-skeleton')).toHaveCount(0);
+    await page.waitForTimeout(1_500);
 
     const cls = await page.evaluate(() => window.__perfGuards?.cls ?? 0);
     expect(cls).toBeLessThan(0.1);
@@ -165,22 +227,25 @@ test.describe('font payload stays subsetted', () => {
   });
 });
 
-test.describe('WebGL hero stays desktop-only', () => {
-  test('phones never mount the three.js canvas on the landing', async ({ page, isMobile }) => {
-    test.skip(!isMobile, 'mobile-only guard');
+test.describe('the landing hero ships no WebGL', () => {
+  // The three.js hero (~320 KB gzip and a GPU loop that never paused) was
+  // replaced by the static atmosphere and the art itself on every viewport.
+  // This used to guard phones only, with a desktop positive control; the
+  // guard now holds on desktop too, and the control is the hero's own art.
+  test('no viewport mounts a canvas or requests a three.js chunk on the landing', async ({
+    page,
+  }) => {
+    const scripts: string[] = [];
+    page.on('request', (request) => {
+      if (request.resourceType() === 'script') scripts.push(request.url());
+    });
     await page.setExtraHTTPHeaders(LANDING_HEADERS);
     await page.goto('/');
+    // Positive control: the hero rendered, with its Signature on the plate.
+    await expect(page.locator('main h1').first()).toBeVisible();
+    await expect(page.getByTestId('hero-art-link').locator('img').first()).toBeVisible();
     await page.waitForTimeout(1_500);
     expect(await page.locator('canvas').count()).toBe(0);
-  });
-
-  test('desktop mounts the three.js canvas on the landing (positive control)', async ({
-    page,
-    isMobile,
-  }) => {
-    test.skip(Boolean(isMobile), 'desktop-only control');
-    await page.setExtraHTTPHeaders(LANDING_HEADERS);
-    await page.goto('/');
-    await expect(page.locator('canvas').first()).toBeAttached({ timeout: 20_000 });
+    expect(scripts.filter((url) => /three|webgl|postprocessing/i.test(url))).toEqual([]);
   });
 });

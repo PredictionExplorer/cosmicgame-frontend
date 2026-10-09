@@ -7,31 +7,38 @@ import { AmbientBackdrop, type AmbientBackdropProps } from '@/components/ui/ambi
 /**
  * PageShell — the canonical top-level layout primitive for every page.
  *
- * Replaces per-page copies of `<MainWrapper>` / ad-hoc `<main>` blocks.
- * Renders the ambient backdrop, sets max-width + padding per variant,
- * and provides the `#main` skip-link target.
+ * Renders the ambient backdrop, the page's `<main>` (the `#main` skip-link
+ * target) and its content edge.
+ *
+ * The edge is the site's one content edge, `--gutter` (styles/tokens.css),
+ * the same one the header and footer draw with `site-container`, so a page's
+ * H1 starts under the header's wordmark at every width. `data` and
+ * `marketing` pages are the full 80rem column; `form` (48rem) and `detail`
+ * (72rem) are narrower measures centred on the same gutters. The top clears
+ * the header and, during maintenance, the banner's measured height
+ * (`--banner-clearance`), so the banner never covers the H1. The width is a
+ * max-width plus gutter padding rather than `site-container`'s `width`, so a
+ * caller's `max-w-none px-0` still opens a full-bleed page.
  */
 
-// `overflow-x-clip` contains the decorative backdrops without creating a
-// scroll container, so content that overflows vertically is still reachable
-// and horizontal bleed is cut rather than silently hidden in both axes.
-const shellVariants = cva(
-  'relative z-[1] mx-auto w-full overflow-x-clip print:overflow-visible leading-normal min-h-[calc(100vh-100px)]',
-  {
-    variants: {
-      variant: {
-        data: 'max-w-7xl px-4 pt-40 pb-24 max-sm:pt-36 max-sm:pb-20 sm:px-6 lg:px-8',
-        marketing: 'max-w-7xl px-4 pt-40 pb-32 max-sm:pt-36 max-sm:pb-24 sm:px-6 lg:px-8',
-        form: 'max-w-3xl px-4 pt-40 pb-24 max-sm:pt-36 max-sm:pb-20 sm:px-6',
-        detail: 'max-w-6xl px-4 pt-40 pb-28 max-sm:pt-36 max-sm:pb-20 sm:px-6 lg:px-8',
-        bare: 'max-w-none px-0 pt-0 pb-0 min-h-0 overflow-visible',
-      },
-    },
-    defaultVariants: {
-      variant: 'data',
+const EDGE = 'px-[var(--gutter)]';
+
+// Backdrops own their clipping. Content remains visible, including focus rings
+// and sticky controls; long data is contained by the responsive table primitive.
+const shellVariants = cva('relative z-[1] mx-auto w-full leading-normal', {
+  variants: {
+    variant: {
+      data: `max-w-[calc(80rem+2*var(--gutter))] ${EDGE} pt-[calc(var(--header-height)+3.5rem+var(--banner-clearance,0px))] pb-16 max-sm:pt-[calc(var(--header-height)+2rem+var(--banner-clearance,0px))] max-sm:pb-12`,
+      marketing: `max-w-[calc(80rem+2*var(--gutter))] ${EDGE} pt-[calc(var(--header-height)+3.5rem+var(--banner-clearance,0px))] pb-20 max-sm:pt-[calc(var(--header-height)+2rem+var(--banner-clearance,0px))] max-sm:pb-16`,
+      form: `max-w-[calc(48rem+2*var(--gutter))] ${EDGE} pt-[calc(var(--header-height)+3.5rem+var(--banner-clearance,0px))] pb-16 max-sm:pt-[calc(var(--header-height)+2rem+var(--banner-clearance,0px))] max-sm:pb-12`,
+      detail: `max-w-[calc(72rem+2*var(--gutter))] ${EDGE} pt-[calc(var(--header-height)+3.5rem+var(--banner-clearance,0px))] pb-16 max-sm:pt-[calc(var(--header-height)+2rem+var(--banner-clearance,0px))] max-sm:pb-12`,
+      bare: 'max-w-none px-0 pt-0 pb-0 min-h-0 overflow-visible',
     },
   },
-);
+  defaultVariants: {
+    variant: 'data',
+  },
+});
 
 type BackdropProp = AmbientBackdropProps['variant'] | null;
 

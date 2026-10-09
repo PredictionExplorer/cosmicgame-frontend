@@ -1,0 +1,74 @@
+{
+  "hero": {
+    "title": "Cosmic Signatureのよくある質問",
+    "breadcrumb": "よくある質問",
+    "subtitle": "初めての参加から詳しい仕組みまで、Cosmic Signatureの疑問に答えます。",
+    "answerCount": "{count, number}件の回答",
+    "categoryCount": "{count, number}カテゴリー"
+  },
+  "search": {
+    "placeholder": "質問を検索…",
+    "ariaLabel": "よくある質問を検索",
+    "clearAria": "検索をクリア",
+    "noResults": "質問が見つかりません。別の語句で検索してみてください。",
+    "resultCount": "{totalCount}件中{resultCount}件を表示"
+  },
+  "navigation": {
+    "ariaLabel": "よくある質問のカテゴリー",
+    "heading": "このページの内容"
+  },
+  "category": {
+    "expandAll": "すべて開く",
+    "collapseAll": "すべて閉じる",
+    "expandAllAria": "すべて開く：{category}",
+    "collapseAllAria": "すべて閉じる：{category}",
+    "copyLink": "リンクをコピー",
+    "copied": "コピーしました",
+    "copyLinkAria": "リンクをコピー：{question}",
+    "linkCopied": "リンクをコピーしました"
+  },
+  "popular": {
+    "heading": "よく読まれている質問"
+  },
+  "empty": {
+    "heading": "質問が見つかりません",
+    "description": "別の語句で検索するか、検索をクリアしてすべての質問をご覧ください。",
+    "clearAction": "検索をクリア"
+  },
+  "glossary": {
+    "title": "用語集",
+    "description": "Cosmic Signatureで使う独自の用語と、その定義です。"
+  },
+  "contact": {
+    "heading": "ほかに知りたいことはありますか？",
+    "description": "DiscordまたはXで質問してください。コミュニティとチームの両方が目を通しています。",
+    "x": "X（Twitter）",
+    "discord": "Discord"
+  },
+  "tooltips": {
+    "erc20": {
+      "term": "ERC-20",
+      "content": "代替可能（交換可能）なトークンのために広く使われているEthereumのトークン規格です。"
+    },
+    "erc721": {
+      "term": "ERC-721",
+      "content": "非代替性トークン（NFT）のためのEthereumのトークン規格です。各トークンは唯一のものです。"
+    },
+    "layer2": {
+      "term": "レイヤー2",
+      "content": "Ethereumの上に築かれた二次的なプロトコルで、Ethereumのセキュリティを引き継ぎながらトランザクションをより速く、より安く処理します。"
+    },
+    "rollup": {
+      "term": "ロールアップ",
+      "content": "多数のトランザクションを一つにまとめるレイヤー2の技術で、Ethereum水準のセキュリティを保ちながらコストを大幅に下げます。"
+    },
+    "randomWalkNft": {
+      "term": "Random Walk NFT",
+      "content": "姉妹NFTコレクションです。ETH一筆に添付すると、ETH一筆の費用が一度だけ50%引き下げられます。"
+    },
+    "renounceOwnership": {
+      "term": "所有権の放棄",
+      "content": "プロトコルのパラメーターを変更するチームの権限を永久に手放す、取り消せないスマートコントラクトの操作です。"
+    }
+  }
+}

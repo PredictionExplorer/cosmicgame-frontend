@@ -1,10 +1,13 @@
 import { COSMIC_OG_SIZE } from '@/lib/og/CosmicOgCard';
-import { getOgCopy, getOgImageMetadata } from '@/lib/og/copy';
-import { createCosmicOgImage } from '@/lib/og/createCosmicOgImage';
+import { ogImageMetadata } from '@/lib/og/cards';
+
+import { readingShareCard } from '../readingCard';
+import { aboutReadingCard } from '../readingCardCopy';
 
 /**
- * About defines page-level Open Graph metadata, so its co-located image keeps
- * the route-specific metadata object from replacing the landing fallback.
+ * About's own card: its title beside the Signature that opens the page, so
+ * the page no longer unfurls as the landing's brand card. About defines
+ * page-level Open Graph metadata, so the card must be co-located here.
  */
 export const contentType = 'image/png';
 export const size = COSMIC_OG_SIZE;
@@ -15,10 +18,10 @@ interface ImageProps {
 
 export async function generateImageMetadata({ params }: ImageProps) {
   const { locale } = await params;
-  return getOgImageMetadata(locale, 'default');
+  return ogImageMetadata(aboutReadingCard(locale).alt);
 }
 
 export default async function Image({ params }: ImageProps) {
   const { locale } = await params;
-  return createCosmicOgImage(locale, getOgCopy(locale, 'default'));
+  return readingShareCard(locale, aboutReadingCard(locale));
 }

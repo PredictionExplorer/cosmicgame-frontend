@@ -1,23 +1,14 @@
 {
-  "gestureSubmitted": "落笔已提交，正在等待确认。",
-  "gestureConfirmed": "落笔已确认，周期继续推进。",
   "allocationRetrieved": "分配已取回至钱包。",
-  "anchorSet": "NFT 已锚定至协议。",
-  "anchorReleased": "NFT 已解锚。",
   "cycleFinalized": "周期已收官，分配已完成。",
   "walletTransactionCancelled": "交易未发送，已在钱包中取消。",
-  "unexpectedError": "操作未能完成，请重试。",
   "generic": {
-    "unexpectedError": "操作未能完成，请重试。",
-    "rpcFailure": "交易未能完成。请检查钱包与网络连接后重试。",
-    "receiptFailure": "交易已发送但未能确认。请先在钱包或区块浏览器中查看状态，再决定是否重试。",
-    "transactionFailed": "交易失败，请重试。"
+    "rpcFailure": "交易未能完成。请检查钱包与网络连接后重试。"
   },
   "wallet": {
     "connect": "请先连接钱包。",
     "connectCorrectNetwork": "请连接钱包并切换至应用所用网络。",
-    "notReady": "钱包尚未就绪，请重新连接后重试。",
-    "stillConnecting": "钱包仍在连接中，请稍后重试。"
+    "notReady": "钱包尚未就绪，请重新连接后重试。"
   },
   "watchAsset": {
     "metaMaskRequired": "请连接 MetaMask 后再添加此资产。",
@@ -33,26 +24,29 @@
   },
   "network": {
     "unavailable": "网络暂不可用，请重新连接钱包。",
-    "switchForGesture": "请先将钱包切换至应用所用网络，再落笔。",
-    "wrongChain": "钱包尚未连接完成，或当前网络与应用不一致。请切换至应用所用网络后重试。"
+    "wrongChain": "钱包尚未连接完成，或当前处于其他网络。请切换至 {network} 后重试。"
   },
   "gesture": {
-    "simulated": "模拟落笔已完成，计时延长 {seconds} 秒。",
-    "confirmed": "落笔已确认，周期继续推进。",
+    "simulated": "模拟落笔已完成，计时延长 {seconds, number} 秒。",
+    "confirmed": "落笔已记录，周期收官时间已延长。",
     "validation": {
       "notNftOwner": "当前钱包并未持有这枚 NFT。",
+      "chooseRandomWalkNft": "请选择此钱包中一枚未使用过的 Random Walk NFT。",
       "tokenDecimalsWarning": "此代币未实现 decimals()；将按 18 位小数处理。",
       "invalidContractAddress": "请输入有效的合约地址。",
       "notErc721": "所选合约不符合 ERC-721 标准。",
       "notErc20": "所选合约不符合 ERC-20 标准。",
       "insufficientAttachedToken": "钱包中的代币余额不足，无法附加至本次落笔。",
-      "insufficientEth": "钱包中的 ETH 余额不足。",
-      "insufficientCst": "钱包中的 CST（ERC-20）余额不足。",
+      "insufficientEth": "本次落笔需要 {required} ETH 及网络手续费，钱包在 {network} 上仅有 {available} ETH。",
+      "insufficientCst": "本次落笔最多需要 {required} CST，钱包中有 {available} CST。",
+      "invalidNftId": "请用纯数字输入 NFT 的代币 ID。",
+      "invalidTokenAmount": "请输入大于 0 的数量，只用数字，且小数位数不超过该代币的精度。",
+      "cstRewardUnavailable": "暂时无法读取参与 CST 预览，因此无法应用 CST 铭刻下限保护。请稍后重试，或选择“接受任意 CST 铭刻量”。",
       "cycleNotStarted": "下一周期尚未开始，{duration}后可落笔。"
     },
     "transaction": {
       "failed": "未能提交落笔。请检查钱包与网络连接，刷新当前落笔价格后重试。",
-      "cstReverted": "CST 落笔未完成，落笔价格或铭刻量已发生变化。请刷新预览后重试；如可接受 0 CST 铭刻量，也可选择“接受任意 CST 铭刻量”。"
+      "cstReverted": "CST 落笔未完成，落笔价格已超出您设定的上限。请刷新预览后重试。"
     },
     "contractErrors": {
       "insufficientReceivedBidAmount": "当前落笔价格高于转入金额。",
@@ -62,18 +56,24 @@
       "tooLongBidMessage": "落笔留言过长。",
       "wrongBidType": "所选落笔类型不正确。",
       "fundTransferFailed": "资金转移失败。",
-      "ethCostChanged": "ETH 落笔价格已变为 {required} ETH，比提交时高 {increase} ETH。请重试。",
-      "cstCostChanged": "交易处理期间，CST 落笔价格已变化。当前需 {required} CST，超过设置的 {maximum} CST 落笔价格上限。请刷新后重试。",
-      "bidPlacedWithinCurrentSecond": "同一秒内已有另一笔落笔。请稍候片刻后重试。",
+      "ethCostChanged": "ETH 落笔价格已升至 {required} ETH，比提交时高 {increase} ETH。请重试。",
+      "cstCostChanged": "交易处理期间，CST 落笔价格已变化。当前需 {required} CST，超过你设置的 {maximum} CST 上限。请刷新后重试。",
+      "cstRewardBelowMinimum": "本次落笔的参与 CST 将低于你设置的下限，很可能是他人抢先落笔。请刷新预览后重试，或放宽允许的下浮幅度。",
       "bidHasBeenPlacedInCurrentRound": "当前周期已有落笔。"
+    },
+    "confirmedWithCst": "落笔已记录，周期收官时间已延长，{cst} 参与 CST 已存入钱包。",
+    "approval": {
+      "token": "钱包将请求授权，允许协议随本次落笔转移恰好 {amount} 枚该代币。附带的代币将归属周期获配者，不会退回。",
+      "nft": "钱包将请求授权，允许协议随本次落笔转移 NFT #{tokenId}。附带的 NFT 将归属周期获配者，不会退回。"
     }
   },
   "anchor": {
-    "walletNotReady": "钱包尚未连接完成，或当前网络与应用不一致。请切换至应用所用网络后重试。",
-    "anchored": "{count} 枚 NFT 已锚定至协议。",
-    "released": "已完成 {count} 项解锚操作。",
-    "releasedWithDistributions": "已完成 {count} 项解锚操作，累积的 ETH 锚定派发已取回至钱包。",
-    "failed": "锚定交易未能完成。请检查钱包与网络连接后重试。"
+    "walletNotReady": "钱包尚未连接完成，或当前处于其他网络。请切换至 {network} 后重试。",
+    "anchored": "{count, number} 枚 NFT 已锚定至协议。",
+    "released": "已完成 {count, number} 项解锚操作。",
+    "releasedWithDistributions": "已完成 {count, number} 项解锚操作，累积的 ETH 锚定派发已取回至钱包。",
+    "failed": "锚定交易未能完成。请检查钱包与网络连接后重试。",
+    "approval": "钱包将请求授权，允许锚定合约在锚定期间保管你的 NFT。每个合集只需授权一次。"
   },
   "allocation": {
     "retrieved": "分配已取回至钱包。"
@@ -90,81 +90,42 @@
   },
   "claim": {
     "walletNotConnected": "请连接钱包，并确认已切换至正确的网络。",
-    "failed": "未能取回分配。请检查钱包与网络连接后重试。",
+    "failed": "取回未完成。请检查钱包与网络后重试。",
     "stellarEthSuccess": "星选 ETH 已取回至钱包。",
     "nftSuccess": "已附加 NFT 已取回至钱包。",
-    "nftsSuccess": "已将 {count} 枚已附加 NFT 取回至钱包。",
+    "nftsSuccess": "已将 {count, number} 枚已附加 NFT 取回至钱包。",
     "tokenSuccess": "已附加 ERC-20 代币已取回至钱包。",
-    "tokensSuccess": "已将 {count} 笔已附加 ERC-20 代币取回至钱包。",
+    "tokensSuccess": "已将 {count, number} 笔已附加 ERC-20 代币取回至钱包。",
     "retrieving": "取回中…"
   },
   "transfer": {
-    "common": {
-      "sourceUnavailable": "转出钱包暂不可用。",
-      "invalidRecipient": "请输入有效的接收地址。",
-      "invalidAmount": "请输入有效的 CST 数量。",
-      "invalidDecimals": "CST 数量的小数位数无效。",
-      "amountPositive": "请输入大于 0 的数量。"
-    },
     "cst": {
       "tokenUnavailable": "CST 代币地址暂不可用。",
-      "walletRequired": "请先连接钱包，再发送 CST。",
-      "sourceWalletRequired": "请连接转出钱包，再从该钱包发送 CST。",
-      "balanceLoading": "CST 余额仍在加载，请稍后重试。",
-      "insufficientBalance": "CST 余额不足。",
-      "decimalsWarning": "未能读取 CST 小数位数；将按 18 位小数处理。",
       "confirmed": "CST 转账已确认。",
       "failed": "未能发送 CST。请检查钱包与网络连接后重试。"
     },
     "nft": {
       "contractUnavailable": "Cosmic Signature NFT 合约地址暂不可用。",
-      "walletRequired": "请先连接钱包，再发送 NFT。",
-      "sourceWalletRequired": "请连接转出钱包，再从该钱包发送 NFT。",
-      "recipientMustDiffer": "接收地址不能与当前连接的钱包地址相同。",
-      "selectOne": "请至少选择一枚可转移的 NFT。",
-      "confirmed": "{count} 笔 NFT 转移已确认。",
+      "confirmed": "{count, number} 笔 NFT 转移已确认。",
       "detailTransferConfirmed": "NFT 转移已确认。",
-      "recipientCheckFailed": "未能校验接收地址。请检查钱包与网络连接后重试。",
-      "failed": "未能发送所选 NFT。请检查钱包与网络连接后重试。",
-      "failedToken": "未能转移 NFT #{tokenId}。请检查钱包与网络连接后重试。",
+      "failedToken": "NFT {tokenId} 未能发送，请检查钱包后重试。",
       "nameSet": "代币名称已成功更改。",
       "nameCleared": "代币名称已成功清除。",
       "nameSetFailed": "未能更改代币名称，请重试。",
       "nameClearFailed": "未能清除代币名称，请重试。"
     },
     "marketingCst": {
-      "tokenUnavailable": "CST 代币地址暂不可用。",
-      "walletRequired": "请先连接钱包，再拨付推广 CST。",
-      "reserveUnavailable": "推广储备钱包暂不可用。",
-      "treasurerUnavailable": "推广钱包财务执行人地址暂不可用。",
       "treasurerRequired": "请连接当前推广钱包财务执行人的钱包，再拨付推广 CST。",
-      "balanceLoading": "推广储备的 CST 余额仍在加载，请稍后重试。",
-      "insufficientBalance": "推广储备的 CST 余额不足。",
-      "decimalsWarning": "未能读取 CST 小数位数；将按 18 位小数处理。",
-      "balanceReadFailed": "未能读取推广储备的 CST 余额，请重试。",
       "confirmed": "推广 CST 拨付已确认。",
       "failed": "未能拨付推广 CST。请检查钱包与网络连接后重试。",
-      "loading": "加载中…",
-      "pay": "拨付推广 CST",
-      "paying": "发放中…",
-      "viewTransaction": "查看交易"
+      "pay": "拨付推广 CST"
     }
   },
   "contribution": {
-    "connectWallet": "请先连接钱包，再贡献 ETH。",
-    "connectWalletInline": "连接钱包后即可贡献 ETH。",
-    "invalidAmount": "请输入大于 0 的 ETH 数量。",
-    "invalidUrl": "请输入以 http:// 或 https:// 开头的有效网址。",
-    "invalidUrlInline": "请使用 http:// 或 https:// 网址。",
-    "contractUnavailable": "请连接钱包，并确认已切换至正确的网络。",
-    "formSubmitted": "{amount} ETH 贡献已确认。",
-    "formSubmittedWithInfo": "附带信息的 {amount} ETH 贡献已确认。",
-    "submitted": "{amount} ETH 贡献已确认。",
-    "submittedWithInfo": "附带信息的 {amount} ETH 贡献已确认。",
+    "contractUnavailable": "协议合约暂不可用，请刷新页面后重试。",
+    "formSubmitted": "{amount} ETH 贡献已确认。",
+    "formSubmittedWithInfo": "附带信息的 {amount} ETH 贡献已确认。",
     "formFailed": "ETH 贡献失败。请检查输入、钱包与网络连接后重试。",
-    "failed": "ETH 贡献失败。请检查钱包与网络连接后重试。",
-    "failedWithInfo": "附带信息的 ETH 贡献失败。请检查输入、钱包与网络连接后重试。",
-    "submitting": "提交中…",
     "publicGoodsVault": {
       "none": "公共物品金库中暂无待转拨资金。",
       "connectWallet": "请连接钱包，再将公共物品金库资金转拨给 Protocol Guild。",
@@ -178,14 +139,59 @@
   "imprint": {
     "contractUnavailable": "Random Walk NFT 合约暂不可用。请连接钱包并切换至正确网络后重试。",
     "confirmed": "Random Walk NFT 铭刻已确认。",
-    "failed": "未能铭刻 Random Walk NFT。请检查钱包与网络连接后重试。",
+    "failed": "铭刻未完成。请检查钱包与网络后重试。",
     "imprinting": "铭刻中…"
   },
-  "admin": {
-    "gestureBan": {
-      "banned": "落笔已成功屏蔽。",
-      "unbanned": "落笔已取消屏蔽。",
-      "failed": "未能更新落笔审核状态，请重试。"
-    }
+  "regionLabel": "通知",
+  "close": "关闭通知",
+  "tx": {
+    "stage": {
+      "switchNetwork": "请在钱包中切换至 {network}",
+      "switchNetworkHint": "Cosmic Signature 运行在 {network} 上。请在钱包中批准切换以继续。",
+      "approve": "请在钱包中批准第 {step} 步（共 {total} 步）",
+      "approvalPending": "正在确认第 {step} 步授权（共 {total} 步）",
+      "confirm": "请在钱包中确认",
+      "confirmStep": "请在钱包中确认第 {step} 步（共 {total} 步）",
+      "confirmHint": "请在钱包中核对详情。确认之前不会发送任何内容。",
+      "pending": "正在等待 {network} 确认"
+    },
+    "button": {
+      "preparing": "准备中…",
+      "switchNetwork": "请在钱包中切换网络…",
+      "approve": "在钱包中批准 {step}/{total}…",
+      "approvalPending": "授权 {step}/{total} 确认中…",
+      "confirm": "在钱包中确认…",
+      "confirmStep": "在钱包中确认 {step}/{total}…",
+      "pending": "确认中…"
+    },
+    "steps": {
+      "signature": "签署",
+      "pending": "确认中",
+      "confirmed": "已确认"
+    },
+    "status": {
+      "confirmed": "已在链上确认。",
+      "cancelled": "已在钱包中取消，未发送任何内容。",
+      "cancelledInWallet": "已在钱包中取消。取消操作消耗了网络手续费，除此之外未发送任何内容。",
+      "replacedInWallet": "已在钱包中被另一笔交易替换，该交易消耗了网络手续费。本次操作未被记录。"
+    },
+    "confirmedRefresh": "已在链上确认。如果页面尚未更新，请刷新页面。",
+    "error": {
+      "insufficientFunds": "钱包在 {network} 上的 ETH 不足以支付本次交易及网络手续费。",
+      "wrongNetwork": "钱包当前处于其他网络。请切换至 {network} 后重试。",
+      "walletNotConnected": "请先连接钱包，然后重试。",
+      "walletBusy": "钱包中已有一个未完成的请求。请先在钱包中完成或关闭它，然后重试。",
+      "wouldRevert": "合约会拒绝这笔交易，因此没有发送。请刷新页面后重试。",
+      "reverted": "交易在链上执行失败，只消耗了网络手续费。请刷新页面后重试。",
+      "timeout": "仍在等待确认。重试之前，请先在 {explorer} 上查看这笔交易。",
+      "network": "无法连接网络。请检查网络连接后重试。",
+      "untrustedContract": "这笔交易的目标地址与链上的 Cosmic Signature 合约不符，因此没有发送。请刷新页面后重试。"
+    },
+    "viewOnExplorer": "在 {explorer} 上查看",
+    "viewOnExplorerShort": "查看交易",
+    "copyDetails": "复制详情",
+    "detailsCopied": "错误详情已复制。",
+    "connectWallet": "连接钱包",
+    "busy": "请先完成正在进行的交易。"
   }
 }

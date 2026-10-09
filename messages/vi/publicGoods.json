@@ -1,0 +1,32 @@
+{
+  "loadError": "Không tải được hồ sơ Hàng hóa công.",
+  "vault": {
+    "description": "Khi một chu kỳ hoàn tất, phần Hàng hóa công trong Dự trữ chu kỳ được chuyển vào kho và chờ ở đó cho đến khi được nhận về cho {beneficiary}.",
+    "due": "Phần của chu kỳ này",
+    "dueCaption": "{percent} Dự trữ chu kỳ tính đến lúc này",
+    "inVault": "Hiện có trong kho",
+    "retrieved": "Đã nhận về tổng cộng",
+    "beneficiaryNote": "<guild>Protocol Guild</guild> là cơ chế tài trợ tập thể cho những người đóng góp cốt lõi cho Ethereum.",
+    "forwardNote": "Bất kỳ ai cũng có thể chuyển số dư của kho đến Protocol Guild; chỉ tốn phí gas."
+  },
+  "ledger": {
+    "contributions": "Các khoản đóng góp",
+    "retrievals": "Các lần nhận về"
+  },
+  "contribute": {
+    "title": "Đóng góp vào kho",
+    "description": "Gửi ETH trên {network} thẳng đến Kho Hàng hóa công. Số ETH này nằm trong kho cùng phần của giao thức cho đến khi được nhận về cho {beneficiary}.",
+    "networkWarning": "Chỉ gửi trên {network}. ETH gửi đến địa chỉ này trên bất kỳ mạng nào khác sẽ không đến được kho.",
+    "network": "Mạng",
+    "form": {
+      "label": "Đóng góp ETH vào Kho Hàng hóa công",
+      "amountHint": "Bất kỳ số lượng nào lớn hơn 0, gửi từ ví trên {network}.",
+      "connectHint": "Kết nối ví trên {network} để đóng góp.",
+      "summary": "{amount} sẽ vào Kho Hàng hóa công cho {beneficiary}.",
+      "submit": "Đóng góp ETH",
+      "submitAmount": "Đóng góp {amount}",
+      "confirmed": "Đã xác nhận khoản đóng góp {amount} ETH vào Kho Hàng hóa công.",
+      "failed": "Khoản đóng góp chưa hoàn tất. Hãy kiểm tra ví và thử lại."
+    }
+  }
+}

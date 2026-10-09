@@ -1,5 +1,7 @@
 import userEvent from '@testing-library/user-event';
 
+import { documentTitleOf } from '@/test-utils/metadata';
+
 import { render, screen, checkA11y } from '@/test-utils';
 
 import Page, { generateMetadata } from '../page';
@@ -49,7 +51,10 @@ describe('app/faq/page.tsx', () => {
   describe('metadata', () => {
     it('has the correct title', async () => {
       const metadata = await generateMetadata(pageProps);
-      expect(metadata.title).toBe('Cosmic Signature FAQ | Arbitrum On-Chain Art Protocol');
+      // The page leads the tab; the brand closes it once.
+      expect(documentTitleOf(metadata)).toBe(
+        'FAQ: Arbitrum On-Chain Art Protocol · Cosmic Signature',
+      );
     });
 
     it('has the correct description', async () => {
@@ -65,9 +70,11 @@ describe('app/faq/page.tsx', () => {
 
     it('includes openGraph with matching title and description', async () => {
       const metadata = await generateMetadata(pageProps);
+      // og:site_name names the site in every preview, so og:title stays bare.
       expect(metadata.openGraph).toEqual(
         expect.objectContaining({
-          title: 'Cosmic Signature FAQ | Arbitrum On-Chain Art Protocol',
+          title: 'FAQ: Arbitrum On-Chain Art Protocol',
+          siteName: 'Cosmic Signature',
         }),
       );
     });
@@ -87,7 +94,8 @@ describe('app/faq/page.tsx', () => {
       expect(metadata.twitter).toEqual(
         expect.objectContaining({
           card: 'summary_large_image',
-          title: 'Cosmic Signature FAQ | Arbitrum On-Chain Art Protocol',
+          site: '@CosmicSignature',
+          title: 'FAQ: Arbitrum On-Chain Art Protocol',
         }),
       );
     });
@@ -101,7 +109,15 @@ describe('app/faq/page.tsx', () => {
   describe('Page component', () => {
     beforeEach(() => {
       jest.clearAllMocks();
-      window.scrollTo = jest.fn();
+      Element.prototype.scrollIntoView = jest.fn();
+      window.matchMedia =
+        window.matchMedia ??
+        ((query: string) =>
+          ({
+            matches: false,
+            media: query,
+            addEventListener: jest.fn(),
+          }) as unknown as MediaQueryList);
       window.requestAnimationFrame = (callback: FrameRequestCallback) => {
         callback(0);
         return 1;
@@ -113,23 +129,30 @@ describe('app/faq/page.tsx', () => {
       expect(screen.getByRole('heading', { name: /cosmic signature faq/i })).toBeInTheDocument();
     });
 
-    it('scrolls the popular allocation card to its canonical hash anchor', async () => {
+    it('scrolls a popular question to its anchor', async () => {
       const user = userEvent.setup();
       render(await Page(pageProps));
       const getElementById = jest.spyOn(document, 'getElementById');
-      const [popularCard] = screen.getAllByRole('button', {
-        name: /What is the Signature Allocation\?/i,
-      });
+      const popular = screen.getByRole('link', { name: /How does Anchoring work\?/i });
+      expect(popular).toHaveAttribute('href', '#how-does-anchoring-work');
 
-      await user.click(popularCard!);
+      await user.click(popular);
 
+      expect(getElementById).toHaveBeenCalledWith('how-does-anchoring-work');
+      expect(Element.prototype.scrollIntoView).toHaveBeenCalledWith(
+        expect.objectContaining({ block: 'start' }),
+      );
+      getElementById.mockRestore();
+    });
+
+    it('scrolls a shared legacy link to the question it names', async () => {
+      window.history.replaceState(null, '', '/faq#main-allocation');
+      const getElementById = jest.spyOn(document, 'getElementById');
+      render(await Page(pageProps));
       expect(getElementById).toHaveBeenCalledWith('main-allocation');
       expect(getElementById).not.toHaveBeenCalledWith('what-is-the-main-allocation');
-      expect(window.scrollTo).toHaveBeenCalledWith({
-        top: expect.any(Number),
-        behavior: 'smooth',
-      });
       getElementById.mockRestore();
+      window.history.replaceState(null, '', '/faq');
     });
 
     it('has no accessibility violations', async () => {

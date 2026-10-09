@@ -1,0 +1,325 @@
+{
+  "shared": {
+    "defaultTitle": "Cosmic Signature",
+    "defaultOgTitle": "Cosmic Signature——すべての一筆がシグネチャーを形づくる。",
+    "defaultDescription": "Arbitrum上のプロシージャル・オンチェーンアート・プロトコル。入れた一筆の一つひとつが、サイクルの最終シグネチャーを形づくります。サイクルが確定すると、プロトコルは準備金を定められた配分トラックへ配ります。その中には、170人以上のEthereumコア貢献者の資金支援メカニズムであるProtocol Guildも含まれます。"
+  },
+  "home": {
+    "title": "Cosmic Signature",
+    "description": "Cosmic SignatureはArbitrum上のプロシージャル・オンチェーンアート・プロトコルです。パフォーマンス・サイクルの間に一筆を入れると、確定時にサイクル準備金がProtocol Guildを含む配分トラックへ配られます。",
+    "descriptionWithReserve": "Cosmic SignatureはArbitrum上のプロシージャル・オンチェーンアート・プロトコルです。パフォーマンス・サイクルの間に一筆を入れると、確定時に{reserve}のサイクル準備金がProtocol Guildを含む配分トラックへ配られます。"
+  },
+  "experimentalUi": {
+    "title": "観測所のアートビュー",
+    "description": "アートを主役にしたCosmic Signature観測所のプレビューです。同じライブのサイクルデータと操作を備えています。"
+  },
+  "gallery": {
+    "title": "ギャラリー：決定論的な三体NFTアート",
+    "description": "決定論的な三体物理、オンチェーンのシード、スペクトルレンダリング、パフォーマンス・サイクルのデータから生成されたCosmic Signature NFTのアートワークを探索する。"
+  },
+  "allocations": {
+    "title": "配分の受領者",
+    "description": "確定したすべてのパフォーマンス・サイクルにわたるCosmic Signatureの配分の受領者、サイクル統計、ETH配分の完全な履歴。"
+  },
+  "anchoring": {
+    "title": "係留配分",
+    "description": "Cosmic Signature NFTをプロトコルに係留して、サイクルごとのETH係留配分を受け取る。係留の全体統計と、Arbitrum上での仕組みを見る。"
+  },
+  "statistics": {
+    "title": "統計：パフォーマンス・サイクル、一筆、NFT、CST",
+    "description": "パフォーマンス・サイクルの状態、一筆、NFTの活動、CST、係留、準備金、配分データを含む、Arbitrum上のCosmic Signatureプロトコル統計。"
+  },
+  "statisticsParticipation": {
+    "title": "参加統計",
+    "description": "すべてのCosmic Signatureパフォーマンス・サイクルでインデックスされたユニーク参加者、配分の受領者、ETH拠出者。"
+  },
+  "statisticsTokens": {
+    "title": "トークン分布統計",
+    "description": "Cosmic Signature NFTの所有、CST（ERC-20）残高の分布、総供給量の履歴、一筆に添付されたアセット。"
+  },
+  "statisticsAnchoring": {
+    "title": "係留統計",
+    "description": "Cosmic Signature NFTとRandom Walk NFTの係留と解除の操作、現在係留中のNFT、ユニーク係留者。"
+  },
+  "statisticsActivity": {
+    "title": "一筆の活動統計",
+    "description": "時間ごとの一筆の頻度、活動の急増、参加者の活動期間、一筆の種類の構成、サイクルのタイムライン、サイクルの有効化。"
+  },
+  "statisticsPerformance": {
+    "title": "参加者の結果",
+    "description": "参加者ごとの一筆への支出と配分の受け取り、そして各サイクルの受け取り可能な資産の受け取り状況。"
+  },
+  "faq": {
+    "title": "よくある質問：Arbitrumのオンチェーンアート・プロトコル",
+    "description": "Cosmic Signature、パフォーマンス・サイクル、一筆、CST、三体NFTアート、Arbitrum、係留、コントラクト、プロトコルのセキュリティに関するよくある質問への回答。"
+  },
+  "myAllocations": {
+    "title": "自分の配分",
+    "description": "Cosmic Signatureプロトコルからの未受け取りのETH配分、星選の配分、係留配分、添付されたアセットを確認して受け取る。"
+  },
+  "myAnchors": {
+    "title": "自分の係留",
+    "description": "係留中のCosmic Signature NFTとRandom Walk NFTを管理する。Cosmic Signature NFTのETH係留配分と、Random Walk NFTの係留NFT星選の履歴を見る。"
+  },
+  "contracts": {
+    "title": "コントラクト：検証済みのArbitrumスマートコントラクト",
+    "description": "Arbitrum One上のCosmic Signatureのすべてのスマートコントラクトアドレスと、エクスプローラーとSourcifyへのリンク。配分の内訳、プロトコルの設定、調律期間も確認できます。"
+  },
+  "terms": {
+    "title": "利用規約",
+    "description": "プロシージャル・オンチェーンアート・プロトコルCosmic Signatureの利用規約。"
+  },
+  "privacy": {
+    "title": "プライバシー",
+    "description": "Cosmic Signatureを利用する際の情報の収集、利用、保護について説明します。"
+  },
+  "pagePrivacy": {
+    "title": "プライバシーポリシー",
+    "description": "Cosmic Signatureのプライバシーポリシー——ウォレットデータ、トランザクション、セキュリティ、ブロックチェーンの透明性の取り扱い。"
+  },
+  "security": {
+    "title": "セキュリティ：プロトコルの検証と安全性",
+    "description": "Cosmic Signatureのセキュリティ対策、Arbitrumコントラクトの検証、運用上の管理、参加者の安全に関する注記。"
+  },
+  "audits": {
+    "title": "監査：検証とコントラクトのレビュー",
+    "description": "HackenによるCosmic Signatureコントラクトの独立監査の概要。深刻度別の所見、ファジングした不変条件、報告書の全文、リポジトリにある形式検証の仕様を確認できます。"
+  },
+  "code": {
+    "title": "ソースコード：CC0のオンチェーンアート・プロトコル",
+    "description": "Cosmic Signatureのソースコード、レンダリングパイプライン、プロジェクトのリポジトリ、CC0パブリックドメインライセンスを確認できます。"
+  },
+  "tokenDetail": {
+    "titleFor": "Cosmic Signature #{id}",
+    "titleWithName": "{name} · Cosmic Signature #{id}",
+    "descriptionFor": "Cosmic Signature NFT #{id}の特性と所有権の履歴。三体問題の物理計算とスペクトルレンダリングから生まれた作品です。"
+  },
+  "gestureDetail": {
+    "title": "一筆の情報",
+    "titleFor": "一筆#{position} · サイクル{cycle}",
+    "titleForId": "一筆の記録{id}",
+    "description": "Cosmic Signatureプロトコルの一筆について、タイムスタンプ、参加者アドレス、一筆の費用、サイクルの文脈を含む詳しい情報を見る。"
+  },
+  "coordinationChanges": {
+    "title": "調整の変更履歴",
+    "description": "Cosmic Signatureのプロトコルパラメーター調整の完全な履歴。一筆の費用の上げ幅、サイクル時間の追加、係留配分の設定、その他の調整の更新を追う。"
+  },
+  "distributionsByToken": {
+    "description": "特定のCosmic Signature NFTの係留配分の詳細——サイクルごとのETH配分の履歴、受け取り状況、累積の係留配分。"
+  },
+  "mint": {
+    "title": "Random Walk NFTの刻印",
+    "description": "Cosmic SignatureでRandom Walk NFTを刻印する。未使用のRandom Walk NFTはそれぞれ1回のETH一筆に添付でき、ETH一筆の費用が50%割引されます。"
+  },
+  "systemEvent": {
+    "title": "サイクル{cycle}より前の調整の変更",
+    "description": "サイクル{cycle}の開始前にコントラクト所有者が変更したプロトコルのパラメーターです。それぞれの新しい値とトランザクションを示します。",
+    "titleInitial": "最初のサイクルより前の調整の変更",
+    "descriptionInitial": "最初のサイクルの開始前にコントラクト所有者が設定したプロトコルのパラメーターです。それぞれの値とトランザクションを示します。"
+  },
+  "currentCycleFull": {
+    "title": "現在のパフォーマンス・サイクル",
+    "description": "進行中のパフォーマンス・サイクルの全詳細：一筆の履歴、順位表、添付された拠出、配分の分布。"
+  },
+  "allocationInfo": {
+    "titleFor": "サイクル{id}の配分情報",
+    "descriptionFor": "Cosmic Signatureサイクル{id}の詳しい配分情報——受領者の詳細、シグネチャー配分の分布、星選の結果、添付されたNFTの配分。"
+  },
+  "anchorAction": {
+    "description": "Cosmic Signatureの特定の係留操作の詳細——トークンの種類、係留数、配分の受け取り状況。"
+  },
+  "pageTerms": {
+    "title": "利用規約",
+    "description": "Cosmic Signatureの利用規約——利用資格、プロトコルの仕組み、配分、リスク、禁止行為、法的条件。"
+  },
+  "userStellarSelectionNft": {
+    "title": "星選NFT",
+    "description": "星選を通じてこの参加者に配分されたすべてのCosmic Signature NFT。オンチェーンの無作為選定で受け取ったNFTを見る。"
+  },
+  "userStellarSelectionEth": {
+    "title": "星選ETH",
+    "description": "この参加者が星選を通じて受け取ったすべてのETH配分。完了したサイクルにわたる無作為選定の配分を追う。"
+  },
+  "publicGoodsCgContributions": {
+    "title": "プロトコルの公共財拠出",
+    "description": "サイクル準備金から公共財金庫への自動送付を確認できます。資金は、設定されている公共財の受け手へ届けられます。"
+  },
+  "publicGoodsRetrievals": {
+    "title": "公共財の受け取り",
+    "description": "公共財金庫から、設定されている公共財の受け手へ送られた資金の履歴を確認できます。"
+  },
+  "publicGoodsVoluntary": {
+    "title": "自発的な公共財拠出",
+    "description": "Cosmic Signatureコミュニティによる公共財金庫への拠出履歴です。拠出は、設定されている公共財の受け手を支えます。"
+  },
+  "allocationRetrieved": {
+    "title": "確定した配分",
+    "description": "確定したCosmic Signatureの各サイクルのシグネチャー配分と、ETH、CST、Cosmic Signature NFTの配分記録の合計です。"
+  },
+  "outreach": {
+    "title": "広報配分",
+    "description": "Cosmic Signatureの広報に貢献してCST配分を受け取る。主なエコシステム貢献者、配分の履歴、参加の方法を見る。"
+  },
+  "outreachAddress": {
+    "title": "広報配分 · {address}",
+    "description": "Cosmic Signatureエコシステム貢献者の広報配分の履歴とCST配分。紹介活動と貢献を確認する。"
+  },
+  "ethContribution": {
+    "title": "直接ETH拠出",
+    "description": "一筆を入れずに、Cosmic Signatureのサイクル準備金へETHを直接拠出できます。公開された拠出履歴も確認できます。"
+  },
+  "ethContributionDetail": {
+    "title": "拠出 #{id}",
+    "description": "サイクル準備金へのETH拠出の詳細です。拠出者アドレス、金額、サイクル、添えられたメモを確認できます。"
+  },
+  "ethContributionByCycle": {
+    "title": "サイクル{cycle}の拠出",
+    "description": "サイクル{cycle}の間にサイクル準備金へ直接拠出されたETHです。"
+  },
+  "myStatistics": {
+    "title": "自分の統計",
+    "description": "すべてのパフォーマンス・サイクルにわたる一筆、配分、NFT、係留の記録です。"
+  },
+  "myTokens": {
+    "title": "自分のNFT",
+    "description": "接続中のウォレットにあるCosmic Signature NFTを確認して管理する。別のアドレスへの任意の移転も含みます。"
+  },
+  "transferCst": {
+    "title": "CSTの送付",
+    "description": "Cosmic Signature CSTトークンを別のウォレットアドレスへ送る。"
+  },
+  "cosmicSignatureTransfers": {
+    "title": "NFTの移転履歴 · {address}",
+    "description": "このアドレスに刻印されたCosmic Signature NFTと、受け取ったり送ったりしたすべてのNFTです。"
+  },
+  "cosmicTokenTransfers": {
+    "title": "CSTの送付履歴 · {address}",
+    "description": "このアドレスに刻印されたCST、受け取ったCSTと送ったCST、そしてCSTでの一筆に消費したCSTです。"
+  },
+  "usedRwlkNfts": {
+    "title": "使用済みのRandom Walk NFT",
+    "description": "Cosmic Signatureで一筆の費用の50%割引のためにETH一筆にすでに添付されたRandom Walk NFT。各Random Walk NFTはこの割引に一度だけ使えます。"
+  },
+  "siteMap": {
+    "title": "サイトマップ",
+    "description": "Cosmic Signatureプロトコルのすべてのセクションを巡る——一筆、NFTギャラリー、係留、統計、配分、公共財拠出。"
+  },
+  "nftDonations": {
+    "title": "添付されたNFT拠出",
+    "description": "コミュニティメンバーが一筆に添付したNFTの履歴を見る。添付されたNFTは、サイクルごとにシグネチャー配分を受け取る参加者へ送られます。"
+  },
+  "namedNfts": {
+    "title": "名前付きNFT",
+    "description": "所有者によって固有の名前を付けられたCosmic Signature NFTを見る。名前付きNFTはそれぞれ、コレクションの中で唯一のアイデンティティを持ちます。"
+  },
+  "recipientHistory": {
+    "title": "自分の配分履歴",
+    "description": "シグネチャー配分、ETH星選の配分、Cosmic Signature NFT、係留配分を含む、Cosmic Signatureでの配分の完全な履歴を見る。"
+  },
+  "userProfile": {
+    "title": "参加者{address}の情報",
+    "description": "参加者{address}の一筆、配分、係留の記録です。",
+    "invalidAddress": "無効なアドレス",
+    "invalidDescription": "このリンクのアドレスは有効なEthereumアドレスではありません。"
+  },
+  "admin": {
+    "title": "一筆のメッセージ管理",
+    "description": "運営ツール：Cosmic Signatureのサイトで一筆のメッセージを非表示にしたり、元に戻したりします。"
+  },
+  "adminSettings": {
+    "title": "コントラクト設定",
+    "description": "Cosmic Signatureのコントラクトアドレスとパラメーターを閲覧のみで表示する運営画面です。"
+  },
+  "internalCstOutreachTransfer": {
+    "title": "CST広報送付",
+    "description": "広報準備金の財務担当者が準備金からCSTを送付するための運営ツールです。"
+  },
+  "embedEndurance": {
+    "title": "持久と時の戦士のタイムライン",
+    "description": "Cosmic Signatureパフォーマンス・サイクルの持久チャンピオンと時の戦士のタイムライン。"
+  },
+  "about": {
+    "title": "Cosmic Signatureについて：Arbitrumのオンチェーンアート",
+    "description": "Cosmic Signatureは、パフォーマンス・サイクルの一筆を決定論的な三体NFTアートへ変えるArbitrum上のプロシージャル・オンチェーンアート・プロトコルです。"
+  },
+  "learn": {
+    "title": "Cosmic Signatureを知る：オンチェーンアート、パフォーマンス・サイクル、Arbitrum",
+    "description": "Cosmic Signatureの仕組みを学ぶ：パフォーマンス・サイクル、一筆、CST、三体NFTアート、Arbitrumコントラクト、係留、公共財、そしてリスクの明確化。"
+  },
+  "whitePaper": {
+    "title": "ホワイトペーパー：プロシージャル・オンチェーンアート・プロトコル",
+    "description": "Cosmic Signatureのリファレンス：パフォーマンス・サイクル、一筆、配分トラック、決定論的な三体NFTアート、CST、係留、宇宙評議会、プロトコルのアップグレード、そして完全な分散化への道。"
+  },
+  "quiz": {
+    "title": "クイズ：プロトコルの知識を試す",
+    "description": "Cosmic Signatureのホワイトペーパーから出題する三段階・全100問：パフォーマンス・サイクル、一筆、配分、アートパイプライン、そして注意深い読者だけが気づく細部。",
+    "tiers": {
+      "basic": {
+        "title": "基礎クイズ",
+        "description": "Cosmic Signatureの基礎に関する25問：一筆、パフォーマンス・サイクル、配分トラック、決定論的な三体アート。"
+      },
+      "medium": {
+        "title": "中級クイズ",
+        "description": "Cosmic Signatureのライブの仕組みに関する25問：調律期間、CSTのフィードバックループ、持続トラック、宇宙評議会のルール。"
+      },
+      "hard": {
+        "title": "上級クイズ",
+        "description": "Cosmic Signatureの設計を掘り下げる50問。期限が過ぎた後の動作、安全性を高める設計、アップグレードの歴史、アートパイプラインを扱います。"
+      }
+    }
+  },
+  "howItWorks": {
+    "title": "仕組み：パフォーマンス・サイクル、一筆、NFT",
+    "description": "調律期間から一筆、確定と配分まで、Cosmic Signatureのパフォーマンス・サイクルを順に解説します。"
+  },
+  "riskDisclosures": {
+    "title": "リスク開示：\u6295\u8cc7\u5546\u54c1ではありません",
+    "description": "ブロックチェーンへの参加、ウォレットの操作、NFT、CST、配分、そして\u6295\u8cc7ではないことの説明を含む、Cosmic Signatureのリスク開示を読む。"
+  },
+  "learnArticles": {
+    "what-is-cosmic-signature": {
+      "title": "Cosmic Signatureとは？",
+      "description": "Cosmic Signatureは、パフォーマンス・サイクルの一筆が決定論的な三体NFTアートワークを形づくる、Arbitrum上のプロシージャル・オンチェーンアート・プロトコルです。"
+    },
+    "how-the-performance-cycle-works": {
+      "title": "Cosmic Signatureのパフォーマンス・サイクルの仕組み",
+      "description": "Cosmic Signatureのパフォーマンス・サイクルがArbitrum上で調律期間、一筆、確定、配分トラックをどう使うかを学ぶ。"
+    },
+    "how-gestures-work": {
+      "title": "Cosmic Signatureにおける一筆の仕組み",
+      "description": "ETH一筆、CST一筆、一筆の費用、参加CST、そして一筆が各Cosmic Signatureパフォーマンス・サイクルをどう形づくるかを理解する。"
+    },
+    "three-body-nft-art": {
+      "title": "Cosmic Signatureが三体NFTアートを生成する仕組み",
+      "description": "オンチェーンのシードと三体物理から生成される決定論的なCosmic Signature NFTアートワークの技術的な解説。"
+    },
+    "cosmic-signature-on-arbitrum": {
+      "title": "Arbitrum上のCosmic Signature",
+      "description": "Cosmic SignatureがArbitrumで動く理由と、プロトコルがオンチェーンアートのためにEthereumレイヤー2のインフラをどう使うか。"
+    },
+    "contracts-security-verification": {
+      "title": "Cosmic Signatureのコントラクト、セキュリティ、検証",
+      "description": "Arbitrumプロトコルの、Cosmic Signatureスマートコントラクト、ソースコード、検証、セキュリティの背景。"
+    },
+    "cst-token-and-cosmic-council": {
+      "title": "CSTと宇宙評議会",
+      "description": "CSTトークンが一筆、プロトコルの調整、宇宙評議会とどう関わるかを学ぶ。"
+    },
+    "anchoring-nfts": {
+      "title": "Cosmic Signature NFTの係留",
+      "description": "Cosmic Signature NFTの係留、ETH係留配分、Random Walk NFTの対象資格の仕組み。"
+    },
+    "protocol-guild-public-goods": {
+      "title": "Cosmic SignatureとEthereumの公共財",
+      "description": "Cosmic Signatureが公共財配分を、Ethereumコア貢献者の資金支援メカニズムであるProtocol Guildへどう届けるか。"
+    },
+    "collecting-and-trading-cosmic-signature": {
+      "title": "Cosmic Signature NFTとCSTの収集と取引",
+      "description": "Cosmic Signatureのアセットが取引される場所：手数料ゼロのAxiom Zero NFTマーケットプレイス、Arbitrum上のUniswapでのCSTスワップ、サイクルについてのChaos Zero予測市場。"
+    },
+    "not-a-\u006cottery-not-an-\u0069nvestment": {
+      "title": "Cosmic Signatureは\u5b9d\u304f\u3058、\u30ab\u30b8\u30ce、\u6295\u8cc7ですか？",
+      "description": "Cosmic Signatureはプロシージャル・オンチェーンアート・プロトコルであり、\u5b9d\u304f\u3058、\u30ab\u30b8\u30ce、\u30ae\u30e3\u30f3\u30d6\u30eb商品、\u6295\u8cc7\u5546\u54c1ではありません。"
+    }
+  }
+}

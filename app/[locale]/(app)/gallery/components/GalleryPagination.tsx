@@ -1,17 +1,10 @@
 'use client';
 
+import { useId } from 'react';
 import { useLocale, useTranslations } from 'next-intl';
 
-import { toIntlLocale } from '@/utils/format';
-import {
-  Pagination,
-  PaginationContent,
-  PaginationItem,
-  PaginationLink,
-  PaginationEllipsis,
-  PaginationPrevious,
-  PaginationNext,
-} from '@/components/ui/pagination';
+import { formatCount } from '@/utils/format';
+import { TablePagination } from '@/components/ui/pagination';
 import {
   Select,
   SelectContent,
@@ -19,119 +12,78 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
+
+import { PER_PAGE_OPTIONS, type PerPage } from '../galleryQuery';
 
 interface GalleryPaginationProps {
-  currentPage: number;
-  totalPages: number;
+  page: number;
+  perPage: PerPage;
   totalItems: number;
-  perPage: number;
   onPageChange: (page: number) => void;
-  onPerPageChange: (perPage: number) => void;
+  onPerPageChange: (perPage: PerPage) => void;
 }
 
-function getPaginationRange(current: number, total: number): (number | 'ellipsis')[] {
-  if (total <= 7) return Array.from({ length: total }, (_, i) => i + 1);
-  const pages: (number | 'ellipsis')[] = [1];
-  if (current > 3) pages.push('ellipsis');
-  for (let i = Math.max(2, current - 1); i <= Math.min(total - 1, current + 1); i++) {
-    pages.push(i);
-  }
-  if (current < total - 2) pages.push('ellipsis');
-  if (total > 1) pages.push(total);
-  return pages;
+function toPerPage(value: string): PerPage | null {
+  const numeric = Number(value);
+  return (PER_PAGE_OPTIONS as readonly number[]).includes(numeric) ? (numeric as PerPage) : null;
 }
 
-const perPageOptions = [12, 24, 48];
-
+/**
+ * The foot of the grid: the range ("1–24 of 48"), Previous and Next with the
+ * page numbers (the ledger pagination), and how many Signatures a page holds.
+ */
 export function GalleryPagination({
-  currentPage,
-  totalPages,
-  totalItems,
+  page,
   perPage,
+  totalItems,
   onPageChange,
   onPerPageChange,
 }: GalleryPaginationProps) {
   const t = useTranslations('gallery');
   const locale = useLocale();
+  const labelId = useId();
 
-  if (totalItems === 0) return null;
-
-  const numberLocale = toIntlLocale(locale);
-  const startItem = (currentPage - 1) * perPage + 1;
-  const endItem = Math.min(currentPage * perPage, totalItems);
+  const paged = totalItems > perPage;
+  const showPerPage = totalItems > PER_PAGE_OPTIONS[0];
+  if (!paged && !showPerPage) return null;
 
   return (
-    <div className="flex flex-col sm:flex-row items-center justify-between gap-4 mt-10">
-      <p className="text-xs text-muted-foreground order-2 sm:order-1">
-        {t.rich('pagination.showing', {
-          start: startItem.toLocaleString(numberLocale),
-          end: endItem.toLocaleString(numberLocale),
-          total: totalItems.toLocaleString(numberLocale),
-          value: (chunks) => <span className="font-medium text-foreground">{chunks}</span>,
-        })}
-      </p>
-
-      {totalPages > 1 && (
-        <div className="order-1 sm:order-2">
-          <Pagination>
-            <PaginationContent>
-              {currentPage > 1 && (
-                <PaginationItem>
-                  <PaginationPrevious onClick={() => onPageChange(currentPage - 1)} />
-                </PaginationItem>
-              )}
-              {getPaginationRange(currentPage, totalPages).map((item, idx) =>
-                item === 'ellipsis' ? (
-                  <PaginationItem key={`ellipsis-${idx}`}>
-                    <PaginationEllipsis />
-                  </PaginationItem>
-                ) : (
-                  <PaginationItem key={item}>
-                    <PaginationLink
-                      isActive={item === currentPage}
-                      onClick={() => onPageChange(item)}
-                    >
-                      {item}
-                    </PaginationLink>
-                  </PaginationItem>
-                ),
-              )}
-              {currentPage < totalPages && (
-                <PaginationItem>
-                  <PaginationNext onClick={() => onPageChange(currentPage + 1)} />
-                </PaginationItem>
-              )}
-            </PaginationContent>
-          </Pagination>
+    <div
+      className="mt-12 flex flex-wrap items-center justify-between gap-x-6 gap-y-4 border-t border-rule-faint pt-5"
+      data-testid="gallery-pagination"
+    >
+      <TablePagination
+        page={page}
+        pageSize={perPage}
+        total={totalItems}
+        onPageChange={onPageChange}
+        className="mt-0 min-w-0 flex-1 sm:pl-0"
+      />
+      {showPerPage ? (
+        <div className="ms-auto flex items-center gap-2">
+          <span id={labelId} className="type-label text-subtle">
+            {t('pagination.perPage')}
+          </span>
+          <Select
+            value={String(perPage)}
+            onValueChange={(value) => {
+              const next = toPerPage(value);
+              if (next !== null) onPerPageChange(next);
+            }}
+          >
+            <SelectTrigger aria-labelledby={labelId} className="w-auto min-w-20">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent align="end">
+              {PER_PAGE_OPTIONS.map((option) => (
+                <SelectItem key={option} value={String(option)}>
+                  {formatCount(option, locale)}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
         </div>
-      )}
-
-      <Tooltip>
-        <TooltipTrigger asChild>
-          <div className="order-3 flex items-center gap-2">
-            <span className="text-xs text-muted-foreground">{t('pagination.perPage')}</span>
-            <Select value={String(perPage)} onValueChange={(v) => onPerPageChange(Number(v))}>
-              <SelectTrigger
-                className="w-[70px] h-8 text-xs border-white/[0.06] bg-white/[0.03]"
-                aria-label={t('pagination.perPageAria')}
-              >
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                {perPageOptions.map((opt) => (
-                  <SelectItem key={opt} value={String(opt)}>
-                    {opt}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
-        </TooltipTrigger>
-        <TooltipContent side="bottom">
-          <p>{t('pagination.perPageTooltip')}</p>
-        </TooltipContent>
-      </Tooltip>
+      ) : null}
     </div>
   );
 }

@@ -1,190 +1,152 @@
-import { useState, type FC } from 'react';
-import { useLocale, useTranslations } from 'next-intl';
+'use client';
 
-import { shortenHex } from '@/utils';
+import { useMemo } from 'react';
+import { useTranslations } from 'next-intl';
 
-import { HydrationSafeDateTime } from '@/components/common/HydrationSafeDateTime';
-import { Link, useRouter } from '@/i18n/navigation';
-import { TABLE_ROW_LINK_CLASS } from '@/components/ui/responsive-table';
-import {
-  TablePrimary,
-  TablePrimaryBody,
-  TablePrimaryCell,
-  TablePrimaryContainer,
-  TablePrimaryHead,
-  TablePrimaryHeadCell,
-  TablePrimaryRow,
-} from '@/components/styled';
-import { CustomPagination } from '@/components/common/CustomPagination';
-import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
-import { TableHeaderHelp } from '@/components/tables/TableHeaderHelp';
+import { TOUCH_TARGET_TEXT_LINK_CLASS } from '@/lib/touch-target';
+import { DataTable, TableLink, TableTag, type DataTableColumn } from '@/components/ui/data-table';
+import { DateTime } from '@/components/ui/date-time';
+import { useSignatureIndex } from '@/components/winnings/useSignatureIndex';
 
-interface RowData {
+import { TokenCell } from './TokenCell';
+import { anchorActionHref } from './anchorLinks';
+import type { AnchoringLedgerProps } from './ledgerProps';
+
+interface GlobalAnchorAction {
   EvtLogId: string | number;
-  ActionId: string | number;
+  ActionId: number;
   TimeStamp: number;
+  TxHash?: string;
   ActionType: number;
-  TokenId: string | number;
+  TokenId: number;
   StakerAddr: string;
   NumStakedNFTs: number;
 }
 
-interface GlobalAnchorActionsRowProps {
-  row: RowData;
+interface GlobalAnchorActionsTableProps extends AnchoringLedgerProps {
+  list: GlobalAnchorAction[];
   IsRWLK: boolean;
 }
 
-const GlobalAnchorActionsRow: FC<GlobalAnchorActionsRowProps> = ({ row, IsRWLK }) => {
+/** A release, the exception: anchoring is what nearly every row records. */
+function isRelease(action: GlobalAnchorAction): boolean {
+  return action.ActionType === 1;
+}
+
+/**
+ * Every anchor and release across all anchor-holders for one collection,
+ * shown by the NFT's artwork, like the anchored-NFT ledger beside it: the
+ * NFT, "Action #34" (only a release carries a tag, since nearly every row
+ * is an anchor) leading to the action's record, the date as the
+ * transaction's proof, and the anchor-holder. A dense ledger of several
+ * links a row, so its links keep their ink until hover. On a phone each
+ * record is one media object: the art and its number, "Action #34 · Sep 23"
+ * beside it, then the holder.
+ */
+export const GlobalAnchorActionsTable = ({
+  list,
+  IsRWLK,
+  headingLevel = 3,
+  ...state
+}: GlobalAnchorActionsTableProps) => {
   const t = useTranslations('anchoring');
-  const locale = useLocale();
-  const router = useRouter();
+  const collection = IsRWLK ? 'randomWalk' : 'cosmicSignature';
+  // The rows carry no seed: one collection read serves every Cosmic Signature thumbnail.
+  const signatures = useSignatureIndex({ enabled: !IsRWLK && list.length > 0 });
+  const seedsPending = signatures.state === 'loading';
+  const { seedFor } = signatures;
 
-  if (!row) {
-    return <TablePrimaryRow />;
-  }
-
-  const actionHref = `/anchor-action/${IsRWLK ? 1 : 0}/${row.ActionId}`;
-
-  const handleRowClick = () => {
-    router.push(actionHref);
-  };
-
-  return (
-    <TablePrimaryRow onActivate={handleRowClick}>
-      <TablePrimaryCell label={t('tables.globalAnchorActions.headers.anchorDatetime.mobile')}>
-        <Link
-          href={actionHref}
-          className={TABLE_ROW_LINK_CLASS}
-          aria-label={t('anchorActionDetail.breadcrumbs.action', { id: row.ActionId })}
+  const columns = useMemo<DataTableColumn<GlobalAnchorAction>[]>(() => {
+    const actionLink = (row: GlobalAnchorAction) => (
+      <span className="inline-flex flex-wrap items-center gap-x-2 gap-y-1">
+        {/* Beside its tag the link is not the whole value: it takes the 24px line itself. */}
+        <TableLink
+          href={anchorActionHref(collection, row.ActionId)}
+          className={TOUCH_TARGET_TEXT_LINK_CLASS}
         >
-          <HydrationSafeDateTime timestamp={row.TimeStamp} locale={locale} />
-        </Link>
-      </TablePrimaryCell>
-
-      <TablePrimaryCell
-        label={t('tables.globalAnchorActions.headers.actionType.mobile')}
-        align="center"
-      >
-        {row.ActionType === 0 ? t('common.anchor') : t('common.release')}
-      </TablePrimaryCell>
-
-      <TablePrimaryCell
-        label={t('tables.globalAnchorActions.headers.tokenId.mobile')}
-        align="center"
-      >
-        {IsRWLK ? (
-          <a href={`https://randomwalknft.com/detail/${row.TokenId}`} className="text-inherit">
-            {row.TokenId}
-          </a>
-        ) : (
-          <Link href={`/detail/${row.TokenId}`} className="text-inherit">
-            {row.TokenId}
-          </Link>
-        )}
-      </TablePrimaryCell>
-
-      <TablePrimaryCell
-        label={t('tables.globalAnchorActions.headers.holderAddress.mobile')}
-        align="center"
-      >
-        <Tooltip>
-          <TooltipTrigger asChild>
-            <Link
-              href={`/user/${row.StakerAddr}`}
-              className="inline-block max-w-full break-all text-inherit font-mono"
-            >
-              {shortenHex(row.StakerAddr, 6)}
-            </Link>
-          </TooltipTrigger>
-          <TooltipContent>
-            <p>{row.StakerAddr}</p>
-          </TooltipContent>
-        </Tooltip>
-      </TablePrimaryCell>
-
-      <TablePrimaryCell
-        label={t('tables.globalAnchorActions.headers.nftCount.mobile')}
-        align="center"
-      >
-        {row.NumStakedNFTs}
-      </TablePrimaryCell>
-    </TablePrimaryRow>
-  );
-};
-
-interface GlobalAnchorActionsTableProps {
-  list: RowData[];
-  IsRWLK: boolean;
-}
-
-export const GlobalAnchorActionsTable: FC<GlobalAnchorActionsTableProps> = ({ list, IsRWLK }) => {
-  const t = useTranslations('anchoring');
-  const perPage = 5;
-  const [page, setPage] = useState(1);
-  const responsiveHeaders = [
-    {
-      desktop: t('tables.globalAnchorActions.headers.anchorDatetime.desktop'),
-      mobile: t('tables.globalAnchorActions.headers.anchorDatetime.mobile'),
-      align: 'left' as const,
-      tooltip: t('tables.globalAnchorActions.headers.anchorDatetime.tooltip'),
-    },
-    {
-      desktop: t('tables.globalAnchorActions.headers.actionType.desktop'),
-      mobile: t('tables.globalAnchorActions.headers.actionType.mobile'),
-      tooltip: t('tables.globalAnchorActions.headers.actionType.tooltip'),
-    },
-    {
-      desktop: t('tables.globalAnchorActions.headers.tokenId.desktop'),
-      mobile: t('tables.globalAnchorActions.headers.tokenId.mobile'),
-      tooltip: t('tables.globalAnchorActions.headers.tokenId.tooltip'),
-    },
-    {
-      desktop: t('tables.globalAnchorActions.headers.holderAddress.desktop'),
-      mobile: t('tables.globalAnchorActions.headers.holderAddress.mobile'),
-      tooltip: t('tables.globalAnchorActions.headers.holderAddress.tooltip'),
-    },
-    {
-      desktop: t('tables.globalAnchorActions.headers.nftCount.desktop'),
-      mobile: t('tables.globalAnchorActions.headers.nftCount.mobile'),
-      tooltip: t('tables.globalAnchorActions.headers.nftCount.tooltip'),
-    },
-  ];
-
-  if (!list || list.length === 0) {
-    return <p className="text-muted-foreground">{t('common.empty.actions')}</p>;
-  }
-
-  const startIndex = (page - 1) * perPage;
-  const endIndex = page * perPage;
-  const visibleRows = list.slice(startIndex, endIndex);
+          {t('anchorActionDetail.breadcrumbs.action', { id: row.ActionId })}
+        </TableLink>
+        {isRelease(row) ? <TableTag>{t('common.release')}</TableTag> : null}
+      </span>
+    );
+    return [
+      {
+        id: 'token',
+        kind: 'link',
+        header: t('tables.globalAnchorActions.headers.tokenId.desktop'),
+        // The record's media object (the art and its number) heads a phone record unlabelled.
+        label: '',
+        value: (row) => row.TokenId,
+        stack: true,
+        cell: (row) => (
+          <TokenCell
+            collection={collection}
+            tokenId={row.TokenId}
+            seed={IsRWLK ? undefined : seedFor(row.TokenId)}
+            seedPending={!IsRWLK && seedsPending}
+            thumbnail
+            phoneCaption={
+              <>
+                {actionLink(row)}
+                {' · '}
+                <DateTime timestamp={row.TimeStamp} />
+              </>
+            }
+          />
+        ),
+      },
+      {
+        id: 'action',
+        kind: 'link',
+        header: t('tables.globalAnchorActions.headers.actionType.desktop'),
+        value: (row) => row.ActionId,
+        cell: actionLink,
+        nowrap: true,
+        // On a phone the token's caption carries the action and the date.
+        priority: 'secondary',
+      },
+      {
+        id: 'datetime',
+        kind: 'datetime',
+        header: t('tables.globalAnchorActions.headers.anchorDatetime.desktop'),
+        label: t('tables.globalAnchorActions.headers.anchorDatetime.mobile'),
+        value: (row) => row.TimeStamp,
+        txHash: (row) => row.TxHash,
+        priority: 'secondary',
+      },
+      {
+        id: 'holder',
+        kind: 'address',
+        header: t('tables.globalAnchorActions.headers.holderAddress.desktop'),
+        label: t('tables.globalAnchorActions.headers.holderAddress.mobile'),
+        value: (row) => row.StakerAddr,
+      },
+      {
+        id: 'nfts',
+        kind: 'count',
+        header: t('tables.globalAnchorActions.headers.nftCount.desktop'),
+        label: t('tables.globalAnchorActions.headers.nftCount.mobile'),
+        help: t('tables.globalAnchorActions.headers.nftCount.tooltip'),
+        value: (row) => row.NumStakedNFTs,
+        // A running total: the record's NFT, action and holder come first on a phone.
+        priority: 'secondary',
+      },
+    ];
+  }, [IsRWLK, collection, seedFor, seedsPending, t]);
 
   return (
-    <>
-      <TablePrimaryContainer>
-        <TablePrimary className="sm:min-w-[720px] lg:min-w-0">
-          <TablePrimaryHead>
-            <tr>
-              {responsiveHeaders.map((header) => (
-                <TablePrimaryHeadCell key={header.desktop} align={header.align}>
-                  <TableHeaderHelp
-                    desktop={header.desktop}
-                    mobile={header.mobile}
-                    tooltip={header.tooltip}
-                  />
-                </TablePrimaryHeadCell>
-              ))}
-            </tr>
-          </TablePrimaryHead>
-
-          <TablePrimaryBody>
-            {visibleRows.map((row) => (
-              <GlobalAnchorActionsRow key={row.EvtLogId} row={row} IsRWLK={IsRWLK} />
-            ))}
-          </TablePrimaryBody>
-        </TablePrimary>
-      </TablePrimaryContainer>
-
-      <CustomPagination page={page} setPage={setPage} totalLength={list.length} perPage={perPage} />
-    </>
+    <DataTable
+      data={list}
+      columns={columns}
+      ariaLabel={t('tables.globalAnchorActions.label')}
+      getRowKey={(row) => row.EvtLogId}
+      emptyTitle={t('common.empty.actions.title')}
+      emptyDescription={t('common.empty.actions.description')}
+      tableClassName="sm:min-w-[44rem] lg:min-w-0"
+      headingLevel={headingLevel}
+      layout="cards"
+      links="quiet"
+      {...state}
+    />
   );
 };

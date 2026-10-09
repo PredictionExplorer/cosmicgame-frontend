@@ -1,5 +1,6 @@
 import { expect, test, type Page } from '@playwright/test';
 
+import { expectNoStrandedHeadingPunctuation } from './heading-lines';
 import {
   LOCALE_ROUTE_INVENTORY,
   toLocalePath,
@@ -112,6 +113,8 @@ function isAssetOrInfrastructurePath(pathname: string): boolean {
   return (
     pathname.startsWith('/_next/') ||
     pathname.startsWith('/api/') ||
+    // RFC 8615 well-known files (security.txt) have one fixed, unlocalized path.
+    pathname.startsWith('/.well-known/') ||
     /^\/(?:favicon|robots\.txt|sitemap\.xml|llms(?:-full)?\.txt|manifest\.webmanifest)/.test(
       pathname,
     ) ||
@@ -123,6 +126,7 @@ async function expectLocalePreservingLinks(page: Page, locale: string): Promise<
   const links = await page.locator('a[href]').evaluateAll((anchors) =>
     anchors.map((anchor) => ({
       href: anchor.getAttribute('href') ?? '',
+      hreflang: anchor.getAttribute('hreflang'),
       text: (anchor.textContent ?? '').trim().replace(/\s+/g, ' ').slice(0, 100),
     })),
   );
@@ -136,6 +140,10 @@ async function expectLocalePreservingLinks(page: Page, locale: string): Promise<
     ) {
       continue;
     }
+    // The footer language directory links the same page in every other
+    // language on purpose; an anchor that declares `hreflang` is an alternate,
+    // not a link that dropped the prefix.
+    if (link.hreflang) continue;
 
     let url: URL;
     try {
@@ -189,11 +197,17 @@ async function expectLocaleTypography(
     const visible = (element: HTMLElement) =>
       element.offsetParent !== null && script.test(element.innerText);
     const headings = [...document.querySelectorAll<HTMLElement>('h1, h2, h3')].filter(visible);
+    // An element set in a display style itself: a class token such as
+    // `type-display-sm` or `sm:type-heading-1`, not a wrapper whose
+    // `[&_h1]:type-heading-1` styles a descendant (the wrapper is body text).
+    const displayClass = /^(?:[a-z0-9-]+:)*type-(?:display|heading-[12])(?![\w-])/;
     const displayElements = [
       ...document.querySelectorAll<HTMLElement>(
         '[class*="type-display"], [class*="type-heading-1"], [class*="type-heading-2"]',
       ),
-    ].filter(visible);
+    ]
+      .filter((element) => [...element.classList].some((token) => displayClass.test(token)))
+      .filter(visible);
     // The leading family of each stack is what actually renders the text.
     const leadingFamily = (element: HTMLElement) =>
       getComputedStyle(element).fontFamily.split(',')[0]?.trim() ?? '';
@@ -236,22 +250,17 @@ async function expectNoUnexpectedEnglishHeadings(
   profile: LocaleQaProfile,
 ): Promise<void> {
   // Streamed routes park their payload in a hidden staging div for a frame;
-  // poll for settled, visible headings rather than sampling once.
-  if (!route.allowNoHeading) {
-    await expect
-      .poll(() => readVisibleHeadings(page), {
-        message: `no visible headings rendered on ${route.id}`,
-      })
-      .not.toBe('');
-  }
-
-  const headings = await readVisibleHeadings(page);
-  if (!headings && route.allowNoHeading) return;
-  expect(headings, `no visible headings rendered on ${route.id}`).not.toBe('');
-  expect(headings, `${profile.locale} heading missing on ${route.id}`).toMatch(profile.script);
-  for (const fallback of UNEXPECTED_ENGLISH_FALLBACKS) {
-    expect(headings, `unexpected English heading fallback on ${route.id}`).not.toMatch(fallback);
-  }
+  // validate a single snapshot per attempt. Reading again after a successful
+  // poll can race with React replacing the streamed subtree.
+  await expect(async () => {
+    const headings = await readVisibleHeadings(page);
+    if (!headings && route.allowNoHeading) return;
+    expect(headings, `no visible headings rendered on ${route.id}`).not.toBe('');
+    expect(headings, `${profile.locale} heading missing on ${route.id}`).toMatch(profile.script);
+    for (const fallback of UNEXPECTED_ENGLISH_FALLBACKS) {
+      expect(headings, `unexpected English heading fallback on ${route.id}`).not.toMatch(fallback);
+    }
+  }).toPass({ timeout: 15_000 });
 }
 
 async function expectNoUnexpectedEnglishUiCopy(
@@ -329,6 +338,7 @@ export function defineLocaleSiteQa(profile: LocaleQaProfile): void {
           await expectNoUnexpectedEnglishHeadings(page, route, profile);
           await expectNoUnexpectedEnglishUiCopy(page, route, profile);
           await expectLocaleTypography(page, route, profile);
+          await expectNoStrandedHeadingPunctuation(page, `${route.id} at ${viewport.name}`);
           await expectLocalePreservingLinks(page, profile.locale);
           await expectNoHorizontalOverflow(page, route);
           if (NOINDEX_ROUTE_IDS.has(route.id)) {

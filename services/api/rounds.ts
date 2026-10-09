@@ -1,7 +1,5 @@
 // lexicon-allow-start: backend HTTP URL paths mirror the Go server routes and are a sealed contract
 
-import { weiToEthNumber } from '@/utils/format';
-
 import {
   apiGet,
   getAPIUrl,
@@ -40,9 +38,12 @@ import type {
 } from './types';
 
 /**
- * Maps the live Go `/statistics/dashboard` JSON into the field names the app schema expects.
- * Wire format uses `PrizeAmountEth`, `BidPriceEth`, `TokenReward` (wei string); lexicon/UI use
- * `CurPrizeAmountEth`, `CurBidPriceEth`, `GestureCostEth`.
+ * Maps the live Go `/statistics/dashboard` JSON onto the app schema: `PrizeAmountEth` →
+ * `CurPrizeAmountEth` and `BidPriceEth` → `CurBidPriceEth` (the ETH Gesture Cost).
+ *
+ * The wire's `TokenReward` (a wei string of CST) passes through untouched: the gesture form
+ * reads the participation CST from the contract, so nothing here converts it, and it never
+ * lands in an ETH-named field.
  */
 export function normalizeDashboardWire(raw: Record<string, unknown>): Record<string, unknown> {
   const data = { ...raw };
@@ -53,25 +54,8 @@ export function normalizeDashboardWire(raw: Record<string, unknown>): Record<str
   if (data.CurBidPriceEth === undefined && typeof data.BidPriceEth === 'number') {
     data.CurBidPriceEth = data.BidPriceEth;
   }
-  if (data.GestureCostEth === undefined) {
-    data.GestureCostEth = tokenRewardWeiStringToGestureCostEth(data.TokenReward);
-  }
 
   return data;
-}
-
-function tokenRewardWeiStringToGestureCostEth(tokenReward: unknown): number {
-  if (typeof tokenReward !== 'string' || tokenReward === '' || tokenReward === 'error') {
-    return 0;
-  }
-  // Keep the value in wei through `formatUnits`: `Number(wei) / 1e18` rounds
-  // the integer to a double first and loses precision past 2^53.
-  try {
-    return weiToEthNumber(BigInt(tokenReward));
-  } catch {
-    const n = Number(tokenReward);
-    return Number.isFinite(n) ? n / 1e18 : 0;
-  }
 }
 
 /**
@@ -128,11 +112,17 @@ export function get_prize_time(opts?: ApiRequestOptions): Promise<number> {
   });
 }
 
-/** Fetches the global allocation-claim history with flattened transaction fields (optionally paged). */
-export function get_claim_history(opts?: ApiListRequestOptions): Promise<TxInfo[]> {
+/**
+ * Fetches the global allocation history (every record type: ETH, CST, NFT and retrieval rows,
+ * with flattened transaction fields; optionally paged). `AmountEth` is in the unit of the row's
+ * `RecordType`, so totals must go through `utils/allocationRecords`, never a plain sum.
+ */
+export function get_claim_history(opts?: ApiListRequestOptions): Promise<WinningHistoryEntry[]> {
   return apiCallRequired(async () => {
     const { data } = await apiGet(getAPIUrl(`prizes/history/global/${pagedPath(opts)}`), opts);
-    return flattenTxArray<TxInfo>(data.GlobalPrizeHistory);
+    const history = flattenTxArray<WinningHistoryEntry>(data.GlobalPrizeHistory);
+    validateList(WinningHistoryEntrySchema, history, 'WinningHistory[global]');
+    return history;
   });
 }
 
@@ -220,15 +210,36 @@ export function get_current_special_winners(
   });
 }
 
+/** Fetches stellarSelection ETH deposits across all rounds (optionally paged). */
+export function get_prize_deposits_list(opts?: ApiListRequestOptions): Promise<TxInfo[]> {
+  return apiCall(async () => {
+    const { data } = await apiGet(getAPIUrl(`raffle/deposits/list/${pagedPath(opts)}`), opts);
+    return flattenTxArray<TxInfo>(data.RaffleDeposits);
+  }, []);
+}
+
+/** Fetches stellarSelection ETH deposits for a specific round. */
+export function get_prize_deposits_by_round(
+  round: number,
+  opts?: ApiRequestOptions,
+): Promise<TxInfo[]> {
+  return apiCall(async () => {
+    const { data } = await apiGet(getAPIUrl(`raffle/deposits/by_round/${round}`), opts);
+    return flattenTxArray<TxInfo>(data.RaffleDeposits);
+  }, []);
+}
+
 /**
- * Fetches the list of administratively banned gestures (Cosmic Game / Go API).
- * Optional read: the route is admin-gated and answers 403 to ordinary clients.
+ * The gestures whose messages moderation has hidden (Cosmic Game / Go API),
+ * a public route. Read strictly: a refused or failed read rejects instead of
+ * resolving to an empty list, which would show every hidden message as
+ * visible, in the public ledgers and chat and in the moderation view alike.
  */
 export function get_banned_bids(opts?: ApiRequestOptions): Promise<BannedGesture[]> {
-  return apiCall(async () => {
+  return apiCallRequired(async () => {
     const { data } = await apiGet(getAPIUrl('get_banned_bids'), opts);
     return data as BannedGesture[];
-  }, []);
+  });
 }
 
 /** Bans a bid by its ID and the bidder's address (admin action). Uses Cosmic Game / Go API. */
@@ -256,6 +267,14 @@ export function get_bid_eth_price(opts?: ApiRequestOptions): Promise<GestureEthC
     const { data } = await apiGet(getAPIUrl(`bid/eth_price`), opts);
     return data as GestureEthCostInfo;
   }, null);
+}
+
+/** Fetches the number of seconds remaining until the next allocation can be claimed. */
+export function get_time_until_prize(opts?: ApiRequestOptions): Promise<number> {
+  return apiCall(async () => {
+    const { data } = await apiGet(getAPIUrl('time/until_prize'), opts);
+    return data.TimeUntilPrize;
+  }, 0);
 }
 
 // lexicon-allow-end

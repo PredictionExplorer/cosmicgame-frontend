@@ -187,11 +187,13 @@ test('experimental UI submits a real gesture and receives the indexed chat messa
   await page.getByTestId('harness-persona-select').selectOption('Lyra');
   await page.getByRole('button', { name: 'Close harness panel' }).click();
 
-  const composer = page.getByTestId('composer-message-input');
+  // The page's own Gesture console (the phone sheet holds a second copy).
+  const gestureConsole = page.locator('#make-gesture');
+  const composer = gestureConsole.getByTestId('gesture-message-input');
   await expect(composer).toBeVisible({ timeout: 30_000 });
   const message = `Experimental UI roundtrip ${Date.now()}`;
   await composer.fill(message);
-  const submit = page.getByTestId('composer-gesture-submit');
+  const submit = gestureConsole.getByTestId('gesture-submit');
   await expect(submit).toBeVisible({ timeout: 30_000 });
   await submit.evaluate((element) => element.scrollIntoView({ block: 'center' }));
 
@@ -270,16 +272,19 @@ test('browser phase controls switch repeatedly and reflow inactive desktop state
   await expect(page.getByTestId('cycle-clock')).toHaveAttribute('data-phase', 'opening-soon', {
     timeout: 90_000,
   });
-  await expect(page.getByTestId('home-deck-header')).toContainText(`#${openingSoon.cycle.index}`, {
-    timeout: 90_000,
-  });
+  await expect(page.getByTestId('home-deck-header')).toContainText(
+    `Cycle ${openingSoon.cycle.index}`,
+    {
+      timeout: 90_000,
+    },
+  );
   await expect(page.getByTestId('control-desk-gesture')).toHaveCount(0);
   await expect(page.getByTestId('clock-finalize')).toHaveCount(0);
-  await expect(page.getByTestId('latest-participant-empty')).toBeVisible();
+  await expect(page.getByTestId('latest-participant-intel')).toHaveAttribute('data-empty', 'true');
 
   const [gridBox, latestBox] = await Promise.all([
     page.getByTestId('control-desk-grid').boundingBox(),
-    page.getByTestId('control-desk-latest').boundingBox(),
+    page.getByTestId('control-desk-standings').boundingBox(),
   ]);
   expect(gridBox).not.toBeNull();
   expect(latestBox).not.toBeNull();

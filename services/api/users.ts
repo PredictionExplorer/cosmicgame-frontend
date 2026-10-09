@@ -42,6 +42,18 @@ import type {
 } from './types';
 
 /**
+ * The anchored Cosmic Signature NFTs in a `user/info` payload. The API keys the
+ * anchored tokens by collection (`{ CST: [...], RWalk: [...] }`); an older
+ * payload sent the Cosmic Signature list alone.
+ */
+const anchoredCosmicSignatureTokens = (value: unknown): unknown =>
+  Array.isArray(value)
+    ? value
+    : value && typeof value === 'object'
+      ? (value as { CST?: unknown }).CST
+      : undefined;
+
+/**
  * Fetches comprehensive user profile including flattened gestures, allocations, tokens, anchoring,
  * and donation lists. Required read with strict validation of the `UserInfo` totals — a wallet
  * page that quietly renders zeros is worse than one that says the read failed.
@@ -60,7 +72,9 @@ export function get_user_info(
         Gestures: flattenGestureArray(data.Gestures ?? data.Bids ?? []),
         PrizeHistory: flattenTxArray(data.PrizeHistory || []),
         CosmicSignatureTokensOwned: flattenTxArray(data.CosmicSignatureTokensOwned || []),
-        CurrentlyStakedTokens: flattenTxArray(data.CurrentlyStakedTokens || []),
+        CurrentlyStakedTokens: flattenTxArray(
+          anchoredCosmicSignatureTokens(data.CurrentlyStakedTokens) ?? [],
+        ),
         DonatedNFTsClaimed: flattenTxArray(data.DonatedNFTsClaimed || []),
         DonatedTokensClaimed: flattenTxArray(data.DonatedTokensClaimed || []),
         ERC20Transfers: flattenTxArray(data.ERC20Transfers || []),
@@ -89,14 +103,39 @@ export function get_user_balance(
   }, null);
 }
 
-/** Fetches red-box notification data (unclaimed winnings) for a wallet address. */
+/** The notice of a wallet with nothing waiting: every figure a confident zero. */
+const EMPTY_RED_BOX: Readonly<NotifyRedBoxResult> = {
+  ETHRaffleToClaim: 0,
+  ETHRaffleToClaimWei: 0,
+  NumDonatedNFTToClaim: 0,
+  UnretrievedAnchorDistribution: 0,
+};
+
+/**
+ * Fetches red-box notification data (unretrieved allocations) for a wallet address. The wire
+ * names the unretrieved Anchor Distribution `UnclaimedStakingReward`; it is mapped onto the
+ * UI's `UnretrievedAnchorDistribution` here, since reading the UI name off the wire left the
+ * retrieval prompt permanently hidden. A new wallet's empty notice reads as zeros.
+ */
 export function notify_red_box(
   address: string,
   opts?: ApiRequestOptions,
 ): Promise<NotifyRedBoxResult | null> {
   return apiCall(async () => {
     const { data } = await apiGet(getAPIUrl(`user/notif_red_box/${address}`), opts);
-    return data.Winnings as NotifyRedBoxResult;
+    const raw: unknown = data?.Winnings;
+    // A wallet the indexer has not seen yet (a new visitor, `UserAid: 0`) is answered with
+    // `Winnings: []`: a successful read with nothing waiting, so it maps to zeros. Spreading the
+    // empty array left `UnretrievedAnchorDistribution` undefined, which pages read as a failed
+    // read. `null` stays reserved for a payload that carries no notice at all.
+    if (Array.isArray(raw)) return raw.length === 0 ? { ...EMPTY_RED_BOX } : null;
+    if (!raw || typeof raw !== 'object') return null;
+    const winnings = raw as Record<string, unknown>;
+    const unretrieved = winnings.UnretrievedAnchorDistribution ?? winnings.UnclaimedStakingReward;
+    return {
+      ...winnings,
+      UnretrievedAnchorDistribution: typeof unretrieved === 'number' ? unretrieved : undefined,
+    } as NotifyRedBoxResult;
   }, null);
 }
 
@@ -112,15 +151,28 @@ export function get_unique_bidders(opts?: ApiRequestOptions): Promise<Participan
   }, []);
 }
 
-/** Fetches the list of unique allocation-recipient addresses with win counts. */
+/**
+ * Maps a `statistics/unique/winners` row onto {@link Recipient}. The wire still names the
+ * allocation count `PrizesCount`; the UI reads `AllocationsCount`, and a row that already
+ * carries it keeps it (`RecipientSchema` accepts either). A missing count stays undefined
+ * so the table shows it as unknown instead of a blank cell.
+ */
+function toRecipient(row: Record<string, unknown>): Recipient {
+  const count = row.AllocationsCount ?? row.PrizesCount;
+  return {
+    ...row,
+    AllocationsCount: typeof count === 'number' && Number.isFinite(count) ? count : undefined,
+  } as Recipient;
+}
+
+/** Fetches the list of unique allocation-recipient addresses with allocation counts. */
 export function get_unique_winners(opts?: ApiRequestOptions): Promise<Recipient[]> {
   return apiCall(async () => {
     const { data } = await apiGet(getAPIUrl('statistics/unique/winners'), opts);
-    return safeValidateListSample(
-      RecipientSchema,
-      data.UniqueWinners,
-      'uniqueWinners',
-    ) as Recipient[];
+    const rows = safeValidateListSample(RecipientSchema, data.UniqueWinners, 'uniqueWinners');
+    return Array.isArray(rows)
+      ? rows.map((row) => toRecipient(row as Record<string, unknown>))
+      : [];
   }, []);
 }
 
@@ -219,6 +271,16 @@ export function get_unique_rwalk_stakers(
       data.UniqueStakersRWalk,
       'uniqueStakersRWalk',
     ) as UniqueAnchorHolderRWLK[];
+  }, []);
+}
+
+/** Fetches addresses that have staked both CST and RandomWalk tokens. */
+export function get_unique_both_stakers(
+  opts?: ApiRequestOptions,
+): Promise<UniqueAnchorHolderRWLK[]> {
+  return apiCall(async () => {
+    const { data } = await apiGet(getAPIUrl('statistics/unique/stakers/both'), opts);
+    return data.UniqueStakersBoth as UniqueAnchorHolderRWLK[];
   }, []);
 }
 

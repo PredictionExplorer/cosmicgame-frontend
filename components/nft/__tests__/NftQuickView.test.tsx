@@ -10,10 +10,22 @@ import { render, screen, checkA11y, fireEvent } from '@/test-utils';
 
 import { NftQuickView } from '../NftQuickView';
 
+let mockReducedMotion = false;
+jest.mock('@/hooks/usePrefersReducedMotion', () => ({
+  usePrefersReducedMotion: () => mockReducedMotion,
+}));
+
 jest.mock('next/image', () => ({
   __esModule: true,
   default: (props: Record<string, unknown>) => {
-    const { fill: _f, priority: _p, unoptimized: _u, ...rest } = props;
+    const {
+      fill: _f,
+      priority: _p,
+      unoptimized: _u,
+      loader: _l,
+      fetchPriority: _fp,
+      ...rest
+    } = props;
     return <img {...rest} />;
   },
 }));
@@ -37,6 +49,10 @@ const items = [
 ];
 
 describe('NftQuickView', () => {
+  beforeEach(() => {
+    mockReducedMotion = false;
+  });
+
   it('stays closed without a token', () => {
     render(
       <NftQuickView
@@ -50,7 +66,7 @@ describe('NftQuickView', () => {
     expect(screen.queryByTestId('nft-quick-view')).not.toBeInTheDocument();
   });
 
-  it('shows the artwork, badges, and trait sheet of the selected token', () => {
+  it('shows the artwork, the label and the trait sheet of the selected token', () => {
     render(
       <NftQuickView
         tokenId={1}
@@ -61,17 +77,48 @@ describe('NftQuickView', () => {
       />,
     );
     expect(screen.getByRole('heading', { name: 'NUMBA 1' })).toBeInTheDocument();
-    expect(screen.getByAltText('Cosmic Signature #000001 artwork')).toHaveAttribute(
-      'src',
-      expect.stringContaining('/0xa1/images/web/full.webp'),
+    // The alt text is composed from the traits, not a bare number.
+    const art = screen.getByAltText(
+      '“NUMBA 1”, Cosmic Signature #000001: Orbit Ribbons structure, Glacial Split palette, spectral class B',
+    );
+    expect(art).toHaveAttribute('src', expect.stringContaining('/0xa1/images/web/full.webp'));
+    // Nothing is layered over the art: the hue strip belongs to the trait sheet.
+    expect(screen.getByTestId('art-frame')).not.toContainElement(
+      screen.getAllByTestId('hue-strip')[0]!,
     );
     expect(screen.getAllByTestId('spectral-class-badge')[0]).toHaveTextContent('Class B');
-    expect(screen.getByTestId('rarity-rank-chip')).toBeInTheDocument();
+    // A named Signature's label carries its number and its rank as caption facts, not chips.
+    expect(screen.getByText('#000001')).toHaveClass('tabular-nums');
+    expect(screen.getByTestId('quick-view-rank')).toHaveTextContent(
+      `Rank 1 of ${collectionTraits.rarity.total}`,
+    );
+    expect(screen.queryByTestId('rarity-rank-chip')).not.toBeInTheDocument();
     expect(screen.getByTestId('trait-sheet')).toBeInTheDocument();
     expect(screen.getByRole('link', { name: /Open full page/ })).toHaveAttribute(
       'href',
       '/detail/1',
     );
+  });
+
+  it('sets the title in the 24px display tier, free of the dialog title defaults', () => {
+    render(
+      <NftQuickView
+        tokenId={1}
+        items={items}
+        onOpenChange={jest.fn()}
+        onNavigate={jest.fn()}
+        collectionTraits={collectionTraits}
+      />,
+    );
+    const title = screen.getByRole('heading', { name: 'NUMBA 1' });
+    // type-heading-2 is Clash at 24px and the display weight. tailwind-merge
+    // does not know the type-* utilities, so any size, weight, leading or
+    // tracking utility beside it would win in the cascade (18px bold).
+    expect(title).toHaveClass('type-heading-2');
+    expect(title.className).not.toMatch(
+      /\b(text-(xs|sm|base|lg|xl)|font-(semibold|bold)|leading-|tracking-)/,
+    );
+    expect(screen.getByRole('dialog')).toHaveAccessibleName('NUMBA 1');
   });
 
   it('navigates with the arrow keys and buttons within the visible items', () => {
@@ -92,6 +139,60 @@ describe('NftQuickView', () => {
     expect(onNavigate).toHaveBeenLastCalledWith(43);
     fireEvent.click(screen.getByRole('button', { name: 'Next Signature' }));
     expect(onNavigate).toHaveBeenLastCalledWith(43);
+  });
+
+  it('leaves the arrow keys to the sweep video while it has focus', () => {
+    const onNavigate = jest.fn();
+    render(
+      <NftQuickView
+        tokenId={7}
+        items={items}
+        onOpenChange={jest.fn()}
+        onNavigate={onNavigate}
+        collectionTraits={collectionTraits}
+      />,
+    );
+    fireEvent.click(screen.getByRole('button', { name: /Play spectral sweep/ }));
+    const video = screen.getByTestId('spectral-sweep-video');
+    fireEvent.keyDown(video, { key: 'ArrowLeft' });
+    fireEvent.keyDown(video, { key: 'ArrowRight' });
+    expect(onNavigate).not.toHaveBeenCalled();
+  });
+
+  it('plays the sweep on request, but waits for Play under reduced motion', () => {
+    const view = (
+      <NftQuickView
+        tokenId={1}
+        items={items}
+        onOpenChange={jest.fn()}
+        onNavigate={jest.fn()}
+        collectionTraits={collectionTraits}
+      />
+    );
+    const { unmount } = render(view);
+    fireEvent.click(screen.getByRole('button', { name: /Play spectral sweep/ }));
+    expect(screen.getByTestId('spectral-sweep-video')).toHaveAttribute('autoplay');
+    unmount();
+
+    mockReducedMotion = true;
+    render(view);
+    fireEvent.click(screen.getByRole('button', { name: /Play spectral sweep/ }));
+    expect(screen.getByTestId('spectral-sweep-video')).not.toHaveAttribute('autoplay');
+  });
+
+  it('names an unnamed Signature by its number once, and tags an anchored one', () => {
+    render(
+      <NftQuickView
+        tokenId={7}
+        items={[{ TokenId: 7, Seed: 'a7', TokenName: '', Staked: true }]}
+        onOpenChange={jest.fn()}
+        onNavigate={jest.fn()}
+        collectionTraits={collectionTraits}
+      />,
+    );
+    expect(screen.getByRole('heading', { name: 'Cosmic Signature #000007' })).toBeInTheDocument();
+    expect(screen.getAllByText(/#000007/)).toHaveLength(1);
+    expect(screen.getByText('Anchored')).toBeInTheDocument();
   });
 
   it('disables previous at the start of the list', () => {

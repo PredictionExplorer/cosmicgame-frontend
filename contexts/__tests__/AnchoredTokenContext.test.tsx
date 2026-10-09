@@ -45,6 +45,16 @@ describe('AnchoredTokenContext', () => {
     expect(result.current.rwlktokens).toEqual([]);
   });
 
+  it('hands out the same empty lists on every render while a read has no data', () => {
+    // Regression: a fresh [] per render re-ran effects keyed on the list (My Anchors'
+    // wallet read) after every state update when the anchored-NFT read failed.
+    const { result, rerender } = renderHook(() => useAnchoredToken(), { wrapper });
+    const first = result.current;
+    rerender();
+    expect(result.current.cstokens).toBe(first.cstokens);
+    expect(result.current.rwlktokens).toBe(first.rwlktokens);
+  });
+
   it('provides CST token data from the hook', () => {
     const cstData = [{ StakeActionId: 1, StakedTokenId: 10, StakeTimeStamp: 100 }];
     mockUseAnchoredCSTokensByUser.mockReturnValue({ data: cstData, refetch: mockRefetchCST });
@@ -142,12 +152,36 @@ describe('AnchoredTokenContext', () => {
   it('context value has the expected properties', () => {
     const { result } = renderHook(() => useAnchoredToken(), { wrapper });
     const keys = Object.keys(result.current);
-    expect(keys).toHaveLength(5);
+    expect(keys).toHaveLength(7);
     expect(keys).toContain('cstokens');
     expect(keys).toContain('rwlktokens');
     expect(keys).toContain('fetchData');
     expect(keys).toContain('error');
     expect(keys).toContain('isLoading');
+    expect(keys).toContain('cstFailed');
+    expect(keys).toContain('rwlkFailed');
+  });
+
+  it('marks a collection whose list could not be read, so its empty array is not "none"', () => {
+    mockUseAnchoredCSTokensByUser.mockReturnValue({
+      data: undefined,
+      error: new Error('Network response was not OK'),
+      refetch: mockRefetchCST,
+    });
+    const { result } = renderHook(() => useAnchoredToken(), { wrapper });
+    expect(result.current.cstFailed).toBe(true);
+    expect(result.current.rwlkFailed).toBe(false);
+    expect(result.current.cstokens).toEqual([]);
+  });
+
+  it('keeps a list whose background refresh failed', () => {
+    mockUseAnchoredCSTokensByUser.mockReturnValue({
+      data: [{ StakeActionId: 1, StakedTokenId: 10, StakeTimeStamp: 100 }],
+      error: new Error('Network response was not OK'),
+      refetch: mockRefetchCST,
+    });
+    const { result } = renderHook(() => useAnchoredToken(), { wrapper });
+    expect(result.current.cstFailed).toBe(false);
   });
 
   it('fetchData is a stable reference across re-renders', () => {

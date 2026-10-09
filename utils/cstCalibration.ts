@@ -47,9 +47,23 @@ const EMPTY: CstCalibrationTimeline = {
   currentSeconds: 0,
 };
 
+/**
+ * Upper bound for a plausible Calibration Window (one year). V3 `BidPlaced`
+ * events repurpose the V2 duration field for the CST price decline multiplier
+ * (an 18-decimal fixed-point value around 1.7e16), so a raw read of a V3
+ * gesture would otherwise chart a ~half-billion-year window. Values beyond
+ * this cap are treated like the legacy -1: no window recorded.
+ */
+const MAX_WINDOW_SECONDS = 31_536_000;
+
 function windowSecondsOf(entry: GestureEntry): number | null {
   const value = entry.CstDutchAuctionDurationInt;
-  return typeof value === 'number' && Number.isFinite(value) && value >= 0 ? value : null;
+  return typeof value === 'number' &&
+    Number.isFinite(value) &&
+    value >= 0 &&
+    value <= MAX_WINDOW_SECONDS
+    ? value
+    : null;
 }
 
 /**

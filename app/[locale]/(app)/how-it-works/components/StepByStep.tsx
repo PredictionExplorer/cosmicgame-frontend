@@ -1,87 +1,64 @@
-'use client';
-
-import { motion } from 'framer-motion';
-import { Wallet, Search, MousePointerClick } from 'lucide-react';
+import { ArrowRight } from 'lucide-react';
 
 import type { HowItWorksContent } from '@/content/how-it-works';
 
-import { GradientText } from '@/components/styled';
-import { InfoTooltip } from '@/components/ui/info-tooltip';
+import { Link } from '@/i18n/navigation';
+import { SectionHeader } from '@/components/ui/section-header';
+import { Steps } from '@/components/ui/steps';
 
-const containerVariants = {
-  hidden: {},
-  visible: { transition: { staggerChildren: 0.2 } },
-};
-
-const itemVariants = {
-  hidden: { opacity: 0, y: 24 },
-  visible: { opacity: 1, y: 0, transition: { duration: 0.5, ease: 'easeOut' as const } },
-};
-
+/**
+ * Getting started: three steps as a vertical stepper (a numbered node on a
+ * rail beside each short checklist), with the section's header and the way
+ * to get ETH on Arbitrum in the left column from `lg`. Every instruction is
+ * in the open; nothing hides behind the step titles.
+ */
 export function StepByStep({ stepByStep }: { stepByStep: HowItWorksContent['stepByStep'] }) {
-  const steps = [
-    { Icon: Wallet, ...stepByStep.steps[0] },
-    { Icon: Search, ...stepByStep.steps[1] },
-    { Icon: MousePointerClick, ...stepByStep.steps[2] },
-  ];
-
   return (
-    <section aria-labelledby="steps-heading" className="py-16">
-      <div className="mb-10 text-center">
-        <h2
-          id="steps-heading"
-          className="font-display text-2xl font-bold tracking-tight sm:text-3xl"
-        >
-          {stepByStep.heading}
-        </h2>
-        <p className="mt-2 text-sm text-muted-foreground">{stepByStep.subhead}</p>
-      </div>
-
-      <motion.div
-        variants={containerVariants}
-        initial="hidden"
-        whileInView="visible"
-        viewport={{ once: true, margin: '-60px' }}
-        className="space-y-8"
+    <section
+      aria-labelledby="steps-heading"
+      className="lg:grid lg:grid-cols-12 lg:grid-rows-[auto_1fr] lg:gap-x-12"
+    >
+      <SectionHeader
+        headingId="steps-heading"
+        title={stepByStep.heading}
+        description={stepByStep.subhead}
+        className="lg:col-span-4"
+      />
+      <Steps
+        layout="timeline"
+        className="lg:col-span-8 lg:row-span-2 lg:pt-1"
+        stepLabel={(n) => stepByStep.stepLabel.replace('{n}', String(n))}
+        items={stepByStep.steps.map((step) => ({
+          id: step.title,
+          title: step.title,
+          body: (
+            // Step copy at body size, as the stages and tips on this page (V233).
+            <ul className="flex max-w-[var(--measure-lede)] flex-col gap-2.5 type-body-md">
+              {step.highlights.map((highlight) => (
+                <li key={highlight} className="flex items-baseline gap-2.5">
+                  <span
+                    aria-hidden
+                    className="size-1 shrink-0 translate-y-[-0.2em] rounded-pill bg-subtle"
+                  />
+                  <span className="min-w-0">{highlight}</span>
+                </li>
+              ))}
+            </ul>
+          ),
+        }))}
+      />
+      <p
+        data-testid="funding-help"
+        className="mt-8 border-t border-rule pt-4 type-body-md text-muted-foreground lg:col-span-4 lg:row-start-2 lg:mt-0 lg:self-start"
       >
-        {steps.map((step, i) => (
-          <motion.div
-            key={step.title}
-            variants={itemVariants}
-            className="gradient-border-card rounded-xl bg-white/[0.02] p-6 sm:p-8"
-          >
-            <div className="flex items-start gap-5">
-              <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-primary/20 to-accent/20 sm:h-14 sm:w-14">
-                <step.Icon className="h-5 w-5 text-primary sm:h-6 sm:w-6" />
-              </div>
-
-              <div className="flex-1">
-                <div className="flex items-center gap-2">
-                  <GradientText className="text-xs font-bold tracking-widest">
-                    {stepByStep.stepLabel} {String(i + 1).padStart(2, '0')}
-                  </GradientText>
-                </div>
-                <div className="mt-1 flex items-center gap-2">
-                  <h3 className="font-display text-lg font-bold sm:text-xl">{step.title}</h3>
-                  <InfoTooltip content={step.tooltip} />
-                </div>
-
-                <ul className="mt-4 space-y-2.5">
-                  {step.highlights.map((highlight) => (
-                    <li
-                      key={highlight}
-                      className="flex items-start gap-2.5 text-sm text-muted-foreground"
-                    >
-                      <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-primary/50" />
-                      {highlight}
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            </div>
-          </motion.div>
-        ))}
-      </motion.div>
+        {stepByStep.funding.text}{' '}
+        {/* Inline, so a long label (Korean, Ukrainian) wraps with the sentence at 320px
+            instead of running past the column; the arrow follows its last word. */}
+        <Link href={stepByStep.funding.link.href} className="link">
+          {stepByStep.funding.link.label}
+          <ArrowRight aria-hidden className="ms-1.5 inline-block size-3.5 align-middle" />
+        </Link>
+      </p>
     </section>
   );
 }

@@ -1,5 +1,6 @@
 import { expect, test, type Page } from '@playwright/test';
 
+import { waitForStableLayout } from './mobile-audit-helpers';
 import { dismissOpenTooltips, expectTooltipFullyVisible, openTooltip } from './tooltip-helpers';
 
 const ADDRESS = '0x1111111111111111111111111111111111111111';
@@ -70,6 +71,10 @@ const dashboard = {
 };
 
 async function mockSprint5Api(page: Page): Promise<void> {
+  // Keep capability probes inside this synthetic legacy backend as well.
+  await page.route('**/api/v2/cosmicgame/**', (route) =>
+    route.fulfill({ status: 404, json: { error: 'V2 API unavailable in legacy fixture' } }),
+  );
   await page.route('**/api/cosmicgame/**', async (route) => {
     const path = new URL(route.request().url()).pathname;
 
@@ -217,6 +222,10 @@ async function openZhRoute(page: Page, path: string, title?: string): Promise<vo
 }
 
 test.describe('zh Sprint 5 — statistics, tables, and formatting', () => {
+  // A reader in China: every record is dated in UTC all the same (the reader's own
+  // time is on hover), so the zone is pinned to prove nothing follows it.
+  test.use({ timezoneId: 'Asia/Shanghai' });
+
   test.beforeEach(async ({ page }) => {
     await mockSprint5Api(page);
     await page.emulateMedia({ reducedMotion: 'reduce' });
@@ -224,43 +233,29 @@ test.describe('zh Sprint 5 — statistics, tables, and formatting', () => {
 
   test('renders every Sprint 5 route in Chinese', async ({ page }) => {
     const routes: Array<[string, string, string | undefined]> = [
-      [
-        '/zh/statistics',
-        'Cosmic Signature 协议统计',
-        'Cosmic Signature 统计 · 演绎周期、落笔、NFT 与 CST',
-      ],
+      ['/zh/statistics', '协议统计', '统计：演绎周期、落笔、NFT 与 CST · Cosmic Signature'],
       ['/zh/statistics/activity', '落笔活动统计', '落笔活动统计 · Cosmic Signature'],
       ['/zh/statistics/anchoring', '锚定统计', '锚定统计 · Cosmic Signature'],
       ['/zh/statistics/participation', '参与统计', '参与统计 · Cosmic Signature'],
-      ['/zh/statistics/performance', '参与者表现统计', '参与者表现统计 · Cosmic Signature'],
+      ['/zh/statistics/performance', '参与者结果', '参与者结果 · Cosmic Signature'],
       ['/zh/statistics/tokens', '代币分布统计', '代币分布统计 · Cosmic Signature'],
       ['/zh/recipient-history', '我的分配历史', '我的分配历史 · Cosmic Signature'],
-      [
-        '/zh/named-nfts',
-        '已命名 Cosmic Signature NFT',
-        '已命名 Cosmic Signature NFT · Cosmic Signature',
-      ],
+      ['/zh/named-nfts', '已命名 Cosmic Signature NFT', '已命名 NFT · Cosmic Signature'],
       ['/zh/attached-nfts', '已附加 NFT 贡献', '已附加 NFT 贡献 · Cosmic Signature'],
       [
         '/zh/used-rwlk-nfts',
         '已使用的 Random Walk NFT',
         '已使用的 Random Walk NFT · Cosmic Signature',
       ],
-      [`/zh/user/${ADDRESS}`, '参与者统计', undefined],
-      [
-        `/zh/user/stellar-selection-eth/${ADDRESS}`,
-        '此参与者获配的星选 ETH',
-        '星选 ETH · Cosmic Signature',
-      ],
-      [
-        `/zh/user/stellar-selection-nft/${ADDRESS}`,
-        '此参与者获配的星选 NFT',
-        '星选 NFT · Cosmic Signature',
-      ],
+      [`/zh/user/${ADDRESS}`, '落笔花费', undefined],
+      // The record pages name their track in the H1 ("星选 · ETH"); the participant is the trail.
+      [`/zh/user/stellar-selection-eth/${ADDRESS}`, '星选 · ETH', '星选 ETH · Cosmic Signature'],
+      [`/zh/user/stellar-selection-nft/${ADDRESS}`, '星选 · NFT', '星选 NFT · Cosmic Signature'],
       [
         `/zh/system-event/${CYCLE}/100/200`,
-        `第 ${CYCLE} 个周期前的系统配置`,
-        '系统事件 · Cosmic Signature',
+        `第 ${CYCLE} 个周期前的协调变更`,
+        // The tab names the window by its cycle, as the H1 does.
+        `第 ${CYCLE} 个周期前的协调变更 · Cosmic Signature`,
       ],
     ];
 
@@ -273,28 +268,46 @@ test.describe('zh Sprint 5 — statistics, tables, and formatting', () => {
   test('localizes statistics tooltips, dates, chart axes, and system-event copy', async ({
     page,
   }) => {
-    await openZhRoute(page, '/zh/statistics', 'Cosmic Signature 统计 · 演绎周期、落笔、NFT 与 CST');
-    const label = page.getByText('周期总数', { exact: true }).first();
-    const tooltipTrigger = label
-      .locator('xpath=ancestor::*[.//button][1]')
-      .locator('button')
-      .first();
+    await openZhRoute(
+      page,
+      '/zh/statistics',
+      '统计：演绎周期、落笔、NFT 与 CST · Cosmic Signature',
+    );
+    // The figure's explanation is a client island: a hover that lands before it hydrates
+    // opens nothing, so the page settles first (it used to be torn down and rebuilt by a
+    // hydration mismatch, which detached the trigger instead).
+    await waitForStableLayout(page);
+    // The header figure's explanation is named after its label.
+    const tooltipTrigger = page.getByRole('button', { name: '查看“当前演绎周期”的更多信息' });
     await tooltipTrigger.scrollIntoViewIfNeeded();
     await openTooltip(tooltipTrigger);
-    await expectTooltipFullyVisible(page, /协议上线以来/);
+    await expectTooltipFullyVisible(page, /当前索引的演绎周期编号/);
     await dismissOpenTooltips(page);
-
-    await openZhRoute(page, '/zh/named-nfts', '已命名 Cosmic Signature NFT · Cosmic Signature');
-    await expect(page.getByText(/1月1日 \d{2}:34/, { exact: true })).toBeVisible();
+    // The cycle's opening, in the zh calendar style and in UTC with the zone named
+    // inline, the same for a reader in Shanghai as on the server (it once flipped to
+    // UTC+8 after hydration); the year shows only outside the current one. (The named
+    // NFTs page this used to check is a gallery of plates now, with no dates.)
+    await expect(page.getByText(/^(2026年)?1月1日 11:34 UTC$/)).toBeVisible();
 
     await openZhRoute(page, '/zh/statistics/tokens', '代币分布统计 · Cosmic Signature');
-    await expect(page.getByRole('button', { name: '开始日期' })).toContainText('2026/1/1');
-    await expect(page.getByText('2026/1/1', { exact: true }).first()).toBeVisible();
+    // The supply readout dates its figure in the zh calendar style, under the figure.
+    const supply = page
+      .getByRole('term')
+      .filter({ hasText: /^总供应量$/ })
+      .first();
+    await expect(supply.locator('xpath=following-sibling::dd[1]')).toHaveText(/^1,000\sCST$/);
+    await expect(supply.locator('xpath=following-sibling::dd[2]')).toHaveText('2026年1月1日');
 
-    await openZhRoute(page, `/zh/system-event/${CYCLE}/100/200`, '系统事件 · Cosmic Signature');
-    const eventTooltipTrigger = page.getByRole('button', {
-      name: '说明“公共物品比例已变更”事件',
-    });
+    await openZhRoute(
+      page,
+      `/zh/system-event/${CYCLE}/100/200`,
+      `第 ${CYCLE} 个周期前的协调变更 · Cosmic Signature`,
+    );
+    // The event's name explains itself in place (no ⓘ per row): the name is the trigger.
+    const eventTooltipTrigger = page
+      .getByRole('main')
+      .getByRole('button', { name: '公共物品比例已变更', exact: true })
+      .first();
     await openTooltip(eventTooltipTrigger);
     await expectTooltipFullyVisible(page, /分配至公共物品金库的资金比例已变更/);
   });

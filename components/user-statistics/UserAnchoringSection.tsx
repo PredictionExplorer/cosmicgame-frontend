@@ -1,235 +1,216 @@
-import { Lock, Unlock, Coins, Gift, Layers } from 'lucide-react';
-import { useLocale, useTranslations } from 'next-intl';
+'use client';
 
-import { formatEthValue } from '@/utils';
+import { useId, useMemo, type ReactNode } from 'react';
+import { useTranslations } from 'next-intl';
 
+import { AnchoringIcon } from '@/lib/conceptIcons';
+import { useFormat } from '@/hooks/useFormat';
 import type { AnchorAction, AnchorDistributionImprint } from '@/services/api';
+import { Amount } from '@/components/ui/amount';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { StatCard } from '@/components/ui/stat-card';
 import { EmptyState } from '@/components/ui/empty-state';
+import { FigureStrip } from '@/components/statistics/FigureStrip';
 import AnchorActionsTable from '@/components/anchoring/AnchorActionsTable';
-import { AnchorDistributionsTable } from '@/components/anchoring/AnchorDistributionsTable';
-import { CSTAnchorDistributionsByDepositTable } from '@/components/anchoring/CSTAnchorDistributionsByDepositTable';
-import { RetrievedCSTAnchorDistributionsTable } from '@/components/anchoring/RetrievedCSTAnchorDistributionsTable';
-import { UnretrievedCSTAnchorDistributionsTable } from '@/components/anchoring/UnretrievedCSTAnchorDistributionsTable';
 import { RwalkAnchorDistributionImprintsTable } from '@/components/anchoring/RwalkAnchorDistributionImprintsTable';
-import type { CSTAnchorDistributionByDeposit } from '@/components/anchoring/CSTAnchorDistributionsByDepositTable';
 
-import type { UserProfileInfo } from './UserStatsSection';
+import { AnchorDistributionsLedger } from './AnchorDistributionsLedger';
+import { anchoredNftDistributions } from './anchorLedger';
+import type { UserProfileInfo } from './types';
 
-interface AnchorDistributionRow {
+export interface AnchorDistributionRow {
   TokenId: number;
   RewardCollectedEth?: number;
   RewardToCollectEth?: number;
   [key: string]: unknown;
 }
 
+/** Rows of the anchor and release history before it pages. */
+const HISTORY_PAGE_SIZE = 10;
+
 /** Props for the user anchoring section. */
 export interface UserAnchoringSectionProps {
   address: string;
-  userInfo: UserProfileInfo;
+  /** The profile record, or null for an address without one (its Random Walk totals read as none). */
+  userInfo: UserProfileInfo | null;
+  /** The connected wallet's own profile: the ledger offers "Release all and retrieve". */
+  canRelease: boolean;
   cstAnchorActions: AnchorAction[];
   rwlkAnchorActions: AnchorAction[];
+  /** Anchor Distributions per anchored Cosmic Signature NFT. */
   cstAnchorDistributions: AnchorDistributionRow[];
-  cstAnchorDistributionsByDeposit: CSTAnchorDistributionByDeposit[];
-  retrievedCstAnchorDistributions: import('@/services/api/types').CSTAnchorDistribution[];
+  /** The same distributions per deposit, each naming the anchors it paid. */
+  cstAnchorDistributionsByDeposit: readonly unknown[];
+  /** Seeds of the Signatures the page already read (held and anchored), for the plates. */
+  seeds: ReadonlyMap<number, string>;
   rwlkImprints: AnchorDistributionImprint[];
 }
 
-/** Anchoring statistics section with Cosmic Signature NFT and RWLK tabs, stat cards, and tables. */
+/** One titled ledger inside a tab: an H3 over its table. */
+function Ledger({ title, children }: { title: string; children: ReactNode }) {
+  const id = useId();
+  return (
+    <section aria-labelledby={id} className="min-w-0">
+      <h3 id={id} className="mb-4 type-heading-3 text-foreground">
+        {title}
+      </h3>
+      {children}
+    </section>
+  );
+}
+
+/**
+ * A participant's anchoring, one underline tab per NFT kind. The Cosmic
+ * Signature tab is a figure strip (anchor and release actions, Anchor
+ * Distributions, what is left to retrieve), one ledger with a row per
+ * anchored NFT that opens onto the deposits it shared in, and the anchor and
+ * release history below it: each figure once, never the same amount again
+ * per deposit. Copy names "this address", so the section reads right on
+ * anyone's profile.
+ */
 export function UserAnchoringSection({
   address,
   userInfo,
+  canRelease,
   cstAnchorActions,
   rwlkAnchorActions,
   cstAnchorDistributions,
   cstAnchorDistributionsByDeposit,
-  retrievedCstAnchorDistributions,
+  seeds,
   rwlkImprints,
 }: UserAnchoringSectionProps) {
   const t = useTranslations('myPages');
-  const locale = useLocale();
-  const totalAnchorActions = cstAnchorActions.filter((a) => a.ActionType !== 1).length;
-  const totalReleaseActions = cstAnchorActions.filter((a) => a.ActionType === 1).length;
-  const totalRewardEth = cstAnchorDistributions.reduce(
-    (sum, r) => sum + (r.RewardCollectedEth ?? 0) + (r.RewardToCollectEth ?? 0),
-    0,
+  const format = useFormat();
+  const s = (key: string) => t(`statistics.anchoring.${key}`);
+
+  const ledger = useMemo(
+    () =>
+      anchoredNftDistributions(
+        cstAnchorDistributions,
+        cstAnchorDistributionsByDeposit,
+        cstAnchorActions,
+      ),
+    [cstAnchorDistributions, cstAnchorDistributionsByDeposit, cstAnchorActions],
   );
-  const unclaimedRewardEth = cstAnchorDistributions.reduce(
-    (sum, r) => sum + (r.RewardToCollectEth ?? 0),
-    0,
-  );
+  const anchorCount = cstAnchorActions.filter((a) => a.ActionType !== 1).length;
+  const releaseCount = cstAnchorActions.filter((a) => a.ActionType === 1).length;
+  const retrievedEth = ledger.reduce((sum, row) => sum + row.retrievedEth, 0);
+  const unretrievedEth = ledger.reduce((sum, row) => sum + row.toRetrieveEth, 0);
 
   const rwlkStats = userInfo?.StakingStatisticsRWalk;
-  const hasCSTActivity = cstAnchorActions.length > 0 || cstAnchorDistributions.length > 0;
-  const hasRWLKActivity =
+  const hasCstActivity = cstAnchorActions.length > 0 || ledger.length > 0;
+  const hasRwlkActivity =
     (rwlkStats?.TotalNumStakeActions ?? 0) > 0 || rwlkAnchorActions.length > 0;
 
   return (
     <div data-testid="user-anchoring-section">
       <Tabs defaultValue="cst" className="w-full">
-        <TabsList className="w-full grid grid-cols-2 h-auto bg-transparent border-b border-border rounded-none p-0">
-          <TabsTrigger
-            value="cst"
-            className="flex-1 h-auto py-3 rounded-none data-[state=active]:bg-white/5 data-[state=active]:shadow-none"
-          >
-            <div className="flex items-center">
-              <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl border border-primary/20 bg-primary/10 text-primary">
-                <Layers className="h-5 w-5" />
-              </span>
-              <span className="text-lg whitespace-nowrap normal-case ml-4">
-                {t('statistics.anchoring.tabs.cosmicSignature')}
-              </span>
-            </div>
-          </TabsTrigger>
-          <TabsTrigger
-            value="rwlk"
-            className="flex-1 h-auto py-3 rounded-none data-[state=active]:bg-white/5 data-[state=active]:shadow-none"
-          >
-            <div className="flex items-center">
-              <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl border border-[rgb(var(--nebula-violet-rgb)/0.28)] bg-[rgb(var(--nebula-violet-rgb)/0.12)] text-[rgb(var(--nebula-violet-rgb))]">
-                <Layers className="h-5 w-5" />
-              </span>
-              <span className="text-lg whitespace-nowrap normal-case ml-4">
-                {t('statistics.anchoring.tabs.randomWalk')}
-              </span>
-            </div>
-          </TabsTrigger>
+        <TabsList variant="underline" scroll className="min-w-full" aria-label={s('tabs.label')}>
+          <TabsTrigger value="cst">{s('tabs.cosmicSignature')}</TabsTrigger>
+          <TabsTrigger value="rwlk">{s('tabs.randomWalk')}</TabsTrigger>
         </TabsList>
 
-        <TabsContent value="cst" className="pt-6">
-          {!hasCSTActivity ? (
+        <TabsContent value="cst" className="mt-8">
+          {!hasCstActivity ? (
             <EmptyState
-              icon={<Layers className="h-8 w-8 text-muted-foreground/50" />}
-              title={t('statistics.anchoring.empty.cosmicSignatureTitle')}
-              description={t('statistics.anchoring.empty.cosmicSignatureDescription')}
+              headingLevel={3}
+              icon={<AnchoringIcon className="size-6" />}
+              title={s('empty.cosmicSignatureTitle')}
+              description={s('empty.cosmicSignatureDescription')}
             />
           ) : (
-            <>
-              <div className="grid grid-cols-2 lg:grid-cols-5 gap-3 mb-8">
-                <StatCard
-                  label={t('statistics.anchoring.stats.anchorActions.label')}
-                  value={totalAnchorActions.toLocaleString(locale)}
-                  icon={<Lock className="h-3.5 w-3.5" />}
-                  tooltip={t('statistics.anchoring.stats.anchorActions.cosmicSignatureTooltip')}
+            <div className="space-y-12">
+              <FigureStrip
+                figures={[
+                  {
+                    id: 'anchors',
+                    label: s('stats.anchorActions'),
+                    value: format.count(anchorCount),
+                  },
+                  {
+                    id: 'releases',
+                    label: s('stats.releaseActions'),
+                    value: format.count(releaseCount),
+                  },
+                  {
+                    id: 'distributions',
+                    label: s('stats.totalDistributions'),
+                    value: <Amount value={retrievedEth + unretrievedEth} unit="ETH" />,
+                    caption: t('statistics.anchoring.stats.acrossNfts', { count: ledger.length }),
+                  },
+                  {
+                    id: 'unretrieved',
+                    label: s('stats.unretrievedDistributions'),
+                    value: <Amount value={unretrievedEth} unit="ETH" />,
+                  },
+                ]}
+              />
+              <Ledger title={s('sections.distributionsByToken')}>
+                <AnchorDistributionsLedger
+                  address={address}
+                  rows={ledger}
+                  deposits={cstAnchorDistributionsByDeposit}
+                  seeds={seeds}
+                  canRelease={canRelease}
                 />
-                <StatCard
-                  label={t('statistics.anchoring.stats.releaseActions.label')}
-                  value={totalReleaseActions.toLocaleString(locale)}
-                  icon={<Unlock className="h-3.5 w-3.5" />}
-                  tooltip={t('statistics.anchoring.stats.releaseActions.cosmicSignatureTooltip')}
+              </Ledger>
+              <Ledger title={s('sections.actions')}>
+                <AnchorActionsTable
+                  list={cstAnchorActions}
+                  IsRwalk={false}
+                  headingLevel={4}
+                  pageSize={HISTORY_PAGE_SIZE}
                 />
-                <StatCard
-                  label={t('statistics.anchoring.stats.nftsWithDistributions.label')}
-                  value={cstAnchorDistributions.length.toLocaleString(locale)}
-                  icon={<Layers className="h-3.5 w-3.5" />}
-                  tooltip={t('statistics.anchoring.stats.nftsWithDistributions.tooltip')}
-                />
-                <StatCard
-                  label={t('statistics.anchoring.stats.totalDistributions.label')}
-                  value={formatEthValue(totalRewardEth)}
-                  icon={<Coins className="h-3.5 w-3.5" />}
-                  tooltip={t('statistics.anchoring.stats.totalDistributions.tooltip')}
-                  featured
-                />
-                <StatCard
-                  label={t('statistics.anchoring.stats.unretrievedDistributions.label')}
-                  value={formatEthValue(unclaimedRewardEth)}
-                  icon={<Gift className="h-3.5 w-3.5" />}
-                  tooltip={t('statistics.anchoring.stats.unretrievedDistributions.tooltip')}
-                  featured={unclaimedRewardEth > 0}
-                  gradient={unclaimedRewardEth > 0}
-                />
-              </div>
-
-              <div className="space-y-8">
-                <div>
-                  <h6 className="text-sm font-medium uppercase tracking-wider text-muted-foreground mb-4">
-                    {t('statistics.anchoring.sections.actions')}
-                  </h6>
-                  <AnchorActionsTable list={cstAnchorActions} IsRwalk={false} />
-                </div>
-                <div>
-                  <h6 className="text-sm font-medium uppercase tracking-wider text-muted-foreground mb-4">
-                    {t('statistics.anchoring.sections.distributionsByToken')}
-                  </h6>
-                  <AnchorDistributionsTable list={cstAnchorDistributions} address={address} />
-                </div>
-                <div>
-                  <h6 className="text-sm font-medium uppercase tracking-wider text-muted-foreground mb-4">
-                    {t('statistics.anchoring.sections.distributionsByDeposit')}
-                  </h6>
-                  <CSTAnchorDistributionsByDepositTable list={cstAnchorDistributionsByDeposit} />
-                </div>
-                <div>
-                  <h6 className="text-sm font-medium uppercase tracking-wider text-muted-foreground mb-4">
-                    {t('statistics.anchoring.sections.retrievedDistributions')}
-                  </h6>
-                  <RetrievedCSTAnchorDistributionsTable list={retrievedCstAnchorDistributions} />
-                </div>
-                <div>
-                  <h6 className="text-sm font-medium uppercase tracking-wider text-muted-foreground mb-4">
-                    {t('statistics.anchoring.sections.unretrievedDistributions')}
-                  </h6>
-                  <UnretrievedCSTAnchorDistributionsTable user={address} />
-                </div>
-              </div>
-            </>
+              </Ledger>
+            </div>
           )}
         </TabsContent>
 
-        <TabsContent value="rwlk" className="pt-6">
-          {!hasRWLKActivity ? (
+        <TabsContent value="rwlk" className="mt-8">
+          {!hasRwlkActivity ? (
             <EmptyState
-              icon={<Layers className="h-8 w-8 text-muted-foreground/50" />}
-              title={t('statistics.anchoring.empty.randomWalkTitle')}
-              description={t('statistics.anchoring.empty.randomWalkDescription')}
+              headingLevel={3}
+              icon={<AnchoringIcon className="size-6" />}
+              title={s('empty.randomWalkTitle')}
+              description={s('empty.randomWalkDescription')}
             />
           ) : (
-            <>
-              <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 mb-8">
-                <StatCard
-                  label={t('statistics.anchoring.stats.anchorActions.label')}
-                  value={(rwlkStats?.TotalNumStakeActions ?? 0).toLocaleString(locale)}
-                  icon={<Lock className="h-3.5 w-3.5" />}
-                  tooltip={t('statistics.anchoring.stats.anchorActions.randomWalkTooltip')}
+            <div className="space-y-12">
+              <FigureStrip
+                figures={[
+                  {
+                    id: 'anchors',
+                    label: s('stats.anchorActions'),
+                    value: format.count(rwlkStats?.TotalNumStakeActions ?? 0),
+                  },
+                  {
+                    id: 'releases',
+                    label: s('stats.releaseActions'),
+                    value: format.count(rwlkStats?.TotalNumUnstakeActions ?? 0),
+                  },
+                  {
+                    id: 'anchored',
+                    label: s('stats.nftsAnchored'),
+                    value: format.count(rwlkStats?.TotalTokensStaked ?? 0),
+                  },
+                  {
+                    id: 'imprinted',
+                    label: s('stats.nftsImprinted'),
+                    value: format.count(rwlkStats?.TotalTokensMinted ?? 0),
+                  },
+                ]}
+              />
+              <Ledger title={s('sections.actions')}>
+                <AnchorActionsTable
+                  list={rwlkAnchorActions}
+                  IsRwalk={true}
+                  headingLevel={4}
+                  pageSize={HISTORY_PAGE_SIZE}
                 />
-                <StatCard
-                  label={t('statistics.anchoring.stats.releaseActions.label')}
-                  value={(rwlkStats?.TotalNumUnstakeActions ?? 0).toLocaleString(locale)}
-                  icon={<Unlock className="h-3.5 w-3.5" />}
-                  tooltip={t('statistics.anchoring.stats.releaseActions.randomWalkTooltip')}
-                />
-                <StatCard
-                  label={t('statistics.anchoring.stats.nftsAnchored.label')}
-                  value={(rwlkStats?.TotalTokensStaked ?? 0).toLocaleString(locale)}
-                  icon={<Layers className="h-3.5 w-3.5" />}
-                  tooltip={t('statistics.anchoring.stats.nftsAnchored.tooltip')}
-                  featured
-                />
-                <StatCard
-                  label={t('statistics.anchoring.stats.nftsImprinted.label')}
-                  value={(rwlkStats?.TotalTokensMinted ?? 0).toLocaleString(locale)}
-                  icon={<Gift className="h-3.5 w-3.5" />}
-                  tooltip={t('statistics.anchoring.stats.nftsImprinted.tooltip')}
-                />
-              </div>
-
-              <div className="space-y-8">
-                <div>
-                  <h6 className="text-sm font-medium uppercase tracking-wider text-muted-foreground mb-4">
-                    {t('statistics.anchoring.sections.actions')}
-                  </h6>
-                  <AnchorActionsTable list={rwlkAnchorActions} IsRwalk={true} />
-                </div>
-                <div>
-                  <h6 className="text-sm font-medium uppercase tracking-wider text-muted-foreground mb-4">
-                    {t('statistics.anchoring.sections.anchoredNftSelection')}
-                  </h6>
-                  <RwalkAnchorDistributionImprintsTable list={rwlkImprints} />
-                </div>
-              </div>
-            </>
+              </Ledger>
+              <Ledger title={s('sections.anchoredNftSelection')}>
+                <RwalkAnchorDistributionImprintsTable list={rwlkImprints} headingLevel={4} />
+              </Ledger>
+            </div>
           )}
         </TabsContent>
       </Tabs>

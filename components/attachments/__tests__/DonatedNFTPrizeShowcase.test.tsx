@@ -114,6 +114,58 @@ beforeEach(() => {
 });
 
 describe('AttachedNFTAllocationShowcase', () => {
+  it('formats small and large amounts in the locale, with sensible precision', () => {
+    render(
+      <AttachedNFTAllocationShowcase
+        nfts={[]}
+        erc20Tokens={[
+          createErc20({ EvtLogId: 1, AmountDonatedEth: 0.000123456789 }),
+          createErc20({ EvtLogId: 2, AmountDonatedEth: 1234567.123456 }),
+          createErc20({
+            EvtLogId: 3,
+            AmountDonatedEth: undefined,
+            Amount: '2500000000000000000',
+          }),
+        ]}
+        cycleNumber={42}
+      />,
+    );
+
+    const amounts = screen.getAllByTestId('erc20-attached-amount');
+    expect(amounts[0]).toHaveTextContent('0.00012346 GLXY');
+    expect(amounts[1]).toHaveTextContent('1,234,567.1235 GLXY');
+    expect(amounts[2]).toHaveTextContent('2.5 GLXY');
+  });
+
+  it('shows what was attached, not what is left, once a Recipient has retrieved it', () => {
+    // A Recipient read of a retrieved attachment: nothing held, 2,000 retrieved.
+    render(
+      <AttachedNFTAllocationShowcase
+        nfts={[]}
+        erc20Tokens={[
+          createErc20({ AmountDonated: '0', AmountDonatedEth: 0, AmountClaimedEth: 2000 }),
+        ]}
+        cycleNumber={42}
+      />,
+    );
+
+    expect(screen.getByTestId('erc20-attached-amount')).toHaveTextContent('2,000 GLXY');
+  });
+
+  it('says the amount is unknown instead of inventing one', () => {
+    render(
+      <AttachedNFTAllocationShowcase
+        nfts={[]}
+        erc20Tokens={[createErc20({ AmountDonatedEth: undefined, Amount: 'not-a-number' })]}
+        cycleNumber={42}
+      />,
+    );
+
+    expect(screen.getByTestId('erc20-attached-amount')).toHaveTextContent(
+      'currentCycle.showcase.erc20Card.unknownAmount',
+    );
+  });
+
   it('renders nothing when there are no attached assets', () => {
     const { container } = render(<AttachedNFTAllocationShowcase nfts={[]} cycleNumber={42} />);
     expect(container).toBeEmptyDOMElement();
@@ -128,8 +180,9 @@ describe('AttachedNFTAllocationShowcase', () => {
       screen.getByText('currentCycle.showcase.description.nftOnly(nftCount=1,cycle=42)'),
     ).toBeInTheDocument();
     expect(screen.getByText('currentCycle.showcase.badge')).toBeInTheDocument();
-    expect(screen.getByText('currentCycle.showcase.bonusReceipt.label')).toBeInTheDocument();
-    expect(screen.getByText('currentCycle.showcase.summary.previewAll')).toBeInTheDocument();
+    expect(screen.getByText('currentCycle.showcase.summary.assetsIncluded')).toBeInTheDocument();
+    // What the preview leaves out is counted under the assets, not in the facts.
+    expect(screen.queryByText(/summary\.preview/)).not.toBeInTheDocument();
     expectSingleRecipientRuleSummary();
   });
 
@@ -153,7 +206,7 @@ describe('AttachedNFTAllocationShowcase', () => {
     ).toBeInTheDocument();
     expect(screen.getByText('currentCycle.showcase.heading')).toBeInTheDocument();
     expect(screen.getAllByTestId('nft-allocation-media')).toHaveLength(2);
-    expect(screen.getByTestId('erc20-attached-amount')).toHaveTextContent('1250.5 GLXY');
+    expect(screen.getByTestId('erc20-attached-amount')).toHaveTextContent('1,250.5 GLXY');
     expectSingleRecipientRuleSummary();
   });
 
@@ -189,9 +242,11 @@ describe('AttachedNFTAllocationShowcase', () => {
     ).toBeInTheDocument();
     expect(screen.getByText('currentCycle.showcase.erc20Card.badge')).toBeInTheDocument();
     const amount = screen.getByTestId('erc20-attached-amount');
-    expect(amount).toHaveTextContent('1250.5 GLXY');
-    expect(amount.className).toContain('shadow-[0_0_70px_-34px');
-    expect(amount.querySelector('span')?.className).toContain('text-transparent');
+    expect(amount).toHaveTextContent('1,250.5 GLXY');
+    // A plain figure in the foreground colour: no glow, no gradient-clipped text.
+    expect(amount).toHaveAccessibleName('1,250.5 GLXY');
+    expect(amount.querySelector('span')).toHaveClass('type-figure-lg', 'text-foreground');
+    expect(amount.querySelector('span')?.className).not.toContain('text-transparent');
     expect(screen.getByText('Galaxy Credits')).toBeInTheDocument();
     expect(screen.queryByText('Pending finalization')).not.toBeInTheDocument();
     expect(screen.queryByText('Retrieved')).not.toBeInTheDocument();
@@ -221,7 +276,7 @@ describe('AttachedNFTAllocationShowcase', () => {
     ).toBeInTheDocument();
     const amounts = screen.getAllByTestId('erc20-attached-amount');
     expect(amounts).toHaveLength(2);
-    expect(amounts[0]).toHaveTextContent('1250.5 GLXY');
+    expect(amounts[0]).toHaveTextContent('1,250.5 GLXY');
     expect(amounts[1]).toHaveTextContent('5 GLXY');
     expectSingleRecipientRuleSummary();
   });
@@ -240,7 +295,7 @@ describe('AttachedNFTAllocationShowcase', () => {
     expect(screen.queryByText('Retrieved')).not.toBeInTheDocument();
     expect(screen.queryByText('Recipient')).not.toBeInTheDocument();
     expect(screen.getAllByRole('link', { name: /0xabcd/i })).toHaveLength(1);
-    expect(screen.getByTestId('erc20-attached-amount')).toHaveTextContent('1250.5 GLXY');
+    expect(screen.getByTestId('erc20-attached-amount')).toHaveTextContent('1,250.5 GLXY');
   });
 
   it('keeps recipient copy at the section level instead of repeating it per asset card', () => {
@@ -277,16 +332,16 @@ describe('AttachedNFTAllocationShowcase', () => {
     ).toBeInTheDocument();
     expectSingleRecipientRuleSummary();
     expect(
-      screen
-        .getAllByRole('link', { name: /showcase\.nftCard\.links\.project/ })
-        .some((link) => link.getAttribute('href') === 'https://project.example/nft/123'),
-    ).toBe(true);
-    expect(
-      screen.getByRole('link', { name: 'currentCycle.showcase.nftCard.openSea' }),
+      screen.getByRole('link', { name: 'currentCycle.showcase.nftCard.links.opensea' }),
     ).toHaveAttribute('href', buildOpenSeaAssetUrl(CONTRACT, 123, networkConfig.chainId));
     expect(
       screen.getByRole('link', { name: 'currentCycle.showcase.nftCard.explorer' }),
     ).toHaveAttribute('href', expect.stringContaining(CONTRACT));
+    // The metadata's own site follows as a caption that names its host.
+    expect(screen.getByRole('link', { name: /^project\.example\b/ })).toHaveAttribute(
+      'href',
+      'https://project.example/nft/123',
+    );
     expect(screen.getByRole('link', { name: /0xabcd/i })).toHaveAttribute(
       'href',
       `/user/${CONTRIBUTOR}`,
@@ -312,6 +367,58 @@ describe('AttachedNFTAllocationShowcase', () => {
       expect(element.className).toContain('max-h-[420px]');
       expect(element.className).toContain('max-w-3xl');
     });
+  });
+
+  it('never makes the metadata’s own site the primary link', () => {
+    // Anyone can attach an NFT from a contract they deployed, metadata included.
+    mockUseAttachedNftMetadata.mockReturnValue({
+      data: {
+        name: 'Retrieve your allocation',
+        image: 'https://cdn.example/nft.png',
+        external_url: 'https://phish.example/claim',
+      },
+      isError: false,
+    });
+
+    render(<AttachedNFTAllocationShowcase nfts={[createNft()]} cycleNumber={42} />);
+
+    const openSea = buildOpenSeaAssetUrl(CONTRACT, 123, networkConfig.chainId);
+    expect(screen.getByTestId('nft-allocation-media')).toHaveAttribute('href', openSea);
+    const project = screen.getByRole('link', { name: /^phish\.example\b/ });
+    expect(project).toHaveAttribute('href', 'https://phish.example/claim');
+    expect(project).toHaveAttribute('rel', 'noopener noreferrer nofollow ugc');
+    expect(
+      screen
+        .getAllByRole('link')
+        .filter((link) => link.getAttribute('href') === 'https://phish.example/claim'),
+    ).toHaveLength(1);
+  });
+
+  it('offers no project link for a plain-http site', () => {
+    mockUseAttachedNftMetadata.mockReturnValue({
+      data: { name: 'Insecure', external_url: 'http://project.example/1' },
+      isError: false,
+    });
+
+    render(<AttachedNFTAllocationShowcase nfts={[createNft()]} cycleNumber={42} />);
+
+    expect(screen.queryByRole('link', { name: /project\.example/ })).not.toBeInTheDocument();
+  });
+
+  it('shows the whole host of a project site, wrapped, never cut or overflowing', () => {
+    const host = 'opensea.io-retrieve-your-allocation.example';
+    mockUseAttachedNftMetadata.mockReturnValue({
+      data: { name: 'Rexy', external_url: `https://${host}/claim` },
+      isError: false,
+    });
+
+    render(<AttachedNFTAllocationShowcase nfts={[createNft()]} cycleNumber={42} />);
+
+    const project = screen.getByRole('link', { name: new RegExp(host.replace(/\./g, '\\.')) });
+    // A caption link, not a no-wrap button whose label could run off a phone.
+    expect(project.className).not.toMatch(/whitespace-nowrap|\btruncate\b/);
+    const label = within(project).getByText(host);
+    expect(label.className).toContain('[overflow-wrap:anywhere]');
   });
 
   it('falls back to OpenSea as the primary action when project link is unavailable', () => {
@@ -366,11 +473,15 @@ describe('AttachedNFTAllocationShowcase', () => {
 
     expect(screen.getByText('currentCycle.showcase.facts.unknown')).toBeInTheDocument();
     expect(
-      screen.queryByRole('link', { name: 'currentCycle.showcase.nftCard.openSea' }),
+      screen.queryByRole('link', { name: 'currentCycle.showcase.nftCard.links.opensea' }),
     ).not.toBeInTheDocument();
+    // The contract on the explorer becomes the primary action, listed once.
     expect(
-      screen.getByRole('link', { name: 'currentCycle.showcase.nftCard.explorer' }),
-    ).toBeInTheDocument();
+      screen.getByRole('link', { name: 'currentCycle.showcase.nftCard.links.explorer' }),
+    ).toHaveAttribute('href', expect.stringContaining(CONTRACT));
+    expect(
+      screen.queryByRole('link', { name: 'currentCycle.showcase.nftCard.explorer' }),
+    ).not.toBeInTheDocument();
   });
 
   it('shows floor estimate only when available and labels it as approximate', () => {
@@ -387,7 +498,7 @@ describe('AttachedNFTAllocationShowcase', () => {
     render(<AttachedNFTAllocationShowcase nfts={[createNft()]} cycleNumber={42} />);
 
     expect(
-      screen.getByText('currentCycle.showcase.nftCard.floorEstimate(price=0.420,currency=ETH)'),
+      screen.getByText('currentCycle.showcase.nftCard.floorEstimate(price=0.42,currency=ETH)'),
     ).toBeInTheDocument();
   });
 
@@ -402,8 +513,11 @@ describe('AttachedNFTAllocationShowcase', () => {
     expect(
       screen.getByText('currentCycle.showcase.remainder.nftOnly(nftCount=2)'),
     ).toBeInTheDocument();
+    // The facts count every attached asset; the remainder line says what is not shown.
     expect(
-      screen.getByText('currentCycle.showcase.summary.previewCount(visible=4,total=6)'),
+      screen.getByText(
+        /currentCycle\.showcase\.bonusReceipt\.(nftOnly|erc20Only)\((nft|erc20)Count=6\)/,
+      ),
     ).toBeInTheDocument();
     expectSingleRecipientRuleSummary();
   });
@@ -421,8 +535,11 @@ describe('AttachedNFTAllocationShowcase', () => {
     expect(
       screen.getByText('currentCycle.showcase.remainder.erc20Only(erc20Count=2)'),
     ).toBeInTheDocument();
+    // The facts count every attached asset; the remainder line says what is not shown.
     expect(
-      screen.getByText('currentCycle.showcase.summary.previewCount(visible=4,total=6)'),
+      screen.getByText(
+        /currentCycle\.showcase\.bonusReceipt\.(nftOnly|erc20Only)\((nft|erc20)Count=6\)/,
+      ),
     ).toBeInTheDocument();
     expectSingleRecipientRuleSummary();
   });

@@ -5,22 +5,71 @@
   },
   "viewer": {
     "title": "代碼查看器",
-    "subtitle": "查看將種子轉換為圖像的生成代碼",
-    "description": "以下代碼會把智能合約生成的種子轉換為圖像。你也可以在 IPFS 上查看：",
-    "github": "公開的 GitHub 組織位於 <link>github.com/PredictionExplorer</link>。"
+    "description": "把每個種子轉換為圖像和影片的 Rust 程式。同一檔案亦發佈在 IPFS 上。",
+    "language": "Rust",
+    "lines": "{count, plural, other {# 行}}",
+    "codeAria": "圖像生成源代碼（Rust）",
+    "copy": "複製代碼",
+    "copied": "已複製",
+    "wrap": "自動換行",
+    "ipfs": "IPFS",
+    "github": "GitHub",
+    "cid": "IPFS 內容識別碼",
+    "copyCid": "複製 IPFS 識別碼"
+  },
+  "pipeline": {
+    "heading": "從種子到圖像",
+    "description": "下方代碼如何一步步把 NFT 的種子變成藝術作品。",
+    "galleryLink": "在畫廊中查看這些圖像",
+    "steps": {
+      "seed": {
+        "label": "種子",
+        "description": "NFT 的種子，在銘刻時記錄在鏈上。"
+      },
+      "stream": {
+        "label": "SHA3-256 隨機流",
+        "description": "將種子雜湊成可重現的隨機字節流。"
+      },
+      "simulation": {
+        "label": "三體模擬",
+        "description": "從隨機流中取得三個天體的質量、位置和速度，並計算它們的軌道。"
+      },
+      "renderer": {
+        "label": "光譜渲染器",
+        "description": "以沿光譜漸變的顏色描繪每個天體的軌跡。"
+      },
+      "image": {
+        "label": "Cosmic Signature NFT 圖像",
+        "description": "最後一幀就是圖像，所有幀組成影片。同一個種子總會得出相同的結果。"
+      }
+    }
   },
   "seo": {
-    "eyebrow": "源代碼 · 確定性藝術",
-    "heading": "Cosmic Signature 源代碼",
-    "description": "Cosmic Signature 公開確定性藝術流水線的源代碼資源；這套流水線將鏈上種子轉換為三體 NFT 藝術。下方客戶端查看器支援互動，本段服務端渲染摘要則讓抓取工具無需等待 JavaScript 即可讀取核心事實。",
-    "excerpt": "種子 -> SHA3-256 隨機流 -> 三體模擬 -> 光譜渲染器 -> Cosmic Signature NFT 圖像",
-    "relatedAria": "源代碼相關頁面",
-    "links": {
-      "ipfs": "打開已發佈的 IPFS 源代碼製品",
-      "github": "打開 GitHub 組織",
-      "contracts": "查看已驗證合約",
-      "security": "閱讀安全說明",
-      "gallery": "瀏覽生成的 NFT 藝術"
+    "heading": "Cosmic Signature 源代碼"
+  },
+  "repositories": {
+    "heading": "項目代碼庫",
+    "items": {
+      "frontend": {
+        "title": "前端",
+        "description": "以 Next.js 建構的網站與應用程式介面。"
+      },
+      "backend": {
+        "title": "Go 後端（Augur Explorer）",
+        "description": "為鏈上事件建立索引，並透過 API 提供協議數據。"
+      },
+      "contracts": {
+        "title": "智能合約",
+        "description": "以 Solidity 編寫，定義 Arbitrum 上的 Cosmic Signature 協議。"
+      },
+      "images": {
+        "title": "圖像生成",
+        "description": "以 Rust 編寫的三體模擬與渲染器，用於生成 Cosmic Signature 圖像和影片。"
+      }
     }
+  },
+  "page": {
+    "lede": "Cosmic Signature 各個部分的源代碼，以及把每個種子變成作品的程式。",
+    "license": "授權：CC0 1.0"
   }
 }

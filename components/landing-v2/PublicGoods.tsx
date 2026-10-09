@@ -1,99 +1,60 @@
-'use client';
-
-import { motion } from 'framer-motion';
-import { ArrowUpRight } from 'lucide-react';
-import { useLocale } from 'next-intl';
-
 import type { LandingContent } from '@/content/landing';
 
-import { Link } from '@/i18n/navigation';
-import { localizeCrossHostHref } from '@/lib/hostRouting';
+import { classifyHref } from '@/config/siteNav';
+import { cn } from '@/lib/utils';
+import { SiteLink } from '@/components/layout/SiteLink';
+import { buttonVariants } from '@/components/ui/button';
 
-import { SectionHeading } from './SectionHeading';
+import { LandingSection, SectionHeading } from './SectionHeading';
+import styles from './Landing.module.css';
 
+/**
+ * Public Goods: the argument on the left, the one figure on the right with
+ * its facts as spec rows, and the tax note as a footnote under it (legal
+ * copy that should be read, not weighed like the pitch).
+ */
 export function PublicGoods({ publicGoods }: { publicGoods: LandingContent['publicGoods'] }) {
-  const locale = useLocale();
-
+  const { card, cta } = publicGoods;
   return (
-    <section className="relative overflow-hidden border-t border-white/10 bg-[#031810] py-28 sm:py-40">
-      <div
-        aria-hidden
-        className="pointer-events-none absolute inset-0 opacity-80"
-        style={{
-          background:
-            'radial-gradient(50% 50% at 50% 0%, rgb(var(--impact-green-rgb) / 0.18) 0%, transparent 65%), radial-gradient(60% 60% at 100% 60%, rgb(var(--aurora-cyan-rgb) / 0.12) 0%, transparent 70%)',
-        }}
-      />
-
-      <div
-        aria-hidden
-        className="pointer-events-none absolute inset-0"
-        style={{
-          background:
-            'linear-gradient(135deg, transparent 30%, rgb(var(--impact-green-rgb) / 0.04) 50%, transparent 70%)',
-        }}
-      />
-
-      <div className="relative mx-auto max-w-7xl px-6 lg:px-12">
-        <div className="grid gap-16 lg:grid-cols-[1fr_1fr] lg:items-center">
+    <LandingSection labelledBy="landing-public-goods-heading">
+      <div className={styles.twoUp}>
+        <div>
           <SectionHeading
             eyebrow={publicGoods.eyebrow}
             heading={publicGoods.heading}
-            description={publicGoods.body}
+            headingId="landing-public-goods-heading"
           />
-
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, amount: 0.4 }}
-            transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
-            className="relative flex aspect-[4/5] flex-col justify-between overflow-hidden rounded-3xl border border-[oklch(77.1%_0.163_161)]/20 p-8 glow-impact sm:p-10"
-            style={{
-              background:
-                'linear-gradient(155deg, rgba(0, 214, 143, 0.08) 0%, rgba(0, 229, 255, 0.06) 45%, rgba(13, 5, 33, 0.9) 100%)',
-            }}
+          <p className="type-body-lg mt-6 max-w-[var(--measure-lede)] text-muted-foreground">
+            {publicGoods.body}
+          </p>
+          <SiteLink
+            href={cta.href}
+            kind={classifyHref(cta.href, 'landing')}
+            className={cn(buttonVariants({ variant: 'outline' }), 'mt-8 no-underline')}
+            externalIconClassName="size-4"
           >
-            <div>
-              <p className="font-mono text-[10px] uppercase tracking-[0.3em] text-[oklch(77.1%_0.163_161)]">
-                {publicGoods.card.label}
-              </p>
-              <p
-                className="mt-4 text-7xl font-semibold text-gradient-aurora sm:text-8xl"
-                style={{ fontFamily: 'var(--font-family-display)' }}
-              >
-                {publicGoods.card.percentage}
-              </p>
-              <p className="mt-4 text-lg text-white/80">{publicGoods.card.description}</p>
-            </div>
-
-            <div className="relative mt-8 space-y-3 border-t border-white/10 pt-6 text-sm text-white/70">
-              {publicGoods.card.tableRows.map((row) => (
-                <div key={row.label} className="flex items-center justify-between">
-                  <span>{row.label}</span>
-                  <span className="font-mono text-white/90">{row.value}</span>
-                </div>
-              ))}
-            </div>
-
-            <Link
-              href={localizeCrossHostHref(publicGoods.cta.href, locale)}
-              className="mt-8 inline-flex items-center gap-2 rounded-full border border-[oklch(77.1%_0.163_161)]/40 bg-[oklch(77.1%_0.163_161)]/10 px-6 py-3 text-sm font-medium text-[oklch(77.1%_0.163_161)] transition hover:bg-[oklch(77.1%_0.163_161)]/20"
-              rel="noopener"
-              target="_blank"
-            >
-              {publicGoods.cta.label}
-              <ArrowUpRight className="h-4 w-4" aria-hidden />
-            </Link>
-          </motion.div>
+            {cta.label}
+          </SiteLink>
         </div>
 
-        <div className="relative mt-16 rounded-2xl border border-white/10 bg-white/[0.02] p-6 text-sm text-white/60 backdrop-blur sm:p-8">
-          <p className="font-mono text-[10px] uppercase tracking-[0.3em] text-white/40">
-            {publicGoods.disclaimerHeading}
-          </p>
-          <p className="mt-2 leading-relaxed">{publicGoods.disclaimer}</p>
+        <div className={styles.figurePanel}>
+          <p className="type-label text-subtle">{card.label}</p>
+          <p className="type-figure-xl mt-3">{card.percentage}</p>
+          <p className="type-body-md mt-3 text-muted-foreground">{card.description}</p>
+          <dl className={styles.specRows}>
+            {card.tableRows.map((row) => (
+              <div key={row.label} className={styles.specRow}>
+                <dt className="type-label text-subtle">{row.label}</dt>
+                <dd className="type-body-sm text-right font-medium text-foreground">{row.value}</dd>
+              </div>
+            ))}
+          </dl>
+          <div className="mt-6">
+            <p className="type-label text-muted-foreground">{publicGoods.disclaimerHeading}</p>
+            <p className="type-caption mt-1 text-subtle">{publicGoods.disclaimer}</p>
+          </div>
         </div>
       </div>
-    </section>
+    </LandingSection>
   );
 }

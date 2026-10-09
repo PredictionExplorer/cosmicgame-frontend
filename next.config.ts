@@ -5,6 +5,8 @@ import { withSentryConfig } from '@sentry/nextjs';
 import withBundleAnalyzer from '@next/bundle-analyzer';
 import createNextIntlPlugin from 'next-intl/plugin';
 
+import { securityHeaders } from './config/securityHeaders';
+
 function resolveGitSha(): string {
   if (process.env.VERCEL_GIT_COMMIT_SHA?.trim()) return process.env.VERCEL_GIT_COMMIT_SHA.trim();
   if (process.env.GITHUB_SHA?.trim()) return process.env.GITHUB_SHA.trim();
@@ -105,6 +107,25 @@ const nextConfig: NextConfig = {
    * the build output justifies it (rare).
    */
   experimental: {
+    /**
+     * `app/global-not-found.tsx` renders every URL no route matches. The site
+     * has three root layouts under a dynamic `[locale]` segment, so no
+     * layout-level not-found file can serve an unmatched URL: a catch-all
+     * page that called `notFound()` sent an empty error shell with no
+     * stylesheet, and the branded page appeared only after the app bundle
+     * hydrated (node_modules/next/dist/docs/01-app/03-api-reference/
+     * 03-file-conventions/not-found.md, `global-not-found.js`).
+     */
+    globalNotFound: true,
+    /**
+     * Pages each build worker prerenders at once (Next's default is 8). Every
+     * prerender reads the public API, which rate-limits bursts: at 8 pages on
+     * each of a build machine's workers the last build was turned away 91
+     * times. Server reads also retry a 429 (services/api/rateLimit.ts); this
+     * keeps the burst smaller in the first place. Prerendering waits on the
+     * network, so the build stays within seconds of the default.
+     */
+    staticGenerationMaxConcurrency: 4,
     optimizePackageImports: [
       'lucide-react',
       'framer-motion',
@@ -142,9 +163,23 @@ const nextConfig: NextConfig = {
         source: '/api/cosmicgame/:path*',
         destination: `${base}/api/cosmicgame/:path*`,
       },
+      {
+        source: '/api/v2/cosmicgame/:path*',
+        destination: `${base}/api/v2/cosmicgame/:path*`,
+      },
     ];
   },
   images: {
+    // A Signature's files are named by its seed, so their pixels never
+    // change: keep the optimizer's 1200 and 1920px renditions of the art (the
+    // detail page's LCP image among them) for a month instead of re-encoding
+    // them from the 3456px original every 4 hours, the default. The same
+    // month applies to the other optimized inputs: static files in public/,
+    // which take a new name when their content changes, and attached NFTs'
+    // art through /api/attached-nft/<contract>/<id>/image, which rarely
+    // changes (a collection that swaps a token's image shows the old one
+    // here for up to a month).
+    minimumCacheTTL: 2_678_400,
     remotePatterns: [
       // Rotated API origins (the media servers actually used by the app).
       ...apiOriginRemotePatterns(),
@@ -185,16 +220,34 @@ const nextConfig: NextConfig = {
     config.externals = [...(config.externals ?? []), 'pino-pretty'];
     return config;
   },
+  // Framing, sniffing, referrer and permission policy, and the Content
+  // Security Policy: enforced baseline plus a report-only allowlist
+  // (config/securityHeaders.ts).
   async headers() {
     return [
       {
         source: '/(.*)',
+        headers: securityHeaders({
+          development: process.env.NODE_ENV === 'development',
+          sentryDsn: process.env.NEXT_PUBLIC_SENTRY_DSN,
+          dataEndpoints: [
+            process.env.NEXT_PUBLIC_API_URLS,
+            process.env.NEXT_PUBLIC_API_URL,
+            process.env.NEXT_PUBLIC_RPC_URLS,
+            process.env.NEXT_PUBLIC_RPC_URL,
+          ].flatMap((value) => value?.split(',') ?? []),
+        }),
+      },
+      {
+        // Static images in public/ (brand marks, landing and learn figures):
+        // a day in the browser, then served from cache while it revalidates.
+        // Their names carry no hash, so this stays short of immutable.
+        source: '/images/:path*',
         headers: [
-          { key: 'X-Frame-Options', value: 'SAMEORIGIN' },
-          { key: 'X-Content-Type-Options', value: 'nosniff' },
-          { key: 'Referrer-Policy', value: 'strict-origin-when-cross-origin' },
-          { key: 'Permissions-Policy', value: 'camera=(), microphone=(), geolocation=()' },
-          { key: 'Cross-Origin-Opener-Policy', value: 'unsafe-none' },
+          {
+            key: 'Cache-Control',
+            value: 'public, max-age=86400, stale-while-revalidate=604800',
+          },
         ],
       },
     ];

@@ -28,7 +28,7 @@ Cells contain `☐` (not done) → replace with `✅` when the stage is complete
 | 0.2 | `normalizeLocale` resolves sub-locales; CLDR negotiation sends `zh-Hant-HK`, `zh-MO`, and `yue` to `/zh-HK`                       | ✅   |
 | 0.3 | Every `LocaleRecord` registry: content indexes, legal, format/time, OG copy/fonts, wallet (RainbowKit `zh-HK`), global-error, PDF | ✅   |
 | 0.4 | Noto Sans HK via `--cjk-font-stack` + `html:lang(zh-HK)`; `NotoSansHK-700.subset.ttf` for OG images (`npm run og:fonts`)          | ✅   |
-| 0.5 | Gates: `ZH_HANT_BANNED_TERMS` + `ZH_HK_BANNED_TERMS`, `scripts/terminology/zh-HK.ts`, `SCRIPT_CONVENTIONS['zh-HK']`               | ✅   |
+| 0.5 | Gates: `ZH_HANT_BANNED_TERMS` + `ZH_HK_BANNED_TERMS`, `scripts/terminology/zh-HK.ts`, `LOCALE_CONVENTIONS['zh-HK']`               | ✅   |
 | 0.6 | hreflang aliases (`zh-MO` → `/zh-HK`) in metadata and both sitemaps                                                               | ✅   |
 | 0.7 | E2E: `LOCALE_CHROME` / `LOCALE_SEO` / `LOCALE_ROUTE_TEXT`, `zh-HK-smoke`, `zh-HK-site-qa.desktop`, landing loop                   | ✅   |
 | 0.8 | `public/llms.txt` / `llms-full.txt` Hong Kong sections; white-paper PDF (`Songti TC` / `PingFang HK`)                             | ✅   |

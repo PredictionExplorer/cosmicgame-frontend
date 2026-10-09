@@ -1,0 +1,358 @@
+import { isAddress } from 'viem';
+
+import { normalizeHttpUrl, normalizeHttpsUrl } from './attachedNftLinks';
+import { MAX_LABEL_LENGTH, cleanDisplayText } from './displayText';
+
+/*
+ * Display metadata of an NFT attached to a gesture: parsing, the IPFS gateway
+ * race, the query key and the same-origin paths. No hooks and no wallet code,
+ * so the server resolver (attachedNftMetadata.server.ts), the route handlers
+ * under app/api/attached-nft and the client hook (useAttachedNftMetadata)
+ * share one implementation.
+ */
+
+/**
+ * What a page shows of an attached NFT. Only these fields are kept from the
+ * token's metadata document: whoever deployed the contract writes that
+ * document, so nothing else in it is passed on, cached or served.
+ */
+export interface AttachedNftMetadata {
+  name?: string;
+  description?: string;
+  image?: string;
+  /** The same image from another source, for the <NFTImage> fallback chain. */
+  imageFallback?: string;
+  /** The project site the document names: https only, never a card's primary link. */
+  external_url?: string;
+  collection_name?: string;
+  /** The contract's own ERC-721 `name()`, read by the server when the document names no collection. */
+  contract_name?: string;
+  artist?: string;
+  platform?: string;
+}
+
+/** The contract and token an attached-NFT record points at. */
+export interface AttachedNftTokenRef {
+  tokenAddr?: string | null;
+  tokenId?: string | number | null;
+}
+
+/**
+ * Public IPFS gateways, raced in parallel until one serves the content, the
+ * most reliable first. ipfs.io and dweb.link now answer most path requests
+ * with 429 (they are moving to a service-worker gateway) but still serve some
+ * CIDs. nftstorage.link is gone: it redirects to ipfs.io without CORS
+ * headers, which the browser reports as a blocked request.
+ */
+export const IPFS_GATEWAYS = [
+  'https://gateway.pinata.cloud/ipfs/',
+  'https://ipfs.io/ipfs/',
+  'https://dweb.link/ipfs/',
+] as const;
+
+/** Per-request timeout of one metadata read. */
+export const METADATA_FETCH_TIMEOUT_MS = 10_000;
+
+/**
+ * The largest metadata document read. A token URI is untrusted input, and a
+ * real document (name, description, image, attributes) is a few kilobytes.
+ */
+export const MAX_METADATA_BYTES = 256 * 1024;
+
+/** A response body larger than the reader's cap. */
+export class ResponseTooLargeError extends Error {
+  constructor(maxBytes: number) {
+    super(`Response body exceeds ${maxBytes} bytes`);
+    this.name = 'ResponseTooLargeError';
+  }
+}
+
+/** Refuses a response whose declared length is already over the cap, before reading it. */
+function assertDeclaredLength(response: Response, maxBytes: number): void {
+  const declared = Number(response.headers?.get('content-length') ?? Number.NaN);
+  if (Number.isFinite(declared) && declared > maxBytes) {
+    void response.body?.cancel().catch(() => {});
+    throw new ResponseTooLargeError(maxBytes);
+  }
+}
+
+/** A stream read to its end, abandoned as soon as it passes `maxBytes`. */
+async function readCappedStream(
+  body: ReadableStream<Uint8Array>,
+  maxBytes: number,
+): Promise<Uint8Array<ArrayBuffer>> {
+  const reader = body.getReader();
+  const chunks: Uint8Array[] = [];
+  let received = 0;
+  for (;;) {
+    const { done, value } = await reader.read();
+    if (done) break;
+    received += value.byteLength;
+    if (received > maxBytes) {
+      void reader.cancel().catch(() => {});
+      throw new ResponseTooLargeError(maxBytes);
+    }
+    chunks.push(value);
+  }
+  const bytes = new Uint8Array(received);
+  let offset = 0;
+  for (const chunk of chunks) {
+    bytes.set(chunk, offset);
+    offset += chunk.byteLength;
+  }
+  return bytes;
+}
+
+/**
+ * The body of `response` as bytes, read chunk by chunk and abandoned as soon
+ * as it passes `maxBytes`, whether or not the server declared a length.
+ * Abandoning the body does not end the request: whoever made it aborts it.
+ */
+export async function readCappedBytes(
+  response: Response,
+  maxBytes: number,
+): Promise<Uint8Array<ArrayBuffer>> {
+  assertDeclaredLength(response, maxBytes);
+  if (!response.body) {
+    // Only environments without body streams take this path.
+    const bytes = new Uint8Array(await response.arrayBuffer());
+    if (bytes.byteLength > maxBytes) throw new ResponseTooLargeError(maxBytes);
+    return bytes;
+  }
+  return readCappedStream(response.body, maxBytes);
+}
+
+/** The body of `response` as text, under the same cap as `readCappedBytes`. */
+export async function readCappedText(response: Response, maxBytes: number): Promise<string> {
+  assertDeclaredLength(response, maxBytes);
+  if (!response.body) {
+    // Only environments without body streams take this path.
+    const text = await response.text();
+    if (new TextEncoder().encode(text).byteLength > maxBytes) {
+      throw new ResponseTooLargeError(maxBytes);
+    }
+    return text;
+  }
+  return new TextDecoder().decode(await readCappedStream(response.body, maxBytes));
+}
+
+function isRecord(value: unknown): value is Record<string, unknown> {
+  return !!value && typeof value === 'object' && !Array.isArray(value);
+}
+
+/** Extracts the `<cid>/<path>` part of an `ipfs://` URI, or null for other schemes. */
+export function ipfsPath(value: unknown): string | null {
+  if (typeof value !== 'string') return null;
+  const trimmed = value.trim();
+  if (!trimmed.startsWith('ipfs://')) return null;
+
+  const withoutProtocol = trimmed.replace(/^ipfs:\/\//, '').replace(/^ipfs\//, '');
+  return withoutProtocol || null;
+}
+
+export function normalizeIpfsUrl(value: string, gateway: string = IPFS_GATEWAYS[0]): string | null {
+  const path = ipfsPath(value);
+  return path ? `${gateway}${path}` : null;
+}
+
+/** Returns the gateway prefix of `url` when it points at one of our IPFS gateways. */
+function gatewayOf(url: string | undefined): string | null {
+  if (!url) return null;
+  return IPFS_GATEWAYS.find((gateway) => url.startsWith(gateway)) ?? null;
+}
+
+export function normalizeMetadataAssetUrl(
+  value: unknown,
+  metadataUri?: string,
+): string | undefined {
+  if (typeof value !== 'string') return undefined;
+  const trimmed = value.trim();
+  if (!trimmed) return undefined;
+
+  const ipfsUrl = normalizeIpfsUrl(trimmed, gatewayOf(metadataUri) ?? IPFS_GATEWAYS[0]);
+  if (ipfsUrl) return ipfsUrl;
+
+  const directHttpUrl = normalizeHttpUrl(trimmed);
+  if (directHttpUrl) return directHttpUrl;
+
+  if (trimmed.startsWith('/')) {
+    const metadataHttpUrl = normalizeHttpUrl(metadataUri);
+    if (!metadataHttpUrl) return undefined;
+    try {
+      return new URL(trimmed, metadataHttpUrl).toString();
+    } catch {
+      return undefined;
+    }
+  }
+
+  return undefined;
+}
+
+/** The longest name kept from a metadata document. */
+const MAX_NAME_LENGTH = 120;
+/** The longest description kept: pages show at most a few lines of it. */
+const MAX_DESCRIPTION_LENGTH = 1_000;
+
+export function normalizeAttachedNftMetadata(
+  raw: unknown,
+  metadataUri?: string,
+): AttachedNftMetadata | null {
+  if (!isRecord(raw)) return null;
+
+  // Serve the image from the gateway that just served the metadata (it is
+  // proven reachable), and keep a second gateway as an <img> onError fallback.
+  const primaryGateway = gatewayOf(metadataUri) ?? IPFS_GATEWAYS[0];
+  const fallbackGateway = IPFS_GATEWAYS.find((gateway) => gateway !== primaryGateway);
+  const imagePath = ipfsPath(raw.image);
+
+  return {
+    name: cleanDisplayText(raw.name, MAX_NAME_LENGTH),
+    description: cleanDisplayText(raw.description, MAX_DESCRIPTION_LENGTH),
+    image: normalizeMetadataAssetUrl(raw.image, metadataUri),
+    imageFallback: imagePath && fallbackGateway ? `${fallbackGateway}${imagePath}` : undefined,
+    external_url: normalizeHttpsUrl(raw.external_url) ?? undefined,
+    collection_name: cleanDisplayText(raw.collection_name ?? raw.collectionName, MAX_LABEL_LENGTH),
+    artist: cleanDisplayText(raw.artist, MAX_LABEL_LENGTH),
+    platform: cleanDisplayText(raw.platform, MAX_LABEL_LENGTH),
+  };
+}
+
+/** All URLs worth trying for a URI: every gateway for ipfs://, or the URL itself. */
+export function metadataUrlCandidates(uri: string): string[] {
+  const path = ipfsPath(uri);
+  if (path) return IPFS_GATEWAYS.map((gateway) => `${gateway}${path}`);
+  const httpUrl = normalizeHttpUrl(uri);
+  return httpUrl ? [httpUrl] : [];
+}
+
+/** A `fetch` stand-in: the server passes one that checks every redirect hop. */
+export type MetadataFetcher = (url: string, init: RequestInit) => Promise<Response>;
+
+/**
+ * One candidate's document. The request ends with this call, whatever the
+ * outcome: the deadline covers the whole body, and every exit aborts the
+ * request, because giving up on a body does not stop a fetcher that keeps
+ * its own copy (Next's data cache tees every body it caches) from reading
+ * the rest of an oversized or endless document. `stop` aborts it early,
+ * when another candidate has already answered.
+ */
+async function fetchMetadataFromUrl(
+  url: string,
+  timeoutMs: number,
+  fetcher: MetadataFetcher,
+  stop?: AbortSignal,
+): Promise<AttachedNftMetadata> {
+  const controller = new AbortController();
+  const abort = () => controller.abort();
+  const timer = setTimeout(abort, timeoutMs);
+  stop?.addEventListener('abort', abort, { once: true });
+  try {
+    const response = await fetcher(url, {
+      headers: { Accept: 'application/json' },
+      signal: controller.signal,
+    });
+    if (!response.ok) {
+      throw new Error(`Failed to fetch NFT metadata (${response.status})`);
+    }
+    const data: unknown = JSON.parse(await readCappedText(response, MAX_METADATA_BYTES));
+    const normalized = normalizeAttachedNftMetadata(data, url);
+    if (!normalized) {
+      throw new Error('Failed to fetch NFT metadata (unusable payload)');
+    }
+    return normalized;
+  } finally {
+    clearTimeout(timer);
+    stop?.removeEventListener('abort', abort);
+    abort();
+  }
+}
+
+export interface FetchAttachedNftMetadataOptions {
+  /** Skips candidates that fail this check (the server's public-host guard). */
+  allowUrl?: (url: string) => boolean;
+  /** Reads each candidate (default: the global `fetch`). */
+  fetcher?: MetadataFetcher;
+  timeoutMs?: number;
+}
+
+/**
+ * Reads a metadata URI: an `ipfs://` URI races every gateway, the first
+ * usable document wins and the other requests are aborted; an http(s) URI
+ * is read as is. Resolves to null for a scheme it cannot read and rejects
+ * when every candidate failed.
+ */
+export async function fetchAttachedNftMetadata(
+  uri: string,
+  {
+    allowUrl,
+    fetcher = (url, requestInit) => fetch(url, requestInit),
+    timeoutMs = METADATA_FETCH_TIMEOUT_MS,
+  }: FetchAttachedNftMetadataOptions = {},
+): Promise<AttachedNftMetadata | null> {
+  const candidates = metadataUrlCandidates(uri).filter((url) => !allowUrl || allowUrl(url));
+  if (candidates.length === 0) return null;
+  if (candidates.length === 1) return fetchMetadataFromUrl(candidates[0]!, timeoutMs, fetcher);
+
+  const race = new AbortController();
+  try {
+    return await Promise.any(
+      candidates.map((url) => fetchMetadataFromUrl(url, timeoutMs, fetcher, race.signal)),
+    );
+  } catch (error) {
+    if (error instanceof AggregateError && error.errors.length > 0) {
+      throw error.errors[0];
+    }
+    throw error;
+  } finally {
+    race.abort();
+  }
+}
+
+/** A token id as a decimal string, or null when it is not a whole number. */
+export function normalizeTokenId(
+  value: string | number | bigint | null | undefined,
+): string | null {
+  if (value == null) return null;
+  const raw = String(value).trim();
+  return /^\d+$/.test(raw) ? BigInt(raw).toString() : null;
+}
+
+/** The validated parts of an attached-NFT reference, as the query key and the API paths use them. */
+export function attachedNftRef(token?: AttachedNftTokenRef): {
+  tokenAddr: `0x${string}` | null;
+  tokenId: string | null;
+} {
+  const address = typeof token?.tokenAddr === 'string' ? token.tokenAddr.trim() : '';
+  return {
+    tokenAddr: isAddress(address) ? address : null,
+    tokenId: normalizeTokenId(token?.tokenId),
+  };
+}
+
+/**
+ * The React Query key of an attached NFT's metadata. The attached-NFTs page
+ * seeds this key from the server and the client hook reads it, so both build
+ * it here.
+ */
+export function attachedNftMetadataQueryKey(
+  uri: string | null | undefined,
+  token?: AttachedNftTokenRef,
+): ['attachedNftMetadata', string, `0x${string}` | null, string | null] {
+  const { tokenAddr, tokenId } = attachedNftRef(token);
+  return ['attachedNftMetadata', typeof uri === 'string' ? uri.trim() : '', tokenAddr, tokenId];
+}
+
+/** Same-origin metadata of an attached NFT, resolved and cached by the server. */
+export function attachedNftMetadataPath(tokenAddr: string, tokenId: string): string {
+  return `/api/attached-nft/${tokenAddr.toLowerCase()}/${tokenId}`;
+}
+
+/**
+ * Same-origin image of an attached NFT. Being local, it goes through the
+ * Next image optimizer, which resizes it for the plate and caches the
+ * result, so a wall of third-party art waits on a public IPFS gateway once
+ * rather than on every visit.
+ */
+export function attachedNftImagePath(tokenAddr: string, tokenId: string): string {
+  return `${attachedNftMetadataPath(tokenAddr, tokenId)}/image`;
+}

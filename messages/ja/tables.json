@@ -1,0 +1,370 @@
+{
+  "empty": {
+    "gestures": "一筆はまだありません",
+    "gestureHistory": "一筆の履歴はまだありません",
+    "participants": "参加者はまだいません",
+    "recipients": "受領者はまだいません",
+    "recipientCyclesTitle": "受領者はまだいません",
+    "recipientCyclesDescription": "確定したパフォーマンス・サイクルはまだありません。",
+    "allocations": "配分はまだありません。",
+    "outreachAllocations": "広報準備金の配分はまだありません",
+    "anchorActions": "係留操作はまだありません。",
+    "anchorHolders": "係留者はまだいません",
+    "anchoredTokens": "係留中のトークンはまだありません。",
+    "contributions": "拠出はまだありません",
+    "contributors": "拠出者はまだいません",
+    "publicGoods": "公共財の活動はまだありません。",
+    "stellarSelection": "星選の配分はまだありません。",
+    "tokens": "トークンはまだありません。",
+    "holders": "保有者はまだいません。",
+    "stellarEntries": "星選の対象はまだありません",
+    "spenders": "支出者はまだいません",
+    "enduranceChampions": "持久チャンピオンはまだいません",
+    "attachedNfts": "添付されたNFTはまだありません。",
+    "attachedTokens": "添付されたトークンはまだありません。",
+    "systemEvents": "システムイベントはまだありません。",
+    "modeChanges": "モードの変更はまだありません",
+    "events": "イベントはまだありません",
+    "history": "履歴はまだありません",
+    "retrievals": "受け取りはまだありません",
+    "generic": "データがありません。",
+    "nothingHere": "まだ何もありません"
+  },
+  "attachedAssets": {
+    "actions": {
+      "claim": "受け取る"
+    },
+    "status": {
+      "yes": "はい",
+      "no": "いいえ"
+    },
+    "aria": {
+      "actions": "操作"
+    },
+    "nft": {
+      "empty": "添付されたNFTはまだありません。",
+      "imageAlt": "NFT #{id}",
+      "imageUnavailable": "画像を利用できません",
+      "unknownToken": "不明なトークン",
+      "columns": {
+        "datetime": "日時",
+        "contributorAddress": "拠出者アドレス",
+        "round": "サイクル",
+        "tokenAddress": "トークンアドレス",
+        "tokenId": "トークンID",
+        "tokenImage": "トークン画像",
+        "tokenUri": "トークンURI"
+      },
+      "ariaLabel": "添付されたNFT"
+    },
+    "erc20": {
+      "empty": "添付されたERC20トークンはまだありません。",
+      "columns": {
+        "datetime": "日時",
+        "cycle": "サイクル",
+        "tokenAddress": "トークンアドレス",
+        "attachedAmount": "添付数量",
+        "retrievedAmount": "受け取り数量",
+        "recipient": "受領者",
+        "retrieved": "受け取り済み"
+      },
+      "ariaLabel": "添付されたERC-20トークン"
+    }
+  },
+  "loading": "読み込み中…",
+  "status": {
+    "loading": "読み込み中…",
+    "live": "ライブ",
+    "youBadge": "自分",
+    "yes": "はい",
+    "no": "いいえ",
+    "none": "なし",
+    "unknown": "不明",
+    "unavailable": "取得不可",
+    "undefined": "未定義",
+    "deployment": "デプロイ",
+    "currentlyActive": "現在有効"
+  },
+  "columns": {
+    "cycle": "サイクル",
+    "cycleNumber": "サイクル番号",
+    "round": "サイクル",
+    "participant": "参加者",
+    "recipient": "受領者",
+    "gestureCount": "筆数",
+    "gestureType": "一筆の種類",
+    "gestureDuration": "保持時間",
+    "gestureInfo": "一筆の情報",
+    "gestureCost": "費用",
+    "allocation": "配分",
+    "allocationsReceived": "配分（すべての種類）",
+    "maxAllocationEth": "最大シグネチャー配分（ETH）",
+    "allocationsSumEth": "受け取ったETH",
+    "anchorHolder": "係留者",
+    "holder": "保有者",
+    "numberOfNfts": "NFTの数",
+    "date": "日付",
+    "dateTime": "日時",
+    "datetime": "日時",
+    "dateTimeCompact": "日時",
+    "amount": "金額",
+    "amountEth": "金額（ETH）",
+    "amountCst": "数量（CST）",
+    "tokenId": "トークンID",
+    "tokenName": "トークン名",
+    "tokenAddress": "トークンアドレス",
+    "retrieved": "受け取り済み",
+    "status": "状態",
+    "message": "メッセージ",
+    "contributor": "拠出者",
+    "destination": "送付先",
+    "from": "送付元",
+    "to": "送付先",
+    "event": "イベント",
+    "newValue": "新しい値",
+    "previousValue": "以前の値",
+    "recordType": "記録の種類",
+    "source": "配分元",
+    "received": "受領",
+    "position": "順位",
+    "note": "メモ",
+    "userAddress": "ユーザーアドレス",
+    "spentAmountEth": "支出額（ETH）",
+    "distributionAmountEth": "配分額（ETH）",
+    "outreachContributor": "広報貢献者",
+    "maxGestureEth": "最大一筆（ETH）",
+    "numberOfContributions": "拠出件数",
+    "totalContributedEth": "拠出総額（ETH）",
+    "started": "開始",
+    "ended": "終了",
+    "actions": "操作",
+    "selected": "選択済み",
+    "gesturesThisCycle": "このサイクルの筆数",
+    "shareOfPool": "プール内の割合"
+  },
+  "names": {
+    "participants": "ユニーク参加者",
+    "recipients": "ユニーク受領者",
+    "ethContributors": "ユニークETH拠出者",
+    "cstAnchorHolders": "Cosmic Signature NFTの係留者",
+    "rwlkAnchorHolders": "Random Walk NFTの係留者",
+    "publicGoodsContributions": "公共財拠出の記録",
+    "publicGoodsRetrievals": "公共財の受け取り記録",
+    "outreachAllocations": "広報準備金の配分記録",
+    "parameterChanges": "パラメーターの変更履歴",
+    "cycleActivations": "サイクルの有効化",
+    "nameHistory": "名前の履歴",
+    "transfers": "移転履歴",
+    "anchorDistribution": "係留配分の受領者",
+    "ethContributions": "ETH拠出",
+    "allocationRecords": "配分の記録",
+    "allocationsByRecipient": "受領者別の配分",
+    "ethSpent": "参加者別のETH支出",
+    "stellarSelectionEntries": "星選の対象",
+    "enduranceChampions": "持久チャンピオン",
+    "gestureMessages": "一筆のメッセージ"
+  },
+  "pagination": {
+    "label": "ページ送り",
+    "labelFor": "{table}のページ送り",
+    "range": "{total}件中{from}～{to}件",
+    "goToPage": "ページへ移動：",
+    "goToPageAria": "ページへ移動",
+    "previous": "前へ",
+    "next": "次へ",
+    "morePages": "その他のページ"
+  },
+  "currentRow": {
+    "position": "{total}件中{rank}番目",
+    "show": "自分の位置を表示"
+  },
+  "proof": {
+    "transactionNewTab": "ブロックエクスプローラーのトランザクション、新しいタブで開きます"
+  },
+  "links": {
+    "newTab": "新しいタブで開きます"
+  },
+  "details": {
+    "header": "詳細"
+  },
+  "message": {
+    "showAll": "すべて表示",
+    "showLess": "折りたたむ"
+  },
+  "skeleton": {
+    "loadingText": "テキストを読み込み中",
+    "loadingStat": "統計を読み込み中",
+    "loadingRows": "行を読み込み中",
+    "loadingNft": "NFTを読み込み中"
+  },
+  "tableHeaderHelp": {
+    "explainColumn": "列の説明：{column}"
+  },
+  "adminEvents": {
+    "empty": "設定の変更はありません"
+  },
+  "allocation": {
+    "cycle": "サイクル{cycle}",
+    "gestures": "筆数",
+    "listAria": "サイクルごとの配分の受領者",
+    "groups": {
+      "eth": "配分トラック別ETH",
+      "nfts": "NFT"
+    },
+    "columns": {
+      "finalized": "確定日時",
+      "signature": "シグネチャー配分",
+      "signatureRecipient": "シグネチャー配分の受領者",
+      "signatureEth": "シグネチャー配分（ETH）",
+      "chrono": "時の戦士",
+      "chronoEth": "時の戦士（ETH）",
+      "stellar": "星選",
+      "stellarEth": "星選（ETH）",
+      "anchor": "係留配分",
+      "anchorEth": "係留配分（ETH）",
+      "publicGoods": "公共財",
+      "publicGoodsEth": "公共財（ETH）",
+      "attached": "添付",
+      "nftsAttached": "添付されたNFT",
+      "nftsViaStellar": "星選によるNFT"
+    }
+  },
+  "anchoringRecipient": {
+    "emptyTitle": "このサイクルに係留されたNFTはありません",
+    "empty": "サイクル確定時に係留中のCosmic Signature NFTがなかったため、このサイクルの係留配分はサイクル準備金に残りました。"
+  },
+  "publicGoods": {
+    "voluntaryEmpty": "公共財金庫へ直接送られた拠出がここに表示されます。金庫は、設定されている公共財の受け手のためにこの資金を保管します。"
+  },
+  "outreach": {
+    "allocationsTitle": "配分の記録",
+    "dustNote": "薄く表示された数量は{amount}未満の配分で、この精度では表示しきれません。"
+  },
+  "banGesture": {
+    "banned": "メッセージを非表示にしました。",
+    "unbanned": "メッセージを元に戻しました。",
+    "error": "メッセージの状態を更新できませんでした。もう一度お試しください。",
+    "hiddenLoadError": "非表示のメッセージを読み込めませんでした。",
+    "ban": "非表示",
+    "unban": "元に戻す",
+    "undo": "取り消す",
+    "visibilityLabel": "表示するメッセージ",
+    "hiddenTag": "非表示",
+    "allCycles": "すべてのサイクル",
+    "search": "メッセージを検索",
+    "noMatches": "条件に合うメッセージはありません",
+    "filters": {
+      "all": "すべて",
+      "visible": "表示中",
+      "hidden": "非表示"
+    }
+  },
+  "ethContribution": {
+    "withNote": "メモあり",
+    "viewContribution": "拠出 #{id}"
+  },
+  "endurance": {
+    "liveHelp": "この参加者は最新の一筆を入れた参加者でもあるため、この持久の期間はまだ伸びています。",
+    "championTime": "先頭保持時間",
+    "chronoWarrior": "時の戦士"
+  },
+  "gestureHistory": {
+    "tableLabel": "一筆の履歴",
+    "viewGesture": "一筆#{position}",
+    "attached": "添付",
+    "randomWalkToken": "Random Walk {id}",
+    "messagesHeld": {
+      "title": "メッセージの表示を保留しています",
+      "description": "非表示のメッセージの一覧を読み込めませんでした。読み込めるまでメッセージは表示しません。"
+    }
+  },
+  "nameHistory": {
+    "removed": "トークン名が削除されました。"
+  },
+  "stellarSelection": {
+    "draws": "サイクルの確定時に、このプールからETHの星選{eth}件とNFTの星選{nft}件が選ばれます。",
+    "weightedNote": "シェアは各一筆のその時点のETHコストで重み付けされます。"
+  },
+  "recipientHistory": {
+    "sources": {
+      "signature": "シグネチャー配分",
+      "finalCstGesture": "最後のCST一筆",
+      "enduranceChampion": "持久チャンピオン",
+      "chronoWarrior": "時の戦士",
+      "stellarSelection": "星選",
+      "anchoredStellarSelection": "係留NFT星選",
+      "anchorDistribution": "係留配分",
+      "attachedNftTimeout": "添付されたNFT（タイムアウト後の受け取り）",
+      "attachedErc20Timeout": "添付されたERC-20（タイムアウト後の受け取り）",
+      "stellarEthTimeout": "ETH星選（タイムアウト後の受け取り）"
+    },
+    "sourceTags": {
+      "anchoredStellarSelection": "係留星選"
+    },
+    "nft": "NFT #{id}",
+    "readyToRetrieve": "受け取り可能",
+    "retrieve": "受け取る",
+    "retrieved": "受け取り済み",
+    "allAnchorHolders": "Cosmic Signature NFTのすべての係留者",
+    "showRecords": "{count, plural, other {#件の記録を表示}}",
+    "hideRecords": "記録を閉じる",
+    "recordsHeader": "記録",
+    "received": {
+      "eth": "ETH",
+      "cst": "CST",
+      "nfts": "NFT"
+    },
+    "totals": {
+      "eth": "受領したETH",
+      "cst": "受領したCST",
+      "nfts": "受領したNFT",
+      "cycles": "サイクル数"
+    }
+  },
+  "specialAllocation": {
+    "firstRecordForming": "最初の持久記録が形成中",
+    "extendingRecord": "持久チャンピオンの記録を延ばしています",
+    "progressAria": "持久チャンピオンへの進み具合",
+    "lastGesture": "最新の一筆",
+    "gestureDetailsSyncing": "最新の一筆の詳細をインデクサーから同期しています。",
+    "gestureDetailsUnavailable": "最新の一筆のトランザクション詳細は一時的に利用できません。",
+    "method": "方法",
+    "gestureTime": "一筆の時刻",
+    "attachedAssets": "添付されたアセット",
+    "growingNow": "現在伸びています",
+    "heading": "特別配分の先頭",
+    "sectionAria": "特別配分の先頭",
+    "latestParticipant": "最新の参加者",
+    "latestTooltip": "最新の一筆を入れた参加者は持久の期間を積み上げています。先頭に立つには、現在の持久チャンピオンの期間より長くその位置を保つ必要があります。",
+    "enduranceChampion": "持久チャンピオン",
+    "chronoWarrior": "時の戦士",
+    "finalCstGesture": "最後のCST一筆",
+    "finalCstNote": "この役割を更新するのはCST一筆だけです。ETHとRandom Walkの一筆は更新しません。",
+    "headingHelp": "現時点で、サイクル確定時の特別配分の対象となる参加者です。新たな一筆によって対象者が変わることがあります。"
+  },
+  "systemModes": {
+    "viewEvent": "パラメーターの変更履歴"
+  },
+  "uniqueAnchorHolders": {
+    "anchors": "係留",
+    "releases": "解除",
+    "imprinted": "刻印",
+    "anchored": "現在係留中",
+    "distributedEth": "配付済み（ETH）",
+    "unretrievedEth": "未受け取り（ETH）"
+  },
+  "statisticsColumns": {
+    "ownerAddress": "保有者",
+    "cstBalance": "残高（CST）",
+    "contractAddress": "コントラクトアドレス",
+    "numberOfNfts": "NFTの数",
+    "isRandomWalk": "Random Walkか"
+  },
+  "statisticsTooltips": {
+    "maxAllocationEth": "最後の一筆によってこの受領者が受け取ったシグネチャー配分の最大値です。受け取ったことがなければダッシュで表示されます。時の戦士と星選のETHは受け取ったETHにのみ含まれます。",
+    "allocationsSumEth": "この受領者が受け取ったすべてのETH配分です。NFTとCSTの配分は「配分（すべての種類）」に数えられますが、このETHには加算されません。",
+    "cstBalance": "このウォレットの現在のCST（ERC-20）残高。",
+    "attachedNftContractAddress": "一筆に添付されたトークンのERC-721コントラクトアドレス。",
+    "attachedNftCount": "このコントラクトのNFTのうち、一筆に添付されたものの数。"
+  }
+}

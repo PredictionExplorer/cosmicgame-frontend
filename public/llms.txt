@@ -1,17 +1,17 @@
 # Cosmic Signature
 
-> Cosmic Signature is a procedural on-chain art protocol on Arbitrum. Every gesture shapes the cycle's final Signature, and the protocol redistributes its reserves across more than ten allocation tracks — including the infrastructure Ethereum itself depends on.
+> Cosmic Signature is a procedural on-chain art protocol on Arbitrum. Every gesture shapes the cycle's final Signature, and the protocol redistributes its reserves across a fixed set of allocation tracks — including the infrastructure Ethereum itself depends on.
 
 ## Overview
 
-Cosmic Signature is a procedural on-chain art protocol on Arbitrum. Participants make gestures during a Performance Cycle; when the cycle finalizes, the protocol distributes its reserves across more than ten allocation tracks — including Protocol Guild, the funding mechanism for 170+ Ethereum core contributors. The protocol runs on Arbitrum, a Layer 2 scaling solution for Ethereum, providing fast and low-cost transactions.
+Cosmic Signature is a procedural on-chain art protocol on Arbitrum. Participants make gestures during a Performance Cycle; when the cycle finalizes, the protocol distributes its reserves across a fixed set of allocation tracks — including Protocol Guild, the funding mechanism for 170+ Ethereum core contributors. The protocol runs on Arbitrum, a Layer 2 scaling solution for Ethereum, designed to process transactions at lower cost; fees vary with network conditions.
 
 Cosmic Signature is not related to the COSMIC cancer mutation database or COSMIC mutational signatures in biology.
 
 ## Key Pages
 
-- [Marketing Home](https://cosmicsignature.com/): Overview of Cosmic Signature as a procedural on-chain art protocol
-- [About](https://cosmicsignature.com/about): Entity home for Cosmic Signature
+- [Protocol Home](https://cosmicsignature.com/): Overview of Cosmic Signature as a procedural on-chain art protocol
+- [About](https://cosmicsignature.com/about): Protocol overview and official resources
 - [White Paper](https://cosmicsignature.com/white-paper): The reference description of the protocol, with a downloadable PDF (v1.0, August 2026)
 - [What is Cosmic Signature?](https://cosmicsignature.com/learn/what-is-cosmic-signature): Plain-English overview
 - [Three-Body NFT Art](https://cosmicsignature.com/learn/three-body-nft-art): Technical explanation of deterministic art generation
@@ -20,28 +20,28 @@ Cosmic Signature is not related to the COSMIC cancer mutation database or COSMIC
 - [How It Works](https://app.cosmicsignature.com/how-it-works): Complete guide to protocol mechanics
 - [FAQ](https://app.cosmicsignature.com/faq): Frequently asked questions
 - [Statistics](https://app.cosmicsignature.com/statistics): Protocol statistics and analytics
-- [Anchoring](https://app.cosmicsignature.com/anchoring): Anchor Cosmic Signature NFTs to receive ETH Anchor Distributions, or anchor RandomWalkNFTs for Anchored-NFT Stellar Selection eligibility
-- [Allocation](https://app.cosmicsignature.com/allocation): Current Cycle Reserve and allocation tracks
+- [Anchoring](https://app.cosmicsignature.com/anchoring): Anchor Cosmic Signature NFTs to receive ETH Anchor Distributions, or anchor Random Walk NFTs for Anchored-NFT Stellar Selection eligibility
+- [Allocation](https://app.cosmicsignature.com/allocation): Finalized cycle records and allocation tracks
 - [Contracts](https://app.cosmicsignature.com/contracts): Smart contract details and addresses
 - [Source Code](https://app.cosmicsignature.com/code): Source code and verification resources
 - [Security](https://app.cosmicsignature.com/security): Security model, verification resources, and participant safety notes
-- [Audits](https://app.cosmicsignature.com/audits): Hacken audit report and formal verification context
+- [Audits](https://app.cosmicsignature.com/audits): Hacken audit report, invariant fuzzing results, formal verification specifications in the contracts repository, and a verification checklist
 - [Risk Disclosures](https://app.cosmicsignature.com/risk-disclosures): Non-investment language, blockchain risks, and participant clarity
 - [Outreach](https://app.cosmicsignature.com/marketing): Outreach allocation program
-- [Imprint](https://app.cosmicsignature.com/imprint): Imprint new tokens
+- [Imprint](https://app.cosmicsignature.com/imprint): Imprint Random Walk NFTs
 
 ## Protocol Mechanics
 
 - Each cycle opens with ETH and CST Calibration Window mechanics; the CST window starts from a 12-hour reference and then changes on-chain
 - Every gesture adds the current time increment to Cycle Finalization Time; the increment starts at 1 hour and grows 1% per finalized cycle
-- The participant who made the Final Gesture when the Cycle Finalization Time expires may finalize the cycle and receive the Signature Allocation (25% of the Cycle Reserve, 1,000 CST, and 1 Cosmic Signature NFT); gestures remain possible until finalization executes
-- The Final Gesture participant has a 48-hour exclusive finalization window; afterwards anyone may finalize and the finalizer receives the Signature Allocation
+- When the Cycle Finalization Time expires, the Final Gesture participant may finalize the cycle and receive the Signature Allocation (25% of the Cycle Reserve, 1,000 CST, and 1 Cosmic Signature NFT); gestures remain possible until finalization executes
+- The Final Gesture participant has a 48-hour exclusive finalization window after the countdown reaches zero; afterwards anyone may finalize and the finalizer receives the Signature Allocation
 - Every gesture records a Stellar Selection entry and may imprint dynamic Participation CST
 - Participation CST uses a square-root formula based on elapsed time since the previous gesture; rapid gestures can imprint 0 CST, while longer quiet periods imprint more
 - CST gestures increase the CST Calibration Window by about 0.4%; ETH gestures decrease it by about 0.398%
 - In the vast majority of cycles, 24 Cosmic Signature NFTs are imprinted and paired with 24,000 CST
 - Three ETH Stellar Selection recipients share 4% of the Cycle Reserve
-- Ten NFT Stellar Selection recipients and ten RandomWalk NFT anchor-holders each receive 1,000 CST and a Cosmic Signature NFT (selections are drawn with replacement)
+- Ten NFT Stellar Selection recipients and ten Random Walk NFT anchor-holders each receive 1,000 CST and a Cosmic Signature NFT (selections are made with replacement)
 - The Chrono-Warrior receives 8% of the Cycle Reserve, 1,000 CST, and 1 Cosmic Signature NFT
 - The Endurance Champion and Final CST Gesture recipient each receive 1,000 CST and 1 Cosmic Signature NFT
 - Anchor Distributions route 6% of the Cycle Reserve to Cosmic Signature NFT anchor-holders; accumulated ETH is paid out when an anchor is released
@@ -50,14 +50,14 @@ Cosmic Signature is not related to the COSMIC cancer mutation database or COSMIC
 - Outreach Reserve imprints 3,000 CST per cycle, bringing typical fixed end-of-cycle/outreach CST imprints to 27,000 CST before dynamic per-gesture CST
 - Participants can make gestures with ETH or CST tokens (CST uses its own Calibration Window); the first gesture of each cycle must be an ETH gesture
 - Secondary ETH and attached-asset allocations use a 5-week retrieval timeout, after which anyone may retrieve unretrieved allocations for themselves
-- RandomWalkNFT holders can attach an unused token to an ETH gesture for a 50% ETH Gesture Cost reduction; each RandomWalkNFT can be used once for this discount
-- RandomWalkNFTs can also be anchored for Anchored-NFT Stellar Selection eligibility (no ETH distributions)
+- Random Walk NFT holders can attach an unused token to an ETH gesture for a 50% ETH Gesture Cost reduction; each Random Walk NFT can be used once for this discount
+- Random Walk NFTs can also be anchored for Anchored-NFT Stellar Selection eligibility (no ETH distributions)
 
 ## Tokens
 
 - **CST tokens**: ERC-20 coordination and utility tokens at the center of the protocol — CST gestures use their own Calibration Window, Cosmic Council coordination weight is denominated in CST, every gesture may imprint dynamic Participation CST, and 1,000 CST pairs with every imprinted Cosmic Signature NFT; trade on Uniswap on Arbitrum
 - **Cosmic Signature NFT**: ERC-721 generative art based on three-body problem physics; trades on Axiom Zero, the zero-fee marketplace
-- **RandomWalkNFT**: Partner ERC-721 that can be attached to an ETH gesture for a one-time 50% ETH Gesture Cost reduction, or anchored for Anchored-NFT Stellar Selection eligibility
+- **Random Walk NFT**: Partner ERC-721 that can be attached to an ETH gesture for a one-time 50% ETH Gesture Cost reduction, or anchored for Anchored-NFT Stellar Selection eligibility
 
 ## Artwork & Media
 
@@ -69,7 +69,7 @@ Cosmic Signature is not related to the COSMIC cancer mutation database or COSMIC
 
 ## Ecosystem
 
-- [Axiom Zero](https://www.axiomzero.market/cosmic-signature): The zero-fee NFT marketplace for Cosmic Signature and RandomWalk NFTs on Arbitrum. Trades settle directly on-chain, and every token page labels the NFT's anchor status (never anchored vs anchored) read live from the anchoring contracts.
+- [Axiom Zero](https://www.axiomzero.market/cosmic-signature): The zero-fee NFT marketplace for Cosmic Signature and Random Walk NFTs on Arbitrum. Trades settle directly on-chain, and every token page labels the NFT's anchor status (never anchored vs anchored) read live from the anchoring contracts.
 - [Chaos Zero](https://chaoszero.com): The prediction market built specifically for Cosmic Signature. Each Performance Cycle opens one question — will this cycle finalize with more gestures than the previous one? Positions are denominated in CST and fully collateralized by construction, with no owner or admin keys.
 - [Uniswap CST trading](https://app.uniswap.org/swap?chain=arbitrum&inputCurrency=NATIVE&outputCurrency=0xAD91843e6A58Ba560F577E676986AFb1dba6FBA0): Swap ETH for CST on Arbitrum.
 
@@ -81,7 +81,7 @@ Cosmic Signature is not related to the COSMIC cancer mutation database or COSMIC
 ## Technical
 
 - Blockchain: Arbitrum (Ethereum Layer 2)
-- Smart contracts: Open-source Solidity contracts, exact-match verified on-chain; owner-controlled parameters until ownership moves under Cosmic Council control (independently audited by Hacken; report and formal-verification status: https://app.cosmicsignature.com/audits)
+- Smart contracts: Open-source Solidity contracts, exact-match verified on-chain; owner-controlled parameters until ownership moves under Cosmic Council control (independently audited by Hacken; report and formal verification specifications: https://app.cosmicsignature.com/audits)
 - NFT art: Generated from on-chain seeds using an open-source Rust program
 - Frontend: Next.js, React, TypeScript
 
@@ -91,7 +91,7 @@ Cosmic Signature is not related to the COSMIC cancer mutation database or COSMIC
 
 ## 中文概览
 
-Cosmic Signature 是运行于 Arbitrum 的程序化链上艺术协议。参与者在演绎周期中落笔；每一笔都会影响周期最终的签名作品。周期收官后，协议按公开规则将周期储备发往十余条分配轨道，其中包括支持以太坊核心贡献者的 Protocol Guild。
+Cosmic Signature 是运行于 Arbitrum 的程序化链上艺术协议。参与者在演绎周期中落笔；每一笔都会影响周期最终的签名作品。周期收官后，协议按公开规则将周期储备发往一组固定的分配轨道，其中包括支持以太坊核心贡献者的 Protocol Guild。
 
 Cosmic Signature 与 COSMIC 癌症突变数据库及生物学中的 COSMIC 突变特征没有关联。
 
@@ -100,7 +100,7 @@ Cosmic Signature 与 COSMIC 癌症突变数据库及生物学中的 COSMIC 突�
 - [中文主页](https://cosmicsignature.com/zh)：协议与链上艺术概览
 - [关于](https://cosmicsignature.com/zh/about)：协议主体、官方链接与名称辨析
 - [白皮书](https://cosmicsignature.com/zh/white-paper)：协议机制与设计的完整说明（中英双语，附 PDF）
-- [学习中心](https://cosmicsignature.com/zh/learn)：演绎周期、三体艺术、锚定与公共物品说明
+- [学习](https://cosmicsignature.com/zh/learn)：演绎周期、三体艺术、锚定与公共物品说明
 - [中文应用](https://app.cosmicsignature.com/zh)：当前周期与落笔界面
 - [画廊](https://app.cosmicsignature.com/zh/gallery)：浏览已铭刻的 Cosmic Signature NFT
 - [运作原理](https://app.cosmicsignature.com/zh/how-it-works)：完整协议机制
@@ -116,11 +116,11 @@ Cosmic Signature 与 COSMIC 癌症突变数据库及生物学中的 COSMIC 突�
 
 - 每个周期以 ETH 与 CST 校准窗口机制开启；CST 窗口从 12 小时基准出发，并随链上参与变化
 - 每次落笔都会按当前时间增量延长收官倒计时；该增量从 1 小时起步，每有一个周期收官便增长 1%
-- 写下收官之笔的参与者拥有 48 小时专属收官窗口；之后任何人均可收官，实际收官者获得签名分配
-- 每周期储备的 25% 进入签名分配，8% 发往时之勇士，4% 由 3 个 ETH 星选资格共享，6% 用于锚定派发，7% 发往 Protocol Guild，约 50% 滚入下一周期
+- 倒计时归零后，写下收官之笔的参与者拥有 48 小时专属收官窗口；之后任何人均可收官，实际收官者获得签名分配
+- 每周期储备的 25% 进入签名分配，8% 发往时之勇士，4% 分为 3 份，经 ETH 星选发放，6% 用于锚定派发，7% 发往 Protocol Guild，约 50% 滚入下一周期
 - 绝大多数周期会铭刻 24 枚 Cosmic Signature NFT，并配套 24,000 CST；连同 3,000 CST 推广储备，典型固定铭刻总量为 27,000 CST，另有按落笔动态计算的参与 CST
-- 每枚 Cosmic Signature NFT 或 RandomWalk NFT 一生只能锚定一次；解锚后不再具备锚定资格
-- 未使用的 RandomWalk NFT 可附加至一笔 ETH 落笔，使该笔 ETH 落笔价格降低 50%；每枚 RandomWalk NFT 只能用于这项减免一次
+- 每枚 Cosmic Signature NFT 或 Random Walk NFT 一生只能锚定一次；解锚后不再具备锚定资格
+- 未使用的 Random Walk NFT 可附加至一笔 ETH 落笔，使该笔 ETH 落笔价格降低 50%；每枚 Random Walk NFT 仅可用于一次价格减免
 - 次级 ETH 与已附加资产设有 5 周取回期限；期限结束后，任何人都可为自己取回仍未取回的分配
 
 ### 生态
@@ -131,7 +131,7 @@ Cosmic Signature 与 COSMIC 癌症突变数据库及生物学中的 COSMIC 突�
 
 ## 繁體中文（台灣）概覽
 
-Cosmic Signature 是運作於 Arbitrum 的程序化鏈上藝術協議。參與者在演繹週期中落筆；每一筆都會影響週期最終的簽名作品。週期收官後，協議按公開規則將週期儲備發往十餘條分配軌道，其中包括支持以太坊核心貢獻者的 Protocol Guild。
+Cosmic Signature 是運作於 Arbitrum 的程序化鏈上藝術協議。參與者在演繹週期中落筆；每一筆都會影響週期最終的簽名作品。週期收官後，協議按公開規則將週期儲備發往一組固定的分配軌道，其中包括支持以太坊核心貢獻者的 Protocol Guild。
 
 Cosmic Signature 與 COSMIC 癌症突變資料庫及生物學中的 COSMIC 突變特徵沒有關聯。
 
@@ -140,7 +140,7 @@ Cosmic Signature 與 COSMIC 癌症突變資料庫及生物學中的 COSMIC 突�
 - [台灣繁體中文首頁](https://cosmicsignature.com/zh-TW)：協議與鏈上藝術概覽
 - [關於](https://cosmicsignature.com/zh-TW/about)：協議主體、官方連結與名稱辨析
 - [白皮書](https://cosmicsignature.com/zh-TW/white-paper)：協議機制與設計的完整說明（台灣繁體中文與英文雙語，附 PDF）
-- [學習中心](https://cosmicsignature.com/zh-TW/learn)：演繹週期、三體藝術、錨定與公共財說明
+- [學習](https://cosmicsignature.com/zh-TW/learn)：演繹週期、三體藝術、錨定與公共財說明
 - [台灣繁體中文應用程式](https://app.cosmicsignature.com/zh-TW)：目前週期與落筆介面
 - [畫廊](https://app.cosmicsignature.com/zh-TW/gallery)：瀏覽已銘刻的 Cosmic Signature NFT
 - [運作原理](https://app.cosmicsignature.com/zh-TW/how-it-works)：完整協議機制
@@ -156,12 +156,12 @@ Cosmic Signature 與 COSMIC 癌症突變資料庫及生物學中的 COSMIC 突�
 
 - 每個週期以 ETH 與 CST 校準窗口機制開啟；CST 窗口從 12 小時基準出發，並隨鏈上參與變化
 - 每次落筆都會按目前時間增量延長收官倒數；該增量從 1 小時起步，每有一個週期收官便增長 1%
-- 寫下收官之筆的參與者擁有 48 小時專屬收官窗口；之後任何人均可收官，實際收官者獲得簽名分配
-- 每週期儲備的 25% 進入簽名分配，8% 發往時之勇士，4% 由 3 個 ETH 星選資格共享，6% 用於錨定配發，7% 發往 Protocol Guild，約 50% 滾入下一週期
+- 倒數歸零後，寫下收官之筆的參與者擁有 48 小時專屬收官窗口；之後任何人均可收官，實際收官者獲得簽名分配
+- 每週期儲備的 25% 進入簽名分配，8% 發往時之勇士，4% 分為 3 份，經 ETH 星選發放，6% 用於錨定配發，7% 發往 Protocol Guild，約 50% 滾入下一週期
 - 絕大多數週期會銘刻 24 枚 Cosmic Signature NFT，並配套 24,000 CST；連同 3,000 CST 推廣儲備，典型固定銘刻總量為 27,000 CST，另有按落筆動態計算的參與 CST
-- 每枚 Cosmic Signature NFT 或 RandomWalk NFT 一生只能錨定一次；解錨後不再具備錨定資格
-- 未使用的 RandomWalk NFT 可附加至一筆 ETH 落筆，使該筆 ETH 落筆價格降低 50%；每枚 RandomWalk NFT 只能用於這項減免一次
-- 次級 ETH 與已附加資產設有 5 周取回期限；期限結束後，任何人都可為自己取回仍未取回的分配
+- 每枚 Cosmic Signature NFT 或 Random Walk NFT 一生只能錨定一次；解錨後不再具備錨定資格
+- 未使用的 Random Walk NFT 可附加至一筆 ETH 落筆，使該筆 ETH 落筆價格降低 50%；每枚 Random Walk NFT 僅可用於一次價格減免
+- 次級 ETH 與已附加資產設有 5 週取回期限；期限結束後，任何人都可為自己取回仍未取回的分配
 
 ### 生態
 
@@ -171,7 +171,7 @@ Cosmic Signature 與 COSMIC 癌症突變資料庫及生物學中的 COSMIC 突�
 
 ## 繁體中文（香港）概覽
 
-Cosmic Signature 是運行於 Arbitrum 的程序化鏈上藝術協議。參與者在演繹週期中落筆；每一筆都會影響週期最終的簽名作品。週期收官後，協議按公開規則將週期儲備發往十餘條分配軌道，其中包括支持以太坊核心貢獻者的 Protocol Guild。
+Cosmic Signature 是運行於 Arbitrum 的程序化鏈上藝術協議。參與者在演繹週期中落筆；每一筆都會影響週期最終的簽名作品。週期收官後，協議按公開規則將週期儲備發往一組固定的分配軌道，其中包括支持以太坊核心貢獻者的 Protocol Guild。
 
 Cosmic Signature 與 COSMIC 癌症突變數據庫及生物學中的 COSMIC 突變特徵沒有關聯。
 
@@ -180,7 +180,7 @@ Cosmic Signature 與 COSMIC 癌症突變數據庫及生物學中的 COSMIC 突�
 - [香港繁體中文主頁](https://cosmicsignature.com/zh-HK)：協議與鏈上藝術概覽
 - [關於](https://cosmicsignature.com/zh-HK/about)：協議主體、官方連結與名稱辨析
 - [白皮書](https://cosmicsignature.com/zh-HK/white-paper)：協議機制與設計的完整說明（香港繁體中文與英文雙語，附 PDF）
-- [學習中心](https://cosmicsignature.com/zh-HK/learn)：演繹週期、三體藝術、錨定與公共物品說明
+- [學習](https://cosmicsignature.com/zh-HK/learn)：演繹週期、三體藝術、錨定與公共物品說明
 - [香港繁體中文應用程式](https://app.cosmicsignature.com/zh-HK)：目前週期與落筆介面
 - [畫廊](https://app.cosmicsignature.com/zh-HK/gallery)：瀏覽已銘刻的 Cosmic Signature NFT
 - [運作原理](https://app.cosmicsignature.com/zh-HK/how-it-works)：完整協議機制
@@ -196,12 +196,12 @@ Cosmic Signature 與 COSMIC 癌症突變數據庫及生物學中的 COSMIC 突�
 
 - 每個週期以 ETH 與 CST 校準窗口機制開啟；CST 窗口從 12 小時基準出發，並隨鏈上參與變化
 - 每次落筆都會按目前時間增量延長收官倒數；該增量從 1 小時起步，每有一個週期收官便增長 1%
-- 寫下收官之筆的參與者擁有 48 小時專屬收官窗口；之後任何人均可收官，實際收官者獲得簽名分配
-- 每週期儲備的 25% 進入簽名分配，8% 發往時之勇士，4% 由 3 個 ETH 星選資格共享，6% 用於錨定派發，7% 發往 Protocol Guild，約 50% 滾入下一週期
+- 倒數歸零後，寫下收官之筆的參與者擁有 48 小時專屬收官窗口；之後任何人均可收官，實際收官者獲得簽名分配
+- 每週期儲備的 25% 進入簽名分配，8% 發往時之勇士，4% 分為 3 份，經 ETH 星選發放，6% 用於錨定派發，7% 發往 Protocol Guild，約 50% 滾入下一週期
 - 絕大多數週期會銘刻 24 枚 Cosmic Signature NFT，並配套 24,000 CST；連同 3,000 CST 推廣儲備，典型固定銘刻總量為 27,000 CST，另有按落筆動態計算的參與 CST
-- 每枚 Cosmic Signature NFT 或 RandomWalk NFT 一生只能錨定一次；解錨後不再具備錨定資格
-- 未使用的 RandomWalk NFT 可附加至一筆 ETH 落筆，使該筆 ETH 落筆價格降低 50%；每枚 RandomWalk NFT 只能用於這項減免一次
-- 次級 ETH 與已附加資產設有 5 周取回期限；期限結束後，任何人都可為自己取回仍未取回的分配
+- 每枚 Cosmic Signature NFT 或 Random Walk NFT 一生只能錨定一次；解錨後不再具備錨定資格
+- 未使用的 Random Walk NFT 可附加至一筆 ETH 落筆，使該筆 ETH 落筆價格降低 50%；每枚 Random Walk NFT 僅可用於一次價格減免
+- 次級 ETH 與已附加資產設有 5 週取回期限；期限結束後，任何人都可為自己取回仍未取回的分配
 
 ### 生態
 
@@ -211,16 +211,16 @@ Cosmic Signature 與 COSMIC 癌症突變數據庫及生物學中的 COSMIC 突�
 
 ## Українська: огляд
 
-Cosmic Signature — це процедурний протокол ончейн-мистецтва на Arbitrum. Учасники роблять жести протягом перформанс-циклу; кожен жест впливає на фінальну Сигнатуру циклу. Коли цикл завершується, протокол за відкритими правилами розподіляє резерв циклу за понад десятьма напрямами розподілу, серед яких Protocol Guild — механізм підтримки основних розробників Ethereum.
+Cosmic Signature — це процедурний протокол ончейн-мистецтва на Arbitrum. Учасники роблять жести протягом перформанс-циклу; кожен жест впливає на фінальну Сигнатуру циклу. Коли цикл завершується, протокол за відкритими правилами розподіляє резерв циклу за фіксованим набором напрямів розподілу, серед яких Protocol Guild — механізм підтримки основних розробників Ethereum.
 
 Cosmic Signature не пов’язаний із базою даних мутацій раку COSMIC чи мутаційними сигнатурами COSMIC у біології.
 
 ### Ключові сторінки українською
 
 - [Головна сторінка](https://cosmicsignature.com/uk): огляд протоколу й ончейн-мистецтва
-- [Про проєкт](https://cosmicsignature.com/uk/about): суб’єкт протоколу, офіційні посилання та розрізнення назв
+- [Про проєкт](https://cosmicsignature.com/uk/about): опис протоколу, офіційні посилання та пояснення назви
 - [Біла книга](https://cosmicsignature.com/uk/white-paper): повний опис механіки та дизайну протоколу (з PDF)
-- [Навчальний центр](https://cosmicsignature.com/uk/learn): перформанс-цикли, мистецтво трьох тіл, закріплення та суспільні блага
+- [Навчання](https://cosmicsignature.com/uk/learn): перформанс-цикли, мистецтво трьох тіл, закріплення та суспільні блага
 - [Застосунок](https://app.cosmicsignature.com/uk): поточний цикл та інтерфейс жестів
 - [Галерея](https://app.cosmicsignature.com/uk/gallery): перегляд закарбованих Cosmic Signature NFT
 - [Як це працює](https://app.cosmicsignature.com/uk/how-it-works): повна механіка протоколу
@@ -236,11 +236,11 @@ Cosmic Signature не пов’язаний із базою даних мута�
 
 - Кожен цикл відкривається механізмом вікон калібрування ETH і CST; вікно CST стартує від базових 12 годин і змінюється разом з ончейн-участю
 - Кожен жест подовжує відлік до завершення на поточний часовий приріст; приріст починається з 1 години й зростає на 1% з кожним завершеним циклом
-- Учасник, який зробив завершальний жест, має ексклюзивне вікно завершення тривалістю 48 годин; після нього завершити цикл може будь-хто, і той, хто це зробить, отримує розподіл Сигнатури
-- З резерву кожного циклу 25% іде на розподіл Сигнатури, 8% — Воїну часу, 4% ділять 3 записи зоряного відбору ETH, 6% — надходження за закріплення, 7% — Protocol Guild, а близько 50% переходить у наступний цикл
-- У більшості циклів закарбовується 24 Cosmic Signature NFT разом із 24 тис. CST; разом із 3 тис. CST для резерву просування типовий фіксований обсяг становить 27 тис. CST, а CST участі закарбовуються динамічно за кожен жест
-- Кожен Cosmic Signature NFT або RandomWalk NFT можна закріпити лише раз; після відкріплення він більше не може бути закріплений
-- Невикористаний RandomWalk NFT можна долучити до ETH-жесту, і вартість цього ETH-жесту зменшиться на 50%; кожен RandomWalk NFT дає таке зменшення лише один раз
+- Після обнулення відліку учасник, який зробив завершальний жест, має ексклюзивне вікно завершення тривалістю 48 годин; після нього завершити цикл може будь-хто, і той, хто це зробить, отримує розподіл Сигнатури
+- З резерву кожного циклу 25% іде на розподіл Сигнатури, 8% — Воїну часу, 4% діляться на 3 рівні частки для зоряного відбору ETH, 6% — надходження за закріплення, 7% — Protocol Guild, а близько 50% переходить у наступний цикл
+- У більшості циклів закарбовується 24 Cosmic Signature NFT разом із 24 000 CST; разом із 3 000 CST для резерву просування типовий фіксований обсяг становить 27 000 CST, а CST участі закарбовуються динамічно за кожен жест
+- Кожен Cosmic Signature NFT або Random Walk NFT можна закріпити лише раз; після відкріплення він більше не може бути закріплений
+- Невикористаний Random Walk NFT можна долучити до ETH-жесту, і вартість цього ETH-жесту зменшиться на 50%; кожен Random Walk NFT дає таке зменшення лише один раз
 - Для вторинних ETH та долучених активів діє термін отримання 5 тижнів; після його завершення будь-хто може забрати собі незабрані розподіли
 
 ### Екосистема
@@ -248,3 +248,123 @@ Cosmic Signature не пов’язаний із базою даних мута�
 - [Axiom Zero](https://www.axiomzero.market/cosmic-signature): NFT-маркетплейс на Arbitrum без комісії платформи
 - [Chaos Zero](https://chaoszero.com): ринок прогнозів для циклів Cosmic Signature; запитання кожного циклу — чи буде на момент завершення більше жестів, ніж у попередньому циклі
 - [Обмін CST на Uniswap](https://app.uniswap.org/swap?chain=arbitrum&inputCurrency=NATIVE&outputCurrency=0xAD91843e6A58Ba560F577E676986AFb1dba6FBA0): обмін CST на Arbitrum
+
+## 한국어 개요
+
+Cosmic Signature는 Arbitrum 위에서 작동하는 절차적 온체인 아트 프로토콜입니다. 참여자는 퍼포먼스 사이클 동안 제스처를 남기고, 모든 제스처는 사이클의 최종 시그니처에 영향을 줍니다. 사이클이 마감되면 프로토콜은 공개된 규칙에 따라 사이클 준비금을 정해진 배분 경로로 배분하며, 그 가운데에는 이더리움 핵심 기여자를 지원하는 Protocol Guild가 있습니다.
+
+Cosmic Signature는 COSMIC 암 돌연변이 데이터베이스나 생물학의 COSMIC 돌연변이 시그니처와 관련이 없습니다.
+
+### 한국어 주요 페이지
+
+- [한국어 홈](https://cosmicsignature.com/ko): 프로토콜과 온체인 아트 개요
+- [소개](https://cosmicsignature.com/ko/about): 프로토콜 소개, 공식 링크, 같은 이름의 다른 서비스와의 구분
+- [백서](https://cosmicsignature.com/ko/white-paper): 프로토콜 메커니즘과 설계의 전체 설명 (한국어와 영어, PDF 포함)
+- [학습](https://cosmicsignature.com/ko/learn): 퍼포먼스 사이클, 삼체 아트, 앵커링, 공공재 설명
+- [한국어 앱](https://app.cosmicsignature.com/ko): 현재 사이클과 제스처 인터페이스
+- [갤러리](https://app.cosmicsignature.com/ko/gallery): 각인된 Cosmic Signature NFT 둘러보기
+- [작동 원리](https://app.cosmicsignature.com/ko/how-it-works): 전체 프로토콜 메커니즘
+- [자주 묻는 질문](https://app.cosmicsignature.com/ko/faq): 주제별로 정리한 한국어 답변
+- [통계](https://app.cosmicsignature.com/ko/statistics): 공개 프로토콜 데이터
+- [앵커링](https://app.cosmicsignature.com/ko/anchoring): 앵커링 규칙과 지급 내역
+- [컨트랙트](https://app.cosmicsignature.com/ko/contracts): 배포된 컨트랙트 주소
+- [보안](https://app.cosmicsignature.com/ko/security): 검증 자료와 안전한 참여 안내
+- [보안 감사](https://app.cosmicsignature.com/ko/audits): Hacken 감사 보고서와 정형 검증 배경
+- [위험 고지](https://app.cosmicsignature.com/ko/risk-disclosures): 블록체인, 지갑, 프로토콜 참여의 위험
+
+### 프로토콜 요점
+
+- 모든 사이클은 ETH 및 CST 보정 구간 메커니즘으로 시작합니다. CST 보정 구간은 12시간 기준에서 출발해 온체인 참여에 따라 달라집니다
+- 모든 제스처는 현재 시간 증가량만큼 마감 카운트다운을 연장합니다. 시간 증가량은 1시간에서 시작해 사이클이 마감될 때마다 1% 늘어납니다
+- 카운트다운이 0이 되면 최종 제스처를 남긴 참여자에게 48시간의 우선 마감 구간이 주어집니다. 그 뒤에는 누구나 사이클을 마감할 수 있으며, 실제로 마감한 사람이 시그니처 배분을 받습니다.
+- 각 사이클 준비금의 25%는 시그니처 배분으로, 8%는 시간의 전사에게, 4%는 ETH 별빛 선정으로 정해지는 3건에 균등 배분되고, 6%는 앵커링 지급에, 7%는 Protocol Guild에 전달되며, 약 50%는 다음 사이클로 이월됩니다.
+- 대부분의 사이클에서는 Cosmic Signature NFT 24개가 각인되고 여기에 24,000 CST가 함께 각인됩니다. 홍보 준비금 3,000 CST를 더하면 일반적인 사이클의 고정 각인 총량은 27,000 CST이며, 제스처마다 동적으로 계산되는 참여 CST는 별도입니다.
+- 각 Cosmic Signature NFT 또는 Random Walk NFT는 평생 한 번만 앵커링할 수 있으며, 앵커링을 해제하면 다시 앵커링할 수 없습니다.
+- 사용하지 않은 Random Walk NFT는 ETH 제스처 하나에 첨부해 그 ETH 제스처의 비용을 50% 할인받을 수 있습니다. 각 Random Walk NFT는 이 할인에 한 번만 쓸 수 있습니다.
+- 2차 ETH와 첨부 자산에는 5주의 회수 기한이 있으며, 기한이 지나면 누구나 미회수 배분을 자기 몫으로 회수할 수 있습니다.
+
+### 생태계
+
+- [Axiom Zero](https://www.axiomzero.market/cosmic-signature): 플랫폼 수수료가 없는 Arbitrum NFT 마켓플레이스
+- [Chaos Zero](https://chaoszero.com): Cosmic Signature 사이클을 다루는 예측 시장. 사이클마다 "이번 사이클은 이전 사이클보다 더 많은 제스처로 마감될 것인가?"를 묻습니다.
+- [Uniswap CST 교환](https://app.uniswap.org/swap?chain=arbitrum&inputCurrency=NATIVE&outputCurrency=0xAD91843e6A58Ba560F577E676986AFb1dba6FBA0): Arbitrum에서 CST 교환
+
+## 日本語の概要
+
+Cosmic SignatureはArbitrum上で動くプロシージャル・オンチェーンアート・プロトコルです。参加者はパフォーマンス・サイクルの間に一筆を入れ、すべての一筆がサイクルの最終シグネチャーに影響します。サイクルが確定すると、プロトコルは公開されたルールに従ってサイクル準備金を定められた配分トラックへ配り、その中にはEthereumのコア貢献者を支えるProtocol Guildも含まれます。
+
+Cosmic Signatureは、COSMICがん変異データベースや生物学のCOSMIC変異シグネチャーとは関係がありません。
+
+### 日本語の主要ページ
+
+- [日本語ホーム](https://cosmicsignature.com/ja): プロトコルとオンチェーンアートの概要
+- [概要](https://cosmicsignature.com/ja/about): プロトコルの概要、公式リンク、同名のサービスとの区別
+- [ホワイトペーパー](https://cosmicsignature.com/ja/white-paper): プロトコルの仕組みと設計の完全な説明（日本語と英語、PDFあり）
+- [学ぶ](https://cosmicsignature.com/ja/learn): パフォーマンス・サイクル、三体アート、係留、公共財の解説
+- [日本語アプリ](https://app.cosmicsignature.com/ja): 現在のサイクルと一筆のインターフェース
+- [ギャラリー](https://app.cosmicsignature.com/ja/gallery): 刻印されたCosmic Signature NFTを見る
+- [仕組み](https://app.cosmicsignature.com/ja/how-it-works): プロトコルの仕組みの全体
+- [よくある質問](https://app.cosmicsignature.com/ja/faq): 話題ごとに整理した日本語の回答
+- [統計](https://app.cosmicsignature.com/ja/statistics): 公開のプロトコルデータ
+- [係留](https://app.cosmicsignature.com/ja/anchoring): 係留のルールと配分の履歴
+- [コントラクト](https://app.cosmicsignature.com/ja/contracts): デプロイ済みのコントラクトアドレス
+- [セキュリティ](https://app.cosmicsignature.com/ja/security): 検証のリソースと安全な参加の案内
+- [監査](https://app.cosmicsignature.com/ja/audits): Hackenの監査報告書と形式検証の背景
+- [リスク開示](https://app.cosmicsignature.com/ja/risk-disclosures): ブロックチェーン、ウォレット、プロトコル参加のリスク
+
+### プロトコルの要点
+
+- すべてのサイクルはETHとCSTの調律期間の仕組みで始まります。CST調律期間は初期値は12時間で、オンチェーンの参加に応じて変わります。
+- すべての一筆は現在の時間増分だけ確定までのカウントダウンを延ばします。時間増分は1時間から始まり、サイクルが確定するごとに1%ずつ増えます。
+- カウントダウンがゼロになると、最後の一筆を入れた参加者に48時間の優先確定期間が与えられます。その後は誰でもサイクルを確定でき、実際に確定した人がシグネチャー配分を受け取ります。
+- 各サイクル準備金の25%はシグネチャー配分に、8%は時の戦士に、4%はETH星選で選ばれた3件に均等配分され、6%は係留配分に、7%はProtocol Guildへ送られ、約50%は次のサイクルへ持ち越されます。
+- 大多数のサイクルでは24枚のCosmic Signature NFTが刻印され、それとともに24,000 CSTが刻印されます。広報準備金の3,000 CSTを加えると、標準的なサイクルの固定の刻印の合計は27,000 CSTで、一筆ごとに動的に計算される参加CSTは別です。
+- 各Cosmic Signature NFTまたは各Random Walk NFTを係留できるのは一度だけで、解除後は再係留できません。
+- 未使用のRandom Walk NFTはETH一筆に添付でき、その一筆の費用が50%割引されます。各Random Walk NFTはこの割引に一度しか使えません。
+- 二次的なETHと添付されたアセットには5週間の受け取り期限があり、期限が過ぎると誰でも未受け取りの配分を自分のものとして受け取れます。
+
+### エコシステム
+
+- [Axiom Zero](https://www.axiomzero.market/cosmic-signature): プラットフォーム手数料のないArbitrumのNFTマーケットプレイス
+- [Chaos Zero](https://chaoszero.com): Cosmic Signatureのサイクルを扱う予測市場。サイクルごとに「このサイクルは前のサイクルより多い筆数で確定するか？」を問います。
+- [UniswapでのCSTスワップ](https://app.uniswap.org/swap?chain=arbitrum&inputCurrency=NATIVE&outputCurrency=0xAD91843e6A58Ba560F577E676986AFb1dba6FBA0): Arbitrum上でのCSTのスワップ
+
+## Tiếng Việt: tổng quan
+
+Cosmic Signature là giao thức nghệ thuật tạo sinh trên chuỗi Arbitrum. Người tham gia đặt nét bút trong một chu kỳ trình diễn, và mỗi nét bút đều định hình Signature cuối cùng của chu kỳ. Khi chu kỳ hoàn tất, giao thức phân phối Dự trữ chu kỳ qua một nhóm luồng phân bổ cố định theo các quy tắc đã công bố, bao gồm Protocol Guild, cơ chế tài trợ cho những người đóng góp cốt lõi cho Ethereum.
+
+Cosmic Signature không liên quan đến cơ sở dữ liệu đột biến ung thư COSMIC hay các chữ ký đột biến COSMIC trong sinh học.
+
+### Các trang chính bằng tiếng Việt
+
+- [Trang chủ tiếng Việt](https://cosmicsignature.com/vi): Tổng quan về giao thức và nghệ thuật trên chuỗi
+- [Về Cosmic Signature](https://cosmicsignature.com/vi/about): Giới thiệu giao thức, liên kết chính thức và phân biệt với các dịch vụ trùng tên
+- [Sách trắng](https://cosmicsignature.com/vi/white-paper): Mô tả đầy đủ về cơ chế và thiết kế của giao thức (tiếng Việt và tiếng Anh, có bản PDF)
+- [Tìm hiểu](https://cosmicsignature.com/vi/learn): Giải thích về chu kỳ trình diễn, nghệ thuật ba vật thể, neo giữ và Hàng hóa công
+- [Ứng dụng tiếng Việt](https://app.cosmicsignature.com/vi): Giao diện chu kỳ hiện tại và nét bút
+- [Phòng trưng bày](https://app.cosmicsignature.com/vi/gallery): Xem các Cosmic Signature NFT đã khắc
+- [Cách hoạt động](https://app.cosmicsignature.com/vi/how-it-works): Toàn bộ cơ chế của giao thức
+- [Câu hỏi thường gặp](https://app.cosmicsignature.com/vi/faq): Giải đáp bằng tiếng Việt, sắp theo chủ đề
+- [Thống kê](https://app.cosmicsignature.com/vi/statistics): Dữ liệu giao thức công khai
+- [Neo giữ](https://app.cosmicsignature.com/vi/anchoring): Quy tắc neo giữ và lịch sử phân phối
+- [Hợp đồng](https://app.cosmicsignature.com/vi/contracts): Địa chỉ các hợp đồng đã triển khai
+- [Bảo mật](https://app.cosmicsignature.com/vi/security): Tài nguyên xác minh và hướng dẫn tham gia an toàn
+- [Kiểm toán](https://app.cosmicsignature.com/vi/audits): Báo cáo kiểm toán của Hacken và bối cảnh kiểm chứng hình thức
+- [Công bố rủi ro](https://app.cosmicsignature.com/vi/risk-disclosures): Rủi ro về blockchain, ví và việc tham gia giao thức
+
+### Những điểm chính của giao thức
+
+- Mỗi chu kỳ bắt đầu với cơ chế cửa sổ hiệu chỉnh ETH và CST. Cửa sổ hiệu chỉnh CST khởi đầu từ mốc tham chiếu 12 giờ và thay đổi theo mức tham gia trên chuỗi
+- Mỗi nét bút kéo dài đếm ngược hoàn tất thêm mức tăng thời gian hiện tại. Mức tăng khởi đầu ở 1 giờ và lớn thêm 1% sau mỗi chu kỳ hoàn tất
+- Khi đếm ngược về không, người đặt nét bút cuối cùng có cửa sổ hoàn tất ưu tiên 48 giờ. Sau đó bất kỳ ai cũng có thể hoàn tất chu kỳ, và người thực sự hoàn tất nhận phân bổ Signature
+- Trong Dự trữ chu kỳ, 25% dành cho phân bổ Signature, 8% cho Chiến binh Thời gian, 4% chia cho 3 lượt ETH Tinh tuyển, 6% cho phân phối neo giữ, 7% chuyển đến Protocol Guild, và khoảng 50% chuyển sang chu kỳ tiếp theo
+- Trong phần lớn các chu kỳ, 24 Cosmic Signature NFT được khắc cùng với 24.000 CST. Cộng 3.000 CST của Dự trữ truyền thông, tổng lượng khắc cố định của một chu kỳ điển hình là 27.000 CST, chưa kể CST tham gia được tính động theo từng nét bút
+- Mỗi Cosmic Signature NFT hoặc mỗi Random Walk NFT chỉ có thể được neo giữ đúng một lần trong đời; sau khi gỡ neo, nó không thể neo giữ lại
+- Một Random Walk NFT chưa sử dụng có thể được đính kèm vào một nét bút ETH để giảm 50% chi phí nét bút ETH đó. Mỗi Random Walk NFT chỉ dùng được một lần cho mức giảm này
+- ETH phụ và tài sản đính kèm có thời hạn nhận về 5 tuần; sau thời hạn đó, bất kỳ ai cũng có thể nhận về phân bổ chưa được nhận cho chính họ
+
+### Hệ sinh thái
+
+- [Axiom Zero](https://www.axiomzero.market/cosmic-signature): Sàn NFT trên Arbitrum không thu phí nền tảng
+- [Chaos Zero](https://chaoszero.com): Thị trường dự đoán về các chu kỳ của Cosmic Signature. Mỗi chu kỳ đặt câu hỏi: Chu kỳ này có hoàn tất với nhiều nét bút hơn chu kỳ trước không?
+- [Hoán đổi CST trên Uniswap](https://app.uniswap.org/swap?chain=arbitrum&inputCurrency=NATIVE&outputCurrency=0xAD91843e6A58Ba560F577E676986AFb1dba6FBA0): Hoán đổi CST trên Arbitrum

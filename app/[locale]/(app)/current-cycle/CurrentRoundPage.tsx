@@ -1,38 +1,19 @@
 'use client';
 
-import { useState, useMemo } from 'react';
-import { zeroAddress } from 'viem';
-import {
-  ArrowLeft,
-  ArrowRight,
-  Hash,
-  Trophy,
-  Shuffle,
-  Heart,
-  Coins,
-  ImageIcon,
-  Radio,
-  Zap,
-} from 'lucide-react';
-import { motion } from 'framer-motion';
-import { useLocale, useTranslations } from 'next-intl';
+import type { ReactNode } from 'react';
+import { useMemo, useState } from 'react';
+import { useTranslations } from 'next-intl';
 
-import { getEnduranceChampions, formatEthValue } from '@/utils';
+import { getEnduranceChampions } from '@/utils';
 
-import { Link } from '@/i18n/navigation';
+import { StandingsLedger } from '@/components/home/observatory/StandingsLedger';
 import { PageShell } from '@/components/ui/page-shell';
-import { StatCard } from '@/components/ui/stat-card';
-import { InfoTooltip } from '@/components/ui/info-tooltip';
-import { Spinner } from '@/components/ui/spinner';
 import { ErrorState } from '@/components/ui/error-state';
-import { Button } from '@/components/ui/button';
-import { AttachedNFTAllocationShowcase } from '@/components/attachments/DonatedNFTPrizeShowcase';
-import { RoundInfoSection } from '@/components/home/RoundInfoSection';
-import Counter from '@/components/common/Counter';
-import { useHydrationSafeDateTime } from '@/components/common/HydrationSafeDateTime';
-import { SmoothCountdown } from '@/components/common/SmoothCountdown';
-import { SpecialAllocationRecipients } from '@/components/tables/SpecialAllocationRecipients';
-import type { AttachedNFT as DonatedNFTType } from '@/services/api/types';
+import { SectionHeader } from '@/components/ui/section-header';
+import { Skeleton, SkeletonTable } from '@/components/ui/skeleton';
+import type { DonatedERC20Token } from '@/components/attachments/AttachedERC20Table';
+import type { EthDonation } from '@/components/tables/EthDonationTable';
+import type { AttachedNFT } from '@/services/api/types';
 import {
   useDashboardInfo,
   useGestureListByCycle,
@@ -41,50 +22,122 @@ import {
   useDonationsERC20ByRound,
   useCurrentTime,
 } from '@/hooks/useApiQuery';
-import { TOUCH_TARGET_TEXT_LINK_CLASS } from '@/lib/touch-target';
-import { cn } from '@/lib/utils';
+import { useChampions } from '@/hooks/useChampions';
+import { deriveAllocationTrackAmounts } from '@/lib/allocationTracks';
+import { ZERO_ADDRESS } from '@/lib/cycleState';
 import { resolveLatestGesture } from '@/lib/latestGesture';
 import { useAllocationFinalize } from '@/hooks/useAllocationFinalize';
 import { useEndgameChainSync } from '@/hooks/useEndgameChainSync';
+import { useHomeAnnouncer } from '@/hooks/useHomeAnnouncer';
+import { useLiveFreshness } from '@/hooks/useLiveFreshness';
 import { useNow } from '@/hooks/useNow';
+import { useActiveWeb3React } from '@/hooks/web3';
 
-type EthDonation = import('@/components/tables/EthDonationTable').EthDonation;
-type DonatedERC20 = import('@/components/attachments/AttachedERC20Table').DonatedERC20Token;
+import { cyclePhaseView } from './cyclePhase';
+import { CycleDetails } from './components/CycleDetails';
+import { CYCLE_SECTION_SCROLL_MARGIN, CycleSectionNav } from './components/CycleSectionNav';
+import { CYCLE_REGION_CLASS, CycleClock, CycleFigures } from './components/CycleStatus';
 
-const sectionFade = {
-  hidden: { opacity: 0, y: 16 },
-  visible: (i: number) => ({
-    opacity: 1,
-    y: 0,
-    transition: { delay: i * 0.08, duration: 0.4, ease: 'easeOut' as const },
-  }),
-};
+const EMPTY: never[] = [];
 
-const CurrentRoundPage = () => {
+/**
+ * The first screen: the header's text beside the cycle's clock and commit
+ * action (under it on smaller screens). The section bar below draws the rule
+ * under both.
+ */
+function HeroRow({ header, aside }: { header: ReactNode; aside: ReactNode }) {
+  return (
+    <div className="grid gap-x-12 gap-y-8 pb-6 sm:pb-10 lg:grid-cols-12 lg:items-end xl:gap-x-16">
+      <div className="min-w-0 lg:col-span-7">{header}</div>
+      <div className="min-w-0 lg:col-span-5">{aside}</div>
+    </div>
+  );
+}
+
+/** The clock's place while the first dashboard read is in flight. */
+function ClockSkeleton() {
+  return (
+    <div aria-hidden className="space-y-4">
+      <Skeleton className="h-5 w-40" />
+      <Skeleton className="h-16 w-4/5" />
+      <Skeleton className="h-4 w-3/5" />
+      <Skeleton className="h-12 w-48 rounded-control" />
+    </div>
+  );
+}
+
+/** The page body while the first dashboard read is in flight: the figures, the standings and a ledger. */
+function CurrentCycleSkeleton() {
+  const t = useTranslations('common');
+  return (
+    <div role="status" aria-label={t('status.loading')} className="space-y-[var(--block-gap)]">
+      <div className="grid gap-10 lg:grid-cols-12 lg:gap-x-12" aria-hidden>
+        <div className="space-y-3 lg:col-span-5">
+          <Skeleton className="h-6 w-40" />
+          <Skeleton className="h-48 w-full rounded-surface" />
+        </div>
+        <div className="space-y-3 lg:col-span-7">
+          <Skeleton className="h-6 w-56" />
+          <Skeleton className="h-28 w-full rounded-surface" />
+          <Skeleton className="h-28 w-full rounded-surface" />
+        </div>
+      </div>
+      <SkeletonTable announce={false} />
+    </div>
+  );
+}
+
+/**
+ * `seoSummary` is the server-rendered page header, the page's only header: it
+ * names the cycle and carries its gesture count and opening time. Beside it
+ * sit the clock and the page's one commit action, so both are in the first
+ * screen; the body starts with the section bar and never repeats those
+ * figures. `relatedPages` (server-rendered) closes the page, after the rules.
+ *
+ * The dashboard polls every few seconds. A failed poll keeps the last reading
+ * on screen (the live status says it is delayed, and the clock stops calling
+ * itself live); the page is replaced by an error only when nothing has ever
+ * loaded, and "Try again" refetches instead of reloading the page. A polite
+ * status speaks the changes a reader acts on (a new Last Gesture by someone
+ * else, the clock's phase changes), never every poll.
+ */
+const CurrentRoundPage = ({
+  seoSummary,
+  relatedPages,
+}: {
+  seoSummary?: ReactNode;
+  relatedPages?: ReactNode;
+}) => {
   const t = useTranslations('currentCycle');
-  const locale = useLocale();
-  const { data: dashboardData, isLoading, isError } = useDashboardInfo();
+  const tTables = useTranslations('tables');
+  const dashboard = useDashboardInfo();
+  const data = dashboard.data ?? null;
   const { data: currentTimeRaw, dataUpdatedAt: currentTimeUpdatedAt } = useCurrentTime();
-  const round = dashboardData?.CurRoundNum ?? -1;
+  const round = data?.CurRoundNum ?? -1;
 
-  const { data: bidListData } = useGestureListByCycle(round, 'desc');
+  const gestureQuery = useGestureListByCycle(round, 'desc');
   const { data: nftDonationsData } = useDonationsNFTByRound(round);
   const { data: ethDonationsRawData } = useDonationsCGWithInfoByRound(round);
   const { data: erc20DonationsData } = useDonationsERC20ByRound(round);
+  const freshness = useLiveFreshness();
 
-  const data = dashboardData ?? null;
-  const curGestureList = useMemo(() => bidListData ?? [], [bidListData]);
+  const gestures = gestureQuery.data ?? EMPTY;
   const latestResolution = useMemo(
     () =>
       resolveLatestGesture({
         dashboardLastAddress: data?.LastBidderAddr,
-        gestures: curGestureList,
+        gestures,
       }),
-    [curGestureList, data?.LastBidderAddr],
+    [gestures, data?.LastBidderAddr],
   );
-  const donatedNFTs = (nftDonationsData ?? []) as DonatedNFTType[];
-  const ethDonations = (ethDonationsRawData ?? []) as EthDonation[];
-  const donatedERC20Tokens = (erc20DonationsData ?? []) as DonatedERC20[];
+  // Standings exist once someone has gestured (known on the server too, unlike the phase).
+  const hasStandings = !!data && data.TsRoundStart !== 0 && data.LastBidderAddr !== ZERO_ADDRESS;
+  // The holders of the four roles: the same reading the home's standings show.
+  const champions = useChampions(undefined, latestResolution.evidence, hasStandings);
+  const trackAmounts = useMemo(() => deriveAllocationTrackAmounts(data), [data]);
+  const attachedNfts = (nftDonationsData ?? EMPTY) as AttachedNFT[];
+  const ethDonations = (ethDonationsRawData ?? EMPTY) as EthDonation[];
+  const attachedErc20 = (erc20DonationsData ?? EMPTY) as DonatedERC20Token[];
 
   const [currentTimeFallbackMs] = useState(() => Date.now());
   const nowMs = useNow(1000);
@@ -95,278 +148,147 @@ const CurrentRoundPage = () => {
     return currentTimeRaw * 1000 - sampledAtMs;
   }, [currentTimeRaw, currentTimeUpdatedAt, currentTimeFallbackMs]);
 
-  const { allocationTime, activationTime } = useAllocationFinalize({ data, offset });
+  const { allocationTime, activationTime, timeoutFinalize } = useAllocationFinalize({
+    data,
+    offset,
+  });
+  const { account } = useActiveWeb3React();
   // Final-minute synchronizer: 1s direct-chain reads around the zero-cross so
   // the page doesn't declare the cycle finished on a stale countdown target.
   const endgame = useEndgameChainSync({ targetMs: allocationTime });
-  const finalizationConfirmed = !endgame.isConfirmationPending;
-  const roundStartedDate = useHydrationSafeDateTime(data?.TsRoundStart ?? 0, false, locale);
-  const activationDate = useHydrationSafeDateTime(activationTime, true, locale);
 
   const championList = useMemo(() => {
-    if (!bidListData) return null;
-    const champions = getEnduranceChampions(bidListData, 0, Math.floor(nowMs / 1000));
+    if (!gestureQuery.data || nowMs <= 0) return null;
+    const champions = getEnduranceChampions(gestureQuery.data, 0, Math.floor(nowMs / 1000));
     return [...champions].sort((a, b) => b.chronoWarrior - a.chronoWarrior);
-  }, [bidListData, nowMs]);
+  }, [gestureQuery.data, nowMs]);
 
-  const [curPage, setCurPage] = useState(1);
-  const [donatedTokensTab, setDonatedTokensTab] = useState(0);
-  const perPage = 12;
+  const participants = useMemo(
+    () => (gestureQuery.data ? new Set(gestureQuery.data.map((g) => g.BidderAddr)).size : null),
+    [gestureQuery.data],
+  );
 
-  if (isLoading) {
+  const phase = data
+    ? cyclePhaseView({
+        data,
+        allocationTime,
+        activationTime,
+        now: nowMs,
+        finalizationConfirmed: !endgame.isConfirmationPending,
+        fresh: freshness.state === 'live' || freshness.state === 'connecting',
+        account,
+        // Unknown until the contract's timeout is read: until then only the
+        // latest participant is offered the finalize action.
+        openFinalizationMs:
+          allocationTime > 0 && timeoutFinalize > 0
+            ? allocationTime + timeoutFinalize * 1000
+            : null,
+      })
+    : null;
+  // The same voice as the home clock: a new Last Gesture by someone else and
+  // the phase changes (final hour, final minute, zero), nothing on load.
+  const announcement = useHomeAnnouncer({
+    phase: phase?.state.phase ?? 'loading',
+    latestAddress: data?.LastBidderAddr,
+    gestureCount: data?.CurNumBids ?? null,
+    account,
+  });
+
+  if (!data || !phase) {
     return (
       <PageShell variant="data" backdrop="signature">
-        <div className="flex items-center justify-center py-32">
-          <Spinner size="lg" />
-        </div>
-      </PageShell>
-    );
-  }
-
-  if (isError || !data) {
-    return (
-      <PageShell variant="data" backdrop="signature">
-        <ErrorState
-          title={t('error.title')}
-          message={t('error.message')}
-          onRetry={() => window.location.reload()}
+        <HeroRow header={seoSummary} aside={dashboard.isError ? null : <ClockSkeleton />} />
+        {/* The section bar draws the header's bottom rule; until it renders, this does. */}
+        <div
+          aria-hidden
+          data-testid="header-rule-stand-in"
+          className="mb-8 border-b border-rule sm:mb-10"
         />
+        {dashboard.isError ? (
+          <ErrorState
+            headingLevel={2}
+            title={t('error.title')}
+            message={t('error.message')}
+            onRetry={() => void dashboard.refetch()}
+          />
+        ) : (
+          <CurrentCycleSkeleton />
+        )}
       </PageShell>
     );
   }
-
-  const roundStarted = data.TsRoundStart ? roundStartedDate : t('status.notStarted');
-
-  const hasStarted = data.TsRoundStart !== 0;
-  const hasLastParticipant = data.LastBidderAddr !== zeroAddress;
-  const isPreActivation = activationTime > nowMs / 1000;
-  const isCountdownActive = hasLastParticipant && allocationTime > nowMs;
-  const isPastDeadline = hasLastParticipant && allocationTime > 0 && allocationTime <= nowMs;
-  // Only declare the cycle finished once the zero-cross is confirmed on-chain;
-  // a last-second gesture may still have extended the deadline.
-  const isConfirmingFinalization = isPastDeadline && !finalizationConfirmed;
-  const isGesturesExhausted = isPastDeadline && finalizationConfirmed;
-  const statusBadgeLabel = isPreActivation
-    ? t('hero.status.openingSoon')
-    : !hasLastParticipant
-      ? t('hero.status.awaitingFirstGesture')
-      : isGesturesExhausted
-        ? t('hero.status.readyToFinalize')
-        : t('hero.status.live');
-  const primaryCtaLabel = isPreActivation
-    ? t('hero.cta.viewHomeClock')
-    : isGesturesExhausted
-      ? t('hero.cta.finalizeCycle')
-      : !hasLastParticipant
-        ? t('hero.cta.makeFirstGesture')
-        : t('hero.cta.makeGesture');
-
-  const charityAmount =
-    (Number(data.CosmicGameBalanceEth) || 0) * ((data.CharityPercentage ?? 0) / 100);
 
   return (
     <PageShell variant="data" backdrop="signature">
-      {/* Back navigation */}
-      <Link
-        href="/"
-        className={cn(
-          'inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-white transition-colors mb-6',
-          TOUCH_TARGET_TEXT_LINK_CLASS,
-        )}
-      >
-        <ArrowLeft className="h-3.5 w-3.5" />
-        {t('nav.backToHome')}
-      </Link>
+      <HeroRow
+        header={seoSummary}
+        aside={
+          <CycleClock
+            data={data}
+            phase={phase}
+            nowMs={nowMs}
+            // One freshness stamp per page: the ledger's while there is one.
+            liveStatus={!hasStandings}
+          />
+        }
+      />
+      <CycleSectionNav hasStandings={hasStandings} />
 
-      {/* ===== HERO SECTION ===== */}
-      {/* No gradient-border-card (mask pseudo): Chrome/Skia PDF often drops nested content in that compositing path. */}
-      <div className="relative mb-8 flex flex-col gap-6 overflow-hidden rounded-2xl border border-white/[0.1] bg-[linear-gradient(135deg,rgb(var(--aurora-cyan-rgb)/0.11),rgb(var(--nebula-violet-rgb)/0.08)_46%,transparent)] p-6 shadow-[0_24px_100px_-72px_rgb(var(--aurora-cyan-rgb)/0.9)] backdrop-blur-sm print:overflow-visible sm:p-8">
-        <div
-          aria-hidden
-          className="pointer-events-none absolute -right-16 -top-20 h-72 w-72 rounded-full opacity-40 blur-3xl"
-          style={{
-            background:
-              'radial-gradient(circle, rgb(var(--aurora-cyan-rgb) / 0.22), rgb(var(--nebula-violet-rgb) / 0.18) 48%, transparent 70%)',
-          }}
-        />
-        {/* Header row: LIVE badge + round info */}
-        <div className="flex flex-wrap items-center justify-between gap-4">
-          <div className="flex items-center gap-3">
-            <div className="relative flex h-10 w-10 items-center justify-center rounded-xl bg-primary/10">
-              <Radio className="h-5 w-5 text-primary" />
-              <span className="absolute -top-0.5 -right-0.5 h-2.5 w-2.5 rounded-full bg-emerald-400 animate-live-dot" />
-            </div>
-            <div>
-              <h2 className="font-display text-2xl font-bold tracking-tight sm:text-3xl">
-                {t('hero.title', { n: data.CurRoundNum })}
-              </h2>
-              <p className="text-xs text-muted-foreground mt-0.5">
-                {t('hero.subtitle', { date: roundStarted, count: data.CurNumBids })}
-              </p>
-            </div>
-          </div>
-          <span
-            data-testid="live-badge"
+      <p role="status" aria-live="polite" className="sr-only" data-testid="cycle-announcer">
+        {announcement.text ? <span key={announcement.id}>{announcement.text}</span> : null}
+      </p>
+
+      <div className="space-y-[calc(var(--block-gap)*1.5)]">
+        {/* One section heading over two peer panels, each on the same hairline and tier. */}
+        <section aria-labelledby="cycle-status-heading">
+          <SectionHeader headingId="cycle-status-heading" title={t('status.heading')} />
+          <div
             className={
-              isPreActivation
-                ? 'inline-flex items-center gap-1.5 rounded-full bg-primary/15 px-3 py-1 text-xs font-semibold uppercase tracking-wider text-primary'
-                : 'inline-flex items-center gap-1.5 rounded-full bg-emerald-500/15 px-3 py-1 text-xs font-semibold uppercase tracking-wider text-emerald-400'
+              hasStandings ? 'grid gap-12 lg:grid-cols-12 lg:gap-x-12 xl:gap-x-16' : 'max-w-xl'
             }
           >
-            <span
-              className={
-                isPreActivation
-                  ? 'h-1.5 w-1.5 rounded-full bg-primary animate-pulse'
-                  : 'h-1.5 w-1.5 rounded-full bg-emerald-400 animate-live-dot'
-              }
+            <CycleFigures
+              data={data}
+              nowMs={nowMs}
+              participants={participants}
+              headingId="cycle-figures-heading"
+              className={hasStandings ? 'lg:col-span-5' : undefined}
             />
-            {statusBadgeLabel}
-          </span>
-        </div>
-
-        {/* Pre-activation countdown */}
-        {isPreActivation && (
-          <div className="text-center">
-            <p className="text-xs font-medium uppercase tracking-widest text-muted-foreground mb-3">
-              {t('hero.countdown.opensIn')}
-            </p>
-            <p className="text-sm text-muted-foreground mb-4">
-              {t('hero.countdown.opensAt', {
-                n: data.CurRoundNum,
-                date: activationDate,
-              })}
-            </p>
-            <SmoothCountdown date={activationTime * 1000} renderer={Counter} />
+            {hasStandings ? (
+              <div
+                id="standings"
+                className={`min-w-0 lg:col-span-7 ${CYCLE_REGION_CLASS} ${CYCLE_SECTION_SCROLL_MARGIN}`}
+              >
+                <StandingsLedger
+                  headingLevel={3}
+                  headingId="cycle-standings-heading"
+                  description={tTables('specialAllocation.headingHelp')}
+                  champions={champions}
+                  latestGesture={latestResolution.gesture}
+                  gestureDetailsPending={latestResolution.isSyncing}
+                  account={account}
+                  chronoEth={trackAmounts.chronoEth}
+                  signatureEth={trackAmounts.signatureEth}
+                  className="min-w-0"
+                />
+              </div>
+            ) : null}
           </div>
-        )}
+        </section>
 
-        {/* Countdown or Closed state */}
-        {!isPreActivation && hasStarted && isCountdownActive && (
-          <div className="text-center">
-            <p className="text-xs font-medium uppercase tracking-widest text-muted-foreground mb-3">
-              {t('hero.countdown.finalizesIn')}
-              <InfoTooltip content={t('hero.countdown.finalizesTooltip')} className="ml-1.5" />
-            </p>
-            <SmoothCountdown date={allocationTime} renderer={Counter} />
-          </div>
-        )}
-
-        {!isPreActivation && hasStarted && isConfirmingFinalization && (
-          <div className="text-center rounded-xl bg-primary/[0.06] p-5">
-            <Spinner size="sm" className="mx-auto mb-2" />
-            <p className="font-display text-lg font-bold text-primary">
-              {t('hero.countdown.confirmingTitle')}
-            </p>
-            <p className="mt-1 text-sm text-primary/80">{t('hero.countdown.confirmingMessage')}</p>
-          </div>
-        )}
-
-        {!isPreActivation && hasStarted && isGesturesExhausted && (
-          <div className="text-center rounded-xl bg-primary/[0.06] p-5 animate-pulse-glow">
-            <Zap className="mx-auto h-7 w-7 text-primary mb-2" />
-            <p className="font-display text-lg font-bold text-primary">
-              {t('hero.countdown.readyTitle')}
-            </p>
-            <p className="mt-1 text-sm text-primary/80">{t('hero.countdown.readyMessage')}</p>
-          </div>
-        )}
-
-        {/* Special Allocation Leaders */}
-        {hasLastParticipant && (
-          <SpecialAllocationRecipients
-            latestParticipantAddress={latestResolution.address}
-            latestGesture={latestResolution.gesture}
-            latestMessage={latestResolution.gesture?.Message ?? ''}
-            showLastGesture
-          />
-        )}
-
-        {/* CTA Button */}
-        <div className="flex justify-center">
-          <Button
-            asChild
-            size="lg"
-            className="bg-gradient-to-r from-[#15BFFD] to-[#9C37FD] hover:opacity-90 text-white border-0 font-semibold"
-          >
-            <Link href="/">
-              {primaryCtaLabel} <ArrowRight className="ml-2 h-4 w-4" />
-            </Link>
-          </Button>
-        </div>
-      </div>
-
-      <AttachedNFTAllocationShowcase
-        nfts={donatedNFTs}
-        erc20Tokens={donatedERC20Tokens}
-        cycleNumber={data.CurRoundNum}
-        className="mb-12"
-      />
-
-      {/* ===== ENHANCED STAT CARDS ===== */}
-      <motion.div
-        custom={1}
-        variants={sectionFade}
-        initial="hidden"
-        animate="visible"
-        className="grid grid-cols-2 md:grid-cols-3 gap-3 mb-12"
-      >
-        <StatCard
-          label={t('stats.totalGestures.label')}
-          value={data.CurNumBids}
-          icon={<Hash className="h-4 w-4" />}
-          tooltip={t('stats.totalGestures.tooltip')}
-        />
-        <StatCard
-          label={t('stats.cycleReserve.label')}
-          value={formatEthValue(data.PrizeAmountEth ?? 0)}
-          icon={<Trophy className="h-4 w-4" />}
-          tooltip={t('stats.cycleReserve.tooltip')}
-          gradient
-        />
-        <StatCard
-          label={t('stats.stellarSelectionPool.label')}
-          value={formatEthValue(data.RaffleAmountEth ?? 0)}
-          icon={<Shuffle className="h-4 w-4" />}
-          tooltip={t('stats.stellarSelectionPool.tooltip', {
-            count: data.NumRaffleEthWinnersBidding ?? 0,
-          })}
-        />
-        <StatCard
-          label={t('stats.publicGoods.label')}
-          value={formatEthValue(charityAmount)}
-          icon={<Heart className="h-4 w-4" />}
-          tooltip={t('stats.publicGoods.tooltip', { percent: data.CharityPercentage ?? 0 })}
-        />
-        <StatCard
-          label={t('stats.contributedEth.label')}
-          value={formatEthValue(data.CurRoundStats?.TotalDonatedAmountEth ?? 0)}
-          icon={<Coins className="h-4 w-4" />}
-          tooltip={t('stats.contributedEth.tooltip')}
-        />
-        <StatCard
-          label={t('stats.attachedNfts.label')}
-          value={data.CurRoundStats?.TotalDonatedNFTs ?? 0}
-          icon={<ImageIcon className="h-4 w-4" />}
-          tooltip={t('stats.attachedNfts.tooltip')}
-        />
-      </motion.div>
-
-      {/* ===== ROUND INFO SECTIONS ===== */}
-      <motion.div custom={2} variants={sectionFade} initial="hidden" animate="visible">
-        <RoundInfoSection
+        <CycleDetails
           data={data}
-          curGestureList={curGestureList}
+          gestures={gestures}
+          gesturesLoading={gestureQuery.isPending && round >= 0}
+          gesturesError={gestureQuery.isError && !gestureQuery.data}
+          onRetryGestures={() => void gestureQuery.refetch()}
           championList={championList}
           ethDonations={ethDonations}
-          donatedNFTs={donatedNFTs}
-          donatedERC20Tokens={donatedERC20Tokens}
-          donatedTokensTab={donatedTokensTab}
-          onTabChange={(_e, v) => setDonatedTokensTab(v)}
-          curPage={curPage}
-          setCurPage={setCurPage}
-          perPage={perPage}
+          attachedNfts={attachedNfts}
+          attachedErc20={attachedErc20}
         />
-      </motion.div>
+        {relatedPages}
+      </div>
     </PageShell>
   );
 };

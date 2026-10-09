@@ -1,0 +1,76 @@
+{
+  "invalid": {
+    "title": "유효하지 않은 제스처 ID",
+    "help": "URL의 제스처 ID는 0 이상의 숫자여야 합니다."
+  },
+  "header": {
+    "title": "제스처 #{position}",
+    "fallback": "제스처 기록 {id}",
+    "explorer": "트랜잭션 보기"
+  },
+  "empty": {
+    "title": "제스처 정보를 찾을 수 없습니다.",
+    "help": "ID가 잘못되었거나 아직 제스처 데이터가 반영되지 않았을 수 있습니다.",
+    "action": "현재 사이클 보기"
+  },
+  "error": {
+    "title": "제스처 기록을 불러오지 못했습니다",
+    "message": "연결 상태를 확인한 뒤 다시 시도해 주세요."
+  },
+  "figures": {
+    "cost": "제스처 비용",
+    "participationCst": "참여 CST",
+    "held": "유지 시간",
+    "heldInfo": "이 제스처가 최근 제스처로 유지된 시간입니다. 다음 제스처가 나오거나 사이클이 마감될 때까지 셉니다.",
+    "heldLive": "현재도 최근 제스처"
+  },
+  "method": {
+    "eth": "ETH",
+    "ethRandomWalk": "ETH + Random Walk NFT",
+    "cst": "CST"
+  },
+  "sections": {
+    "details": {
+      "title": "기록"
+    },
+    "message": {
+      "title": "메시지"
+    },
+    "nft": {
+      "title": "첨부된 NFT"
+    }
+  },
+  "rows": {
+    "participant": "참여자",
+    "finalizationTime": "이 제스처 이후 마감 시각",
+    "clockExtended": "{duration} 연장됨",
+    "transaction": "트랜잭션",
+    "copyHash": "트랜잭션 해시 복사",
+    "hashCopied": "트랜잭션 해시를 복사했습니다",
+    "erc20": "첨부된 ERC-20",
+    "erc20Amount": "첨부된 ERC-20 토큰 수량",
+    "nftContract": "첨부된 NFT 토큰 주소",
+    "nftId": "첨부된 NFT 토큰 ID",
+    "cstToOutbid": "추월당한 참여자에게"
+  },
+  "nav": {
+    "aria": "인접 제스처",
+    "previous": "이전 제스처",
+    "next": "다음 제스처",
+    "all": "사이클 {cycle}의 모든 제스처"
+  },
+  "nftPreview": {
+    "collectionName": "컬렉션 이름",
+    "artist": "작가",
+    "platform": "플랫폼",
+    "description": "설명"
+  },
+  "randomWalk": {
+    "heading": "Random Walk NFT"
+  },
+  "rail": {
+    "position": "전체 {total}개 중 {position}번째 제스처",
+    "positionLive": "지금까지 {total}개 중 {position}번째 제스처",
+    "liveNote": "이 사이클은 아직 진행 중입니다. 시그니처는 사이클이 마감될 때 각인됩니다."
+  }
+}

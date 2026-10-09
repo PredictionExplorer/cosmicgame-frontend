@@ -1,0 +1,9 @@
+{
+  "gallery": {
+    "placeholder": "Số hoặc tên",
+    "ariaLabel": "Tìm NFT",
+    "clear": "Xóa tìm kiếm",
+    "submit": "Tìm",
+    "results": "{count, plural, other {# kết quả}}"
+  }
+}

@@ -1,25 +1,18 @@
 {
-  "invalid": {
-    "title": "代币 ID 无效"
+  "notFound": {
+    "title": "这枚签名尚未铭刻",
+    "description": "签名按铭刻的先后顺序编号。",
+    "newest": "最新的一枚是 #{id}。",
+    "newestLink": "查看最新的签名"
   },
   "jsonLd": {
-    "productName": "Cosmic Signature NFT #{id}",
-    "productDescription": "独一无二的生成艺术 NFT，由三体问题物理渲染而成，出自程序化链上艺术协议 Cosmic Signature。",
-    "breadcrumbToken": "代币 #{id}"
-  },
-  "breadcrumb": {
-    "tokenFallback": "代币 {id}"
-  },
-  "hero": {
-    "unnamedToken": "未命名代币"
+    "productDescription": "Cosmic Signature 的生成艺术 NFT，以三体物理模拟生成独一无二的图像。"
   },
   "badges": {
     "stellarSelectionRecipient": "星选获配者",
     "anchorRecipient": "锚定获配者",
     "cycleRecipient": "周期获配者",
     "enduranceChampion": "坚守冠军",
-    "receivedAsCycleRecipient": "这枚 NFT 在第 {round} 个周期分配给周期获配者。",
-    "receivedAs": "这枚 NFT 最初分配给{label}。",
     "eligibleForAnchoring": "可锚定",
     "eligibleForAnchoringTooltip": "这枚 Cosmic Signature NFT 尚未锚定过，锚定后即可累积 ETH 锚定派发。",
     "alreadyAnchored": "已锚定过",
@@ -29,66 +22,66 @@
     "trigger": "分享",
     "copyVideoLink": "复制视频链接",
     "copyImageLink": "复制图片链接",
-    "copyPageLink": "复制页面链接"
-  },
-  "actions": {
-    "buyOrSellNfts": "买卖 NFT",
-    "viewCycleDetails": "查看第 {round} 个周期详情"
+    "copyPageLink": "复制页面链接",
+    "copyFailed": "无法复制链接。"
   },
   "navigation": {
-    "previousToken": "上一枚代币",
-    "nextToken": "下一枚代币"
+    "label": "上一枚与下一枚签名"
   },
   "sections": {
     "nameHistory": "命名记录",
     "ownershipHistory": "流转记录"
   },
-  "transferDialog": {
-    "title": "确认转移",
-    "description": "目标账户似乎没有任何交易记录。确定要将代币发送至该地址吗？请再次核对。",
-    "confirm": "仍要转移"
-  },
   "ownerActions": {
     "title": "管理这枚代币",
-    "titleTooltip": "作为当前持有者，你可以在 MetaMask 中显示、转移或命名这枚代币。",
-    "metaMaskHeading": "在 MetaMask 中显示",
+    "tabs": {
+      "name": "命名",
+      "transfer": "转移"
+    },
+    "anchor": {
+      "button": "锚定 {id}",
+      "note": "锚定后，这枚 NFT 将共享每个已收官周期的锚定派发。每枚 NFT 只能锚定一次，解锚后无法再次锚定。"
+    },
     "metaMaskTooltip": "请求 MetaMask 浏览器扩展显示这枚 NFT。NFT 导入仍为实验性功能，MetaMask 移动端暂不支持。",
     "addToMetaMask": "将 NFT 添加至 MetaMask",
     "addingToMetaMask": "正在添加 NFT…",
-    "transferHeading": "转移",
-    "transferTooltip": "将代币发送至其他以太坊地址。转移不可撤销，确认前请仔细核对地址。",
-    "recipientPlaceholder": "接收地址（0x…）",
-    "transferButton": "转移",
-    "nameHeading": "命名代币",
-    "renameHeading": "重新命名",
-    "nameTooltip": "为代币设置专属名称（最多 32 字节）。已命名的代币会显示在“已命名 NFT”页面。",
+    "nameLabel": "名称",
+    "nameHint": "最多 {max} 字节，记录在链上，所有人可见。",
     "namePlaceholder": "输入代币名称",
     "setName": "设置名称",
     "changeName": "更改名称",
     "clearName": "清除",
+    "transferButton": "转移 {id}",
     "namedTokensCount": "目前共有 {count} 枚已命名代币。",
     "viewAllNamedTokens": "查看全部已命名代币"
   },
   "metadata": {
     "imprinted": "铭刻时间",
-    "imprintedTooltip": "这枚代币在链上铭刻的时间。点击可查看交易。",
     "cycle": "周期",
-    "cycleTooltip": "这枚代币所属的演绎周期。点击可查看周期详情。",
     "recipient": "获配者",
-    "recipientTooltip": "演绎周期中最初收到这枚代币的地址。",
     "owner": "持有者",
-    "ownerTooltip": "这枚代币的当前持有者，若经转移则可能与获配者不同。",
     "roundNumber": "第 {round} 个周期",
+    "anchoring": "锚定",
     "seed": "种子",
     "seedTooltip": "用于生成这枚代币画面与特征的唯一随机种子。",
     "copySeed": "复制种子"
   },
-  "video": {
-    "watchAnimation": "观看动画",
-    "watchAnimationTooltip": "每枚 Cosmic Signature NFT 都有一段由种子生成的专属动画。点击即可观看。"
-  },
   "image": {
-    "defaultAlt": "NFT",
+    "rendering": "正在渲染",
     "artworkUnavailable": "作品暂不可用"
+  },
+  "viewer": {
+    "modeLabel": "作品视图",
+    "still": "静态",
+    "motion": "动态",
+    "play": "播放动画",
+    "pause": "暂停动画",
+    "fullscreen": "全屏",
+    "zoomIn": "放大",
+    "zoomOut": "适应屏幕",
+    "zoomHint": "点按作品或按 + 键放大。",
+    "panHint": "拖动或使用方向键移动作品。按 0 键恢复为适应屏幕。",
+    "motionError": "动画无法加载。",
+    "motionLabel": "{subject} 的动画"
   }
 }

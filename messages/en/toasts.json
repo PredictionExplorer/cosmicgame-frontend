@@ -1,23 +1,14 @@
 {
-  "gestureSubmitted": "Gesture submitted. Waiting for confirmation.",
-  "gestureConfirmed": "Gesture confirmed. The cycle continues.",
   "allocationRetrieved": "Allocation retrieved to your wallet.",
-  "anchorSet": "NFT anchored to the protocol.",
-  "anchorReleased": "Anchor released.",
   "cycleFinalized": "Cycle finalized. Allocations distributed.",
   "walletTransactionCancelled": "Transaction not sent — you cancelled it in your wallet.",
-  "unexpectedError": "Unexpected error. Please try again.",
   "generic": {
-    "unexpectedError": "Unexpected error. Please try again.",
-    "rpcFailure": "The transaction could not be completed. Check your wallet and network connection, then try again.",
-    "receiptFailure": "The transaction was sent but could not be confirmed. Check its status in your wallet or a block explorer before trying again.",
-    "transactionFailed": "Transaction failed. Please try again."
+    "rpcFailure": "The transaction could not be completed. Check your wallet and network connection, then try again."
   },
   "wallet": {
     "connect": "Please connect your wallet.",
     "connectCorrectNetwork": "Please connect your wallet and ensure you are on the correct network.",
-    "notReady": "Your wallet is not ready. Reconnect and try again.",
-    "stillConnecting": "Wallet is still connecting. Please try again in a moment."
+    "notReady": "Your wallet is not ready. Reconnect and try again."
   },
   "watchAsset": {
     "metaMaskRequired": "Connect MetaMask to add this asset.",
@@ -33,54 +24,63 @@
   },
   "network": {
     "unavailable": "Network unavailable — please reconnect your wallet.",
-    "switchForGesture": "Switch your wallet to the app network before making a gesture.",
-    "wrongChain": "Wallet is still connecting or MetaMask is on the wrong chain. Switch to the app network and try again."
+    "wrongChain": "Your wallet is still connecting or is on another network. Switch to {network} and try again."
   },
   "gesture": {
     "simulated": "Simulated gesture placed. Timer extended by {seconds, plural, one {# second} other {# seconds}}.",
-    "confirmed": "Gesture confirmed. The cycle continues.",
+    "confirmed": "Gesture recorded. Cycle Finalization Time extended.",
     "validation": {
-      "notNftOwner": "You aren't the owner of the token!",
-      "tokenDecimalsWarning": "Token doesn't implement decimals(); assuming 18 decimal places.",
-      "invalidContractAddress": "The address provided is not a valid contract address!",
-      "notErc721": "The attached NFT contract is not an ERC721 token contract.",
-      "notErc20": "The attached token contract is not an ERC20 token contract.",
+      "notNftOwner": "This NFT does not belong to your connected wallet.",
+      "chooseRandomWalkNft": "Choose one of this wallet’s unused Random Walk NFTs.",
+      "tokenDecimalsWarning": "Token doesn’t implement decimals(); assuming 18 decimal places.",
+      "invalidContractAddress": "Enter a valid contract address.",
+      "notErc721": "The attached NFT must use an ERC-721 contract.",
+      "notErc20": "The attached token must use an ERC-20 contract.",
       "insufficientAttachedToken": "Insufficient token balance to attach to this gesture.",
-      "insufficientEth": "Insufficient ETH balance! There isn't enough ETH in your wallet.",
-      "insufficientCst": "Insufficient CST balance! There isn't enough CST (ERC-20) in your wallet.",
+      "insufficientEth": "This gesture needs {required} ETH plus a network fee. Your wallet has {available} ETH on {network}.",
+      "insufficientCst": "This gesture needs up to {required} CST. Your wallet has {available} CST.",
+      "invalidNftId": "Enter the NFT’s token ID as a whole number, digits only.",
+      "invalidTokenAmount": "Enter an amount above zero in digits, with no more decimal places than this token has.",
+      "cstRewardUnavailable": "The Participation CST preview couldn’t be read, so your minimum CST reward protection can’t be applied. Try again in a moment, or choose \"Accept any CST reward\".",
       "cycleNotStarted": "The next cycle has not started yet. Gestures open in {duration}."
     },
     "transaction": {
       "failed": "Unable to submit the gesture. Check your wallet and network connection, refresh the current cost, and try again.",
-      "cstReverted": "The CST gesture reverted. Another gesture may have landed first, causing your max CST cost or minimum CST reward protection to fail. Refresh the preview and try again, or choose \"Accept any CST reward\" if you are comfortable receiving 0 CST."
+      "cstReverted": "The CST gesture reverted. Another gesture may have landed first, raising the CST cost above your maximum. Refresh the preview and try again."
     },
     "contractErrors": {
       "insufficientReceivedBidAmount": "The current Gesture Cost is greater than the amount you transferred.",
-      "usedRandomWalkNft": "This RandomWalk NFT has already been used for a gesture.",
+      "usedRandomWalkNft": "This Random Walk NFT has already been used for a gesture.",
       "callerIsNotNftOwner": "You are not the owner of this NFT.",
       "roundIsInactive": "The current cycle is not active.",
       "tooLongBidMessage": "Your gesture message is too long.",
       "wrongBidType": "Wrong gesture type selected.",
       "fundTransferFailed": "Fund transfer failed.",
-      "ethCostChanged": "Gesture Cost rose by {increase} ETH while your transaction was in transit. The new required cost is {required} ETH. Please try again.",
-      "cstCostChanged": "CST Gesture Cost changed while your transaction was in transit, likely because another gesture landed first. The contract required {required} CST, above your {maximum} CST maximum. Refresh and try again.",
-      "bidPlacedWithinCurrentSecond": "Another gesture landed in the same second. Wait a moment and try again.",
+      "ethCostChanged": "Gesture Cost rose by {increase} ETH while your transaction was in transit. The new required cost is {required} ETH. Please try again.",
+      "cstCostChanged": "CST Gesture Cost changed while your transaction was in transit, likely because another gesture landed first. The contract required {required} CST, above your {maximum} CST maximum. Refresh and try again.",
+      "cstRewardBelowMinimum": "The Participation CST for this gesture would fall below your minimum, most likely because another gesture landed first. Refresh the preview and try again, or allow a larger drop.",
       "bidHasBeenPlacedInCurrentRound": "A gesture has already been made in the current cycle."
+    },
+    "confirmedWithCst": "Gesture recorded. Cycle Finalization Time extended, and {cst} Participation CST arrived in your wallet.",
+    "approval": {
+      "token": "Your wallet asks for permission to move exactly {amount} of this token with your gesture. Attached tokens go to a cycle Recipient and are not returned.",
+      "nft": "Your wallet asks for permission to move NFT #{tokenId} with your gesture. Attached NFTs go to a cycle Recipient and are not returned."
     }
   },
   "anchor": {
-    "walletNotReady": "Wallet is still connecting or MetaMask is on the wrong chain. Switch to the app network and try again.",
-    "anchored": "{count, plural, one {# NFT was anchored to the protocol.} other {# NFTs were anchored to the protocol.}}",
-    "released": "{count, plural, one {# selected anchor was released successfully.} other {# selected anchors were released successfully.}}",
+    "walletNotReady": "Your wallet is still connecting or is on another network. Switch to {network} and try again.",
+    "anchored": "{count, plural, one {# NFT was anchored to the protocol.} other {# NFTs were anchored to the protocol.}}",
+    "released": "{count, plural, one {# selected anchor released.} other {# selected anchors released.}}",
     "releasedWithDistributions": "{count, plural, one {# selected anchor was released and its accumulated ETH Anchor Distributions were retrieved.} other {# selected anchors were released and their accumulated ETH Anchor Distributions were retrieved.}}",
-    "failed": "The anchor transaction could not be completed. Check your wallet and network connection, then try again."
+    "failed": "The anchor transaction could not be completed. Check your wallet and network connection, then try again.",
+    "approval": "Your wallet asks for permission for the anchoring contract to hold your NFTs while they are anchored. It asks once per collection."
   },
   "allocation": {
     "retrieved": "Allocation retrieved to your wallet."
   },
   "finalize": {
-    "roundDidNotAdvance": "Claim transaction succeeded but the cycle did not advance. Please refresh the page.",
-    "metadataUpdating": "Cycle finalized on-chain. Token metadata may still be updating — check My Allocations or refresh later.",
+    "roundDidNotAdvance": "The finalization transaction succeeded, but the cycle has not advanced. Please refresh the page.",
+    "metadataUpdating": "Cycle finalized on-chain. Token metadata may still be updating — check My allocations or refresh later.",
     "failed": "Unable to finalize the cycle. Check your wallet and network connection, then try again.",
     "contractErrors": {
       "mainPrizeEarlyClaim": "Not enough time has elapsed to retrieve the Signature Allocation.",
@@ -90,87 +90,48 @@
   },
   "claim": {
     "walletNotConnected": "Please connect your wallet and ensure you are on the correct network.",
-    "failed": "An error occurred",
+    "failed": "Retrieve didn’t go through. Check your wallet and network, then try again.",
     "stellarEthSuccess": "Stellar Selection ETH retrieved to your wallet.",
     "nftSuccess": "Attached NFT retrieved to your wallet.",
     "nftsSuccess": "{count, plural, one {# attached NFT retrieved to your wallet.} other {# attached NFTs retrieved to your wallet.}}",
     "tokenSuccess": "Attached ERC-20 token retrieved to your wallet.",
     "tokensSuccess": "{count, plural, one {# attached ERC-20 token retrieved to your wallet.} other {# attached ERC-20 tokens retrieved to your wallet.}}",
-    "retrieving": "Retrieving..."
+    "retrieving": "Retrieving…"
   },
   "transfer": {
-    "common": {
-      "sourceUnavailable": "Source wallet is not available.",
-      "invalidRecipient": "Enter a valid recipient address.",
-      "invalidAmount": "Enter a valid CST amount.",
-      "invalidDecimals": "Enter a CST amount with a valid number of decimals.",
-      "amountPositive": "Enter an amount greater than zero."
-    },
     "cst": {
       "tokenUnavailable": "CST token address is not available yet.",
-      "walletRequired": "Connect your wallet before sending CST.",
-      "sourceWalletRequired": "Connect the source wallet before sending CST from it.",
-      "balanceLoading": "CST balance is still loading. Please try again in a moment.",
-      "insufficientBalance": "Insufficient CST balance.",
-      "decimalsWarning": "Unable to read CST decimals; assuming 18 decimal places.",
       "confirmed": "CST transfer confirmed.",
       "failed": "Unable to send CST. Please try again."
     },
     "nft": {
       "contractUnavailable": "Cosmic Signature NFT contract address is not available yet.",
-      "walletRequired": "Connect your wallet before sending NFTs.",
-      "sourceWalletRequired": "Connect the source wallet before sending NFTs from it.",
-      "recipientMustDiffer": "Enter a recipient address different from your connected wallet.",
-      "selectOne": "Select at least one transferable NFT.",
-      "confirmed": "{count, plural, one {NFT transfer confirmed.} other {# NFT transfers confirmed.}}",
+      "confirmed": "{count, plural, one {NFT transfer confirmed.} other {# NFT transfers confirmed.}}",
       "detailTransferConfirmed": "NFT transfer confirmed.",
-      "recipientCheckFailed": "Could not check the recipient address. Check your wallet and network connection, then try again.",
-      "failed": "Unable to send selected NFTs. Please try again.",
-      "failedToken": "Unable to transfer NFT #{tokenId}. Please try again.",
-      "nameSet": "The token name has been changed successfully!",
-      "nameCleared": "The token name has been cleared successfully!",
+      "failedToken": "NFT {tokenId} wasn’t sent. Check your wallet and try again.",
+      "nameSet": "Token name updated.",
+      "nameCleared": "Token name cleared.",
       "nameSetFailed": "An error occurred while setting the token name. Please try again.",
       "nameClearFailed": "An error occurred while clearing the token name. Please try again."
     },
     "marketingCst": {
-      "tokenUnavailable": "CST token address is not available yet.",
-      "walletRequired": "Connect your wallet before paying a CST reward.",
-      "reserveUnavailable": "Outreach reserve wallet is not available.",
-      "treasurerUnavailable": "Marketing wallet treasurer is not available.",
-      "treasurerRequired": "Connect the current marketing wallet treasurer before paying CST rewards.",
-      "balanceLoading": "Outreach reserve CST balance is still loading. Please try again in a moment.",
-      "insufficientBalance": "Insufficient outreach reserve CST balance.",
-      "decimalsWarning": "Unable to read CST decimals; assuming 18 decimal places.",
-      "balanceReadFailed": "Unable to read the outreach reserve CST balance. Please try again.",
-      "confirmed": "Marketing CST reward confirmed.",
-      "failed": "Unable to pay CST reward. Please try again.",
-      "loading": "Loading...",
-      "pay": "Pay CST Reward",
-      "paying": "Paying...",
-      "viewTransaction": "View transaction"
+      "treasurerRequired": "Connect the Outreach Reserve treasurer wallet to send CST allocations.",
+      "confirmed": "Outreach Reserve CST allocation confirmed.",
+      "failed": "Unable to send the CST allocation. Please try again.",
+      "pay": "Send CST allocation"
     }
   },
   "contribution": {
-    "connectWallet": "Please connect your wallet to contribute ETH.",
-    "connectWalletInline": "Connect your wallet to contribute ETH.",
-    "invalidAmount": "Enter an ETH amount greater than 0.",
-    "invalidUrl": "Enter a valid URL beginning with http:// or https://.",
-    "invalidUrlInline": "Use an http:// or https:// URL.",
-    "contractUnavailable": "Please connect your wallet and ensure you are on the correct network.",
-    "formSubmitted": "{amount} ETH contribution confirmed.",
-    "formSubmittedWithInfo": "{amount} ETH contribution with information confirmed.",
-    "submitted": "{amount} ETH was contributed successfully!",
-    "submittedWithInfo": "{amount} ETH with information was contributed successfully!",
+    "contractUnavailable": "The protocol contract isn’t available yet. Refresh the page and try again.",
+    "formSubmitted": "{amount} ETH contribution confirmed.",
+    "formSubmittedWithInfo": "{amount} ETH contribution and accompanying information confirmed.",
     "formFailed": "ETH contribution failed, please check your input and try again.",
-    "failed": "Contribution failed, please try again.",
-    "failedWithInfo": "Contribution with information failed, please check your input.",
-    "submitting": "Submitting...",
     "publicGoodsVault": {
-      "none": "No public-goods funds are waiting in the vault.",
+      "none": "No Public Goods funds are waiting in the vault.",
       "connectWallet": "Connect your wallet to forward Public Goods Vault funds.",
-      "forwarded": "Public-goods funds were forwarded to Protocol Guild.",
+      "forwarded": "Public Goods funds were forwarded to Protocol Guild.",
       "failed": "Unable to forward Public Goods Vault funds.",
-      "forwarding": "Forwarding...",
+      "forwarding": "Forwarding…",
       "forward": "Forward to Protocol Guild",
       "nothing": "Nothing to Forward"
     }
@@ -178,14 +139,59 @@
   "imprint": {
     "contractUnavailable": "The Random Walk NFT contract is unavailable. Connect your wallet on the correct network and try again.",
     "confirmed": "Random Walk NFT imprint confirmed.",
-    "failed": "Imprint failed",
-    "imprinting": "Imprinting..."
+    "failed": "Imprint didn’t go through. Check your wallet and network, then try again.",
+    "imprinting": "Imprinting…"
   },
-  "admin": {
-    "gestureBan": {
-      "banned": "Gesture was banned successfully!",
-      "unbanned": "Gesture was unbanned successfully!",
-      "failed": "An error occurred"
-    }
+  "regionLabel": "Notifications",
+  "close": "Close notification",
+  "tx": {
+    "stage": {
+      "switchNetwork": "Switch to {network} in your wallet",
+      "switchNetworkHint": "Cosmic Signature runs on {network}. Approve the switch in your wallet to continue.",
+      "approve": "Approve {step} of {total} in your wallet",
+      "approvalPending": "Confirming approval {step} of {total}",
+      "confirm": "Confirm in your wallet",
+      "confirmStep": "Confirm {step} of {total} in your wallet",
+      "confirmHint": "Check the details in your wallet. Nothing is sent until you confirm.",
+      "pending": "Waiting for confirmation on {network}"
+    },
+    "button": {
+      "preparing": "Preparing…",
+      "switchNetwork": "Switch network in wallet…",
+      "approve": "Approve {step} of {total} in wallet…",
+      "approvalPending": "Approval {step} of {total} pending…",
+      "confirm": "Confirm in wallet…",
+      "confirmStep": "Confirm {step} of {total} in wallet…",
+      "pending": "Pending…"
+    },
+    "steps": {
+      "signature": "Signature",
+      "pending": "Pending",
+      "confirmed": "Confirmed"
+    },
+    "status": {
+      "confirmed": "Confirmed on-chain.",
+      "cancelled": "Cancelled in your wallet. Nothing was sent.",
+      "cancelledInWallet": "Cancelled in your wallet. The cancellation used a network fee; nothing else was sent.",
+      "replacedInWallet": "Replaced in your wallet by a different transaction, which used a network fee. This action was not recorded."
+    },
+    "confirmedRefresh": "Confirmed on-chain. Refresh the page if it hasn’t updated yet.",
+    "error": {
+      "insufficientFunds": "Your wallet doesn’t have enough ETH on {network} for this transaction and its network fee.",
+      "wrongNetwork": "Your wallet is on another network. Switch to {network} and try again.",
+      "walletNotConnected": "Connect your wallet, then try again.",
+      "walletBusy": "Your wallet already has a request open. Finish or close it there, then try again.",
+      "wouldRevert": "The contract would reject this transaction, so nothing was sent. Refresh the page and try again.",
+      "reverted": "The transaction failed on-chain. Only the network fee was spent. Refresh the page and try again.",
+      "timeout": "Still waiting for confirmation. Check the transaction on {explorer} before you try again.",
+      "network": "The network could not be reached. Check your connection and try again.",
+      "untrustedContract": "This transaction would go to an address that isn’t one of the Cosmic Signature contracts on-chain, so nothing was sent. Refresh the page and try again."
+    },
+    "viewOnExplorer": "View on {explorer}",
+    "viewOnExplorerShort": "View transaction",
+    "copyDetails": "Copy details",
+    "detailsCopied": "Error details copied.",
+    "connectWallet": "Connect wallet",
+    "busy": "Finish the transaction in progress first."
   }
 }

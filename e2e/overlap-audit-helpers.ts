@@ -99,6 +99,18 @@ export async function collectOverlapViolations(page: Page): Promise<OverlapViola
 
       for (const pinned of pinnedElements) {
         const rect = pinned.getBoundingClientRect();
+        // A sticky element whose container has run out travels up with the
+        // page, above its `top` offset and under the site header, like any
+        // other scrolling content. It is no longer pinned, so nothing covers it.
+        const pinnedStyle = window.getComputedStyle(pinned);
+        const stickyTop = Number.parseFloat(pinnedStyle.top);
+        if (
+          pinnedStyle.position === 'sticky' &&
+          Number.isFinite(stickyTop) &&
+          rect.top < stickyTop - 1
+        ) {
+          continue;
+        }
         // Only the part actually on screen can be covered.
         const top = Math.max(rect.top, 0);
         const bottom = Math.min(rect.bottom, window.innerHeight);

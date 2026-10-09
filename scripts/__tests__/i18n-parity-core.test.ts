@@ -5,6 +5,7 @@ import {
   icuSignature,
   pluralCategoriesFor,
   strictProblems,
+  unitSpacingProblems,
 } from '../i18n-parity-core';
 
 describe('flattenMessages', () => {
@@ -13,6 +14,16 @@ describe('flattenMessages', () => {
       ['a.b', 'x'],
       ['a.c.d', 'y'],
       ['e', 'z'],
+    ]);
+  });
+
+  it('includes strings in raw-message lists so they receive the same integrity checks', () => {
+    expect([
+      ...flattenMessages({ chips: ['Art', 'Protocol'], cards: [{ title: 'Gallery' }] }),
+    ]).toEqual([
+      ['chips[0]', 'Art'],
+      ['chips[1]', 'Protocol'],
+      ['cards[0].title', 'Gallery'],
     ]);
   });
 });
@@ -84,6 +95,46 @@ describe('compareNamespace', () => {
     expect(report.missing).toEqual(['count']);
     expect(report.empty).toEqual(['title']);
     expect(report.extra).toEqual(['nested.stale']);
+  });
+
+  it('rejects whitespace-only text and non-string leaves instead of counting them as translations', () => {
+    const report = compareNamespace({
+      namespace: 'n',
+      source: { title: 'Gallery', count: 'Count', action: 'Open', nested: { help: 'Help' } },
+      translation: { title: ' \n\t', count: 3, action: null, nested: { help: false } },
+      intlLocale: 'uk-UA',
+    });
+    expect(report.empty).toEqual(['title']);
+    expect(report.invalidValues).toEqual(['count', 'action', 'nested.help']);
+    expect(strictProblems(report)).toEqual([
+      'empty: title',
+      'not a string: count',
+      'not a string: action',
+      'not a string: nested.help',
+    ]);
+    expect(report.untranslated).toBe(false);
+  });
+
+  it('allows a localized space separator without allowing whitespace-only prose', () => {
+    const report = compareNamespace({
+      namespace: 'timer',
+      source: { separator: ', ', label: 'Duration' },
+      translation: { separator: ' ', label: '期間' },
+      intlLocale: 'ja-JP',
+    });
+    expect(strictProblems(report)).toEqual([]);
+  });
+
+  it('rejects an object substituted for a raw-message list, even with matching numeric keys', () => {
+    const report = compareNamespace({
+      namespace: 'seo',
+      source: { chips: ['Art', 'Protocol'] },
+      translation: { chips: { '0': '作品', '1': 'プロトコル' } },
+      intlLocale: 'ja-JP',
+    });
+    expect(report.missing).toEqual(['chips[0]', 'chips[1]']);
+    expect(report.extra).toEqual(['chips.0', 'chips.1']);
+    expect(strictProblems(report)).toHaveLength(4);
   });
 
   it('flags plural blocks that lack the locale categories, but not extra categories', () => {
@@ -169,15 +220,116 @@ describe('checkSourceNamespace', () => {
   it('validates the source catalog against its own plural rules', () => {
     expect(checkSourceNamespace('n', { ok: '{n, plural, one {#} other {#}}' }, 'en-US')).toEqual({
       namespace: 'n',
+      empty: [],
+      invalidValues: [],
       syntaxErrors: [],
       pluralGaps: [],
+      unitSpacing: [],
+      typography: [],
     });
     expect(
       checkSourceNamespace('n', { bad: '{n, plural, other {#}}', broken: '{' }, 'en-US'),
     ).toEqual({
       namespace: 'n',
+      empty: [],
+      invalidValues: [],
       syntaxErrors: [expect.stringMatching(/^broken: /)],
       pluralGaps: ['bad: {n, plural} lacks one'],
+      unitSpacing: [],
+      typography: [],
     });
+  });
+
+  it('rejects blank and non-string source messages too', () => {
+    expect(
+      checkSourceNamespace('n', { blank: '\t ', count: 1, list: [], nil: null }, 'en-US'),
+    ).toEqual({
+      namespace: 'n',
+      empty: ['blank'],
+      invalidValues: ['count', 'list', 'nil'],
+      syntaxErrors: [],
+      pluralGaps: [],
+      unitSpacing: [],
+      typography: [],
+    });
+  });
+
+  // V143 / V348: English mixed "Loading..." with "Search questions…" and
+  // "couldn't" with "couldn’t"; the source now uses one form of each.
+  it('holds the source to the ellipsis and the typographic apostrophe', () => {
+    const report = checkSourceNamespace(
+      'n',
+      {
+        dots: 'Loading...',
+        contraction: "The records couldn't be loaded.",
+        possessive: "Takes three bodies' masses.",
+        fine: "Loading… The records couldn’t be loaded. Type '{' to open.",
+      },
+      'en-US',
+    );
+    expect(report.typography).toEqual([
+      'dots: "..." should be the ellipsis "…" (U+2026)',
+      'contraction: "n\'t" should use the apostrophe "’" (U+2019)',
+      'possessive: "s\'" should use the apostrophe "’" (U+2019)',
+    ]);
+  });
+
+  it('holds the source to no-break number–unit joins as well', () => {
+    const report = checkSourceNamespace('n', { cost: 'Gesture with ETH ({cost} ETH)' }, 'en-US');
+    expect(report.unitSpacing).toEqual([
+      'cost: "{cost} ETH" needs a no-break space (U+00A0) before the unit',
+    ]);
+  });
+});
+
+describe('number formatting parity', () => {
+  const compare = (source: string, translation: string) =>
+    compareNamespace({
+      namespace: 'n',
+      source: { m: source },
+      translation: { m: translation },
+      intlLocale: 'zh-CN',
+    });
+
+  it('rejects a translation that prints a formatted source number bare', () => {
+    const report = compare('{count, plural, one {# Gesture} other {# Gestures}}', '{count} 次落笔');
+    expect(report.numberFormatGaps).toEqual([
+      'm: {count} is a formatted number in the source; write {count, number} or # inside its plural',
+    ]);
+    expect(strictProblems(report)).toContainEqual(expect.stringMatching(/^number format: m: /));
+  });
+
+  it('accepts {n, number} or # in the translation', () => {
+    const source = '{count, plural, one {# Gesture} other {# Gestures}}';
+    expect(compare(source, '{count, number} 次落笔').numberFormatGaps).toEqual([]);
+    expect(compare(source, '{count, plural, other {# 次落笔}}').numberFormatGaps).toEqual([]);
+    expect(compare('{n, number} items', '{n, number} 项').numberFormatGaps).toEqual([]);
+  });
+
+  it('leaves arguments the source prints bare alone', () => {
+    expect(compare('Cycle {cycle}', '第 {cycle} 个周期').numberFormatGaps).toEqual([]);
+  });
+
+  it('counts # inside a select branch of the plural, not a nested plural', () => {
+    const signature = icuSignature(
+      '{n, plural, other {{kind, select, a {# a} other {# b}}}} {m, plural, other {{n, plural, other {#}}}}',
+    );
+    expect([...signature.numberArguments].sort()).toEqual(['n']);
+  });
+});
+
+describe('unitSpacingProblems', () => {
+  it('flags quantity placeholders and plural counts before a unit', () => {
+    expect(
+      unitSpacingProblems(
+        '{amount} ETH, {cost} CST, {nftCount} NFT, {count, plural, other {# NFTs}}',
+      ),
+    ).toEqual(['{amount} ETH', '{cost} CST', '{nftCount} NFT', '# NFTs']);
+  });
+
+  it('leaves names that read as adjectives, and joins that already use U+00A0', () => {
+    expect(unitSpacingProblems('Anchor Action for {token} NFT · Cycle {cycle} ETH')).toEqual([]);
+    expect(unitSpacingProblems('{amount}\u00a0ETH')).toEqual([]);
+    expect(unitSpacingProblems('{amount} ETHER')).toEqual([]);
   });
 });

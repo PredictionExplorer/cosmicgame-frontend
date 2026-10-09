@@ -1,20 +1,10 @@
+import { AUDIT_FINDINGS_TOTAL, HACKEN_AUDIT } from '@/content/legal/audit';
 import { cstRewardFacts, isV3Mechanics, protocolFacts } from '@/content/protocol-facts';
 
 import type { LearnText } from './structure';
-import type { LearnSection } from './types';
 
 /** 附加在每篇中文文章末尾的共享附录章节。 */
-const answerabilitySections: readonly LearnSection[] = [
-  {
-    heading: '查阅最新信息',
-    body: [
-      '实时周期数据、已验证合约地址、源代码和统计均可在官方应用中查阅。',
-      '会随时间变化的信息，请以应用中的实时数据为准；协议机制则以学习中心、常见问题、服务条款、安全、审计和风险披露页面为准。',
-    ],
-  },
-];
-
-/** 中文学习中心文案，以 structure.ts 中的骨架为键。 */
+/** 中文“学习”栏目文案，以 structure.ts 中的骨架为键。 */
 export const learnTextZh = {
   hub: {
     meta: {
@@ -22,33 +12,61 @@ export const learnTextZh = {
       description:
         '了解 Cosmic Signature 的运作原理：演绎周期、落笔、CST、三体 NFT 艺术、Arbitrum 合约、锚定、公共物品与风险释疑。',
     },
-    eyebrow: 'Cosmic Signature 学习中心',
     h1: '了解 Cosmic Signature',
     intro:
       '这里汇集了一组简明指南，带你读懂 Cosmic Signature。这套程序化链上艺术协议运行于 Arbitrum；参与者在演绎周期中落笔，共同塑造确定性的三体 NFT 艺术。',
     breadcrumbs: {
       homeLabel: 'Cosmic Signature',
-      learnLabel: '学习中心',
+      learnLabel: '学习',
+    },
+    groups: {
+      start: {
+        title: '从这里开始',
+        description: '四篇指南，讲清协议是什么、周期如何运转、落笔做什么，以及作品从何而来。',
+      },
+      mechanics: {
+        title: '运作机制',
+        description: '协议所在的链、合约、CST 与宇宙议会，以及锚定。',
+      },
+      context: {
+        title: '背景',
+        description: '公共物品、收藏与交易作品的去处，以及协议不是什么。',
+      },
+    },
+    whitePaper: {
+      eyebrow: '完整参考',
+      readLabel: '阅读白皮书',
     },
     quizCta: {
       heading: '自认已经读懂协议了？',
-      body: '一百道题，三个层级，全部出自白皮书。每道题都讲清背后的规则，并指向一锤定音的原文章节。',
+      body: '一百道题，三个层级，全部出自白皮书。每道题都附有规则讲解与原文章节，方便边答边学。',
       linkLabel: '开始知识测验',
     },
   },
   articleUi: {
-    eyebrow: 'Cosmic Signature 学习中心',
     breadcrumbs: {
-      ariaLabel: '面包屑导航',
       homeLabel: 'Cosmic Signature',
-      learnLabel: '学习中心',
+      learnLabel: '学习',
     },
-    lastUpdatedLabel: '最后更新：',
-    publisherLabel: '由 Cosmic Signature 发布',
-    relatedResourcesHeading: 'Cosmic Signature 相关资源',
+    guideTemplate: '第 {number} 篇，共 {total} 篇',
+    readingTimeTemplate: '约 {minutes} 分钟读完',
+    nextGuideLabel: '下一篇指南',
+    contents: {
+      railLabel: '本页内容',
+      openLabel: '目录',
+      backToTopLabel: '回到顶部',
+    },
+    headingLinkTemplate: '本节链接：{title}',
+    relatedResourcesHeading: '相关资源',
+    contractsFigure: {
+      title: 'Arbitrum One 上的核心合约',
+      caption: '每个地址都可在 Arbiscan 上打开。合约页面列出全部官方地址，包括各金库与钱包。',
+    },
   },
   articles: {
     'what-is-cosmic-signature': {
+      cardTitle: '协议是什么',
+      cardDescription: '运行于 Arbitrum 的程序化艺术，由每个演绎周期的落笔共同塑造。',
       title: '什么是 Cosmic Signature？ · Cosmic Signature',
       description:
         'Cosmic Signature 是运行于 Arbitrum 的程序化链上艺术协议；参与者在演绎周期中落笔，共同塑造确定性的三体 NFT 作品。',
@@ -67,7 +85,6 @@ export const learnTextZh = {
           heading: '名称为何重要',
           body: [
             '名称中的 Signature，指每个周期最终生成的作品。每一笔都会改变周期状态，并随最终签名一同写入协议历史。',
-            'Cosmic Signature 与生物学中的 COSMIC 癌症突变数据库或 COSMIC 突变特征无关。它专注于确定性三体 NFT 艺术，是一套链上艺术协议。',
           ],
         },
         {
@@ -80,15 +97,15 @@ export const learnTextZh = {
         {
           heading: '如何阅读公开数据',
           body: [
-            '无需连接钱包，也能在应用中查看当前周期、统计、分配名录、合约地址、画廊和资助记录。',
-            '品牌站负责解释机制与术语，应用站提供实时状态。两者相互链接，方便读者从概念说明前往链上记录。',
+            '无需连接钱包，你也能在应用中查看当前周期、统计、获配者、合约地址、画廊记录和资助记录：每个数字都来自 Arbitrum 上的公开记录。',
+            '在这里读懂规则，再到应用中查看它在当前周期里如何生效：此刻的落笔价格、剩余时间，以及已经记录下的一切。',
           ],
         },
-        ...answerabilitySections,
       ],
-      relatedLabels: ['打开 Cosmic Signature 应用', '阅读常见问题', '查看协议统计'],
     },
     'how-the-performance-cycle-works': {
+      cardTitle: '演绎周期',
+      cardDescription: '一个周期如何开启、依倒计时推进、完成收官并分配周期储备。',
       title: 'Cosmic Signature 演绎周期如何运作 · Cosmic Signature',
       description:
         '了解 Cosmic Signature 的演绎周期如何在 Arbitrum 上展开，包括校准窗口、落笔、收官和分配轨道。',
@@ -124,11 +141,11 @@ export const learnTextZh = {
             '周期收官后，相关状态会归入历史。最终签名、获配记录、分配取回、已附加 NFT 和公共物品资助也会进入公开档案，供后续查阅。',
           ],
         },
-        ...answerabilitySections,
       ],
-      relatedLabels: ['查看当前演绎周期', '查看分配记录', '阅读协议常见问题'],
     },
     'how-gestures-work': {
+      cardTitle: '落笔如何运作',
+      cardDescription: 'ETH 与 CST 落笔各需多少、记录什么，又如何延长倒计时。',
       title: 'Cosmic Signature 的落笔如何运作 · Cosmic Signature',
       description:
         '了解 ETH 落笔、CST 落笔、落笔价格与参与 CST，以及每一笔如何塑造 Cosmic Signature 演绎周期。',
@@ -139,7 +156,7 @@ export const learnTextZh = {
         {
           heading: '落笔会带来什么',
           body: [
-            `每一笔都会写入当前周期，可能铭刻参与 CST，延长收官倒计时，并成为最终签名历史的一部分。参与 CST 的数量按${isV3Mechanics ? '线性' : '平方根'}公式计算：${cstRewardFacts.formula}。`,
+            `每一笔都会写入当前周期，可能铭刻参与 CST，延长收官倒计时，并成为最终签名历史的一部分。参与 CST 的数量按${isV3Mechanics ? '线性' : '平方根'}公式计算：${cstRewardFacts.notation}，其中 ${protocolFacts.participationCstSymbols[0]} 为距上一笔的秒数，m 为参与 CST 乘数，i 为周期时间增量。`,
             `落笔价格会在周期中持续变化。ETH 落笔与 CST 落笔彼此关联，但各有机制；校准窗口会清楚显示价格如何变化。每笔 CST 落笔会使 CST 校准窗口延长约 ${protocolFacts.cstCalibrationWindowIncreasePercentPerCstGesture}%；每笔 ETH 落笔则会使其缩短约 ${protocolFacts.cstCalibrationWindowDecreasePercentPerEthGesture}%。`,
           ],
         },
@@ -164,11 +181,11 @@ export const learnTextZh = {
             '附加 Random Walk NFT 也会写入公开记录。未使用的 Random Walk NFT 可在 ETH 落笔时附加，以获得一次价格减免；已使用的 NFT 会单独标记，方便事后核对。',
           ],
         },
-        ...answerabilitySections,
       ],
-      relatedLabels: ['在应用中落笔或查看落笔记录', '了解演绎周期', '查看当前周期数据'],
     },
     'three-body-nft-art': {
+      cardTitle: '三体艺术',
+      cardDescription: '链上种子与三体物理如何每次都生成同一件作品。',
       title: 'Cosmic Signature 如何生成三体 NFT 艺术 · Cosmic Signature',
       description:
         '从技术层面了解 Cosmic Signature 如何以链上种子与三体物理生成确定性的 NFT 作品。',
@@ -180,7 +197,7 @@ export const learnTextZh = {
           heading: '从链上种子到确定性渲染',
           body: [
             '每枚 Cosmic Signature NFT 都保存着可复现作品的种子。渲染管线采用确定性输入，因此同一种子始终生成相同的签名作品。',
-            '创作过程模拟 3 个天体在牛顿引力下的运动。混沌轨迹化作光谱般的轨道痕迹，由此形成协议鲜明的视觉语言。',
+            '创作过程模拟 3 个天体在牛顿引力下的运动。混沌轨迹化作光谱般的轨道痕迹，由此形成协议鲜明的视觉语言。',
           ],
         },
         {
@@ -204,11 +221,11 @@ export const learnTextZh = {
             '艺术作品是协议的一部分，不是脱离协议存在的媒体藏品。周期、代币、画廊、渲染管线和公开元数据都指向同一 Cosmic Signature 协议。',
           ],
         },
-        ...answerabilitySections,
       ],
-      relatedLabels: ['浏览 Cosmic Signature 画廊', '查看源代码', '阅读合约与验证说明'],
     },
     'cosmic-signature-on-arbitrum': {
+      cardTitle: '运行于 Arbitrum',
+      cardDescription: '协议为何选择以太坊 Layer 2 网络 Arbitrum。',
       title: '运行于 Arbitrum 的 Cosmic Signature · Cosmic Signature',
       description:
         '了解 Cosmic Signature 为何运行于 Arbitrum，以及协议如何借助以太坊 Layer 2 基础设施承载链上艺术。',
@@ -227,7 +244,7 @@ export const learnTextZh = {
           heading: '为何要明确标注网络',
           body: [
             'Cosmic Signature 在应用各处明确标注 Arbitrum，因为网络本就是协议身份的一部分。落笔、周期记录、合约地址、CST、NFT 所有权与分配取回，都需要指向具体网络，才能独立查验。',
-            '合约与统计页面把机制说明连接到链上记录：读者可以先了解协议，再核验实际数据。',
+            '[合约页面](contracts)与[统计页面](statistics)把机制说明连接到链上记录：读者可以先了解协议，再核验实际数据。',
           ],
         },
         {
@@ -237,43 +254,48 @@ export const learnTextZh = {
             '无需连接钱包或加载完整交互界面，也能了解 Arbitrum 上的协议活动。',
           ],
         },
-        ...answerabilitySections,
       ],
-      relatedLabels: ['查看已验证合约', '查看协议统计'],
     },
     'contracts-security-verification': {
+      cardTitle: '合约与验证',
+      cardDescription: '在哪里查阅合约与源代码，以及如何自行验证。',
       title: 'Cosmic Signature 合约、安全与验证 · Cosmic Signature',
       description:
         '查阅 Cosmic Signature 智能合约、源代码、验证信息，以及这套 Arbitrum 协议的安全背景。',
       h1: 'Cosmic Signature 合约、安全与验证',
-      summary: 'Cosmic Signature 公开合约与源代码信息，便于参与者审视协议机制并验证链上行为。',
+      summary:
+        'Cosmic Signature 运行在 Arbitrum One 上的一组合约之上。本指南列出核心合约，介绍自行核验的方法，并说明独立审计的覆盖范围。',
       sections: [
         {
-          heading: '公开的合约信息',
+          heading: '协议背后的合约',
           body: [
-            '合约页面是查询地址、验证链接、部署详情和协议资金流向的官方入口。',
-            '关键信息会以清晰文字列出，无需连接钱包或打开区块浏览器也能查阅。',
+            'Cosmic Signature 运行在 Arbitrum One 上，链 ID 为 42161。落笔、周期与分配都经由同一个合约：Cosmic Signature 协议。它以可升级代理合约的形式部署，地址保持不变，逻辑则位于代理所指向的实现合约中。CST、两个 NFT 系列和宇宙议会各有自己的地址。',
+            '[合约页面](contracts)是官方地址的唯一清单，各金库与钱包也列在其中。任何以 Cosmic Signature 名义出现、却不在此清单上的地址，都应视为非官方地址。',
           ],
         },
         {
-          heading: '可供验证的公开入口',
-          body: [
-            '验证信息分布在多个公开入口。合约页面列出部署地址与区块浏览器链接，源代码页面介绍确定性渲染资源，审计页面说明审阅状态，安全页面则解释如何查验官方资源。',
-            '核验时应结合这些页面：合约地址需与部署说明一同查看，安全声明也应有报告或链接作为依据。站内链接会串联合约地址、源代码、风险说明和审计状态。',
+          heading: '自行核验合约',
+          body: ['以下步骤都无需连接钱包。'],
+          steps: [
+            '从[合约页面](contracts)在 [Arbiscan](explorer) 上打开地址，确认网络是 Arbitrum One，而不是测试网。',
+            '在 Contract 标签页确认源代码已验证，再与[公开的合约仓库](contractsRepository)比对，或在 [Sourcify](sourcify) 上核对完全匹配。',
+            '对于协议合约，打开 Read as Proxy：其中列出的实现合约，应与合约页面上的实现合约地址一致。',
+            '在应用中选一条记录，例如一次落笔或一笔分配，再在区块浏览器上该合约的交易中找到同一笔交易。',
           ],
         },
         {
-          heading: '应先核对什么',
+          heading: '审计覆盖的范围',
           body: [
-            '先在官方应用主站打开合约页面，确认网络为 Arbitrum；再逐一对照源代码链接、安全概览与审计页面。如尚未发布审计或形式化验证报告，页面会明确标注当前状态。',
-            '已部署事实、已发布报告、静态分析、社区审阅和后续工作各有不同，不能混为一谈。',
+            `2025年末，Hacken 审查了生产合约：驱动每个周期的核心协议、CST 代币、两个 NFT 系列、锚定钱包，以及钱包与系统管理合约。[审计报告](hackenReport)于2026年1月发布，共列出 ${AUDIT_FINDINGS_TOTAL} 项发现，其中没有严重或高危级别问题；在 Hacken 模糊测试的 ${HACKEN_AUDIT.invariants.tested} 项不变量中，${HACKEN_AUDIT.invariants.held} 项保持成立。`,
+            '合约仓库还包含 Certora Prover 规范、Solidity SMTChecker 配置、Slither 静态分析和自动化测试套件，[审计页面](audits)逐一附有链接。这些检查只证明或测试它们所声明的属性，仅此而已。',
+            '审计的范围是智能合约：本网站、应用背后的数据服务和艺术渲染流程都不在其中。与所有检查一样，审计只能降低风险，无法消除风险；参与之前，请阅读[风险披露](riskDisclosures)。',
           ],
         },
-        ...answerabilitySections,
       ],
-      relatedLabels: ['查看合约地址', '打开源代码资源', '阅读常见问题'],
     },
     'cst-token-and-cosmic-council': {
+      cardTitle: 'CST 与宇宙议会',
+      cardDescription: 'CST 是什么、如何铭刻，以及持有者如何协调协议。',
       title: 'CST 与宇宙议会 · Cosmic Signature',
       description: '了解 CST 代币与落笔、协议协调和宇宙议会之间的关系。',
       h1: 'CST 与宇宙议会',
@@ -301,14 +323,14 @@ export const learnTextZh = {
           heading: '协调记录',
           body: [
             '宇宙议会让 CST 持有者依照链上规则协调协议变更。协调变更及相关应用页面会公开参数变更历史，帮助读者理解协议如何演进。',
-            '为避免相关措辞引发歧义，Cosmic Signature 将这套协调机制称为"宇宙议会"，并将法律说明与风险披露单独呈现。',
+            '为避免相关措辞引发歧义，Cosmic Signature 将这套协调机制称为“宇宙议会”，并将法律说明与风险披露单独呈现。',
           ],
         },
-        ...answerabilitySections,
       ],
-      relatedLabels: ['了解落笔如何运作', '打开应用'],
     },
     'anchoring-nfts': {
+      cardTitle: '锚定 NFT',
+      cardDescription: '已锚定的 NFT 如何分享每个周期的锚定派发，以及解锚的规则。',
       title: '锚定 Cosmic Signature NFT · Cosmic Signature',
       description:
         '了解 Cosmic Signature NFT 的锚定机制、ETH 锚定派发，以及 Random Walk NFT 的参与资格。',
@@ -338,11 +360,11 @@ export const learnTextZh = {
             '页面会清楚标注代币类型，并链接至统计、画廊和当前周期页面，方便核对相关记录。',
           ],
         },
-        ...answerabilitySections,
       ],
-      relatedLabels: ['打开锚定工具', '浏览画廊'],
     },
     'protocol-guild-public-goods': {
+      cardTitle: '公共物品与 Protocol Guild',
+      cardDescription: '每份周期储备中的一部分如何流向以太坊核心贡献者。',
       title: 'Cosmic Signature 与以太坊公共物品 · Cosmic Signature',
       description:
         '了解 Cosmic Signature 如何将公共物品分配转拨至 Protocol Guild，为以太坊核心贡献者提供资助。',
@@ -371,11 +393,11 @@ export const learnTextZh = {
             'Cosmic Signature 仅说明公开记录中的资金流向，不对税务处理或法律地位作任何暗示。',
           ],
         },
-        ...answerabilitySections,
       ],
-      relatedLabels: ['查看公共物品资助记录', '了解周期如何运作'],
     },
     'collecting-and-trading-cosmic-signature': {
+      cardTitle: '收藏与交易',
+      cardDescription: 'NFT 与 CST 在哪里交易，以及交易前需要核对什么。',
       title: '收藏与交易 Cosmic Signature NFT 和 CST · Cosmic Signature',
       description:
         '了解 Cosmic Signature 资产可在哪里交易：Axiom Zero NFT 市场不收平台费，可在 Arbitrum 上通过 Uniswap 兑换 CST，Chaos Zero 则提供周期预测市场。',
@@ -407,22 +429,16 @@ export const learnTextZh = {
         {
           heading: '如何核验交易场所与地址',
           body: [
-            '交易前，先在应用主站的合约页面确认官方地址，再与市场中的系列地址或兑换平台上的代币地址逐一比对。应用页眉、页脚与网站地图均提供 Axiom Zero、Chaos Zero 和 Uniswap 的官方链接，因此始终可以循着官方导航抵达正确地址。',
+            '交易前，先在应用的合约页面确认官方地址，再与市场中的系列地址或兑换平台上的代币地址逐一比对。应用页眉、页脚与网站地图均提供 Axiom Zero、Chaos Zero 和 Uniswap 的官方链接，因此始终可以循着官方导航抵达正确地址。',
             '兑换 CST 与持有预测凭证时也应同样谨慎：核对代币地址是否与已公布的 CST 合约一致。Chaos Zero 会根据协议记录的公开落笔次数判定预测结果，因此市场的每项输入都可在 Arbitrum 上独立查验。',
           ],
         },
-        ...answerabilitySections,
-      ],
-      relatedLabels: [
-        '在 Axiom Zero 浏览 Cosmic Signature',
-        '在 Chaos Zero 研判周期结果',
-        '在 Uniswap 用 ETH 兑换 CST',
-        '核验合约地址',
-        '浏览 NFT 画廊',
       ],
     },
     // lexicon-allow-start: 保留明确的否认措辞。
     'not-a-lottery-not-an-investment': {
+      cardTitle: '它不是什么',
+      cardDescription: '这套协议不是什么，以及这一区别为何重要。',
       title: 'Cosmic Signature 是彩票、赌场或投资产品吗？ · Cosmic Signature',
       description: 'Cosmic Signature 是程序化链上艺术协议，不是彩票、赌场、赌博产品或投资产品。',
       h1: 'Cosmic Signature 是彩票、赌场或投资产品吗？',
@@ -446,12 +462,10 @@ export const learnTextZh = {
           heading: '如何理解分配措辞',
           body: [
             '这里所说的分配，是指周期收官后由协议按规则发放的资产，不代表利润分成、股息权、股权或任何承诺的财务回报。参与前，请阅读风险披露和服务条款。',
-            '说明内容与钱包操作分开呈现。无需连接钱包，也能阅读协议定义和否认说明。',
+            '无需连接钱包，也能阅读协议说明、服务条款和风险披露。',
           ],
         },
-        ...answerabilitySections,
       ],
-      relatedLabels: ['阅读服务条款', '阅读常见问题'],
     },
     // lexicon-allow-end
   },

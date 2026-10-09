@@ -29,7 +29,7 @@ Cells contain `☐` (not done) → replace with `✅` when the stage is complete
 | 0.2 | `normalizeLocale` resolves sub-locales (exact → alias → script/region); `splitLocalePrefix` longest-first, case-insensitive        | ✅   |
 | 0.3 | Every `LocaleRecord` registry: content indexes, legal, format/time, OG copy/fonts, wallet (RainbowKit `zh-TW`), global-error, PDF  | ✅   |
 | 0.4 | Noto Sans TC via `--cjk-font-stack` + `html:lang(zh-TW)`; `NotoSansTC-700.subset.ttf` for OG images (`npm run og:fonts`)           | ✅   |
-| 0.5 | Gates: `ZH_HANT_BANNED_TERMS` + `ZH_TW_BANNED_TERMS`, `scripts/terminology/zh-TW.ts`, `SCRIPT_CONVENTIONS['zh-TW']`                | ✅   |
+| 0.5 | Gates: `ZH_HANT_BANNED_TERMS` + `ZH_TW_BANNED_TERMS`, `scripts/terminology/zh-TW.ts`, `LOCALE_CONVENTIONS['zh-TW']`                | ✅   |
 | 0.6 | hreflang aliases (`zh-Hant` → `/zh-TW`) in metadata and both sitemaps                                                              | ✅   |
 | 0.7 | E2E: `LOCALE_CHROME` / `LOCALE_SEO` / `LOCALE_ROUTE_TEXT`, `zh-TW-smoke`, `zh-TW-site-qa.desktop`, landing loop                    | ✅   |
 | 0.8 | `public/llms.txt` / `llms-full.txt` Taiwan sections; white-paper PDF (`Songti TC` / `PingFang TC`)                                 | ✅   |

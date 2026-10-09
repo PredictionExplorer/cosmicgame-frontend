@@ -26,9 +26,9 @@ export function SkipLink({ href = '#main', className, children, ...props }: Skip
         'sr-only focus:not-sr-only',
         'focus:fixed focus:left-4 focus:top-4 focus:z-[100]',
         'focus:inline-flex focus:items-center focus:gap-2',
-        'focus:rounded-md focus:bg-card focus:border focus:border-white/10',
+        'focus:rounded-control focus:bg-surface-raised focus:border focus:border-rule',
         'focus:px-4 focus:py-2 focus:text-sm focus:font-medium focus:text-foreground',
-        'focus:shadow-[var(--elevation-3)]',
+        'focus:shadow-float',
         className,
       )}
       {...props}

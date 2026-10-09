@@ -1,0 +1,198 @@
+{
+  "formats": {
+    "cycle": "Chu kỳ {cycle}"
+  },
+  "recipients": {
+    "header": {
+      "title": "Người nhận phân bổ",
+      "subtitle": "Lịch sử người nhận phân bổ, thống kê và chi tiết phân bổ của mọi chu kỳ trình diễn đã hoàn tất.",
+      "scope": "Chỉ gồm các bản ghi chu kỳ đã hoàn tất",
+      "scopeTooltip": "Số liệu chỉ bao gồm các chu kỳ trình diễn đã hoàn tất. Chu kỳ đang chờ và các lần nhận về không liên quan không được tính vào tổng."
+    },
+    "reserveSplit": {
+      "label": "Cơ cấu Dự trữ chu kỳ",
+      "tooltip": "Tỷ lệ phần trăm cho thấy dự trữ ETH của một chu kỳ đã hoàn tất được phân bổ qua các luồng của giao thức như thế nào."
+    },
+    "ledgerTitle": "Các chu kỳ đã hoàn tất",
+    "loadError": "Không tải được các chu kỳ đã hoàn tất. Hãy thử lại sau giây lát.",
+    "intro": "Khi một chu kỳ trình diễn hoàn tất, người tham gia đặt nét bút cuối cùng nhận về phân bổ Signature — {percentage}% Dự trữ chu kỳ, 1.000 CST và {cscNftCount, number} Cosmic Signature NFT độc nhất. Các phân bổ khác chảy qua Chiến binh Thời gian, Tinh tuyển, phân phối neo giữ, Hàng hóa công và Dự trữ tích lũy."
+  },
+  "details": {
+    "navigation": {
+      "label": "Các chu kỳ liền kề",
+      "previousAria": "Chu kỳ trước",
+      "nextAria": "Chu kỳ sau"
+    },
+    "recipientCard": {
+      "recipient": "Người nhận"
+    },
+    "share": {
+      "summary": "Chu kỳ {cycle} — Cosmic Signature\nPhân bổ Signature: {amount} ETH\nNgười nhận: {recipient}\nNét bút: {gestures}",
+      "copyLink": "Sao chép liên kết",
+      "linkCopied": "Đã sao chép liên kết",
+      "failed": "Không sao chép được liên kết"
+    },
+    "error": {
+      "title": "Không tải được chu kỳ này",
+      "message": "Không tải được dữ liệu chu kỳ {cycle}. Hãy thử lại, hoặc quay về danh sách người nhận."
+    },
+    "breadcrumbs": {
+      "recipients": "Người nhận phân bổ"
+    },
+    "loading": "Đang tải chu kỳ",
+    "hero": {
+      "finalized": "Hoàn tất <dateTime></dateTime>",
+      "viewTransaction": "Xem giao dịch",
+      "share": "Chia sẻ",
+      "shareAria": "Chia sẻ tóm tắt chu kỳ",
+      "nfts": "NFT",
+      "nftTooltip": "Xem (các) NFT Cosmic Signature của người nhận trong thư viện. Các chu kỳ V3 trao nhiều NFT có số thứ tự liên tiếp cho người nhận phân bổ Signature."
+    },
+    "recipientSection": {
+      "title": "Người nhận của chu kỳ",
+      "description": "Mỗi vai trò dưới đây đã nhận một Cosmic Signature NFT khi chu kỳ hoàn tất.",
+      "rolesInfo": "Phân bổ Signature: người tham gia đặt nét bút cuối cùng. Chiến binh Thời gian: giữ vị trí Quán quân Bền bỉ trong khoảng thời gian liên tục dài nhất. Quán quân Bền bỉ: giữ vị trí nét bút gần nhất trong khoảng thời gian liên tục dài nhất. Nét bút CST cuối cùng: người đặt nét bút cuối cùng của chu kỳ bằng CST.",
+      "cards": {
+        "signature": {
+          "title": "Phân bổ Signature",
+          "tooltip": "Khi đếm ngược về 0, người đặt nét bút cuối cùng có thể hoàn tất chu kỳ và nhận về phân bổ Signature: ETH, 1.000 CST và {cscNftCount, number} Cosmic Signature NFT."
+        },
+        "chrono": {
+          "title": "Chiến binh Thời gian"
+        },
+        "endurance": {
+          "title": "Quán quân Bền bỉ"
+        },
+        "finalCst": {
+          "title": "Nét bút CST cuối cùng"
+        }
+      }
+    },
+    "distribution": {
+      "title": "Cơ cấu phân bổ",
+      "tooltip": "Tỷ lệ của từng luồng trong dự trữ chu kỳ khi chu kỳ này hoàn tất, cùng cách chia như trang “Người nhận phân bổ”. Phần chưa được phân bổ chuyển sang chu kỳ tiếp theo.",
+      "total": "Đã phân bổ {amount} ETH trong chu kỳ này"
+    },
+    "statistics": {
+      "cards": {
+        "signatureEth": {
+          "label": "ETH phân bổ Signature",
+          "tooltip": "Phần ETH của phân bổ Signature được người tham gia đặt nét bút cuối cùng của chu kỳ này nhận về."
+        },
+        "recipients": {
+          "label": "Người nhận",
+          "tooltip": "Các ví đã nhận ít nhất một khoản phân bổ trong chu kỳ này, mỗi ví chỉ tính một lần."
+        },
+        "gestures": {
+          "label": "Tổng số nét bút"
+        },
+        "attachedNfts": {
+          "label": "NFT đính kèm"
+        },
+        "anchoredTokens": {
+          "label": "NFT đang neo giữ"
+        },
+        "uniqueAnchorHolders": {
+          "label": "Người neo giữ riêng biệt",
+          "tooltip": "Số địa chỉ riêng biệt có NFT neo giữ trong chu kỳ này."
+        },
+        "totalContributed": {
+          "label": "Đóng góp trực tiếp",
+          "tooltip": "Các khoản đóng góp ETH trực tiếp từ cộng đồng trong chu kỳ này."
+        }
+      }
+    },
+    "ledger": {
+      "title": "Mọi phân bổ của chu kỳ này",
+      "description": "Mọi bản ghi phân bổ của chu kỳ, nhóm theo người nhận.",
+      "empty": "Chưa có bản ghi phân bổ nào."
+    },
+    "data": {
+      "divider": "Dữ liệu chi tiết",
+      "tabs": {
+        "gestures": "Lịch sử nét bút",
+        "endurance": "Quán quân Bền bỉ",
+        "anchoring": "Phân phối neo giữ",
+        "contributions": "Đóng góp"
+      },
+      "empty": {
+        "gestures": "Không có nét bút nào được đặt trong chu kỳ này.",
+        "endurance": "Không có dữ liệu Quán quân Bền bỉ cho chu kỳ này.",
+        "anchoring": "Không có phân phối neo giữ nào trong chu kỳ này.",
+        "nfts": "Không có NFT nào được đính kèm vào nét bút trong chu kỳ này.",
+        "erc20": "Không có token ERC-20 nào được đính kèm vào nét bút trong chu kỳ này."
+      },
+      "error": {
+        "title": "Không tải được danh sách này",
+        "message": "Danh sách tạm thời không khả dụng. Hãy thử lại sau giây lát."
+      },
+      "contributions": {
+        "nfts": "NFT đính kèm",
+        "nftsTooltip": "Các NFT đính kèm vào nét bút trong chu kỳ này, được chuyển đến người tham gia đặt nét bút cuối cùng.",
+        "erc20": "Token ERC-20 đính kèm",
+        "erc20Tooltip": "Các token ERC-20 người tham gia đính kèm vào nét bút, được chuyển đến người nhận phân bổ Signature."
+      }
+    }
+  },
+  "art": {
+    "failed": "Không tải được tác phẩm"
+  },
+  "missingCycle": {
+    "open": {
+      "title": "Chu kỳ {cycle} vẫn đang diễn ra",
+      "body": "Bản ghi phân bổ của chu kỳ sẽ xuất hiện ở đây sau khi chu kỳ hoàn tất."
+    },
+    "notStarted": {
+      "title": "Chu kỳ {cycle} chưa bắt đầu",
+      "body": "Các chu kỳ diễn ra lần lượt, và chu kỳ đang mở hiện nay là chu kỳ {live}."
+    },
+    "unknown": {
+      "title": "Chưa có bản ghi của chu kỳ {cycle}",
+      "body": "Chu kỳ có thể vẫn đang diễn ra, hoặc bản ghi vẫn đang được lập chỉ mục."
+    },
+    "currentCycle": "Theo dõi chu kỳ hiện tại"
+  },
+  "finalized": {
+    "title": "Phân bổ đã hoàn tất",
+    "index": {
+      "title": "Các chu kỳ vừa hoàn tất",
+      "description": "Phân bổ Signature của từng chu kỳ, kèm Cosmic Signature được khắc trong chu kỳ đó.",
+      "error": "Không tải được các chu kỳ mới nhất",
+      "empty": {
+        "title": "Chưa có chu kỳ nào hoàn tất",
+        "description": "Phân bổ Signature của chu kỳ đầu tiên sẽ xuất hiện ở đây sau khi chu kỳ hoàn tất."
+      }
+    },
+    "loading": {
+      "status": "Đang tải chu kỳ đã hoàn tất"
+    },
+    "pending": {
+      "successTitle": "Chu kỳ {cycle} đã hoàn tất",
+      "successBody": "Việc hoàn tất đã được ghi trên chuỗi. Bản ghi sẽ hiện ở đây ngay khi được lập chỉ mục; trang này tự cập nhật."
+    },
+    "links": {
+      "viewCycle": "Xem chu kỳ {cycle}",
+      "myAllocations": "Phân bổ của tôi",
+      "allCycles": "Tất cả chu kỳ",
+      "cycles": "Các chu kỳ khác"
+    },
+    "result": {
+      "title": "Phân bổ Signature của chu kỳ {cycle}",
+      "successTitle": "Chúc mừng! Phân bổ Signature của chu kỳ {cycle} là của bạn",
+      "lede": "Những gì người đặt nét bút cuối cùng nhận được khi chu kỳ hoàn tất.",
+      "allocation": "Phân bổ",
+      "successLede": "Bạn đã đặt nét bút cuối cùng của chu kỳ {cycle}. ETH, CST và Cosmic Signature này đã có trong ví của bạn.",
+      "componentsTitle": "Phân bổ gồm những gì",
+      "nft": "Cosmic Signature NFT",
+      "attached": "NFT đính kèm",
+      "recipient": "Người nhận",
+      "finalized": "Hoàn tất",
+      "viewTransaction": "Xem giao dịch"
+    },
+    "nextCycle": "Chu kỳ tiếp theo đã bắt đầu. <link>Đến Đài quan sát</link>",
+    "next": {
+      "title": "Bước tiếp theo",
+      "body": "Cũng có thể có thêm phân bổ từ Tinh tuyển. Để xem phân bổ của bạn, hãy vào trang <allocations>Phân bổ của tôi</allocations>. Với phân phối neo giữ, hãy xem trang <anchors>Neo giữ của tôi</anchors>."
+    }
+  }
+}

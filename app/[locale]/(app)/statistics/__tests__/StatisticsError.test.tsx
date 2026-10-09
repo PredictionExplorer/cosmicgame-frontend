@@ -9,22 +9,22 @@ import StatisticsError from '../error';
 jest.mock('../../../../../utils/errors', () => ({ reportError: jest.fn() }));
 
 describe('statistics route error boundary', () => {
-  it('reports the error and offers a retry that calls reset', async () => {
+  it('reports the error and offers a retry that calls retry', async () => {
     const user = userEvent.setup();
-    const reset = jest.fn();
+    const retry = jest.fn();
     const error = Object.assign(new Error('boom'), { digest: 'digest-1' });
 
-    render(<StatisticsError error={error} reset={reset} />);
+    render(<StatisticsError error={error} retry={retry} />);
 
     expect(reportError).toHaveBeenCalledWith(error, 'statistics-route');
     expect(screen.getByText('Statistics failed to load')).toBeInTheDocument();
 
     await user.click(screen.getByRole('button', { name: /try again/i }));
-    expect(reset).toHaveBeenCalledTimes(1);
+    expect(retry).toHaveBeenCalledTimes(1);
   });
 
   it('has no accessibility violations', async () => {
-    const { container } = render(<StatisticsError error={new Error('boom')} reset={() => {}} />);
+    const { container } = render(<StatisticsError error={new Error('boom')} retry={() => {}} />);
     await checkA11y(container);
   });
 });

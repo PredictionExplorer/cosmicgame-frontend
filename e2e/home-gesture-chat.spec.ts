@@ -1,219 +1,288 @@
-import { expect, test, type Page } from '@playwright/test';
+import { expect, test, type Locator, type Page } from '@playwright/test';
 
-const MOCK_NOW_SECONDS = Math.floor(Date.now() / 1000);
-const CYCLE_NUMBER = 7;
+import { TRANSLATED_LOCALES } from '../i18n/routing';
+import home from '../messages/en/home.json';
 
-const dashboard = {
-  CurRoundNum: CYCLE_NUMBER,
-  CurNumBids: 4,
-  CurPrizeAmountEth: 2.5,
-  CurBidPriceEth: 0.1,
-  PrizeAmountEth: 2.5,
-  RaffleAmountEth: 0.4,
-  PrizeClaimTs: MOCK_NOW_SECONDS + 3_600,
-  CurRoundPrizeTime: MOCK_NOW_SECONDS + 3_600,
-  TsRoundStart: MOCK_NOW_SECONDS - 3_600,
-  LastBidderAddr: '0x3333333333333333333333333333333333333333',
-  GestureCostEth: 0.1,
-  StakingAmountEth: 0,
-  CosmicGameBalanceEth: 10,
-  PrizePercentage: 25,
-  ChronoWarriorPercentage: 8,
-  RafflePercentage: 4,
-  StakingPercentage: 6,
-  CharityPercentage: 7,
-  NumRaffleEthWinnersBidding: 2,
-  NumRaffleNFTWinnersBidding: 1,
-  NumRaffleNFTWinnersStakingRWalk: 0,
-  MainStats: {
-    NumCSTokenMints: 0,
-    TotalRaffleEthDeposits: 0,
-    TotalCSTConsumedEth: 0,
-    TotalMktRewardsEth: 0,
-    NumMktRewards: 0,
-    TotalRaffleEthWithdrawn: 0,
-    NumBidsCST: 0,
-    NumUniqueBidders: 3,
-    NumUniqueWinners: 0,
-    NumUniqueDonors: 0,
-    TotalNamedTokens: 0,
-    NumUniqueStakersCST: 0,
-    NumUniqueStakersRWalk: 0,
-    StakeStatisticsCST: { NumActiveStakers: 0, TotalTokensStaked: 0 },
-    StakeStatisticsRWalk: { NumActiveStakers: 0, TotalTokensStaked: 0 },
-  },
-  CurRoundStats: {
-    TotalBids: 4,
-    TotalDonatedAmountEth: 0,
-    TotalDonatedNFTs: 0,
-    TotalRaffleEthDepositsEth: 0,
-    TotalRaffleNFTs: 0,
-    ActivationTime: MOCK_NOW_SECONDS - 60,
-  },
-};
+import {
+  gestures,
+  makeLongGestureFeed,
+  mockHomeGestureChatApi,
+  specialRecipients,
+} from './home-gesture-chat-fixtures';
 
-const gestures = [
-  {
-    BidderAddr: '0x1111111111111111111111111111111111111111',
-    BidType: 0,
-    EthPriceEth: 0.1,
-    RoundNum: CYCLE_NUMBER,
-    Message: 'Older message from a gesture',
-    Tx: {
-      EvtLogId: 101,
-      BlockNum: 1,
-      TxId: 1,
-      TxHash: '0x101',
-      TimeStamp: MOCK_NOW_SECONDS - 300,
-      DateTime: '2023-11-14T22:08:20Z',
-    },
-  },
-  {
-    BidderAddr: '0x2222222222222222222222222222222222222222',
-    BidType: 0,
-    EthPriceEth: 0.11,
-    RoundNum: CYCLE_NUMBER,
-    Message: '',
-    Tx: {
-      EvtLogId: 102,
-      BlockNum: 2,
-      TxId: 2,
-      TxHash: '0x102',
-      TimeStamp: MOCK_NOW_SECONDS - 200,
-      DateTime: '2023-11-14T22:10:00Z',
-    },
-  },
-  {
-    BidderAddr: '0x3333333333333333333333333333333333333333',
-    BidType: 2,
-    CstPriceEth: 20,
-    EthPriceEth: -1,
-    CSTRewardEth: 100,
-    BidPosition: 4,
-    RoundNum: CYCLE_NUMBER,
-    Message: 'Newest message from a gesture',
-    Tx: {
-      EvtLogId: 103,
-      BlockNum: 3,
-      TxId: 3,
-      TxHash: '0x103',
-      TimeStamp: MOCK_NOW_SECONDS - 100,
-      DateTime: '2023-11-14T22:11:40Z',
-    },
-  },
-];
+const DESKTOP_VIEWPORTS = [
+  { width: 1280, height: 720 },
+  { width: 1366, height: 768 },
+  { width: 1440, height: 900 },
+  { width: 1920, height: 1080 },
+] as const;
 
-const specialRecipients = {
-  EnduranceChampionAddress: '0x1111111111111111111111111111111111111111',
-  EnduranceChampionDuration: 600,
-  EnduranceChampionStartTimeStamp: MOCK_NOW_SECONDS - 1_200,
-  PrevEnduranceChampionDuration: 0,
-  ChronoWarriorAddress: '0x2222222222222222222222222222222222222222',
-  ChronoWarriorDuration: 1_800,
-  ChronoWarriorIsLive: false,
-  LastBidderAddress: '0x3333333333333333333333333333333333333333',
-  LastBidderLastBidTime: Math.floor(Date.now() / 1000) - 100,
-  LastCstBidderAddress: '0x3333333333333333333333333333333333333333',
-  SourceBlockNumber: 100,
-  SourceBlockTimeStamp: MOCK_NOW_SECONDS,
-};
+async function expectDecisionDashboardInViewport(page: Page) {
+  const viewport = page.viewportSize()!;
+  const panel = page.locator('[data-testid="gesture-panel"][data-variant="card"]');
+  // The page exists for one action: the clock, the Calibration Window that
+  // prices CST, the methods and the form's own action share the first
+  // viewport at every desktop size, from 1280×720 up.
+  const critical = [
+    ['clock', page.getByTestId('cycle-clock')],
+    ['Calibration Window', page.getByTestId('control-desk-calibration')],
+    ['gesture methods', panel.getByTestId('panel-method-tabs')],
+    ['commit action', panel.getByTestId('connect-to-gesture').getByRole('button')],
+  ] as const;
 
-const longGestureFeed = Array.from({ length: 12 }, (_, index) => {
-  const sequence = index + 1;
-  return {
-    ...gestures[0]!,
-    BidderAddr: `0x${sequence.toString(16).padStart(40, '0')}`,
-    Message: `Scrollable message ${sequence}: ${'cosmic signal '.repeat(8).trim()}`,
-    Tx: {
-      ...gestures[0]!.Tx,
-      EvtLogId: 200 + sequence,
-      TxId: 200 + sequence,
-      TxHash: `0x${200 + sequence}`,
-      TimeStamp: MOCK_NOW_SECONDS - sequence * 60,
-    },
-  };
-});
+  // Visibility alone does not mean that a participant can see the content
+  // without scrolling. Assert each required surface's actual viewport bounds.
+  expect(await page.evaluate(() => window.scrollY)).toBe(0);
+  for (const [name, locator] of critical) {
+    await expect(locator).toBeVisible();
+    const box = await locator.boundingBox();
+    expect(box, name).not.toBeNull();
+    expect(box!.y, `${name} top`).toBeGreaterThanOrEqual(0);
+    expect(box!.y + box!.height, `${name} bottom`).toBeLessThanOrEqual(viewport.height);
+    expect(box!.x, `${name} left`).toBeGreaterThanOrEqual(0);
+    expect(box!.x + box!.width, `${name} right`).toBeLessThanOrEqual(viewport.width);
+  }
+  // The standings are decision inputs: always open, never behind a disclosure.
+  for (const testId of [
+    'latest-participant-intel',
+    'control-desk-endurance',
+    'chrono-role-summary',
+    'chrono-active-challenge',
+  ]) {
+    await expect(page.getByTestId(testId)).toBeVisible();
+    expect(
+      await page.getByTestId(testId).evaluate((element) => element.closest('details') === null),
+    ).toBe(true);
+  }
+  expect(
+    await page.evaluate(() => document.documentElement.scrollWidth),
+    'the page must not overflow horizontally',
+  ).toBeLessThanOrEqual(viewport.width);
+}
 
-async function mockHomeGestureChatApi(
-  page: Page,
-  gestureFeed = gestures,
-  roleSnapshot = specialRecipients,
-) {
-  await page.route('**/api/cosmicgame/**', async (route) => {
-    const url = new URL(route.request().url());
-    const path = url.pathname;
-
-    if (path.endsWith('/time/current')) {
-      await route.fulfill({ json: { CurrentTimeStamp: MOCK_NOW_SECONDS } });
-      return;
-    }
-
-    if (path.endsWith('/rounds/current/time')) {
-      await route.fulfill({ json: { CurRoundPrizeTime: MOCK_NOW_SECONDS + 3_600 } });
-      return;
-    }
-
-    if (path.endsWith('/statistics/dashboard')) {
-      await route.fulfill({ json: dashboard });
-      return;
-    }
-
-    // lexicon-allow-start: backend route paths are sealed API contracts.
-    if (path.includes(`/bid/list/by_round/${CYCLE_NUMBER}/1/`)) {
-      await route.fulfill({ json: { BidsByRound: gestureFeed } });
-      return;
-    }
-
-    if (path.endsWith('/get_banned_bids')) {
-      await route.fulfill({ json: [] });
-      return;
-    }
-
-    if (path.endsWith('/bid/eth_price')) {
-      await route.fulfill({
-        json: {
-          AuctionDuration: '3600',
-          ETHPrice: '100000000000000000',
-          SecondsElapsed: '120',
-        },
+/**
+ * The desk reads in DOM order: within each column of the two-column desk,
+ * keyboard focus never moves up (WCAG 1.3.2, 2.4.3). Focus may cross back to
+ * the other column (the wallet's standing is read after the form beside it).
+ * A stop belongs to the column its desk cell starts in, so a link at the far
+ * edge of the wide standings cell still reads with the standings.
+ */
+async function expectDeskFocusOrderReadsDown(page: Page) {
+  const stops = await page.getByTestId('control-desk-grid').evaluate((grid) => {
+    const selector =
+      'a[href], button:not([disabled]), input, textarea, select, [tabindex]:not([tabindex="-1"])';
+    const form = grid
+      .querySelector('[data-testid="control-desk-gesture"]')!
+      .getBoundingClientRect();
+    return Array.from(grid.querySelectorAll<HTMLElement>(selector))
+      .filter((element) => {
+        const style = getComputedStyle(element);
+        const rect = element.getBoundingClientRect();
+        return (
+          style.visibility !== 'hidden' &&
+          style.display !== 'none' &&
+          !element.closest('[hidden], [inert], [aria-hidden="true"]') &&
+          rect.width > 0 &&
+          rect.height > 0
+        );
+      })
+      .map((element) => {
+        const rect = element.getBoundingClientRect();
+        const cell = element.closest('[data-testid="control-desk-grid"] > *') ?? element;
+        return {
+          name: (element.getAttribute('aria-label') ?? element.textContent ?? '')
+            .trim()
+            .slice(0, 40),
+          column: cell.getBoundingClientRect().left >= form.left - 1 ? 'right' : 'left',
+          // The middle of the control: controls of different heights on one
+          // line (an ⓘ beside a 44px menu button) read as one line.
+          middle: rect.top + rect.height / 2 + window.scrollY,
+        };
       });
-      return;
-    }
-
-    if (path.endsWith('/bid/cst_price')) {
-      await route.fulfill({
-        json: {
-          AuctionDuration: '3600',
-          CSTPrice: '20000000000000000000',
-          SecondsElapsed: '120',
-        },
-      });
-      return;
-    }
-
-    if (path.endsWith('/bid/current_special_winners')) {
-      await route.fulfill({ json: roleSnapshot });
-      return;
-    }
-
-    if (path.endsWith('/bid/used_randomwalk_nfts')) {
-      await route.fulfill({ json: { UsedRwalkNFTs: [] } });
-      return;
-    }
-
-    if (path.endsWith(`/donations/nft/by_round/${CYCLE_NUMBER}`)) {
-      await route.fulfill({ json: { NFTDonations: [] } });
-      return;
-    }
-
-    if (path.endsWith(`/donations/erc20/by_round/all/${CYCLE_NUMBER}`)) {
-      await route.fulfill({ json: { DonationsERC20ByRoundAll: [] } });
-      return;
-    }
-    // lexicon-allow-end
-
-    await route.fulfill({ json: {} });
   });
+  expect(stops.length).toBeGreaterThan(5);
+  for (const column of ['left', 'right'] as const) {
+    const inColumn = stops.filter((stop) => stop.column === column);
+    for (let index = 1; index < inColumn.length; index += 1) {
+      expect(
+        inColumn[index]!.middle,
+        `${column} column: "${inColumn[index]!.name}" after "${inColumn[index - 1]!.name}"`,
+      ).toBeGreaterThanOrEqual(inColumn[index - 1]!.middle - 12);
+    }
+  }
+}
+
+/** Opens the optional message editor, which recedes behind one control until wanted. */
+async function openMessageEditor(panel: Locator) {
+  const toggle = panel.getByTestId('gesture-message-toggle');
+  // A click that lands before hydration only focuses the toggle; try again.
+  await expect(async () => {
+    if ((await toggle.getAttribute('aria-expanded')) !== 'true') await toggle.click();
+    await expect(toggle).toHaveAttribute('aria-expanded', 'true', { timeout: 2000 });
+  }).toPass();
+}
+
+/** Folds the message editor back behind its toggle, as the form loads. */
+async function closeMessageEditor(panel: Locator) {
+  const toggle = panel.getByTestId('gesture-message-toggle');
+  if ((await toggle.getAttribute('aria-expanded')) === 'true') await toggle.click();
+  await expect(toggle).toHaveAttribute('aria-expanded', 'false');
+}
+
+/** The expanded editor can extend the form, but every control must remain reachable. */
+async function expectCommentFormReachable(page: Page) {
+  const panel = page.locator('[data-testid="gesture-panel"][data-variant="card"]');
+  const message = panel.getByTestId('gesture-message-input');
+  const connect = panel.getByTestId('connect-to-gesture');
+  await openMessageEditor(panel);
+  await expect(message).toBeVisible();
+  await expect(message).toBeEditable();
+  await expect(message).toHaveAccessibleName(/\S/);
+  expect(await message.evaluate((element) => element.closest('details') !== null)).toBe(false);
+  const messageBox = await message.boundingBox();
+  const connectBox = await connect.boundingBox();
+  expect(messageBox).not.toBeNull();
+  expect(connectBox).not.toBeNull();
+  expect(messageBox!.height).toBeGreaterThanOrEqual(96);
+  expect(messageBox!.y + messageBox!.height).toBeLessThanOrEqual(connectBox!.y);
+  await expectTextWithoutOverlap(panel.getByTestId('gesture-panel-message'));
+  // Center each control so fractional scroll alignment at the viewport edge
+  // cannot turn a reachable field into a false clipping failure.
+  await message.evaluate((element) =>
+    element.scrollIntoView({ block: 'center', behavior: 'instant' }),
+  );
+  await expect(message).toBeInViewport({ ratio: 1 });
+  const connectButton = connect.getByRole('button');
+  await connectButton.evaluate((element) =>
+    element.scrollIntoView({ block: 'center', behavior: 'instant' }),
+  );
+  await expect(connectButton).toBeInViewport({ ratio: 1 });
+  await page.evaluate(() => window.scrollTo({ top: 0, behavior: 'instant' }));
+  await expect.poll(() => page.evaluate(() => window.scrollY)).toBe(0);
+}
+
+/**
+ * Row 1 is the Cycle column (the clock over the Calibration Window, 5 of 12)
+ * beside the gesture form (7 of 12), so the form's action is in the first
+ * viewport. Row 2 is the Standings Ledger beside the newest Signature. The
+ * three methods sit side by side.
+ */
+async function expectEfficientDesktopLayout(page: Page) {
+  const grid = page.getByTestId('control-desk-grid');
+  const clock = page.getByTestId('control-desk-clock');
+  const calibration = page.getByTestId('control-desk-calibration');
+  const standings = page.getByTestId('control-desk-standings');
+  const form = page.getByTestId('control-desk-gesture');
+  const methods = page.getByTestId('panel-method-tabs');
+  const art = page.getByTestId('control-desk-art');
+  const [gridBox, clockBox, calibrationBox, standingsBox, formBox, methodsBox, artBox] =
+    await Promise.all([
+      grid.boundingBox(),
+      clock.boundingBox(),
+      calibration.boundingBox(),
+      standings.boundingBox(),
+      form.boundingBox(),
+      methods.boundingBox(),
+      art.boundingBox(),
+    ]);
+  for (const box of [
+    gridBox,
+    clockBox,
+    calibrationBox,
+    standingsBox,
+    formBox,
+    methodsBox,
+    artBox,
+  ]) {
+    expect(box).not.toBeNull();
+  }
+
+  // The Cycle column and the form share the first row; the Calibration
+  // Window continues the Cycle column under the clock.
+  expect(Math.abs(clockBox!.y - formBox!.y)).toBeLessThanOrEqual(1);
+  expect(Math.abs(clockBox!.x - gridBox!.x)).toBeLessThanOrEqual(1);
+  expect(clockBox!.x + clockBox!.width).toBeLessThanOrEqual(formBox!.x);
+  expect(Math.abs(calibrationBox!.x - clockBox!.x)).toBeLessThanOrEqual(1);
+  expect(calibrationBox!.y).toBeGreaterThanOrEqual(clockBox!.y + clockBox!.height - 1);
+  expect(Math.abs(formBox!.x + formBox!.width - (gridBox!.x + gridBox!.width))).toBeLessThanOrEqual(
+    1,
+  );
+  expect(formBox!.width).toBeGreaterThan(gridBox!.width * 0.5);
+
+  // Row 2 starts under both: the standings at the desk's edge, the art beside them.
+  const gap = await grid.evaluate((element) => Number.parseFloat(getComputedStyle(element).rowGap));
+  const rowBottom = Math.max(
+    calibrationBox!.y + calibrationBox!.height,
+    formBox!.y + formBox!.height,
+  );
+  const rowGap = standingsBox!.y - rowBottom;
+  expect(rowGap).toBeGreaterThanOrEqual(-1);
+  expect(rowGap).toBeLessThanOrEqual(gap + 2);
+  expect(Math.abs(standingsBox!.x - gridBox!.x)).toBeLessThanOrEqual(1);
+  expect(standingsBox!.x + standingsBox!.width).toBeLessThanOrEqual(artBox!.x);
+  expect(Math.abs(artBox!.y - standingsBox!.y)).toBeLessThanOrEqual(1);
+  expect(methodsBox!.width).toBeGreaterThanOrEqual(formBox!.width * 0.8);
+
+  // Every method on one line, each with its price.
+  const tops = await methods
+    .getByRole('radio')
+    .evaluateAll((buttons) => buttons.map((button) => button.getBoundingClientRect().top));
+  expect(tops.length).toBeGreaterThanOrEqual(1);
+  for (const top of tops) expect(Math.abs(top - tops[0]!)).toBeLessThanOrEqual(1);
+
+  expect(
+    await page.evaluate(() => document.documentElement.scrollWidth),
+    'the page must not overflow horizontally',
+  ).toBeLessThanOrEqual(page.viewportSize()!.width);
+}
+
+/** Check rendered glyph bounds, which catch overlapping labels even when their cards fit. */
+async function expectTextWithoutOverlap(surface: Locator) {
+  const failures = await surface.evaluate((root) => {
+    const bounds = root.getBoundingClientRect();
+    const walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT);
+    const textRects: { text: string; rect: DOMRect }[] = [];
+    let node: Node | null;
+    while ((node = walker.nextNode())) {
+      const parent = node.parentElement;
+      if (!parent || !node.textContent?.trim()) continue;
+      if (parent.closest('.sr-only, [hidden], [aria-hidden="true"]')) continue;
+      const style = window.getComputedStyle(parent);
+      if (style.visibility !== 'visible' || style.display === 'none') continue;
+      const range = document.createRange();
+      range.selectNodeContents(node);
+      for (const rect of range.getClientRects()) {
+        if (rect.width > 0 && rect.height > 0) {
+          textRects.push({ text: node.textContent.trim(), rect });
+        }
+      }
+    }
+
+    const errors: string[] = [];
+    for (const [index, current] of textRects.entries()) {
+      if (
+        current.rect.left < bounds.left - 1 ||
+        current.rect.right > bounds.right + 1 ||
+        current.rect.top < bounds.top - 1 ||
+        current.rect.bottom > bounds.bottom + 1
+      ) {
+        errors.push(`Text escapes its surface: ${current.text}`);
+      }
+      for (const other of textRects.slice(index + 1)) {
+        const overlapX =
+          Math.min(current.rect.right, other.rect.right) -
+          Math.max(current.rect.left, other.rect.left);
+        const overlapY =
+          Math.min(current.rect.bottom, other.rect.bottom) -
+          Math.max(current.rect.top, other.rect.top);
+        if (overlapX > 1 && overlapY > 1) {
+          errors.push(`Text overlaps: ${current.text} / ${other.text}`);
+        }
+      }
+    }
+    return errors;
+  });
+  expect(failures).toEqual([]);
 }
 
 test.describe('home gesture chat', () => {
@@ -226,7 +295,7 @@ test.describe('home gesture chat', () => {
     await page.goto('/', { waitUntil: 'domcontentloaded' });
 
     const chat = page.locator('[data-testid="gesture-message-chat"]:visible').first();
-    await expect(chat.getByText('Cycle #7 · 2 messages')).toBeVisible();
+    await expect(chat.getByText('Cycle 7 · 2 messages')).toBeVisible();
     await chat.scrollIntoViewIfNeeded();
 
     await expect(chat).toBeVisible();
@@ -239,8 +308,12 @@ test.describe('home gesture chat', () => {
     );
     await expect(chat.getByRole('link', { name: 'Open gesture position 102' })).toHaveCount(0);
 
-    const firstMessage = chat.getByRole('listitem').first();
-    await expect(firstMessage).toContainText('Newest message from a gesture');
+    const participantMessages = chat
+      .getByRole('listitem')
+      .filter({ has: page.getByTestId('gesture-message-meta') });
+    await expect(participantMessages).toHaveCount(2);
+    await expect(participantMessages.nth(0)).toContainText('Newest message from a gesture');
+    await expect(participantMessages.nth(1)).toContainText('Older message from a gesture');
   });
 
   test('shows complete latest-participant and active Chrono challenge intelligence', async ({
@@ -250,9 +323,11 @@ test.describe('home gesture chat', () => {
 
     const latest = page.getByTestId('latest-participant-intel');
     await expect(latest).toBeVisible();
-    await expect(latest.getByText('0x3333333333333333333333333333333333333333')).toBeVisible();
-    await expect(page.getByTestId('latest-participant-paid-amount')).toContainText('20.0000 CST');
-    await expect(page.getByTestId('latest-participant-cst-received')).toContainText('100.00 CST');
+    await expect(
+      latest.locator('a[href="/user/0x3333333333333333333333333333333333333333"]'),
+    ).toBeVisible();
+    await expect(page.getByTestId('latest-participant-paid-amount')).toContainText('20 CST');
+    await expect(page.getByTestId('latest-participant-cst-received')).toContainText('100 CST');
     await expect(page.getByTestId('latest-participant-gesture-id')).toContainText('#4');
     await expect(page.getByTestId('latest-participant-message')).toContainText(
       'Newest message from a gesture',
@@ -260,22 +335,34 @@ test.describe('home gesture chat', () => {
     await expect(
       latest.getByRole('progressbar', { name: 'Progress toward Endurance Champion' }),
     ).toBeVisible();
-    await expect(page.getByTestId('latest-participant-allocation-package')).toContainText(
-      'Currently in line for at finalization',
-    );
+    await expect(page.getByTestId('clock-reserve')).toContainText('2.5000 ETH');
 
-    const challenge = page.getByTestId('chrono-active-challenge');
+    // The Endurance Champion's current reign against the Chrono record, in
+    // neutral words, under the Chrono-Warrior row it can change: the holder
+    // is named once, on the Endurance row, and the record once, as the
+    // Chrono-Warrior's time held.
+    const chrono = page.getByTestId('chrono-role-summary');
+    // Every duration in the ledger reads as a clock, the record included.
+    await expect(chrono).toContainText(/00:30:00/);
+    const challenge = chrono.getByTestId('chrono-active-challenge');
     await expect(challenge).toBeVisible();
-    await expect(challenge).toContainText('Active Endurance Challenge');
-    await expect(challenge).toContainText('0x111111....111111');
+    // The reign keeps growing while the page is open, so the time left ticks
+    // down; both read as clocks whose width holds while they tick.
+    await expect(challenge.getByTestId('chrono-challenge-segment')).toContainText(
+      new RegExp(`${home.observatory.ledger.challenge.reign}\\s*00:(20|21):\\d\\d`),
+    );
+    await expect(challenge.getByTestId('chrono-challenge-next-change')).toContainText(
+      new RegExp(`${home.observatory.ledger.challenge.passesIn}\\s*00:(10:0[01]|09:\\d\\d)`),
+    );
     await expect(
-      challenge.getByRole('link', {
-        name: '0x1111111111111111111111111111111111111111',
-      }),
+      challenge.getByRole('progressbar', { name: home.observatory.ledger.challenge.progressAria }),
     ).toBeVisible();
-    await expect(page.getByTestId('chrono-challenge-segment')).toContainText('20m');
-    await expect(page.getByTestId('chrono-challenge-record-to-beat')).toContainText('30m');
-    await expect(page.getByTestId('chrono-challenge-next-change')).toContainText('10m 1s');
+    await expect(challenge.getByRole('link')).toHaveCount(0);
+    await expect(
+      page
+        .getByTestId('control-desk-endurance')
+        .locator('a[href="/user/0x1111111111111111111111111111111111111111"]'),
+    ).toBeVisible();
   });
 
   test('keeps Last Gesture visible while the special-recipient endpoint is stale', async ({
@@ -290,11 +377,15 @@ test.describe('home gesture chat', () => {
     await page.goto('/', { waitUntil: 'domcontentloaded' });
 
     const latest = page.getByTestId('latest-participant-intel');
-    await expect(latest).toContainText('0x3333333333333333333333333333333333333333');
-    await expect(latest).not.toContainText('0x9999999999999999999999999999999999999999');
+    await expect(
+      latest.locator('a[href="/user/0x3333333333333333333333333333333333333333"]'),
+    ).toBeVisible();
+    await expect(
+      latest.locator('a[href="/user/0x9999999999999999999999999999999999999999"]'),
+    ).toHaveCount(0);
     await expect(page.getByTestId('latest-participant-gesture-details')).toBeVisible();
-    await expect(page.getByTestId('latest-participant-paid-amount')).toContainText('20.0000 CST');
-    await expect(page.getByTestId('latest-participant-cst-received')).toContainText('100.00 CST');
+    await expect(page.getByTestId('latest-participant-paid-amount')).toContainText('20 CST');
+    await expect(page.getByTestId('latest-participant-cst-received')).toContainText('100 CST');
   });
 
   test('keeps a syncing Last Gesture panel when the gesture list trails the dashboard', async ({
@@ -313,197 +404,338 @@ test.describe('home gesture chat', () => {
     );
     await page.goto('/', { waitUntil: 'domcontentloaded' });
 
-    await expect(page.getByTestId('latest-participant-gesture-details')).toBeVisible();
-    await expect(page.getByTestId('latest-participant-gesture-syncing')).toContainText(
+    // The dashboard names the Last Gesture's holder before the gesture list
+    // has the Gesture: the row keeps the holder, says its details are
+    // syncing, and never borrows another Gesture's details meanwhile. (The
+    // server-rendered page shows the live cycle's Last Gesture until the
+    // mocked reads land, so only the settled row is evidence.)
+    const latest = page.getByTestId('latest-participant-intel');
+    await expect(latest.getByTestId('latest-participant-gesture-syncing')).toContainText(
       'Last Gesture details are syncing from the indexer.',
     );
-    await expect(page.getByTestId('latest-participant-intel')).not.toContainText(
-      'Older message from a gesture',
-    );
+    await expect(
+      latest.locator('a[href="/user/0x3333333333333333333333333333333333333333"]'),
+    ).toBeVisible();
+    await expect(latest.getByTestId('latest-participant-gesture-details')).toHaveCount(0);
+    await expect(latest).not.toContainText('Older message from a gesture');
   });
 
-  test('fits all decision-critical desk zones in a 1440×900 first viewport', async ({
-    page,
-  }, testInfo) => {
-    test.skip(testInfo.project.name !== 'Desktop Chrome', 'desktop density guard');
-    await page.setViewportSize({ width: 1440, height: 900 });
-    await page.goto('/', { waitUntil: 'domcontentloaded' });
+  for (const viewport of DESKTOP_VIEWPORTS) {
+    test(`keeps standings above the fold and uses the full form width at ${viewport.width}×${viewport.height} with ETH and CST selected`, async ({
+      page,
+    }, testInfo) => {
+      test.skip(testInfo.project.name !== 'Desktop Chrome', 'desktop density guard');
+      await page.setViewportSize(viewport);
+      await page.goto('/', { waitUntil: 'domcontentloaded' });
+      await expect(page.getByTestId('panel-method-cst-cost')).toContainText('20 CST');
+      await page.evaluate(() => document.fonts.ready);
 
-    const critical = [
-      ['clock', page.getByTestId('cycle-clock')],
-      ['latest paid', page.getByTestId('latest-participant-paid-amount')],
-      ['latest CST received', page.getByTestId('latest-participant-cst-received')],
-      ['active Chrono challenge', page.getByTestId('chrono-active-challenge')],
-      ['ETH price', page.getByTestId('panel-method-eth-cost')],
-      ['RandomWalk price', page.getByTestId('panel-method-randomWalk-cost')],
-      ['CST price', page.getByTestId('panel-method-cst-cost')],
-      ['allocation ledger', page.getByTestId('allocation-ledger')],
-      ...[
-        'signature',
-        'chrono',
-        'endurance',
-        'stellar-eth',
-        'stellar-nft',
-        'cosmic-anchor',
-        'rwlk-anchor',
-        'public-goods',
-        'next-cycle',
-      ].map((track) => [`${track} track`, page.getByTestId(`ledger-track-${track}`)] as const),
-    ] as const;
+      await expectDecisionDashboardInViewport(page);
+      await expectEfficientDesktopLayout(page);
+      await expectDeskFocusOrderReadsDown(page);
+      await expect(page.getByTestId('standings-disclosure')).toHaveCount(0);
+      await expect(page.getByTestId('allocation-ledger')).toBeHidden();
+      await expect(page.getByTestId('control-desk-calibration').getByRole('region')).toHaveCount(1);
+      await expectCommentFormReachable(page);
+      // The editor, opened above, may extend the form; choosing CST must not.
+      await closeMessageEditor(page.locator('[data-testid="gesture-panel"][data-variant="card"]'));
+      if (viewport.width === 1280 || viewport.width === 1440) {
+        const screenshotPath = testInfo.outputPath(`home-dashboard-${viewport.width}.png`);
+        await page.screenshot({ path: screenshotPath, fullPage: true, animations: 'disabled' });
+        await testInfo.attach(`home-dashboard-${viewport.width}`, {
+          path: screenshotPath,
+          contentType: 'image/png',
+        });
+      }
 
-    await expect(page.getByTestId('chrono-active-challenge')).toBeVisible();
-    for (const [name, locator] of critical) {
-      await expect(locator).toBeVisible();
-      const box = await locator.boundingBox();
-      expect(box).not.toBeNull();
-      expect(box!.y + box!.height, `${name} must fit in first viewport`).toBeLessThanOrEqual(900);
-    }
+      await page.getByTestId('panel-method-cst').click();
+      await expect(page.getByTestId('panel-method-cst')).toHaveAttribute('aria-checked', 'true');
+      await page.evaluate(() => window.scrollTo({ top: 0, behavior: 'instant' }));
+      await expectDecisionDashboardInViewport(page);
+      await expectEfficientDesktopLayout(page);
+      await expect(page.getByTestId('panel-cst-reward')).toBeVisible();
+      await expectTextWithoutOverlap(page.getByTestId('panel-method-tabs'));
+      await expectTextWithoutOverlap(page.getByTestId('panel-cst-reward'));
+      await expectTextWithoutOverlap(page.getByTestId('control-desk-calibration'));
+      for (const testId of [
+        'latest-participant-intel',
+        'control-desk-endurance',
+        'chrono-role-summary',
+      ]) {
+        const profiles = page.getByTestId(testId).getByRole('link', { name: /^0x/ });
+        for (const profile of await profiles.all()) {
+          // Full accessible identities remain available, and the displayed
+          // address glyphs must fit their own link instead of being clipped.
+          await expect(profile).toHaveAttribute('title', /^0x/);
+          await expectTextWithoutOverlap(profile);
+        }
+      }
+      for (const key of ['reward', 'cost', 'net']) {
+        await expectTextWithoutOverlap(page.getByTestId(`panel-cst-metric-${key}`));
+      }
+      await expectCommentFormReachable(page);
+    });
+  }
 
-    const deskBox = await page.getByTestId('control-desk').boundingBox();
-    const gridBox = await page.getByTestId('control-desk-grid').boundingBox();
-    const ledgerBox = await page.getByTestId('allocation-ledger').boundingBox();
-    expect(deskBox).not.toBeNull();
-    expect(gridBox).not.toBeNull();
-    expect(ledgerBox).not.toBeNull();
-    expect(deskBox!.y).toBeGreaterThanOrEqual(72);
-    expect(deskBox!.y).toBeLessThanOrEqual(112);
-    expect(ledgerBox!.y - (gridBox!.y + gridBox!.height)).toBeLessThanOrEqual(1);
-  });
+  for (const viewport of [DESKTOP_VIEWPORTS[0], DESKTOP_VIEWPORTS[3]]) {
+    test(`wraps long CST amounts without overlapping at ${viewport.width}×${viewport.height}`, async ({
+      page,
+    }, testInfo) => {
+      test.skip(testInfo.project.name !== 'Desktop Chrome', 'desktop amount-width guard');
+      await page.unroute('**/api/cosmicgame/**');
+      await mockHomeGestureChatApi(
+        page,
+        gestures,
+        specialRecipients,
+        '987654321012345678901234567',
+      );
+      await page.setViewportSize(viewport);
+      await page.goto('/', { waitUntil: 'domcontentloaded' });
+      await expect(page.getByTestId('panel-method-cst-cost')).toContainText('987');
+      await page.getByTestId('panel-method-cst').click();
+      await page.evaluate(() => document.fonts.ready);
+      await page.evaluate(() => window.scrollTo({ top: 0, behavior: 'instant' }));
 
-  test('uses a price strip and one sheet-only gesture console on phones', async ({
+      await expectDecisionDashboardInViewport(page);
+      await expectEfficientDesktopLayout(page);
+      await expectTextWithoutOverlap(page.getByTestId('panel-method-tabs'));
+      await expectTextWithoutOverlap(page.getByTestId('panel-cst-reward'));
+      for (const key of ['reward', 'cost', 'net']) {
+        await expectTextWithoutOverlap(page.getByTestId(`panel-cst-metric-${key}`));
+      }
+      await expectCommentFormReachable(page);
+    });
+  }
+
+  for (const locale of TRANSLATED_LOCALES) {
+    test(`${locale} keeps the expanded composer usable across the desktop row`, async ({
+      page,
+    }, testInfo) => {
+      test.skip(testInfo.project.name !== 'Desktop Chrome', 'translated desktop layout guard');
+      await page.setViewportSize(DESKTOP_VIEWPORTS[0]);
+      await page.goto(`/${locale}`, { waitUntil: 'domcontentloaded' });
+      await expect(page.locator('html')).toHaveAttribute('lang', locale);
+      await expect(page.getByTestId('panel-method-cst-cost')).toContainText('20');
+      await page.evaluate(() => document.fonts.ready);
+
+      await expectEfficientDesktopLayout(page);
+      await expectCommentFormReachable(page);
+      await page.getByTestId('panel-method-cst').click();
+      await expect(page.getByTestId('panel-method-cst')).toHaveAttribute('aria-checked', 'true');
+      await expectEfficientDesktopLayout(page);
+      await expectTextWithoutOverlap(page.getByTestId('panel-method-tabs'));
+      await expectTextWithoutOverlap(page.getByTestId('control-desk-calibration'));
+      for (const key of ['reward', 'cost', 'net']) {
+        await expectTextWithoutOverlap(page.getByTestId(`panel-cst-metric-${key}`));
+      }
+      await expectCommentFormReachable(page);
+    });
+  }
+
+  test('keeps an inline form on phones, with the dock offering the form’s own connect action', async ({
     page,
   }, testInfo) => {
     test.skip(testInfo.project.name === 'Desktop Chrome', 'mobile action-path guard');
+    await page.setViewportSize({ width: 320, height: 800 });
     await page.goto('/', { waitUntil: 'domcontentloaded' });
 
-    await expect(page.getByTestId('gesture-price-strip')).toBeVisible();
-    await expect(page.locator('[data-testid="gesture-panel"]:visible')).toHaveCount(0);
-    const dockAction = page.getByTestId('dock-open-sheet');
-    await expect(dockAction).toBeVisible();
-    await dockAction.click();
+    // The phone's first screen holds the Cycle clock and the top of the form:
+    // the dock would repeat the one and lie over the other, so it waits aside.
+    // Aside, the dock slides away and leaves the accessibility tree and the
+    // tab order (aria-hidden and inert); Playwright counts a faded element
+    // as visible, so the attributes are the contract.
+    const dock = page.locator('[data-action-dock]');
+    await expect(page.getByTestId('cycle-clock')).toBeInViewport();
+    await expect(dock).toHaveAttribute('aria-hidden', 'true');
+    await expect(dock).toHaveAttribute('inert', '');
 
-    const sheetPanel = page.locator('[data-testid="gesture-panel"][data-variant="sheet"]:visible');
-    await expect(sheetPanel).toHaveCount(1);
-    await expect(sheetPanel.getByTestId('panel-method-eth-cost')).toBeVisible();
-    // This mocked production project has no connected wallet; the same sheet
-    // exposes the message input after connect (covered by HomePage unit flow).
-    await expect(sheetPanel.getByTestId('connect-to-gesture')).toBeVisible();
+    const inlinePanel = page.locator('[data-testid="gesture-panel"][data-variant="card"]');
+    await expect(inlinePanel).toBeVisible();
+    await expect(inlinePanel.getByTestId('panel-method-eth-cost')).toBeVisible();
+    const inlineMessage = inlinePanel.getByRole('textbox', {
+      name: new RegExp(`^${home.form.advanced.messageLabel}`),
+    });
+    await expect(inlineMessage).toBeHidden();
+    await openMessageEditor(inlinePanel);
+    await expect(inlineMessage).toBeVisible();
+    await expect(inlineMessage).toBeEditable();
+    const draft = 'A comment started before connecting.';
+    await inlineMessage.fill(draft);
+
+    // The dock never lies over a field being filled: it stays aside while any
+    // of the form is on screen and comes in once the clock and the form have
+    // both scrolled away.
+    await expect(dock).toHaveAttribute('aria-hidden', 'true');
+    await page.getByTestId('home-feed-layout').scrollIntoViewIfNeeded();
+    await expect(dock).not.toHaveAttribute('aria-hidden', 'true');
+    await expect(dock).not.toHaveAttribute('inert');
+
+    // Without a wallet its one action is the form's own "Connect wallet",
+    // which opens the wallet list directly, never a sheet that only asks for
+    // a wallet; the draft waits in the form.
+    const dockConnect = page.getByTestId('dock-connect');
+    await expect(dockConnect).toBeVisible();
+    await expect(page.getByTestId('dock-open-sheet')).toHaveCount(0);
+    await dockConnect.click();
+    const wallets = page.getByRole('dialog', { name: /connect a wallet/i }).first();
+    await expect(wallets).toBeVisible({ timeout: 10_000 });
     await page.keyboard.press('Escape');
-    await expect(sheetPanel).toHaveCount(0);
+    await expect(wallets).toBeHidden();
+    await expect(page.locator('[data-testid="gesture-panel"][data-variant="sheet"]')).toHaveCount(
+      0,
+    );
+    await expect(inlineMessage).toHaveValue(draft);
+    await page.evaluate(() => document.fonts.ready);
+    const screenshotPath = testInfo.outputPath('home-dashboard-mobile-320.png');
+    await page.screenshot({ path: screenshotPath, fullPage: true, animations: 'disabled' });
+    await testInfo.attach('home-dashboard-mobile-320', {
+      path: screenshotPath,
+      contentType: 'image/png',
+    });
   });
 
-  test('handles a long feed without making phone scrolling feel nested', async ({
+  test('opens optional allocations from the keyboard while decision information stays visible', async ({
     page,
-  }, testInfo) => {
+  }) => {
+    await page.goto('/', { waitUntil: 'domcontentloaded' });
+
+    const allocations = page.getByTestId('allocations-disclosure');
+    await expect(page.getByTestId('latest-participant-intel')).toBeVisible();
+    await expect(page.getByTestId('standings-ledger')).toBeVisible();
+    await expect(page.getByTestId('control-desk-calibration')).toBeVisible();
+    await expect(page.getByTestId('allocation-ledger')).toBeHidden();
+
+    await allocations.locator('summary').focus();
+    await page.keyboard.press('Space');
+    await expect(allocations).toHaveAttribute('open', '');
+    await expect(page.getByTestId('allocation-ledger')).toBeVisible();
+
+    await allocations.locator('summary').focus();
+    await page.keyboard.press('Enter');
+    await expect(page.getByTestId('allocation-ledger')).toBeHidden();
+    await expect(page.getByTestId('latest-participant-intel')).toBeVisible();
+    await expect(page.getByTestId('standings-ledger')).toBeVisible();
+    await expect(page.getByTestId('control-desk-calibration')).toBeVisible();
+  });
+
+  test('keeps long chat history readable in the page at every width, never in a scroll box', async ({
+    page,
+  }) => {
     await page.unroute('**/api/cosmicgame/**');
-    await mockHomeGestureChatApi(page, longGestureFeed);
+    await mockHomeGestureChatApi(page, makeLongGestureFeed());
     await page.goto('/', { waitUntil: 'domcontentloaded' });
 
     const chat = page.locator('[data-testid="gesture-message-chat"]:visible').first();
-    const scroll = chat.getByTestId('gesture-message-chat-scroll');
-    const cycleDetails = page.locator('[data-testid="cycle-details-link-card"]:visible').first();
-    await expect(chat.getByText('Cycle #7 · 12 messages')).toBeVisible();
+    const feed = chat.getByTestId('gesture-message-chat-scroll');
+    await expect(chat.getByText('Cycle 7 · 12 messages')).toBeVisible();
+    await chat.scrollIntoViewIfNeeded();
+    const oldest = chat.getByText(/Scrollable message 12:/);
 
-    const viewport = page.viewportSize();
-    const chatBox = await chat.boundingBox();
-    const metrics = await scroll.evaluate((element) => ({
+    // The newest messages, then "Show more": the wheel always moves the
+    // page, never a box inside it.
+    const metrics = await feed.evaluate((element) => ({
       clientHeight: element.clientHeight,
       scrollHeight: element.scrollHeight,
       overflowY: window.getComputedStyle(element).overflowY,
     }));
-    expect(viewport).not.toBeNull();
-    expect(chatBox).not.toBeNull();
-
-    if (testInfo.project.name === 'Desktop Chrome') {
-      expect(chatBox!.height).toBeLessThanOrEqual(viewport!.height * 0.75);
-      expect(metrics.overflowY).toBe('auto');
-      expect(metrics.scrollHeight).toBeGreaterThan(metrics.clientHeight + 20);
-
-      await scroll.evaluate((element) => {
-        element.scrollTop = element.scrollHeight;
-      });
-      expect(await scroll.evaluate((element) => element.scrollTop)).toBeGreaterThan(0);
-      await expect(chat.getByText(/Scrollable message 12:/)).toBeVisible();
-      return;
-    }
-
     expect(metrics.overflowY).toBe('visible');
     expect(metrics.scrollHeight).toBeLessThanOrEqual(metrics.clientHeight + 1);
-    expect(chatBox!.height).toBeGreaterThan(viewport!.height);
-
-    const cycleDetailsBox = await cycleDetails.boundingBox();
-    expect(cycleDetailsBox).not.toBeNull();
-    expect(cycleDetailsBox!.y + cycleDetailsBox!.height).toBeLessThanOrEqual(chatBox!.y + 2);
+    await expect(oldest).toBeHidden();
+    const pageScroll = await page.evaluate(() => window.scrollY);
+    await feed.hover();
+    await page.mouse.wheel(0, 400);
+    await expect.poll(() => page.evaluate(() => window.scrollY)).toBeGreaterThan(pageScroll);
+    await chat.getByRole('button', { name: 'Show more', exact: true }).click();
+    await expect(oldest).toBeVisible();
   });
 
   test('positions the chat appropriately for the current viewport', async ({ page }, testInfo) => {
     await page.goto('/', { waitUntil: 'domcontentloaded' });
 
     const chat = page.locator('[data-testid="gesture-message-chat"]:visible').first();
-    const panel = page.locator('[data-testid="gesture-panel"]:visible');
+    const panel = page.locator('[data-testid="gesture-panel"][data-variant="card"]');
     const clock = page.locator('[data-testid="cycle-clock"]:visible').first();
-    const latest = page.locator('[data-testid="latest-participant-intel"]:visible').first();
-    const chrono = page.locator('[data-testid="chrono-endurance-intel"]:visible').first();
-    const ledger = page.locator('[data-testid="allocation-ledger"]:visible').first();
-    const prices = page.locator('[data-testid="gesture-price-strip"]:visible');
+    const latest = page.getByTestId('latest-participant-intel');
+    const chrono = page.getByTestId('standings-ledger');
+    const ledger = page.getByTestId('allocation-ledger');
+    const guide = page.getByTestId('cycle-phase-guide');
     const cycleDetails = page.locator('[data-testid="cycle-details-link-card"]:visible').first();
-    const artwork = page.locator('[data-testid="deck-art-card"]:visible').first();
-    await expect(chat.getByText('Cycle #7 · 2 messages')).toBeVisible();
+    const artwork = page.locator('[data-testid="latest-signature"]:visible').first();
+    await expect(chat.getByText('Cycle 7 · 2 messages')).toBeVisible();
     await expect(chat).toBeVisible();
     await expect(latest).toBeVisible();
     await expect(chrono).toBeVisible();
-    await expect(ledger).toBeVisible();
+    await expect(ledger).toBeHidden();
+    await expect(panel).toBeVisible();
+    await expect(guide).toBeVisible();
     await expect(cycleDetails).toBeVisible();
     await expect(artwork).toBeVisible();
     await expect(page.getByTestId('public-goods-impact-card')).toHaveCount(0);
 
     const viewport = page.viewportSize();
     const clockBox = await clock.boundingBox();
-    const cycleDetailsBox = await cycleDetails.boundingBox();
     const artworkBox = await artwork.boundingBox();
+    const panelBox = await panel.boundingBox();
+    const guideBox = await guide.boundingBox();
     const box = await chat.boundingBox();
-    expect(viewport).not.toBeNull();
-    expect(clockBox).not.toBeNull();
-    expect(box).not.toBeNull();
-    expect(cycleDetailsBox).not.toBeNull();
-    expect(artworkBox).not.toBeNull();
-    expect(cycleDetailsBox!.y + cycleDetailsBox!.height).toBeLessThanOrEqual(box!.y + 2);
+    for (const measured of [viewport, clockBox, artworkBox, panelBox, guideBox, box]) {
+      expect(measured).not.toBeNull();
+    }
+    // The cycle links live in the guide beside the chat, never floating above it.
+    await expect(guide).toContainText('View full cycle details');
+    expect(panelBox!.y + panelBox!.height).toBeLessThanOrEqual(box!.y + 2);
 
     if (testInfo.project.name !== 'Desktop Chrome') {
-      await expect(panel).toHaveCount(0);
-      await expect(prices).toHaveCount(1);
       expect(box!.width).toBeLessThanOrEqual(viewport!.width);
       expect(box!.x).toBeGreaterThanOrEqual(0);
-      // Phones lead with the clock and role intelligence; the inline form is
-      // absent and the feed begins only after the complete desk.
-      const latestBox = await latest.boundingBox();
-      const ledgerBox = await ledger.boundingBox();
-      expect(latestBox).not.toBeNull();
-      expect(ledgerBox).not.toBeNull();
-      expect(clockBox!.y + clockBox!.height).toBeLessThanOrEqual(latestBox!.y + 2);
-      expect(ledgerBox!.y + ledgerBox!.height).toBeLessThanOrEqual(box!.y + 2);
-      expect(artworkBox!.y).toBeGreaterThan(box!.y + box!.height);
+      // Decision information first; then the art, then the conversation.
+      expect(clockBox!.y + clockBox!.height).toBeLessThanOrEqual(panelBox!.y + 2);
+      expect(artworkBox!.y + artworkBox!.height).toBeLessThanOrEqual(box!.y + 2);
+      expect(box!.y + box!.height).toBeLessThanOrEqual(guideBox!.y + 2);
 
-      const participantBox = await chat
-        .getByTestId('gesture-message-participant')
-        .first()
-        .boundingBox();
-      const badgesBox = await chat.getByTestId('gesture-message-badges').first().boundingBox();
-      expect(participantBox).not.toBeNull();
-      expect(badgesBox).not.toBeNull();
-      expect(badgesBox!.y).toBeGreaterThanOrEqual(participantBox!.y + participantBox!.height - 1);
+      // Who, how the Gesture was made and when share one line over the message.
+      const meta = chat.getByTestId('gesture-message-meta').first();
+      await expect(meta.getByTestId('gesture-method-badge')).toBeVisible();
       return;
     }
 
-    await expect(panel).toHaveCount(1);
-    await expect(prices).toHaveCount(0);
-    const panelBox = await panel.first().boundingBox();
-    expect(panelBox).not.toBeNull();
-    // Desktop control desk: the panel flanks the clock's right in the same band.
+    // Desktop: the form beside the Cycle column; the standings and the art
+    // below; then the chat and the guide.
     expect(clockBox!.x + clockBox!.width).toBeLessThanOrEqual(panelBox!.x + 2);
-    // Feed floor: chat on the left, artwork rail on the right.
+    await expectEfficientDesktopLayout(page);
+    expect(artworkBox!.y).toBeGreaterThanOrEqual(panelBox!.y + panelBox!.height);
+    expect(box!.x + box!.width).toBeLessThanOrEqual(guideBox!.x + 2);
+    expect(Math.abs(box!.y - guideBox!.y)).toBeLessThanOrEqual(1);
     expect(box!.x).toBeLessThan(viewport!.width / 2);
     expect(box!.width).toBeGreaterThan(320);
-    expect(artworkBox!.x).toBeGreaterThan(box!.x + box!.width - 2);
+  });
+
+  test("gives the art the form's place between cycles and the standings the whole row under it", async ({
+    page,
+  }, testInfo) => {
+    test.skip(testInfo.project.name !== 'Desktop Chrome', 'The two-column desk starts at 1024px.');
+    await page.setViewportSize({ width: 1440, height: 900 });
+    await page.goto('/?uxScenario=opening-soon', { waitUntil: 'domcontentloaded' });
+
+    const grid = page.getByTestId('control-desk-grid');
+    await expect(grid).toHaveAttribute('data-layout', 'between-cycles');
+    const [gridBox, clockBox, artBox, standingsBox] = await Promise.all([
+      grid.boundingBox(),
+      page.getByTestId('control-desk-clock').boundingBox(),
+      page.getByTestId('control-desk-art').boundingBox(),
+      page.getByTestId('control-desk-standings').boundingBox(),
+    ]);
+    for (const box of [gridBox, clockBox, artBox, standingsBox]) expect(box).not.toBeNull();
+
+    // The art beside the Cycle column, out to the desk's right edge.
+    expect(clockBox!.x + clockBox!.width).toBeLessThanOrEqual(artBox!.x);
+    expect(Math.abs(artBox!.y - clockBox!.y)).toBeLessThanOrEqual(1);
+    expect(Math.abs(artBox!.x + artBox!.width - (gridBox!.x + gridBox!.width))).toBeLessThanOrEqual(
+      1,
+    );
+    // The standings under it across the whole desk, so no empty cell sits beside them.
+    expect(standingsBox!.y).toBeGreaterThanOrEqual(artBox!.y + artBox!.height - 1);
+    expect(Math.abs(standingsBox!.x - gridBox!.x)).toBeLessThanOrEqual(1);
+    expect(Math.abs(standingsBox!.width - gridBox!.width)).toBeLessThanOrEqual(1);
   });
 });

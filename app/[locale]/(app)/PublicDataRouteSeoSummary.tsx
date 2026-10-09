@@ -1,28 +1,55 @@
+import type { ReactNode } from 'react';
+import { ArrowRight, ArrowUpRight } from 'lucide-react';
 import { getLocale, getTranslations } from 'next-intl/server';
+import { isAddress, zeroAddress } from 'viem';
 
-import { InfoTooltip } from '@/components/ui/info-tooltip';
-import { Link } from '@/i18n/navigation';
-import { localizeCrossHostHref } from '@/lib/hostRouting';
+import { protocolFacts } from '@/content/protocol-facts';
+
+import { OUTBOUND_LINKS, classifyHref } from '@/config/siteNav';
+import { PageHeader, PageHeaderFacts, type PageHeaderFigure } from '@/components/layout/PageHeader';
+import type { PageSectionId } from '@/components/layout/pageSections';
+import { SiteLink } from '@/components/layout/SiteLink';
+import { SnapshotStamp } from '@/components/layout/SnapshotStamp';
+import { AnchoringHeaderCount } from '@/components/anchoring/AnchoringHeaderCount';
+import { AddressChip } from '@/components/ui/address-chip';
+import { Amount } from '@/components/ui/amount';
+import { Badge } from '@/components/ui/badge';
+import { DateTime } from '@/components/ui/date-time';
+import { LANDING_ORIGIN, localizeCrossHostHref } from '@/lib/hostRouting';
+import { cn } from '@/lib/utils';
+import { toFiniteNumber } from '@/utils/finiteNumber';
+import { formatCount, formatPercent, sameAddress } from '@/utils/format';
+
 import {
-  get_staked_cst_tokens,
-  get_staked_rwalk_tokens,
-  get_staking_cst_actions,
-  get_staking_cst_rewards,
-  get_staking_rwalk_actions,
-  get_staking_rwalk_mints_global,
-} from '@/services/api/anchoring';
+  FINALIZED_INDEX_FIGURES,
+  FINALIZED_INDEX_LINKS,
+} from './allocation-finalized/finalizedIndexSummary';
+import { ContributionFigure } from './eth-contribution/ContributionFigure';
+import { DashboardFigure } from './DashboardFigure';
+import { dashboardSeed } from './dashboardMetrics';
+import { PublicDataFigureRefill, type RefillSource } from './PublicDataFigureRefill';
+import { latestTimestamp, measureRows, measureUnit, type ListMeasure } from './publicDataMeasures';
 import {
-  get_charity_cg_deposits,
-  get_charity_voluntary,
-  get_charity_withdrawals,
-  get_donations_cg_with_info_list,
-  get_donations_nft_list,
-} from '@/services/api/donations';
-import { get_marketing_rewards } from '@/services/api/marketing';
-import { get_claim_history, get_dashboard_info, get_round_list } from '@/services/api/rounds';
-import { get_system_modelist } from '@/services/api/system';
-import { get_named_nfts, get_used_rwlk_nfts } from '@/services/api/tokens';
-import { formatUtcDateTimeStamp, toIntlLocale } from '@/utils/format';
+  readAnchorCstActions,
+  readAnchorEthDeposits,
+  readAnchorRwalkActions,
+  readAnchorStellarImprints,
+  readAttachedNfts,
+  readClaimHistory,
+  readCoordinationEvents,
+  readDashboard,
+  readDirectContributions,
+  readGameOwner,
+  readMarketingRewards,
+  readNamedNfts,
+  readPublicGoodsDeposits,
+  readPublicGoodsRetrievals,
+  readRandomWalkImprinted,
+  readRoundList,
+  readUsedRwlkNfts,
+  readVoluntaryPublicGoods,
+  type TimedRead,
+} from './publicDataReads';
 
 export type SeoSummaryRoute =
   | 'allocation'
@@ -39,18 +66,27 @@ export type SeoSummaryRoute =
   | 'public-goods-contributions-voluntary'
   | 'public-goods-retrievals';
 
-interface SummaryCard {
-  key: string;
-  value?: string;
-  hasTooltip?: boolean;
-}
-
 interface RouteDefinition {
+  section: PageSectionId;
+  /**
+   * Related pages. Landing pages are built on `LANDING_ORIGIN`, so
+   * `localizeCrossHostHref` adds the reader's locale on every host.
+   */
   links: readonly { href: string; key: string }[];
 }
 
+/** The Learn guide to Public Goods and Protocol Guild. */
+const PUBLIC_GOODS_GUIDE = `${LANDING_ORIGIN}/learn/protocol-guild-public-goods`;
+
+/** The Public Goods Vault's section on /contracts: its balance, beneficiary and share. */
+const PUBLIC_GOODS_VAULT = '/contracts#public-goods-heading';
+
+/** Protocol Guild's own site, the Public Goods Vault's beneficiary. */
+const PROTOCOL_GUILD_URL = OUTBOUND_LINKS.find((link) => link.id === 'protocolGuild')!.href;
+
 const routeDefinitions: Record<SeoSummaryRoute, RouteDefinition> = {
   allocation: {
+    section: 'records',
     links: [
       { href: '/statistics', key: 'statistics' },
       { href: '/how-it-works', key: 'learn' },
@@ -58,20 +94,23 @@ const routeDefinitions: Record<SeoSummaryRoute, RouteDefinition> = {
     ],
   },
   anchoring: {
+    section: 'records',
     links: [
-      { href: '/statistics', key: 'statistics' },
-      { href: 'https://cosmicsignature.com/learn/anchoring-nfts', key: 'learn' },
+      { href: '/statistics/anchoring', key: 'statistics' },
+      { href: `${LANDING_ORIGIN}/learn/anchoring-nfts`, key: 'learn' },
       { href: '/gallery', key: 'gallery' },
     ],
   },
   marketing: {
+    section: 'records',
     links: [
-      { href: '/faq', key: 'faq' },
+      // The FAQ answer about the Outreach Reserve itself, not the FAQ's top.
+      { href: '/faq#what-are-marketing-rewards', key: 'faq' },
       { href: '/statistics', key: 'statistics' },
-      { href: '/site-map', key: 'siteMap' },
     ],
   },
   imprint: {
+    section: 'participate',
     links: [
       { href: '/', key: 'cycle' },
       { href: '/how-it-works', key: 'learn' },
@@ -79,13 +118,15 @@ const routeDefinitions: Record<SeoSummaryRoute, RouteDefinition> = {
     ],
   },
   'eth-contribution': {
+    section: 'records',
     links: [
+      { href: '/how-it-works', key: 'reserve' },
       { href: '/public-goods-contributions-cg', key: 'protocol' },
-      { href: '/public-goods-contributions-voluntary', key: 'voluntary' },
       { href: '/risk-disclosures', key: 'risk' },
     ],
   },
   'attached-nfts': {
+    section: 'collection',
     links: [
       { href: '/gallery', key: 'gallery' },
       { href: '/current-cycle', key: 'cycle' },
@@ -93,20 +134,19 @@ const routeDefinitions: Record<SeoSummaryRoute, RouteDefinition> = {
     ],
   },
   'allocation-finalized': {
-    links: [
-      { href: '/allocation', key: 'allocation' },
-      { href: '/statistics', key: 'statistics' },
-      { href: '/contracts', key: 'contracts' },
-    ],
+    section: 'records',
+    links: FINALIZED_INDEX_LINKS,
   },
   'named-nfts': {
+    section: 'collection',
     links: [
       { href: '/gallery', key: 'gallery' },
-      { href: 'https://cosmicsignature.com/learn/three-body-nft-art', key: 'learn' },
+      { href: `${LANDING_ORIGIN}/learn/three-body-nft-art`, key: 'learn' },
       { href: '/code', key: 'code' },
     ],
   },
   'used-rwlk-nfts': {
+    section: 'collection',
     links: [
       { href: '/imprint', key: 'imprint' },
       { href: '/how-it-works', key: 'learn' },
@@ -114,296 +154,641 @@ const routeDefinitions: Record<SeoSummaryRoute, RouteDefinition> = {
     ],
   },
   'coordination-changes': {
+    section: 'records',
     links: [
       { href: '/security', key: 'security' },
       { href: '/audits', key: 'audits' },
       {
-        href: 'https://cosmicsignature.com/learn/cst-token-and-cosmic-council',
+        href: `${LANDING_ORIGIN}/learn/cst-token-and-cosmic-council`,
         key: 'learn',
       },
     ],
   },
+  // The three Public Goods ledgers link each other through their tabs, so
+  // their related pages go where the tabs do not: the guide, and the vault
+  // itself on /contracts (its section, not the top of the page).
   'public-goods-contributions-cg': {
+    section: 'records',
     links: [
-      {
-        href: 'https://cosmicsignature.com/learn/protocol-guild-public-goods',
-        key: 'learn',
-      },
-      { href: '/public-goods-retrievals', key: 'retrievals' },
-      { href: '/statistics', key: 'statistics' },
+      { href: PUBLIC_GOODS_GUIDE, key: 'learn' },
+      { href: PUBLIC_GOODS_VAULT, key: 'contracts' },
     ],
   },
   'public-goods-contributions-voluntary': {
+    section: 'records',
     links: [
       { href: '/eth-contribution', key: 'direct' },
-      { href: '/public-goods-contributions-cg', key: 'protocol' },
+      { href: PUBLIC_GOODS_GUIDE, key: 'learn' },
       { href: '/risk-disclosures', key: 'risk' },
     ],
   },
   'public-goods-retrievals': {
+    section: 'records',
     links: [
-      { href: '/public-goods-contributions-cg', key: 'protocol' },
-      { href: '/public-goods-contributions-voluntary', key: 'voluntary' },
-      { href: '/contracts', key: 'contracts' },
+      { href: PUBLIC_GOODS_GUIDE, key: 'learn' },
+      { href: PROTOCOL_GUILD_URL, key: 'protocolGuild' },
+      { href: PUBLIC_GOODS_VAULT, key: 'contracts' },
     ],
   },
 };
 
-function formatLocalizedNumber(value: unknown, locale: string, unavailable: string): string {
-  const numeric = Number(value);
-  return Number.isFinite(numeric)
-    ? new Intl.NumberFormat(toIntlLocale(locale)).format(numeric)
-    : unavailable;
+/** The section a public data route's header names (checked against the taxonomy in tests). */
+export function publicDataRouteSection(route: SeoSummaryRoute): PageSectionId {
+  return routeDefinitions[route].section;
 }
 
-function formatLocalizedEth(value: unknown, locale: string, unavailable: string): string {
-  const numeric = Number(value);
-  return Number.isFinite(numeric)
-    ? `${new Intl.NumberFormat(toIntlLocale(locale), {
-        maximumFractionDigits: 4,
-      }).format(numeric)} ETH`
-    : unavailable;
+/** Every public data route. */
+export const PUBLIC_DATA_ROUTES = Object.keys(routeDefinitions) as SeoSummaryRoute[];
+
+/**
+ * The value of a figure read from a list that may be empty: `NONE_YET` when the
+ * read succeeded but has no row to show ("None yet"), `null` when it failed
+ * (the header's "Unavailable" dash).
+ */
+const NONE_YET = Symbol('none-yet');
+
+/** A figure before its label is resolved: the catalog key under `cards` plus the value. */
+interface FigureSpec {
+  key: string;
+  value: ReactNode | typeof NONE_YET | null;
+  /** Show the card's `tooltip` copy behind an info button. */
+  hasTooltip?: boolean;
+  /** A date: kept at figure-md beside the counts (see `PageHeaderFigure.size`). */
+  size?: 'md';
+  /** A short count: three of them share one phone row (see `PageHeaderFigure.compact`). */
+  compact?: boolean;
+  /** A date and time: its own phone row (see `PageHeaderFigure.date`). */
+  date?: boolean;
 }
 
-function sumEth<T>(rows: T[], selector: (row: T) => unknown): number {
-  return rows.reduce((total, row) => {
-    const numeric = Number(selector(row));
-    return Number.isFinite(numeric) ? total + numeric : total;
-  }, 0);
+interface RouteFigures {
+  figures: FigureSpec[];
+  /** The reads the figures were built from; the snapshot is dated by those that resolved. */
+  reads: readonly TimedRead<unknown>[];
 }
 
-async function getSummaryCards(
+/** The row with the newest `TimeStamp`, or null. */
+function latestRow<T extends { TimeStamp?: unknown }>(rows: readonly T[]): T | null {
+  let latest: T | null = null;
+  for (const row of rows) {
+    const ts = toFiniteNumber(row.TimeStamp) ?? 0;
+    if (latest === null || ts > (toFiniteNumber(latest.TimeStamp) ?? 0)) latest = row;
+  }
+  return latest;
+}
+
+async function getRouteFigures(
   route: SeoSummaryRoute,
   locale: string,
-  unavailable: string,
-): Promise<SummaryCard[]> {
-  const formatNumber = (value: unknown) => formatLocalizedNumber(value, locale, unavailable);
-  const formatEth = (value: unknown) => formatLocalizedEth(value, locale, unavailable);
+  /** The route's own copy, `publicData.routes.<route>.<key>`. */
+  copy: (key: string) => string,
+  /** "None yet", for a latest date of an empty list the browser measures. */
+  none: string,
+): Promise<RouteFigures> {
+  const count = (value: number) => formatCount(value, locale);
+  /**
+   * A figure measured from one list: the server's measure of the rows it
+   * read or, when that read failed, the browser's measure of the same list
+   * (`PublicDataFigureRefill`), so a read turned away while the page was
+   * rendered is not cached as a dash.
+   */
+  const fromList = (
+    rows: readonly object[] | null,
+    source: RefillSource,
+    measure: ListMeasure,
+  ): FigureSpec['value'] => {
+    if (rows === null) {
+      return <PublicDataFigureRefill source={source} measure={measure} none={none} />;
+    }
+    const value = measureRows(rows, measure);
+    const unit = measureUnit(measure);
+    if (value === null) return unit === 'date' ? NONE_YET : null;
+    if (unit === 'eth') return <Amount value={value} unit="ETH" locale={locale} />;
+    if (unit === 'date') return <DateTime timestamp={value} locale={locale} year="always" />;
+    return count(value);
+  };
+  /**
+   * The newest row's date, "None yet" for an empty list, unknown when the read
+   * failed. Always with its year, like the same date in the ledger below.
+   */
+  const latestDate = (rows: readonly { TimeStamp?: unknown }[] | null) => {
+    if (rows === null) return null;
+    const seconds = latestTimestamp(rows);
+    return seconds === null ? (
+      NONE_YET
+    ) : (
+      <DateTime timestamp={seconds} locale={locale} year="always" />
+    );
+  };
 
   switch (route) {
     case 'allocation': {
-      const rounds = await get_round_list();
-      return [
-        { key: 'finalizedCycles', value: formatNumber(rounds.length), hasTooltip: true },
-        {
-          key: 'recipients',
-          value: formatNumber(new Set(rounds.map((row) => row.WinnerAddr).filter(Boolean)).size),
-          hasTooltip: true,
-        },
-        {
-          key: 'totalEth',
-          value: formatEth(sumEth(rounds, (row) => row.AmountEth)),
-          hasTooltip: true,
-        },
-      ];
+      const rounds = await readRoundList();
+      const rows = rounds.data;
+      return {
+        reads: [rounds],
+        // Self-evident counts carry no explanation; the two figures a reader
+        // could misread do.
+        figures: [
+          { key: 'finalizedCycles', value: fromList(rows, 'roundList', { kind: 'count' }) },
+          {
+            key: 'recipients',
+            value: fromList(rows, 'roundList', { kind: 'distinct', fields: ['WinnerAddr'] }),
+            hasTooltip: true,
+          },
+          {
+            key: 'totalEth',
+            value: fromList(rows, 'roundList', { kind: 'ethSum' }),
+            hasTooltip: true,
+          },
+          {
+            key: 'totalGestures',
+            value: fromList(rows, 'roundList', { kind: 'sum', path: ['RoundStats', 'TotalBids'] }),
+          },
+        ],
+      };
     }
     case 'anchoring': {
-      const [cstActions, rwalkActions, cstTokens, rwalkTokens, rewards, rwalkMints] =
-        await Promise.all([
-          get_staking_cst_actions(),
-          get_staking_rwalk_actions(),
-          get_staked_cst_tokens(),
-          get_staked_rwalk_tokens(),
-          get_staking_cst_rewards(),
-          get_staking_rwalk_mints_global(),
-        ]);
-      return [
-        { key: 'actions', value: formatNumber(cstActions.length + rwalkActions.length) },
-        { key: 'tokens', value: formatNumber(cstTokens.length + rwalkTokens.length) },
-        { key: 'distributions', value: formatNumber(rewards.length + rwalkMints.length) },
-      ];
+      const [cstActions, rwalkActions, ethDeposits, stellarImprints] = await Promise.all([
+        readAnchorCstActions(),
+        readAnchorRwalkActions(),
+        readAnchorEthDeposits(),
+        readAnchorStellarImprints(),
+      ]);
+      // The server counts what it read: the action lists (every anchor and release ever) are
+      // counted here and never sent to the page. A read that failed here is read again in the
+      // browser (AnchoringHeaderCount) instead of cached as a dash.
+      const actions =
+        cstActions.data && rwalkActions.data
+          ? cstActions.data.length + rwalkActions.data.length
+          : null;
+      return {
+        reads: [cstActions, rwalkActions, ethDeposits, stellarImprints],
+        // Three short counts: one row on phones.
+        figures: [
+          {
+            key: 'actions',
+            // The actions are listed on the anchoring statistics, one link away.
+            value: (
+              <AnchoringHeaderCount
+                metric="actions"
+                serverCount={actions}
+                href="/statistics/anchoring"
+              />
+            ),
+            hasTooltip: true,
+            compact: true,
+          },
+          {
+            key: 'ethDeposits',
+            value: (
+              <AnchoringHeaderCount
+                metric="ethDeposits"
+                serverCount={ethDeposits.data?.length ?? null}
+              />
+            ),
+            hasTooltip: true,
+            compact: true,
+          },
+          {
+            key: 'stellarImprints',
+            value: (
+              <AnchoringHeaderCount
+                metric="stellarImprints"
+                serverCount={stellarImprints.data?.length ?? null}
+              />
+            ),
+            hasTooltip: true,
+            compact: true,
+          },
+        ],
+      };
     }
     case 'marketing': {
-      const [dashboard, rewards] = await Promise.all([
-        get_dashboard_info(),
-        get_marketing_rewards(),
-      ]);
-      return [
-        { key: 'records', value: formatNumber(rewards.length) },
-        { key: 'reserve', value: formatEth(dashboard?.MainStats?.TotalMktRewardsEth) },
-        {
-          key: 'contributors',
-          value: formatNumber(new Set(rewards.map((row) => row.MarketerAddr)).size),
-        },
-      ];
+      const [dashboard, rewards] = await Promise.all([readDashboard(), readMarketingRewards()]);
+      return {
+        reads: [dashboard, rewards],
+        figures: [
+          { key: 'records', value: fromList(rewards.data, 'marketingRewards', { kind: 'count' }) },
+          {
+            key: 'allocatedCst',
+            // The live dashboard's figure, starting from this render's read.
+            value: (
+              <DashboardFigure
+                metric="outreachCst"
+                seed={dashboardSeed(dashboard.data, 'outreachCst')}
+              />
+            ),
+          },
+          {
+            key: 'contributors',
+            value: fromList(rewards.data, 'marketingRewards', {
+              kind: 'distinct',
+              fields: ['MarketerAddr'],
+            }),
+          },
+        ],
+      };
     }
     case 'imprint': {
-      const dashboard = await get_dashboard_info();
-      return [
-        { key: 'cycle', value: formatNumber(dashboard?.CurRoundNum) },
-        {
-          key: 'cost',
-          value: formatEth(dashboard?.GestureCostEth ?? dashboard?.CurBidPriceEth),
-        },
-        { key: 'discount', value: '50%' },
-      ];
+      // The page's own subject: how many Random Walk NFTs exist (read from
+      // the contract) and how many have been used. What an imprint costs is
+      // the panel's to say, once, where it is paid.
+      const [imprinted, used] = await Promise.all([readRandomWalkImprinted(), readUsedRwlkNfts()]);
+      return {
+        reads: [imprinted, used],
+        figures: [
+          // The reduction itself is a constant, stated once in the lede.
+          {
+            key: 'imprinted',
+            value: imprinted.data === null ? null : count(imprinted.data),
+            compact: true,
+          },
+          {
+            key: 'used',
+            value: fromList(used.data, 'usedRwlkNfts', { kind: 'count' }),
+            compact: true,
+          },
+        ],
+      };
     }
     case 'eth-contribution': {
-      const contributions = await get_donations_cg_with_info_list();
-      return [
-        { key: 'records', value: formatNumber(contributions.length) },
-        {
-          key: 'totalEth',
-          value: formatEth(sumEth(contributions, (row) => row.AmountEth)),
-        },
-        {
-          key: 'contributors',
-          value: formatNumber(new Set(contributions.map((row) => row.DonorAddr)).size),
-        },
-      ];
+      // The figures read the ledger's own client query (seeded from this read), so
+      // they always reconcile with the rows below, also after a new contribution.
+      const contributions = await readDirectContributions();
+      return {
+        reads: [contributions],
+        figures: [
+          { key: 'records', value: <ContributionFigure metric="records" /> },
+          { key: 'totalEth', value: <ContributionFigure metric="totalEth" /> },
+          { key: 'contributors', value: <ContributionFigure metric="contributors" /> },
+        ],
+      };
     }
     case 'attached-nfts': {
-      const attachedNfts = await get_donations_nft_list();
-      return [
-        { key: 'records', value: formatNumber(attachedNfts.length) },
-        {
-          key: 'contracts',
-          value: formatNumber(new Set(attachedNfts.map((row) => row.TokenAddr)).size),
-        },
-        {
-          key: 'contributors',
-          value: formatNumber(new Set(attachedNfts.map((row) => row.DonorAddr)).size),
-        },
-      ];
+      const attached = await readAttachedNfts();
+      const rows = attached.data;
+      return {
+        reads: [attached],
+        figures: [
+          { key: 'records', value: fromList(rows, 'attachedNfts', { kind: 'count' }) },
+          {
+            key: 'contracts',
+            value: fromList(rows, 'attachedNfts', { kind: 'distinct', fields: ['TokenAddr'] }),
+          },
+          {
+            key: 'contributors',
+            value: fromList(rows, 'attachedNfts', { kind: 'distinct', fields: ['DonorAddr'] }),
+          },
+        ],
+      };
     }
     case 'allocation-finalized': {
-      const claims = await get_claim_history();
-      return [
-        { key: 'records', value: formatNumber(claims.length) },
-        { key: 'eth', value: formatEth(sumEth(claims, (row) => row.AmountEth)) },
-        {
-          key: 'recipients',
-          value: formatNumber(new Set(claims.map((row) => row.WinnerAddr)).size),
-        },
-      ];
+      const history = await readClaimHistory();
+      const rows = history.data;
+      const values: Record<(typeof FINALIZED_INDEX_FIGURES)[number]['key'], FigureSpec['value']> = {
+        records: fromList(rows, 'claimHistory', { kind: 'count' }),
+        // History rows mix ETH, CST and NFT record types, and `AmountEth` carries each
+        // row's own unit: only ETH allocation types may be summed as ETH.
+        eth: fromList(rows, 'claimHistory', { kind: 'allocatedEth' }),
+        recipients: fromList(rows, 'claimHistory', { kind: 'distinct', fields: ['WinnerAddr'] }),
+      };
+      return {
+        reads: [history],
+        // The loading state draws the same figures (FINALIZED_INDEX_FIGURES) before they arrive.
+        figures: FINALIZED_INDEX_FIGURES.map(({ key, tooltip }) => ({
+          key,
+          value: values[key],
+          hasTooltip: tooltip,
+        })),
+      };
     }
     case 'named-nfts': {
-      const named = await get_named_nfts();
-      return [
-        { key: 'named', value: formatNumber(named.length) },
-        {
-          key: 'owners',
-          value: formatNumber(new Set(named.map((row) => row.CurOwnerAddr ?? row.OwnerAddr)).size),
-        },
-        { key: 'collection' },
-      ];
+      const named = await readNamedNfts();
+      const rows = named.data;
+      // The names endpoint may omit owners. Rows without any owner field say nothing
+      // about ownership: counting them would print "0 owners" beside 3 named NFTs.
+      const owners: ListMeasure = {
+        kind: 'distinct',
+        fields: ['CurOwnerAddr', 'OwnerAddr'],
+        unknownWhenAbsent: true,
+      };
+      const ownersKnown = rows === null || measureRows(rows, owners) !== null;
+      // Only facts about named NFTs: the collection's size is the gallery's.
+      return {
+        reads: [named],
+        figures: [
+          { key: 'named', value: fromList(rows, 'namedNfts', { kind: 'count' }) },
+          ...(ownersKnown
+            ? [{ key: 'owners', value: fromList(rows, 'namedNfts', owners) } satisfies FigureSpec]
+            : []),
+        ],
+      };
     }
     case 'used-rwlk-nfts': {
-      const used = await get_used_rwlk_nfts();
-      return [
-        { key: 'used', value: formatNumber(used.length) },
-        { key: 'discount', value: '50%' },
-        { key: 'scope' },
-      ];
+      const used = await readUsedRwlkNfts();
+      const rows = used.data;
+      return {
+        reads: [used],
+        figures: [
+          { key: 'used', value: fromList(rows, 'usedRwlkNfts', { kind: 'count' }) },
+          {
+            key: 'wallets',
+            value: fromList(rows, 'usedRwlkNfts', { kind: 'distinct', fields: ['BidderAddr'] }),
+          },
+          {
+            key: 'discount',
+            value: formatPercent(protocolFacts.randomWalkDiscountPercentage, locale),
+          },
+        ],
+      };
     }
     case 'coordination-changes': {
-      const changes = await get_system_modelist();
-      return [
-        { key: 'records', value: formatNumber(changes.length) },
-        { key: 'governance' },
-        { key: 'network' },
-      ];
+      const [events, owner] = await Promise.all([readCoordinationEvents(), readGameOwner()]);
+      const rows = events.data;
+      return {
+        reads: [events, owner],
+        figures: [
+          { key: 'records', value: rows && count(rows.length) },
+          { key: 'latest', value: latestDate(rows), size: 'md', date: true },
+          // Who can still change the parameters: the page's key trust fact,
+          // said as a status either way, never left to the tooltip.
+          {
+            key: 'owner',
+            value:
+              owner.data === null ? null : sameAddress(owner.data, zeroAddress) ? (
+                <Badge tone="positive" dot>
+                  {copy('cards.owner.renounced')}
+                </Badge>
+              ) : (
+                <span className="inline-flex flex-wrap items-center gap-x-3 gap-y-1.5">
+                  <AddressChip
+                    address={owner.data}
+                    variant="plain"
+                    showCopy={false}
+                    className="type-figure-md"
+                  />
+                  <Badge tone="attention" dot>
+                    {copy('cards.owner.active')}
+                  </Badge>
+                </span>
+              ),
+            hasTooltip: true,
+            size: 'md',
+          },
+        ],
+      };
     }
     case 'public-goods-contributions-cg': {
-      const deposits = await get_charity_cg_deposits();
-      return [
-        { key: 'records', value: formatNumber(deposits.length) },
-        { key: 'totalEth', value: formatEth(sumEth(deposits, (row) => row.AmountEth)) },
-        { key: 'track' },
-      ];
+      const [deposits, dashboard] = await Promise.all([readPublicGoodsDeposits(), readDashboard()]);
+      const rows = deposits.data;
+      // The live contract share, or the documented one when the dashboard read failed.
+      const share =
+        toFiniteNumber(dashboard.data?.CharityPercentage) ?? protocolFacts.publicGoodsPercentage;
+      // The money leads, as on the other two tabs: what the cycles have
+      // forwarded so far. The vault section below follows it on (due from
+      // the live cycle, in the vault, retrieved); the ledger dates each row.
+      return {
+        reads: [deposits],
+        figures: [
+          { key: 'totalEth', value: fromList(rows, 'publicGoodsDeposits', { kind: 'ethSum' }) },
+          { key: 'records', value: fromList(rows, 'publicGoodsDeposits', { kind: 'count' }) },
+          { key: 'share', value: formatPercent(share, locale), hasTooltip: true },
+        ],
+      };
     }
     case 'public-goods-contributions-voluntary': {
-      const deposits = await get_charity_voluntary();
-      return [
-        { key: 'records', value: formatNumber(deposits.length) },
-        { key: 'totalEth', value: formatEth(sumEth(deposits, (row) => row.AmountEth)) },
-        {
-          key: 'contributors',
-          value: formatNumber(new Set(deposits.map((row) => row.DonorAddr)).size),
-        },
-      ];
+      const deposits = await readVoluntaryPublicGoods();
+      const rows = deposits.data;
+      // With no contribution yet the row reads 0 · 0 ETH · 0: the three Public
+      // Goods tabs keep one header shape, so the tab row never jumps.
+      return {
+        reads: [deposits],
+        figures: [
+          { key: 'totalEth', value: fromList(rows, 'voluntaryPublicGoods', { kind: 'ethSum' }) },
+          { key: 'records', value: fromList(rows, 'voluntaryPublicGoods', { kind: 'count' }) },
+          {
+            key: 'contributors',
+            value: fromList(rows, 'voluntaryPublicGoods', {
+              kind: 'distinct',
+              fields: ['DonorAddr'],
+            }),
+          },
+        ],
+      };
     }
     case 'public-goods-retrievals': {
-      const withdrawals = await get_charity_withdrawals();
-      return [
-        { key: 'records', value: formatNumber(withdrawals.length) },
-        {
-          key: 'totalEth',
-          value: formatEth(sumEth(withdrawals, (row) => row.AmountEth)),
-        },
-        { key: 'track' },
-      ];
+      const withdrawals = await readPublicGoodsRetrievals();
+      const rows = withdrawals.data;
+      const latest = rows && latestRow(rows);
+      const beneficiary =
+        latest && typeof latest.DestinationAddr === 'string' && isAddress(latest.DestinationAddr)
+          ? latest.DestinationAddr
+          : null;
+      // Named when it is the vault's documented beneficiary; any other address reads as hex.
+      const { name: beneficiaryName, address: beneficiaryAddress } =
+        protocolFacts.publicGoodsBeneficiary;
+      return {
+        reads: [withdrawals],
+        figures: [
+          { key: 'totalEth', value: fromList(rows, 'publicGoodsRetrievals', { kind: 'ethSum' }) },
+          { key: 'records', value: fromList(rows, 'publicGoodsRetrievals', { kind: 'count' }) },
+          {
+            key: 'latest',
+            value: fromList(rows, 'publicGoodsRetrievals', { kind: 'latest' }),
+            size: 'md',
+            date: true,
+          },
+          {
+            key: 'beneficiary',
+            value:
+              rows === null ? null : beneficiary === null ? (
+                NONE_YET
+              ) : (
+                // A figure like its neighbours: the name (or hex) as figure text,
+                // linked to the address, not a small chip.
+                <AddressChip
+                  address={beneficiary}
+                  variant="plain"
+                  showCopy={false}
+                  label={sameAddress(beneficiary, beneficiaryAddress) ? beneficiaryName : undefined}
+                  className="type-figure-md"
+                />
+              ),
+            hasTooltip: true,
+            size: 'md',
+          },
+        ],
+      };
     }
   }
 }
 
-export async function PublicDataRouteSeoSummary({ route }: { route: SeoSummaryRoute }) {
+/** When the figures were read: the newest of the reads that resolved, or null if none did. */
+function snapshotTime(reads: readonly TimedRead<unknown>[]): number | null {
+  const resolved = reads.filter((read) => read.data !== null);
+  return resolved.length > 0 ? Math.max(...resolved.map((read) => read.at)) : null;
+}
+
+export interface PublicDataRouteSeoSummaryProps {
+  route: SeoSummaryRoute;
+  /** A footnote for the meta line, such as the records' scope. */
+  note?: ReactNode;
+  /** Right-aligned actions, from the page. */
+  actions?: ReactNode;
+  /** Sibling pages as `PageHeaderTabs`, opening the header (e.g. `RouteGroupNav`). */
+  tabs?: ReactNode;
+  /** Classes for the header, for a page that sets it inside a wider hero row. */
+  className?: string;
+}
+
+/**
+ * The page header of a public data route, rendered on the server: section
+ * eyebrow, H1, lede, the route's figures read from the public API (a quiet
+ * facts line on the collection pages), a snapshot stamp dated by those
+ * reads, and related pages. It is the page's only header — client pages
+ * render it first and add no header of their own.
+ */
+export async function PublicDataRouteSeoSummary({
+  route,
+  note,
+  actions,
+  tabs,
+  className,
+}: PublicDataRouteSeoSummaryProps) {
   const locale = await getLocale();
   const t = await getTranslations({ locale, namespace: 'seo' });
   const prefix = `publicData.routes.${route}`;
   const definition = routeDefinitions[route];
   const heading = t(`${prefix}.heading`);
-  const updatedAt = new Date();
-  const cards = await getSummaryCards(route, locale, t('publicData.common.unavailable')).catch(
-    () => [] as SummaryCard[],
+  const { figures, reads } = await getRouteFigures(
+    route,
+    locale,
+    (key) => t(`${prefix}.${key}`),
+    t('publicData.common.none'),
   );
+  const readAt = snapshotTime(reads);
+  const related = definition.links.map((link) => ({
+    href: localizeCrossHostHref(link.href, locale),
+    label: t(`${prefix}.links.${link.key}`),
+  }));
+  const relatedLabel = t('publicData.common.relatedPagesAria', { heading });
+
+  const snapshot = readAt !== null ? <SnapshotStamp at={readAt} /> : null;
+  const noneYet = <span className="text-muted-foreground">{t('publicData.common.none')}</span>;
+
+  // A collection page's headline is its art: its facts sit on one quiet line
+  // under the lede, as on the gallery, instead of a row of large figures.
+  if (definition.section === 'collection') {
+    return (
+      <PageHeader
+        section={definition.section}
+        title={heading}
+        titleId={`${route}-heading`}
+        subtitle={t(`${prefix}.description`)}
+        actions={actions}
+        tabs={tabs}
+        facts={
+          <PageHeaderFacts
+            facts={figures.map((figure) => ({
+              id: figure.key,
+              label: t(`${prefix}.cards.${figure.key}.label`),
+              value: figure.value === NONE_YET ? noneYet : figure.value,
+            }))}
+            meta={
+              snapshot || note ? (
+                <>
+                  {snapshot}
+                  {note}
+                </>
+              ) : undefined
+            }
+          />
+        }
+        related={related}
+        relatedLabel={relatedLabel}
+      />
+    );
+  }
+
+  const headerFigures: PageHeaderFigure[] = figures.map((figure) => {
+    const label = t(`${prefix}.cards.${figure.key}.label`);
+    return {
+      id: figure.key,
+      label,
+      value: figure.value === NONE_YET ? noneYet : figure.value,
+      info: figure.hasTooltip ? t(`${prefix}.cards.${figure.key}.tooltip`) : undefined,
+      size: figure.size,
+      compact: figure.compact,
+      date: figure.date,
+    };
+  });
 
   return (
-    <section
-      aria-labelledby={`${route}-seo-heading`}
-      className="mb-10 rounded-2xl border border-white/[0.08] bg-white/[0.03] p-6 shadow-[0_24px_80px_-56px_rgb(var(--aurora-cyan-rgb)/0.8)] backdrop-blur-sm sm:p-8"
-    >
-      <p className="type-eyebrow text-muted-foreground">{t(`${prefix}.eyebrow`)}</p>
-      <h1 id={`${route}-seo-heading`} className="mt-4 type-display-md text-foreground">
-        {heading}
-      </h1>
-      <p className="mt-4 max-w-3xl type-body-lg text-muted-foreground">
-        {t(`${prefix}.description`)}
-      </p>
-      <p className="mt-3 type-body-sm text-muted-foreground">
-        {t('publicData.common.lastUpdated', {
-          date: formatUtcDateTimeStamp(updatedAt, locale),
-          source: t(`${prefix}.source`),
-        })}
-      </p>
+    <PageHeader
+      section={definition.section}
+      title={heading}
+      titleId={`${route}-heading`}
+      subtitle={t(`${prefix}.description`)}
+      figures={headerFigures}
+      actions={actions}
+      tabs={tabs}
+      meta={
+        snapshot || note ? (
+          <>
+            {snapshot}
+            {note}
+          </>
+        ) : undefined
+      }
+      related={related}
+      relatedLabel={relatedLabel}
+      className={className}
+    />
+  );
+}
 
-      {cards.length > 0 ? (
-        <dl className="mt-8 grid gap-3 sm:grid-cols-3">
-          {cards.map((card) => {
-            const cardPrefix = `${prefix}.cards.${card.key}`;
-            const label = t(`${cardPrefix}.label`);
-            const tooltip = card.hasTooltip ? t(`${cardPrefix}.tooltip`) : undefined;
-            return (
-              <div key={card.key} className="rounded-xl border border-white/[0.06] bg-black/20 p-4">
-                <dt className="flex items-center gap-1.5 text-xs uppercase tracking-[0.18em] text-muted-foreground">
-                  <span>{label}</span>
-                  {tooltip ? (
-                    <InfoTooltip content={tooltip} label={label} iconClassName="h-3 w-3" />
-                  ) : null}
-                </dt>
-                <dd className="mt-2 text-2xl font-semibold text-foreground">
-                  {card.value ?? t(`${cardPrefix}.value`)}
-                </dd>
-              </div>
-            );
-          })}
-        </dl>
-      ) : null}
-
-      <nav aria-label={t('publicData.common.relatedPagesAria', { heading })} className="mt-6">
-        <ul className="flex flex-wrap gap-3 text-sm">
-          {definition.links.map((link) => (
-            <li key={link.href}>
-              <Link
-                href={localizeCrossHostHref(link.href, locale)}
-                className="text-primary underline-offset-4 hover:underline"
+/**
+ * The header's related pages again, for phones, where the header hides its
+ * chips: a compact list the page puts after its last section, one 44px row
+ * per link, with the header's links, order and labels.
+ */
+export async function PublicDataRelatedPages({
+  route,
+  className,
+}: {
+  route: SeoSummaryRoute;
+  className?: string;
+}) {
+  const locale = await getLocale();
+  const t = await getTranslations({ locale, namespace: 'seo' });
+  const tCommon = await getTranslations({ locale, namespace: 'common' });
+  const headingId = `${route}-related-pages`;
+  return (
+    <nav aria-labelledby={headingId} className={cn('sm:hidden', className)}>
+      <h2 id={headingId} className="type-label text-subtle">
+        {tCommon('pageHeader.relatedPages')}
+      </h2>
+      <ul className="mt-2 divide-y divide-rule-faint">
+        {routeDefinitions[route].links.map((link) => {
+          const href = localizeCrossHostHref(link.href, locale);
+          const kind = classifyHref(href, 'app');
+          const Icon = kind === 'external' ? ArrowUpRight : ArrowRight;
+          return (
+            <li key={link.key}>
+              <SiteLink
+                href={href}
+                kind={kind}
+                externalIcon={false}
+                className="flex min-h-11 items-center justify-between gap-4 type-body-sm text-foreground no-underline"
               >
-                {t(`${prefix}.links.${link.key}`)}
-              </Link>
+                {t(`publicData.routes.${route}.links.${link.key}`)}
+                <Icon aria-hidden className="size-4 shrink-0 text-subtle" />
+              </SiteLink>
             </li>
-          ))}
-        </ul>
-      </nav>
-    </section>
+          );
+        })}
+      </ul>
+    </nav>
   );
 }

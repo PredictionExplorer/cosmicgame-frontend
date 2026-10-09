@@ -1,0 +1,122 @@
+{
+  "languageSwitcher": {
+    "label": "言語",
+    "current": "言語：{language}",
+    "currentShort": "言語：{language}（{short}）"
+  },
+  "themeSwitcher": {
+    "label": "カラーテーマ",
+    "description": "雰囲気を変えても、いつものCosmic Signatureです。",
+    "sitewide": "選んだ配色をサイト全体に適用します。",
+    "themes": {
+      "midnight": {
+        "name": "ミッドナイト",
+        "description": "インクブラックと柔らかなラベンダー"
+      },
+      "classic-blue": {
+        "name": "クラシックブルー",
+        "description": "初代のコズミックブルー"
+      },
+      "aurora": {
+        "name": "オーロラ",
+        "description": "深い青緑とシーグラス"
+      },
+      "nebula": {
+        "name": "ネビュラ",
+        "description": "プラムと光を帯びたライラック"
+      },
+      "ember": {
+        "name": "エンバー",
+        "description": "温かなチャコールとシャンパン"
+      }
+    }
+  },
+  "accessibility": {
+    "skipToMain": "メインコンテンツへスキップ",
+    "breadcrumb": "パンくずリスト",
+    "footer": "フッター"
+  },
+  "breadcrumbs": {
+    "home": "ホーム",
+    "gallery": "ギャラリー"
+  },
+  "pageHeader": {
+    "snapshot": "データのスナップショット：{date}",
+    "lastReviewed": "最終確認：{date}",
+    "lastUpdated": "最終更新：{date}",
+    "relatedPages": "関連ページ",
+    "readMore": "続きを読む",
+    "readLess": "閉じる",
+    "crumbs": {
+      "participants": "参加者",
+      "allocationRecipients": "配分の受領者",
+      "cycle": "サイクル{cycle}"
+    }
+  },
+  "status": {
+    "loading": "読み込み中",
+    "loadingEllipsis": "読み込み中…",
+    "loadingDots": "読み込み中…",
+    "unavailable": "取得不可"
+  },
+  "liveStatus": {
+    "connecting": "接続中…",
+    "live": "ライブ",
+    "updated": "{age}に更新",
+    "reconnecting": "再接続中…",
+    "delayed": "更新が遅れています・最終更新{age}",
+    "delayedCaveat": "更新が遅れています・最終更新{age}。その後、確定時刻が延長されている可能性があります。",
+    "offline": "オフライン",
+    "offlineDetail": "ネットワークに接続されていません。最終更新は{age}です。",
+    "offlineCaveat": "ネットワークに接続されていません。最終更新は{age}です。その後、確定時刻が延長されている可能性があります。",
+    "age": {
+      "justNow": "たった今",
+      "seconds": "{count}秒前",
+      "minutes": "{count}分前",
+      "hours": "{count}時間前",
+      "days": "{count}日前"
+    },
+    "delayedShort": "更新が遅れています"
+  },
+  "attention": {
+    "menuLabel": "通知とサウンド",
+    "title": "通知とサウンド",
+    "intro": "ここにある項目は、オンにするまですべてオフです。選択はこのブラウザーに保存されます。",
+    "sound": {
+      "label": "自分の一筆の後に新しい一筆が入ったら音で知らせる",
+      "description": "他の参加者の一筆が自分の最新の一筆の後に入ると、短い音が鳴ります。ウォレットの接続と、このタブを開いておくことが必要です。"
+    },
+    "alert": {
+      "label": "確定前に通知",
+      "description": "サイクル確定時刻の前にブラウザーで通知します。このタブを開いたままにしてください。",
+      "minutes": "{minutes}分",
+      "blocked": "このサイトの通知はブロックされています。使うには、ブラウザーの設定で通知を許可してください。",
+      "unsupported": "このブラウザーは通知に対応していません。"
+    },
+    "tabTitle": {
+      "label": "タブのタイトルにカウントダウンを表示",
+      "description": "サイクルの最後の1時間、ブラウザーのタブに残り時間を表示します。"
+    }
+  },
+  "actions": {
+    "copyAddress": "アドレスをコピー",
+    "addressCopied": "アドレスをコピーしました",
+    "copied": "コピーしました",
+    "cancel": "キャンセル",
+    "close": "閉じる"
+  },
+  "externalLink": {
+    "title": "外部サイトへ移動します",
+    "description": "このリンクは、オンチェーンに記録された参加者のメッセージに含まれています。内容の審査や安全性の検証は行っていません。以下のアドレスが目的のサイトと一致するか確認してください。",
+    "site": "サイト",
+    "copy": "リンクをコピー",
+    "copied": "リンクをコピーしました",
+    "warning": "外部サイトでウォレットのシードフレーズや秘密鍵を入力しないでください。",
+    "open": "リンクを開く"
+  },
+  "signature": {
+    "untitled": "シグネチャー{id}",
+    "cycle": "サイクル{n}",
+    "anchored": "係留中"
+  }
+}

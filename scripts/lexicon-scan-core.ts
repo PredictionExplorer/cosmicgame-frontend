@@ -75,6 +75,18 @@ export const DEFAULT_BANNED_TERMS: readonly string[] = [
   // Stellar Selection / lottery triggers
   'raffle',
   'raffles',
+  // "Draw" in its lottery sense only: "draws a line", "the drawing" (a
+  // diagram) and "drawn as the table" stay legal in code and copy.
+  'draw from',
+  'draws from',
+  'drawn from',
+  'drawn at random',
+  'randomly drawn',
+  'random draw',
+  'drawn with replacement',
+  'draws with replacement',
+  'drawn to receive',
+  'drawn more than once',
   'lottery',
   'lotteries',
   'sweepstakes',
@@ -120,6 +132,10 @@ export const DEFAULT_BANNED_TERMS: readonly string[] = [
   'earnings',
   'income',
   'tax-deductible',
+  // Scarcity as value: the imprint pace is a mechanic, never a promise of worth
+  'scarcity',
+  'scarce',
+  'rarer',
   // Crypto-slang landmines
   'degen',
   'moon',
@@ -253,6 +269,8 @@ export const ZH_BANNED_TERMS: readonly string[] = [
   // investment
   '投资',
   '理财',
+  // scarcity as value (稀缺性); trait rarity is 稀有度
+  '稀缺',
   '炒币',
   '建仓',
   // yield / profit / dividend
@@ -384,6 +402,8 @@ export const ZH_HANT_BANNED_TERMS: readonly string[] = [
   // investment
   '投資',
   '理財',
+  // scarcity as value (稀缺性); trait rarity is 稀有度
+  '稀缺',
   '炒幣',
   '建倉',
   // yield / profit / dividend
@@ -703,12 +723,452 @@ export const UK_BANNED_TERMS: readonly string[] = [
 // lexicon-allow-end
 
 /**
+ * Korean banned register (docs/i18n/glossary-ko.md §5): the words Korean
+ * actually uses for the banned concepts. Korean compounds join without
+ * spaces (재투자 "reinvest", NFT민팅) and particles attach directly to the
+ * noun (도박을, 투자자에게), so the terms are matched as substrings like the
+ * Chinese lists. Every entry was checked against the Korean the site does
+ * need: words dropped because a common innocent word contains them are
+ * listed in the glossary as reviewer cautions — 내기 (a bet) hides in 보내기
+ * "send", 호가 (an asking price) in 번호가 "the number is", 시합 (a match)
+ * in 표시합니다 "displays", 수입 (income) in 개수입니다 "is the count", 청구
+ * stays available for the legal sense of "claim". Terms that a rarer
+ * innocent word contains stay banned and the
+ * glossary tells writers which word to use instead (배경 for 백그라운드,
+ * 불리한 결과 for 불이익, 손해 배상 for 보상금).
+ *
+ * As in English and Chinese, the only sanctioned exception is FAQ/legal
+ * denial copy inside lexicon-allow pragmas (or `\uXXXX` escapes in JSON).
+ */
+// lexicon-allow-start: banned-term list for the scanner itself
+export const KO_BANNED_TERMS: readonly string[] = [
+  // auction / bidding
+  '경매',
+  '입찰',
+  '낙찰',
+  '옥션',
+  '비드',
+  '비딩',
+  '더치 옥션',
+  // prize / jackpot
+  '상금',
+  '경품',
+  '잭팟',
+  '대박',
+  '당첨금',
+  // winner
+  '당첨',
+  '승자',
+  '우승',
+  // lottery / raffle / sweepstakes
+  '추첨',
+  '복권',
+  '로또',
+  '뽑기',
+  '응모',
+  // gambling / bets / odds
+  '도박',
+  '베팅',
+  '배팅',
+  '카지노',
+  '갬블',
+  '사행',
+  '판돈',
+  '배당',
+  // luck flavor
+  '행운',
+  '럭키',
+  '찬스',
+  // ticket
+  '티켓',
+  '참가권',
+  // game framing / competition
+  '게임',
+  '게이머',
+  '플레이어',
+  '승부',
+  '경쟁',
+  '대회',
+  '토너먼트',
+  '콘테스트',
+  // securities / yield / earnings
+  '투자',
+  // scarcity as value; trait rarity is 희귀도, which stays legal
+  '희귀성',
+  '재테크',
+  '수익',
+  '이익',
+  '이윤',
+  '소득',
+  '이자율',
+  '이자 수익',
+  '이자 소득',
+  // tax
+  '면세',
+  '세금 공제',
+  // crypto slang
+  '존버',
+  '가즈아',
+  '떡상',
+  // staking
+  '스테이킹',
+  '예치',
+  '락업',
+  // mint / mining
+  '민팅',
+  '민트',
+  '채굴',
+  // withdraw / claim slang
+  '인출',
+  '출금',
+  '클레임',
+  '캐시아웃',
+  '현금화',
+  '페이아웃',
+  // charity / donation
+  '자선',
+  '기부',
+  '후원',
+  '모금',
+  '도네이션',
+  // DAO
+  '다오',
+  // marketing
+  '마케팅',
+  // round
+  '라운드',
+  '회차',
+];
+// lexicon-allow-end
+
+/**
+ * Japanese banned register (docs/i18n/glossary-ja.md §5): the words Japanese
+ * actually uses for the banned concepts. Japanese writes without spaces and
+ * attaches particles directly (投資を, 抽選で), so the terms are matched as
+ * substrings like the Chinese and Korean lists — which is also why several
+ * obvious candidates are deliberately absent: ロト hides in プロトコル
+ * "protocol", ベット in アルファベット "alphabet", プレイ in ディスプレイ
+ * "display", and bare くじ in ordinary hiragana runs, so the list carries
+ * 宝くじ / くじ引き / ベッティング / プレイヤー instead. Terms that a rarer
+ * innocent word contains stay banned and the glossary names the word to
+ * use instead (背景 for バックグラウンド, 関係者 for ステークホルダー, 損害 or
+ * 不都合 for 不利益).
+ *
+ * As in English and Chinese, the only sanctioned exception is FAQ/legal
+ * denial copy inside lexicon-allow pragmas (or `\uXXXX` escapes in JSON).
+ */
+// lexicon-allow-start: banned-term list for the scanner itself
+export const JA_BANNED_TERMS: readonly string[] = [
+  // auction / bidding
+  'オークション',
+  '競売',
+  '入札',
+  '落札',
+  '競り',
+  // prize / jackpot
+  '賞金',
+  '賞品',
+  '景品',
+  '懸賞',
+  '大当たり',
+  'ジャックポット',
+  // winner
+  '当選',
+  '勝者',
+  '優勝',
+  '勝利',
+  '受賞',
+  // lottery / raffle / sweepstakes
+  '抽選',
+  '抽籤',
+  '宝くじ',
+  'くじ引き',
+  'ロッタリー',
+  'ラッフル',
+  '福引',
+  'ガチャ',
+  // gambling / bets / odds
+  'ギャンブル',
+  '賭博',
+  '賭け',
+  '賭場',
+  'カジノ',
+  '胴元',
+  'オッズ',
+  'ベッティング',
+  'パチンコ',
+  // luck flavor
+  '幸運',
+  'ラッキー',
+  '運試し',
+  '一発逆転',
+  'チャンス',
+  // ticket
+  'チケット',
+  '参加券',
+  // game framing / competition
+  'ゲーム',
+  'ゲーマー',
+  'プレイヤー',
+  '勝負',
+  '対戦',
+  '対決',
+  'トーナメント',
+  '大会',
+  'コンテスト',
+  '競争',
+  '競技',
+  'バトル',
+  // securities / yield / earnings
+  '投資',
+  // scarcity as value; trait rarity is 希少度, which stays legal
+  '希少性',
+  '利回り',
+  '収益',
+  '利益',
+  '利潤',
+  '儲け',
+  '儲かる',
+  '稼ぐ',
+  '稼げる',
+  '利息',
+  '利子',
+  '配当',
+  'リターン',
+  '収入',
+  '所得',
+  '資産運用',
+  '運用益',
+  '金利',
+  // tax
+  '免税',
+  '税控除',
+  // crypto slang
+  'ガチホ',
+  '爆上げ',
+  '億り人',
+  // staking
+  'ステーキング',
+  'ステーク',
+  'ロックアップ',
+  '預け入れ',
+  '預入',
+  // mint / mining
+  'ミント',
+  'ミンティング',
+  '鋳造',
+  'マイニング',
+  '採掘',
+  // withdraw / claim slang
+  '引き出し',
+  '出金',
+  'キャッシュアウト',
+  '換金',
+  '現金化',
+  'クレーム',
+  'ペイアウト',
+  '払い出し',
+  // charity / donation
+  '慈善',
+  'チャリティ',
+  '寄付',
+  '寄附',
+  '寄贈',
+  '募金',
+  '献金',
+  'ドネーション',
+  // DAO
+  'ダオ',
+  // marketing
+  'マーケティング',
+  '宣伝',
+  '広告',
+  '販促',
+  'プロモーション',
+  // round
+  'ラウンド',
+  '回戦',
+];
+// lexicon-allow-end
+
+/**
+ * Vietnamese banned register (docs/i18n/glossary-vi.md §5): the words
+ * Vietnamese actually uses for the banned concepts. Vietnamese is a Latin
+ * alphabet with stacked diacritics, written one spaced syllable at a time,
+ * so the terms are matched as whole words with Unicode boundaries
+ * (`unicode-word`; JavaScript's `\b` stops at every diacritic). Because a
+ * word boundary is also a syllable boundary, a bare syllable that another
+ * innocent compound contains is deliberately absent and its compounds are
+ * listed instead: thưởng hides in thưởng thức "to appreciate (art)", lời in
+ * lời nhắn "message", rút in rút gọn "shorten", vòng in vòng lặp "loop",
+ * hiệp in hiệp hội "association", bạc in bạc "silver". Terms are
+ * case-insensitive; every entry carries a diacritic or a Vietnamese-only
+ * spelling so the profile never re-flags English (see DEFAULT_BANNED_TERMS).
+ *
+ * As in every other locale, the only sanctioned exception is FAQ/legal
+ * denial copy inside lexicon-allow pragmas (or `\uXXXX` escapes in JSON).
+ */
+// lexicon-allow-start: banned-term list for the scanner itself
+export const VI_BANNED_TERMS: readonly string[] = [
+  // auction / bidding
+  'đấu giá',
+  'đấu thầu',
+  'bỏ thầu',
+  'đặt giá',
+  'trả giá',
+  'ra giá',
+  'phiên đấu',
+  // prize / jackpot / reward
+  'giải thưởng',
+  'phần thưởng',
+  'tiền thưởng',
+  'trúng thưởng',
+  'trao thưởng',
+  'nhận thưởng',
+  'lĩnh thưởng',
+  'trả thưởng',
+  'khen thưởng',
+  'độc đắc',
+  // winner / win / lose
+  'thắng',
+  'chiến thắng',
+  'thắng cuộc',
+  'thắng giải',
+  'người thắng',
+  'người trúng',
+  'đoạt giải',
+  'giành giải',
+  'trúng giải',
+  'trúng số',
+  'thua',
+  'thua cuộc',
+  'thua lỗ',
+  // lottery / raffle / draw
+  'xổ số',
+  'vé số',
+  'số đề',
+  'lô tô',
+  'lô đề',
+  'rút thăm',
+  'bốc thăm',
+  'quay số',
+  'quay thưởng',
+  'vòng quay',
+  // luck flavor
+  'may mắn',
+  'vận may',
+  'cầu may',
+  'ăn may',
+  'may rủi',
+  'hên xui',
+  'số đỏ',
+  'đỏ đen',
+  // gambling / bets / odds
+  'cá cược',
+  'đặt cược',
+  'cược',
+  'kèo',
+  'đánh bạc',
+  'cờ bạc',
+  'sòng bạc',
+  'sòng bài',
+  'đánh bài',
+  'nhà cái',
+  'con bạc',
+  // ticket
+  'vé',
+  'tấm vé',
+  // game framing / competition
+  'trò chơi',
+  'người chơi',
+  'chơi',
+  'ván',
+  'lượt chơi',
+  'giải đấu',
+  'thi đấu',
+  'trận đấu',
+  'hiệp đấu',
+  'vòng đấu',
+  'vòng chơi',
+  'vòng cược',
+  'đối đầu',
+  'đối thủ',
+  'so tài',
+  'tranh tài',
+  'cạnh tranh',
+  'cuộc đua',
+  'cuộc thi',
+  // securities / yield / earnings
+  'đầu tư',
+  // scarcity as value
+  'khan hiếm',
+  'nhà đầu tư',
+  'lợi nhuận',
+  'lợi tức',
+  'lợi suất',
+  'lãi',
+  'lãi suất',
+  'tiền lãi',
+  'sinh lời',
+  'sinh lãi',
+  'sinh lợi',
+  'kiếm lời',
+  'kiếm tiền',
+  'thu lợi',
+  'thu nhập',
+  'cổ tức',
+  'cổ phiếu',
+  'chứng khoán',
+  'lướt sóng',
+  // tax
+  'miễn thuế',
+  // staking / deposit
+  'đặt cọc',
+  'ký gửi',
+  'thế chấp',
+  'gửi tiết kiệm',
+  // mint / mining
+  'đúc',
+  'khai thác',
+  'đào coin',
+  'đào tiền',
+  'thợ đào',
+  // withdraw / claim slang
+  'rút tiền',
+  'rút về',
+  'rút vốn',
+  'rút lời',
+  'rút ETH',
+  'lĩnh tiền',
+  // charity / donation
+  'từ thiện',
+  'quyên góp',
+  'quyên tặng',
+  'hiến tặng',
+  'thiện nguyện',
+  'làm phúc',
+  'cứu trợ',
+  'ủng hộ',
+  // DAO
+  'tự trị phi tập trung',
+  // marketing
+  'tiếp thị',
+  'quảng cáo',
+  'quảng bá',
+  'khuyến mãi',
+  'khuyến mại',
+];
+// lexicon-allow-end
+
+/**
  * One banned-register profile per translated locale. The type forces a
  * decision the moment a locale joins routing.locales. The CLI applies a
  * profile to every locale-agnostic file and to every file of another
- * language (stray copy in the wrong file is exactly what the scanner exists
- * to catch), but not to files of a sibling variant of the same language —
- * see `checkAppliesTo` in scripts/locale-files.ts.
+ * language written in a different family of characters (stray copy in the
+ * wrong file is exactly what the scanner exists to catch), but not to files
+ * of a sibling variant of the same language or of another language sharing
+ * its script — Chinese and Japanese write the same characters with different
+ * meanings — see `checkAppliesTo` in scripts/locale-files.ts.
  */
 export interface LexiconProfile {
   /** Where the register is documented. */
@@ -741,6 +1201,20 @@ export const LEXICON_PROFILES: Record<TranslatedLocale, LexiconProfile> = {
       { matcher: 'unicode-stem', terms: UK_BANNED_STEMS },
       { matcher: 'unicode-word', terms: UK_BANNED_TERMS },
     ],
+  },
+  ko: {
+    glossary: 'docs/i18n/glossary-ko.md',
+    termSets: [{ matcher: 'cjk-substring', terms: KO_BANNED_TERMS }],
+  },
+  ja: {
+    glossary: 'docs/i18n/glossary-ja.md',
+    termSets: [{ matcher: 'cjk-substring', terms: JA_BANNED_TERMS }],
+  },
+  vi: {
+    glossary: 'docs/i18n/glossary-vi.md',
+    // Spaced Latin syllables with diacritics: whole words under Unicode
+    // boundaries, never `latin-word`, whose ASCII `\b` breaks at every ế or ợ.
+    termSets: [{ matcher: 'unicode-word', terms: VI_BANNED_TERMS }],
   },
 };
 

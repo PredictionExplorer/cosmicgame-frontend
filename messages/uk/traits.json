@@ -19,16 +19,16 @@
   },
   "hints": {
     "structure": "Основна графічна мова, якою намальовано три орбіти.",
-    "underlay": "Друга, слабша графічна мова, покладена під основну структуру.",
-    "accent": "Розріджена мова акцентів, намальована поверх структури.",
+    "underlay": "Другий, менш виразний графічний шар під основною структурою.",
+    "accent": "Поодинокі світлові акценти поверх структури.",
     "symmetry": "Згортання, застосоване до композиції: дзеркальне, розета або мандала.",
     "projection": "Координатний простір, у якому побудовано траєкторії.",
     "wildcard": "Нечастий варіант, який порушує звичні правила рендерингу.",
     "finish": "Ефект постобробки, застосований до фінального кадру.",
-    "palette": "Колірна родина та схема гармонії трьох тіл.",
+    "palette": "Група кольорів і схема їх поєднання для трьох тіл.",
     "spectralClass": "Зоряний колірний клас домінантного тіла — від блакитно-білого O до червоного M.",
-    "massBalance": "Як співвідносяться три маси: одна важка головна, подвійна пара або три рівні.",
-    "fate": "Як завершується симуляція: зв’язаний вічний танець або викид одного з тіл.",
+    "massBalance": "Співвідношення мас трьох тіл: одне масивне головне тіло, пара тіл або три тіла однакової маси.",
+    "fate": "Чим завершується симуляція: тіла залишаються зв’язаними у вічному танці або одне з них вилітає із системи.",
     "chaos": "Чутливість до початкових умов за шкалою від 0 (упорядковано) до 100 (турбулентно).",
     "syzygies": "Моменти, коли всі три тіла вишиковуються в одну лінію.",
     "cycle": "Перформанс-цикл, у якому закарбовано цей NFT.",
@@ -37,62 +37,62 @@
   },
   "values": {
     "vocabulary": {
-      "orbitRibbons": "орбітальні стрічки",
-      "timeChords": "часові акорди",
-      "harmonicWeave": "гармонічне плетіння",
-      "tangentCaustics": "дотичні каустики",
-      "stippleConstellation": "пунктирне сузір’я",
-      "nebulaVeil": "серпанок туманності"
+      "orbitRibbons": "Орбітальні стрічки",
+      "timeChords": "Часові акорди",
+      "harmonicWeave": "Гармонічне плетіння",
+      "tangentCaustics": "Дотичні каустики",
+      "stippleConstellation": "Пунктирне сузір’я",
+      "nebulaVeil": "Серпанок туманності"
     },
     "symmetry": {
-      "mirror": "дзеркальна",
-      "rosette": "розета ×{n}",
-      "mandala": "мандала ×{n}"
+      "mirror": "Дзеркальна",
+      "rosette": "Розета ×{n}",
+      "mandala": "Мандала ×{n}"
     },
     "projection": {
-      "crossBraid": "перехресне плетиво",
-      "phasePortrait": "фазовий портрет",
-      "hodograph": "годограф"
+      "crossBraid": "Перехресне плетиво",
+      "phasePortrait": "Фазовий портрет",
+      "hodograph": "Годограф"
     },
     "wildcard": {
       "yes": "Так"
     },
     "finish": {
-      "stardust": "зоряний пил",
-      "prism": "призма"
+      "stardust": "Зоряний пил",
+      "prism": "Призма"
     },
     "massBalance": {
-      "heavyPrimary": "важка головна",
-      "twinBinary": "подвійна пара",
-      "equalTrio": "рівне тріо"
+      "heavyPrimary": "Важка головна",
+      "twinBinary": "Подвійна пара",
+      "equalTrio": "Рівне тріо"
     },
     "fate": {
-      "eternalDance": "вічний танець",
-      "ejection": "викид"
+      "eternalDance": "Вічний танець",
+      "ejection": "Викид"
     },
     "allocation": {
-      "stellarSelection": "зоряний відбір",
-      "anchoredSelection": "відбір закріплених NFT",
-      "finalGesture": "завершальний жест",
-      "lastCstGesture": "останній CST-жест",
+      "stellarSelection": "Зоряний відбір",
+      "anchoredSelection": "Відбір закріплених NFT",
+      "finalGesture": "Завершальний жест",
+      "lastCstGesture": "Завершальний CST-жест",
       "enduranceChampion": "Чемпіон витривалості",
       "chronoWarrior": "Воїн часу"
     },
     "palette": {
-      "pattern": "{hue} · {scheme}",
+      "pattern": "{hue} ({scheme})",
       "hues": {
-        "amber": "бурштин",
-        "aurora": "аврора",
-        "cerulean": "лазур",
-        "ember": "жарина",
-        "glacial": "крига",
-        "jade": "нефрит",
-        "nebular": "туманність",
-        "orchid": "орхідея",
-        "rose": "троянда",
-        "sapphire": "сапфір",
-        "solar": "сонце",
-        "violet": "фіалка"
+        "amber": "Бурштин",
+        "aurora": "Аврора",
+        "cerulean": "Лазур",
+        "ember": "Жарина",
+        "glacial": "Крига",
+        "jade": "Нефрит",
+        "nebular": "Туманність",
+        "orchid": "Орхідея",
+        "rose": "Троянда",
+        "sapphire": "Сапфір",
+        "solar": "Сонце",
+        "violet": "Фіалка"
       },
       "schemes": {
         "mono": "моно",
@@ -105,31 +105,31 @@
     },
     "spectralClass": {
       "O": {
-        "label": "клас O",
+        "label": "Клас O",
         "tone": "Блакитний — найгарячіший клас"
       },
       "B": {
-        "label": "клас B",
+        "label": "Клас B",
         "tone": "Блакитно-білий"
       },
       "A": {
-        "label": "клас A",
+        "label": "Клас A",
         "tone": "Білий"
       },
       "F": {
-        "label": "клас F",
+        "label": "Клас F",
         "tone": "Жовто-білий"
       },
       "G": {
-        "label": "клас G",
+        "label": "Клас G",
         "tone": "Жовтий, як Сонце"
       },
       "K": {
-        "label": "клас K",
+        "label": "Клас K",
         "tone": "Оранжевий"
       },
       "M": {
-        "label": "клас M",
+        "label": "Клас M",
         "tone": "Червоний — найхолодніший клас"
       }
     }
@@ -142,20 +142,16 @@
   },
   "card": {
     "chaosAria": "Хаос {value} з {max}",
-    "chaosShort": "Хаос {value}",
-    "syzygiesAria": "{count, plural, one {# сизигія} few {# сизигії} many {# сизигій} other {# сизигії}}",
-    "syzygiesShort": "{count, plural, one {# сизигія} few {# сизигії} many {# сизигій} other {# сизигії}}",
     "hueStripAria": "Відтінки палітри трьох тіл",
     "spectralAria": "Спектральний клас {value}",
     "fateAria": "Доля: {value}",
     "quickView": "Швидкий перегляд",
     "quickViewAria": "Швидкий перегляд Cosmic Signature {id}",
-    "traitsPending": "Ознаки очікуються",
-    "traitsPendingTooltip": "Метадані ознак цієї Сигнатури ще не опубліковано.",
-    "cycleShort": "Ц{n}",
+    "traitsPending": "Очікування даних ознак",
+    "traitSummary": "{structure} · {palette}",
     "cycleLong": "Цикл {n}",
-    "cycleTooltip": "Закарбовано в циклі {n}",
-    "viewCycle": "Переглянути цикл {n}"
+    "viewCycle": "Переглянути цикл {n}",
+    "anchoredState": "Закріплено"
   },
   "rarity": {
     "rank": "#{rank}",
@@ -166,39 +162,33 @@
     "rarest": "Найрідкісніша ознака",
     "share": "{count, plural, one {# з {total} має цю ознаку} few {# з {total} мають цю ознаку} many {# з {total} мають цю ознаку} other {# з {total} має цю ознаку}}",
     "shareShort": "{count}/{total}",
-    "scoreLabel": "Оцінка рідкості",
     "unavailable": "Ще без рангу"
   },
   "facets": {
     "title": "Ознаки",
-    "toggle": "Ознаки",
-    "toggleWithCount": "Ознаки · {count}",
-    "toggleAria": "Фільтрувати за ознакою",
     "clearAll": "Очистити все",
     "clearFacet": "Очистити: {trait}",
     "activeAria": "Активні фільтри ознак",
     "removeFilter": "Прибрати фільтр {trait}: {value}",
-    "optionAria": "{value}: {count} NFT",
+    "optionAria": "{value}: {count} NFT",
     "chaosRange": "Діапазон хаосу",
     "chaosMin": "Мінімальний хаос",
     "chaosMax": "Максимальний хаос",
     "chaosValue": "від {min} до {max}",
     "showMore": "Показати ще {count}",
     "showLess": "Показати менше",
-    "sheetTitle": "Фільтрувати за ознакою",
     "sheetDescription": "Звузьте архів за композицією, фізикою та походженням кожної Сигнатури.",
     "loading": "Індексування ознак…",
     "partial": "Індекс ознак ще заповнюється ({indexed} з {total})",
     "unavailable": "Фільтри ознак зараз недоступні.",
-    "retry": "Повторити",
-    "matches": "Знайдено {count} NFT"
+    "retry": "Повторити"
   },
   "quickView": {
     "title": "Cosmic Signature {id}",
     "description": "Ознаки, орбітальна фізика та походження цієї Сигнатури.",
     "openDetail": "Відкрити повну сторінку",
     "playSweep": "Відтворити спектральний огляд",
-    "sweepNote": "Транслює великий відеофайл із медіасервера",
+    "sweepNote": "Потокове відтворення відео великого розміру",
     "hideSweep": "Повернутися до твору",
     "previous": "Попередня Сигнатура",
     "next": "Наступна Сигнатура",
@@ -241,7 +231,7 @@
     "copied": "Скопійовано",
     "webImage": "Вебзображення (WebP)",
     "sourceImage": "Вихідне зображення (PNG)",
-    "hqVideo": "Відео HQ",
+    "hqVideo": "Відео високої якості",
     "spectralSweep": "Спектральний огляд",
     "assetManifest": "Маніфест ресурсів",
     "traitSource": "Джерело ознак",
@@ -249,9 +239,13 @@
   },
   "dna": {
     "title": "ДНК колекції",
-    "subtitle": "Як архів поділяється за визначальними ознаками. Виберіть сегмент, щоб відфільтрувати галерею.",
-    "segmentAria": "{value}: {count} NFT. Фільтрувати за цією ознакою.",
-    "legendCount": "{count}",
+    "subtitle": "Як колекція розподіляється за головними ознаками. Оберіть ознаку, щоб звузити галерею.",
+    "segmentAria": "{value}: {count} NFT. Фільтрувати за цією ознакою.",
     "loading": "Зчитування ознак колекції…"
+  },
+  "alt": {
+    "subjectNamed": "«{name}», Cosmic Signature {id}",
+    "withTraits": "{subject}: структура {structure}, палітра {palette}",
+    "withTraitsAndClass": "{subject}: структура {structure}, палітра {palette}, спектральний клас {spectralClass}"
   }
 }

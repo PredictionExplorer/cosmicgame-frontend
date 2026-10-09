@@ -2,22 +2,25 @@
 
 import { useTranslations } from 'next-intl';
 
-import { SectionDivider } from '@/components/ui/section-divider';
-import { RoiLeaderboardSection } from '@/components/statistics/RoiLeaderboardSection';
+import { SectionShell } from '@/components/statistics/SectionShell';
+import { ParticipantOutcomesSection } from '@/components/statistics/ParticipantOutcomesSection';
 import { ClaimsByRoundSection } from '@/components/statistics/ClaimsByRoundSection';
 
-/** Participant performance leaderboard and allocation claims by cycle. */
+/**
+ * Participant outcomes: what each participant spent beside what came back
+ * to them, then how every cycle's retrievable assets were retrieved.
+ */
 const PerformancePanel = () => {
   const t = useTranslations('statistics');
 
   return (
-    <div data-testid="performance-panel">
-      <SectionDivider title={t('performance.leaderboardTitle')} className="mb-6" />
-      <RoiLeaderboardSection />
-      <div className="mt-12">
-        <SectionDivider title={t('performance.claimsTitle')} className="mb-6" />
+    <div data-testid="performance-panel" className="space-y-12 sm:space-y-16">
+      <SectionShell title={t('performance.leaderboardTitle')}>
+        <ParticipantOutcomesSection />
+      </SectionShell>
+      <SectionShell title={t('performance.claimsTitle')}>
         <ClaimsByRoundSection />
-      </div>
+      </SectionShell>
     </div>
   );
 };

@@ -1,24 +1,25 @@
 import { COSMIC_OG_SIZE } from '@/lib/og/CosmicOgCard';
-import { formatOgEyebrow, getOgCopy, getOgImageMetadata } from '@/lib/og/copy';
-import { createCosmicOgImage } from '@/lib/og/createCosmicOgImage';
-import { parseCanonicalNonNegativeSafeInteger } from '@/utils/routeParams';
+import { allocationCard, allocationCardAlt, ogImageMetadata } from '@/lib/og/cards';
 
+/**
+ * A cycle's allocations: the cycle in the headline, beside the cycle's
+ * Signature once the cycle has finalized and imprinted it.
+ */
 export const contentType = 'image/png';
 export const size = COSMIC_OG_SIZE;
+// A cycle gains its Signature when it finalizes; regenerate hourly until then.
+export const revalidate = 3600;
 
 interface ImageProps {
   params: Promise<{ locale: string; id: string }>;
 }
 
 export async function generateImageMetadata({ params }: ImageProps) {
-  const { locale } = await params;
-  return getOgImageMetadata(locale, 'allocation');
+  const { locale, id } = await params;
+  return ogImageMetadata(allocationCardAlt(locale, id));
 }
 
 export default async function Image({ params }: ImageProps) {
   const { locale, id } = await params;
-  const copy = getOgCopy(locale, 'allocation');
-  const eyebrow = formatOgEyebrow(copy, parseCanonicalNonNegativeSafeInteger(id));
-
-  return createCosmicOgImage(locale, { ...copy, eyebrow });
+  return allocationCard(locale, id);
 }

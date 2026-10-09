@@ -10,8 +10,8 @@ import { getLocaleConfig } from '@/i18n/localeConfig';
  * on the marketing host — can use `reportError` without dragging wallet
  * SDKs into the landing client bundle.
  *
- * Contract-revert-specific helpers (`getContractErrorMessage`,
- * `isContractRevertError`, `CUSTOM_ERROR_MESSAGES`) live in
+ * Contract-revert-specific helpers (`getContractErrorDescriptor`,
+ * `withDecodedContractError`, `isEmptyContractReadError`) live in
  * `utils/contractErrors.ts` — import from there when you need them.
  */
 

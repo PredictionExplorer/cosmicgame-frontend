@@ -7,7 +7,10 @@ import {
   type QuizText,
 } from './structure';
 import { quizTextEn } from './text.en';
+import { quizTextJa } from './text.ja';
+import { quizTextKo } from './text.ko';
 import { quizTextUk } from './text.uk';
+import { quizTextVi } from './text.vi';
 import { quizTextZh } from './text.zh';
 import { quizTextZhHk } from './text.zh-HK';
 import { quizTextZhTw } from './text.zh-TW';
@@ -29,6 +32,7 @@ function buildQuizContent(text: QuizText): QuizContent {
       return {
         id: tier.id,
         title: tierText.title,
+        heading: tierText.heading,
         tagline: tierText.tagline,
         description: tierText.description,
         questions: tier.questions.map((question): QuizQuestion => {
@@ -55,6 +59,9 @@ export const quizContentZh: QuizContent = buildQuizContent(quizTextZh);
 export const quizContentZhTw: QuizContent = buildQuizContent(quizTextZhTw);
 export const quizContentZhHk: QuizContent = buildQuizContent(quizTextZhHk);
 export const quizContentUk: QuizContent = buildQuizContent(quizTextUk);
+export const quizContentKo: QuizContent = buildQuizContent(quizTextKo);
+export const quizContentJa: QuizContent = buildQuizContent(quizTextJa);
+export const quizContentVi: QuizContent = buildQuizContent(quizTextVi);
 
 const QUIZ_CONTENT: LocaleRecord<QuizContent> = {
   en: quizContentEn,
@@ -62,6 +69,9 @@ const QUIZ_CONTENT: LocaleRecord<QuizContent> = {
   'zh-TW': quizContentZhTw,
   'zh-HK': quizContentZhHk,
   uk: quizContentUk,
+  ko: quizContentKo,
+  ja: quizContentJa,
+  vi: quizContentVi,
 };
 
 export function getQuizContent(locale: string): QuizContent {

@@ -1,0 +1,19 @@
+{
+  "breadcrumbs": {
+    "home": "ホーム",
+    "terms": "利用規約",
+    "privacy": "プライバシーポリシー",
+    "risk": "リスク開示",
+    "security": "セキュリティ",
+    "audits": "監査",
+    "contracts": "コントラクト",
+    "code": "ソースコード"
+  },
+  "document": {
+    "contents": "このページの内容",
+    "backToTop": "ページの先頭へ",
+    "backToContents": "目次へ戻る",
+    "sectionLink": "「{section}」へのリンク",
+    "revisionHistory": "GitHubの改訂履歴"
+  }
+}

@@ -133,14 +133,38 @@ export async function collectOverflowViolations(page: Page): Promise<OverflowVio
        * element's contents returns the actual line boxes and ignores
        * out-of-flow content, so it answers the question we care about: is any
        * text outside the box?
+       *
+       * Visually hidden text (the `sr-only` pattern: a 1px absolutely
+       * positioned box that clips its content, e.g. "(opens in a new tab)"
+       * inside an external link) still lays out its full line, but none of it
+       * is ever painted, so it is skipped.
        */
+      function visuallyHidden(node: Element | null, boundary: Element): boolean {
+        for (let current = node; current && current !== boundary; current = current.parentElement) {
+          const style = window.getComputedStyle(current);
+          if (
+            style.position === 'absolute' &&
+            style.overflow === 'hidden' &&
+            current.clientWidth <= 1 &&
+            current.clientHeight <= 1
+          ) {
+            return true;
+          }
+        }
+        return false;
+      }
+
       function textSpill(el: Element, contentLeft: number, contentRight: number): number {
-        const range = document.createRange();
-        range.selectNodeContents(el);
+        const walker = document.createTreeWalker(el, NodeFilter.SHOW_TEXT);
         let spill = 0;
-        for (const line of Array.from(range.getClientRects())) {
-          if (line.width === 0) continue;
-          spill = Math.max(spill, line.right - contentRight, contentLeft - line.left);
+        for (let node = walker.nextNode(); node; node = walker.nextNode()) {
+          if (visuallyHidden(node.parentElement, el)) continue;
+          const range = document.createRange();
+          range.selectNodeContents(node);
+          for (const line of Array.from(range.getClientRects())) {
+            if (line.width === 0) continue;
+            spill = Math.max(spill, line.right - contentRight, contentLeft - line.left);
+          }
         }
         return spill;
       }
@@ -184,7 +208,11 @@ export async function collectOverflowViolations(page: Page): Promise<OverflowVio
           }
         }
 
-        // 2. The text fits its own box but an ancestor cuts it off.
+        // 2. The text fits its own box but an ancestor cuts it off. Measured on
+        // the text's line boxes, not the element's box: a standalone explained
+        // term grows a transparent 44px hit area (touch-hit-area padding that a
+        // negative margin hands back), which may reach into a clipped gutter
+        // while every word stays visible.
         for (let parent = el.parentElement; parent; parent = parent.parentElement) {
           const parentStyle = window.getComputedStyle(parent);
           const parentOverflow = parentStyle.overflowX;
@@ -198,7 +226,7 @@ export async function collectOverflowViolations(page: Page): Promise<OverflowVio
           const parentRect = parent.getBoundingClientRect();
           const contentLeft = parentRect.left + parent.clientLeft;
           const contentRight = contentLeft + parent.clientWidth;
-          const spill = Math.max(rect.right - contentRight, contentLeft - rect.left);
+          const spill = textSpill(el, contentLeft, contentRight);
           if (spill > tolerance) {
             violations.push({ type: 'clipped', selector: describe(el), overflowBy: spill, text });
           }
@@ -246,6 +274,38 @@ export async function collectTapTargetViolations(page: Page): Promise<TapTargetV
       function isTextLink(el: Element): boolean {
         if (el.tagName !== 'A') return false;
         return (el.textContent ?? '').trim().length > 0;
+      }
+
+      /**
+       * Whether an inline control flows inside a sentence: visible text
+       * beside it, directly or around the inline elements that wrap it, up
+       * to the first box that is not inline. That is WCAG 2.5.8's inline
+       * exception, measured here rather than taken from the component, so
+       * a figure label or a heading made of the term alone is still held to
+       * the full size.
+       */
+      function sitsInSentence(el: Element): boolean {
+        let node: Element = el;
+        for (let parent = el.parentElement; parent; parent = parent.parentElement) {
+          for (const sibling of Array.from(parent.childNodes)) {
+            if (sibling === node) continue;
+            if (sibling.nodeType === Node.TEXT_NODE) {
+              if (/\S/.test(sibling.textContent ?? '')) return true;
+              continue;
+            }
+            if (!(sibling instanceof HTMLElement) || sibling.hidden) continue;
+            if (sibling.hasAttribute('data-explain-companion')) continue;
+            if (
+              window.getComputedStyle(sibling).display === 'inline' &&
+              /\S/.test(sibling.textContent ?? '')
+            ) {
+              return true;
+            }
+          }
+          if (window.getComputedStyle(parent).display !== 'inline') return false;
+          node = parent;
+        }
+        return false;
       }
 
       /**
@@ -329,8 +389,17 @@ export async function collectTapTargetViolations(page: Page): Promise<TapTargetV
         if (style.display === 'none' || style.visibility === 'hidden') continue;
         if (style.pointerEvents === 'none') continue;
 
-        // Inline links flowing inside body copy are exempt from target sizing.
+        // Inline links flowing inside body copy are exempt from target sizing,
+        // and so is an explained word (an inline role="button") inside a
+        // sentence. A standalone one is measured like any other control.
         if (el.tagName === 'A' && style.display === 'inline') continue;
+        if (
+          el.getAttribute('role') === 'button' &&
+          style.display === 'inline' &&
+          sitsInSentence(el)
+        ) {
+          continue;
+        }
 
         const rect = el.getBoundingClientRect();
         if (rect.width === 0 || rect.height === 0) continue;

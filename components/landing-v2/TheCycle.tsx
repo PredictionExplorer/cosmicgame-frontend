@@ -1,78 +1,86 @@
-'use client';
-
-import { motion, useScroll, useTransform } from 'framer-motion';
-import { useRef } from 'react';
+import { ArrowRight } from 'lucide-react';
+import { useLocale } from 'next-intl';
 
 import type { LandingContent } from '@/content/landing';
 
-import { SectionHeading } from './SectionHeading';
+import { classifyHref } from '@/config/siteNav';
+import { localizeCrossHostHref } from '@/lib/hostRouting';
+import { cn } from '@/lib/utils';
+import { SiteLink } from '@/components/layout/SiteLink';
+import { buttonVariants } from '@/components/ui/button';
 
-export function TheCycle({ cycle }: { cycle: LandingContent['cycle'] }) {
-  const sectionRef = useRef<HTMLElement | null>(null);
-  const { scrollYProgress } = useScroll({
-    target: sectionRef,
-    offset: ['start end', 'end start'],
-  });
+import { CycleDiagram } from './CycleDiagram';
+import { LandingSection, SectionHeading } from './SectionHeading';
+import styles from './Landing.module.css';
 
-  const lineProgress = useTransform(scrollYProgress, [0.1, 0.9], ['0%', '100%']);
+/**
+ * How a cycle works, drawn and then told: the cycle's time line (gestures
+ * pushing the finalization time out, the clock reaching zero, the reserve
+ * fanning into the tracks of the next section), captioned by three numbered
+ * steps, one under each zone of the drawing, and the way to take the first
+ * one: a gesture in the app, or the full walkthrough. From 64rem the actions
+ * sit beside the heading; on phones they close the section. The Calibration
+ * Window mechanics live in the FAQ and on How it works, not here.
+ */
+export function TheCycle({
+  cycle,
+  tracks,
+}: {
+  cycle: LandingContent['cycle'];
+  /** The ETH tracks the drawing's fan ends in (`content.tracks.eth`). */
+  tracks: LandingContent['tracks']['eth'];
+}) {
+  const locale = useLocale();
+  const gesture = cycle.gestureCta;
+  const guide = cycle.guideCta;
 
   return (
-    <section
-      id="cycle"
-      ref={sectionRef}
-      className="relative border-t border-white/10 bg-[#0D0521] py-28 sm:py-40"
-    >
-      <div className="mx-auto max-w-7xl px-6 lg:px-12">
+    <LandingSection id="cycle" labelledBy="landing-cycle-heading">
+      <div className={styles.cycleLayout}>
         <SectionHeading
           eyebrow={cycle.eyebrow}
           heading={cycle.heading}
-          description={cycle.description}
+          headingId="landing-cycle-heading"
+          className={styles.cycleIntro}
         />
-
-        <div className="relative mt-20 grid gap-10 lg:grid-cols-[72px_1fr] lg:gap-16">
-          <div className="relative hidden lg:block">
-            <div
-              className="absolute left-1/2 top-0 h-full w-px -translate-x-1/2 bg-white/10"
-              aria-hidden
-            />
-            <motion.div
-              className="absolute left-1/2 top-0 w-px -translate-x-1/2 bg-gradient-to-b from-[oklch(84.7%_0.149_213)] via-[oklch(50.4%_0.247_296)] to-[oklch(67.2%_0.228_4)]"
-              style={{ height: lineProgress }}
-              aria-hidden
-            />
-          </div>
-
-          <ol className="space-y-10">
-            {cycle.stages.map((stage, idx) => (
-              <motion.li
-                key={stage.number}
-                initial={{ opacity: 0, y: 24 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true, amount: 0.4 }}
-                transition={{ duration: 0.6, delay: idx * 0.08, ease: [0.22, 1, 0.36, 1] }}
-                className="group relative grid grid-cols-[auto_1fr] gap-6 rounded-2xl border border-white/10 bg-white/[0.02] p-6 transition hover:border-white/20 hover:bg-white/[0.04] sm:p-8 md:grid-cols-[64px_1fr] md:gap-8"
-              >
-                <div className="relative">
-                  <div className="flex h-12 w-12 items-center justify-center rounded-full border border-white/20 bg-white/5 font-mono text-sm text-white/70 md:h-16 md:w-16 md:text-base">
-                    {stage.number}
-                  </div>
-                </div>
-                <div>
-                  <h3
-                    className="text-xl font-semibold text-white sm:text-2xl md:text-3xl"
-                    style={{ fontFamily: 'var(--font-family-display)' }}
-                  >
-                    {stage.title}
-                  </h3>
-                  <p className="mt-3 text-base leading-relaxed text-white/70 md:text-lg">
-                    {stage.body}
-                  </p>
-                </div>
-              </motion.li>
-            ))}
-          </ol>
+        <CycleDiagram tracks={tracks} />
+        {/* The steps caption the drawing's three zones, set as every numbered
+            sequence is (Steps): the index in the label face, the title at
+            type-heading-3, the body at type-body-sm. */}
+        <ol className={styles.steps}>
+          {cycle.steps.map((step) => (
+            <li key={step.number} className={styles.step}>
+              <span aria-hidden className="type-label pt-1 tabular-nums text-subtle">
+                {step.number}
+              </span>
+              <div className="min-w-0">
+                <h3 className="type-heading-3">{step.title}</h3>
+                <p className="type-body-sm mt-1.5 max-w-[48ch] text-muted-foreground">
+                  {step.body}
+                </p>
+              </div>
+            </li>
+          ))}
+        </ol>
+        <div className={cn(styles.sectionActions, styles.cycleActions)}>
+          <SiteLink
+            href={localizeCrossHostHref(gesture.href, locale)}
+            kind={classifyHref(gesture.href, 'landing')}
+            className={cn(buttonVariants({ variant: 'default', size: 'lg' }), 'no-underline')}
+          >
+            {gesture.label}
+            <ArrowRight aria-hidden />
+          </SiteLink>
+          <SiteLink
+            href={localizeCrossHostHref(guide.href, locale)}
+            kind={classifyHref(guide.href, 'landing')}
+            className="link-quiet type-body-md inline-flex min-h-11 items-center gap-1.5 text-foreground"
+          >
+            {guide.label}
+            <ArrowRight aria-hidden className="size-4 text-subtle" />
+          </SiteLink>
         </div>
       </div>
-    </section>
+    </LandingSection>
   );
 }

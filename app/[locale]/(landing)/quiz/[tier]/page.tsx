@@ -1,32 +1,58 @@
-import type { Metadata } from 'next';
+import type { Metadata, ResolvingMetadata } from 'next';
 import { notFound } from 'next/navigation';
 import { getTranslations, setRequestLocale } from 'next-intl/server';
 
-import { QUIZ_PATH, QUIZ_TIER_IDS, getQuizContent, isQuizTierId } from '@/content/quiz';
+import {
+  QUIZ_PATH,
+  QUIZ_TIER_IDS,
+  getQuizContent,
+  isQuizTierId,
+  type QuizRunnerUi,
+} from '@/content/quiz';
+import { getLearnContent } from '@/content/learn';
 
+import { notFoundMetadata } from '@/components/layout/notFoundMetadata';
+import { PageHeader } from '@/components/layout/PageHeader';
+import { MetaItems } from '@/components/reading/MetaItems';
+import { DifficultyMeter } from '@/components/quiz/DifficultyMeter';
 import { QuizRunner } from '@/components/quiz/QuizRunner';
-import { Link } from '@/i18n/navigation';
+import {
+  RANK_BANDS,
+  estimatedMinutes,
+  fillTemplate,
+  type QuizRankKey,
+} from '@/components/quiz/quizProgress';
+import { ReadingMain } from '@/components/reading/ReadingMain';
 import { LANDING_ORIGIN, localeHref } from '@/lib/hostRouting';
+import { formatCount, formatPercent } from '@/utils/format/numbers';
 import { JsonLd, breadcrumbJsonLd, jsonLdInLanguage } from '@/utils/jsonLd';
-import { createMetadata } from '@/utils/seo';
+import { createPageMetadata } from '@/utils/seo';
 
 interface PageProps {
   params: Promise<{ locale: string; tier: string }>;
 }
 
-export const dynamicParams = false;
-
 export function generateStaticParams() {
   return QUIZ_TIER_IDS.map((tier) => ({ tier }));
 }
 
-export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
+// Every tier is prerendered. proxy.ts answers any other tier before routing
+// (lib/paramRoutes.ts) with app/global-not-found.tsx, the landing chrome
+// rendered on the server; this is the backstop, which Next.js reaches only
+// by logging an internal NoFallbackError.
+export const dynamicParams = false;
+
+export async function generateMetadata(
+  { params }: PageProps,
+  parent: ResolvingMetadata,
+): Promise<Metadata> {
   const { locale, tier } = await params;
   setRequestLocale(locale);
-  if (!isQuizTierId(tier)) return {};
+  if (!isQuizTierId(tier)) return notFoundMetadata(locale);
   const t = await getTranslations({ locale, namespace: 'meta' });
 
-  return createMetadata(
+  return createPageMetadata(
+    parent,
     t(`quiz.tiers.${tier}.title`),
     t(`quiz.tiers.${tier}.description`),
     undefined,
@@ -38,18 +64,44 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   );
 }
 
+/**
+ * Where each rank starts, for the ladder ("From 50%"), and where the first
+ * one ends ("Below 50%"), so every step of the ladder carries its range.
+ */
+function rankFloors(ui: QuizRunnerUi, locale: string): Record<QuizRankKey, string> {
+  const lowestFloor = Math.min(
+    ...RANK_BANDS.filter(({ threshold }) => threshold > 0).map(({ threshold }) => threshold),
+  );
+  return Object.fromEntries(
+    RANK_BANDS.map(({ rank, threshold }) => [
+      rank,
+      threshold === 0
+        ? fillTemplate(ui.intro.rankBelowTemplate, {
+            percent: formatPercent(lowestFloor * 100, locale),
+          })
+        : fillTemplate(ui.intro.rankFromTemplate, {
+            percent: formatPercent(threshold * 100, locale),
+          }),
+    ]),
+  ) as Record<QuizRankKey, string>;
+}
+
 export default async function QuizTierPage({ params }: PageProps) {
   const { locale, tier: tierParam } = await params;
   setRequestLocale(locale);
   if (!isQuizTierId(tierParam)) notFound();
 
   const { hub, ui, tiers } = getQuizContent(locale);
-  const tier = tiers.find((candidate) => candidate.id === tierParam);
+  const learnLabel = getLearnContent(locale).hub.breadcrumbs.learnLabel;
+  const tierIndex = tiers.findIndex((candidate) => candidate.id === tierParam);
+  const tier = tiers[tierIndex];
   if (!tier) notFound();
+  const nextTier = tiers[tierIndex + 1];
 
   const t = await getTranslations({ locale, namespace: 'meta' });
   const inLanguage = jsonLdInLanguage(locale);
   const pageUrl = localeHref(LANDING_ORIGIN, `${QUIZ_PATH}/${tier.id}`, locale);
+  const questionCount = tier.questions.length;
 
   const quizJsonLd = {
     '@context': 'https://schema.org',
@@ -65,12 +117,13 @@ export default async function QuizTierPage({ params }: PageProps) {
   };
 
   return (
-    <main id="main" tabIndex={-1} className="relative mx-auto max-w-3xl px-6 py-24 lg:py-32">
+    <ReadingMain>
       <JsonLd
         data={[
           breadcrumbJsonLd(
             [
               { name: hub.breadcrumbs.homeLabel, path: '/' },
+              { name: learnLabel, path: '/learn' },
               { name: hub.breadcrumbs.quizLabel, path: QUIZ_PATH },
               { name: tier.title, path: `${QUIZ_PATH}/${tier.id}` },
             ],
@@ -80,33 +133,60 @@ export default async function QuizTierPage({ params }: PageProps) {
         ]}
       />
 
-      <nav aria-label={hub.breadcrumbs.ariaLabel} className="mb-8 text-sm text-white/60">
-        <Link href="/" className="hover:text-white">
-          {hub.breadcrumbs.homeLabel}
-        </Link>
-        <span className="mx-2">/</span>
-        <Link href={QUIZ_PATH} className="hover:text-white">
-          {hub.breadcrumbs.quizLabel}
-        </Link>
-        <span className="mx-2">/</span>
-        <span className="text-white/80">{tier.title}</span>
-      </nav>
+      {/* The header keeps the site's content edge, like every reading page;
+          the runner holds to the reading measure with its rank panel beside it. */}
+      <PageHeader
+        variant="reading"
+        host="landing"
+        breadcrumbs={[
+          { label: learnLabel, href: '/learn' },
+          { label: hub.breadcrumbs.quizLabel, href: QUIZ_PATH },
+        ]}
+        title={tier.heading}
+        subtitle={tier.description}
+        meta={
+          <span className="inline-flex flex-wrap items-center gap-x-2.5 gap-y-1">
+            <MetaItems
+              items={[
+                <span key="count" className="tabular-nums">
+                  {fillTemplate(hub.questionCountTemplate, {
+                    count: formatCount(questionCount, locale),
+                  })}
+                </span>,
+                <span key="duration" className="tabular-nums">
+                  {fillTemplate(hub.durationTemplate, {
+                    minutes: estimatedMinutes(questionCount),
+                  })}
+                </span>,
+                <span key="difficulty" className="inline-flex items-center gap-2">
+                  <DifficultyMeter
+                    level={tierIndex + 1}
+                    max={tiers.length}
+                    label={fillTemplate(hub.difficultyTemplate, {
+                      level: tierIndex + 1,
+                      max: tiers.length,
+                    })}
+                  />
+                </span>,
+              ]}
+            />
+          </span>
+        }
+      />
 
-      <header>
-        <p className="font-mono text-xs uppercase tracking-[0.28em] text-white/50">
-          {hub.eyebrow}
-          {' · '}
-          {hub.questionCountTemplate.replace('{count}', String(tier.questions.length))}
-        </p>
-        <h1 className="mt-4 text-balance text-4xl font-semibold tracking-tight text-white sm:text-5xl">
-          {tier.title}
-        </h1>
-        <p className="mt-6 text-lg leading-8 text-white/78">{tier.description}</p>
-      </header>
-
-      <div className="mt-10">
-        <QuizRunner tier={tier} ui={ui} hubHref={QUIZ_PATH} />
+      <div>
+        <QuizRunner
+          tier={tier}
+          ui={ui}
+          locale={locale}
+          hubHref={QUIZ_PATH}
+          rankFloors={rankFloors(ui, locale)}
+          bestTemplate={hub.bestTemplate}
+          nextTier={
+            nextTier ? { title: nextTier.title, href: `${QUIZ_PATH}/${nextTier.id}` } : undefined
+          }
+        />
       </div>
-    </main>
+    </ReadingMain>
   );
 }

@@ -19,6 +19,43 @@ beforeEach(() => {
   global.fetch = fetchMock;
 });
 
+describe('seed reads under a rate limit', () => {
+  it('asks again after a 429 instead of seeding nothing', async () => {
+    const tooManyRequests = {
+      ok: false,
+      status: 429,
+      headers: new Headers({ 'retry-after': '0' }),
+      json: jest.fn(),
+    } as unknown as Response;
+    fetchMock.mockResolvedValueOnce(tooManyRequests).mockResolvedValueOnce(
+      response({
+        BidsByRound: [
+          {
+            RoundNum: 3,
+            BidderAddr: '0x1111111111111111111111111111111111111111',
+            BidType: 0,
+            EthPriceEth: 0.01,
+            Message: '',
+            Tx: {
+              EvtLogId: 9,
+              BlockNum: 123,
+              TxId: 9,
+              TxHash: '0xhash',
+              TimeStamp: 1_700_000_000,
+              DateTime: '2023-11-14T22:13:20Z',
+            },
+          },
+        ],
+      }),
+    );
+
+    const seed = await getLatestGestureSeed(3);
+
+    expect(fetchMock).toHaveBeenCalledTimes(2);
+    expect(seed).toMatchObject({ EvtLogId: 9 });
+  });
+});
+
 describe('home intelligence server seeds', () => {
   it('fetches only the newest gesture and normalizes its transaction envelope', async () => {
     fetchMock.mockResolvedValue(
@@ -90,6 +127,21 @@ describe('home intelligence server seeds', () => {
   it('fails soft when a seed endpoint is unavailable', async () => {
     fetchMock.mockResolvedValue(response({}, false));
     await expect(getCurrentSpecialRecipientsSeed()).resolves.toBeNull();
+  });
+
+  // A slow API must not hold the ISR render up: every seed read carries the
+  // server read deadline, and one that runs out is a missing seed.
+  it('bounds every seed read by the server read timeout', async () => {
+    fetchMock.mockResolvedValue(response({}));
+    await getCurrentSpecialRecipientsSeed();
+
+    const init = fetchMock.mock.calls[0]?.[1] as RequestInit;
+    expect(init.signal).toBeInstanceOf(AbortSignal);
+  });
+
+  it('reads a timed-out seed as missing', async () => {
+    fetchMock.mockRejectedValue(new DOMException('The operation timed out.', 'TimeoutError'));
+    await expect(getLatestGestureSeed(7)).resolves.toBeNull();
   });
 
   it('fetches a coherent chain-clock sample for first paint', async () => {

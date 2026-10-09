@@ -1,18 +1,32 @@
 {
-  "protocol": {
-    "title": "协议公共物品资助",
-    "subtitle": "Cosmic Signature 协议自动转入公共物品金库的资金",
-    "description": "每个周期，协议都会自动将一定比例的周期储备转入公共物品金库。宇宙议会协调确定资金流向的公共物品受益方，让协议参与与生态建设直接相连。"
+  "loadError": "无法加载公共物品记录。",
+  "vault": {
+    "description": "每个周期收官时，周期储备中的公共物品份额转入金库，并在此等待为 {beneficiary} 取回。",
+    "due": "本周期应转入",
+    "dueCaption": "目前周期储备的 {percent}",
+    "inVault": "金库现存",
+    "retrieved": "累计已取回",
+    "beneficiaryNote": "<guild>Protocol Guild</guild> 是资助以太坊核心贡献者的集体机制。",
+    "forwardNote": "任何人都可以把金库余额转拨给 Protocol Guild，只需支付 Gas 费。"
   },
-  "voluntary": {
-    "title": "自愿公共物品资助",
-    "subtitle": "社区成员自愿转入公共物品金库的资金",
-    "description": "除协议自动转拨外，社区成员也可自愿向公共物品金库贡献资金。这些链上记录展现了 Cosmic Signature 社区对公共物品建设的持续支持。"
+  "ledger": {
+    "contributions": "资助记录",
+    "retrievals": "取回记录"
   },
-  "retrievals": {
-    "title": "公共物品取回",
-    "subtitle": "从公共物品金库取回的资金",
-    "description": "此处记录 Cosmic Signature 公共物品金库的全部取回操作。每笔资金都会转拨给由宇宙议会协调选定的公共物品受益方。"
-  },
-  "loading": "加载中…"
+  "contribute": {
+    "title": "向金库资助",
+    "description": "在 {network} 上将 ETH 直接发送到公共物品金库。它会与协议份额一起在金库中等待为 {beneficiary} 取回。",
+    "networkWarning": "仅限在 {network} 上发送。在其他网络上发往此地址的 ETH 不会进入金库。",
+    "network": "网络",
+    "form": {
+      "label": "向公共物品金库资助 ETH",
+      "amountHint": "任意大于 0 的数量，从 {network} 上的钱包发送。",
+      "connectHint": "连接 {network} 上的钱包即可资助。",
+      "summary": "{amount} 将进入公共物品金库，为 {beneficiary} 保管。",
+      "submit": "资助 ETH",
+      "submitAmount": "资助 {amount}",
+      "confirmed": "向公共物品金库资助的 {amount} ETH 已确认。",
+      "failed": "资助未能完成。请检查钱包后重试。"
+    }
+  }
 }

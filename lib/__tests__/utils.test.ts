@@ -5,6 +5,24 @@ describe('cn', () => {
     expect(cn('foo', 'bar')).toBe('foo bar');
   });
 
+  it('lets a later type utility replace an earlier one', () => {
+    expect(cn('type-title text-foreground', 'type-eyebrow')).toBe('text-foreground type-eyebrow');
+  });
+
+  it("lets a caller's type utility replace a primitive's size, weight and leading", () => {
+    expect(cn('text-lg font-semibold leading-none tracking-tight', 'type-heading-3')).toBe(
+      'type-heading-3',
+    );
+  });
+
+  it('keeps a deliberate size override after a type utility', () => {
+    expect(cn('type-body-sm', 'text-xs')).toBe('type-body-sm text-xs');
+  });
+
+  it('leaves colour classes beside a type utility alone', () => {
+    expect(cn('type-label text-subtle')).toBe('type-label text-subtle');
+  });
+
   it('handles a single class name', () => {
     expect(cn('foo')).toBe('foo');
   });

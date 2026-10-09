@@ -22,7 +22,7 @@ describe('e2e locale fixtures', () => {
       chrome.footer.terms,
       chrome.footer.privacy,
       chrome.nav.gallery,
-      chrome.nav.help,
+      chrome.nav.learn,
       chrome.siteMap.heading,
       chrome.skipLink,
       chrome.landingText,

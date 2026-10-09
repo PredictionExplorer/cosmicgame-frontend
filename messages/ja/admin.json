@@ -1,0 +1,81 @@
+{
+  "tools": {
+    "label": "運営ツール",
+    "moderation": "メッセージ管理",
+    "settings": "コントラクト設定",
+    "outreachTransfer": "広報送付"
+  },
+  "wallet": {
+    "connected": "接続中のウォレット",
+    "notConnected": "ウォレット未接続",
+    "restoring": "ウォレットの接続を復元しています…",
+    "rolesLabel": "このウォレットのオンチェーンの役割",
+    "rolesError": "オンチェーンの役割を読み取れませんでした。",
+    "rolesPartial": "一部のオンチェーンの役割を読み取れませんでした。",
+    "roles": {
+      "protocolOwner": "プロトコル所有者",
+      "outreachOwner": "広報準備金の所有者",
+      "outreachTreasurer": "広報準備金の財務担当者",
+      "none": "オンチェーンの役割なし"
+    }
+  },
+  "moderation": {
+    "title": "一筆のメッセージ管理",
+    "subtitle": "このサイトで一筆のメッセージを非表示にしたり、元に戻したりします。非表示にしたメッセージもオンチェーンには残り、サイトに表示されなくなるだけです。",
+    "heading": "一筆のメッセージ",
+    "description": "メッセージ付きのすべての一筆です。表示状態、サイクル、テキストで絞り込めます。",
+    "readOnly": "閲覧のみです。メッセージを非表示にしたり元に戻したりするには、モデレーターのウォレットを接続してください。",
+    "noRole": "このウォレットにはオンチェーンの運営の役割がないため、メッセージを非表示にしたり元に戻したりできません。メッセージを管理するには、運営のウォレットを接続してください。",
+    "loadError": "一筆のメッセージを読み込めませんでした。",
+    "clearSearch": "検索をクリア"
+  },
+  "settings": {
+    "title": "コントラクト設定",
+    "subtitle": "ダッシュボードが報告するプロトコルのコントラクトアドレスとパラメーターです。閲覧のみで、これらの値はプロトコル所有者だけがオンチェーンで変更できます。",
+    "loadError": "コントラクト設定を読み込めませんでした。",
+    "contractsDescription": "すべてのプロトコルコントラクトと、Arbiscanのアドレス、検証済みの場合はSourcifyのソースコードです。",
+    "groups": {
+      "contracts": "コントラクト",
+      "cost": "一筆の費用"
+    },
+    "values": {
+      "divisorPercent": "{percent}（除数{divisor}）"
+    },
+    "status": {
+      "active": "有効",
+      "scheduled": "予定"
+    },
+    "fields": {
+      "timeIncrease": "サイクルごとの時間増分の増加率",
+      "activationTime": "有効化時刻",
+      "calibrationWindowLength": "サイクル開始時のCST調律期間の長さ"
+    }
+  },
+  "outreachTransfer": {
+    "title": "CST広報送付",
+    "subtitle": "広報準備金から参加者にCSTを送付します。送付できるのは準備金の財務担当者のウォレットだけです。",
+    "treasurer": "財務担当者",
+    "owner": "所有者",
+    "walletRequiredTitle": "CSTを送付するには財務担当者のウォレットを接続してください",
+    "walletRequiredDescription": "接続すると、このページに広報準備金の残高が表示され、財務担当者にはCSTの送付フォームが表示されます。",
+    "walletUnavailableTitle": "広報準備金のアドレスを利用できません",
+    "walletUnavailableDescription": "ダッシュボードはまだ広報準備金のアドレスを提供していません。しばらくしてからページを再読み込みしてください。",
+    "rolesErrorTitle": "広報準備金の役割を読み取れませんでした",
+    "rolesErrorDescription": "財務担当者のアドレスがないため、このウォレットが送付できるか判断できません。",
+    "restrictedTitle": "このウォレットは財務担当者ではありません",
+    "restrictedDescription": "広報準備金からCSTを送付できるのは財務担当者だけです。続けるには財務担当者のウォレットを接続してください。",
+    "form": {
+      "title": "CSTを送付",
+      "description": "1回のトランザクションで、金額が広報準備金から受領者へ移ります。取り消すことはできません。",
+      "submit": "CSTを送付",
+      "reserveHeading": "広報準備金",
+      "reserve": "準備金のアドレス",
+      "balance": "CST残高",
+      "history": "広報準備金の送付履歴",
+      "balanceError": "準備金のCST残高を読み取れませんでした。",
+      "confirmed": "広報準備金からCSTを送付しました。",
+      "failed": "CSTを送付できませんでした。ウォレットを確認して、もう一度お試しください。",
+      "sendAmount": "{amount}を送付"
+    }
+  }
+}

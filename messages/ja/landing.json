@@ -1,0 +1,70 @@
+{
+  "timer": {
+    "cycle": {
+      "current": "現在のサイクル",
+      "numbered": "サイクル{number}",
+      "generic": "パフォーマンス・サイクル"
+    },
+    "phases": {
+      "loading": {
+        "title": "サイクル確定時刻を読み込んでいます"
+      },
+      "openingSoon": {
+        "title": "{cycle}はまもなく始まります"
+      },
+      "waitingFirstGesture": {
+        "title": "{cycle}は最初の一筆を待っています",
+        "body": "最初の一筆で確定までのカウントダウンが始まり、次のシグネチャーが形づくられていきます。"
+      },
+      "approach": {
+        "title": "{cycle}の確定まで"
+      },
+      "finalHour": {
+        "title": "{cycle}は最後の1時間に入りました"
+      },
+      "finalMinutes": {
+        "title": "{cycle}は最後の数分に入りました"
+      },
+      "ready": {
+        "title": "{cycle}を確定できます",
+        "state": "確定できます",
+        "body": "新しい一筆でまだサイクルを延長できます。最後の一筆を記した参加者は、今すぐサイクルを確定できます。"
+      },
+      "confirming": {
+        "title": "{cycle}のカウントダウンがゼロになりました",
+        "state": "確認中",
+        "body": "直前の一筆で確定時刻が延びていないか、チェーン上で確認しています。"
+      },
+      "unavailable": {
+        "title": "現在のサイクル時刻を取得できません",
+        "body": "サイクル時刻を取得できませんでした。最新の状態はアプリで確認してください。"
+      },
+      "live": {
+        "title": "{cycle}の確定まで"
+      }
+    },
+    "liveClock": "ライブのサイクル時計",
+    "cycleClock": "サイクルの時計",
+    "gestureCount": "{count, plural, other {#筆}}",
+    "duration": {
+      "days": "{count, plural, other {#日}}",
+      "hours": "{count, plural, other {#時間}}",
+      "minutes": "{count, plural, other {#分}}",
+      "seconds": "{count, plural, other {#秒}}"
+    },
+    "currentCycle": "現在のサイクルを開く",
+    "noscript": "ライブの時計にはJavaScriptが必要です。アプリでは現在のサイクルをいつでも確認できます。",
+    "durationSeparator": " "
+  },
+  "artwork": {
+    "previous": "前の作品",
+    "next": "次の作品",
+    "pauseRotation": "作品の切り替えを一時停止",
+    "resumeRotation": "作品の切り替えを再開",
+    "playAnimation": "アニメーションを再生",
+    "pauseAnimation": "アニメーションを一時停止",
+    "resumeAnimation": "アニメーションを再開",
+    "replayAnimation": "もう一度再生",
+    "unavailable": "アートワークを利用できません"
+  }
+}

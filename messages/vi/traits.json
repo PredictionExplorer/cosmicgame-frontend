@@ -1,0 +1,251 @@
+{
+  "types": {
+    "structure": "Cấu trúc",
+    "underlay": "Nền lót",
+    "accent": "Điểm nhấn",
+    "symmetry": "Đối xứng",
+    "projection": "Phép chiếu",
+    "wildcard": "Ẩn số",
+    "finish": "Hoàn thiện",
+    "palette": "Bảng màu",
+    "spectralClass": "Lớp quang phổ",
+    "massBalance": "Cân bằng khối lượng",
+    "fate": "Vận mệnh",
+    "chaos": "Hỗn độn",
+    "syzygies": "Sóc vọng",
+    "cycle": "Chu kỳ",
+    "imprinted": "Đã khắc",
+    "allocation": "Phân bổ"
+  },
+  "hints": {
+    "structure": "Kiểu nét chính dùng để thể hiện ba quỹ đạo.",
+    "underlay": "Lớp nét phụ, mờ hơn, nằm dưới cấu trúc chính.",
+    "accent": "Các điểm sáng thưa được vẽ lên trên cấu trúc.",
+    "symmetry": "Phép gấp áp lên bố cục: gương, hoa thị hoặc mandala.",
+    "projection": "Không gian tọa độ mà các quỹ đạo được vẽ trong đó.",
+    "wildcard": "Một biến thể hiếm gặp phá vỡ các quy tắc kết xuất thông thường.",
+    "finish": "Hiệu ứng hậu xử lý áp lên khung hình cuối.",
+    "palette": "Nhóm màu và cách phối màu của ba vật thể.",
+    "spectralClass": "Lớp màu sao của vật thể chủ đạo, từ O xanh trắng đến M đỏ.",
+    "massBalance": "Tương quan khối lượng giữa ba vật thể: một vật thể chính nặng hơn, một cặp tương đương hoặc ba vật thể cân bằng.",
+    "fate": "Kết cục mô phỏng: ba vật thể tiếp tục chuyển động cùng nhau hoặc một vật thể bị phóng xuất.",
+    "chaos": "Độ nhạy với điều kiện ban đầu, chấm từ 0 (trật tự) đến 100 (hỗn loạn).",
+    "syzygies": "Những khoảnh khắc cả ba vật thể xếp thẳng hàng.",
+    "cycle": "Chu kỳ trình diễn trong đó NFT được khắc.",
+    "imprinted": "Thời điểm NFT được khắc trên Arbitrum.",
+    "allocation": "Phân bổ đã đưa NFT này đến người nhận đầu tiên."
+  },
+  "values": {
+    "vocabulary": {
+      "orbitRibbons": "Dải quỹ đạo",
+      "timeChords": "Hợp âm thời gian",
+      "harmonicWeave": "Dệt hài hòa",
+      "tangentCaustics": "Tụ quang tiếp tuyến",
+      "stippleConstellation": "Chòm sao chấm",
+      "nebulaVeil": "Màn tinh vân"
+    },
+    "symmetry": {
+      "mirror": "Gương",
+      "rosette": "Hoa thị ×{n}",
+      "mandala": "Mandala ×{n}"
+    },
+    "projection": {
+      "crossBraid": "Đan chéo",
+      "phasePortrait": "Chân dung pha",
+      "hodograph": "Hodograph"
+    },
+    "wildcard": {
+      "yes": "Có"
+    },
+    "finish": {
+      "stardust": "Bụi sao",
+      "prism": "Lăng kính"
+    },
+    "massBalance": {
+      "heavyPrimary": "Sao chính nặng",
+      "twinBinary": "Sao đôi song sinh",
+      "equalTrio": "Bộ ba cân bằng"
+    },
+    "fate": {
+      "eternalDance": "Vũ điệu vĩnh cửu",
+      "ejection": "Phóng xuất"
+    },
+    "allocation": {
+      "stellarSelection": "Tinh tuyển",
+      "anchoredSelection": "Tinh tuyển neo giữ",
+      "finalGesture": "Nét bút cuối cùng",
+      "lastCstGesture": "Nét bút CST cuối cùng",
+      "enduranceChampion": "Quán quân Bền bỉ",
+      "chronoWarrior": "Chiến binh Thời gian"
+    },
+    "palette": {
+      "pattern": "{hue} {scheme}",
+      "hues": {
+        "amber": "Hổ phách",
+        "aurora": "Cực quang",
+        "cerulean": "Thiên thanh",
+        "ember": "Than hồng",
+        "glacial": "Băng hà",
+        "jade": "Ngọc bích",
+        "nebular": "Tinh vân",
+        "orchid": "Lan",
+        "rose": "Hồng",
+        "sapphire": "Lam ngọc",
+        "solar": "Mặt trời",
+        "violet": "Tím"
+      },
+      "schemes": {
+        "mono": "đơn sắc",
+        "split": "phân tách",
+        "analogous": "tương đồng",
+        "triad": "bộ ba",
+        "complementary": "bổ túc",
+        "tetrad": "bộ bốn"
+      }
+    },
+    "spectralClass": {
+      "O": {
+        "label": "Lớp O",
+        "tone": "Xanh lam, lớp nóng nhất"
+      },
+      "B": {
+        "label": "Lớp B",
+        "tone": "Xanh trắng"
+      },
+      "A": {
+        "label": "Lớp A",
+        "tone": "Trắng"
+      },
+      "F": {
+        "label": "Lớp F",
+        "tone": "Vàng trắng"
+      },
+      "G": {
+        "label": "Lớp G",
+        "tone": "Vàng, như Mặt Trời"
+      },
+      "K": {
+        "label": "Lớp K",
+        "tone": "Cam"
+      },
+      "M": {
+        "label": "Lớp M",
+        "tone": "Đỏ, lớp lạnh nhất"
+      }
+    }
+  },
+  "groups": {
+    "composition": "Bố cục",
+    "physics": "Vật lý quỹ đạo",
+    "provenance": "Nguồn gốc",
+    "media": "Hình ảnh và video"
+  },
+  "card": {
+    "chaosAria": "Hỗn độn {value} trên {max}",
+    "hueStripAria": "Sắc màu bảng màu của ba vật thể",
+    "spectralAria": "Lớp quang phổ {value}",
+    "fateAria": "Vận mệnh: {value}",
+    "quickView": "Xem nhanh",
+    "quickViewAria": "Xem nhanh Cosmic Signature {id}",
+    "traitsPending": "Đang chờ dữ liệu đặc tính",
+    "traitSummary": "{structure} · {palette}",
+    "cycleLong": "Chu kỳ {n}",
+    "viewCycle": "Xem chu kỳ {n}",
+    "anchoredState": "Đang neo giữ"
+  },
+  "rarity": {
+    "rank": "#{rank}",
+    "rankLabel": "Hạng độ hiếm",
+    "rankOf": "Hạng {rank} trên {total}",
+    "tooltip": "Hạng độ hiếm {rank} trên {total}: các đặc tính của Signature này hiếm đến mức nào trong toàn bộ sưu tập. Đặc tính hiếm nhất: {trait}.",
+    "tooltipNoTrait": "Hạng độ hiếm {rank} trên {total}: các đặc tính của Signature này hiếm đến mức nào trong toàn bộ sưu tập.",
+    "rarest": "Đặc tính hiếm nhất",
+    "share": "{count} trên {total} có chung đặc tính này",
+    "shareShort": "{count}/{total}",
+    "unavailable": "Chưa xếp hạng"
+  },
+  "facets": {
+    "title": "Đặc tính",
+    "clearAll": "Xóa tất cả",
+    "clearFacet": "Xóa {trait}",
+    "activeAria": "Bộ lọc đặc tính đang bật",
+    "removeFilter": "Bỏ bộ lọc {trait}: {value}",
+    "optionAria": "{value}: {count} NFT",
+    "chaosRange": "Khoảng hỗn độn",
+    "chaosMin": "Hỗn độn tối thiểu",
+    "chaosMax": "Hỗn độn tối đa",
+    "chaosValue": "{min} đến {max}",
+    "showMore": "Hiện thêm {count}",
+    "showLess": "Thu gọn",
+    "sheetDescription": "Thu hẹp kho lưu trữ theo bố cục, vật lý và nguồn gốc của từng Signature.",
+    "loading": "Đang lập chỉ mục đặc tính…",
+    "partial": "Chỉ mục đặc tính vẫn đang được bổ sung ({indexed} trên {total})",
+    "unavailable": "Bộ lọc đặc tính hiện không khả dụng.",
+    "retry": "Thử lại"
+  },
+  "quickView": {
+    "title": "Cosmic Signature {id}",
+    "description": "Đặc tính, vật lý quỹ đạo và nguồn gốc của Signature này.",
+    "openDetail": "Mở trang đầy đủ",
+    "playSweep": "Phát quét quang phổ",
+    "sweepNote": "Video dung lượng lớn được phát trực tiếp từ máy chủ",
+    "hideSweep": "Quay lại tác phẩm",
+    "previous": "Signature trước",
+    "next": "Signature sau",
+    "close": "Đóng xem nhanh",
+    "imageAlt": "Tác phẩm Cosmic Signature {id}",
+    "loading": "Đang tải đặc tính…"
+  },
+  "panel": {
+    "title": "Đặc tính của Signature",
+    "subtitle": "Mọi đặc tính đều bắt nguồn từ seed trên chuỗi. Cùng seed, cùng điểm ảnh.",
+    "loading": "Đang tải đặc tính…",
+    "unavailable": "Siêu dữ liệu đặc tính của Signature này chưa được công bố. Bố cục và vật lý của nó sẽ xuất hiện ở đây khi siêu dữ liệu được tạo lại.",
+    "error": "Không tải được siêu dữ liệu đặc tính.",
+    "retry": "Thử lại",
+    "masses": "Khối lượng các vật thể",
+    "massAria": "Vật thể {index}: khối lượng {value}",
+    "closestApproach": "Điểm tiếp cận gần nhất",
+    "closestApproachValue": "Vật thể {a} và {b} ở khoảng cách {distance}",
+    "totalEnergy": "Tổng năng lượng",
+    "angularMomentum": "Mô men động lượng",
+    "equilateralness": "Độ đều cạnh",
+    "braid": "Chuỗi ký hiệu bện",
+    "braidCrossings": "{count} điểm giao",
+    "integrator": "Bộ tích phân",
+    "steps": "{steps} bước",
+    "ejectionStep": "Phóng xuất ở bước {step}",
+    "horizonSteps": "Chân trời {steps} bước",
+    "dominantWavelength": "Bước sóng chủ đạo",
+    "nanometres": "{value} nm",
+    "hueDispersion": "Độ phân tán sắc màu",
+    "degrees": "{value}°",
+    "halation": "Quầng sáng",
+    "metadataVersion": "Phiên bản siêu dữ liệu",
+    "image": "Hình ảnh",
+    "animation": "Hoạt ảnh",
+    "dimensions": "{width} × {height}",
+    "duration": "{seconds} s",
+    "sha256": "SHA-256",
+    "copyHash": "Sao chép mã băm",
+    "copied": "Đã sao chép",
+    "webImage": "Hình ảnh web (WebP)",
+    "sourceImage": "Hình ảnh gốc (PNG)",
+    "hqVideo": "Video chất lượng cao",
+    "spectralSweep": "Quét quang phổ",
+    "assetManifest": "Bản kê tài sản",
+    "traitSource": "Nguồn đặc tính",
+    "external": "Mở tệp trong thẻ mới"
+  },
+  "dna": {
+    "title": "DNA bộ sưu tập",
+    "subtitle": "Cách bộ sưu tập phân bố theo các đặc tính chính. Chọn một đặc tính để thu hẹp phòng trưng bày.",
+    "segmentAria": "{value}: {count} NFT. Lọc theo đặc tính này.",
+    "loading": "Đang đọc đặc tính của bộ sưu tập…"
+  },
+  "alt": {
+    "subjectNamed": "“{name}”, Cosmic Signature {id}",
+    "withTraits": "{subject}: cấu trúc {structure}, bảng màu {palette}",
+    "withTraitsAndClass": "{subject}: cấu trúc {structure}, bảng màu {palette}, lớp quang phổ {spectralClass}"
+  }
+}

@@ -1,13 +1,26 @@
 import { AxiosError } from 'axios';
 import { createElement, StrictMode, type ReactNode } from 'react';
 
+import { createFakeTxFlow } from '@/test-utils/txFlow';
+
 import type { DashboardInfo } from '@/services/api/types';
+import { activeChain } from '@/config/chains';
 
 import { act, renderHook, waitFor } from '@/test-utils';
 
 const mockNotify = jest.fn();
 const mockNotifyErrorFromEthers = jest.fn();
 const mockPush = jest.fn();
+const mockGameAddress = '0x1111111111111111111111111111111111111111';
+const mockUseContractAddresses = jest.fn(() => ({ cosmicGame: mockGameAddress }));
+// The chain guard, receipt wait and toasts are useTxFlow's (useTxFlow.test.ts);
+// here the fake flow runs the finalize callbacks in the same order.
+const mockTx = createFakeTxFlow('0x2222222222222222222222222222222222222222');
+
+jest.mock('../useTxFlow', () => ({ useTxFlow: () => mockTx.flow }));
+jest.mock('../../contexts/ContractAddressesContext', () => ({
+  useContractAddresses: () => mockUseContractAddresses(),
+}));
 
 jest.mock('../../hooks/useNotify', () => ({
   useNotify: () => ({ notify: mockNotify, notifyErrorFromEthers: mockNotifyErrorFromEthers }),
@@ -17,9 +30,23 @@ jest.mock('next/navigation', () => ({
 }));
 
 const mockWaitForReceipt = jest.fn().mockResolvedValue({ status: 'success' });
-const mockUsePublicClient = jest.fn(() => ({ waitForTransactionReceipt: mockWaitForReceipt }));
+const mockReadContract = jest.fn(({ functionName }: { functionName: string }) => {
+  if (functionName === 'roundNum') return mockReadRoundNum();
+  if (functionName === 'lastCstBidderAddress') return Promise.resolve(undefined);
+  throw new Error(`Unexpected read: ${functionName}`);
+});
+const mockUsePublicClient = jest.fn((_options?: { chainId: number }) => ({
+  waitForTransactionReceipt: mockWaitForReceipt,
+  readContract: mockReadContract,
+  estimateContractGas: mockEstimateGas,
+}));
 jest.mock('wagmi', () => ({
-  usePublicClient: () => mockUsePublicClient(),
+  usePublicClient: (options: { chainId: number }) => mockUsePublicClient(options),
+  useConfig: () => ({}),
+}));
+jest.mock('@wagmi/core', () => ({
+  getAccount: () => ({ address: '0x2222222222222222222222222222222222222222' }),
+  writeContract: (_config: unknown, request: unknown) => mockFinalizeCycle(request),
 }));
 
 const mockEstimateGas = jest.fn().mockResolvedValue(BigInt(500000));
@@ -57,7 +84,7 @@ jest.mock('../../services/api', () => ({
 const mockGetContractErrorDescriptor = jest.fn().mockReturnValue(null);
 
 jest.mock('../../utils/errors', () => ({
-  isUserRejection: jest.fn((_err: unknown) => false),
+  ...jest.requireActual('../../utils/errors'),
   reportError: jest.fn(),
 }));
 
@@ -69,13 +96,12 @@ jest.mock('../../utils/contractErrors', () => ({
 import { useAllocationFinalize } from '../useAllocationFinalize';
 import { useAllocationTime, useCurrentTime } from '../useApiQuery';
 import api from '../../services/api';
-import { isUserRejection, reportError } from '../../utils/errors';
+import { reportError } from '../../utils/errors';
 import useCosmicGameContract from '../../hooks/useCosmicGameContract';
 
 const mockApi = api as jest.Mocked<typeof api>;
 const mockUseAllocationTime = useAllocationTime as jest.MockedFunction<typeof useAllocationTime>;
 const mockUseCurrentTime = useCurrentTime as jest.MockedFunction<typeof useCurrentTime>;
-const mockIsUserRejection = isUserRejection as jest.MockedFunction<typeof isUserRejection>;
 const mockReportError = reportError as jest.MockedFunction<typeof reportError>;
 const mockUseCosmicGameContract = useCosmicGameContract as jest.Mock;
 
@@ -86,7 +112,14 @@ beforeEach(() => {
   mockReadRoundNum.mockReset();
   mockReadRoundNum.mockResolvedValueOnce(BigInt(5)).mockResolvedValueOnce(BigInt(6));
   mockGetContractErrorDescriptor.mockReturnValue(null);
-  mockUsePublicClient.mockReturnValue({ waitForTransactionReceipt: mockWaitForReceipt });
+  mockTx.reset();
+  mockTx.writeContract.mockImplementation((request: unknown) => mockFinalizeCycle(request));
+  mockUseContractAddresses.mockReturnValue({ cosmicGame: mockGameAddress });
+  mockUsePublicClient.mockReturnValue({
+    waitForTransactionReceipt: mockWaitForReceipt,
+    readContract: mockReadContract,
+    estimateContractGas: mockEstimateGas,
+  });
   mockWaitForReceipt.mockResolvedValue({ status: 'success' });
   mockUseAllocationTime.mockReturnValue({ data: 1000 } as ReturnType<typeof useAllocationTime>);
   mockUseCurrentTime.mockReturnValue({
@@ -152,10 +185,22 @@ describe('useAllocationFinalize', () => {
     });
 
     expect(success).toBe(true);
-    expect(mockEstimateGas).toHaveBeenCalled();
-    expect(mockFinalizeCycle).toHaveBeenCalled();
-    expect(mockWaitForReceipt).toHaveBeenCalledWith({ hash: '0xhash' });
+    expect(mockUsePublicClient).toHaveBeenCalledWith({ chainId: activeChain.id });
+    expect(mockEstimateGas).toHaveBeenCalledWith(
+      expect.objectContaining({
+        functionName: 'claimMainPrize',
+        account: '0x2222222222222222222222222222222222222222',
+      }),
+    );
+    expect(mockFinalizeCycle).toHaveBeenCalledWith(
+      expect.objectContaining({
+        address: mockGameAddress,
+        functionName: 'claimMainPrize',
+      }),
+    );
     expect(mockReadRoundNum).toHaveBeenCalledTimes(2);
+    expect(mockTx.runs[0]!.failureMessage).toBe('toasts.finalize.failed');
+    expect(mockTx.lastSuccessMessage()).toBe('toasts.cycleFinalized');
     expect(mockApi.create).toHaveBeenCalledWith(5, 5);
     expect(mockPush).toHaveBeenCalledWith(expect.stringContaining('/allocation-finalized'));
     expect(mockPush).toHaveBeenCalledWith(expect.stringContaining('cycle=5'));
@@ -171,7 +216,9 @@ describe('useAllocationFinalize', () => {
       await result.current.onFinalize();
     });
 
-    expect(mockFinalizeCycle).toHaveBeenCalledWith({ gas: BigInt(300_000) + BigInt(1_000_000) });
+    expect(mockFinalizeCycle).toHaveBeenCalledWith(
+      expect.objectContaining({ gas: BigInt(300_000) + BigInt(1_000_000) }),
+    );
   });
 
   it('falls back to GAS_FLOOR when estimateGas returns undefined', async () => {
@@ -183,7 +230,9 @@ describe('useAllocationFinalize', () => {
       await result.current.onFinalize();
     });
 
-    expect(mockFinalizeCycle).toHaveBeenCalledWith({ gas: BigInt(2_000_000) });
+    expect(mockFinalizeCycle).toHaveBeenCalledWith(
+      expect.objectContaining({ gas: BigInt(2_000_000) }),
+    );
   });
 
   it('falls back to GAS_FLOOR when estimateGas throws (still claims)', async () => {
@@ -197,7 +246,9 @@ describe('useAllocationFinalize', () => {
     });
 
     expect(mockReportError).toHaveBeenCalledWith(estimateErr, 'finalize-cycle-gas-estimate');
-    expect(mockFinalizeCycle).toHaveBeenCalledWith({ gas: BigInt(2_000_000) });
+    expect(mockFinalizeCycle).toHaveBeenCalledWith(
+      expect.objectContaining({ gas: BigInt(2_000_000) }),
+    );
   });
 
   it('includes NumRaffleNFTWinnersStakingRWalk in count when RWLK tokens are anchored', async () => {
@@ -256,9 +307,8 @@ describe('useAllocationFinalize', () => {
   //  error paths
   // ─────────────────────────────────────────────
 
-  it('onFinalize error: reports error, shows notification, returns false', async () => {
-    const claimError = new Error('transaction failed');
-    mockFinalizeCycle.mockRejectedValueOnce(claimError);
+  it('onFinalize error: fails through the flow with the finalize fallback, returns false', async () => {
+    mockFinalizeCycle.mockRejectedValueOnce(new Error('transaction failed'));
 
     const { result } = renderHook(() => useAllocationFinalize({ data: baseData, offset: 0 }));
 
@@ -268,13 +318,13 @@ describe('useAllocationFinalize', () => {
     });
 
     expect(success).toBe(false);
-    expect(mockReportError).toHaveBeenCalledWith(claimError, 'finalize-cycle');
-    expect(mockNotifyErrorFromEthers).toHaveBeenCalledWith(claimError, 'toasts.finalize.failed');
+    expect(mockTx.lastFailureMessage()).toBe('toasts.finalize.failed');
+    expect(mockPush).not.toHaveBeenCalled();
+    expect(result.current.isClaiming).toBe(false);
   });
 
-  it('onFinalize user rejection: silently returns false with info toast', async () => {
-    mockIsUserRejection.mockReturnValueOnce(true);
-    mockFinalizeCycle.mockRejectedValueOnce(new Error('user rejected'));
+  it('onFinalize user rejection: returns false without a failure or navigation', async () => {
+    mockFinalizeCycle.mockRejectedValueOnce({ code: 4001, message: 'User rejected' });
 
     const { result } = renderHook(() => useAllocationFinalize({ data: baseData, offset: 0 }));
 
@@ -284,66 +334,12 @@ describe('useAllocationFinalize', () => {
     });
 
     expect(success).toBe(false);
-    expect(mockNotifyErrorFromEthers).not.toHaveBeenCalled();
-    expect(mockNotify).toHaveBeenCalledWith('info', 'toasts.walletTransactionCancelled');
+    expect(mockTx.lastFailureMessage()).toBeUndefined();
+    expect(mockPush).not.toHaveBeenCalled();
   });
 
-  it('selects the localized key for a decoded contract error', async () => {
-    const err = new Error('MainPrizeEarlyClaim revert');
-    mockFinalizeCycle.mockRejectedValueOnce(err);
-    mockGetContractErrorDescriptor.mockReturnValueOnce({
-      key: 'finalize.contractErrors.mainPrizeEarlyClaim',
-      errorName: 'MainPrizeEarlyClaim',
-    });
-
-    const { result } = renderHook(() => useAllocationFinalize({ data: baseData, offset: 0 }));
-
-    await act(async () => {
-      await result.current.onFinalize();
-    });
-
-    expect(mockNotify).toHaveBeenCalledWith(
-      'error',
-      'toasts.finalize.contractErrors.mainPrizeEarlyClaim',
-    );
-    expect(mockNotifyErrorFromEthers).not.toHaveBeenCalled();
-  });
-
-  it('waitForTransactionReceipt failure is caught and surfaced as error', async () => {
-    const rxErr = new Error('tx reverted on mine');
-    mockWaitForReceipt.mockRejectedValueOnce(rxErr);
-
-    const { result } = renderHook(() => useAllocationFinalize({ data: baseData, offset: 0 }));
-
-    let success: boolean | undefined;
-    await act(async () => {
-      success = await result.current.onFinalize();
-    });
-
-    expect(success).toBe(false);
-    expect(mockReportError).toHaveBeenCalledWith(rxErr, 'finalize-cycle');
-    expect(mockNotifyErrorFromEthers).toHaveBeenCalledWith(rxErr, 'toasts.finalize.failed');
-  });
-
-  it('treats a reverted receipt status as a localized finalize failure', async () => {
-    mockWaitForReceipt.mockResolvedValueOnce({ status: 'reverted' });
-    const { result } = renderHook(() => useAllocationFinalize({ data: baseData, offset: 0 }));
-
-    let success: boolean | undefined;
-    await act(async () => {
-      success = await result.current.onFinalize();
-    });
-
-    expect(success).toBe(false);
-    expect(mockReportError).toHaveBeenCalledWith(expect.any(Error), 'finalize-cycle');
-    expect(mockNotifyErrorFromEthers).toHaveBeenCalledWith(
-      expect.any(Error),
-      'toasts.finalize.failed',
-    );
-  });
-
-  it('onFinalize with no contract: notifies error, returns false, never calls write', async () => {
-    mockUseCosmicGameContract.mockReturnValueOnce(null);
+  it('onFinalize with no contract address: notifies error, returns false, never calls write', async () => {
+    mockUseContractAddresses.mockReturnValueOnce({ cosmicGame: '' });
 
     const { result } = renderHook(() => useAllocationFinalize({ data: baseData, offset: 0 }));
 
@@ -393,6 +389,31 @@ describe('useAllocationFinalize', () => {
     expect(mockNotify).toHaveBeenCalledWith('warning', 'toasts.finalize.roundDidNotAdvance');
     expect(mockApi.create).not.toHaveBeenCalled();
     expect(mockPush).not.toHaveBeenCalled();
+    // The "Cycle finalized" toast would be wrong here, so the lifecycle toast closes.
+    expect(mockTx.lastSuccessMessage()).toBeNull();
+  });
+
+  it('trusts the receipt when the round check read fails, and still redirects', async () => {
+    mockReadRoundNum.mockReset();
+    mockReadRoundNum
+      .mockResolvedValueOnce(BigInt(5))
+      .mockRejectedValueOnce(new Error('429 Too Many Requests'));
+
+    const { result } = renderHook(() => useAllocationFinalize({ data: baseData, offset: 0 }));
+
+    let success: boolean | undefined;
+    await act(async () => {
+      success = await result.current.onFinalize();
+    });
+
+    expect(success).toBe(true);
+    expect(mockNotify).not.toHaveBeenCalledWith('warning', 'toasts.finalize.roundDidNotAdvance');
+    expect(mockReportError).toHaveBeenCalledWith(
+      expect.objectContaining({ message: '429 Too Many Requests' }),
+      'finalize-cycle-round-check',
+    );
+    expect(mockPush).toHaveBeenCalledWith('/allocation-finalized?cycle=5&message=success');
+    expect(mockTx.lastSuccessMessage()).toBe('toasts.cycleFinalized');
   });
 
   it('warns if on-chain round went backwards (chain reorg edge case)', async () => {

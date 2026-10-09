@@ -65,6 +65,13 @@ class MockIntersectionObserver {
 (global as unknown as { IntersectionObserver: unknown }).IntersectionObserver =
   MockIntersectionObserver;
 
+// Charts lay out their plots only once they near the screen (ChartPlot). The
+// observer above never reports an element in view, so unit tests render every
+// plot at once; hooks/__tests__/useNearViewport.test.tsx covers the gate.
+jest.mock('@/hooks/useNearViewport', () => ({
+  useNearViewport: () => [true, () => undefined],
+}));
+
 // Fail tests on unexpected console.error / console.warn. Known third-party
 // warnings that we cannot fix are allowlisted and silently skipped. Any NEW
 // warning that doesn't match the allowlist throws, failing the test
@@ -101,6 +108,13 @@ console.warn = (...args: unknown[]) => {
   throw new Error(`Unexpected console.warn in test: ${msg.slice(0, 200)}`);
 };
 
+// Jest runs outside Next's server, which provides the data cache that
+// `unstable_cache` stores in: a shared server read (publicDataReads) calls
+// straight through, once per call, as an uncached read would.
+jest.mock('next/cache', () => ({
+  unstable_cache: <A extends unknown[], R>(read: (...args: A) => Promise<R>) => read,
+}));
+
 // Mock next/navigation for App Router. All routing hooks return no-op
 // defaults so individual tests can override per-case via jest.mock() without
 // importing the real next/navigation (which pulls React server components).
@@ -135,6 +149,7 @@ jest.mock('next-intl', () => {
     coordination: require('./messages/en/coordination.json') as Record<string, unknown>,
     ethContribution: require('./messages/en/ethContribution.json') as Record<string, unknown>,
     faq: require('./messages/en/faq.json') as Record<string, unknown>,
+    glossary: require('./messages/en/glossary.json') as Record<string, unknown>,
     imprint: require('./messages/en/imprint.json') as Record<string, unknown>,
     legal: require('./messages/en/legal.json') as Record<string, unknown>,
     marketing: require('./messages/en/marketing.json') as Record<string, unknown>,
@@ -151,8 +166,21 @@ jest.mock('next-intl', () => {
           value && typeof value === 'object' ? (value as Record<string, unknown>)[part] : undefined,
         messages,
       );
+  // Enough ICU for English catalogs: `{name}`, `{name, number}` and a
+  // `{name, plural, one {…} other {…}}` block (with `#` for the count).
+  const interpolatePlurals = (message: string, values?: Record<string, unknown>) =>
+    message.replace(
+      /\{(\w+), plural, one \{([^{}]*)\} other \{([^{}]*)\}\}/g,
+      (match, name: string, one: string, other: string) => {
+        const value = values?.[name];
+        if (typeof value !== 'number') return match;
+        return (value === 1 ? one : other).replace(/#/g, String(value));
+      },
+    );
   const interpolate = (message: string, values?: Record<string, unknown>) =>
-    message.replace(/\{(\w+)\}/g, (_match, name: string) => String(values?.[name] ?? `{${name}}`));
+    interpolatePlurals(message, values)
+      .replace(/\{(\w+), number\}/g, (_match, name: string) => `{${name}}`)
+      .replace(/\{(\w+)\}/g, (_match, name: string) => String(values?.[name] ?? `{${name}}`));
 
   const useTranslations = (namespace?: string) => {
     const prefix = namespace ? `${namespace}.` : '';
@@ -166,7 +194,7 @@ jest.mock('next-intl', () => {
         if (typeof message === 'string') return interpolate(message, values);
       }
       if (namespace === 'tooltips') {
-        if (key === 'moreInformation') return `More information: ${String(values?.content ?? '')}`;
+        if (key === 'moreInformation') return 'More information';
         if (key === 'moreInformationAbout') {
           return `More information about ${String(values?.label ?? '')}`;
         }
@@ -190,17 +218,20 @@ jest.mock('next-intl', () => {
       if (namespace && catalogMessages[namespace]) {
         const message = resolveMessage(catalogMessages[namespace], key);
         if (typeof message === 'string') {
-          const strongMatch = message.match(/^(.*)<strong>\{(\w+)\}<\/strong>(.*)$/);
-          if (strongMatch && typeof values?.strong === 'function') {
-            const before = strongMatch[1] ?? '';
-            const valueName = strongMatch[2] ?? '';
-            const after = strongMatch[3] ?? '';
-            const renderStrong = values.strong as (chunks: string) => unknown;
+          // One tag around one placeholder (`<strong>{amount}</strong>`, `<who>{address}</who>`),
+          // rendered through the caller's tag function as next-intl does.
+          const tagMatch = message.match(/^(.*)<(\w+)>\{(\w+)\}<\/\2>(.*)$/);
+          const tagName = tagMatch?.[2] ?? '';
+          if (tagMatch && typeof values?.[tagName] === 'function') {
+            const before = tagMatch[1] ?? '';
+            const valueName = tagMatch[3] ?? '';
+            const after = tagMatch[4] ?? '';
+            const renderTag = values[tagName] as (chunks: string) => unknown;
             return React.createElement(
               React.Fragment,
               null,
               interpolate(before, values),
-              renderStrong(String(values?.[valueName] ?? `{${valueName}}`)),
+              renderTag(String(values?.[valueName] ?? `{${valueName}}`)),
               interpolate(after, values),
             );
           }
@@ -377,12 +408,20 @@ jest.mock('@/i18n/navigation', () => {
     const { href, children, locale: _locale, prefetch: _prefetch, ...rest } = props;
     return React.createElement('a', { href: hrefToString(href), ref, ...rest }, children);
   });
+  // Mirrors `localePrefix: 'as-needed'`: the default locale stays unprefixed,
+  // every other locale lives under its prefix (`/vi/gallery`, `/vi` for `/`).
+  const getPathname = (args: { href: unknown; locale?: string }) => {
+    const pathname = hrefToString(args?.href);
+    const { routing } = require('./i18n/routing') as { routing: { defaultLocale: string } };
+    if (!args?.locale || args.locale === routing.defaultLocale) return pathname;
+    return pathname === '/' ? `/${args.locale}` : `/${args.locale}${pathname}`;
+  };
   return {
     Link,
     useRouter: () => nav().useRouter(),
     usePathname: () => nav().usePathname(),
     redirect: (href: unknown) => nav().redirect?.(hrefToString(href)),
     permanentRedirect: (href: unknown) => nav().permanentRedirect?.(hrefToString(href)),
-    getPathname: (args: { href: unknown }) => hrefToString(args?.href),
+    getPathname,
   };
 });

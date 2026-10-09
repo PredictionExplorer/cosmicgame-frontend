@@ -4,7 +4,7 @@ import {
   createVariantConverter,
   renameIdentifiers,
 } from '../i18n-derive-variant-core';
-import { SCRIPT_CONVENTIONS, checkScriptConventions } from '../i18n-script-conventions-core';
+import { LOCALE_CONVENTIONS, checkConventions } from '../i18n-conventions-core';
 
 const tw = createVariantConverter('zh', 'zh-TW')!;
 const hk = createVariantConverter('zh', 'zh-HK')!;
@@ -52,8 +52,8 @@ describe('createVariantConverter', () => {
   it('produces drafts that already satisfy the script conventions', () => {
     const source =
       '每一笔都会延长收官倒计时，并把“分配”写入链上记录。请通过应用查看详情，当前默认为 24 小时。';
-    expect(checkScriptConventions(tw.text(source), SCRIPT_CONVENTIONS['zh-TW']!)).toEqual([]);
-    expect(checkScriptConventions(hk.text(source), SCRIPT_CONVENTIONS['zh-HK']!)).toEqual([]);
+    expect(checkConventions(tw.text(source), LOCALE_CONVENTIONS['zh-TW']!)).toEqual([]);
+    expect(checkConventions(hk.text(source), LOCALE_CONVENTIONS['zh-HK']!)).toEqual([]);
   });
 });
 

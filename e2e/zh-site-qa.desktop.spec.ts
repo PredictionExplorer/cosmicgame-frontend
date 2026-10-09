@@ -1,5 +1,6 @@
 import { expect, test, type Page } from '@playwright/test';
 
+import { expectNoStrandedHeadingPunctuation } from './heading-lines';
 import { mockZhQualityApi } from './zh-quality-mocks';
 import { toZhPath, ZH_ROUTE_INVENTORY, type ZhRouteInventoryEntry } from './zh-route-inventory';
 
@@ -49,7 +50,7 @@ const UNEXPECTED_EXACT_UI_COPY = new Set([
   'Public Goods',
   'Anchor Distribution',
   'Chrono-Warrior',
-  'Next cycle',
+  'Compounding Cycle Reserve',
   'Allocation Tracks',
   'Protocol Configuration',
 ]);
@@ -82,6 +83,8 @@ function isAssetOrInfrastructurePath(pathname: string): boolean {
   return (
     pathname.startsWith('/_next/') ||
     pathname.startsWith('/api/') ||
+    // RFC 8615 well-known files (security.txt) have one fixed, unlocalized path.
+    pathname.startsWith('/.well-known/') ||
     /^\/(?:favicon|robots\.txt|sitemap\.xml|llms(?:-full)?\.txt|manifest\.webmanifest)/.test(
       pathname,
     ) ||
@@ -94,6 +97,7 @@ async function expectLocalePreservingLinks(page: Page): Promise<void> {
   const links = await page.locator('a[href]').evaluateAll((anchors) =>
     anchors.map((anchor) => ({
       href: anchor.getAttribute('href') ?? '',
+      hreflang: anchor.getAttribute('hreflang'),
       text: (anchor.textContent ?? '').trim().replace(/\s+/g, ' ').slice(0, 100),
     })),
   );
@@ -107,6 +111,10 @@ async function expectLocalePreservingLinks(page: Page): Promise<void> {
     ) {
       continue;
     }
+    // The footer language directory links the same page in every other
+    // language on purpose; an anchor that declares `hreflang` is an alternate,
+    // not a link that dropped the prefix.
+    if (link.hreflang) continue;
 
     let url: URL;
     try {
@@ -145,7 +153,11 @@ async function expectLocalizedMetadata(page: Page, route: ZhRouteInventoryEntry)
   }
 }
 
-async function expectChineseTypography(page: Page, route: ZhRouteInventoryEntry): Promise<void> {
+async function expectChineseTypography(
+  page: Page,
+  route: ZhRouteInventoryEntry,
+  viewportName: string,
+): Promise<void> {
   const typography = await page.evaluate(async () => {
     await document.fonts.ready;
     const bodyStyle = getComputedStyle(document.body);
@@ -158,6 +170,7 @@ async function expectChineseTypography(page: Page, route: ZhRouteInventoryEntry)
       headingFound: Boolean(heading),
       letterSpacing: headingStyle?.letterSpacing ?? '',
       wordBreak: headingStyle?.wordBreak ?? '',
+      overflowWrap: headingStyle?.overflowWrap ?? '',
       lineBreak: headingStyle?.lineBreak ?? '',
     };
   });
@@ -168,9 +181,17 @@ async function expectChineseTypography(page: Page, route: ZhRouteInventoryEntry)
   }
   if (typography.headingFound) {
     expect(['normal', '0px']).toContain(typography.letterSpacing);
-    expect(typography.wordBreak).not.toBe('keep-all');
+    // Headings break Han text at punctuation (keep-all), so a line turns at a
+    // comma rather than inside 周期; a clause too long for its line must
+    // still wrap, so keep-all always comes with an overflow-wrap safety net.
+    // That net ignores the line-start rules, so the lines themselves are
+    // checked too: none may start with 。 or ，.
+    if (typography.wordBreak === 'keep-all') {
+      expect(['anywhere', 'break-word']).toContain(typography.overflowWrap);
+    }
     expect(typography.lineBreak).not.toBe('anywhere');
   }
+  await expectNoStrandedHeadingPunctuation(page, `${route.id} at ${viewportName}`);
 }
 
 function readVisibleHeadings(page: Page): Promise<string> {
@@ -192,22 +213,17 @@ async function expectNoUnexpectedEnglishHeadings(
   // staging div and only moves into the layout on the next frame. `body`
   // already carries the text at that point, so the checks around this one pass
   // while every heading still computes as `display: none`. Poll rather than
-  // sample once — everything after this reads the settled DOM.
-  if (!route.allowNoHeading) {
-    await expect
-      .poll(() => readVisibleHeadings(page), {
-        message: `no visible headings rendered on ${route.id}`,
-      })
-      .not.toBe('');
-  }
-
-  const headings = await readVisibleHeadings(page);
-  if (!headings && route.allowNoHeading) return;
-  expect(headings, `no visible headings rendered on ${route.id}`).not.toBe('');
-  expect(headings, `Chinese heading missing on ${route.id}`).toMatch(CJK);
-  for (const fallback of UNEXPECTED_ENGLISH_FALLBACKS) {
-    expect(headings, `unexpected English heading fallback on ${route.id}`).not.toMatch(fallback);
-  }
+  // sample once. Validate one snapshot per attempt: a second read after a
+  // successful poll can catch React replacing that same streamed subtree.
+  await expect(async () => {
+    const headings = await readVisibleHeadings(page);
+    if (!headings && route.allowNoHeading) return;
+    expect(headings, `no visible headings rendered on ${route.id}`).not.toBe('');
+    expect(headings, `Chinese heading missing on ${route.id}`).toMatch(CJK);
+    for (const fallback of UNEXPECTED_ENGLISH_FALLBACKS) {
+      expect(headings, `unexpected English heading fallback on ${route.id}`).not.toMatch(fallback);
+    }
+  }).toPass({ timeout: 15_000 });
 }
 
 async function expectNoUnexpectedEnglishUiCopy(
@@ -273,7 +289,7 @@ test.describe('Sprint 8 Chinese full-site route QA', () => {
         await expectLocalizedMetadata(page, route);
         await expectNoUnexpectedEnglishHeadings(page, route);
         await expectNoUnexpectedEnglishUiCopy(page, route);
-        await expectChineseTypography(page, route);
+        await expectChineseTypography(page, route, viewport.name);
         await expectLocalePreservingLinks(page);
         await expectNoHorizontalOverflow(page, route);
         if (NOINDEX_ROUTE_IDS.has(route.id)) {

@@ -10,9 +10,23 @@ import { pickByLocale, type LocaleRecord } from './locale';
  * ternaries. Single-use conventions may instead live as a `LocaleRecord`
  * next to their only consumer (e.g. the RainbowKit locale map in WalletUi).
  */
+
+/**
+ * The family of characters a locale's copy is written in. Languages in the
+ * same family share characters without sharing vocabulary — Chinese and
+ * Japanese both write 利益, 請求, and 大会, each meaning something different —
+ * so a gate that scans one language's copy for another language's words
+ * (the banned registers in scripts/lexicon-scan-core.ts) must skip every
+ * other locale of the same family, not only sibling variants of the same
+ * language. Korean is written in Hangul alone here, so it is its own family.
+ */
+export type ScriptFamily = 'latin' | 'han' | 'hangul' | 'cyrillic';
+
 export interface LocaleConfig {
   /** BCP-47 tag for `Intl.NumberFormat` / `Intl.DateTimeFormat` / `toLocaleString`. */
   readonly intlLocale: string;
+  /** Character family the copy is written in (see `ScriptFamily`). */
+  readonly scriptFamily: ScriptFamily;
   /** schema.org `inLanguage` value emitted in JSON-LD. */
   readonly jsonLdInLanguage: string;
   /** OpenGraph `og:locale` value. */
@@ -41,27 +55,37 @@ export interface LocaleConfig {
   readonly lowercaseMidSentence: boolean;
   /**
    * Whether raw wallet/RPC provider diagnostics may be shown to the user.
-   * Providers return arbitrary English strings, so locales other than
-   * English hide them behind the translated fallback while the original
-   * error still flows to `reportError` (docs/i18n/README.md).
+   * Providers return arbitrary developer text (multi-paragraph viem dumps,
+   * revert data), so every locale shows its translated cause-plus-next-step
+   * sentence instead, while the original error still flows to `reportError`
+   * and the transaction toasts offer it behind "Copy details". English turns
+   * the raw text back on only for debugging (`DEBUG_PROVIDER_ERRORS`).
    */
   readonly showRawProviderErrors: boolean;
 }
 
+/**
+ * Local debugging aid: `NEXT_PUBLIC_DEBUG_PROVIDER_ERRORS=1` shows raw
+ * provider text in the English UI again. Inlined at build time.
+ */
+const DEBUG_PROVIDER_ERRORS = process.env.NEXT_PUBLIC_DEBUG_PROVIDER_ERRORS === '1';
+
 const LOCALE_CONFIG: LocaleRecord<LocaleConfig> = {
   en: {
     intlLocale: 'en-US',
+    scriptFamily: 'latin',
     jsonLdInLanguage: 'en',
     ogLocale: 'en_US',
     textDirection: 'ltr',
     wordSpacing: true,
     weekStartsMonday: false,
-    ellipsis: '...',
+    ellipsis: '…',
     lowercaseMidSentence: true,
-    showRawProviderErrors: true,
+    showRawProviderErrors: DEBUG_PROVIDER_ERRORS,
   },
   zh: {
     intlLocale: 'zh-CN',
+    scriptFamily: 'han',
     jsonLdInLanguage: 'zh-Hans',
     ogLocale: 'zh_CN',
     textDirection: 'ltr',
@@ -73,6 +97,7 @@ const LOCALE_CONFIG: LocaleRecord<LocaleConfig> = {
   },
   'zh-TW': {
     intlLocale: 'zh-TW',
+    scriptFamily: 'han',
     jsonLdInLanguage: 'zh-Hant-TW',
     ogLocale: 'zh_TW',
     textDirection: 'ltr',
@@ -85,6 +110,7 @@ const LOCALE_CONFIG: LocaleRecord<LocaleConfig> = {
   },
   'zh-HK': {
     intlLocale: 'zh-HK',
+    scriptFamily: 'han',
     jsonLdInLanguage: 'zh-Hant-HK',
     ogLocale: 'zh_HK',
     textDirection: 'ltr',
@@ -97,6 +123,7 @@ const LOCALE_CONFIG: LocaleRecord<LocaleConfig> = {
   },
   uk: {
     intlLocale: 'uk-UA',
+    scriptFamily: 'cyrillic',
     jsonLdInLanguage: 'uk',
     ogLocale: 'uk_UA',
     textDirection: 'ltr',
@@ -104,6 +131,55 @@ const LOCALE_CONFIG: LocaleRecord<LocaleConfig> = {
     weekStartsMonday: true,
     ellipsis: '…',
     // Ukrainian has letter case and, like English, lowercases a Title-Case
+    // phrase that lands mid-sentence.
+    lowercaseMidSentence: true,
+    showRawProviderErrors: false,
+  },
+  ko: {
+    intlLocale: 'ko-KR',
+    scriptFamily: 'hangul',
+    jsonLdInLanguage: 'ko',
+    ogLocale: 'ko_KR',
+    textDirection: 'ltr',
+    // Korean separates words with spaces (unlike Chinese): "1일 2시간".
+    wordSpacing: true,
+    // CLDR week data: Korean calendars start on Sunday.
+    weekStartsMonday: false,
+    ellipsis: '…',
+    // Hangul has no letter case.
+    lowercaseMidSentence: false,
+    showRawProviderErrors: false,
+  },
+  ja: {
+    intlLocale: 'ja-JP',
+    scriptFamily: 'han',
+    jsonLdInLanguage: 'ja',
+    ogLocale: 'ja_JP',
+    textDirection: 'ltr',
+    // Japanese runs words together like Chinese: "1日2時間", "48時間".
+    wordSpacing: false,
+    // CLDR week data: Japanese calendars start on Sunday.
+    weekStartsMonday: false,
+    ellipsis: '…',
+    // Kana and kanji have no letter case.
+    lowercaseMidSentence: false,
+    showRawProviderErrors: false,
+  },
+  vi: {
+    intlLocale: 'vi-VN',
+    // Latin alphabet with stacked diacritics (ế, ợ, ữ): the same family as
+    // English, so the Vietnamese banned register is never applied to English
+    // source files' siblings in another script and vice versa.
+    scriptFamily: 'latin',
+    jsonLdInLanguage: 'vi',
+    ogLocale: 'vi_VN',
+    textDirection: 'ltr',
+    // Vietnamese writes every syllable as a spaced word: "1 ngày 2 giờ".
+    wordSpacing: true,
+    // CLDR week data: Vietnamese calendars start on Monday (thứ Hai).
+    weekStartsMonday: true,
+    ellipsis: '…',
+    // Vietnamese has letter case and, like English, lowercases a Title-Case
     // phrase that lands mid-sentence.
     lowercaseMidSentence: true,
     showRawProviderErrors: false,

@@ -1,0 +1,197 @@
+{
+  "breadcrumbs": {
+    "home": "ホーム",
+    "contracts": "コントラクト"
+  },
+  "page": {
+    "title": "コントラクトアドレス",
+    "subtitle": "Cosmic Signatureプロトコルのオンチェーンアドレス、構成、ソースへのリンク、検証の背景。"
+  },
+  "network": {
+    "chain": "チェーン{chainId}"
+  },
+  "entries": {
+    "protocol": {
+      "name": "Cosmic Signatureプロトコル",
+      "description": "サイクル、一筆、配分の分配を管理する主なプロトコルのプロキシコントラクト"
+    },
+    "implementation": {
+      "name": "実装コントラクト",
+      "description": "Cosmic Signatureプロトコルのプロキシコントラクトの背後にある現在の実装"
+    },
+    "cst": {
+      "name": "Cosmic Signature CSTトークン",
+      "description": "一筆ごとに刻印され、宇宙評議会で調整ウェイトを表すために使われるERC-20トークン（CST）"
+    },
+    "nft": {
+      "name": "Cosmic Signature NFT",
+      "description": "サイクルの受領者への配分として刻印されるERC-721 NFTコレクション"
+    },
+    "randomWalk": {
+      "name": "Random Walk NFT",
+      "description": "一度だけの割引のためにETH一筆に添付するか、係留NFT星選の対象となるために係留できるRandomWalk NFTコレクション"
+    },
+    "council": {
+      "name": "宇宙評議会",
+      "description": "調整提案のためのオンチェーンのプロトコル調整コントラクト"
+    },
+    "publicGoods": {
+      "name": "公共財金庫",
+      "description": "各サイクルのサイクル準備金から公共財配分を受け取ります"
+    },
+    "outreach": {
+      "name": "広報準備金",
+      "description": "広報配分とエコシステムの貢献者のために配分された資金"
+    },
+    "allocations": {
+      "name": "配分ウォレット",
+      "description": "受け取りを待つ配分を保管するエスクローコントラクト"
+    },
+    "cosmicAnchor": {
+      "name": "Cosmic Signature NFT係留ウォレット",
+      "description": "Cosmic Signature NFTの係留コントラクト"
+    },
+    "rwalkAnchor": {
+      "name": "RWLK係留ウォレット",
+      "description": "Random Walk NFTの係留コントラクト"
+    }
+  },
+  "categories": {
+    "core": "コアコントラクト",
+    "wallet": "ウォレット",
+    "anchoring": "係留"
+  },
+  "addresses": {
+    "title": "コントラクトアドレス",
+    "description": "Arbitrum One上のCosmic Signatureのすべてのコントラクトです。アドレスをコピーするか、Arbiscanでアドレスを、Sourcifyでソースコードを確認できます。",
+    "verified": "Sourcifyへのリンクがあるアドレスは、すべてSourcifyで完全一致しています（{date}に確認）。",
+    "markets": "マーケット",
+    "reported": "インデクサーが報告するアドレス{address}は検証されていません。"
+  },
+  "funds": {
+    "title": "配分トラック",
+    "description": "サイクル準備金が配分トラックにどう分かれるか：シグネチャー配分、時の戦士、星選、係留配分、公共財。残りは累積準備金として次のサイクルへ繰り越されます。",
+    "chartAria": "配分トラックの棒グラフ",
+    "segments": {
+      "signature": {
+        "label": "シグネチャー配分",
+        "tooltip": "最後の一筆を入れた参加者が受け取るETHの割合。1,000 CSTとCosmic Signature NFTも受け取ります"
+      },
+      "chrono": {
+        "label": "時の戦士",
+        "tooltip": "時の戦士へのETH配分。1,000 CSTとCosmic Signature NFTも受け取ります"
+      },
+      "stellar": {
+        "label": "星選",
+        "tooltip": "サイクルが確定したときに、無作為に選ばれた参加者へ配られる部分"
+      },
+      "anchor": {
+        "label": "係留配分",
+        "tooltip": "Cosmic Signature NFTの係留者へ、係留NFT数に比例して配られるETHの係留配分"
+      },
+      "publicGoods": {
+        "label": "公共財",
+        "tooltip": "サイクルごとに公共財の受け手（Protocol Guild）へ送られます"
+      },
+      "next": {
+        "label": "累積準備金",
+        "tooltip": "累積準備金として次のサイクルへ持ち越される残りの資金。"
+      }
+    }
+  },
+  "configuration": {
+    "title": "プロトコル構成",
+    "description": "プロトコルのコントラクトが読み取っている現在のパラメーターです。",
+    "cards": {
+      "ethStep": {
+        "label": "ETH一筆の費用の上げ幅",
+        "tooltip": "ETH一筆の費用はこの上げ幅のパラメーターに従います。CST一筆の費用はライブのCST調律期間に従います。"
+      },
+      "timeIncrement": {
+        "label": "一筆あたりに加わる時間",
+        "tooltip": "一筆ごとにこの時間がサイクル確定時刻に加わります。増分はサイクルごとに{percent}%ずつ大きくなります。"
+      },
+      "cstPreview": {
+        "label": "現在の参加CSTのプレビュー",
+        "tooltip": "今一筆を入れた場合の参加CSTの見込み。量は動的で、{formula}を使います。"
+      },
+      "finalization": {
+        "label": "確定タイムアウト",
+        "tooltip": "公開確定期間が誰にでも開かれる前に、最後の一筆の参加者がサイクルを確定できる時間"
+      },
+      "initial": {
+        "label": "初期サイクル期間",
+        "tooltip": "最初の一筆が入れられたときに加わる初期のサイクル確定時刻"
+      },
+      "message": {
+        "label": "メッセージの最大長",
+        "tooltip": "一筆のメッセージに許される最大文字数"
+      },
+      "v3CstDecline": {
+        "label": "CST価格の下降レート",
+        "value": "{amount} CST/分",
+        "tooltip": "CST調律期間中にCST一筆費用が下がる速さです。刻印される参加CSTは、上回られた参加者に全額付与されます。"
+      },
+      "v3SignatureNfts": {
+        "label": "シグネチャー配分NFT数",
+        "tooltip": "サイクル確定時にシグネチャー配分の受領者へ刻印されるCosmic Signature NFT（連番ID）の数です。"
+      },
+      "v3LateWindow": {
+        "label": "終盤一筆期間",
+        "tooltip": "サイクル確定時刻の直前に設けられる期間で、一筆費用に指数的に増える割増（最大約5倍）が適用されます。"
+      }
+    },
+    "groups": {
+      "gestures": "一筆",
+      "timing": "時間",
+      "selection": "星選"
+    }
+  },
+  "parameters": {
+    "windowsTitle": "調律期間",
+    "windowsDescription": "各期間は時間とともに一筆の費用を下げます。CSTの期間はCSTの一筆のたびに始まり直し、ETHの期間は各サイクルの始まりに開いて最初の一筆で閉じます。",
+    "cstTitle": "CST調律期間",
+    "ethTitle": "ETH調律期間",
+    "duration": "長さ",
+    "elapsed": "経過時間",
+    "remaining": "残り",
+    "progress": "{percent}完了",
+    "state": {
+      "running": "進行中",
+      "complete": "完了",
+      "closed": "終了",
+      "notStarted": "未開始"
+    },
+    "ceiling": "開始時の費用",
+    "cstDurationTooltip": "CST調律期間のライブの保存された長さ。CST一筆は約{increase}%長くし、ETH一筆は約{decrease}%短くします。",
+    "cstCeilingTooltip": "現在表示されているCST調律期間の開始時の一筆の費用。費用は保存された長さの間に線形に下がります。",
+    "publicGoodsAddress": "公共財の受け手",
+    "publicGoodsAddressTooltip": "公共財金庫コントラクトから公共財配分を現在受け取っているオンチェーンアドレス",
+    "selection": {
+      "ethLabel": "ETH星選の受領者",
+      "ethTooltip": "サイクルごとにETH配分を受け取るために無作為に選ばれる参加者の数",
+      "nftLabel": "NFT星選（参加者）",
+      "nftTooltip": "サイクルごとにCosmic Signature NFTを受け取るために無作為に選ばれる参加者の数",
+      "anchorLabel": "NFT星選（係留RWLK）",
+      "anchorTooltip": "サイクルごとにCosmic Signature NFTを受け取るために無作為に選ばれるRandom Walk NFT係留者の数"
+    },
+    "cstComplete": "期間が最後まで経過したため、次のCSTの一筆で始まり直すまで、CSTの一筆の費用は最低値のままです。",
+    "ethClosed": "このサイクルの最初の一筆でこの期間は閉じました。以後、ETHの一筆の費用は一筆ごとに上がります。",
+    "ethComplete": "期間が最後まで経過したため、このサイクルの最初の一筆まで、ETHの一筆の費用は最低値のままです。"
+  },
+  "vault": {
+    "title": "公共財",
+    "description": "各サイクルの公共財の割合は金庫に入り、金庫から公共財の受け手へ送られます。",
+    "tooltip": "公共財金庫のsend()関数を呼び出し、金庫のETH残高を設定済みのProtocol Guildの受け手へ送ります。",
+    "vaultAddress": "金庫",
+    "share": "サイクルごとの割合",
+    "balance": "現在の金庫残高",
+    "empty": "金庫は空のため、送れる資金はまだありません。",
+    "balanceUnavailable": "金庫の残高を読み取れなかったため、現在は送る操作を表示していません。",
+    "note": "誰でも金庫の残高を受け手へ送ることができ、かかるのはガス代だけです。"
+  },
+  "seo": {
+    "heading": "Cosmic Signatureコントラクト",
+    "partialFallback": "現在、ライブの数値を取得できません。下のアドレスは検証済みの一覧です。"
+  }
+}

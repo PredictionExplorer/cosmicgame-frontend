@@ -1,0 +1,198 @@
+{
+  "formats": {
+    "cycle": "サイクル{cycle}"
+  },
+  "recipients": {
+    "header": {
+      "title": "配分の受領者",
+      "subtitle": "確定したすべてのサイクルについて、配分の受領者、統計、配分の内訳を確認できます。",
+      "scope": "確定したサイクルの記録のみ",
+      "scopeTooltip": "このページはサイクルAPIから確定済みのパフォーマンス・サイクルを要約しています。未確定のサイクルや、関係のない配分受け取りの記録はこれらの合計に含まれません。"
+    },
+    "reserveSplit": {
+      "label": "サイクル準備金の内訳",
+      "tooltip": "確定したサイクルのETH準備金がプロトコルの各トラックにどう配分されるかを割合で示します。"
+    },
+    "ledgerTitle": "確定したサイクル",
+    "loadError": "確定したサイクルを読み込めませんでした。しばらくしてからもう一度お試しください。",
+    "intro": "パフォーマンス・サイクルが確定すると、最後の一筆を入れた参加者がシグネチャー配分——サイクル準備金の{percentage}%、1,000 CST、そして{cscNftCount, number}点のCosmic Signature NFT——を受け取ります。さらに、時の戦士、星選、係留配分、公共財、累積準備金を通じて追加の配分が流れます。"
+  },
+  "details": {
+    "navigation": {
+      "label": "前後のサイクル",
+      "previousAria": "前のサイクル",
+      "nextAria": "次のサイクル"
+    },
+    "recipientCard": {
+      "recipient": "受領者"
+    },
+    "share": {
+      "summary": "サイクル{cycle}——Cosmic Signature\nシグネチャー配分：{amount} ETH\n受領者：{recipient}\n筆数：{gestures}",
+      "copyLink": "リンクをコピー",
+      "linkCopied": "リンクをコピーしました",
+      "failed": "リンクをコピーできませんでした"
+    },
+    "error": {
+      "title": "このサイクルを読み込めませんでした",
+      "message": "サイクル{cycle}のデータを読み込めませんでした。再試行するか、受領者の一覧に戻ってください。"
+    },
+    "breadcrumbs": {
+      "recipients": "配分の受領者"
+    },
+    "loading": "サイクルを読み込み中",
+    "hero": {
+      "finalized": "<dateTime></dateTime>に確定",
+      "viewTransaction": "トランザクションを見る",
+      "share": "共有",
+      "shareAria": "サイクルの要約を共有",
+      "nfts": "NFT",
+      "nftTooltip": "ギャラリーで受領者のCosmic Signature NFTを表示します。V3のサイクルでは、シグネチャー配分の受領者に連番のNFTが複数授与されます。"
+    },
+    "recipientSection": {
+      "title": "サイクルの受領者",
+      "description": "サイクルの確定時に、以下の各役割がCosmic Signature NFTを受け取りました。",
+      "rolesInfo": "シグネチャー配分：最後の一筆を入れた参加者です。時の戦士：持久チャンピオンの位置を最も長く連続して保った参加者です。持久チャンピオン：最新の一筆の位置を最も長く途切れずに保った参加者です。最後のCST一筆：サイクルの最後の一筆をCSTで入れた参加者です。",
+      "cards": {
+        "signature": {
+          "title": "シグネチャー配分",
+          "tooltip": "確定時刻を過ぎると、最後に一筆を入れた参加者がサイクルを確定できます。シグネチャー配分にはETH、1,000 CST、{cscNftCount, number}点のCosmic Signature NFTが含まれます。"
+        },
+        "chrono": {
+          "title": "時の戦士"
+        },
+        "endurance": {
+          "title": "持久チャンピオン"
+        },
+        "finalCst": {
+          "title": "最後のCST一筆"
+        }
+      }
+    },
+    "distribution": {
+      "title": "配分の分布",
+      "tooltip": "このサイクルの確定時に、各トラックがサイクル準備金に占めた割合です。「配分の受領者」ページと同じ基準で示します。配分されなかった残りは次のサイクルへ持ち越されます。",
+      "total": "このサイクルの配分総額：{amount} ETH"
+    },
+    "statistics": {
+      "cards": {
+        "signatureEth": {
+          "label": "シグネチャー配分ETH",
+          "tooltip": "このサイクルで最後の一筆を入れた参加者が受け取ったシグネチャー配分のETH部分。"
+        },
+        "recipients": {
+          "label": "受領者",
+          "tooltip": "このサイクルで少なくとも1件の配分を受け取ったウォレットの数（重複なし）。"
+        },
+        "gestures": {
+          "label": "一筆の総数"
+        },
+        "attachedNfts": {
+          "label": "添付されたNFT"
+        },
+        "anchoredTokens": {
+          "label": "係留中のNFT"
+        },
+        "uniqueAnchorHolders": {
+          "label": "ユニーク係留者",
+          "tooltip": "このサイクル中にNFTを係留していた異なるアドレスの数。"
+        },
+        "totalContributed": {
+          "label": "直接拠出",
+          "tooltip": "このサイクル中にコミュニティから直接拠出されたETH。"
+        }
+      }
+    },
+    "ledger": {
+      "title": "このサイクルのすべての配分",
+      "description": "このサイクルのすべての配分記録を、受領者ごとにまとめています。",
+      "empty": "配分の記録はまだありません。"
+    },
+    "data": {
+      "divider": "詳細データ",
+      "tabs": {
+        "gestures": "一筆の履歴",
+        "endurance": "持久チャンピオン",
+        "anchoring": "係留配分",
+        "contributions": "拠出"
+      },
+      "empty": {
+        "gestures": "このサイクルでは一筆は入れられませんでした。",
+        "endurance": "このサイクルの持久チャンピオンのデータはありません。",
+        "anchoring": "このサイクルに係留配分はありません。",
+        "nfts": "このサイクルでは一筆にNFTは添付されませんでした。",
+        "erc20": "このサイクルでは一筆にERC-20トークンは添付されませんでした。"
+      },
+      "error": {
+        "title": "この一覧を読み込めませんでした",
+        "message": "一覧を一時的に取得できません。しばらくしてからもう一度お試しください。"
+      },
+      "contributions": {
+        "nfts": "添付されたNFT",
+        "nftsTooltip": "このサイクル中に一筆に添付され、最後の一筆を入れた参加者へ送られたNFT。",
+        "erc20": "添付されたERC-20トークン",
+        "erc20Tooltip": "参加者が一筆に添付し、シグネチャー配分の受領者へ送られたERC-20トークン。"
+      }
+    }
+  },
+  "art": {
+    "failed": "作品を読み込めませんでした"
+  },
+  "missingCycle": {
+    "open": {
+      "title": "サイクル{cycle}は進行中です",
+      "body": "サイクルが確定すると、配分の記録がここに表示されます。"
+    },
+    "notStarted": {
+      "title": "サイクル{cycle}はまだ始まっていません",
+      "body": "サイクルは一つずつ進み、現在進行中なのはサイクル{live}です。"
+    },
+    "unknown": {
+      "title": "サイクル{cycle}の記録はまだありません",
+      "body": "サイクルがまだ続いているか、記録のインデックス中の可能性があります。"
+    },
+    "currentCycle": "現在のサイクルを見る"
+  },
+  "finalized": {
+    "title": "配分が確定しました",
+    "index": {
+      "title": "最近確定したサイクル",
+      "description": "各サイクルのシグネチャー配分を、そのサイクルで刻印されたCosmic Signatureとともに表示します。",
+      "error": "最新のサイクルを読み込めませんでした",
+      "empty": {
+        "title": "確定したサイクルはまだありません",
+        "description": "最初のサイクルが確定すると、シグネチャー配分がここに表示されます。"
+      }
+    },
+    "loading": {
+      "status": "確定したサイクルを読み込み中"
+    },
+    "pending": {
+      "successTitle": "サイクル{cycle}が確定しました",
+      "successBody": "確定はオンチェーンに記録されました。インデックスが完了しだい記録がここに表示され、このページは自動で更新されます。"
+    },
+    "links": {
+      "viewCycle": "サイクル{cycle}を見る",
+      "myAllocations": "自分の配分",
+      "allCycles": "すべてのサイクル",
+      "cycles": "ほかのサイクル"
+    },
+    "result": {
+      "title": "サイクル{cycle}のシグネチャー配分",
+      "successTitle": "おめでとうございます。サイクル{cycle}のシグネチャー配分を受け取りました",
+      "lede": "サイクルの確定時に、最後の一筆を入れた参加者が受け取った配分です。",
+      "allocation": "配分",
+      "successLede": "サイクル{cycle}の最後の一筆を入れました。ETH、CST、このCosmic Signatureはすでにウォレットにあります。",
+      "componentsTitle": "配分の内容",
+      "nft": "Cosmic Signature NFT",
+      "attached": "添付されたNFT",
+      "recipient": "受領者",
+      "finalized": "確定日時",
+      "viewTransaction": "トランザクションを見る"
+    },
+    "nextCycle": "次のサイクルが始まりました。<link>観測所へ移動</link>",
+    "next": {
+      "title": "次のステップ",
+      "body": "星選から追加の配分がある可能性もあります。配分を確認するには<allocations>自分の配分</allocations>ページへ。係留配分は<anchors>自分の係留</anchors>ページで確認できます。"
+    }
+  }
+}

@@ -7,7 +7,7 @@ import { X } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 
 import { cn } from '@/lib/utils';
-import { TOUCH_TARGET_ICON_CLASS } from '@/lib/touch-target';
+import { OVERLAY_CLOSE_CLASS } from '@/components/ui/dialog';
 
 const Sheet = SheetPrimitive.Root;
 
@@ -38,7 +38,10 @@ const SheetOverlay = React.forwardRef<
 SheetOverlay.displayName = SheetPrimitive.Overlay.displayName;
 
 const sheetVariants = cva(
-  'fixed z-50 gap-4 bg-background p-6 shadow-lg transition ease-in-out data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:duration-300 data-[state=open]:duration-500',
+  // A floating layer: the raised surface, one hairline edge and the float
+  // shadow. It slides in from its edge over the base duration and leaves
+  // faster; reduced motion skips both (styles/global.css, overlay motion).
+  'fixed z-50 gap-4 border-rule bg-surface-raised p-6 shadow-float ease-[var(--ease-out-expo)] data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:duration-[var(--duration-fast)] data-[state=open]:duration-[var(--duration-base)]',
   {
     variants: {
       side: {
@@ -59,25 +62,41 @@ const sheetVariants = cva(
 interface SheetContentProps
   extends
     React.ComponentPropsWithoutRef<typeof SheetPrimitive.Content>,
-    VariantProps<typeof sheetVariants> {}
+    VariantProps<typeof sheetVariants> {
+  /**
+   * `corner` (default): the dialog's close control in the top corner.
+   * `header`: for a drawer that opens with a header-height row (the site
+   * menus): the close control sits where the menu button that opened it was,
+   * a 44px target centred on the row at the page gutter, with the menu
+   * button's 20px glyph.
+   */
+  closePlacement?: 'corner' | 'header';
+}
+
+/**
+ * On a drawer's header row, where the menu button was: centred on the row,
+ * its edge half a rem inside the page gutter (the button's own `-mr-2` in a
+ * `site-container`), so it tracks the gutter from a 320px phone to a tablet.
+ */
+const HEADER_CLOSE_CLASS =
+  'right-[calc(var(--gutter)-0.5rem)] top-[calc((var(--header-height)-2.75rem)/2)] size-11 min-h-11 min-w-11 sm:m-0 sm:size-11';
 
 const SheetContent = React.forwardRef<
   React.ComponentRef<typeof SheetPrimitive.Content>,
   SheetContentProps
->(({ side = 'right', className, children, ...props }, ref) => (
+>(({ side = 'right', closePlacement = 'corner', className, children, ...props }, ref) => (
   <SheetPortal>
     <SheetOverlay />
     <SheetPrimitive.Content ref={ref} className={cn(sheetVariants({ side }), className)} {...props}>
-      {children}
+      {/* First in the DOM so focus order matches the corner it paints in. */}
       <SheetPrimitive.Close
-        className={cn(
-          'absolute right-4 top-4 rounded-sm opacity-70 ring-offset-background transition-opacity hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:pointer-events-none data-[state=open]:bg-secondary',
-          TOUCH_TARGET_ICON_CLASS,
-        )}
+        className={cn(OVERLAY_CLOSE_CLASS, closePlacement === 'header' && HEADER_CLOSE_CLASS)}
+        data-placement={closePlacement}
       >
-        <X className="h-4 w-4" />
+        <X aria-hidden className={closePlacement === 'header' ? 'size-5' : 'size-4'} />
         <SheetCloseLabel />
       </SheetPrimitive.Close>
+      {children}
     </SheetPrimitive.Content>
   </SheetPortal>
 ));
@@ -102,7 +121,7 @@ const SheetTitle = React.forwardRef<
 >(({ className, ...props }, ref) => (
   <SheetPrimitive.Title
     ref={ref}
-    className={cn('text-lg font-semibold text-foreground', className)}
+    className={cn('type-title text-foreground', className)}
     {...props}
   />
 ));

@@ -58,22 +58,28 @@ describe('generated ABI barrel', () => {
     expect(signatures).toContain('bidWithEth(int256,string,uint256)');
   });
 
-  it('exposes V3 configuration getters (late-bid premium, multi-NFT prize)', () => {
+  it('exposes V3 configuration getters (late-bid premium, CST price decline, multi-NFT prize)', () => {
     const signatures = functionSignatures(abis.cosmicGameAbi);
-    expect(signatures).toContain('bidRaffleCumulativeWeights(uint256,uint256)');
+    expect(signatures).toContain('cstBidPriceDeclineMultiplier()');
+    expect(signatures).toContain('cstBidPriceDeclineMultiplierChangeDivisor()');
     expect(signatures).toContain('mainPrizeNumCosmicSignatureNfts()');
     expect(signatures).toContain('getRoundLateBidDuration()');
     expect(signatures).toContain('roundLateBidDurationDivisor()');
     expect(signatures).toContain('roundLateBidPricePremiumAmountBaseMultiplier()');
     expect(signatures).toContain('roundLateBidPricePremiumAmountExponent()');
+    // v3.1-2026-08-19: raffle weights live in the BidInfo struct (bidsInfo /
+    // getBidInfoAt replace the earlier bidRaffleCumulativeWeights mapping).
+    expect(signatures).toContain('getBidInfoAt(uint256,uint256)');
+    expect(signatures).toContain('bidsInfo(uint256)');
+    expect(signatures).not.toContain('bidRaffleCumulativeWeights(uint256,uint256)');
     // Retired V3-prototype getter: 100% of the CST reward now goes to the outbid bidder.
     expect(signatures).not.toContain('lastBidderBidCstRewardAmountPercentage()');
-    // V3 reverted to the V2 stored CST auction duration, so the decline-multiplier
-    // prototype is gone and the V2 duration setters are live again.
-    expect(signatures).not.toContain('cstBidPriceDeclineMultiplier()');
-    expect(signatures).not.toContain('cstBidPriceDeclineMultiplierChangeDivisor()');
-    expect(signatures).toContain('setCstDutchAuctionDuration(uint256)');
-    expect(signatures).toContain('setCstDutchAuctionDurationChangeDivisor(uint256)');
+    // v3.1 removed the one-gesture-per-second throttle.
+    const errorNames = abis.cosmicGameAbi
+      .filter((item) => item.type === 'error')
+      .map((item) => (item as { name: string }).name);
+    expect(errorNames).not.toContain('BidPlacedWithinCurrentSecond');
+    expect(errorNames).toContain('NotImplemented');
   });
 
   it('exposes both BidPlaced overloads so the live refresh watcher matches V1 and V2/V3 topics', () => {

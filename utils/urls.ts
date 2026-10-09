@@ -1,18 +1,63 @@
 import { networkConfig } from '@/config/networks';
 import { LANDING_ORIGIN } from '@/lib/hostRouting';
-import { getApiOrigin } from '@/lib/serverRotation';
+import { BRAND_ICON_PATHS } from '@/lib/og/brandIcons';
+import { apiBaseUrls } from '@/lib/serverRotation';
 
 const EXPLORER_BASE = networkConfig.explorerUrl.replace(/\/$/, '');
 
+function originOf(url: string): string | null {
+  try {
+    return new URL(url).origin;
+  } catch {
+    return null;
+  }
+}
+
 /**
- * NFT media origin (no path). The rotated API servers serve the media too
- * (`/images/...`), so media follows the same hourly rotation and failover as
- * API calls instead of pinning a dedicated single-server media host.
- * Falls back to the per-environment `nftApiUrl` when no API base is
- * configured.
+ * Every server that serves the NFT media (`/images/...`, `/metadata/...`):
+ * the configured API servers, which serve both, in their configured order.
  */
+export const MEDIA_ORIGINS: readonly string[] = [
+  ...new Set(apiBaseUrls.map(originOf).filter((origin): origin is string => !!origin)),
+];
+
+/**
+ * The one origin media URLs are built on: the first media server, else the
+ * per-environment `nftApiUrl`. Deliberately not the API's hourly rotation
+ * pick. A media URL is rendered on the server and again while hydrating, and
+ * a page cached in one hour and hydrated in the next would swap every
+ * image's host after it painted, blanking the whole gallery while each file
+ * downloaded a second time; a rotating host also defeats the browser cache
+ * every hour. Failover happens only when an image actually fails, in the
+ * art frame's source chain ({@link mediaFailoverUrl}).
+ */
+export const MEDIA_ORIGIN: string =
+  MEDIA_ORIGINS[0] ?? (networkConfig.nftApiUrl || '').replace(/\/+$/, '');
+
 function nftCdnOrigin(): string {
-  return getApiOrigin() || (networkConfig.nftApiUrl || '').replace(/\/+$/, '');
+  return MEDIA_ORIGIN;
+}
+
+/**
+ * The same media file on the next media server in the list, for an image
+ * that failed to load (the art frame tries it once before its next source).
+ * Null when the URL is not on a media server or there is no other server.
+ */
+export function mediaFailoverUrl(url: string): string | null {
+  const index = MEDIA_ORIGINS.findIndex((origin) => url.startsWith(`${origin}/`));
+  if (index === -1 || MEDIA_ORIGINS.length < 2) return null;
+  const failed = MEDIA_ORIGINS[index]!;
+  const next = MEDIA_ORIGINS[(index + 1) % MEDIA_ORIGINS.length]!;
+  return `${next}${url.slice(failed.length)}`;
+}
+
+/**
+ * A media URL without its server's origin (`/images/new/…`), so two copies of
+ * one file on different media servers compare equal. Other URLs unchanged.
+ */
+export function mediaPathKey(url: string): string {
+  const origin = MEDIA_ORIGINS.find((candidate) => url.startsWith(`${candidate}/`));
+  return origin ? url.slice(origin.length) : url;
 }
 
 /** Returns a block-explorer URL for a tx hash, address, or token. */
@@ -43,7 +88,7 @@ export const getThumbUrl = (seed: string | number, variant: ThumbVariant): strin
 };
 
 /** Seed as lower-case hex without a `0x` prefix, however the caller spelled it. */
-const bareSeed = (seed: string | number): string =>
+export const bareSeed = (seed: string | number): string =>
   String(seed).trim().toLowerCase().replace(/^0x/, '');
 
 /**
@@ -85,6 +130,19 @@ export const getRWLKImageUrl = (fileName: string, variant: string = 'black_thumb
   return `${nftCdnOrigin()}/images/randomwalk/${fileName}_${variant}`;
 };
 
+/**
+ * A Random Walk NFT's render on the media server, by token id: the files are
+ * named by the zero-padded id ("004079_black_thumb.jpg").
+ */
+export const randomWalkImageUrl = (
+  tokenId: number | string,
+  variant: string = 'black_thumb.jpg',
+): string => getRWLKImageUrl(String(tokenId).padStart(6, '0'), variant);
+
+/** A Random Walk NFT's page on the project's own site. */
+export const randomWalkTokenUrl = (tokenId: number | string): string =>
+  `https://www.randomwalknft.com/detail/${tokenId}`;
+
 /** Decodes the original URL (handles legacy proxied format for backwards compatibility). */
 export const getOriginUrl = (url: string): string => {
   if (url.startsWith('/api/proxy?url=')) {
@@ -96,5 +154,5 @@ export const getOriginUrl = (url: string): string => {
 /** Same origin as root `metadataBase` — marketing/branding, not chain-specific. */
 const CANONICAL_SITE_ORIGIN = LANDING_ORIGIN;
 
-/** Site branding logo (`public/images/logo.svg`). Not on the NFT CDN. */
-export const logoImgUrl = `${CANONICAL_SITE_ORIGIN}/images/logo.svg`;
+/** Site logo: the orbit mark on the Midnight plate, a 512px PNG. Not on the NFT CDN. */
+export const logoImgUrl = `${CANONICAL_SITE_ORIGIN}${BRAND_ICON_PATHS.logo512}`;

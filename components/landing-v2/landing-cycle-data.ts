@@ -1,5 +1,6 @@
 'use client';
 
+import { toFiniteNumber } from '@/utils/finiteNumber';
 import { getApiBase } from '@/lib/serverRotation';
 
 /**
@@ -9,8 +10,8 @@ import { getApiBase } from '@/lib/serverRotation';
  * the axios client plus the full zod schema module (~90 KB gzip — the
  * largest chunk in the landing bundle) onto the marketing host for three
  * display-only reads. These fetch helpers shape-check exactly the handful
- * of fields the countdown consumes and degrade to null on any failure,
- * which the timer renders as its "unavailable" state.
+ * of fields the countdown consumes and degrade to null on any failure; the
+ * clock keeps its last good value of each read (landing-cycle-clock.ts).
  */
 
 /** Structural subset of the dashboard read the landing timer consumes. */
@@ -23,13 +24,39 @@ export interface LandingDashboardSnapshot {
   CurRoundStats?: { ActivationTime?: number } | null;
 }
 
-function apiUrl(path: string): string {
-  return `${getApiBase().replace(/\/+$/, '')}/${path}`;
+/**
+ * How long one landing read may wait before it counts as failed, so a stalled
+ * request never holds a skeleton, a busy state or the clock's poll loop.
+ */
+export const LANDING_FETCH_TIMEOUT_MS = 8_000;
+
+/**
+ * An API path on the server the rotation picks right now (lib/serverRotation:
+ * the hourly rotation, skipping servers marked down), the one base every
+ * landing read uses.
+ */
+export function landingApiUrl(path: string): string {
+  const base = getApiBase().replace(/\/+$/, '');
+  const cleanPath = path.replace(/^\/+/, '');
+  return base ? `${base}/${cleanPath}` : `/${cleanPath}`;
 }
 
-async function fetchJson(path: string): Promise<Record<string, unknown> | null> {
+/** An abort signal that fires after `ms`, where the browser has `AbortSignal.timeout`. */
+export function timeoutSignal(ms: number): AbortSignal | undefined {
+  return typeof AbortSignal !== 'undefined' && typeof AbortSignal.timeout === 'function'
+    ? AbortSignal.timeout(ms)
+    : undefined;
+}
+
+async function fetchJson(
+  path: string,
+  timeoutMs: number = LANDING_FETCH_TIMEOUT_MS,
+): Promise<Record<string, unknown> | null> {
   try {
-    const response = await fetch(apiUrl(path), { headers: { Accept: 'application/json' } });
+    const response = await fetch(landingApiUrl(path), {
+      headers: { Accept: 'application/json' },
+      signal: timeoutSignal(timeoutMs),
+    });
     if (!response.ok) return null;
     const data: unknown = await response.json();
     return data !== null && typeof data === 'object' ? (data as Record<string, unknown>) : null;
@@ -38,29 +65,27 @@ async function fetchJson(path: string): Promise<Record<string, unknown> | null> 
   }
 }
 
-function toFiniteNumber(value: unknown): number | null {
-  return typeof value === 'number' && Number.isFinite(value) ? value : null;
-}
-
 function toOptionalFiniteNumber(value: unknown): number | undefined {
-  return typeof value === 'number' && Number.isFinite(value) ? value : undefined;
+  return toFiniteNumber(value) ?? undefined;
 }
 
 /** Unix seconds when the current cycle can finalize, or null when unknown. */
-export async function fetchLandingFinalizationTimeSec(): Promise<number | null> {
-  const data = await fetchJson('rounds/current/time');
+export async function fetchLandingFinalizationTimeSec(timeoutMs?: number): Promise<number | null> {
+  const data = await fetchJson('rounds/current/time', timeoutMs);
   return toFiniteNumber(data?.CurRoundPrizeTime);
 }
 
 /** Server clock in Unix seconds, or null when unknown. */
-export async function fetchLandingCurrentTimeSec(): Promise<number | null> {
-  const data = await fetchJson('time/current');
+export async function fetchLandingCurrentTimeSec(timeoutMs?: number): Promise<number | null> {
+  const data = await fetchJson('time/current', timeoutMs);
   return toFiniteNumber(data?.CurrentTimeStamp);
 }
 
 /** Narrow dashboard snapshot for the landing timer, or null when unusable. */
-export async function fetchLandingDashboardSnapshot(): Promise<LandingDashboardSnapshot | null> {
-  const data = await fetchJson('statistics/dashboard');
+export async function fetchLandingDashboardSnapshot(
+  timeoutMs?: number,
+): Promise<LandingDashboardSnapshot | null> {
+  const data = await fetchJson('statistics/dashboard', timeoutMs);
   if (!data) return null;
 
   const cycleNumber = toFiniteNumber(data.CurRoundNum);

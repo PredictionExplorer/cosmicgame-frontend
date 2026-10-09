@@ -1,32 +1,39 @@
 'use client';
 
-import type { CountdownRenderProps } from 'react-countdown';
-import { ArrowRight, BellRing, CalendarPlus, Clock3 } from 'lucide-react';
+import type { ReactNode } from 'react';
+import { ArrowRight, CalendarPlus } from 'lucide-react';
 import { useLocale, useTranslations } from 'next-intl';
 
-import { isV3Mechanics, protocolFacts } from '@/content/protocol-facts';
-import { formatSeconds } from '@/utils';
-
-import Counter from '@/components/common/Counter';
-import { SmoothCountdown } from '@/components/common/SmoothCountdown';
+import {
+  SmoothCountdown,
+  type LocalizedCountdownRenderProps,
+} from '@/components/common/SmoothCountdown';
+import { Amount } from '@/components/ui/amount';
 import { Button } from '@/components/ui/button';
+import {
+  CountdownFigures,
+  countdownGroups,
+  countdownPartsFromMs,
+  countdownSeconds,
+} from '@/components/ui/countdown-figures';
+import { Duration } from '@/components/ui/duration';
 import { InfoTooltip } from '@/components/ui/info-tooltip';
-import { Spinner } from '@/components/ui/spinner';
-import { Surface } from '@/components/ui/surface';
+import { useHydrated } from '@/hooks/useHydrated';
+import { Term } from '@/components/ui/term';
+import { UnknownValue } from '@/components/ui/unknown-value';
+import { ChainGuard } from '@/components/wallet/NetworkGuard';
+import { Link } from '@/i18n/navigation';
 import { buildCalendarInviteDataUri } from '@/lib/calendarInvite';
 import { getCycleState } from '@/lib/cycleState';
-import { TOUCH_TARGET_EXTENDED_CLASS, TOUCH_TARGET_HEIGHT_CLASS } from '@/lib/touch-target';
+import { APP_ORIGIN, localeHref } from '@/lib/hostRouting';
+import { TOUCH_TARGET_HEIGHT_CLASS, TOUCH_TARGET_TEXT_LINK_CLASS } from '@/lib/touch-target';
 import { cn } from '@/lib/utils';
 import type { DashboardInfo } from '@/services/api';
-import { Link } from '@/i18n/navigation';
+import { formatAmount, sameAddress } from '@/utils/format';
+import { toFiniteNumber } from '@/utils/finiteNumber';
 
-import { viewForPhase } from './phaseView';
-
-/** Cosmic Signature NFTs in the Signature Allocation: V3 awards 3 sequential NFTs, V2 awards 1. */
-const signatureNftCount = isV3Mechanics ? protocolFacts.v3.mainPrizeNftsPerCycleDefault : 1;
-
-/** Selectable "notify me before finalization" thresholds, in minutes. */
-export const NOTIFY_THRESHOLD_CHOICES_MIN = [5, 30, 60] as const;
+import { PHASE_TEXT_CLASS, viewForPhase } from './phaseView';
+import { ValuePending } from './ValuePending';
 
 export interface CycleClockProps {
   data: DashboardInfo | null;
@@ -39,23 +46,69 @@ export interface CycleClockProps {
   /** True once the deadline passed, on-chain state confirms it, and the cycle can close. */
   canClaim: boolean;
   isClaiming: boolean;
-  /** Timestamp (ms) after which non-final-gesture wallets may also finalize. */
+  /** Timestamp (ms) after which any wallet, not only the Last Gesture holder, may finalize. */
   claimWait: number;
   onFinalize: () => void;
-  /** Minutes before finalization at which the browser notification fires. */
-  notifyThresholdMin?: number;
-  onNotifyThresholdChange?: (minutes: number) => void;
-  /** ETH price in USD for the reserve conversion; 0 hides the USD line. */
+  /** ETH price in USD for the allocation conversion; 0 hides the USD line. */
   ethUsdPrice?: number;
-  /** Removes the standalone card treatment inside the unified control desk. */
-  embedded?: boolean;
+  /**
+   * NFTs and tokens attached to this cycle's Gestures, which travel with the
+   * Signature Allocation; the line names them only when there are some.
+   */
+  attachedAssetCount?: number;
+  /** Where the attached assets are listed on the page (a same-page anchor). */
+  attachedAssetsHref?: string;
+  /** A control beside the clock's heading (the finalization alerts menu). */
+  headingAction?: ReactNode;
   className?: string;
 }
 
+/** A dot centred in the 1rem gutter before an item; clipped when the item starts a line. */
+const ITEM_SEPARATOR =
+  "relative ps-4 before:pointer-events-none before:absolute before:inset-y-0 before:start-0 before:flex before:w-4 before:items-center before:justify-center before:text-subtle before:content-['·']";
+
 /**
- * The observatory centerpiece: the finalization clock, its phase, and what is
- * at stake (the Signature Allocation reserve). Owns the finalize action —
- * closing the cycle is the clock reaching zero, not a form concern.
+ * The readout keeps the height of the figures (CountdownFigures' `desk`
+ * bounds plus their captions) whatever stands in it. Words that replace the
+ * figures (at zero, before the first Gesture) take the slightly smaller word
+ * size so "Ready to finalize" stays on one line, but nothing on the clock
+ * shrinks at zero.
+ */
+const WORD_SIZE = 'text-[clamp(1.625rem,7.5cqi,2.75rem)]';
+const READOUT_HEIGHT = 'min-h-[calc(clamp(2.25rem,12cqi,3.5rem)+1.5rem)]';
+
+/**
+ * Ticks the server-rendered figures until React takes over. The page is
+ * statically regenerated, so its HTML carries a countdown read up to a few
+ * seconds before it was served, and on a slow phone hydration can take
+ * several more: without this the clock sat frozen, then jumped. The script
+ * runs where it stands (right after the figures), recomputes each group from
+ * the deadline every second, and stops once the figures say they are
+ * hydrated. It exists only in the server HTML: a client-side render never
+ * creates it, since React ticks from the first frame. It rounds like
+ * `countdownSeconds` (whole seconds, up), so React takes over on the same
+ * reading.
+ */
+export const PREHYDRATION_TICK = `(function(){var s=document.currentScript,e=s&&s.previousElementSibling;if(!e)return;var t=Number(e.getAttribute('data-deadline'));if(!(t>0))return;var i=0;function k(){if(e.hasAttribute('data-hydrated')){clearInterval(i);return}var r=Math.max(0,Math.ceil((t-Date.now())/1e3)),v={days:Math.floor(r/86400),hours:Math.floor(r%86400/3600),minutes:Math.floor(r%3600/60),seconds:r%60},n=e.querySelectorAll('[data-unit]');for(var j=0;j<n.length;j++){var u=n[j].getAttribute('data-unit');if(u in v)n[j].textContent=String(v[u]).padStart(2,'0')}if(r<=0)clearInterval(i)}i=setInterval(k,1000);k()})();`;
+
+function renderWindowCountdown({ total }: LocalizedCountdownRenderProps) {
+  return (
+    <Duration
+      seconds={countdownSeconds(total)}
+      variant="clock"
+      className="type-figure-sm text-foreground"
+    />
+  );
+}
+
+/**
+ * The observatory's first reading: the Cycle Finalization Time as type under
+ * the phase as the region's heading, and what the cycle is for (the
+ * Signature Allocation). It owns the finalize action: closing the cycle is
+ * the clock reaching zero, not a form concern. At zero nothing shrinks: the
+ * figures give way to "Ready to finalize" at the clock's size, with who may
+ * finalize and from when. Everything reads from the start edge, like the
+ * ledger beside it, so a late figure (the USD reading) never moves another.
  */
 export function CycleClock({
   data,
@@ -69,14 +122,16 @@ export function CycleClock({
   isClaiming,
   claimWait,
   onFinalize,
-  notifyThresholdMin,
-  onNotifyThresholdChange,
   ethUsdPrice = 0,
-  embedded = false,
+  attachedAssetCount = 0,
+  attachedAssetsHref,
+  headingAction = null,
   className,
 }: CycleClockProps) {
   const t = useTranslations('home');
+  const tCommon = useTranslations('common');
   const locale = useLocale();
+  const hydrated = useHydrated();
 
   const cycleState = getCycleState({
     data,
@@ -92,9 +147,6 @@ export function CycleClock({
   const label = t(`chrono.phase.${view.messageKey}.label`);
   const status = t(`chrono.phase.${view.messageKey}.status`);
   const tooltip = t(`chrono.phase.${view.messageKey}.tooltip`);
-  const displayText = view.hasDisplayText
-    ? t(`chrono.phase.${view.messageKey}.display`)
-    : undefined;
   const targetMs = cycleState.isOpeningSoon
     ? (cycleState.activationTime ?? activationTime) * 1000
     : allocationTime;
@@ -102,275 +154,255 @@ export function CycleClock({
   const isRoundActive =
     cycleState.isGestureOpen || cycleState.isReadyToFinalize || cycleState.isConfirmingFinalization;
 
-  const reserveEth = data?.PrizeAmountEth ?? data?.CurPrizeAmountEth ?? 0;
-  const reserveUsd = ethUsdPrice > 0 ? reserveEth * ethUsdPrice : 0;
-  const finalizeWaiting = data?.LastBidderAddr !== account && claimWait > now;
+  // The word that stands in for the figures (only phases without a countdown
+  // have one in the catalog).
+  const displayText = (() => {
+    if (showCountdown) return null;
+    if (cycleState.isReadyToFinalize) return t('observatory.clock.state.ready');
+    if (cycleState.isConfirmingFinalization) return t('observatory.clock.state.confirming');
+    if (phase === 'unavailable') return label;
+    return t(`chrono.phase.${view.messageKey}.display`);
+  })();
 
-  const renderInlineCountdown = ({ total }: CountdownRenderProps) => (
-    <span className="font-mono tabular-nums">{formatSeconds(Math.ceil(total / 1000), locale)}</span>
-  );
-  const renderClockCounter = (props: CountdownRenderProps) => (
-    <Counter
-      {...props}
-      size={embedded ? 'md' : 'xl'}
-      tone={cycleState.isOpeningSoon ? 'impact' : 'default'}
-    />
-  );
+  const reserveEth = toFiniteNumber(data?.PrizeAmountEth ?? data?.CurPrizeAmountEth);
+  const reserveUsd = reserveEth != null && ethUsdPrice > 0 ? reserveEth * ethUsdPrice : null;
+
+  // At zero the Last Gesture holder has an exclusive window; after it, anyone
+  // may finalize. Both facts are stated, with the time, for every viewer.
+  const isHolder = sameAddress(account, data?.LastBidderAddr);
+  const windowOpen = claimWait > now;
+  const canFinalizeHere =
+    !loading && cycleState.isReadyToFinalize && canClaim && !!account && (isHolder || !windowOpen);
 
   return (
     <section
+      id="cycle-clock"
+      tabIndex={-1}
+      // The region keeps one stable name; its visible heading is the phase.
       aria-label={t('chrono.sectionAria')}
-      className="print-motion-visible relative z-[1] min-w-0"
+      className={cn(
+        'print-motion-visible relative min-w-0 scroll-mt-24 focus:outline-none',
+        className,
+      )}
       data-testid="cycle-clock"
       data-phase={phase}
     >
-      <Surface
-        variant={embedded ? 'plain' : 'gradient-border-accent'}
-        radius={embedded ? 'none' : 'xl'}
-        padding="none"
-        className={cn(
-          'isolate h-full overflow-hidden',
-          embedded ? 'border-0 bg-transparent shadow-none' : [view.toneClass, view.glowClass],
-          className,
-        )}
-      >
-        <div
-          className={cn(
-            'pointer-events-none absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 rounded-full bg-primary/10 blur-3xl',
-            embedded ? 'h-64 w-64 opacity-60' : 'h-[26rem] w-[26rem]',
-          )}
-        />
-        <div
-          className={cn(
-            'pointer-events-none absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 rounded-full border opacity-70',
-            embedded ? 'h-56 w-56 sm:h-64 sm:w-64' : 'h-72 w-72 sm:h-96 sm:w-96',
-            view.haloClass,
-            view.pulseClass,
-          )}
-        />
-        {!embedded && (
-          <div className="pointer-events-none absolute inset-x-8 top-0 h-px bg-gradient-to-r from-transparent via-white/45 to-transparent" />
-        )}
-
-        <div
-          className={cn(
-            'relative flex h-full flex-col text-center',
-            embedded ? 'px-3 py-3' : 'px-4 py-5 sm:px-6 sm:py-6',
-          )}
-        >
-          <div
-            className={cn(
-              'mx-auto inline-flex max-w-full items-center gap-2 rounded-full border border-white/[0.10] bg-white/[0.045] text-[11px] font-semibold uppercase tracking-[0.12em] text-muted-foreground',
-              embedded ? 'mb-2 px-2.5 py-1' : 'mb-3.5 px-3 py-1.5 sm:tracking-[0.24em]',
-            )}
-          >
-            <Clock3 className={cn('h-3.5 w-3.5', view.iconClass)} aria-hidden />
+      <div className="flex min-h-6 items-center justify-between gap-3">
+        <div className="flex min-w-0 items-center gap-1.5">
+          <h2 id="cycle-clock-title" className="type-heading-3 min-w-0 text-foreground">
             {eyebrow}
-            <InfoTooltip content={tooltip} className="ml-0" />
-          </div>
+          </h2>
+          <InfoTooltip content={tooltip} label={eyebrow} />
+        </div>
+        {headingAction}
+      </div>
 
-          <div
-            className={cn(
-              // `@container`: the fluid `xl` Counter sizes its digits in cqw
-              // against this box, so the clock always fits its column.
-              '@container border border-white/[0.10] bg-black/20 text-center backdrop-blur-md',
-              embedded ? 'rounded-xl p-2.5' : 'rounded-[1.75rem] p-4 sm:p-5',
-              phase === 'final-minute' && 'motion-safe:animate-urgency-pulse',
-            )}
-            role="timer"
-            aria-live="off"
-            aria-label={t('chrono.timerAria', { label, status })}
-          >
-            {showCountdown ? (
-              <SmoothCountdown date={targetMs} renderer={renderClockCounter} />
-            ) : (
-              <div
-                className={cn(
-                  'flex items-center justify-center',
-                  embedded ? 'min-h-16' : 'min-h-[96px]',
+      <div
+        className={cn('@container mt-2.5 flex items-end', READOUT_HEIGHT)}
+        role="timer"
+        aria-live="off"
+        aria-label={t('chrono.timerAria', { label, status })}
+      >
+        <div className="w-full">
+          {showCountdown ? (
+            <>
+              <SmoothCountdown
+                date={targetMs}
+                initialNowMs={now}
+                renderer={({ total }) => (
+                  // The one Cycle clock (the landing's and /current-cycle's
+                  // too): padded groups, one set of captions, and one
+                  // rounding rule (countdownSeconds), like the dock's and the
+                  // pre-hydration tick's, so no two readings on the page are
+                  // ever a second apart.
+                  <CountdownFigures
+                    groups={countdownGroups(countdownPartsFromMs(total), locale)}
+                    size="desk"
+                    align="start"
+                    deadlineMs={targetMs}
+                    hydrated={hydrated}
+                    data-testid="clock-figures"
+                  />
                 )}
-              >
-                <p
-                  className={cn(
-                    'font-display text-3xl font-bold tracking-tight sm:text-5xl',
-                    view.clockTextClass,
-                  )}
-                >
-                  {displayText}
-                </p>
-              </div>
-            )}
-          </div>
-
-          <p
-            className={cn(
-              'mx-auto max-w-xl text-muted-foreground',
-              embedded ? 'mt-2 text-xs leading-relaxed' : 'mt-3 text-sm',
-            )}
-          >
-            {status}
-          </p>
-
-          {/* What is at stake: the Signature Allocation reserve. */}
-          <div
-            data-testid="clock-reserve"
-            className={cn(
-              'mx-auto w-full max-w-md border border-primary/20 bg-primary/[0.05]',
-              embedded ? 'mt-2.5 rounded-lg px-3 py-2' : 'mt-4 rounded-2xl px-4 py-3',
-            )}
-          >
-            <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-muted-foreground">
-              {t('observatory.clock.reserveLabel')}
-              <InfoTooltip
-                content={t('status.metrics.signatureTooltip.base', {
-                  cscNftCount: signatureNftCount,
-                })}
-                className="ml-1.5"
+                intervalMs={1000}
               />
-            </p>
+              {/* Server HTML and hydration only: a client-side render ticks
+                  from its first frame, and never creates a script. */}
+              {!hydrated && <script dangerouslySetInnerHTML={{ __html: PREHYDRATION_TICK }} />}
+            </>
+          ) : (
             <p
+              data-testid="clock-display"
               className={cn(
-                'mt-0.5 font-display font-bold tabular-nums text-gradient-signature',
-                embedded ? 'text-xl' : 'text-3xl',
+                WORD_SIZE,
+                'font-medium leading-tight tracking-[-0.02em] text-balance',
+                cycleState.isReadyToFinalize ? PHASE_TEXT_CLASS.positive : 'text-foreground',
               )}
             >
-              {reserveEth.toFixed(4)} ETH
+              {displayText}
             </p>
-            {reserveUsd > 0 && (
-              <p
-                data-testid="clock-reserve-usd"
-                className="mt-0.5 text-xs font-medium tabular-nums text-muted-foreground"
-              >
-                {t('observatory.clock.reserveUsd', {
-                  amount: reserveUsd.toLocaleString(locale, { maximumFractionDigits: 0 }),
-                })}
-              </p>
-            )}
-            <p
-              className={cn(
-                'text-muted-foreground',
-                embedded ? 'mt-0.5 text-[10px]' : 'mt-1 text-xs',
-              )}
-            >
-              {t('observatory.clock.reserveExtras')}
-            </p>
-          </div>
-
-          {/* Finalize is the clock's own action: it exists because the clock hit zero. */}
-          {!loading && cycleState.isReadyToFinalize && canClaim && account && (
-            <div className={cn('mx-auto w-full max-w-md space-y-2', embedded ? 'mt-2.5' : 'mt-4')}>
-              <Button
-                size="lg"
-                data-testid="clock-finalize"
-                onClick={onFinalize}
-                className="h-12 w-full border-0 bg-gradient-to-r from-emerald-500 to-emerald-600 text-base font-semibold text-white hover:opacity-90"
-                disabled={isClaiming || finalizeWaiting}
-              >
-                {isClaiming ? (
-                  <span className="flex items-center gap-2">
-                    <Spinner size="sm" /> {t('form.processing')}
-                  </span>
-                ) : (
-                  <>
-                    {t('form.finalize')}
-                    <span className="flex items-center">
-                      {finalizeWaiting && (
-                        <>
-                          &nbsp;{t('form.finalizeAvailableIn')}&nbsp;
-                          <SmoothCountdown
-                            date={claimWait}
-                            renderer={renderInlineCountdown}
-                            intervalMs={1000}
-                          />
-                        </>
-                      )}
-                      &nbsp;
-                      <ArrowRight className="h-[22px] w-[22px]" />
-                    </span>
-                  </>
-                )}
-              </Button>
-              {finalizeWaiting && (
-                <p className="text-xs italic text-primary">{t('form.finalizeWaitNote')}</p>
-              )}
-            </div>
-          )}
-
-          {/* Notify-before-finalization threshold. */}
-          {onNotifyThresholdChange && cycleState.isFinalizationCountdownActive && (
-            <div
-              data-testid="clock-notify-control"
-              role="group"
-              aria-label={t('observatory.clock.notifyAria')}
-              className={cn(
-                'mx-auto flex flex-wrap items-center justify-center gap-1.5 text-[11px] text-muted-foreground',
-                embedded ? 'mt-2.5' : 'mt-4',
-              )}
-            >
-              <BellRing className="h-3.5 w-3.5 shrink-0 text-muted-foreground/70" aria-hidden />
-              <span>{t('observatory.clock.notifyLabel')}</span>
-              {NOTIFY_THRESHOLD_CHOICES_MIN.map((minutes) => (
-                <button
-                  key={minutes}
-                  type="button"
-                  onClick={() => onNotifyThresholdChange(minutes)}
-                  aria-pressed={notifyThresholdMin === minutes}
-                  data-touch-target="extended"
-                  className={cn(
-                    'rounded-full border px-2 py-0.5 font-semibold transition-colors',
-                    // Inline pills beside text: growing them would bloat the
-                    // row, so a pseudo-element extends the hit area instead.
-                    TOUCH_TARGET_EXTENDED_CLASS,
-                    notifyThresholdMin === minutes
-                      ? 'border-primary/50 bg-primary/12 text-white'
-                      : 'border-white/[0.08] bg-white/[0.02] text-muted-foreground hover:text-white',
-                  )}
-                >
-                  {t('observatory.clock.notifyMinutes', { minutes: String(minutes) })}
-                </button>
-              ))}
-            </div>
-          )}
-
-          {/* Between cycles: calendar invite and the cycle-details path. */}
-          {!loading && !isRoundActive && (
-            <div className={cn('flex flex-col items-center gap-1', embedded ? 'mt-2.5' : 'mt-4')}>
-              {cycleState.isOpeningSoon && (cycleState.activationTime ?? 0) > 0 && (
-                <a
-                  data-testid="clock-calendar-link"
-                  href={buildCalendarInviteDataUri({
-                    uid: `cosmic-cycle-${data?.CurRoundNum ?? 'next'}-opening`,
-                    title: t('observatory.clock.calendarTitle', {
-                      number: String(data?.CurRoundNum ?? ''),
-                    }),
-                    description: t('observatory.clock.calendarBody'),
-                    url: 'https://app.cosmicsignature.com/',
-                    startSeconds: cycleState.activationTime ?? 0,
-                  })}
-                  download={`cosmic-cycle-${data?.CurRoundNum ?? 'next'}-opening.ics`}
-                  className={cn(
-                    'inline-flex items-center gap-2 text-sm font-semibold text-primary transition hover:text-foreground',
-                    TOUCH_TARGET_HEIGHT_CLASS,
-                  )}
-                >
-                  <CalendarPlus className="h-4 w-4" aria-hidden />
-                  {t('observatory.clock.calendarCta')}
-                </a>
-              )}
-              <Link
-                href="/current-cycle"
-                className={cn(
-                  'inline-flex items-center gap-2 font-semibold text-primary transition hover:text-foreground',
-                  TOUCH_TARGET_HEIGHT_CLASS,
-                )}
-              >
-                {t('chrono.cta.viewCycle')}
-                <ArrowRight className="h-4 w-4" aria-hidden />
-              </Link>
-            </div>
           )}
         </div>
-      </Surface>
+      </div>
+
+      <p
+        data-testid="clock-status"
+        className={cn(
+          'type-body-sm mt-2 max-w-[var(--measure-lede)] text-pretty',
+          view.tone === 'attention' ? PHASE_TEXT_CLASS.attention : 'text-muted-foreground',
+        )}
+      >
+        {status}
+      </p>
+
+      {cycleState.isReadyToFinalize && (
+        <div data-testid="clock-finalize-window" className="mt-4 w-full max-w-sm">
+          {windowOpen ? (
+            <p className="flex flex-wrap items-baseline gap-x-2 gap-y-0.5">
+              <span className="type-label text-subtle">
+                {isHolder
+                  ? t('observatory.clock.finalize.exclusiveFor')
+                  : t('observatory.clock.finalize.openIn')}
+              </span>
+              <SmoothCountdown
+                date={claimWait}
+                initialNowMs={now}
+                renderer={renderWindowCountdown}
+                intervalMs={1000}
+              />
+            </p>
+          ) : (
+            <p className="type-label text-muted-foreground">
+              {t('observatory.clock.finalize.openNow')}
+            </p>
+          )}
+          {canFinalizeHere && (
+            <ChainGuard className="mt-3" buttonClassName="w-full">
+              <Button
+                variant="commit"
+                size="xl"
+                data-testid="clock-finalize"
+                onClick={onFinalize}
+                loading={isClaiming}
+                className="mt-3 w-full"
+              >
+                {t('form.finalize')}
+                <ArrowRight aria-hidden />
+              </Button>
+            </ChainGuard>
+          )}
+        </div>
+      )}
+
+      {/* What the cycle is for: the Signature Allocation. */}
+      <div data-testid="clock-reserve" className="mt-3 border-t border-rule-faint pt-3">
+        <p className="type-label text-subtle">
+          <Term id="signatureAllocation">{t('observatory.clock.reserveLabel')}</Term>
+        </p>
+        <p className="mt-1.5 flex flex-wrap items-baseline gap-x-3 gap-y-1">
+          {reserveEth != null ? (
+            <Amount
+              value={reserveEth}
+              unit="ETH"
+              context="card"
+              data-testid="clock-reserve-amount"
+              className="type-figure-lg text-foreground"
+            />
+          ) : loading ? (
+            <ValuePending ch={9} className="type-figure-lg" />
+          ) : (
+            <UnknownValue label={tCommon('status.unavailable')} className="type-figure-lg" />
+          )}
+          {reserveUsd != null && (
+            <span data-testid="clock-reserve-usd" className="type-caption text-subtle">
+              {t('observatory.clock.reserveUsd', {
+                amount: formatAmount(reserveUsd, { unit: 'USD', locale, withUnit: false }),
+              })}
+            </span>
+          )}
+        </p>
+        {/* The fixed extras, then the attached assets when there are any. The
+            dots hang in clipped gutters, so a wrapped line never starts or
+            ends on one; each item's words sit in their own box inside its
+            gutter, so only the padding, never text, meets the clip. Every line
+            is a 24px box, the attached-assets link's target size, so the line
+            keeps its height when that link arrives. */}
+        <div className="mt-0.5 overflow-hidden">
+          <ul
+            role="list"
+            data-testid="clock-reserve-extras"
+            className={cn(
+              'type-caption -ms-4 flex flex-wrap text-subtle',
+              TOUCH_TARGET_TEXT_LINK_CLASS,
+            )}
+          >
+            <li className="ps-4">
+              <span>{t('observatory.clock.reserveExtraCst')}</span>
+            </li>
+            <li className={ITEM_SEPARATOR}>
+              <span>{t('observatory.clock.reserveExtraNft')}</span>
+            </li>
+            {attachedAssetCount > 0 && (
+              <li className={ITEM_SEPARATOR} data-testid="clock-reserve-attached">
+                {attachedAssetsHref ? (
+                  <a
+                    href={attachedAssetsHref}
+                    className={cn(
+                      'link-quiet inline-flex text-primary',
+                      TOUCH_TARGET_TEXT_LINK_CLASS,
+                    )}
+                  >
+                    {t('observatory.clock.reserveAttached', { count: attachedAssetCount })}
+                  </a>
+                ) : (
+                  <span>
+                    {t('observatory.clock.reserveAttached', { count: attachedAssetCount })}
+                  </span>
+                )}
+              </li>
+            )}
+          </ul>
+        </div>
+      </div>
+
+      {/* Between cycles: a calendar invite and the cycle-details path. */}
+      {!loading && !isRoundActive && (
+        <div className="mt-4 flex flex-col items-start gap-1">
+          {cycleState.isOpeningSoon && (cycleState.activationTime ?? 0) > 0 && (
+            <a
+              data-testid="clock-calendar-link"
+              href={buildCalendarInviteDataUri({
+                uid: `cosmic-cycle-${data?.CurRoundNum ?? 'next'}-opening`,
+                title: t('observatory.clock.calendarTitle', {
+                  number: String(data?.CurRoundNum ?? ''),
+                }),
+                description: t('observatory.clock.calendarBody'),
+                // The home in the viewer's own language, on this build's app host.
+                url: localeHref(APP_ORIGIN, '/', locale),
+                startSeconds: cycleState.activationTime ?? 0,
+              })}
+              download={`cosmic-cycle-${data?.CurRoundNum ?? 'next'}-opening.ics`}
+              className={cn(
+                'link-quiet inline-flex items-center gap-2 text-sm font-medium text-primary',
+                TOUCH_TARGET_HEIGHT_CLASS,
+              )}
+            >
+              <CalendarPlus className="size-4" aria-hidden />
+              {t('observatory.clock.calendarCta')}
+            </a>
+          )}
+          <Link
+            href="/current-cycle"
+            className={cn(
+              'link-quiet inline-flex items-center gap-2 text-sm font-medium text-primary',
+              TOUCH_TARGET_HEIGHT_CLASS,
+            )}
+          >
+            {t('chrono.cta.viewCycle')}
+            <ArrowRight className="size-4" aria-hidden />
+          </Link>
+        </div>
+      )}
     </section>
   );
 }

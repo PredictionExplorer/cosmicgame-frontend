@@ -28,46 +28,61 @@ describe('NFTImage', () => {
     expect(extractOptimizedUrl(src)).toContain(mockData);
   });
 
-  test('with no src falls back to the lightweight placeholder', () => {
-    const mockData = '';
-    render(<NFTImage src={mockData} />);
-    const src = screen.getByAltText('NFT').getAttribute('src');
-    expect(extractOptimizedUrl(src)).toContain('/images/qmark-preview.png');
+  test('with no src renders the unavailable state, never stock artwork', () => {
+    render(<NFTImage src="" />);
+    const state = screen.getByRole('img', { name: 'NFT' });
+    expect(state).toHaveAccessibleDescription('detail.image.artworkUnavailable');
+    expect(state.tagName).toBe('DIV');
+    expect(document.querySelector('img')).toBeNull();
   });
 
-  test('shows fallback on image error', () => {
+  test('shows the unavailable state when the only image fails', () => {
     const brokenSrc = 'https://example.com/broken-image.png';
     render(<NFTImage src={brokenSrc} />);
     const img = screen.getByAltText('NFT');
     expect(extractOptimizedUrl(img.getAttribute('src'))).toContain(brokenSrc);
 
     fireEvent.error(img);
-    expect(extractOptimizedUrl(img.getAttribute('src'))).toContain('/images/qmark-preview.png');
+    expect(document.querySelector('img')).toBeNull();
+    expect(screen.getByRole('img', { name: 'NFT' })).toHaveTextContent(
+      'detail.image.artworkUnavailable',
+    );
   });
 
-  test('falls back from thumbnail to full image, then to the placeholder', () => {
+  test('falls back from thumbnail to full image, then to the unavailable state', () => {
     const thumb =
       'https://nfts.cosmicsignature.com/images/new/cosmicsignature/0xabc/thumb_card.webp';
     const full = 'https://nfts.cosmicsignature.com/images/new/cosmicsignature/0xabc.png';
     render(<NFTImage src={thumb} fallbackSrc={full} />);
-    const img = screen.getByAltText('NFT');
 
     // 1) thumbnail first
-    expect(img.getAttribute('src')).toBe(thumb);
+    expect(screen.getByAltText('NFT').getAttribute('src')).toBe(thumb);
 
     // 2) thumbnail missing → full image
-    fireEvent.error(img);
-    expect(img.getAttribute('src')).toBe(full);
+    fireEvent.error(screen.getByAltText('NFT'));
+    expect(screen.getByAltText('NFT').getAttribute('src')).toBe(full);
 
-    // 3) full image also fails → lightweight placeholder
-    fireEvent.error(img);
-    expect(extractOptimizedUrl(img.getAttribute('src'))).toContain('/images/qmark-preview.png');
+    // 3) full image also fails → the designed unavailable state
+    fireEvent.error(screen.getByAltText('NFT'));
+    expect(screen.getByRole('img', { name: 'NFT' })).toHaveTextContent(
+      'detail.image.artworkUnavailable',
+    );
   });
 
-  test('never references the full-resolution qmark asset as fallback', () => {
-    render(<NFTImage src="" />);
-    const src = screen.getByAltText('NFT').getAttribute('src');
-    expect(extractOptimizedUrl(src)).not.toBe('/images/qmark.png');
+  test('never falls back to the retired qmark placeholder artwork', () => {
+    const brokenSrc = 'https://example.com/broken-image.png';
+    render(<NFTImage src={brokenSrc} />);
+    fireEvent.error(screen.getByAltText('NFT'));
+    expect(document.body.innerHTML).not.toContain('qmark');
+  });
+
+  test('still honours an explicit terminal fallback image', () => {
+    const brokenSrc = 'https://example.com/broken-image.png';
+    render(<NFTImage src={brokenSrc} terminalFallbackSrc="/images/logo.svg" />);
+    fireEvent.error(screen.getByAltText('NFT'));
+    expect(extractOptimizedUrl(screen.getByAltText('NFT').getAttribute('src'))).toContain(
+      '/images/logo.svg',
+    );
   });
 
   test('can render a neutral unavailable state instead of a terminal image fallback', () => {
@@ -100,6 +115,52 @@ describe('NFTImage', () => {
     expect(state).not.toHaveTextContent('detail.image.artworkUnavailable');
   });
 
+  test('keeps the 16:9 media box by default for RandomWalk and third-party NFTs', () => {
+    render(<NFTImage src="https://example.com/rwlk.png" />);
+    expect(screen.getByAltText('NFT')).toHaveClass('aspect-video', 'object-contain');
+  });
+
+  test('puts a Signature on its black plate at the native ratio with frame="signature"', () => {
+    render(<NFTImage src="https://example.com/sig.png" frame="signature" alt="Sig" />);
+    const img = screen.getByAltText('Sig');
+    expect(img).toHaveClass('aspect-art', 'bg-art-ground', 'object-contain');
+    expect(img).not.toHaveClass('aspect-video');
+    expect(img).toHaveAttribute('width', '3456');
+    expect(img).toHaveAttribute('height', '2234');
+  });
+
+  test('draws a Signature’s unavailable state as the orbit plate with its token number', () => {
+    render(
+      <NFTImage
+        src="https://example.com/sig.png"
+        frame="signature"
+        alt="Sig"
+        unavailableDetail="#000042"
+      />,
+    );
+    fireEvent.error(screen.getByAltText('Sig'));
+    const plate = screen.getByRole('img', { name: 'Sig' });
+    expect(plate).toHaveClass('aspect-art');
+    expect(plate).toHaveTextContent('#000042');
+    expect(screen.getByTestId('orbit-mark')).toBeInTheDocument();
+  });
+
+  test('offers published renditions as a srcset', () => {
+    const thumb = 'https://example.com/0xabc/thumb_card.webp';
+    const full = 'https://example.com/0xabc/images/web/full.webp';
+    render(
+      <NFTImage
+        frame="signature"
+        alt="Sig"
+        renditions={[
+          { src: thumb, width: 640 },
+          { src: full, width: 3456 },
+        ]}
+      />,
+    );
+    expect(screen.getByAltText('Sig').getAttribute('srcset')).toContain(`${thumb} 640w`);
+  });
+
   test('defaults to lazy loading for below-the-fold use', () => {
     const mockData = getAssetsUrl('cosmicsignature/000000.png');
     render(<NFTImage src={mockData} />);
@@ -110,6 +171,7 @@ describe('NFTImage', () => {
     const mockData = getAssetsUrl('cosmicsignature/000000.png');
     render(<NFTImage src={mockData} priority />);
     expect(screen.getByAltText('NFT').getAttribute('loading')).toBe('eager');
+    expect(screen.getByAltText('NFT').getAttribute('fetchpriority')).toBe('high');
   });
 
   test('accepts custom sizes for responsive srcset', () => {

@@ -1,10 +1,25 @@
 /**
  * Canonical Sprint 8 inventory for every page under app/[locale].
  *
- * `pageFile` is checked against the filesystem by a Jest guard. `publicPath`
+ * `pageFile` is checked against the filesystem by a Jest guard (the 404 is
+ * app/global-not-found.tsx, outside app/[locale], and an alias is answered
+ * by proxy.ts). `publicPath`
  * documents the real route shape, while `fixturePath` supplies deterministic
  * values for every dynamic segment.
  */
+
+/**
+ * The 404 for every URL no route matches, relative to app/[locale] like the
+ * page files: app/global-not-found.tsx renders the whole document.
+ */
+export const GLOBAL_NOT_FOUND_FILE = '../global-not-found.tsx';
+
+/**
+ * The source of every alias route, relative to app/[locale] like the page
+ * files: an alias has no page, and proxy.ts redirects it to the page it names
+ * (PAGE_ALIASES in lib/paramRoutes.ts).
+ */
+export const PROXY_ALIAS_FILE = '../../proxy.ts';
 
 export type ZhRouteHost = 'app' | 'landing';
 export type ZhRouteCluster =
@@ -49,12 +64,13 @@ export const ZH_ROUTE_INVENTORY: readonly ZhRouteInventoryEntry[] = [
   // Sprint 1 — global chrome and utility routes.
   {
     id: 'app-not-found',
-    pageFile: '(app)/[...notFound]/page.tsx',
+    // Any URL no route matches: the whole-document 404 at the app root.
+    pageFile: GLOBAL_NOT_FOUND_FILE,
     publicPath: '/[...notFound]',
     fixturePath: '/quality-assurance-route-not-found',
     host: 'app',
     cluster: 'global',
-    expectedText: '404：找不到页面',
+    expectedText: '找不到页面',
   },
   {
     id: 'site-map',
@@ -149,7 +165,7 @@ export const ZH_ROUTE_INVENTORY: readonly ZhRouteInventoryEntry[] = [
     fixturePath: '/experimental-ui',
     host: 'app',
     cluster: 'core',
-    expectedText: 'Cosmic Signature 观测台',
+    expectedText: '观测台艺术视图',
   },
   {
     id: 'current-cycle',
@@ -167,7 +183,7 @@ export const ZH_ROUTE_INVENTORY: readonly ZhRouteInventoryEntry[] = [
     fixturePath: '/gallery',
     host: 'app',
     cluster: 'core',
-    expectedText: 'NFT 画廊',
+    expectedText: 'Cosmic Signature 画廊',
   },
   {
     id: 'detail',
@@ -186,7 +202,8 @@ export const ZH_ROUTE_INVENTORY: readonly ZhRouteInventoryEntry[] = [
     fixturePath: `/gesture/${gestureId}`,
     host: 'app',
     cluster: 'core',
-    expectedText: '落笔详情',
+    // A header figure label: it renders only once the gesture has loaded.
+    expectedText: '落笔价格',
   },
   {
     id: 'how-it-works',
@@ -224,7 +241,7 @@ export const ZH_ROUTE_INVENTORY: readonly ZhRouteInventoryEntry[] = [
     fixturePath: `/allocation-finalized?cycle=${cycle}`,
     host: 'app',
     cluster: 'transactions',
-    expectedText: '已取回分配',
+    expectedText: `第 ${cycle} 个周期的签名分配`,
   },
   {
     id: 'anchoring',
@@ -296,7 +313,7 @@ export const ZH_ROUTE_INVENTORY: readonly ZhRouteInventoryEntry[] = [
     fixturePath: `/cosmic-signature-transfer/${address}`,
     host: 'app',
     cluster: 'transactions',
-    expectedText: 'Cosmic Signature NFT 转移记录',
+    expectedText: 'NFT 转移记录',
   },
   {
     id: 'cst-transfer-history',
@@ -305,7 +322,7 @@ export const ZH_ROUTE_INVENTORY: readonly ZhRouteInventoryEntry[] = [
     fixturePath: `/cosmic-token-transfer/${address}`,
     host: 'app',
     cluster: 'transactions',
-    expectedText: 'Cosmic Signature CST 转账记录',
+    expectedText: 'CST 转账记录',
   },
   {
     id: 'token-distributions',
@@ -314,7 +331,7 @@ export const ZH_ROUTE_INVENTORY: readonly ZhRouteInventoryEntry[] = [
     fixturePath: `/distributions-by-token/${address}/${tokenId}`,
     host: 'app',
     cluster: 'transactions',
-    expectedText: `代币 ${tokenId} 的锚定派发明细`,
+    expectedText: `Cosmic Signature #${String(tokenId).padStart(6, '0')} 的锚定派发`,
   },
 
   // Sprint 5 — statistics and public data tables.
@@ -325,7 +342,7 @@ export const ZH_ROUTE_INVENTORY: readonly ZhRouteInventoryEntry[] = [
     fixturePath: '/statistics',
     host: 'app',
     cluster: 'statistics',
-    expectedText: 'Cosmic Signature 协议统计',
+    expectedText: '协议统计',
   },
   {
     id: 'statistics-activity',
@@ -361,7 +378,7 @@ export const ZH_ROUTE_INVENTORY: readonly ZhRouteInventoryEntry[] = [
     fixturePath: '/statistics/performance',
     host: 'app',
     cluster: 'statistics',
-    expectedText: '参与者表现统计',
+    expectedText: '参与者结果',
   },
   {
     id: 'statistics-tokens',
@@ -415,7 +432,7 @@ export const ZH_ROUTE_INVENTORY: readonly ZhRouteInventoryEntry[] = [
     fixturePath: `/user/${address}`,
     host: 'app',
     cluster: 'statistics',
-    expectedText: '参与者统计',
+    expectedText: '落笔花费',
   },
   {
     id: 'user-stellar-eth',
@@ -424,7 +441,7 @@ export const ZH_ROUTE_INVENTORY: readonly ZhRouteInventoryEntry[] = [
     fixturePath: `/user/stellar-selection-eth/${address}`,
     host: 'app',
     cluster: 'statistics',
-    expectedText: '此参与者获配的星选 ETH',
+    expectedText: '星选 · ETH',
     allowNoHeading: true,
   },
   {
@@ -434,7 +451,7 @@ export const ZH_ROUTE_INVENTORY: readonly ZhRouteInventoryEntry[] = [
     fixturePath: `/user/stellar-selection-nft/${address}`,
     host: 'app',
     cluster: 'statistics',
-    expectedText: '此参与者获配的星选 NFT',
+    expectedText: '星选 · NFT',
     allowNoHeading: true,
   },
   {
@@ -444,7 +461,7 @@ export const ZH_ROUTE_INVENTORY: readonly ZhRouteInventoryEntry[] = [
     fixturePath: `/system-event/${cycle}/100/200`,
     host: 'app',
     cluster: 'statistics',
-    expectedText: `第 ${cycle} 个周期前的系统配置`,
+    expectedText: `第 ${cycle} 个周期前的协调变更`,
   },
 
   // Sprint 6 — FAQ, legal, trust, contracts, and source.
@@ -482,7 +499,7 @@ export const ZH_ROUTE_INVENTORY: readonly ZhRouteInventoryEntry[] = [
     fixturePath: '/risk-disclosures',
     host: 'app',
     cluster: 'trust',
-    expectedText: 'Cosmic Signature 风险披露',
+    expectedText: '风险披露',
   },
   {
     id: 'security',
@@ -491,7 +508,7 @@ export const ZH_ROUTE_INVENTORY: readonly ZhRouteInventoryEntry[] = [
     fixturePath: '/security',
     host: 'app',
     cluster: 'trust',
-    expectedText: 'Cosmic Signature 安全',
+    expectedText: '安全',
   },
   {
     id: 'audits',
@@ -500,7 +517,7 @@ export const ZH_ROUTE_INVENTORY: readonly ZhRouteInventoryEntry[] = [
     fixturePath: '/audits',
     host: 'app',
     cluster: 'trust',
-    expectedText: 'Cosmic Signature 审计',
+    expectedText: '审计',
   },
   {
     id: 'imprint',
@@ -509,7 +526,7 @@ export const ZH_ROUTE_INVENTORY: readonly ZhRouteInventoryEntry[] = [
     fixturePath: '/imprint',
     host: 'app',
     cluster: 'trust',
-    expectedText: '铭刻 RandomWalk NFT',
+    expectedText: '铭刻 Random Walk NFT',
   },
   {
     id: 'contracts',
@@ -518,7 +535,7 @@ export const ZH_ROUTE_INVENTORY: readonly ZhRouteInventoryEntry[] = [
     fixturePath: '/contracts',
     host: 'app',
     cluster: 'trust',
-    expectedText: 'Cosmic Signature 合约',
+    expectedText: '核心合约',
   },
   {
     id: 'code',
@@ -527,16 +544,16 @@ export const ZH_ROUTE_INVENTORY: readonly ZhRouteInventoryEntry[] = [
     fixturePath: '/code',
     host: 'app',
     cluster: 'trust',
-    expectedText: 'Cosmic Signature 源代码',
+    expectedText: '代码查看器',
   },
   {
     id: 'source-code-alias',
-    pageFile: '(app)/source-code/page.tsx',
+    pageFile: PROXY_ALIAS_FILE,
     publicPath: '/source-code',
     fixturePath: '/source-code',
     host: 'app',
     cluster: 'trust',
-    expectedText: 'Cosmic Signature 源代码',
+    expectedText: '代码查看器',
     redirectsTo: '/code',
   },
 
@@ -557,7 +574,7 @@ export const ZH_ROUTE_INVENTORY: readonly ZhRouteInventoryEntry[] = [
     fixturePath: `/eth-contribution/detail/${contributionId}`,
     host: 'app',
     cluster: 'long-tail',
-    expectedText: 'ETH 贡献详情',
+    expectedText: `贡献 #${contributionId}`,
   },
   {
     id: 'eth-contribution-cycle',
@@ -566,7 +583,7 @@ export const ZH_ROUTE_INVENTORY: readonly ZhRouteInventoryEntry[] = [
     fixturePath: `/eth-contribution/round/${contributionId}`,
     host: 'app',
     cluster: 'long-tail',
-    expectedText: `第 ${contributionId} 个周期的直接 ETH 贡献`,
+    expectedText: `第 ${contributionId} 个周期的贡献`,
   },
   {
     id: 'public-goods-cg',
@@ -602,7 +619,7 @@ export const ZH_ROUTE_INVENTORY: readonly ZhRouteInventoryEntry[] = [
     fixturePath: '/marketing',
     host: 'app',
     cluster: 'long-tail',
-    expectedText: '推广 Cosmic Signature',
+    expectedText: '推广分配',
   },
   {
     id: 'outreach-address',
@@ -611,8 +628,7 @@ export const ZH_ROUTE_INVENTORY: readonly ZhRouteInventoryEntry[] = [
     fixturePath: `/marketing/${address}`,
     host: 'app',
     cluster: 'long-tail',
-    expectedText: '此参与者的推广分配',
-    allowNoHeading: true,
+    expectedText: '获得的推广分配',
   },
   {
     id: 'coordination-changes',
@@ -630,7 +646,7 @@ export const ZH_ROUTE_INVENTORY: readonly ZhRouteInventoryEntry[] = [
     fixturePath: '/admin',
     host: 'app',
     cluster: 'long-tail',
-    expectedText: '管理',
+    expectedText: '落笔留言审核',
   },
   {
     id: 'admin-settings',
@@ -639,7 +655,7 @@ export const ZH_ROUTE_INVENTORY: readonly ZhRouteInventoryEntry[] = [
     fixturePath: '/admin/admin',
     host: 'app',
     cluster: 'long-tail',
-    expectedText: '管理方法',
+    expectedText: '合约设置',
   },
   {
     id: 'internal-outreach-transfer',
@@ -652,7 +668,7 @@ export const ZH_ROUTE_INVENTORY: readonly ZhRouteInventoryEntry[] = [
   },
   {
     id: 'endurance-embed',
-    pageFile: '(app)/embed/endurance/[round]/page.tsx',
+    pageFile: '(embed)/embed/endurance/[round]/page.tsx',
     publicPath: '/embed/endurance/[round]',
     fixturePath: `/embed/endurance/${contributionId}`,
     host: 'app',

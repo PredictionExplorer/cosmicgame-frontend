@@ -6,6 +6,11 @@ import ERC20_ABI from '@/contracts/CosmicToken.json';
 
 import { activeChain } from '@/config/chains';
 
+import { MAX_LABEL_LENGTH, cleanDisplayText } from './displayText';
+
+/** The longest token symbol kept (real ones run to a dozen characters). */
+const MAX_SYMBOL_LENGTH = 32;
+
 export interface AttachedErc20Metadata {
   name?: string;
   symbol?: string;
@@ -77,17 +82,18 @@ export function useAttachedErc20Metadata(tokenAddress: string | null | undefined
       const logo = logoResult.status === 'fulfilled' ? logoResult.value : {};
 
       return {
+        // Whoever deployed the token wrote its symbol and name: shown cleaned.
         symbol:
-          symbolResult.status === 'fulfilled' && typeof symbolResult.value === 'string'
-            ? symbolResult.value
+          symbolResult.status === 'fulfilled'
+            ? cleanDisplayText(symbolResult.value, MAX_SYMBOL_LENGTH)
             : undefined,
         decimals:
           decimalsResult.status === 'fulfilled' && Number.isFinite(Number(decimalsResult.value))
             ? Number(decimalsResult.value)
             : 18,
         name:
-          nameResult.status === 'fulfilled' && typeof nameResult.value === 'string'
-            ? nameResult.value
+          nameResult.status === 'fulfilled'
+            ? cleanDisplayText(nameResult.value, MAX_LABEL_LENGTH)
             : undefined,
         ...logo,
       };

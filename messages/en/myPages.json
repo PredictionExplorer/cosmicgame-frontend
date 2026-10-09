@@ -1,424 +1,409 @@
 {
   "shared": {
-    "home": "Home",
-    "user": "User",
-    "walletNotConnected": "Wallet not connected",
-    "loading": "Loading...",
     "unavailable": "Unavailable",
-    "yes": "Yes",
-    "no": "No",
-    "datetime": "Datetime",
-    "from": "From",
-    "to": "To",
-    "tokenId": "Token ID",
-    "cycle": "Cycle",
-    "recipient": "Recipient"
+    "cycleNumber": "Cycle {cycle}"
   },
   "allocations": {
-    "eyebrow": "Personal · Allocations",
-    "title": "My Allocations",
-    "subtitle": "View and retrieve all your pending allocations",
-    "walletDescription": "Connect your wallet to view and retrieve your allocations.",
-    "loadErrorTitle": "Failed to load",
-    "loadErrorMessage": "Failed to load pending allocations data",
-    "sections": {
-      "eth": "Retrievable ETH Allocations",
-      "anchors": "Cosmic Signature NFT Anchor Distributions",
+    "title": "My allocations",
+    "subtitle": "What the protocol has set aside for this wallet, and one place to retrieve it all.",
+    "loadErrorTitle": "Couldn’t load your allocations",
+    "loadErrorMessage": "Your pending allocations could not be loaded. Try again in a moment.",
+    "anchorLoadError": {
+      "title": "Your Anchor Distributions could not be loaded",
+      "message": "The Anchor Distributions held for this wallet are temporarily unavailable. Try again in a moment."
+    },
+    "summary": {
+      "title": "Ready to retrieve",
+      "description": "One transaction retrieves the ETH, attached NFTs and attached tokens held for this wallet.",
+      "eth": "ETH allocations",
       "nfts": "Attached NFTs",
-      "erc20": "Attached ERC-20 Tokens"
+      "tokens": "Attached tokens",
+      "anchor": "Anchor Distributions",
+      "cycles": "{count, plural, one {From # cycle} other {From # cycles}}",
+      "anchorCaption": "Retrieved separately below",
+      "retrieveEverything": "Retrieve ETH, NFTs and tokens",
+      "retrieveBy": "Retrieve by <date></date>. After that, anyone can retrieve it.",
+      "expired": "The deadline passed on <date></date>. You can still retrieve these until someone else does.",
+      "success": "Everything is retrieved to your wallet."
     },
-    "empty": {
-      "ethTitle": "No ETH allocations yet",
-      "ethDescription": "Participate in Stellar Selection by making gestures to receive ETH allocations.",
-      "nftTitle": "No attached NFTs",
-      "nftDescription": "NFTs attached to gestures during cycles will appear here.",
-      "erc20Title": "No attached tokens",
-      "erc20Description": "ERC-20 tokens attached to gestures during cycles will appear here."
+    "nothing": {
+      "title": "Nothing to retrieve right now",
+      "description": "When a finalized cycle allocates ETH, NFTs or tokens to this wallet, they wait here until you retrieve them."
     },
-    "retrievable": "Retrievable:",
-    "retrieving": "Retrieving...",
-    "retrieveAll": "Retrieve All",
-    "viewHistory": "View Allocation History"
+    "sections": {
+      "eth": "ETH allocations",
+      "ethDescription": "Stellar Selection and Chrono-Warrior ETH, held for each cycle until you retrieve it.",
+      "anchors": "Anchor Distributions",
+      "anchorsDescription": "ETH the anchoring contract pays to your anchored Cosmic Signature NFTs.",
+      "nfts": "Attached NFTs",
+      "erc20": "Attached ERC-20 tokens"
+    },
+    "retrieveAll": "Retrieve all",
+    "lookup": {
+      "label": "Look up any address",
+      "hint": "Allocations are public: see what any address has received.",
+      "submit": "Look up",
+      "invalid": "Enter a full address: 0x followed by 40 hexadecimal characters (0–9, a–f)."
+    }
   },
   "anchors": {
-    "eyebrow": "Personal · Anchors",
-    "title": "My Anchors",
-    "subtitle": "Manage your anchored NFTs and view Cosmic Signature NFT distributions",
-    "walletDescription": "Please connect your wallet to manage your anchors.",
+    "title": "My anchors",
+    "subtitle": "Anchor your NFTs, follow what they receive, and release them when you are ready.",
     "tabs": {
-      "cosmicSignature": "Cosmic Signature Anchoring",
-      "randomWalk": "Random Walk Anchoring"
+      "label": "Collection",
+      "cosmicSignature": "Cosmic Signature",
+      "randomWalk": "Random Walk",
+      "anchoredCount": "{count, plural, one {# anchored} other {# anchored}}"
     },
     "stats": {
-      "cosmicSignature": {
-        "label": "Your Anchored Cosmic Signature NFTs",
-        "tooltip": "Number of Cosmic Signature NFTs you currently have anchored. Anchoring more Cosmic Signature NFTs increases your share of ETH Anchor Distributions."
-      },
-      "randomWalk": {
-        "label": "Your Anchored Random Walk NFTs",
-        "tooltip": "Number of Random Walk NFTs you currently have anchored. Each anchored Random Walk NFT is eligible for Anchored-NFT Stellar Selection."
-      },
       "unretrieved": {
-        "label": "Unretrieved Distributions",
-        "tooltip": "ETH Anchor Distributions allocated to your anchored Cosmic Signature NFTs but not yet retrieved. Releasing a Cosmic Signature NFT anchor automatically retrieves its accumulated distributions."
+        "label": "Unretrieved Anchor Distributions",
+        "tooltip": "ETH Anchor Distributions allocated to your anchored Cosmic Signature NFTs but not yet retrieved. Releasing a Cosmic Signature NFT anchor automatically retrieves its accumulated distributions. Releasing is permanent: a released NFT can never be anchored again.",
+        "caption": "Retrieved when you release. Releasing is permanent."
       },
       "distributionPerNft": {
-        "label": "Distribution per Cosmic Signature NFT",
+        "label": "Per anchored NFT",
         "tooltip": "Current ETH Anchor Distribution per anchored Cosmic Signature NFT, calculated as the total anchoring pool (on-chain) divided by the indexed number of anchored Cosmic Signature NFTs.",
-        "indexUnavailableSuffix": "The on-chain anchor pool is non-zero, but the indexed total of anchored Cosmic Signature NFTs is zero (e.g. cg_stake_stats_cst not updated by ETL), so a per-NFT rate cannot be computed."
+        "noneAnchored": "No anchored Cosmic Signature NFTs indexed yet"
       }
     }
   },
   "statistics": {
     "page": {
-      "invalidAddress": "Invalid Address",
-      "ariaOwn": "My Statistics",
-      "ariaUser": "User Statistics",
-      "ownTitle": "My Statistics",
-      "userTitle": "User Profile",
-      "ownSubtitle": "Your complete performance dashboard and activity history",
-      "userSubtitle": "Viewing another participant’s statistics and activity",
+      "invalidAddress": "Invalid address",
+      "ownTitle": "My statistics",
+      "ownSubtitle": "Your gestures and what they cost, what you received, your NFTs and your anchors, across every Performance Cycle.",
+      "userSubtitle": "This address’s gestures and what they cost, what it received, its NFTs and its anchors, across every Performance Cycle.",
       "emptyTitle": "No activity yet",
-      "emptyDescription": "This account hasn't participated in any Performance Cycles yet. Make a gesture to get started!",
+      "emptyDescription": "This address has no gestures, allocations or anchors yet.",
       "sections": {
-        "gestureHistory": "Gesture History",
-        "recipientHistory": "Recipient History",
+        "gestureHistory": "Gestures",
+        "recipientHistory": "Allocations received",
         "anchoring": "Anchoring",
-        "tokenHoldings": "Token Holdings",
-        "outreachAllocations": "Outreach Allocations",
-        "claimableAssets": "Claimable Assets"
-      }
-    },
-    "hero": {
-      "ethBalance": {
-        "label": "ETH Balance",
-        "tooltip": "Your current ETH balance in this wallet."
+        "artworks": "Cosmic Signature NFTs",
+        "outreachAllocations": "Outreach allocations",
+        "claimableAssets": "Attached assets"
       },
-      "cstBalance": {
-        "label": "CST Balance",
-        "tooltip": "Your CST token (ERC-20) balance from gestures, Recognition CST allocations, and transfers."
-      },
-      "signatureAllocations": {
-        "label": "Signature Allocations Received",
-        "tooltip": "Number of times you retrieved the Signature Allocation by making the Final Gesture before the Cycle Finalization Time expired."
-      },
-      "totalEth": {
-        "label": "Total Stellar Selection ETH",
-        "tooltip": "Total ETH allocated through Stellar Selection across all cycles, including retrieved and unretrieved amounts."
-      },
-      "gestures": {
-        "label": "Gestures Made",
-        "tooltip": "Total number of gestures you have made across all Performance Cycles."
-      },
-      "selectionFrequency": {
-        "label": "Selection Frequency",
-        "tooltip": "Your best Stellar Selection frequency in the current cycle, calculated from your gesture count relative to total gestures and the number of selected recipients."
-      }
-    },
-    "activity": {
-      "title": "Activity Overview",
-      "groups": {
+      "participant": "Participant",
+      "loadErrorTitle": "Statistics for this address could not be loaded",
+      "loadErrorMessage": "The statistics service did not respond. Try again in a moment.",
+      "sectionLoadErrorTitle": "This section did not load",
+      "nav": {
+        "label": "Profile contents",
+        "overview": "Overview",
+        "nfts": "NFTs",
         "gestures": "Gestures",
-        "stellarSelections": "Stellar Selections",
-        "anchoring": "Anchoring"
-      },
-      "gesturesMade": {
-        "label": "Gestures Made",
-        "tooltip": "Total gestures across all cycles."
-      },
-      "maxGesture": {
-        "label": "Max Gesture",
-        "tooltip": "The highest single gesture you have ever made."
-      },
-      "ethSelections": {
-        "label": "ETH Stellar Selection Allocations",
-        "tooltip": "Number of ETH Stellar Selection allocations you have received."
-      },
-      "nftsReceived": {
-        "label": "NFTs Received",
-        "tooltip": "Cosmic Signature NFTs received through Stellar Selection imprints."
-      },
-      "anchorActions": {
-        "label": "Anchor Actions",
-        "tooltip": "Combined anchor and release actions for RandomWalk NFTs."
-      },
-      "distributionsReceived": {
-        "label": "Total Anchor Distributions",
-        "tooltip": "Total ETH Anchor Distributions from anchoring Cosmic Signature NFTs, including retrieved and unretrieved amounts."
+        "allocations": "Allocations",
+        "anchoring": "Anchoring",
+        "outreach": "Outreach",
+        "attached": "Attached assets"
       }
     },
-    "quickActions": {
-      "anchor": {
-        "label": "Anchor NFTs",
-        "description": "Anchor Cosmic Signature NFTs for ETH distributions or Random Walk NFTs for Stellar Selection"
+    "figures": {
+      "gestures": {
+        "label": "Gestures",
+        "caption": "{count, plural, one {in # cycle} other {across # cycles}}"
       },
-      "gesture": {
-        "label": "Make a Gesture",
-        "description": "Take part in the active cycle"
+      "spent": {
+        "label": "Spent on gestures",
+        "caption": "plus {amount}",
+        "info": "ETH this address paid for its ETH gestures. CST gestures are paid in CST, shown underneath. Gesture Costs are not refunded."
       },
-      "transfers": {
-        "label": "View NFT Transfers",
-        "description": "Cosmic Signature NFT transfer history"
+      "received": {
+        "label": "Received",
+        "caption": "{count, plural, one {from # allocation} other {from # allocations}}",
+        "info": "ETH this address received through allocations: Signature Allocation, Chrono-Warrior and Stellar Selection ETH. CST, NFTs and Anchor Distributions are listed further down."
+      },
+      "balance": {
+        "label": "Wallet balance"
+      }
+    },
+    "titles": {
+      "label": "Titles",
+      "signatureAllocation": "Signature Allocation",
+      "enduranceChampion": "Endurance Champion",
+      "chronoWarrior": "Chrono-Warrior",
+      "finalCstGesture": "Final CST Gesture",
+      "entry": "{title} · {count, plural, one {Cycle {cycles}} other {Cycles {cycles}}}"
+    },
+    "selection": {
+      "title": "Stellar Selection share · Cycle {cycle}",
+      "share": "{mine} of {total} gestures",
+      "caption": "At finalization, {eth} ETH and {nft} NFT Stellar Selections are made from all of this cycle’s gestures. Each gesture is one entry and can be selected more than once.",
+      "captionGeneric": "At finalization, Stellar Selections are made from all of this cycle’s gestures. Each gesture is one entry and can be selected more than once.",
+      "weightedNote": "On V3 cycles, shares of the ETH pool are weighted by each gesture’s ETH cost at the moment it was made."
+    },
+    "overview": {
+      "title": "At a glance",
+      "gestures": {
+        "title": "Gestures",
+        "largest": "Largest ETH gesture",
+        "firstCycle": "First cycle",
+        "latest": "Latest gesture"
       },
       "stellarSelection": {
-        "label": "Stellar Selection History",
-        "description": "Your Stellar Selection allocations and ETH deposits"
+        "title": "Stellar Selection",
+        "ethSelections": "ETH selections",
+        "ethAllocated": "ETH allocated",
+        "ethRetrieved": "ETH retrieved",
+        "nfts": "NFTs selected"
+      },
+      "nfts": {
+        "title": "Cosmic Signature NFTs",
+        "received": "Received",
+        "toRetrieve": "Attached NFTs to retrieve",
+        "transfers": "Transfers",
+        "heldOrAnchored": "{count, number} held or anchored now"
+      },
+      "anchoring": {
+        "title": "Anchoring",
+        "anchoredNow": "Anchored now",
+        "actions": "Anchor and release actions",
+        "distributions": "Anchor Distributions",
+        "byKind": "{cosmicSignature, number} Cosmic Signature · {randomWalk, number} Random Walk"
+      },
+      "definitions": {
+        "label": "Definitions",
+        "largest": "The largest single ETH gesture this address has made.",
+        "ethAllocated": "ETH allocated to this address through Stellar Selection across all cycles, retrieved or not.",
+        "selectionNfts": "Cosmic Signature NFTs imprinted for this address through Stellar Selection.",
+        "nftsReceived": "Cosmic Signature NFTs this address has received across all cycles, from any allocation.",
+        "toRetrieve": "Attached NFTs allocated to this address with a Signature Allocation and not yet retrieved.",
+        "distributions": "ETH Anchor Distributions from anchoring Cosmic Signature NFTs, retrieved or not."
       }
     },
-    "stellarSelection": {
-      "currentFrequency": "Current Cycle Selection Frequency",
-      "ethProbability": {
-        "label": "ETH Stellar Selection",
-        "tooltip": "Your selection frequency for an ETH Stellar Selection allocation this cycle, based on your share of total gestures and the number of ETH Stellar Selection recipients chosen."
+    "artworks": {
+      "emptyTitle": "No Cosmic Signature NFTs held",
+      "emptyDescription": "Cosmic Signature NFTs this address holds appear here.",
+      "showAll": "Show all {count}",
+      "showFewer": "Show fewer"
+    },
+    "quickActions": {
+      "label": "Next steps",
+      "gesture": {
+        "label": "Make a gesture",
+        "description": "Take part in the active cycle"
       },
-      "nftProbability": {
-        "label": "NFT Stellar Selection",
-        "tooltip": "Your selection frequency for a Cosmic Signature NFT Stellar Selection imprint this cycle, based on your share of total gestures."
+      "anchor": {
+        "label": "Anchor NFTs",
+        "description": "Anchor Cosmic Signature NFTs for ETH Anchor Distributions or Random Walk NFTs for Anchored-NFT Stellar Selection."
       },
-      "totalEth": {
-        "label": "Total Stellar Selection ETH",
-        "tooltip": "Total ETH allocated through Stellar Selection across all cycles, including retrieved and unretrieved amounts."
+      "stellarSelection": {
+        "label": "Stellar Selection history",
+        "description": "Your Stellar Selection allocations and ETH deposits"
       },
-      "ethRetrieved": {
-        "label": "ETH Retrieved",
-        "tooltip": "ETH already retrieved from Stellar Selection allocations to your wallet."
-      },
-      "unretrievedNfts": {
-        "label": "Unretrieved NFTs",
-        "tooltip": "Attached NFTs received with the Signature Allocation but not yet retrieved."
-      },
-      "stellarSelectionNfts": {
-        "label": "Stellar Selection NFTs",
-        "tooltip": "Cosmic Signature NFTs imprinted through Stellar Selection."
-      },
-      "allocationNfts": {
-        "label": "Allocation NFTs",
-        "tooltip": "Total Cosmic Signature NFTs received as allocations (all imprint types combined)."
-      },
-      "cosmicSignatureNfts": {
-        "label": "Cosmic Signature NFTs Received",
-        "tooltip": "Total Cosmic Signature NFTs received across all cycles."
+      "transfers": {
+        "label": "NFT transfers",
+        "description": "Cosmic Signature NFT transfer history"
       }
     },
     "anchoring": {
       "tabs": {
-        "cosmicSignature": "Cosmic Signature Anchoring",
-        "randomWalk": "Random Walk Anchoring"
+        "label": "NFT kind",
+        "cosmicSignature": "Cosmic Signature NFTs",
+        "randomWalk": "Random Walk NFTs"
       },
       "empty": {
         "cosmicSignatureTitle": "No anchoring activity yet",
-        "cosmicSignatureDescription": "Anchor your Cosmic Signature NFTs to receive ETH Anchor Distributions each cycle.",
-        "randomWalkTitle": "No RandomWalk anchoring yet",
-        "randomWalkDescription": "Anchor your RandomWalk NFTs to take part in Anchored-NFT Stellar Selection."
+        "cosmicSignatureDescription": "Anchored Cosmic Signature NFTs share the ETH Anchor Distributions of each cycle.",
+        "randomWalkTitle": "No Random Walk anchoring yet",
+        "randomWalkDescription": "Anchored Random Walk NFTs take part in Anchored-NFT Stellar Selection."
       },
       "stats": {
-        "anchorActions": {
-          "label": "Anchor Actions",
-          "cosmicSignatureTooltip": "Number of times you have anchored Cosmic Signature NFTs.",
-          "randomWalkTooltip": "Number of times you have anchored RandomWalk NFTs."
-        },
-        "releaseActions": {
-          "label": "Release Actions",
-          "cosmicSignatureTooltip": "Number of times you have released anchored Cosmic Signature NFTs.",
-          "randomWalkTooltip": "Number of times you have released anchored RandomWalk NFTs."
-        },
-        "nftsWithDistributions": {
-          "label": "NFTs with Distributions",
-          "tooltip": "Number of anchored Cosmic Signature NFTs that have accumulated Anchor Distributions."
-        },
-        "totalDistributions": {
-          "label": "Total Distributions",
-          "tooltip": "Total ETH Anchor Distributions received from anchoring (retrieved + unretrieved)."
-        },
-        "unretrievedDistributions": {
-          "label": "Unretrieved Distributions",
-          "tooltip": "Anchor Distributions allocated but not yet retrieved to your wallet."
-        },
-        "nftsAnchored": {
-          "label": "NFTs Anchored",
-          "tooltip": "Total RandomWalk NFTs currently anchored."
-        },
-        "nftsImprinted": {
-          "label": "NFTs Imprinted",
-          "tooltip": "Cosmic Signature NFTs received through Anchored-NFT Stellar Selection."
-        }
+        "anchorActions": "Anchor actions",
+        "releaseActions": "Release actions",
+        "totalDistributions": "Anchor Distributions",
+        "unretrievedDistributions": "Not yet retrieved",
+        "nftsAnchored": "Anchored now",
+        "nftsImprinted": "NFTs imprinted",
+        "acrossNfts": "{count, plural, one {across # NFT} other {across # NFTs}}"
       },
       "sections": {
-        "actions": "Anchor / Release Actions",
-        "distributionsByToken": "Anchor Distributions by Token",
-        "distributionsByDeposit": "Anchor Distributions by Deposit",
-        "retrievedDistributions": "Retrieved Anchor Distributions",
-        "unretrievedDistributions": "Unretrieved Anchor Distributions",
+        "actions": "Anchor and release actions",
+        "distributionsByToken": "Anchor Distributions by NFT",
         "anchoredNftSelection": "Anchored-NFT Stellar Selection"
-      }
+      },
+      "showDeposits": "Show deposits",
+      "hideDeposits": "Hide deposits",
+      "depositsHeader": "Deposits",
+      "nothingRetrieved": "Nothing retrieved yet: an NFT’s Anchor Distributions are retrieved when its anchor is released."
     },
     "donatedAssets": {
       "nfts": {
-        "title": "Attached NFTs Received",
-        "tooltip": "NFTs attached by other participants and received as part of the Signature Allocation. Unretrieved NFTs can be retrieved to your wallet.",
-        "unclaimed": "{count} unclaimed",
-        "claimAll": "Claim All NFTs",
+        "title": "Attached NFTs",
+        "tooltip": "NFTs attached to gestures by other participants and allocated to this address with a Signature Allocation. The recipient can retrieve any not yet retrieved.",
+        "unclaimed": "{count} to retrieve",
+        "claimAll": "Retrieve all NFTs",
         "emptyTitle": "No attached NFTs",
-        "emptyDescription": "You haven't received any attached NFTs through the Signature Allocation yet."
+        "emptyDescription": "No attached NFTs have been allocated to this address yet."
       },
       "erc20": {
-        "title": "Attached ERC20 Tokens",
-        "tooltip": "ERC20 tokens attached by other participants. Unretrieved tokens can be retrieved to your wallet.",
-        "unclaimed": "{count} unclaimed",
-        "claimAll": "Claim All Tokens",
+        "title": "Attached ERC-20 tokens",
+        "tooltip": "ERC-20 tokens attached to gestures by other participants and allocated to this address. The recipient can retrieve any not yet retrieved.",
+        "unclaimed": "{count} to retrieve",
+        "claimAll": "Retrieve all tokens",
         "emptyTitle": "No attached tokens",
-        "emptyDescription": "You haven't received any attached ERC20 tokens yet."
+        "emptyDescription": "No attached ERC-20 tokens have been allocated to this address yet."
       }
+    },
+    "viewAddress": {
+      "label": "View any address",
+      "hint": "Participant statistics are public: see any address without connecting a wallet.",
+      "placeholder": "0x…",
+      "submit": "View",
+      "invalid": "Enter a full address: 0x followed by 40 letters and digits."
     }
   },
   "tokens": {
     "page": {
       "title": "My NFTs",
-      "subtitle": "Cosmic Signature NFTs in your connected wallet",
-      "marketplace": "Buy or sell NFTs",
-      "walletDescription": "Please connect your wallet to view and manage your NFTs.",
+      "subtitle": "The Cosmic Signature NFTs held by the wallet you connect",
+      "newestCaption": "The newest Signatures. Yours will hang here too.",
+      "anchorLink": "Anchor NFTs",
       "loadErrorTitle": "Failed to load tokens",
       "loadErrorMessage": "Failed to load Cosmic Signature NFTs.",
-      "ownedTitle": "Cosmic Signature NFTs I Own",
+      "ownedTitle": "Cosmic Signature NFTs I own",
       "transferTitle": "Transfer NFTs",
-      "transferSubtitle": "Optional: send selected Cosmic Signature NFTs to another wallet.",
-      "transferDescription": "Select NFTs from this wallet only when you are ready to send them to another address."
-    },
-    "table": {
-      "empty": "No tokens yet.",
-      "details": "Details",
-      "datetime": "Datetime",
-      "tokenId": "Token ID",
-      "tokenName": "Token Name",
-      "cycle": "Cycle",
-      "recipientAddress": "Recipient Address",
-      "currentlyAnchored": "Currently Anchored?",
-      "anchoredOnce": "Anchored Once?",
-      "allocationType": "Allocation Type",
-      "types": {
-        "stellarSelection": "Cosmic Signature NFT Stellar Selection",
-        "anchoredNftSelection": "Anchored-NFT Stellar Selection (RandomWalk anchor-holder)",
-        "signatureAllocation": "Signature Allocation Recipient (#{cycle})",
-        "enduranceChampion": "Endurance Champion",
-        "lastCstParticipant": "Last CST Participant"
-      }
+      "figures": {
+        "owned": "In this wallet",
+        "anchored": "Anchored"
+      },
+      "emptyTitle": "No Signatures in this wallet yet",
+      "emptyDescription": "Signatures you receive in an allocation or buy on the marketplace appear here."
     }
   },
   "transferCst": {
     "page": {
       "title": "Transfer CST",
-      "subtitle": "Send your Cosmic Signature CST tokens to another address.",
-      "walletDescription": "Connect your wallet to transfer CST from your own balance.",
-      "sourceLabel": "Connected wallet",
-      "description": "Transfer CST from your connected wallet. The transaction is signed by your wallet and sent directly to the CST token contract."
+      "subtitle": "Send CST from your connected wallet to another address on {network}."
     },
     "form": {
-      "title": "Transfer CST",
-      "sourceWallet": "Source wallet",
-      "defaultDescription": "Send CST from your connected wallet to any address.",
-      "available": "Available CST",
-      "balanceReadError": "Unable to read this wallet CST balance. Please try again.",
-      "decimalsReadWarning": "Unable to read CST decimals; assuming 18 decimal places.",
-      "recipientAddress": "Recipient address",
-      "amount": "Amount",
-      "sendAria": "Send CST",
-      "sending": "Sending...",
       "send": "Send CST",
-      "viewHistory": "View CST transfer history",
-      "confirmed": "Transfer confirmed.",
-      "viewTransaction": "View transaction"
+      "sendAmount": "Send {amount}"
+    },
+    "guide": {
+      "from": "Sending from",
+      "history": "Your CST transfers",
+      "title": "Before you send",
+      "final": "Transfers are final. CST sent to a wrong address can’t be recovered.",
+      "network": "Send only to an address that can hold tokens on {network}.",
+      "paste": "Copy the address from the receiving wallet rather than typing it."
     }
   },
   "nftTransfer": {
-    "defaultDescription": "Select one or more Cosmic Signature NFTs and send them to another wallet address.",
-    "marketplacePrompt": "Looking to sell instead of sending directly? Use the marketplace to list or acquire Cosmic Signature NFTs.",
-    "marketplace": "Buy or sell NFTs",
-    "sourceWallet": "Source wallet",
-    "ownedNfts": "Owned NFTs",
-    "selected": "Selected",
-    "recipientAddress": "Recipient address",
-    "empty": "You do not have any Cosmic Signature NFTs in this wallet.",
     "pickerTitle": "Choose NFTs to transfer",
     "pickerSummary": "{selected} selected of {total} transferable NFTs.",
-    "selectAll": "Select all transferable",
-    "selectPage": "Select current page",
-    "clear": "Clear selection",
-    "listAria": "Cosmic Signature NFTs",
-    "selectAria": "Select NFT #{id}",
-    "nftLabel": "NFT #{id}",
-    "tokenId": "Token ID",
-    "customName": "Custom name",
-    "noCustomName": "No custom name",
-    "generationCycle": "Generation cycle",
-    "cycle": "Cycle {cycle}",
-    "cycleUnavailable": "Cycle data not available",
-    "status": "Status",
+    "selectAll": "Select all",
+    "selectAria": "Select NFT {id}",
     "statusLabels": {
-      "anchored": "Anchored - release before transfer",
-      "ownerChanged": "Owner changed - refresh before transfer",
-      "selected": "Selected",
-      "transferable": "Transferable"
+      "anchored": "Anchored: release it to send",
+      "ownerChanged": "Owner changed: refresh the page"
     },
     "progress": {
-      "transferred": "Transferred {completed} of {total} NFTs",
-      "stopped": "Transfer stopped at NFT #{id}",
-      "current": "Current NFT: #{id}"
+      "transferred": "Transferred {completed} of {total} NFTs",
+      "stopped": "Stopped after {completed} of {total}, at NFT {id}. The NFTs not sent are still selected."
     },
-    "confirmation": {
-      "latest": "Latest transfer confirmed.",
-      "multiple": "{count} transfers confirmed.",
-      "viewLatest": "View latest transaction"
-    },
-    "sendAria": "Send selected NFTs",
-    "sending": "Sending...",
-    "send": "Send Selected NFTs",
+    "sending": "Sending…",
+    "send": "Send selected NFTs",
     "viewHistory": "View NFT transfer history",
-    "warning": {
-      "title": "Recipient has no transaction history",
-      "description": "This address appears to have no transactions yet. Double-check the recipient before sending; NFT transfers cannot be undone.",
-      "cancel": "Cancel",
-      "continue": "Continue transfer"
-    }
+    "review": {
+      "count": "{count, plural, one {# NFT} other {# NFTs}}"
+    },
+    "sendCount": "{count, plural, one {Send # NFT} other {Send # NFTs}}"
   },
   "transferHistory": {
-    "loading": "Loading...",
-    "walletLabels": {
-      "cosmicSignatureAnchoring": "Cosmic Signature NFT Anchoring Wallet",
-      "randomWalkAnchoring": "RandomWalk Anchoring Wallet",
-      "outreach": "Outreach Wallet",
-      "stellarSelection": "Stellar Selection Wallet",
-      "publicGoods": "Public Goods Vault"
-    },
-    "breadcrumbs": {
-      "nft": "NFT transfers",
-      "cst": "CST transfers"
-    },
     "nft": {
-      "title": "Cosmic Signature Transfers",
+      "title": "NFT transfers",
       "empty": "No NFT transfers yet.",
-      "invalidAddress": {
-        "title": "Invalid address",
-        "description": "Enter a valid wallet address to view NFT transfer history."
+      "lede": "Cosmic Signature NFTs imprinted to this address, and every one it received or sent.",
+      "emptyDescription": "An NFT reaches an address when it is imprinted to it or sent from another wallet.",
+      "figures": {
+        "imprinted": "Imprinted",
+        "received": "Received",
+        "sent": "Sent",
+        "anchoring": "Anchored or released"
       }
     },
     "cst": {
-      "title": "Cosmic Signature CST Token Transfers",
+      "title": "CST transfers",
       "empty": "No CST transfers yet.",
-      "invalidAddress": {
-        "title": "Invalid address",
-        "description": "Enter a valid wallet address to view CST transfer history."
-      },
-      "value": "Value (CST)"
+      "lede": "CST imprinted to this address, received and sent by it, and consumed by its CST gestures.",
+      "emptyDescription": "CST reaches an address when a gesture imprints it or another wallet sends it.",
+      "figures": {
+        "received": "Total in",
+        "sent": "Total out",
+        "net": "Net change",
+        "imprintedCaption": "Imprinted: {amount}",
+        "consumedCaption": "Consumed: {amount}"
+      }
+    },
+    "switcherLabel": "Transfers of this address",
+    "artUnavailable": "Artwork unavailable",
+    "viewOnExplorer": "View on {explorer}",
+    "error": "The transfers of this address couldn’t be loaded.",
+    "count": "{count, plural, one {# transfer} other {# transfers}}",
+    "activity": {
+      "imprinted": "Imprinted",
+      "received": "Received",
+      "sent": "Sent",
+      "consumed": "Consumed",
+      "anchored": "Anchored",
+      "released": "Released"
+    },
+    "filter": {
+      "label": "Show",
+      "all": "All",
+      "in": "Incoming",
+      "out": "Outgoing",
+      "empty": "Nothing in this direction yet.",
+      "transfers": "Between wallets"
+    },
+    "columns": {
+      "activity": "Activity",
+      "counterparty": "Counterparty"
+    },
+    "invalidAddress": {
+      "title": "Invalid address",
+      "description": "The link needs a full address: 0x followed by 40 letters and digits.",
+      "action": "Browse participants"
     }
   },
-  "stellarSelectionAllocations": {
-    "datetime": "Datetime",
-    "cycle": "Cycle",
-    "recipient": "Recipient",
-    "expirationDate": "Expiration Date",
-    "amount": "Amount (ETH)",
-    "retrieved": "Retrieved",
-    "expired": "{date} (Expired)",
-    "remaining": "{date} ({remaining})"
+  "ethAllocations": {
+    "columns": {
+      "cycle": "Cycle",
+      "source": "Source",
+      "allocated": "Allocated",
+      "amount": "Amount",
+      "deadline": "Retrieve by",
+      "status": "Status"
+    },
+    "cycle": "Cycle {cycle}",
+    "sources": {
+      "stellarSelection": "Stellar Selection",
+      "chronoWarrior": "Chrono-Warrior"
+    },
+    "status": {
+      "retrieved": "Retrieved",
+      "waiting": "Not retrieved"
+    },
+    "deadline": {
+      "remaining": "{remaining} left",
+      "expired": "Expired",
+      "help": "Until this date only the recipient can retrieve the ETH. After it, anyone can."
+    }
+  },
+  "attached": {
+    "columns": {
+      "nft": "NFT",
+      "token": "Token",
+      "cycle": "Cycle",
+      "contributor": "Attached by",
+      "attached": "Attached",
+      "amount": "Amount",
+      "action": "Action"
+    },
+    "tokenNumber": "Token #{id}",
+    "retrieve": "Retrieve",
+    "retrieveItem": "Retrieve {item}"
   }
 }

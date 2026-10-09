@@ -1,25 +1,28 @@
 'use client';
 
 import { useMemo, useState } from 'react';
-import { Gift, ImageOff } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 
-import { cn } from '@/lib/utils';
-import { TOUCH_TARGET_HEIGHT_CLASS } from '@/lib/touch-target';
+import { AttachedAssetsIcon } from '@/lib/conceptIcons';
 import { useDonationsERC20ByRound, useDonationsNFTList } from '@/hooks/useApiQuery';
 import type { AttachedNFT as AttachedNFTRecord, DonatedERC20Token } from '@/services/api/types';
 import AttachedNFTCard from '@/components/attachments/AttachedNFT';
 import AttachedERC20Table from '@/components/attachments/AttachedERC20Table';
-import { CustomPagination } from '@/components/common/CustomPagination';
+import { TablePagination } from '@/components/ui/pagination';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { EmptyState } from '@/components/ui/empty-state';
 import { ErrorState } from '@/components/ui/error-state';
-import { SkeletonNFTCard, SkeletonTableRow } from '@/components/ui/skeleton';
-import { StatsSection } from '@/components/statistics/StatsSection';
+import { SkeletonNFTCard, SkeletonTable } from '@/components/ui/skeleton';
+import { SegmentedControl } from '@/components/ui/segmented-control';
+
+import { StatsSection } from './StatsSection';
 
 const ITEMS_PER_PAGE = 12;
 
 type NftScope = 'all' | 'current';
+type AssetKind = 'nfts' | 'erc20';
+
+const isAssetKind = (value: string): value is AssetKind => value === 'nfts' || value === 'erc20';
 
 function nftKey(nft: AttachedNFTRecord, index: number): string {
   if (nft.RecordId != null) return `record-${nft.RecordId}`;
@@ -28,29 +31,56 @@ function nftKey(nft: AttachedNFTRecord, index: number): string {
 }
 
 export interface AttachedAssetsSectionProps {
-  /** Current Performance Cycle number (used for the current-cycle scope). */
-  currentRoundNum: number;
+  /** The live Performance Cycle (the current-cycle scope), or null while it is unknown. */
+  currentCycle: number | null;
+  /** The dashboard that names the live cycle is still loading. */
+  cycleLoading: boolean;
+  /** The dashboard read failed, so the live cycle is unknown. */
+  cycleFailed: boolean;
+  onRetryCycle: () => void;
 }
 
 /**
- * Unified view of assets attached to gestures: an ERC-721 grid that can be
- * scoped to all cycles or just the current one, plus the current cycle's
- * attached ERC-20 tokens. Replaces the two overlapping sections that used to
- * render back-to-back on the statistics page.
+ * Assets attached to gestures: an ERC-721 grid that can be scoped to all
+ * cycles or the current one, and the current cycle's attached ERC-20 tokens.
+ * The two are views of one thing, so they switch in a segmented control,
+ * never a second underline row under the statistics sub-navigation; the
+ * grid's scope sits at the end of the same row. What depends on the live
+ * cycle waits for it: a skeleton while the dashboard loads, an error with a
+ * retry when it failed, never an empty "nothing attached" for a cycle that
+ * was not read.
  */
-export function AttachedAssetsSection({ currentRoundNum }: AttachedAssetsSectionProps) {
+export function AttachedAssetsSection({
+  currentCycle,
+  cycleLoading,
+  cycleFailed,
+  onRetryCycle,
+}: AttachedAssetsSectionProps) {
   const t = useTranslations('statistics');
   const nftQuery = useDonationsNFTList();
-  const erc20Query = useDonationsERC20ByRound(currentRoundNum);
+  const erc20Query = useDonationsERC20ByRound(currentCycle ?? -1);
+  const cycleUnknown = currentCycle === null;
+  const cycleState =
+    cycleUnknown && (cycleLoading || !cycleFailed) ? (
+      <SkeletonTable rows={4} columns={4} />
+    ) : cycleUnknown ? (
+      <ErrorState
+        headingLevel={3}
+        title={t('shared.sectionLoadErrorTitle')}
+        message={t('shared.serviceError')}
+        onRetry={onRetryCycle}
+      />
+    ) : null;
 
+  const [kind, setKind] = useState<AssetKind>('nfts');
   const [nftScope, setNftScope] = useState<NftScope>('all');
   const [page, setPage] = useState(1);
 
   const allNfts = useMemo(() => (nftQuery.data ?? []) as AttachedNFTRecord[], [nftQuery.data]);
   const visibleNfts = useMemo(
     () =>
-      nftScope === 'current' ? allNfts.filter((nft) => nft.RoundNum === currentRoundNum) : allNfts,
-    [allNfts, nftScope, currentRoundNum],
+      nftScope === 'current' ? allNfts.filter((nft) => nft.RoundNum === currentCycle) : allNfts,
+    [allNfts, nftScope, currentCycle],
   );
 
   // Clamp instead of state-sync so scope switches and data refreshes can
@@ -66,72 +96,49 @@ export function AttachedAssetsSection({ currentRoundNum }: AttachedAssetsSection
     setPage(1);
   };
 
-  const scopeToggle = (
-    <div
-      role="group"
-      aria-label={t('attachedAssets.scopeAria')}
-      className="mb-4 inline-flex items-center gap-1 rounded-lg bg-white/[0.04] p-1"
-    >
-      {(
-        [
-          { value: 'all', label: t('attachedAssets.scopeAll') },
-          { value: 'current', label: t('attachedAssets.scopeCurrent') },
-        ] as const
-      ).map((option) => (
-        <button
-          key={option.value}
-          type="button"
-          aria-pressed={nftScope === option.value}
-          onClick={() => setScope(option.value)}
-          className={cn(
-            'rounded-md px-3 py-1.5 text-xs font-medium transition-colors',
-            TOUCH_TARGET_HEIGHT_CLASS,
-            nftScope === option.value
-              ? 'bg-primary/15 text-primary'
-              : 'text-muted-foreground hover:text-foreground',
-          )}
-        >
-          {option.label}
-        </button>
-      ))}
-    </div>
-  );
-
   return (
-    <StatsSection
-      title={t('tokens.sections.attachedAssets')}
-      tooltip={t('sectionTooltips.attachedAssets')}
-      icon={<Gift className="h-3.5 w-3.5" />}
-      defaultOpen
-    >
-      <Tabs defaultValue="nfts">
-        <TabsList className="w-full sm:w-auto">
-          <TabsTrigger value="nfts" className="flex-1 sm:flex-none">
-            {t('attachedAssets.nftTab')}
-          </TabsTrigger>
-          <TabsTrigger value="erc20" className="flex-1 sm:flex-none">
-            {t('attachedAssets.erc20Tab')}
-          </TabsTrigger>
-        </TabsList>
+    <StatsSection title={t('tokens.sections.attachedAssets')}>
+      <Tabs value={kind} onValueChange={(value) => isAssetKind(value) && setKind(value)}>
+        <div className="flex flex-wrap items-center justify-between gap-x-6 gap-y-3">
+          <TabsList aria-label={t('tokens.sections.attachedAssets')}>
+            <TabsTrigger value="nfts">{t('attachedAssets.nftTab')}</TabsTrigger>
+            <TabsTrigger value="erc20">{t('attachedAssets.erc20Tab')}</TabsTrigger>
+          </TabsList>
+          {kind === 'nfts' ? (
+            <SegmentedControl
+              label={t('attachedAssets.scopeAria')}
+              hideLabel
+              value={nftScope}
+              onValueChange={setScope}
+              options={[
+                { value: 'all', label: t('attachedAssets.scopeAll') },
+                { value: 'current', label: t('attachedAssets.scopeCurrent') },
+              ]}
+            />
+          ) : null}
+        </div>
 
-        <TabsContent value="nfts" className="pt-4">
-          {scopeToggle}
-          {nftQuery.isLoading ? (
+        <TabsContent value="nfts" className="mt-6 space-y-6">
+          {nftScope === 'current' && cycleState ? (
+            cycleState
+          ) : nftQuery.isLoading ? (
             <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6">
               {Array.from({ length: 6 }).map((_, i) => (
-                <SkeletonNFTCard key={i} />
+                <SkeletonNFTCard key={i} announce={i === 0} />
               ))}
             </div>
           ) : nftQuery.isError ? (
             <ErrorState
+              headingLevel={3}
               title={t('attachedAssets.nftLoadError')}
               message={t('attachedAssets.serviceError')}
               onRetry={() => nftQuery.refetch()}
-              className="py-10"
             />
           ) : visibleNfts.length === 0 ? (
             <EmptyState
-              icon={<ImageOff className="h-8 w-8 text-muted-foreground/50" />}
+              variant="inline"
+              headingLevel={3}
+              icon={<AttachedAssetsIcon className="size-6" />}
               title={
                 nftScope === 'current'
                   ? t('attachedAssets.emptyCurrentTitle')
@@ -142,7 +149,6 @@ export function AttachedAssetsSection({ currentRoundNum }: AttachedAssetsSection
                   ? t('attachedAssets.emptyCurrentDescription')
                   : t('attachedAssets.emptyAllDescription')
               }
-              className="py-10"
             />
           ) : (
             <>
@@ -151,35 +157,35 @@ export function AttachedAssetsSection({ currentRoundNum }: AttachedAssetsSection
                   <AttachedNFTCard key={nftKey(nft, index)} nft={nft} />
                 ))}
               </div>
-              <CustomPagination
+              <TablePagination
                 page={safePage}
-                setPage={setPage}
-                totalLength={visibleNfts.length}
-                perPage={ITEMS_PER_PAGE}
+                pageSize={ITEMS_PER_PAGE}
+                total={visibleNfts.length}
+                onPageChange={setPage}
+                // Named for its grid, so it stands apart from the ledgers' pagination.
+                label={t('attachedAssets.paginationLabel')}
               />
             </>
           )}
         </TabsContent>
 
-        <TabsContent value="erc20" className="pt-4">
-          <p className="mb-4 text-xs text-muted-foreground">
+        <TabsContent value="erc20" className="mt-6 space-y-4">
+          <p className="max-w-[var(--measure-lede)] type-body-sm text-muted-foreground">
             {t('attachedAssets.erc20Description')}
           </p>
-          {erc20Query.isLoading ? (
-            <div>
-              {Array.from({ length: 4 }).map((_, i) => (
-                <SkeletonTableRow key={i} />
-              ))}
-            </div>
+          {cycleState ? (
+            cycleState
+          ) : erc20Query.isLoading ? (
+            <SkeletonTable rows={4} columns={4} />
           ) : erc20Query.isError ? (
             <ErrorState
+              headingLevel={3}
               title={t('attachedAssets.erc20LoadError')}
               message={t('attachedAssets.serviceError')}
               onRetry={() => erc20Query.refetch()}
-              className="py-10"
             />
           ) : (
-            <AttachedERC20Table list={erc20Tokens} handleClaim={null} />
+            <AttachedERC20Table list={erc20Tokens} />
           )}
         </TabsContent>
       </Tabs>

@@ -20,7 +20,7 @@ export const basicQuestionsTextEn = {
       'Cosmic Signature is a procedural art protocol: timed Performance Cycles fill with gestures, and finalization imprints deterministic three-body artwork. No AI is involved anywhere in the pipeline — the art is physics computed from a seed, which is the opposite of a text-prompt image service.',
     funFact:
       'The name collides with COSMIC, a well-known cancer mutation database. The protocol has nothing to do with it — a disambiguation the docs state outright.',
-    referenceLabel: 'Learn: What Is Cosmic Signature?',
+    referenceLabel: 'Learn: What is Cosmic Signature?',
   },
   'what-is-a-gesture': {
     prompt: 'In protocol terms, what is a gesture?',
@@ -31,7 +31,7 @@ export const basicQuestionsTextEn = {
       d: 'A message posted in the community channels.',
     },
     explanation:
-      'Gestures are the protocol\u2019s only input. Each one carries ETH or CST, pushes the Cycle Finalization Time further out, records one entry in the cycle\u2019s Stellar Selections, and can imprint Participation CST. You never draw anything by hand — the artwork is computed from a seed at finalization.',
+      'Gestures drive the active cycle. Each one carries ETH or CST, extends the Cycle Finalization Time, records one entry in the cycle’s Stellar Selections, and can imprint Participation CST. The artwork is computed from a seed recorded at finalization; participants do not draw it by hand.',
     referenceLabel: 'White paper \u00a74 \u2014 Gestures',
   },
   'two-currencies': {
@@ -56,7 +56,7 @@ export const basicQuestionsTextEn = {
       d: 'Nothing \u2014 only ETH gestures move the clock.',
     },
     explanation: `Every gesture, whether ETH or CST, adds the current time increment to the stored finalization time. Nothing ever resets the clock to a fixed window \u2014 the ${protocolFacts.initialCycleFinalizationHoursAtLaunch}-hour figure is only the initial countdown after a cycle\u2019s opening gesture at launch parameters.`,
-    referenceLabel: 'White paper \u00a73.2 \u2014 The Countdown',
+    referenceLabel: 'White paper \u00a73.2 \u2014 The countdown',
   },
   'final-gesture-role': {
     prompt: 'The countdown has just expired. Who is eligible to finalize the cycle first?',
@@ -79,7 +79,7 @@ export const basicQuestionsTextEn = {
       c: 'The cycle finalizes, but the Final Gesture participant still receives everything.',
       d: 'Nothing happens until the Cosmic Council votes to intervene.',
     },
-    explanation: `The Final Gesture participant holds the right exclusively for ${protocolFacts.finalGestureExclusivityHours} hours. After that, the Open-Finalization Window begins: anyone may finalize, and the contract treats whoever does as the cycle\u2019s beneficiary, with everything the role carries. The rule is deliberately unforgiving \u2014 it keeps the protocol alive if a participant disappears, and it prices carelessness.`,
+    explanation: `The Final Gesture participant has the exclusive right to finalize for ${protocolFacts.finalGestureExclusivityHours} hours. After that, the Open-Finalization Window begins: anyone may finalize and become the cycle’s beneficiary, receiving the allocations assigned to that role. This lets the protocol continue if the Final Gesture participant does not return.`,
     funFact:
       'Nothing in the protocol waits forever on an absent participant. Every deadline eventually opens to the first caller.',
     referenceLabel: 'White paper \u00a73.3 \u2014 Finalization',
@@ -93,10 +93,10 @@ export const basicQuestionsTextEn = {
       d: `${protocolFacts.publicGoodsPercentage}%`,
     },
     explanation: `The Signature Allocation is ${protocolFacts.mainEthPercentage}% of the protocol\u2019s ETH balance, read once at the moment of finalization. The ${protocolFacts.compoundingReservePercentage}% figure is the share that is not distributed at all \u2014 it rolls forward as the Compounding Cycle Reserve.`,
-    referenceLabel: 'White paper \u00a75.1 \u2014 Distribution at Finalization',
+    referenceLabel: 'White paper \u00a75.1 \u2014 Distribution at finalization',
   },
   'compounding-reserve': {
-    prompt: 'Why does each Performance Cycle open with a larger reserve than the last?',
+    prompt: 'How does part of the Cycle Reserve carry over into the next Performance Cycle?',
     options: {
       a: `About ${protocolFacts.compoundingReservePercentage}% of every cycle\u2019s reserve is never distributed \u2014 it rolls forward into the next cycle.`,
       b: 'The team tops the reserve up between cycles.',
@@ -104,8 +104,8 @@ export const basicQuestionsTextEn = {
       d: 'The Cosmic Council votes fresh ETH into the reserve.',
     },
     explanation:
-      'The five distributed ETH tracks sum to half of the reserve; the remainder compounds automatically. No one tops anything up, and no protocol can imprint ETH \u2014 the growth is purely mechanical. The protocol accumulates rather than extracts.',
-    referenceLabel: 'White paper \u00a75.1 \u2014 Distribution at Finalization',
+      'The five distributed ETH tracks account for about half of the reserve. The remainder carries forward into the next cycle. This does not guarantee a larger reserve each time: its size also depends on the ETH added during the cycle.',
+    referenceLabel: 'White paper \u00a75.1 \u2014 Distribution at finalization',
   },
   'art-engine': {
     prompt: 'What actually generates a Cosmic Signature artwork?',
@@ -119,7 +119,7 @@ export const basicQuestionsTextEn = {
       'Three bodies of comparable mass orbit under Newtonian gravity; the seed decides the starting conditions and physics does the rest. No generative model is involved at any stage \u2014 no training data, no sampling, no prompt. Chaos theory, not randomness, is what makes every Signature unique.',
     funFact:
       'The three-body problem has no general closed-form solution. An imperceptible change in starting conditions produces a completely different dance.',
-    referenceLabel: 'White paper \u00a76 \u2014 The Art',
+    referenceLabel: 'White paper \u00a76 \u2014 The art',
   },
   'same-seed': {
     prompt:
@@ -132,19 +132,19 @@ export const basicQuestionsTextEn = {
     },
     explanation:
       'Determinism is enforced, not assumed: the same seed produces the same image, bit for bit, on any machine. SHA-256 hashes of rendered frames are asserted in continuous integration, so a drift in output would fail the build.',
-    referenceLabel: 'White paper \u00a76.2 \u2014 Reproducibility and License',
+    referenceLabel: 'White paper \u00a76.2 \u2014 Reproducibility and license',
   },
   'cst-supply-origin': {
     prompt: 'Where does CST come from?',
     options: {
-      a: 'Supply starts at zero, and only the protocol contract can imprint it \u2014 every CST traces back to participation in a cycle.',
+      a: 'Supply starts at zero, and only the protocol contract can imprint CST through its defined mechanisms.',
       b: 'A large allocation was created for the team at launch.',
       c: 'It was distributed for free to early wallets before launch.',
       d: 'Anyone can imprint CST by calling the token contract.',
     },
     explanation:
-      'The CST token contract accepts imprint and burn instructions only from the protocol contract, and supply started at zero. There is no cap, no premine, and no team allocation \u2014 patient participation is the only source of new CST.',
-    referenceLabel: 'White paper \u00a77 \u2014 The CST Token',
+      'CST supply started at zero, and the token contract accepts imprint and burn instructions only from the protocol contract. New CST comes from the protocol’s defined mechanisms, including Participation CST, cycle allocations, and the Outreach Reserve. There is no hard supply cap.',
+    referenceLabel: 'White paper \u00a77 \u2014 The CST token',
   },
   'cst-on-spend': {
     prompt: 'Rio spends a handful of CST on a gesture. Where does that CST go?',
@@ -155,8 +155,8 @@ export const basicQuestionsTextEn = {
       d: 'It is returned to Rio when the cycle finalizes.',
     },
     explanation:
-      'The full cost of every CST gesture is burned. That ties the token\u2019s supply to actual use: quiet cycles imprint little, and heavy CST activity burns supply back down. Nothing flows to any treasury \u2014 there is none.',
-    referenceLabel: 'White paper \u00a77.2 \u2014 Burning and Supply Dynamics',
+      'The full cost of every CST gesture is burned, permanently removing those tokens from supply. The CST spent on a gesture is not transferred to a treasury or added to the Cycle Reserve.',
+    referenceLabel: 'White paper \u00a77.2 \u2014 Burning and supply dynamics',
   },
   'public-goods-beneficiary': {
     prompt: `Every cycle forwards ${protocolFacts.publicGoodsPercentage}% of the reserve as the Public Goods Allocation. Who receives it today?`,
@@ -184,7 +184,7 @@ export const basicQuestionsTextEn = {
     referenceLabel: 'White paper \u00a78 \u2014 Anchoring',
   },
   'anchor-once-ever': {
-    prompt: 'Mira later releases her anchor. Can she anchor that NFT again next month?',
+    prompt: 'Mira releases an anchored NFT. Can she anchor that NFT again next month?',
     options: {
       a: 'No \u2014 each NFT can be anchored only once, ever. Releasing is permanent.',
       b: 'Yes, after a short cooldown.',
@@ -204,7 +204,7 @@ export const basicQuestionsTextEn = {
       d: 'The NFT doubles the Participation CST the gesture imprints.',
     },
     explanation: `Attaching a Random Walk NFT reduces one ETH gesture\u2019s cost by ${protocolFacts.randomWalkDiscountPercentage}%. The NFT is not transferred \u2014 the contract simply marks it used. Each Random Walk NFT can be attached exactly once across all cycles, which makes the reduction a consumable resource.`,
-    referenceLabel: 'White paper \u00a74.2 \u2014 Random Walk NFT Attachment',
+    referenceLabel: 'White paper \u00a74.2 \u2014 Random Walk NFT attachment',
   },
   'first-gesture-currency': {
     prompt: 'A new cycle has just activated. Which gesture can open it?',
@@ -216,7 +216,7 @@ export const basicQuestionsTextEn = {
     },
     explanation:
       'Every cycle must open with an ETH gesture, priced by the ETH Calibration Window. Once the cycle is under way, CST offers a second way in. No privileged account opens cycles \u2014 whoever makes the opening gesture does.',
-    referenceLabel: 'White paper \u00a74.3 \u2014 CST Gestures',
+    referenceLabel: 'White paper \u00a74.3 \u2014 CST gestures',
   },
   'message-on-gesture': {
     prompt: 'Besides value, what can a gesture carry?',
@@ -229,12 +229,12 @@ export const basicQuestionsTextEn = {
     explanation: `A gesture may carry a message of up to ${protocolFacts.gestureMessageMaxLength} bytes, recorded on-chain alongside it, and may attach tokens or an NFT. Attached assets are held by the Allocations Wallet, where the cycle\u2019s beneficiary has priority to retrieve them after finalization.`,
     funFact:
       'Every message ever attached to a gesture is permanently readable on Arbitrum \u2014 a public guest book woven through the cycles.',
-    referenceLabel: 'White paper \u00a74.4 \u2014 Messages and Attached Assets',
+    referenceLabel: 'White paper \u00a74.4 \u2014 Messages and attached assets',
   },
   'who-runs-cycles': {
     prompt: 'Who decides how each cycle\u2019s ETH is distributed?',
     options: {
-      a: 'No one \u2014 allocation percentages are constants in verified contracts, executed mechanically at finalization.',
+      a: 'The protocol contracts execute the allocation rules at finalization.',
       b: 'The team reviews each cycle and signs the distribution.',
       c: 'An oracle service computes the split.',
       d: 'The app\u2019s backend servers issue the transfers.',
@@ -252,7 +252,7 @@ export const basicQuestionsTextEn = {
       d: '100',
     },
     explanation: `A typical cycle imprints ${protocolFacts.typicalNftsPerCycle} NFTs: ${protocolFacts.roleNftsPerCycle} role NFTs (beneficiary, Chrono-Warrior, Endurance Champion, Final CST Gesture), ${protocolFacts.nftStellarSelectionRecipients} participant Stellar Selection NFTs, and ${protocolFacts.anchoredRwlkNftSelectionRecipients} anchored-Random-Walk Selection NFTs. Cycles that skip a track imprint fewer.`,
-    referenceLabel: 'White paper \u00a75.1 \u2014 Distribution at Finalization',
+    referenceLabel: 'White paper \u00a75.1 \u2014 Distribution at finalization',
   },
   'chrono-endurance-exist': {
     prompt: 'What do the Endurance Champion and Chrono-Warrior tracks measure?',
@@ -269,13 +269,13 @@ export const basicQuestionsTextEn = {
   'stellar-selection-what': {
     prompt: 'What are Stellar Selections?',
     options: {
-      a: 'Per-gesture entries recorded during the cycle, from which the contract draws recipients at finalization.',
+      a: 'Per-gesture entries recorded during the cycle, from which the contract selects recipients at finalization.',
       b: 'A leaderboard ranking participants by activity.',
       c: 'Rarity tiers assigned to the NFT artwork.',
       d: 'A scheme for naming constellations in the art.',
     },
     explanation:
-      'Each gesture records one entry in the cycle\u2019s Selection pool. At finalization the contract draws entries for the ETH and NFT Stellar Selections, so selection frequency is proportional to participation. It is a distribution mechanism, not a ranking.',
+      'Each gesture records one entry in the cycle\u2019s Selection pool. At finalization the contract selects entries for the ETH and NFT Stellar Selections, so selection frequency is proportional to participation. It is a distribution mechanism, not a ranking.',
     referenceLabel: 'White paper \u00a75.3 \u2014 Stellar Selections',
   },
   'ecosystem-optionality': {
@@ -289,7 +289,7 @@ export const basicQuestionsTextEn = {
     },
     explanation:
       'The ecosystem around the contracts \u2014 the app, Axiom Zero, Uniswap liquidity, Chaos Zero \u2014 is convenience, not dependency. None of it is required: gestures, finalization, anchoring, and retrieval all work by calling the verified contracts directly.',
-    referenceLabel: 'White paper \u00a72 \u2014 Protocol Overview',
+    referenceLabel: 'White paper \u00a72 \u2014 Protocol overview',
   },
   'what-it-is-not': {
     prompt: 'Which statement matches how the white paper describes the protocol\u2019s nature?',
@@ -301,7 +301,7 @@ export const basicQuestionsTextEn = {
     },
     explanation:
       'Every allocation track flows to participants, to anchored NFTs, to the compounding reserve, or to public goods \u2014 there is no operator\u2019s margin. The paper makes no promises about price, liquidity, or future value, and says plainly that no one should acquire CST or the NFTs expecting financial gain from the efforts of others.',
-    referenceLabel: 'White paper \u00a714.1 \u2014 What Cosmic Signature Is Not',
+    referenceLabel: 'White paper \u00a714.1 \u2014 What Cosmic Signature is not',
   },
   'where-recorded': {
     prompt: 'Where do gestures, seeds, and cycle history actually live?',

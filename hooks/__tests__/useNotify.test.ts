@@ -1,34 +1,25 @@
 import { renderHook, act } from '@testing-library/react';
 
 import { useNotification } from '@/contexts/NotificationContext';
-import getErrorMessage from '@/utils/alert';
-import { isEthProviderError, reportError } from '@/utils/errors';
+import { reportError } from '@/utils/errors';
 
 import { useNotify } from '../useNotify';
 
 jest.mock('../../contexts/NotificationContext', () => ({
   useNotification: jest.fn(),
 }));
-jest.mock('../../utils/alert', () => jest.fn((msg: string) => `parsed: ${msg}`));
 jest.mock('../../utils/errors', () => {
   const actual = jest.requireActual<typeof import('../../utils/errors')>('../../utils/errors');
-  return {
-    ...actual,
-    isEthProviderError: jest.fn(),
-    reportError: jest.fn(),
-  };
+  return { ...actual, reportError: jest.fn() };
 });
 
 const mockSetNotification = jest.fn();
 const mockUseNotification = useNotification as jest.Mock;
-const mockIsEthProviderError = isEthProviderError as unknown as jest.Mock;
-const mockGetErrorMessage = getErrorMessage as jest.Mock;
 const mockReportError = reportError as jest.Mock;
 
 beforeEach(() => {
   jest.clearAllMocks();
   mockUseNotification.mockReturnValue({ setNotification: mockSetNotification });
-  mockIsEthProviderError.mockReturnValue(false);
 });
 
 describe('useNotify', () => {
@@ -52,108 +43,70 @@ describe('useNotify', () => {
   });
 
   describe('notifyErrorFromEthers', () => {
-    it('handles EthProviderError with data.message', () => {
-      mockIsEthProviderError.mockReturnValue(true);
-      const ethError = { data: { message: 'revert reason' } };
-
+    it('never shows provider text: a revert reason becomes the fallback sentence', () => {
       const { result } = renderHook(() => useNotify());
+      const err = Object.assign(new Error('execution reverted: ERC20: transfer amount'), {
+        data: { message: 'revert reason' },
+      });
 
       act(() => {
-        result.current.notifyErrorFromEthers(ethError);
+        result.current.notifyErrorFromEthers(err, 'Action fallback');
       });
 
-      expect(mockGetErrorMessage).toHaveBeenCalledWith('revert reason');
-      expect(mockSetNotification).toHaveBeenCalledWith({
-        visible: true,
-        type: 'error',
-        text: 'parsed: revert reason',
-      });
+      expect(mockSetNotification).toHaveBeenCalledWith(
+        expect.objectContaining({ type: 'error', text: 'Action fallback' }),
+      );
+      const [{ text, details }] = mockSetNotification.mock.calls[0] as [
+        { text: string; details: string },
+      ];
+      expect(text).not.toContain('ERC20');
+      // The technical summary rides along for "Copy details".
+      expect(details).toContain('execution reverted');
     });
 
-    it('handles standard Error using err.message', () => {
-      const error = new Error('something broke');
-
+    it('names the cause when it is known (not enough ETH)', () => {
       const { result } = renderHook(() => useNotify());
+      const err = { name: 'InsufficientFundsError', message: 'insufficient funds for gas' };
 
       act(() => {
-        result.current.notifyErrorFromEthers(error);
+        result.current.notifyErrorFromEthers(err, 'Action fallback');
       });
 
-      expect(mockSetNotification).toHaveBeenCalledWith({
-        visible: true,
-        type: 'error',
-        text: 'something broke',
-      });
-      expect(mockGetErrorMessage).not.toHaveBeenCalled();
+      expect(mockSetNotification).toHaveBeenCalledWith(
+        expect.objectContaining({
+          type: 'error',
+          text: expect.stringContaining('toasts.tx.error.insufficientFunds'),
+        }),
+      );
     });
 
-    it('handles unknown errors with reportError and generic message', () => {
-      const unknownError = 42;
-
+    it('uses the generic sentence and reports unknown errors', () => {
       const { result } = renderHook(() => useNotify());
+      const err = 'something unexpected';
 
       act(() => {
-        result.current.notifyErrorFromEthers(unknownError);
+        result.current.notifyErrorFromEthers(err);
       });
 
-      expect(mockReportError).toHaveBeenCalledWith(42, 'ethers provider error');
-      expect(mockSetNotification).toHaveBeenCalledWith({
-        visible: true,
-        type: 'error',
-        text: 'toasts.generic.rpcFailure',
-      });
+      expect(mockReportError).toHaveBeenCalledWith(err, 'ethers provider error');
+      expect(mockSetNotification).toHaveBeenCalledWith(
+        expect.objectContaining({ type: 'error', text: 'toasts.generic.rpcFailure' }),
+      );
     });
 
-    it('uses an action-specific localized fallback when provided', () => {
-      const error = 42;
+    it('shows a neutral cancelled notice for a dismissed wallet prompt', () => {
       const { result } = renderHook(() => useNotify());
 
       act(() => {
-        result.current.notifyErrorFromEthers(error, 'toasts.transfer.cst.failed');
+        result.current.notifyErrorFromEthers({ code: 4001, message: 'User rejected' });
       });
 
-      expect(mockSetNotification).toHaveBeenCalledWith({
-        visible: true,
-        type: 'error',
-        text: 'toasts.transfer.cst.failed',
-      });
-      expect(mockReportError).toHaveBeenCalledWith(error, 'ethers provider error');
-    });
-
-    it('does not expose raw provider diagnostics in Chinese UI', () => {
-      const nextIntl = jest.requireMock('next-intl') as { useLocale: () => string };
-      const localeSpy = jest.spyOn(nextIntl, 'useLocale').mockReturnValue('zh');
-      mockIsEthProviderError.mockReturnValue(true);
-      const providerError = { data: { message: 'execution reverted: English diagnostic' } };
-
-      const { result } = renderHook(() => useNotify());
-      act(() => {
-        result.current.notifyErrorFromEthers(providerError, 'toasts.transfer.cst.failed');
-      });
-
-      expect(mockSetNotification).toHaveBeenCalledWith({
-        visible: true,
-        type: 'error',
-        text: 'toasts.transfer.cst.failed',
-      });
-      expect(mockGetErrorMessage).not.toHaveBeenCalled();
-      expect(mockReportError).toHaveBeenCalledWith(providerError, 'ethers provider error');
-      localeSpy.mockRestore();
-    });
-
-    it('shows info when user rejected the transaction (EIP-1193 4001)', () => {
-      const { result } = renderHook(() => useNotify());
-
-      act(() => {
-        result.current.notifyErrorFromEthers({ code: 4001 });
-      });
-
+      expect(mockReportError).not.toHaveBeenCalled();
       expect(mockSetNotification).toHaveBeenCalledWith({
         visible: true,
         type: 'info',
         text: 'toasts.walletTransactionCancelled',
       });
-      expect(mockReportError).not.toHaveBeenCalled();
     });
   });
 });

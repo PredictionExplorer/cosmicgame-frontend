@@ -1,0 +1,410 @@
+import userEvent from '@testing-library/user-event';
+import { zeroAddress } from 'viem';
+
+import type { DashboardInfo } from '@/services/api';
+import type { CstGestureData } from '@/utils/cstGesture';
+
+import { renderWithQuery, screen, within, checkA11y } from '@/test-utils';
+
+import { GestureConsole, type ConsoleFinalize, type ConsoleFormState } from '../GestureConsole';
+
+jest.mock('@/components/nft/PaginationRWLKGrid', () => ({
+  __esModule: true,
+  default: ({ data, labelledBy }: { data: number[]; labelledBy?: string }) => (
+    <div data-testid="rwlk-grid" data-count={data.length} aria-labelledby={labelledBy} />
+  ),
+}));
+
+const ACCOUNT = '0x2222222222222222222222222222222222222222';
+
+const cstGestureData: CstGestureData = {
+  AuctionDuration: 8 * 3600,
+  SecondsElapsed: 2 * 3600,
+  CSTPrice: 250.52,
+  CSTPriceWei: 0n,
+  isFree: false,
+  source: 'api',
+};
+
+function makeForm(overrides: Partial<ConsoleFormState> = {}): ConsoleFormState {
+  return {
+    gestureType: 'ETH',
+    contributionType: 'NFT',
+    setContributionType: jest.fn(),
+    message: '',
+    setMessage: jest.fn(),
+    nftDonateAddress: '',
+    setNftDonateAddress: jest.fn(),
+    nftId: '',
+    setNftId: jest.fn(),
+    tokenDonateAddress: '',
+    setTokenDonateAddress: jest.fn(),
+    tokenAmount: '',
+    setTokenAmount: jest.fn(),
+    rwlkId: -1,
+    setRwlkId: jest.fn(),
+    gestureCostPlus: 2,
+    setBidPricePlus: jest.fn(),
+    advancedExpanded: false,
+    setAdvancedExpanded: jest.fn(),
+    rwlknftIds: [11, 12],
+    rwlkListStatus: 'ready',
+    ethGestureInfo: { AuctionDuration: 3600, SecondsElapsed: 900, ETHPrice: 0.10211 },
+    gestureCstRewardAmount: 186.18,
+    isCstRewardLoading: false,
+    isGesturing: false,
+    gestureTxStage: { status: 'idle' },
+    ...overrides,
+  };
+}
+
+const data = {
+  CurRoundNum: 2,
+  LastBidderAddr: '0x1111111111111111111111111111111111111111',
+} as DashboardInfo;
+
+type ConsoleProps = Parameters<typeof GestureConsole>[0];
+
+function renderConsole(props: Partial<ConsoleProps> = {}) {
+  const onGesture = jest.fn();
+  const onSelectGestureType = jest.fn();
+  const view = renderWithQuery(
+    <GestureConsole
+      variant="page"
+      data={data}
+      loading={false}
+      account={ACCOUNT}
+      form={makeForm()}
+      cstGestureData={cstGestureData}
+      submitLabel="Gesture with ETH (0.10211 ETH)"
+      canGesture
+      cycleTimerEnded={false}
+      onGesture={onGesture}
+      onSelectGestureType={onSelectGestureType}
+      {...props}
+    />,
+  );
+  return { ...view, onGesture, onSelectGestureType };
+}
+
+/** The method segments (the closed Advanced disclosure holds radios too). */
+function methodRadios() {
+  return within(screen.getByTestId('gesture-method-selector')).getAllByRole('radio');
+}
+
+function visibleText(element: HTMLElement): string {
+  const clone = element.cloneNode(true) as HTMLElement;
+  clone.querySelectorAll('[hidden], .sr-only').forEach((node) => node.remove());
+  return clone.textContent ?? '';
+}
+
+describe('GestureConsole', () => {
+  it('prices every method inside its segment, the discount beside RandomWalk', () => {
+    renderConsole();
+
+    const radios = methodRadios();
+    expect(radios).toHaveLength(3);
+    expect(radios[0]).toHaveTextContent('0.10211 ETH');
+    expect(radios[1]).toHaveTextContent('0.051055 ETH');
+    // A short qualifier, not the method's full sentence.
+    expect(radios[1]).toHaveTextContent('home.deck.console.randomWalkNote');
+    expect(radios[1]).not.toHaveTextContent('home.form.method.randomWalk.desc');
+    expect(radios[2]).toHaveTextContent('250.52 CST');
+  });
+
+  it('keeps the chosen Random Walk NFT when an attachment is picked', async () => {
+    // Regression (V061, fixed in the Observatory first): picking what to attach
+    // cleared the Random Walk NFT, so the submit disabled with no reason given.
+    const form = makeForm({ gestureType: 'RandomWalk', rwlkId: 11, advancedExpanded: true });
+    renderConsole({ form });
+    await userEvent.click(screen.getByRole('radio', { name: 'home.form.advanced.attachToken' }));
+    expect(form.setContributionType).toHaveBeenCalledWith('Token');
+    expect(form.setRwlkId).not.toHaveBeenCalled();
+  });
+
+  it('keeps the Calibration Window right under the methods', () => {
+    renderConsole();
+
+    const selector = screen.getByTestId('gesture-method-selector');
+    const calibration = screen.getByTestId('calibration-window');
+    expect(
+      selector.compareDocumentPosition(calibration) & Node.DOCUMENT_POSITION_FOLLOWING,
+    ).toBeTruthy();
+  });
+
+  it('reads a CST Gesture at its floor as 0 CST, never "free"', () => {
+    renderConsole({ cstGestureData: { ...cstGestureData, isFree: true } });
+
+    expect(methodRadios()[2]).toHaveTextContent('home.calibration.floor');
+  });
+
+  it('offers only ETH before the first Gesture of a cycle', () => {
+    renderConsole({ data: { ...data, LastBidderAddr: zeroAddress } as DashboardInfo });
+
+    expect(methodRadios()).toHaveLength(1);
+    expect(screen.queryByTestId('gesture-reward-preview')).not.toBeInTheDocument();
+  });
+
+  it('selects a method through the shared handler', async () => {
+    const { onSelectGestureType } = renderConsole();
+
+    await userEvent.click(methodRadios()[2]!);
+    expect(onSelectGestureType).toHaveBeenCalledWith('CST');
+  });
+
+  it('keeps the message field visible and counts its bytes', () => {
+    renderConsole({ form: makeForm({ message: 'hello' }) });
+
+    const input = screen.getByTestId('gesture-message-input');
+    expect(input).toHaveValue('hello');
+    expect(screen.getByTestId('gesture-message-char-count')).toHaveTextContent('5/280');
+    expect(input).toHaveAccessibleDescription(/home\.deck\.console\.messageHint/);
+  });
+
+  it('counts a CJK message in UTF-8 bytes against the live cap, as the contract does', () => {
+    // Three bytes per character: 93 of them take 279 of the 280 bytes.
+    renderConsole({ form: makeForm({ message: '字'.repeat(93), messageMaxBytes: 280 }) });
+
+    const counter = screen.getByTestId('gesture-message-char-count');
+    expect(counter).toHaveTextContent('279/280');
+    expect(counter).toHaveClass('text-attention');
+  });
+
+  it("names the contract's live cap once it is read", () => {
+    renderConsole({ form: makeForm({ message: 'hi', messageMaxBytes: 300 }) });
+
+    expect(screen.getByTestId('gesture-message-char-count')).toHaveTextContent('2/300');
+    expect(screen.getByTestId('gesture-message-input')).toHaveAttribute('maxLength', '300');
+  });
+
+  it('previews the Participation CST as spec rows, explained on the label', () => {
+    renderConsole();
+
+    const preview = screen.getByTestId('gesture-reward-preview');
+    expect(visibleText(preview)).toContain('home.deck.console.reward');
+    expect(visibleText(preview)).toContain('186.18 CST');
+    // No minimum-accepted row: under V3 the guarded limit is always zero.
+    expect(visibleText(preview)).not.toContain('home.deck.console.minAccepted');
+    // The long description lives in the explanation, not in the layout.
+    expect(visibleText(preview)).not.toContain('home.form.reward.previewDescription');
+  });
+
+  it('shows reward, cost and net for a CST Gesture', () => {
+    renderConsole({ form: makeForm({ gestureType: 'CST' }) });
+
+    const preview = screen.getByTestId('gesture-reward-preview');
+    expect(visibleText(preview)).toContain('home.form.reward.rewardLabel');
+    expect(visibleText(preview)).toContain('home.form.reward.costLabel');
+    expect(visibleText(preview)).toContain('\u221264.34 CST');
+    expect(screen.getByText('home.form.reward.netNegative')).toBeInTheDocument();
+  });
+
+  it('submits through the one commit button, priced by the shared label', async () => {
+    const { onGesture } = renderConsole();
+
+    const submit = screen.getByRole('button', { name: 'Gesture with ETH (0.10211 ETH)' });
+    expect(submit).toHaveAttribute('id', 'gesture-submit');
+    await userEvent.click(submit);
+    expect(onGesture).toHaveBeenCalledTimes(1);
+    expect(screen.getByTestId('gesture-send-amount')).toHaveTextContent(
+      'home.form.submit.sendsNote(amount=0.10415,percent=2)',
+    );
+  });
+
+  it('keeps the submit unavailable until a RandomWalk NFT is chosen', () => {
+    renderConsole({ form: makeForm({ gestureType: 'RandomWalk', rwlkId: -1 }) });
+
+    expect(screen.getByTestId('gesture-submit')).toBeDisabled();
+    expect(screen.getByTestId('rwlk-grid')).toHaveAttribute('data-count', '2');
+  });
+
+  it('submits a RandomWalk Gesture only with one of the wallet’s own unused NFTs', () => {
+    // A token from a shared link, or picked before a wallet switch, would
+    // revert on-chain and still cost gas.
+    const { unmount } = renderConsole({
+      form: makeForm({ gestureType: 'RandomWalk', rwlkId: 99 }),
+    });
+    expect(screen.getByTestId('gesture-submit')).toBeDisabled();
+    unmount();
+
+    renderConsole({ form: makeForm({ gestureType: 'RandomWalk', rwlkId: 12 }) });
+    expect(screen.getByTestId('gesture-submit')).toBeEnabled();
+  });
+
+  it('says so when the wallet’s Random Walk NFTs could not be read', () => {
+    renderConsole({
+      form: makeForm({
+        gestureType: 'RandomWalk',
+        rwlkId: 11,
+        rwlknftIds: [],
+        rwlkListStatus: 'error',
+      }),
+    });
+
+    expect(screen.getByTestId('rwlk-picker-error')).toHaveTextContent('home.form.rwlk.error');
+    expect(screen.queryByTestId('rwlk-grid')).not.toBeInTheDocument();
+    expect(screen.getByTestId('gesture-submit')).toBeDisabled();
+  });
+
+  it('keeps the label and focus while the transaction is busy', () => {
+    renderConsole({
+      form: makeForm({ isGesturing: true, gestureTxStage: { status: 'preparing' } }),
+    });
+
+    const submit = screen.getByTestId('gesture-submit');
+    expect(submit).toHaveAttribute('aria-busy', 'true');
+    expect(submit).not.toBeDisabled();
+  });
+
+  it('says when the connected wallet made the Final Gesture', () => {
+    renderConsole({ canGesture: false });
+
+    expect(screen.queryByTestId('gesture-submit')).not.toBeInTheDocument();
+    expect(screen.getByText('home.form.finalGestureMade')).toBeInTheDocument();
+  });
+
+  it('opens Advanced inline with the attachment and buffer groups', async () => {
+    const setAdvancedExpanded = jest.fn();
+    renderConsole({ form: makeForm({ advancedExpanded: true, setAdvancedExpanded }) });
+
+    const advanced = screen.getByTestId('gesture-advanced');
+    expect(advanced).toHaveAttribute('open');
+    // No minimum-CST protection group: under V3 the guarded limit is always zero.
+    expect(within(advanced).queryByTestId('min-cst-protection')).not.toBeInTheDocument();
+    expect(within(advanced).getByTestId('collision-buffer')).toBeInTheDocument();
+    await userEvent.click(within(advanced).getByText('home.form.advanced.title'));
+    expect(setAdvancedExpanded).toHaveBeenCalledWith(false);
+  });
+
+  it('without a wallet: one connect block, no Advanced, the draft still writable', () => {
+    renderConsole({ account: null });
+
+    const connect = screen.getByTestId('connect-to-gesture');
+    expect(within(connect).getByTestId('connect-wallet-button')).toBeInTheDocument();
+    expect(screen.getAllByTestId('connect-wallet-button')).toHaveLength(1);
+    expect(screen.queryByTestId('gesture-advanced')).not.toBeInTheDocument();
+    expect(screen.queryByTestId('gesture-submit')).not.toBeInTheDocument();
+    expect(screen.getByTestId('gesture-message-input')).toBeEnabled();
+    expect(screen.queryByText('home.form.preview')).not.toBeInTheDocument();
+  });
+
+  it('shows the layout skeleton while the cycle loads', () => {
+    renderConsole({ loading: true });
+
+    expect(screen.getByTestId('gesture-form-skeleton')).toHaveAttribute('role', 'status');
+    expect(screen.queryByRole('radiogroup')).not.toBeInTheDocument();
+  });
+
+  it('offers finalization once the clock reached zero', async () => {
+    const onFinalize = jest.fn();
+    const finalize: ConsoleFinalize = {
+      canClaim: true,
+      isClaiming: false,
+      isLatestParticipant: true,
+      openToAllAtMs: 0,
+      nowMs: 0,
+      onFinalize,
+    };
+    renderConsole({ canGesture: false, cycleTimerEnded: true, finalize });
+
+    await userEvent.click(screen.getByTestId('finalize-submit'));
+    expect(onFinalize).toHaveBeenCalledTimes(1);
+  });
+
+  it('tells the Final Gesture participant how long only they can finalize', () => {
+    renderConsole({
+      canGesture: false,
+      cycleTimerEnded: true,
+      finalize: {
+        canClaim: true,
+        isClaiming: false,
+        isLatestParticipant: true,
+        openToAllAtMs: 3_600_000,
+        nowMs: 1_800_000,
+        onFinalize: jest.fn(),
+      },
+    });
+
+    expect(screen.getByTestId('finalize-submit')).toBeEnabled();
+    const note = screen.getByTestId('finalize-holder-window');
+    expect(note).toHaveTextContent('home.deck.console.holderWindow(duration=30m)');
+    expect(note).toHaveClass('text-subtle');
+    expect(screen.queryByTestId('finalize-wait')).not.toBeInTheDocument();
+  });
+
+  it('names no exclusive window while its length is unknown', () => {
+    renderConsole({
+      canGesture: false,
+      cycleTimerEnded: true,
+      finalize: {
+        canClaim: true,
+        isClaiming: false,
+        isLatestParticipant: true,
+        openToAllAtMs: null,
+        nowMs: 1_800_000,
+        onFinalize: jest.fn(),
+      },
+    });
+
+    expect(screen.getByTestId('finalize-submit')).toBeEnabled();
+    expect(screen.queryByTestId('finalize-holder-window')).not.toBeInTheDocument();
+    expect(screen.queryByTestId('finalize-wait')).not.toBeInTheDocument();
+  });
+
+  it('marks the last ten minutes of the exclusive window, then says it ended', () => {
+    const finalize: ConsoleFinalize = {
+      canClaim: true,
+      isClaiming: false,
+      isLatestParticipant: true,
+      openToAllAtMs: 3_600_000,
+      nowMs: 3_600_000 - 9 * 60_000,
+      onFinalize: jest.fn(),
+    };
+    const { unmount } = renderConsole({ canGesture: false, cycleTimerEnded: true, finalize });
+    expect(screen.getByTestId('finalize-holder-window')).toHaveClass('text-attention');
+    unmount();
+
+    renderConsole({
+      canGesture: false,
+      cycleTimerEnded: true,
+      finalize: { ...finalize, nowMs: 3_700_000 },
+    });
+    const note = screen.getByTestId('finalize-holder-window');
+    expect(note).toHaveTextContent(/^home\.deck\.console\.holderWindowEnded$/);
+    expect(note).toHaveClass('text-subtle');
+  });
+
+  it('holds finalization for others until the exclusive window ends', () => {
+    renderConsole({
+      finalize: {
+        canClaim: true,
+        isClaiming: false,
+        isLatestParticipant: false,
+        openToAllAtMs: 120_000,
+        nowMs: 30_000,
+        onFinalize: jest.fn(),
+      },
+    });
+
+    expect(screen.getByTestId('finalize-submit')).toBeDisabled();
+    // One sentence with the wait inside it, so every locale orders and spaces it.
+    expect(screen.getByTestId('finalize-wait')).toHaveTextContent(
+      'home.deck.console.finalizeOpensIn(duration=1m 30s)',
+    );
+  });
+
+  it('owns #make-gesture only on the page, not in the sheet', () => {
+    const { unmount } = renderConsole({ variant: 'sheet' });
+    expect(screen.getByTestId('gesture-console')).not.toHaveAttribute('id');
+    expect(screen.getByTestId('gesture-submit')).not.toHaveAttribute('id');
+    unmount();
+
+    renderConsole();
+    expect(screen.getByTestId('gesture-console')).toHaveAttribute('id', 'make-gesture');
+  });
+
+  it('has no accessibility violations', async () => {
+    const { container } = renderConsole();
+    await checkA11y(container);
+  });
+});

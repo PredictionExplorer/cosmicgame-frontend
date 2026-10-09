@@ -1,0 +1,87 @@
+{
+  "notFound": {
+    "title": "このシグネチャーはまだ刻印されていません",
+    "description": "シグネチャーには刻印された順に番号が付きます。",
+    "newest": "最新は#{id}です。",
+    "newestLink": "最新のシグネチャーを見る"
+  },
+  "jsonLd": {
+    "productDescription": "Cosmic Signatureから生まれたジェネラティブNFT。三体問題の物理シミュレーションが、一点ごとに異なる軌跡を描きます。"
+  },
+  "badges": {
+    "stellarSelectionRecipient": "星選の受領者",
+    "anchorRecipient": "係留の受領者",
+    "cycleRecipient": "サイクル受領者",
+    "enduranceChampion": "持久チャンピオン",
+    "eligibleForAnchoring": "係留可能",
+    "eligibleForAnchoringTooltip": "このCosmic Signature NFTはまだ係留されたことがなく、係留するとETHの係留配分を受け取れます。",
+    "alreadyAnchored": "係留済み",
+    "alreadyAnchoredTooltip": "このトークンはすでに係留されたことがあり、再び係留することはできません。"
+  },
+  "share": {
+    "trigger": "共有",
+    "copyVideoLink": "動画リンクをコピー",
+    "copyImageLink": "画像リンクをコピー",
+    "copyPageLink": "ページリンクをコピー",
+    "copyFailed": "リンクをコピーできませんでした。"
+  },
+  "navigation": {
+    "label": "前後のシグネチャー"
+  },
+  "sections": {
+    "nameHistory": "名前の履歴",
+    "ownershipHistory": "所有権の履歴"
+  },
+  "ownerActions": {
+    "title": "トークンを管理する",
+    "tabs": {
+      "name": "名前",
+      "transfer": "移転"
+    },
+    "anchor": {
+      "button": "{id}を係留",
+      "note": "係留したNFTは、確定した各サイクルの係留配分を分け合います。係留は各NFTにつき一度しかできないため、係留解除は取り消せません。"
+    },
+    "metaMaskTooltip": "MetaMaskのブラウザー拡張機能にこのNFTを追加します。NFTのインポートは実験的な機能で、MetaMask Mobileには対応していません。",
+    "addToMetaMask": "NFTをMetaMaskに追加",
+    "addingToMetaMask": "NFTをMetaMaskに追加しています…",
+    "nameLabel": "名前",
+    "nameHint": "最大{max}バイトまで。オンチェーンに記録され、誰でも見られます。",
+    "namePlaceholder": "トークン名を入力",
+    "setName": "名前を設定",
+    "changeName": "名前を変更",
+    "clearName": "クリア",
+    "transferButton": "{id}を移転",
+    "namedTokensCount": "名前の付いたトークンは{count}件あります。",
+    "viewAllNamedTokens": "名前付きトークンをすべて見る"
+  },
+  "metadata": {
+    "imprinted": "刻印日時",
+    "cycle": "サイクル",
+    "recipient": "受領者",
+    "owner": "所有者",
+    "roundNumber": "サイクル{round}",
+    "anchoring": "係留",
+    "seed": "シード",
+    "seedTooltip": "このトークンのアートワークと特性の生成に使われた唯一の乱数シードです。",
+    "copySeed": "シードをコピー"
+  },
+  "image": {
+    "rendering": "レンダリング中",
+    "artworkUnavailable": "アートワークを利用できません"
+  },
+  "viewer": {
+    "modeLabel": "アートワークの表示",
+    "still": "静止画",
+    "motion": "動画",
+    "play": "アニメーションを再生",
+    "pause": "アニメーションを一時停止",
+    "fullscreen": "全画面",
+    "zoomIn": "拡大",
+    "zoomOut": "画面に合わせる",
+    "zoomHint": "作品を選択するか+キーを押すと拡大します。",
+    "panHint": "ドラッグまたは矢印キーで作品を移動します。0キーで画面に合わせます。",
+    "motionError": "アニメーションを読み込めませんでした。",
+    "motionLabel": "{subject}のアニメーション"
+  }
+}

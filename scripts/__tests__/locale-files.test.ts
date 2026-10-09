@@ -1,3 +1,4 @@
+import { getLocaleConfig } from '../../i18n/localeConfig';
 import { routing, TRANSLATED_LOCALES } from '../../i18n/routing';
 import { checkAppliesTo, fileLocale, localeLanguage } from '../locale-files';
 
@@ -65,6 +66,20 @@ describe('checkAppliesTo', () => {
     expect(checkAppliesTo('zh-TW', 'zh-HK')).toBe(false);
     expect(checkAppliesTo('zh', 'zh-TW')).toBe(false);
     expect(checkAppliesTo('zh-TW', 'zh')).toBe(false);
+  });
+
+  it('skips other languages written in the same family of characters, and only those', () => {
+    // Shared characters, different vocabulary: a Han-script register must not
+    // run on another Han-script language's copy (Chinese 利益 vs Japanese 利益),
+    // while checks from a different family can only match stray copy.
+    for (const check of TRANSLATED_LOCALES) {
+      for (const owner of TRANSLATED_LOCALES) {
+        if (localeLanguage(check) === localeLanguage(owner)) continue;
+        const sameFamily =
+          getLocaleConfig(check).scriptFamily === getLocaleConfig(owner).scriptFamily;
+        expect(checkAppliesTo(check, owner)).toBe(!sameFamily);
+      }
+    }
   });
 
   it('derives the language from the BCP 47 tag', () => {

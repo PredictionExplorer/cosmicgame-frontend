@@ -44,7 +44,7 @@ describe('git hooks', () => {
 
     it('runs type-check before tests (fail-fast)', () => {
       expect(content).toMatch(
-        /type-check\s*&&\s*npm run audit:high\s*&&\s*NODE_OPTIONS=--no-warnings npm run test:coverage/,
+        /type-check\s*&&\s*npm run deps:audit\s*&&\s*NODE_OPTIONS=--no-warnings npm run test:coverage/,
       );
     });
 
@@ -69,7 +69,7 @@ describe('git hooks', () => {
     });
 
     it('runs the dependency audit gate before coverage', () => {
-      expect(content).toMatch(/audit:high\s*&&\s*NODE_OPTIONS=--no-warnings npm run test:coverage/);
+      expect(content).toMatch(/deps:audit\s*&&\s*NODE_OPTIONS=--no-warnings npm run test:coverage/);
     });
 
     it('suppresses noisy Node runtime warnings during coverage', () => {

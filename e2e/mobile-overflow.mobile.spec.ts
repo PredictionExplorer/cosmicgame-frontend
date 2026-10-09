@@ -47,9 +47,85 @@ const TABLE_HEAVY_ROUTE_IDS = new Set([
   'token-distributions',
 ]);
 
+/** Every route with a ledger: the table-heavy routes plus the single-ledger pages. */
+const LEDGER_ROUTE_IDS = new Set([
+  ...TABLE_HEAVY_ROUTE_IDS,
+  'public-goods-retrievals',
+  'public-goods-cg',
+  'public-goods-voluntary',
+  'eth-contribution',
+  'eth-contribution-cycle',
+  'coordination-changes',
+  'system-event',
+  'statistics-activity',
+  'outreach',
+  'admin',
+]);
+
 test.beforeEach(async ({ page }) => {
   await mockMobileAuditApi(page);
 });
+
+/*
+ * A table may scroll inside its own container, so the sweeps above accept
+ * it. On a phone, though, every ledger is either a record list or a compact
+ * table of short columns, and neither should need sideways scrolling: a
+ * compact table that did cut its last column off at the screen's edge (the
+ * Public Goods retrievals' amounts at 320px).
+ */
+test.describe('Mobile overflow — phone ledgers fit their column at 320px', () => {
+  test.use({ viewport: { width: NARROW.width, height: NARROW.height } });
+
+  for (const route of APP_AUDIT_ROUTES.filter((r) => LEDGER_ROUTE_IDS.has(r.id))) {
+    test(`${route.path} ledgers need no sideways scrolling`, async ({ page }) => {
+      await page.goto(route.path, { waitUntil: 'domcontentloaded' });
+      await waitForStableLayout(page);
+
+      const wide = await page.$$eval('.cs-table-scroll', (containers) =>
+        containers
+          .filter((el) => el.scrollWidth > el.clientWidth + 1)
+          .map((el) => {
+            const table = el.querySelector('table');
+            return {
+              table: table?.getAttribute('aria-label') ?? table?.getAttribute('aria-labelledby'),
+              layout: table?.getAttribute('data-layout'),
+              scrollWidth: el.scrollWidth,
+              clientWidth: el.clientWidth,
+            };
+          }),
+      );
+      expect(wide, `${route.path}: ledgers wider than their column`).toEqual([]);
+    });
+  }
+});
+
+/*
+ * A shortened address is one word. The CST holders ledger once broke every
+ * address before its last character at 390px ("0x360E…FB3" / "2"): the hex
+ * could wrap, so the compact table never measured as too wide and never
+ * turned into records.
+ */
+for (const width of [NARROW.width, 390]) {
+  test.describe(`Mobile overflow — ledger addresses stay whole at ${width}px`, () => {
+    test.use({ viewport: { width, height: 844 } });
+
+    for (const route of APP_AUDIT_ROUTES.filter((r) => LEDGER_ROUTE_IDS.has(r.id))) {
+      test(`${route.path} never splits an address across lines`, async ({ page }) => {
+        await page.goto(route.path, { waitUntil: 'domcontentloaded' });
+        await waitForStableLayout(page);
+
+        const split = await page.$$eval(
+          ".cs-table td[data-kind='address'] .font-mono",
+          (elements) =>
+            elements
+              .filter((element) => element.getClientRects().length > 1)
+              .map((element) => element.textContent),
+        );
+        expect(split, `${route.path}: addresses broken across lines`).toEqual([]);
+      });
+    }
+  });
+}
 
 test.describe('Mobile overflow — every app route at 320px', () => {
   test.use({ viewport: { width: NARROW.width, height: NARROW.height } });

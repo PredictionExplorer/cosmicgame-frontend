@@ -25,6 +25,7 @@ import {
   pagedPath,
   DEFAULT_API_PAGE_LIMIT,
 } from '@/services/api/client';
+import { ApiReadError, apiErrorStatus, isRecordNotFound } from '@/services/api/readError';
 
 import { reportError } from '../../../utils/errors';
 
@@ -48,6 +49,29 @@ const makeAxios400 = (): AxiosError => {
   });
   return err;
 };
+
+/** The API's answer for a record it does not hold. */
+const makeAxios400RecordNotFound = (): AxiosError =>
+  new AxiosError('Bad Request', 'ERR_BAD_REQUEST', undefined, undefined, {
+    status: 400,
+    statusText: 'Bad Request',
+    headers: {},
+    config: {} as never,
+    data: { error: 'record not found', status: 0 },
+  });
+
+/** Another of the API's 400s: a parameter it could not parse. */
+const makeAxios400ParseError = (): AxiosError =>
+  new AxiosError('Bad Request', 'ERR_BAD_REQUEST', undefined, undefined, {
+    status: 400,
+    statusText: 'Bad Request',
+    headers: {},
+    config: {} as never,
+    data: {
+      error: 'Can\'t parse integer parameter: strconv.ParseInt: parsing "abc": invalid syntax',
+      status: 0,
+    },
+  });
 
 const makeAxios403 = (): AxiosError => {
   const err = new AxiosError('Forbidden', 'ERR_BAD_REQUEST', undefined, undefined, {
@@ -246,6 +270,25 @@ describe('apiCallRequired', () => {
     ).rejects.toThrow('Network response was not OK');
   });
 
+  it.each([
+    ['a 400 "record not found"', makeAxios400RecordNotFound, 400, true],
+    ['a 400 that says something else', makeAxios400ParseError, 400, false],
+    ['a 400 with no body', makeAxios400, 400, false],
+    ['404', makeAxios404, 404, true],
+    ['500', makeAxios500, 500, false],
+    ['a network failure', makeAxiosNoResponse, undefined, false],
+  ])(
+    'keeps the HTTP status of %s on the rejection, so a page can tell a missing record from a failure',
+    async (_label, makeError, status, notFound) => {
+      const rejection = await apiCallRequired(async () => {
+        throw makeError();
+      }).catch((error: unknown) => error);
+      expect(rejection).toBeInstanceOf(ApiReadError);
+      expect(apiErrorStatus(rejection)).toBe(status);
+      expect(isRecordNotFound(rejection)).toBe(notFound);
+    },
+  );
+
   it('keeps a schema mismatch message intact so the field path survives', async () => {
     const mismatch = new Error('schemaMismatch:DashboardInfo — CurRoundNum: expected number');
     await expect(
@@ -361,6 +404,14 @@ describe('apiGet', () => {
     await apiGet('/api/cosmicgame/test', undefined, { adapter });
 
     expect(adapter.mock.calls[0]?.[0]?.signal).toBeUndefined();
+  });
+
+  // The server bound (client.server.test.ts) is for renders: a reader in the
+  // browser waits on a loading state, so its reads keep the 15 s default.
+  it('leaves a browser read on the default timeout', async () => {
+    await apiGet('/api/cosmicgame/test', undefined, { adapter });
+
+    expect(adapter.mock.calls[0]?.[0]).toMatchObject({ timeout: 15_000 });
   });
 });
 
@@ -839,6 +890,7 @@ describe('client helper functions', () => {
         EthAmountEth: 1.5,
         NftTokenId: 42,
         CstAmountEth: 10,
+        Seed: '5084a87375896c7103ba17b57264f20de35d9e6eb545314680ad5e074dfc33ad',
       },
       CharityDeposit: {
         CharityAddress: '0xcharity',
@@ -882,6 +934,11 @@ describe('client helper functions', () => {
       expect(result).toHaveProperty('WinnerAddr', '0xwinner');
       expect(result).toHaveProperty('AmountEth', 1.5);
       expect(result).toHaveProperty('TokenId', 42);
+      // The imprinted Signature's seed: a finalized cycle's art without a token read.
+      expect(result).toHaveProperty(
+        'TokenSeed',
+        '5084a87375896c7103ba17b57264f20de35d9e6eb545314680ad5e074dfc33ad',
+      );
       expect(result).toHaveProperty('CharityAddress', '0xcharity');
       expect(result).toHaveProperty('CharityAmountETH', 0.5);
       expect(result).toHaveProperty('StakingDepositAmountEth', 0.3);

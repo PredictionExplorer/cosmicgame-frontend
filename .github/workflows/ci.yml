@@ -31,15 +31,19 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
-      - name: Audit high-severity dependencies
-        run: npm run audit:high
-        continue-on-error: true
+      # Blocking, like the pre-push hook: advisories, lockfile integrity, and
+      # time-boxed exceptions (audit-exceptions.json) — see README → Dependencies.
+      - name: Audit dependencies
+        run: npm run deps:audit
 
       - name: Run lint
         run: npm run lint
 
       - name: Enforce i18n catalog integrity (parity, ICU, plurals) for every locale
         run: npm run i18n:strict
+
+      - name: Enforce copy conventions (script, punctuation, disallowed patterns) in every translated locale
+        run: npm run i18n:conventions
 
       - name: Enforce canonical terminology in every translated locale
         run: npm run terminology:check
@@ -61,6 +65,13 @@ jobs:
 
       - name: Build
         run: npm run build
+
+      # The resolved <head> of every prerendered page: og:image, og:url,
+      # twitter:site and the other fields a shallow metadata merge can drop.
+      # The pre-push hook runs it too, but a push with --no-verify or a PR
+      # from a machine without husky reaches only this job.
+      - name: Enforce share metadata
+        run: npm run seo:share-check
 
       - name: Enforce app-home bundle budget
         run: npm run bundle:budget

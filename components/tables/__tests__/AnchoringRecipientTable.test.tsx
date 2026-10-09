@@ -1,20 +1,8 @@
 import '@testing-library/jest-dom';
 
-import { convertTimestampToDateTime, shortenHex } from '@/utils';
+import { formatAddress } from '@/utils';
 
 import { checkA11y, render, screen } from '@/test-utils';
-
-const mockConvertTimestampToDateTime = jest.fn();
-jest.mock('@/utils', () => {
-  const actual = jest.requireActual<typeof import('@/utils')>('@/utils');
-  return {
-    ...actual,
-    convertTimestampToDateTime: (timestamp: number, showSecond?: boolean, locale?: string) => {
-      mockConvertTimestampToDateTime(timestamp, showSecond, locale);
-      return actual.convertTimestampToDateTime(timestamp, showSecond, locale);
-    },
-  };
-});
 
 // eslint-disable-next-line import/order
 import AnchoringRecipientTable from '@/components/tables/AnchoringRecipientTable';
@@ -52,17 +40,21 @@ describe('AnchoringRecipientTable', () => {
   it('renders datetime as explorer link', () => {
     const recipient = createRecipient();
     render(<AnchoringRecipientTable list={[recipient]} />);
-    const datetime = screen.getByText(convertTimestampToDateTime(recipient.TimeStamp));
+    const datetime = screen.getByText('Nov 30, 2023, 12:18');
     expect(datetime.closest('a')).toHaveAttribute('target', '_blank');
     expect(datetime.closest('a')).toHaveAttribute('rel', 'noopener noreferrer');
-    expect(mockConvertTimestampToDateTime).toHaveBeenCalledWith(recipient.TimeStamp, false, 'en');
+    expect(
+      document.querySelector(
+        `time[datetime="${new Date(recipient.TimeStamp * 1000).toISOString()}"]`,
+      ),
+    ).toBeInTheDocument();
   });
 
   it('renders shortened anchorHolder address with link', () => {
     const addr = '0x1234567890abcdef1234567890abcdef12345678';
     render(<AnchoringRecipientTable list={[createRecipient({ StakerAddr: addr })]} />);
-    expect(screen.getByText(shortenHex(addr, 6))).toBeInTheDocument();
-    const addrLink = screen.getByText(shortenHex(addr, 6)).closest('a');
+    expect(screen.getByText(formatAddress(addr))).toBeInTheDocument();
+    const addrLink = screen.getByText(formatAddress(addr)).closest('a');
     expect(addrLink).toHaveAttribute('href', `/user/${addr}`);
   });
 
@@ -81,16 +73,16 @@ describe('AnchoringRecipientTable', () => {
     expect(screen.getByText('0.1000')).toBeInTheDocument();
   });
 
-  it('renders only first page of results (perPage=5)', () => {
-    const list = Array.from({ length: 8 }, (_, i) =>
+  it('shows 20 rows a page with the row range', () => {
+    const list = Array.from({ length: 25 }, (_, i) =>
       createRecipient({
         StakerAddr: `0x${String(i).padStart(40, '0')}`,
         StakerNumStakedNFTs: 100 + i,
       }),
     );
-    render(<AnchoringRecipientTable list={list} />);
-    expect(screen.getByText('104')).toBeInTheDocument();
-    expect(screen.queryByText('105')).not.toBeInTheDocument();
+    const { container } = render(<AnchoringRecipientTable list={list} />);
+    expect(container.querySelectorAll('tbody tr')).toHaveLength(20);
+    expect(screen.getByText('tables.pagination.range(from=1,to=20,total=25)')).toBeInTheDocument();
   });
 
   it('has no accessibility violations', async () => {

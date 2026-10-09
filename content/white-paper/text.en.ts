@@ -12,7 +12,7 @@ export const whitePaperTextEn = {
     description:
       'The reference description of Cosmic Signature: Performance Cycles, gestures, allocation tracks, deterministic three-body NFT art, CST, anchoring, the Cosmic Council, protocol upgrades, and the path to full decentralization.',
   },
-  breadcrumbLabel: 'White Paper',
+  breadcrumbLabel: 'White paper',
   breadcrumbs: {
     ariaLabel: 'Breadcrumb',
     homeLabel: 'Home',
@@ -27,7 +27,7 @@ export const whitePaperTextEn = {
   abstract: {
     heading: 'Abstract',
     paragraphs: [
-      'Cosmic Signature is a procedural art protocol on Arbitrum One. It runs as a sequence of timed Performance Cycles. During a cycle, participants make gestures with ETH or with CST, the protocol\u2019s ERC-20 token. Every gesture extends the cycle\u2019s countdown, records an entry in the cycle\u2019s Stellar Selections, and can imprint new CST. When the countdown expires and the cycle is finalized, the protocol distributes its ETH reserve across more than ten allocation tracks, imprints a new generation of Cosmic Signature NFTs, and forwards a fixed share to Protocol Guild, the funding mechanism for more than 170 Ethereum core contributors. About half of the reserve rolls forward, so each cycle begins larger than the last.',
+      'Cosmic Signature is a procedural art protocol on Arbitrum One. It runs as a sequence of timed Performance Cycles. During a cycle, participants make gestures with ETH or with CST, the protocol\u2019s ERC-20 token. Every gesture extends the cycle\u2019s countdown, records an entry in the cycle\u2019s Stellar Selections, and can imprint new CST. When the countdown expires and the cycle is finalized, the protocol distributes its ETH reserve across a fixed set of allocation tracks, imprints a new generation of Cosmic Signature NFTs, and forwards a fixed share to Protocol Guild, the funding mechanism for more than 170 Ethereum core contributors. About half of the reserve rolls forward, so each cycle begins larger than the last.',
       'Each Cosmic Signature NFT is a deterministic rendering of the gravitational three-body problem, generated from an on-chain seed and reproducible by anyone, pixel for pixel. No neural network touches the image. This paper describes the mechanics and token design in full, documents the V2 upgrade that is live today, presents the planned V3 upgrade, and sets out the commitment to remove every form of privileged control from the deploying address once the design is complete.',
     ],
   },
@@ -52,7 +52,7 @@ export const whitePaperTextEn = {
           kind: 'list',
           items: [
             'Determinism. The artwork is computed from a seed recorded on-chain at imprint time. The rendering pipeline is open source, and the same seed always produces the same image and video, bit for bit.',
-            'Mechanical distribution. Allocation percentages are constants in verified contracts. No discretionary account sits between participants and the distribution rules, and no team wallet receives ETH from gestures.',
+            'Mechanical distribution. The deployed contracts execute the allocation rules at finalization. No discretionary account sits between participants and those rules, and no team wallet receives ETH from gestures.',
             'A finite role for the team. Owner powers are narrow, are locked while a cycle runs, and are scheduled to be removed entirely once the remaining upgrades land.',
           ],
         },
@@ -63,7 +63,7 @@ export const whitePaperTextEn = {
       ],
     },
     'protocol-overview': {
-      heading: 'Protocol Overview',
+      heading: 'Protocol overview',
       blocks: [
         {
           kind: 'paragraph',
@@ -142,7 +142,7 @@ export const whitePaperTextEn = {
           ],
         },
         countdown: {
-          heading: 'The Countdown',
+          heading: 'The countdown',
           blocks: [
             {
               kind: 'paragraph',
@@ -178,12 +178,12 @@ export const whitePaperTextEn = {
       blocks: [
         {
           kind: 'paragraph',
-          text: 'Gestures are the protocol\u2019s only input. Each one, regardless of currency, extends the countdown, records one entry in the cycle\u2019s participant Stellar Selections, updates the endurance clocks of Section 5.2, and can imprint Participation CST as described in Section 7.1.',
+          text: 'Gestures drive each Performance Cycle. Each one, regardless of currency, extends the countdown, records one entry in the cycle’s participant Stellar Selections, updates the endurance clocks of Section 5.2, and can imprint Participation CST as described in Section 7.1.',
         },
       ],
       subsections: {
         'eth-gestures': {
-          heading: 'ETH Gestures',
+          heading: 'ETH gestures',
           blocks: [
             {
               kind: 'paragraph',
@@ -192,7 +192,7 @@ export const whitePaperTextEn = {
           ],
         },
         'random-walk-attachment': {
-          heading: 'Random Walk NFT Attachment',
+          heading: 'Random Walk NFT attachment',
           blocks: [
             {
               kind: 'paragraph',
@@ -201,7 +201,7 @@ export const whitePaperTextEn = {
           ],
         },
         'cst-gestures': {
-          heading: 'CST Gestures',
+          heading: 'CST gestures',
           blocks: [
             {
               kind: 'paragraph',
@@ -222,7 +222,7 @@ export const whitePaperTextEn = {
           ],
         },
         'messages-and-attachments': {
-          heading: 'Messages and Attached Assets',
+          heading: 'Messages and attached assets',
           blocks: [
             {
               kind: 'paragraph',
@@ -233,7 +233,7 @@ export const whitePaperTextEn = {
       },
     },
     'allocation-tracks': {
-      heading: 'The Cycle Reserve and Allocation Tracks',
+      heading: 'The Cycle Reserve and allocation tracks',
       blocks: [
         {
           kind: 'paragraph',
@@ -242,7 +242,7 @@ export const whitePaperTextEn = {
       ],
       subsections: {
         'distribution-at-finalization': {
-          heading: 'Distribution at Finalization',
+          heading: 'Distribution at finalization',
           blocks: [
             {
               kind: 'table',
@@ -260,9 +260,9 @@ export const whitePaperTextEn = {
                     'The longest-reigning Endurance Champion (Section 5.2).',
                   ],
                   [
-                    'Public Goods Allocation',
-                    `${protocolFacts.publicGoodsPercentage}%`,
-                    'Protocol Guild, via the Public Goods Vault.',
+                    'ETH Stellar Selection',
+                    `${protocolFacts.stellarSelectionEthPercentage}%`,
+                    `${protocolFacts.ethStellarSelectionRecipients} entries selected from the cycle\u2019s gesture pool, sharing the amount equally.`,
                   ],
                   [
                     'Anchor Distribution',
@@ -270,9 +270,9 @@ export const whitePaperTextEn = {
                     'Anchored Cosmic Signature NFTs, pro rata.',
                   ],
                   [
-                    'ETH Stellar Selection',
-                    `${protocolFacts.stellarSelectionEthPercentage}%`,
-                    `${protocolFacts.ethStellarSelectionRecipients} entries drawn from the cycle\u2019s gesture pool, sharing the amount equally.`,
+                    'Public Goods Allocation',
+                    `${protocolFacts.publicGoodsPercentage}%`,
+                    'Protocol Guild, via the Public Goods Vault.',
                   ],
                   [
                     'Compounding Cycle Reserve',
@@ -286,7 +286,7 @@ export const whitePaperTextEn = {
             },
             {
               kind: 'paragraph',
-              text: 'The five distributed tracks sum to half of the reserve. The remainder compounds: the protocol accumulates rather than extracts, and each cycle opens with a larger reserve than the last. If a cycle finalizes with no Cosmic Signature NFTs anchored, that cycle\u2019s Anchor Distribution is skipped and its share compounds as well.',
+              text: 'The five distributed tracks account for about half of the reserve. The remainder carries forward into the next cycle. Its size depends on the ETH added and distributed; a larger reserve is not guaranteed each cycle. If no Cosmic Signature NFTs are anchored at finalization, the Anchor Distribution is skipped and its share also remains in the Cycle Reserve.',
             },
             {
               kind: 'table',
@@ -316,12 +316,12 @@ export const whitePaperTextEn = {
                   [
                     'NFT Stellar Selection',
                     `${cst(protocolFacts.specialAllocationCst)} CST and one NFT, ${protocolFacts.nftStellarSelectionRecipients} times`,
-                    `${protocolFacts.nftStellarSelectionRecipients} entries drawn from the gesture pool.`,
+                    `${protocolFacts.nftStellarSelectionRecipients} entries selected from the gesture pool.`,
                   ],
                   [
                     'Anchored-NFT Stellar Selection',
                     `${cst(protocolFacts.specialAllocationCst)} CST and one NFT, ${protocolFacts.anchoredRwlkNftSelectionRecipients} times`,
-                    `${protocolFacts.anchoredRwlkNftSelectionRecipients} draws across anchored Random Walk NFTs.`,
+                    `${protocolFacts.anchoredRwlkNftSelectionRecipients} selections across anchored Random Walk NFTs.`,
                   ],
                   [
                     'Outreach Reserve',
@@ -355,20 +355,20 @@ export const whitePaperTextEn = {
           blocks: [
             {
               kind: 'paragraph',
-              text: `Each gesture records one entry in the cycle\u2019s participant Selection pool. At finalization, the contract draws ${protocolFacts.ethStellarSelectionRecipients} entries for the ETH Stellar Selection, which share ${protocolFacts.stellarSelectionEthPercentage}% of the reserve equally, and ${protocolFacts.nftStellarSelectionRecipients} entries for the NFT Stellar Selection. Draws are made with replacement, so the same participant can be drawn more than once, and entries scale with gestures made: selection frequency is proportional to participation.`,
+              text: `Each gesture records one entry in the cycle\u2019s participant Selection pool. At finalization, the contract selects ${protocolFacts.ethStellarSelectionRecipients} entries for the ETH Stellar Selection, which share ${protocolFacts.stellarSelectionEthPercentage}% of the reserve equally, and ${protocolFacts.nftStellarSelectionRecipients} entries for the NFT Stellar Selection. Selections are made with replacement, so the same participant can be selected more than once, and entries scale with gestures made: selection frequency is proportional to participation.`,
             },
             {
               kind: 'paragraph',
-              text: `A separate Anchored-NFT Stellar Selection runs across anchored Random Walk NFTs: ${protocolFacts.anchoredRwlkNftSelectionRecipients} draws, weighted by the number of NFTs each holder has anchored. This track distributes CST and Cosmic Signature NFTs only; it carries no ETH.`,
+              text: `A separate Anchored-NFT Stellar Selection runs across anchored Random Walk NFTs: ${protocolFacts.anchoredRwlkNftSelectionRecipients} selections, weighted by the number of NFTs each holder has anchored. This track distributes CST and Cosmic Signature NFTs only; it carries no ETH.`,
             },
             {
               kind: 'paragraph',
-              text: 'The randomness behind these draws is constructed on-chain at finalization. Section 11.3 describes its sources and its limits.',
+              text: 'The randomness behind these selections is constructed on-chain at finalization. Section 11.3 describes its sources and its limits.',
             },
           ],
         },
         'delivery-and-timeouts': {
-          heading: 'Delivery, Escrow, and Timeouts',
+          heading: 'Delivery, escrow, and timeouts',
           blocks: [
             {
               kind: 'paragraph',
@@ -383,7 +383,7 @@ export const whitePaperTextEn = {
       },
     },
     'the-art': {
-      heading: 'The Art: Deterministic Three-Body Signatures',
+      heading: 'The art: Deterministic three-body Signatures',
       blocks: [
         {
           kind: 'paragraph',
@@ -396,7 +396,7 @@ export const whitePaperTextEn = {
       ],
       subsections: {
         'art-pipeline': {
-          heading: 'The Pipeline',
+          heading: 'The pipeline',
           blocks: [
             {
               kind: 'list',
@@ -417,7 +417,7 @@ export const whitePaperTextEn = {
           ],
         },
         'reproducibility-and-license': {
-          heading: 'Reproducibility and License',
+          heading: 'Reproducibility and license',
           blocks: [
             {
               kind: 'paragraph',
@@ -432,7 +432,7 @@ export const whitePaperTextEn = {
       },
     },
     cst: {
-      heading: 'The CST Token',
+      heading: 'The CST token',
       blocks: [
         {
           kind: 'paragraph',
@@ -441,7 +441,7 @@ export const whitePaperTextEn = {
       ],
       subsections: {
         'imprint-rules': {
-          heading: 'Imprint Rules',
+          heading: 'Imprint rules',
           blocks: [
             {
               kind: 'paragraph',
@@ -450,6 +450,21 @@ export const whitePaperTextEn = {
             {
               kind: 'formula',
               formula: protocolFacts.dynamicCstRewardFormula,
+              notation: protocolFacts.participationCstNotation,
+              legend: [
+                {
+                  symbol: protocolFacts.participationCstSymbols[0],
+                  meaning: 'seconds since the previous gesture',
+                },
+                {
+                  symbol: protocolFacts.participationCstSymbols[1],
+                  meaning: 'the Participation CST multiplier, a contract parameter',
+                },
+                {
+                  symbol: protocolFacts.participationCstSymbols[2],
+                  meaning: 'the current cycle time increment, in microseconds',
+                },
+              ],
               caption:
                 'Participation CST imprinted by a gesture. Elapsed time is measured since the previous gesture and scaled against the current cycle time increment.',
             },
@@ -471,15 +486,15 @@ export const whitePaperTextEn = {
           ],
         },
         'supply-dynamics': {
-          heading: 'Burning and Supply Dynamics',
+          heading: 'Burning and supply dynamics',
           blocks: [
             {
               kind: 'paragraph',
-              text: `CST leaves circulation whenever it is spent: the full cost of every CST gesture is burned. Supply is therefore shaped by behavior. Quiet cycles imprint little Participation CST, active CST usage burns supply back down, and the fixed Recognition and Outreach flows add a predictable ${cst(protocolFacts.typicalCstImprintsPerCycle)} CST per typical cycle. There is no cap, no premine, and no team allocation.`,
+              text: `CST leaves circulation whenever it is spent: the full cost of every CST gesture is burned. Supply is therefore shaped by behavior. Quiet cycles imprint little Participation CST, active CST usage burns supply back down, and the fixed Recognition and Outreach flows add ${cst(protocolFacts.typicalCstImprintsPerCycle)} CST per typical cycle. Supply started at zero and has no hard cap. The recurring team-directed CST flow is the Outreach Reserve described in Section 7.1.`,
             },
             {
               kind: 'paragraph',
-              text: 'The square-root formula is itself a supply control, introduced in the V2 upgrade (Section 12.2). The original design imprinted a flat 100 CST per gesture, which made machine-speed gesture sequences an unbounded source of new CST. Under the current rule, a burst of rapid gestures imprints approximately zero, while patient participation is what creates supply.',
+              text: 'The square-root formula limits Participation CST and was introduced in the V2 upgrade (Section 12.2). The original design imprinted a flat 100 CST per gesture. Under the current rule, rapid successive gestures imprint little or no Participation CST, while longer intervals produce larger amounts. Recognition CST and the Outreach Reserve remain separate sources of supply.',
             },
           ],
         },
@@ -507,7 +522,7 @@ export const whitePaperTextEn = {
         },
         {
           kind: 'paragraph',
-          text: `Random Walk NFTs anchor separately and for a different purpose: anchored Random Walk NFTs receive draws in the Anchored-NFT Stellar Selection (Section 5.3), ${protocolFacts.anchoredRwlkNftSelectionRecipients} per cycle, each carrying ${cst(protocolFacts.specialAllocationCst)} CST and a Cosmic Signature NFT. Random Walk anchoring carries no ETH distributions. The same once-ever rule applies.`,
+          text: `Random Walk NFTs anchor separately and for a different purpose: anchored Random Walk NFTs take part in the Anchored-NFT Stellar Selection (Section 5.3), ${protocolFacts.anchoredRwlkNftSelectionRecipients} per cycle, each carrying ${cst(protocolFacts.specialAllocationCst)} CST and a Cosmic Signature NFT. Random Walk anchoring carries no ETH distributions. The same once-ever rule applies.`,
         },
       ],
     },
@@ -548,11 +563,11 @@ export const whitePaperTextEn = {
       ],
     },
     security: {
-      heading: 'Security, Randomness, and Verifiability',
+      heading: 'Security, randomness, and verifiability',
       blocks: [],
       subsections: {
         'independent-review': {
-          heading: 'Independent Review',
+          heading: 'Independent review',
           blocks: [
             {
               kind: 'paragraph',
@@ -569,7 +584,7 @@ export const whitePaperTextEn = {
           ],
         },
         'defensive-design': {
-          heading: 'Defensive Design',
+          heading: 'Defensive design',
           blocks: [
             {
               kind: 'list',
@@ -587,16 +602,16 @@ export const whitePaperTextEn = {
           blocks: [
             {
               kind: 'paragraph',
-              text: 'The protocol needs randomness twice: for Selection draws at finalization and for each new NFT\u2019s seed. It builds a seed on-chain by folding together the previous block hash, the current base fee, and Arbitrum-specific entropy from the ArbSys and ArbGasInfo precompiles: the previous Arbitrum block hash, the gas backlog, and L1 pricing counters. Individual values are then drawn from that seed with keccak256. The precompile calls are failure-tolerant; if one is unavailable, the construction falls back to the remaining sources.',
+              text: 'The protocol needs randomness twice: for the Stellar Selections at finalization and for each new NFT\u2019s seed. It builds a seed on-chain by folding together the previous block hash, the current base fee, and Arbitrum-specific entropy from the ArbSys and ArbGasInfo precompiles: the previous Arbitrum block hash, the gas backlog, and L1 pricing counters. Individual values are then derived from that seed with keccak256. The precompile calls are failure-tolerant; if one is unavailable, the construction falls back to the remaining sources.',
             },
             {
               kind: 'paragraph',
-              text: 'This is deliberate minimalism: no oracle, no external committee, no callback that could strand a cycle. The trade-off is stated plainly. A sequencer could in principle influence block-level inputs, and the design bounds what that influence could reach. Selection draws and art seeds are the only consumers of randomness; the countdown, the Gesture Cost sequence, and every percentage in Section 5 are deterministic. The construction is consumed once per finalization, and finalization is a public transaction anyone can submit.',
+              text: 'This is deliberate minimalism: no oracle, no external committee, no callback that could strand a cycle. The trade-off is stated plainly. A sequencer could in principle influence block-level inputs, and the design bounds what that influence could reach. Stellar Selections and art seeds are the only consumers of randomness; the countdown, the Gesture Cost sequence, and every percentage in Section 5 are deterministic. The construction is consumed once per finalization, and finalization is a public transaction anyone can submit.',
             },
           ],
         },
         'open-verification': {
-          heading: 'Open Verification',
+          heading: 'Open verification',
           blocks: [
             {
               kind: 'paragraph',
@@ -607,7 +622,7 @@ export const whitePaperTextEn = {
       },
     },
     'upgrade-history': {
-      heading: 'Deployment History and the Road Ahead',
+      heading: 'Deployment history and the road ahead',
       blocks: [
         {
           kind: 'paragraph',
@@ -625,7 +640,7 @@ export const whitePaperTextEn = {
           ],
         },
         v2: {
-          heading: 'The V2 Upgrade, Live Today',
+          heading: 'The V2 upgrade, live today',
           blocks: [
             {
               kind: 'paragraph',
@@ -644,7 +659,7 @@ export const whitePaperTextEn = {
           ],
         },
         v3: {
-          heading: 'The Planned V3 Upgrade',
+          heading: 'The planned V3 upgrade',
           blocks: [
             {
               kind: 'paragraph',
@@ -669,7 +684,7 @@ export const whitePaperTextEn = {
       },
     },
     decentralization: {
-      heading: 'The Path to Full Decentralization',
+      heading: 'The path to full decentralization',
       blocks: [
         {
           kind: 'paragraph',
@@ -694,16 +709,16 @@ export const whitePaperTextEn = {
       ],
     },
     clarifications: {
-      heading: 'Clarifications and Risk Factors',
+      heading: 'Clarifications and risk factors',
       blocks: [],
       subsections: {
         'what-it-is-not': {
-          heading: 'What Cosmic Signature Is Not',
+          heading: 'What Cosmic Signature is not',
           blocks: [
             // lexicon-allow-start: denial copy must name the concepts it denies, matching FAQ practice.
             {
               kind: 'paragraph',
-              text: 'Cosmic Signature is not a lottery, a casino, or a gambling product. There is no house, no dealer, and no bet. Participants exchange value for participation itself: every gesture is an expressive act that shapes the artwork, extends the cycle, and is recorded permanently on-chain. The protocol retains no operator\u2019s margin of any kind; every allocation track in Section 5 flows to participants, to anchored NFTs, to the compounding reserve, or to public goods.',
+              text: 'Cosmic Signature is not a lottery, a casino, or a gambling product. There is no house, no dealer, and no bet. Participants exchange value for participation itself: every gesture is an expressive act that shapes the artwork, extends the cycle, and is recorded permanently on-chain. The protocol retains no operator\u2019s margin of any kind; every allocation track in Section 5 flows to participants, to anchored NFTs, to the compounding reserve, or to Public Goods.',
             },
             {
               kind: 'paragraph',
@@ -713,13 +728,13 @@ export const whitePaperTextEn = {
           ],
         },
         'risk-factors': {
-          heading: 'Risk Factors',
+          heading: 'Risk factors',
           blocks: [
             {
               kind: 'list',
               items: [
                 'Smart contract risk. The contracts are reviewed, formally analyzed, and source-verified, and none of that is a guarantee. Unknown defects can exist in any software that holds value.',
-                'Randomness limits. Selection draws use block-derived entropy (Section 11.3). A sequencer could in principle influence it; the design bounds the consequences but cannot eliminate them.',
+                'Randomness limits. Stellar Selections use block-derived entropy (Section 11.3). A sequencer could in principle influence it; the design bounds the consequences but cannot eliminate them.',
                 `Timing responsibilities. The ${protocolFacts.finalGestureExclusivityHours}-hour finalization window and the ${protocolFacts.secondaryRetrievalTimeoutWeeks}-week escrow timeout are real deadlines. Allocations left unretrieved past them become available to others, by design.`,
                 'Parameter changes. Until the decentralization step completes, parameters can change between cycles as described in Section 13. Every change is public before the next cycle begins.',
                 'Asset volatility. The values of ETH, CST, and NFTs move. Participation costs real money; treat gestures as expenditure on participation and art, not as a path to financial gain.',
@@ -740,7 +755,7 @@ export const whitePaperTextEn = {
       ],
     },
     'appendix-a': {
-      heading: 'Appendix A: Verified Contract Addresses',
+      heading: 'Appendix A: Verified contract addresses',
       blocks: [
         {
           kind: 'table',
@@ -772,7 +787,7 @@ export const whitePaperTextEn = {
       ],
     },
     'appendix-b': {
-      heading: 'Appendix B: Parameters at a Glance',
+      heading: 'Appendix B: Parameters at a glance',
       blocks: [
         {
           kind: 'table',
@@ -890,4 +905,56 @@ export const whitePaperTextEn = {
   },
   licenseNote:
     'This paper, like all project-owned Cosmic Signature materials, is dedicated to the public domain under CC0 1.0.',
+  reading: {
+    railLabel: 'On this page',
+    openContentsLabel: 'Contents',
+    backToTopLabel: 'Back to top',
+    headingLinkTemplate: 'Link to this section: {title}',
+    formulaLabel: 'Formula',
+    noteLabel: 'Note',
+    contractExpressionLabel: 'The expression in the contract',
+    figureTemplate: 'Figure {number}',
+    readingTimeTemplate: '{minutes} min read',
+    newTabNote: '(opens in a new tab)',
+  },
+  figures: {
+    cycle: {
+      title: 'A Performance Cycle, from opening to the next cycle',
+      caption: 'Durations are launch values; Sections 3.1 through 3.3 give the exact rules.',
+      steps: [
+        {
+          label: 'Opening',
+          detail:
+            'The ETH Calibration Window lowers the opening cost until someone makes the first gesture.',
+        },
+        {
+          label: 'Gestures',
+          detail: `Each gesture adds the time increment to the countdown: ${protocolFacts.initialCycleTimeIncrementHours} hour at launch.`,
+        },
+        {
+          label: 'Final Gesture window',
+          detail: `Once the countdown expires, only the Final Gesture participant may finalize, for ${protocolFacts.finalGestureExclusivityHours} hours.`,
+        },
+        {
+          label: 'Open finalization',
+          detail: 'After that, anyone may finalize and take over the beneficiary\u2019s role.',
+        },
+        {
+          label: 'Next cycle',
+          detail: `The next cycle opens after a short delay, ${protocolFacts.defaultNextCycleDelayMinutes} minutes by default.`,
+        },
+      ],
+    },
+    allocation: {
+      title: 'Where the Cycle Reserve goes at finalization',
+      caption:
+        'Shares of the protocol\u2019s ETH balance at finalization. The remainder, about half, compounds into the next cycle.',
+    },
+    art: {
+      title: 'Two Signatures from the collection',
+      caption:
+        'Each image is the pipeline\u2019s output for the seed printed under it; anyone can regenerate it, pixel for pixel.',
+      seedLabel: 'Seed',
+    },
+  },
 } satisfies WhitePaperText;

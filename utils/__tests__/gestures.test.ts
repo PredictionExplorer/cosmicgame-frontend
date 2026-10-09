@@ -1,5 +1,5 @@
 // lexicon-allow-start: fixtures mirror sealed backend wire field names
-import { getGestureKindLabel, resolveGestureTypeCode } from '../gestures';
+import { resolveGestureTypeCode } from '../gestures';
 
 describe('resolveGestureTypeCode', () => {
   it('returns the normalised GestureType when the API sends one', () => {
@@ -40,42 +40,8 @@ describe('resolveGestureTypeCode', () => {
     expect(resolveGestureTypeCode({ GestureType: 7 })).toBe(7);
   });
 
-  it('does not treat NaN as a resolvable code by accident', () => {
-    // NaN is typeof number, so it flows through; callers compare against
-    // 1 and 2, and NaN matches neither, which is the safe outcome.
-    expect(getGestureKindLabel(resolveGestureTypeCode({ GestureType: NaN }))).toBe(
-      'an ETH gesture',
-    );
+  it('passes NaN through as a number, which matches no method code', () => {
+    // Callers compare against 0, 1 and 2; NaN matches none of them.
+    expect(resolveGestureTypeCode({ GestureType: NaN })).toBeNaN();
   });
 });
-
-describe('getGestureKindLabel', () => {
-  it('labels the CST method', () => {
-    expect(getGestureKindLabel(2)).toBe('a CST gesture');
-  });
-
-  it('labels the ETH + RandomWalk method', () => {
-    expect(getGestureKindLabel(1)).toBe('an ETH + RandomWalk gesture');
-  });
-
-  it('labels the plain ETH method', () => {
-    expect(getGestureKindLabel(0)).toBe('an ETH gesture');
-  });
-
-  it('falls back to the ETH label for an unknown or missing code', () => {
-    expect(getGestureKindLabel(undefined)).toBe('an ETH gesture');
-    expect(getGestureKindLabel(null)).toBe('an ETH gesture');
-    expect(getGestureKindLabel(99)).toBe('an ETH gesture');
-  });
-
-  it('requires a strict numeric match, so a stringified code is not a CST gesture', () => {
-    expect(getGestureKindLabel('2')).toBe('an ETH gesture');
-  });
-
-  it('reads end to end from a backend record', () => {
-    const record = { BidType: 2 };
-
-    expect(getGestureKindLabel(resolveGestureTypeCode(record))).toBe('a CST gesture');
-  });
-});
-// lexicon-allow-end

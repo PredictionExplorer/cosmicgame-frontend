@@ -1,0 +1,593 @@
+'use client';
+
+import { useId, useMemo, type ReactNode, type RefObject } from 'react';
+import { parseEther, zeroAddress } from 'viem';
+import { ChevronDown, Settings2 } from 'lucide-react';
+import { useLocale, useTranslations } from 'next-intl';
+
+import { UniswapTradeButton } from '@/components/common/UniswapTradeButton';
+import { GESTURE_MESSAGE_MAX_BYTES, gestureMessageBytes } from '@/components/home/gestureInput';
+import PaginationRWLKGrid from '@/components/nft/PaginationRWLKGrid';
+import { Button } from '@/components/ui/button';
+import { ExplainedTerm } from '@/components/ui/explain-popover';
+import { Label } from '@/components/ui/label';
+import { MessageTextarea } from '@/components/ui/message-textarea';
+import { Skeleton, skeletonVariants } from '@/components/ui/skeleton';
+import { TxStatus } from '@/components/ui/tx-status';
+import { ConnectWalletAction } from '@/components/wallet/ConnectWalletAction';
+import { FundingNotice } from '@/components/wallet/FundingNotice';
+import { ChainGuard } from '@/components/wallet/NetworkGuard';
+import type { useGestureForm } from '@/hooks/useGestureForm';
+import { useTxStageLabel } from '@/hooks/useTxStageLabel';
+import { cn } from '@/lib/utils';
+import type { DashboardInfo } from '@/services/api';
+import type { CstGestureData } from '@/utils/cstGesture';
+import { formatAmount, formatAmountParts, formatDuration, NBSP } from '@/utils/format';
+import { ethGestureBaseCost, ethGestureSendAmount, formatEthQuote } from '@/utils/gestureQuote';
+
+import { CalibrationWindow } from './CalibrationWindow';
+import { GestureAdvancedFields } from './GestureAdvancedFields';
+import { MethodSelector, type GestureMethod, type MethodOption } from './MethodSelector';
+
+/** The message counter turns to attention this many bytes before the cap. */
+const MESSAGE_COUNTER_WARN_BYTES = 20;
+
+/** The holder's exclusive finalization window turns to attention in its last ten minutes. */
+const HOLDER_WINDOW_ATTENTION_MS = 10 * 60 * 1000;
+
+type GestureFormState = ReturnType<typeof useGestureForm>;
+
+/** The slice of the shared gesture-form state the console reads and writes. */
+export type ConsoleFormState = Pick<
+  GestureFormState,
+  | 'gestureType'
+  | 'contributionType'
+  | 'setContributionType'
+  | 'message'
+  | 'setMessage'
+  | 'nftDonateAddress'
+  | 'setNftDonateAddress'
+  | 'nftId'
+  | 'setNftId'
+  | 'tokenDonateAddress'
+  | 'setTokenDonateAddress'
+  | 'tokenAmount'
+  | 'setTokenAmount'
+  | 'rwlkId'
+  | 'setRwlkId'
+  | 'gestureCostPlus'
+  | 'setBidPricePlus'
+  | 'advancedExpanded'
+  | 'setAdvancedExpanded'
+  | 'rwlknftIds'
+  | 'rwlkListStatus'
+  | 'ethGestureInfo'
+  | 'gestureCstRewardAmount'
+  | 'isCstRewardLoading'
+  | 'isGesturing'
+  | 'gestureTxStage'
+> &
+  // The contract's live message cap in UTF-8 bytes; the documented default until read.
+  Partial<Pick<GestureFormState, 'messageMaxBytes'>>;
+
+/** Finalization, once the clock has reached zero. */
+export interface ConsoleFinalize {
+  /** The chain confirmed the deadline passed and a Gesture exists. */
+  canClaim: boolean;
+  isClaiming: boolean;
+  /** The connected wallet made the Final Gesture (its exclusive window). */
+  isLatestParticipant: boolean;
+  /**
+   * When anyone else may finalize, in epoch ms; `null` while the contract's
+   * finalize timeout is unknown (still loading, or its read failed), so no
+   * window is claimed on a guess.
+   */
+  openToAllAtMs: number | null;
+  nowMs: number;
+  onFinalize: () => void;
+}
+
+interface GestureConsoleProps {
+  /**
+   * `page`: the console in the monument column; it owns `#make-gesture` and
+   * `#gesture-submit`. `sheet`: the same console in the phone bottom sheet.
+   */
+  variant: 'page' | 'sheet';
+  data: DashboardInfo | null;
+  loading: boolean;
+  account: string | null;
+  form: ConsoleFormState;
+  /** CST quote and Calibration Window timing, derived live. */
+  cstGestureData: CstGestureData;
+  /** The shared, live-priced label of every gesture submit. */
+  submitLabel: string;
+  canGesture: boolean;
+  /** The clock reached zero: the Final Gesture participant is told to finalize. */
+  cycleTimerEnded: boolean;
+  onGesture: () => void;
+  onSelectGestureType: (value: string) => void;
+  finalize?: ConsoleFinalize;
+  messageInputRef?: RefObject<HTMLTextAreaElement | null>;
+  /**
+   * Renders the console's heading in place of its own h2. The sheet makes it
+   * the dialog's title, so the dialog is named by the heading it shows rather
+   * than by a second, hidden copy; the console then leaves the naming to the
+   * dialog.
+   */
+  renderTitle?: (title: { className: string; children: ReactNode }) => ReactNode;
+  className?: string;
+}
+
+/** A label-and-value line of the reward preview. */
+function SpecRow({ label, children }: { label: ReactNode; children: ReactNode }) {
+  return (
+    <div className="flex items-baseline justify-between gap-4 py-2.5">
+      <dt className="min-w-0 type-label text-muted-foreground">{label}</dt>
+      <dd className="shrink-0 text-end type-figure-sm text-foreground">{children}</dd>
+    </div>
+  );
+}
+
+function ConsoleSkeleton({ label }: { label: string }) {
+  return (
+    <div
+      role="status"
+      aria-label={label}
+      data-testid="gesture-form-skeleton"
+      className="mt-5 space-y-5"
+    >
+      <Skeleton className="h-16 rounded-control" />
+      <Skeleton className="h-10 rounded-control" />
+      <Skeleton className="h-24 rounded-control" />
+      <Skeleton className="h-14 rounded-control" />
+    </div>
+  );
+}
+
+/**
+ * The one gesture form of the page: method with live prices, the running
+ * Calibration Window, the optional message, the Participation CST preview,
+ * the Advanced options and the commit action with its transaction status.
+ * The page renders it in the monument column; phones open the same console,
+ * with the same shared state, in a bottom sheet.
+ *
+ * Without a wallet it is a preview of the live options with one connect
+ * block where the action goes; the message can still be drafted, and the
+ * draft follows the participant once they connect.
+ */
+export function GestureConsole({
+  variant,
+  data,
+  loading,
+  account,
+  form,
+  cstGestureData,
+  submitLabel,
+  canGesture,
+  cycleTimerEnded,
+  onGesture,
+  onSelectGestureType,
+  finalize,
+  messageInputRef,
+  renderTitle,
+  className,
+}: GestureConsoleProps) {
+  const t = useTranslations('home');
+  const locale = useLocale();
+  const stageLabel = useTxStageLabel();
+  const baseId = useId();
+  const ids = {
+    title: `${baseId}-title`,
+    method: `${baseId}-method`,
+    message: `${baseId}-message`,
+    rwlk: `${baseId}-rwlk`,
+  };
+
+  const {
+    gestureType,
+    message,
+    setMessage,
+    rwlkId,
+    setRwlkId,
+    rwlknftIds,
+    rwlkListStatus,
+    gestureCostPlus,
+    ethGestureInfo,
+    gestureCstRewardAmount,
+    isCstRewardLoading,
+    advancedExpanded,
+    setAdvancedExpanded,
+    isGesturing,
+    gestureTxStage,
+  } = form;
+
+  const isPage = variant === 'page';
+  const showAll = data?.LastBidderAddr !== zeroAddress;
+  const ethPrice = ethGestureInfo?.ETHPrice;
+  const hasEthQuote = ethPrice != null && Number.isFinite(ethPrice) && ethPrice >= 0;
+  const hasCstQuote = cstGestureData.source !== 'empty';
+  // An inline placeholder: prices sit inside buttons and definition rows.
+  const pending = (
+    <span
+      aria-hidden
+      className={cn(skeletonVariants(), 'inline-block h-3.5 w-16 rounded-edge align-middle')}
+    />
+  );
+
+  const ethPriceLabel = (method: 'ETH' | 'RandomWalk') =>
+    hasEthQuote
+      ? `${formatEthQuote(ethGestureBaseCost(ethPrice, method), locale)}${NBSP}ETH`
+      : pending;
+  // At its floor the CST cost is 0 CST, never "free": gas still applies.
+  const cstPriceLabel = !hasCstQuote
+    ? pending
+    : cstGestureData.isFree
+      ? t('calibration.floor')
+      : formatAmount(cstGestureData.CSTPrice, { unit: 'CST', locale });
+
+  const allOptions: MethodOption[] = [
+    { value: 'ETH', label: t('form.method.eth.label'), price: ethPriceLabel('ETH') },
+    {
+      value: 'RandomWalk',
+      label: t('form.method.randomWalk.label'),
+      price: ethPriceLabel('RandomWalk'),
+      note: t('deck.console.randomWalkNote'),
+      // Under the whole track the note names its method, as the Observatory's does.
+      trackNote: t('form.method.randomWalk.desc'),
+    },
+    { value: 'CST', label: t('form.method.cst.label'), price: cstPriceLabel },
+  ];
+  const options = showAll ? allOptions : allOptions.filter((option) => option.value === 'ETH');
+
+  // The ETH the wallet must hold before gas: the cost plus the collision buffer.
+  const requiredWei = useMemo(() => {
+    if (!hasEthQuote || (gestureType !== 'ETH' && gestureType !== 'RandomWalk')) return null;
+    const decimal = formatAmountParts(
+      ethGestureSendAmount(ethPrice, gestureType, gestureCostPlus),
+      { unit: 'ETH' },
+    ).machineValue;
+    try {
+      return decimal ? parseEther(decimal) : null;
+    } catch {
+      return null;
+    }
+  }, [hasEthQuote, ethPrice, gestureType, gestureCostPlus]);
+
+  const sendsNote =
+    (gestureType === 'ETH' || gestureType === 'RandomWalk') && gestureCostPlus > 0 && hasEthQuote
+      ? t('form.submit.sendsNote', {
+          amount: formatEthQuote(
+            ethGestureSendAmount(ethPrice, gestureType, gestureCostPlus),
+            locale,
+          ),
+          percent: gestureCostPlus,
+        })
+      : null;
+
+  // Only one of the wallet's own unused Random Walk NFTs can halve the cost: a
+  // token from a shared link, or one picked before a wallet switch, would
+  // revert on-chain and still cost gas.
+  const needsRwlkToken = gestureType === 'RandomWalk' && !rwlknftIds.includes(rwlkId);
+  const hasSelectedQuote = gestureType === 'CST' ? hasCstQuote : hasEthQuote;
+  const submitUnavailable = needsRwlkToken || gestureType === '' || !hasSelectedQuote;
+  const busyLabel = isGesturing ? stageLabel(gestureTxStage) : null;
+
+  const cstAmount = (value: number | null | undefined) =>
+    isCstRewardLoading ? pending : formatAmount(value, { unit: 'CST', locale });
+  const currentCstCost = cstGestureData.isFree ? 0 : cstGestureData.CSTPrice;
+  const netCst =
+    gestureCstRewardAmount != null && Number.isFinite(gestureCstRewardAmount) && hasCstQuote
+      ? gestureCstRewardAmount - currentCstCost
+      : null;
+
+  // Bytes, as the contract counts them (a CJK character takes three), against
+  // the cap the hint names; the shared form cuts a message at that cap.
+  const messageMaxBytes = form.messageMaxBytes ?? GESTURE_MESSAGE_MAX_BYTES;
+  const messageBytes = gestureMessageBytes(message);
+  const messageCount = (
+    <span
+      id={`${ids.message}-count`}
+      data-testid="gesture-message-char-count"
+      className={cn(
+        'shrink-0 type-caption tabular-nums',
+        messageBytes >= messageMaxBytes - MESSAGE_COUNTER_WARN_BYTES
+          ? 'text-attention'
+          : 'text-subtle',
+      )}
+    >
+      {messageBytes}/{messageMaxBytes}
+    </span>
+  );
+
+  const openToAllInMs =
+    finalize && finalize.openToAllAtMs !== null
+      ? Math.max(0, finalize.openToAllAtMs - finalize.nowMs)
+      : null;
+  const finalizeWaitMs = finalize && !finalize.isLatestParticipant ? (openToAllInMs ?? 0) : 0;
+  // The Final Gesture participant alone may finalize until the window
+  // closes; `null` while its length is unknown, so no caption is shown.
+  const holderWindowMs = finalize?.isLatestParticipant ? openToAllInMs : null;
+
+  const titleClassName = 'type-heading-3 text-foreground';
+
+  return (
+    <section
+      id={isPage ? 'make-gesture' : undefined}
+      tabIndex={-1}
+      aria-labelledby={renderTitle ? undefined : ids.title}
+      data-testid="gesture-console"
+      data-variant={variant}
+      className={cn('min-w-0 scroll-mt-28 focus:outline-none', className)}
+    >
+      {renderTitle ? (
+        renderTitle({ className: titleClassName, children: t('deck.console.title') })
+      ) : (
+        <h2 id={ids.title} className={titleClassName}>
+          {t('deck.console.title')}
+        </h2>
+      )}
+
+      {loading ? (
+        <ConsoleSkeleton label={t('form.loadingAria')} />
+      ) : (
+        <div className="mt-5 space-y-6">
+          <div className="space-y-4">
+            <p id={ids.method} className="type-label text-muted-foreground">
+              {t('deck.console.methodLabel')}
+            </p>
+            <MethodSelector
+              options={options}
+              value={gestureType}
+              labelledBy={ids.method}
+              onChange={(value: GestureMethod) => onSelectGestureType(value)}
+            />
+            <CalibrationWindow
+              data={data}
+              ethGestureInfo={ethGestureInfo}
+              cstGestureData={cstGestureData}
+            />
+          </div>
+
+          {gestureType === 'RandomWalk' && account ? (
+            <div data-testid="rwlk-picker">
+              <h3 id={ids.rwlk} className="type-label text-foreground">
+                <ExplainedTerm definition={t('form.rwlk.tooltip')}>
+                  {t('form.rwlk.title')}
+                </ExplainedTerm>
+              </h3>
+              {/* Where the wallet's list stands: loading, read, or failed. */}
+              {rwlkListStatus === 'error' ? (
+                <p
+                  role="status"
+                  data-testid="rwlk-picker-error"
+                  className="mt-1 type-caption text-subtle"
+                >
+                  {t('form.rwlk.error')}
+                </p>
+              ) : (
+                <PaginationRWLKGrid
+                  compact
+                  loading={rwlkListStatus === 'loading'}
+                  data={rwlknftIds}
+                  selectedToken={rwlkId}
+                  setSelectedToken={setRwlkId}
+                  labelledBy={ids.rwlk}
+                />
+              )}
+            </div>
+          ) : null}
+
+          {gestureType === 'CST' ? (
+            <div className="flex flex-wrap items-center justify-between gap-x-4 gap-y-2">
+              <p className="min-w-0 max-w-sm type-body-sm text-muted-foreground">
+                {t('form.cstTrade')}
+              </p>
+              <UniswapTradeButton variant="compact" />
+            </div>
+          ) : null}
+
+          <div>
+            <div className="mb-2 flex items-baseline justify-between gap-3">
+              <Label htmlFor={ids.message} className="type-label text-muted-foreground">
+                {t('form.advanced.messageLabel')}{' '}
+                <span className="type-caption text-subtle">
+                  {t('form.advanced.messageOptionalHint', {
+                    maxLength: String(messageMaxBytes),
+                  })}
+                </span>
+              </Label>
+              {messageCount}
+            </div>
+            <MessageTextarea
+              id={ids.message}
+              ref={messageInputRef}
+              data-testid="gesture-message-input"
+              aria-describedby={`${ids.message}-hint ${ids.message}-count`}
+              placeholder={t('form.advanced.messagePlaceholder')}
+              value={message}
+              // UTF-8 never takes fewer bytes than UTF-16 units, so this native
+              // cap never cuts early; the byte cap itself applies on change.
+              maxLength={messageMaxBytes}
+              rows={3}
+              onChange={(e) => setMessage(e.target.value)}
+            />
+            <p id={`${ids.message}-hint`} className="mt-1.5 type-caption text-subtle">
+              {t('deck.console.messageHint')}
+            </p>
+          </div>
+
+          {showAll ? (
+            <div data-testid="gesture-reward-preview">
+              <dl className="divide-y divide-rule-faint border-y border-rule-faint">
+                {gestureType === 'CST' ? (
+                  <>
+                    <SpecRow
+                      label={
+                        <ExplainedTerm definition={t('form.reward.economicsDescription')}>
+                          {t('form.reward.rewardLabel')}
+                        </ExplainedTerm>
+                      }
+                    >
+                      {cstAmount(gestureCstRewardAmount)}
+                    </SpecRow>
+                    <SpecRow label={t('form.reward.costLabel')}>
+                      {hasCstQuote
+                        ? formatAmount(currentCstCost, { unit: 'CST', locale })
+                        : pending}
+                    </SpecRow>
+                    <SpecRow label={t('form.reward.netLabel')}>
+                      {isCstRewardLoading || netCst == null ? (
+                        pending
+                      ) : (
+                        <span className={netCst > 0 ? 'text-positive' : undefined}>
+                          {formatAmount(netCst, { unit: 'CST', locale, signDisplay: 'exceptZero' })}
+                        </span>
+                      )}
+                    </SpecRow>
+                  </>
+                ) : (
+                  <SpecRow
+                    label={
+                      <ExplainedTerm definition={t('form.reward.previewDescription')}>
+                        {t('deck.console.reward')}
+                      </ExplainedTerm>
+                    }
+                  >
+                    {cstAmount(gestureCstRewardAmount)}
+                  </SpecRow>
+                )}
+              </dl>
+              {gestureType === 'CST' && netCst != null && !isCstRewardLoading ? (
+                <p className="mt-2 type-caption text-subtle">
+                  {netCst > 0 ? t('form.reward.netPositive') : t('form.reward.netNegative')}
+                </p>
+              ) : null}
+            </div>
+          ) : null}
+
+          {account ? (
+            <details
+              open={advancedExpanded}
+              onToggle={(event) => setAdvancedExpanded(event.currentTarget.open)}
+              className="group/advanced"
+              data-testid="gesture-advanced"
+            >
+              <summary className="flex min-h-11 cursor-pointer list-none items-center justify-between gap-3 rounded-control type-label text-muted-foreground transition-colors hover:text-foreground [&::-webkit-details-marker]:hidden">
+                <span className="inline-flex items-center gap-2">
+                  <Settings2 className="size-4" aria-hidden />
+                  {t('form.advanced.title')}
+                </span>
+                <ChevronDown
+                  className="size-4 transition-transform duration-[var(--duration-base)] group-open/advanced:rotate-180 motion-reduce:transition-none"
+                  aria-hidden
+                />
+              </summary>
+              <GestureAdvancedFields
+                gestureType={gestureType}
+                contributionType={form.contributionType}
+                setContributionType={form.setContributionType}
+                nftDonateAddress={form.nftDonateAddress}
+                setNftDonateAddress={form.setNftDonateAddress}
+                nftId={form.nftId}
+                setNftId={form.setNftId}
+                tokenDonateAddress={form.tokenDonateAddress}
+                setTokenDonateAddress={form.setTokenDonateAddress}
+                tokenAmount={form.tokenAmount}
+                setTokenAmount={form.setTokenAmount}
+                gestureCostPlus={gestureCostPlus}
+                setBidPricePlus={form.setBidPricePlus}
+                ethGestureInfo={ethGestureInfo}
+                className="pb-2 pt-3"
+              />
+            </details>
+          ) : null}
+
+          <div className="space-y-3" data-testid="gesture-commit">
+            <p className="type-body-sm text-muted-foreground">{t('orientation.costsNote')}</p>
+
+            {account ? (
+              <>
+                {canGesture ? (
+                  <>
+                    <FundingNotice requiredWei={requiredWei} />
+                    <ChainGuard buttonClassName="w-full">
+                      <Button
+                        id={isPage ? 'gesture-submit' : undefined}
+                        data-testid="gesture-submit"
+                        variant="commit"
+                        size="xl"
+                        className="h-auto w-full whitespace-normal py-3 leading-tight"
+                        loading={isGesturing}
+                        disabled={submitUnavailable}
+                        onClick={onGesture}
+                      >
+                        {busyLabel ?? submitLabel}
+                      </Button>
+                    </ChainGuard>
+                    {sendsNote ? (
+                      <p className="type-caption text-subtle" data-testid="gesture-send-amount">
+                        {sendsNote}
+                      </p>
+                    ) : null}
+                  </>
+                ) : !cycleTimerEnded ? (
+                  <p className="type-body-sm text-muted-foreground">{t('form.finalGestureMade')}</p>
+                ) : null}
+                <TxStatus stage={gestureTxStage} />
+
+                {finalize?.canClaim ? (
+                  <div
+                    className="space-y-2 border-t border-rule-faint pt-4"
+                    data-testid="finalize-action"
+                  >
+                    <Button
+                      variant={canGesture ? 'outline' : 'commit'}
+                      size={canGesture ? 'lg' : 'xl'}
+                      className="w-full"
+                      loading={finalize.isClaiming}
+                      disabled={finalizeWaitMs > 0}
+                      onClick={finalize.onFinalize}
+                      data-testid="finalize-submit"
+                    >
+                      {t('form.finalize')}
+                    </Button>
+                    {holderWindowMs !== null ? (
+                      <p
+                        className={cn(
+                          'type-caption',
+                          holderWindowMs > 0 && holderWindowMs <= HOLDER_WINDOW_ATTENTION_MS
+                            ? 'text-attention'
+                            : 'text-subtle',
+                        )}
+                        data-testid="finalize-holder-window"
+                      >
+                        {holderWindowMs > 0
+                          ? t('deck.console.holderWindow', {
+                              duration: formatDuration(Math.ceil(holderWindowMs / 1000), {
+                                locale,
+                              }),
+                            })
+                          : t('deck.console.holderWindowEnded')}
+                      </p>
+                    ) : finalizeWaitMs > 0 ? (
+                      <p className="type-caption text-subtle" data-testid="finalize-wait">
+                        {t('deck.console.finalizeOpensIn', {
+                          duration: formatDuration(Math.ceil(finalizeWaitMs / 1000), { locale }),
+                        })}
+                      </p>
+                    ) : null}
+                  </div>
+                ) : null}
+              </>
+            ) : (
+              <div data-testid="connect-to-gesture" className="space-y-3">
+                <p className="type-body-sm text-foreground">{t('orientation.connectHelp')}</p>
+                <ConnectWalletAction size="xl" className="w-full" warmOnVisible />
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+    </section>
+  );
+}

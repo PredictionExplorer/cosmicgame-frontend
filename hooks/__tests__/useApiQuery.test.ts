@@ -1,6 +1,7 @@
 import { renderHook } from '@testing-library/react';
 import { useQuery } from '@tanstack/react-query';
 
+import { ApiReadError } from '@/services/api/readError';
 import {
   useDashboardInfo,
   useRoundList,
@@ -97,6 +98,9 @@ jest.mock('../../services/api', () => ({
 }));
 
 const mockUseQuery = useQuery as jest.Mock;
+
+/** The API's answer body for a record it does not hold. */
+const NOT_HELD = { error: 'record not found', status: 0 };
 
 beforeEach(() => {
   jest.clearAllMocks();
@@ -250,6 +254,22 @@ describe('useApiQuery hooks', () => {
       renderHook(() => useRoundInfo(5));
       expect(mockUseQuery.mock.calls[0][0].enabled).toBe(true);
     });
+
+    it('never retries the answer for a cycle with no record (HTTP 400 "record not found"), and retries failures twice', () => {
+      renderHook(() => useRoundInfo(2));
+      const retry = mockUseQuery.mock.calls[0][0].retry as (
+        count: number,
+        error: unknown,
+      ) => boolean;
+
+      expect(retry(0, new ApiReadError('Network response was not OK', 400, NOT_HELD))).toBe(false);
+      // Another 400 (a parameter the API could not parse) is a failed read.
+      expect(retry(0, new ApiReadError('Network response was not OK', 400))).toBe(true);
+      expect(retry(0, new ApiReadError('Network response was not OK', 502))).toBe(true);
+      expect(retry(0, new Error('Network Error'))).toBe(true);
+      expect(retry(1, new ApiReadError('Network response was not OK', 502))).toBe(true);
+      expect(retry(2, new ApiReadError('Network response was not OK', 502))).toBe(false);
+    });
   });
 
   describe('useAllocationTime', () => {
@@ -348,6 +368,19 @@ describe('useApiQuery hooks', () => {
 
       expect(getOptions().enabled).toBe(true);
     });
+
+    it('never retries the answer for a record the API does not hold (HTTP 400 "record not found"), and retries failures twice (D321)', () => {
+      renderHook(() => useGestureInfo(40000));
+      const retry = getOptions().retry as (count: number, error: unknown) => boolean;
+
+      expect(retry(0, new ApiReadError('Network response was not OK', 400, NOT_HELD))).toBe(false);
+      expect(retry(0, new ApiReadError('Network response was not OK', 404))).toBe(false);
+      expect(retry(0, new ApiReadError('Network response was not OK', 400))).toBe(true);
+      expect(retry(0, new ApiReadError('Network response was not OK', 502))).toBe(true);
+      expect(retry(0, new Error('Network Error'))).toBe(true);
+      expect(retry(1, new ApiReadError('Network response was not OK', 502))).toBe(true);
+      expect(retry(2, new ApiReadError('Network response was not OK', 502))).toBe(false);
+    });
   });
 
   describe('useGestureListByCycle', () => {
@@ -439,6 +472,11 @@ describe('useApiQuery hooks', () => {
       renderHook(() => useBannedGestures());
       expect(getOptions().staleTime).toBe(30_000);
     });
+
+    it('reads nothing where the server already moderated the messages', () => {
+      renderHook(() => useBannedGestures({ enabled: false }));
+      expect(getOptions().enabled).toBe(false);
+    });
   });
 
   describe('useGestureEthCost', () => {
@@ -511,6 +549,32 @@ describe('useApiQuery hooks', () => {
       renderHook(() => useCSTInfo(0));
 
       expect(mockUseQuery.mock.calls[0][0].enabled).toBe(true);
+    });
+
+    it('treats a server seed as fresh by default', () => {
+      const seed = { TokenId: 7 } as never;
+      renderHook(() => useCSTInfo(7, seed));
+
+      const options = mockUseQuery.mock.calls[0][0];
+      expect(options.initialData).toBe(seed);
+      expect(options.initialDataUpdatedAt).toBeUndefined();
+    });
+
+    it('dates a stale ISR seed to epoch 0 so it refreshes after hydration', () => {
+      const seed = { TokenId: 7 } as never;
+      renderHook(() => useCSTInfo(7, seed, { seedIsStale: true }));
+
+      const options = mockUseQuery.mock.calls[0][0];
+      expect(options.initialData).toBe(seed);
+      expect(options.initialDataUpdatedAt).toBe(0);
+    });
+
+    it('leaves a missing seed to the normal first fetch', () => {
+      renderHook(() => useCSTInfo(7, null, { seedIsStale: true }));
+
+      const options = mockUseQuery.mock.calls[0][0];
+      expect(options.initialData).toBeUndefined();
+      expect(options.initialDataUpdatedAt).toBeUndefined();
     });
   });
 

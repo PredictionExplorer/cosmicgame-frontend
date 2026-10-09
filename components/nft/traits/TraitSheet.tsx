@@ -14,15 +14,22 @@ import {
   type TraitKey,
 } from '@/lib/nftMetadata';
 import { Link } from '@/i18n/navigation';
-import { useHydrationSafeDateTime } from '@/components/common/HydrationSafeDateTime';
+import { useHydrationSafeDateTime } from '@/components/ui/date-time';
 import { cn } from '@/lib/utils';
 import { toIntlLocale } from '@/utils/format';
 import { InfoTooltip } from '@/components/ui/info-tooltip';
 
-import { AllocationPill } from './AllocationPill';
+import { AllocationLabel } from './AllocationLabel';
 import { ChaosMeter } from './ChaosMeter';
 import { FateGlyph } from './FateGlyph';
 import { HueStrip } from './HueStrip';
+import {
+  TRAIT_LEDGER_CLASS,
+  TRAIT_LEDGER_DENSE_CLASS,
+  TRAIT_ROW_CLASS,
+  TRAIT_ROW_DENSE_CLASS,
+  TRAIT_ROW_WIDE_CLASS,
+} from './layout';
 import { SpectralClassBadge } from './SpectralClassBadge';
 import { useTraitLabels } from './useTraitLabels';
 
@@ -64,7 +71,44 @@ export interface TraitSheetProps {
   onSelectTrait?: (key: CategoricalTraitKey, value: string) => void;
   /** Hide group headings (when the parent already labels the section). */
   hideHeadings?: boolean;
+  /**
+   * More rows (`TraitLedgerRow`s) at the end of the last group's ledger, so
+   * the facts a page adds read as one ledger with the traits.
+   */
+  extraRows?: ReactNode;
   className?: string;
+}
+
+export interface TraitLedgerRowProps {
+  label: ReactNode;
+  children: ReactNode;
+  /** The value needs the width of both columns (the masses, a braid word). */
+  wide?: boolean;
+  dense?: boolean;
+  testId?: string;
+}
+
+/**
+ * One label / value row of the trait ledger, the spec-sheet row the detail
+ * page's provenance ledger uses: the label in the subtle tier, the value
+ * beside it.
+ */
+export function TraitLedgerRow({
+  label,
+  children,
+  wide = false,
+  dense = false,
+  testId,
+}: TraitLedgerRowProps) {
+  return (
+    <div
+      className={cn(dense ? TRAIT_ROW_DENSE_CLASS : TRAIT_ROW_CLASS, wide && TRAIT_ROW_WIDE_CLASS)}
+      data-testid={testId}
+    >
+      <dt className="flex min-w-0 items-center gap-1 type-label text-subtle">{label}</dt>
+      <dd className="min-w-0 type-body-sm text-foreground">{children}</dd>
+    </div>
+  );
 }
 
 function shareOf(
@@ -76,9 +120,11 @@ function shareOf(
 }
 
 /**
- * TraitSheet — every trait of a token laid out as labelled rows, grouped
- * into Composition, Orbital physics, and Provenance. Shared by the gallery
- * quick view and the detail page panel.
+ * TraitSheet — every trait of a token as a ledger of labelled rows, grouped
+ * into Composition, Orbital physics, and Provenance. A categorical value
+ * carries how many tokens share it ("22/48") at the end of its line, where
+ * it stays when the value wraps. Shared by the gallery quick view (one
+ * column) and the detail page panel (two from `lg`).
  */
 export function TraitSheet({
   entry,
@@ -88,6 +134,7 @@ export function TraitSheet({
   dense = false,
   onSelectTrait,
   hideHeadings = false,
+  extraRows,
   className,
 }: TraitSheetProps) {
   const t = useTranslations('traits');
@@ -118,11 +165,7 @@ export function TraitSheet({
         return selectable(key, entry.fate, <FateGlyph value={entry.fate} size="md" withLabel />);
       case 'allocation':
         if (!entry.allocation) return null;
-        return selectable(
-          key,
-          entry.allocation,
-          <AllocationPill value={entry.allocation} size="md" />,
-        );
+        return selectable(key, entry.allocation, <AllocationLabel value={entry.allocation} />);
       case 'chaos':
         if (typeof entry.chaos !== 'number') return null;
         return <ChaosMeter value={entry.chaos} max={entry.chaosMax} size="md" />;
@@ -136,7 +179,7 @@ export function TraitSheet({
         return (
           <Link
             href={`/allocation/${entry.cycle}`}
-            className="font-medium text-inherit no-underline transition-colors hover:text-primary"
+            className="link-quiet inline-flex min-h-6 items-center font-medium"
             aria-label={t('card.viewCycle', { n: entry.cycle })}
           >
             {t('card.cycleLong', { n: entry.cycle })}
@@ -161,74 +204,76 @@ export function TraitSheet({
       <button
         type="button"
         onClick={() => onSelectTrait(key, value)}
-        className="inline-flex items-center rounded-md text-left transition-colors hover:text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+        className="inline-flex items-center rounded-edge text-left transition-colors hover:text-primary"
       >
         {content}
       </button>
     );
   }
 
+  const shown = groups
+    .map((group) => ({
+      group,
+      rows: GROUP_KEYS[group]
+        .map((key) => ({ key, value: renderValue(key) }))
+        .filter((row) => row.value !== null),
+    }))
+    .filter(({ rows }) => rows.length > 0);
+  const lastGroup = shown[shown.length - 1]?.group;
+
   return (
     <div className={cn('space-y-6', dense && 'space-y-4', className)} data-testid="trait-sheet">
-      {groups.map((group) => {
-        const rows = GROUP_KEYS[group]
-          .map((key) => ({ key, value: renderValue(key) }))
-          .filter((row) => row.value !== null);
-        if (rows.length === 0) return null;
-        return (
-          <section key={group} aria-label={t(`groups.${group}`)}>
-            {hideHeadings ? null : (
-              <h3 className="type-eyebrow mb-3 text-muted-foreground">{t(`groups.${group}`)}</h3>
-            )}
-            <dl
-              className={cn(
-                'grid gap-x-6',
-                dense
-                  ? 'grid-cols-2 gap-y-3 sm:grid-cols-3'
-                  : 'grid-cols-1 gap-y-4 sm:grid-cols-2 lg:grid-cols-3',
-              )}
-            >
-              {rows.map(({ key, value }) => {
-                const share =
-                  CATEGORICAL.has(key) && total
-                    ? shareOf(
-                        facets,
-                        key as CategoricalTraitKey,
-                        categoricalValue(entry, key as CategoricalTraitKey) ?? '',
-                      )
-                    : undefined;
-                return (
-                  <div
-                    key={key}
-                    className={cn(
-                      'min-w-0 rounded-lg border border-white/[0.06] bg-white/[0.02] px-3 py-2.5',
-                      // The allocation pill is the widest value; give it room.
-                      key === 'allocation' && 'col-span-2',
-                    )}
-                    data-testid={`trait-row-${key}`}
-                  >
-                    <dt className="mb-1 flex items-center gap-1 text-[11px] font-medium uppercase tracking-wider text-muted-foreground">
+      {shown.map(({ group, rows }) => (
+        <section key={group} aria-label={t(`groups.${group}`)}>
+          {hideHeadings ? null : (
+            <h3 className="type-eyebrow mb-3 text-muted-foreground">{t(`groups.${group}`)}</h3>
+          )}
+          <dl className={dense ? TRAIT_LEDGER_DENSE_CLASS : TRAIT_LEDGER_CLASS}>
+            {rows.map(({ key, value }) => {
+              const share =
+                CATEGORICAL.has(key) && total
+                  ? shareOf(
+                      facets,
+                      key as CategoricalTraitKey,
+                      categoricalValue(entry, key as CategoricalTraitKey) ?? '',
+                    )
+                  : undefined;
+              return (
+                <TraitLedgerRow
+                  key={key}
+                  dense={dense}
+                  testId={`trait-row-${key}`}
+                  label={
+                    <>
                       {typeLabel(key)}
-                      <InfoTooltip content={typeHint(key)} iconClassName="h-3 w-3" />
-                    </dt>
-                    <dd className="flex flex-wrap items-center gap-2 text-sm text-foreground">
-                      {value}
-                      {share !== undefined && total ? (
-                        <span
-                          className="ml-auto shrink-0 font-mono text-[10px] tabular-nums text-muted-foreground/70"
-                          title={t('rarity.share', { count: share, total })}
-                        >
-                          {t('rarity.shareShort', { count: share, total })}
-                        </span>
-                      ) : null}
-                    </dd>
-                  </div>
-                );
-              })}
-            </dl>
-          </section>
-        );
-      })}
+                      <InfoTooltip
+                        content={typeHint(key)}
+                        label={typeLabel(key)}
+                        iconClassName="h-3 w-3"
+                      />
+                    </>
+                  }
+                >
+                  {/* The share keeps its place at the end of the first line
+                      when the value wraps. */}
+                  <span className="grid grid-cols-[minmax(0,1fr)_auto] items-baseline gap-x-3">
+                    <span className="min-w-0">{value}</span>
+                    {share !== undefined && total ? (
+                      <span
+                        className="type-figure-sm text-subtle"
+                        title={t('rarity.share', { count: share, total })}
+                      >
+                        {t('rarity.shareShort', { count: share, total })}
+                      </span>
+                    ) : null}
+                  </span>
+                </TraitLedgerRow>
+              );
+            })}
+            {group === lastGroup ? extraRows : null}
+          </dl>
+        </section>
+      ))}
     </div>
   );
 }

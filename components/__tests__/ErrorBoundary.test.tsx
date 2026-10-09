@@ -1,7 +1,7 @@
 import '@testing-library/jest-dom';
 import type React from 'react';
 
-import ErrorBoundary from '@/components/layout/ErrorBoundary';
+import ErrorBoundary, { ErrorBoundaryBase } from '@/components/layout/ErrorBoundary';
 
 import { render, screen, fireEvent, checkA11y } from '@/test-utils';
 
@@ -39,33 +39,40 @@ describe('ErrorBoundary', () => {
     expect(screen.queryByText('Test error')).not.toBeInTheDocument();
   });
 
-  it('displays a "Try Again" button on error', () => {
+  it('draws the shared error state, with a heading in the outline', () => {
     render(
       <ErrorBoundary>
         <ThrowError shouldThrow />
       </ErrorBoundary>,
     );
-    expect(screen.getByRole('button', { name: 'errors.boundary.retry' })).toBeInTheDocument();
+    expect(
+      screen.getByRole('heading', { level: 2, name: 'errors.boundary.title' }),
+    ).toBeInTheDocument();
   });
 
-  it('resets error state when "Try Again" is clicked', () => {
-    const { rerender } = render(
+  it('reloads the page rather than re-rendering the tree that just threw', () => {
+    const reload = jest.fn();
+    render(
+      <ErrorBoundaryBase
+        onReload={reload}
+        messages={{ title: 'Title', description: 'Description', reload: 'Reload', home: 'Home' }}
+      >
+        <ThrowError shouldThrow />
+      </ErrorBoundaryBase>,
+    );
+    fireEvent.click(screen.getByRole('button', { name: 'Reload' }));
+    expect(reload).toHaveBeenCalledTimes(1);
+    // The tree that threw is not rendered again in place.
+    expect(screen.getByText('Title')).toBeInTheDocument();
+  });
+
+  it('offers a way home', () => {
+    render(
       <ErrorBoundary>
         <ThrowError shouldThrow />
       </ErrorBoundary>,
     );
-
-    expect(screen.getByText('errors.boundary.title')).toBeInTheDocument();
-
-    rerender(
-      <ErrorBoundary>
-        <ThrowError shouldThrow={false} />
-      </ErrorBoundary>,
-    );
-
-    fireEvent.click(screen.getByRole('button', { name: 'errors.boundary.retry' }));
-    expect(screen.getByText('No error')).toBeInTheDocument();
-    expect(screen.queryByText('errors.boundary.title')).not.toBeInTheDocument();
+    expect(screen.getByRole('link', { name: 'errors.boundary.home' })).toHaveAttribute('href', '/');
   });
 
   it('renders custom fallback when provided', () => {

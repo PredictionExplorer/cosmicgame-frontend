@@ -1,0 +1,81 @@
+{
+  "howItWorks": {
+    "title": "참여 방법",
+    "steps": {
+      "promote": {
+        "title": "알리기",
+        "description": "소셜 미디어, 블로그, 커뮤니티에서 Cosmic Signature를 소개합니다.",
+        "detail": "게시물, 추천 링크, 글, 영상 모두 해당됩니다."
+      },
+      "verify": {
+        "title": "검증받기",
+        "description": "팀이 홍보 활동을 검증합니다.",
+        "detail": "배분을 승인하기 전에 도달 범위, 품질, 진정성을 평가합니다."
+      },
+      "receive": {
+        "title": "CST 받기",
+        "description": "홍보 배분이 CST로 지갑에 직접 전달됩니다.",
+        "detail": "검증이 끝나면 온체인으로 전송되며, 배분 규모는 홍보 활동의 영향력에 따라 달라집니다."
+      }
+    },
+    "description": "Cosmic Signature를 알리는 일부터 지갑으로 CST를 받기까지 세 단계입니다."
+  },
+  "leaderboard": {
+    "title": "주요 홍보 기여자",
+    "empty": "아직 홍보 기여자가 없습니다.",
+    "description": "홍보 활동으로 받은 CST 총량 기준 순위입니다.",
+    "columns": {
+      "rank": "순위",
+      "contributor": "기여자",
+      "share": "비중",
+      "shareHelp": "지금까지 전달된 홍보 CST 전체에서 이 기여자가 받은 비중입니다.",
+      "received": "받은 CST",
+      "allocations": "배분 건수"
+    }
+  },
+  "history": {
+    "title": "홍보 배분 내역",
+    "emptyDescription": "홍보 활동이 검증되고 배분이 전달되면 여기에 표시됩니다.",
+    "description": "홍보 준비금에서 전달된 모든 배분과 각 트랜잭션 링크입니다."
+  },
+  "cta": {
+    "title": "함께 알릴 준비가 되었습니까?",
+    "description": "홍보 프로그램에 참여하면 Cosmic Signature를 세상에 알리고 CST 홍보 배분을 받을 수 있습니다.",
+    "contact": "홍보 팀에 이메일 보내기",
+    "note": "팀이 홍보 자료 준비를 돕고 배분이 정해지는 방식을 안내합니다.",
+    "copyEmail": "이메일 주소 복사",
+    "emailCopied": "이메일 주소를 복사했습니다",
+    "rulesLink": "팀에 이메일을 보내기 전에 참여 조건을 읽어 보십시오"
+  },
+  "address": {
+    "parent": "홍보 배분",
+    "title": "받은 홍보 배분",
+    "lede": "이 주소가 홍보 준비금에서 받은 CST입니다.",
+    "profile": "참여자 프로필",
+    "figures": {
+      "total": "받은 CST",
+      "allocations": "배분 건수",
+      "first": "첫 배분",
+      "latest": "최근 배분",
+      "allocated": "배분 일시",
+      "rank": "순위",
+      "rankValue": "{total}명 중 {rank}위",
+      "shareCaption": "전체 홍보 CST의 {share}"
+    },
+    "emptyDescription": "홍보 팀이 이 주소로 CST를 보내면 배분이 여기에 표시됩니다.",
+    "invalidAddress": {
+      "title": "잘못된 주소",
+      "description": "링크에 0x 뒤에 영문자와 숫자 40자가 이어지는 전체 주소가 필요합니다.",
+      "action": "전체 홍보 배분"
+    }
+  },
+  "learnHow": "참여 방법 보기",
+  "loadError": "홍보 배분 내역을 불러오지 못했습니다.",
+  "rules": {
+    "title": "참여 조건",
+    "review": "누구나 홍보 활동을 제안할 수 있으며, 팀은 배분 전에 모든 제안을 검토합니다.",
+    "discretion": "배분은 팀의 재량입니다. 홍보 활동의 승인 여부와 CST 전송 시점, 수량을 팀이 정합니다. 승인되지 않은 홍보 활동은 배분을 받지 않습니다.",
+    "excluded": "스팸, 구매한 팔로워나 참여, CST의 가치에 관한 주장을 포함해 오해의 소지가 있는 주장은 인정되지 않습니다.",
+    "disclose": "Cosmic Signature에 관해 게시할 때마다 그로 인해 CST를 받을 수 있다는 사실을 밝히십시오."
+  }
+}

@@ -11,9 +11,21 @@ jest.mock('../../../../../hooks/useApiQuery', () => ({
 }));
 
 let capturedList: unknown[] = [];
+let capturedProps: { error?: unknown; onRetry?: () => void; showArt?: boolean } = {};
 jest.mock('../../../../../components/tables/AllocationTable', () => ({
-  AllocationTable: ({ list, loading }: { list: unknown[]; loading: boolean }) => {
+  AllocationTable: ({
+    list,
+    loading,
+    ...props
+  }: {
+    list: unknown[];
+    loading: boolean;
+    error?: unknown;
+    onRetry?: () => void;
+    showArt?: boolean;
+  }) => {
     capturedList = list;
+    capturedProps = props;
     return (
       <div data-testid="allocation-table">{loading ? 'Loading...' : `rows: ${list.length}`}</div>
     );
@@ -46,7 +58,7 @@ describe('AllocationRecipientsPage', () => {
     expect(screen.getByText(/allocation\.recipients\.header\.subtitle/i)).toBeInTheDocument();
   });
 
-  it('renders page-scope and reserve-split tooltips', () => {
+  it('explains the scope once, and the split in one sentence under its heading', () => {
     mockUseRoundList.mockReturnValue({ data: [], isLoading: false });
     render(<AllocationRecipientsPage />);
 
@@ -55,11 +67,31 @@ describe('AllocationRecipientsPage', () => {
         name: 'More information about allocation.recipients.header.scope',
       }),
     ).toBeInTheDocument();
+    // The legend's terms explain themselves: the heading carries no second (i).
     expect(
-      screen.getByRole('button', {
+      screen.queryByRole('button', {
         name: 'More information about allocation.recipients.reserveSplit.label',
       }),
-    ).toBeInTheDocument();
+    ).not.toBeInTheDocument();
+    expect(screen.getByText('allocation.recipients.reserveSplit.tooltip')).toBeInTheDocument();
+  });
+
+  it('leads with the ledger of finalized cycles, each shown by its Signature', () => {
+    mockUseRoundList.mockReturnValue({ data: [createRound()], isLoading: false });
+    render(<AllocationRecipientsPage />);
+    const ledger = screen.getByTestId('allocation-table');
+    const split = screen.getByRole('region', { name: 'allocation.recipients.reserveSplit.label' });
+    expect(ledger.compareDocumentPosition(split) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+    expect(capturedProps.showArt).toBe(true);
+  });
+
+  it('shows a failed cycle list as an error with a retry, never as "no finalized cycles"', () => {
+    const refetch = jest.fn();
+    mockUseRoundList.mockReturnValue({ data: undefined, isLoading: false, isError: true, refetch });
+    render(<AllocationRecipientsPage />);
+    expect(capturedProps.error).toBe('allocation.recipients.loadError');
+    capturedProps.onRetry?.();
+    expect(refetch).toHaveBeenCalledTimes(1);
   });
 
   it('passes loading state to AllocationTable', () => {
@@ -108,53 +140,56 @@ describe('AllocationRecipientsPage', () => {
     expect(screen.getByText(`~${protocolFacts.compoundingReservePercentage}%`)).toBeInTheDocument();
   });
 
-  it('renders help tooltips for allocation track labels', () => {
+  it('names every track by its canonical label, which explains itself', () => {
     mockUseRoundList.mockReturnValue({ data: [], isLoading: false });
     render(<AllocationRecipientsPage />);
 
-    for (const track of ['signature', 'chrono', 'stellar', 'anchor', 'publicGoods', 'nextCycle']) {
-      expect(
-        screen.getByRole('button', {
-          name: `More information about allocation.recipients.reserveSplit.tracks.${track}.label`,
-        }),
-      ).toBeInTheDocument();
+    // The labels and definitions are the ones /contracts uses (contracts.funds.segments).
+    for (const label of [
+      'Signature Allocation',
+      'Chrono-Warrior',
+      'Stellar Selection',
+      'Anchor Distribution',
+      'Public Goods',
+      'Compounding Cycle Reserve',
+    ]) {
+      expect(screen.getByRole('button', { name: label })).toBeInTheDocument();
     }
   });
 
-  describe('summary statistics', () => {
-    it('renders summary stats when data is available', () => {
+  it('draws the split as one bar that names every share for screen readers', () => {
+    mockUseRoundList.mockReturnValue({ data: [], isLoading: false });
+    render(<AllocationRecipientsPage />);
+    const bar = screen.getByRole('img', { name: /allocation\.recipients\.reserveSplit\.label/ });
+    expect(bar.getAttribute('aria-label')).toContain(
+      `track=Signature Allocation,share=${protocolFacts.mainEthPercentage}%`,
+    );
+  });
+
+  describe('page header', () => {
+    it('leaves the totals to the header instead of a second stat row', () => {
       mockUseRoundList.mockReturnValue({
         data: [
           createRound({ AmountEth: 1.5, WinnerAddr: '0xA', RoundStats: { TotalBids: 10 } }),
           createRound({ AmountEth: 2.5, WinnerAddr: '0xB', RoundStats: { TotalBids: 20 } }),
-          createRound({ AmountEth: 3.0, WinnerAddr: '0xA', RoundStats: { TotalBids: 30 } }),
         ],
         isLoading: false,
       });
-      render(<AllocationRecipientsPage />);
+      render(<AllocationRecipientsPage seoSummary={<h1>Allocation Recipients</h1>} />);
 
-      const statsContainer = screen.getByTestId('summary-stats');
-      expect(statsContainer).toBeInTheDocument();
-
-      expect(screen.getByTestId('summary-stat-total-cycles')).toHaveTextContent('3');
-      expect(screen.getByTestId('summary-stat-total-eth-distributed')).toHaveTextContent(
-        '7.00 ETH',
-      );
-      expect(screen.getByTestId('summary-stat-total-gestures')).toHaveTextContent('60');
-      expect(screen.getByTestId('summary-stat-unique-recipients')).toHaveTextContent('2');
+      // The server header (PublicDataRouteSeoSummary) carries cycles, recipients, ETH and
+      // gestures; the page body starts with the reserve split and the ledger.
+      expect(screen.queryByTestId('summary-stats')).not.toBeInTheDocument();
+      expect(screen.getAllByRole('heading', { level: 1 })).toHaveLength(1);
     });
 
-    it('does not render summary stats when data is empty', () => {
+    it('renders its own header with the records scope when rendered without the server one', () => {
       mockUseRoundList.mockReturnValue({ data: [], isLoading: false });
       render(<AllocationRecipientsPage />);
-      expect(screen.queryByTestId('summary-stats')).not.toBeInTheDocument();
-    });
-
-    it('shows skeleton loading for summary stats while loading', () => {
-      mockUseRoundList.mockReturnValue({ data: [], isLoading: true });
-      const { container } = render(<AllocationRecipientsPage />);
-      const skeletons = container.querySelectorAll('.animate-pulse');
-      expect(skeletons.length).toBeGreaterThan(0);
+      expect(
+        screen.getByRole('heading', { level: 1, name: 'allocation.recipients.header.title' }),
+      ).toBeInTheDocument();
+      expect(screen.getByText('allocation.recipients.header.scope')).toBeInTheDocument();
     });
   });
 

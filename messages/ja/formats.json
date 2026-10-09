@@ -1,0 +1,41 @@
+{
+  "liveCycleCountdown": "パフォーマンス・サイクルのライブカウントダウン",
+  "countdown": {
+    "days": "日",
+    "hours": "時",
+    "minutes": "分",
+    "seconds": "秒"
+  },
+  "durationCompact": {
+    "days": "日",
+    "hours": "時間",
+    "minutes": "分",
+    "seconds": "秒"
+  },
+  "address": {
+    "zero": "ゼロアドレス",
+    "imprinted": "刻印",
+    "consumed": "消費",
+    "self": "このアドレス",
+    "known": {
+      "protocol": "Cosmic Signatureプロトコル",
+      "implementation": "実装コントラクト",
+      "cst": "Cosmic Signature CSTトークン",
+      "nft": "Cosmic Signature NFT",
+      "randomWalk": "Random Walk NFT",
+      "council": "宇宙評議会",
+      "publicGoods": "公共財金庫",
+      "outreach": "広報準備金",
+      "allocations": "配分ウォレット",
+      "cosmicAnchor": "Cosmic Signature NFT係留ウォレット",
+      "rwalkAnchor": "RWLK係留ウォレット"
+    }
+  },
+  "dateTime": {
+    "timeZone": "タイムゾーン：{zone}"
+  },
+  "allocationSplit": {
+    "label": "{label}：{items}",
+    "item": "{track}{share}"
+  }
+}

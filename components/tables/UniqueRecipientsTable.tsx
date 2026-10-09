@@ -1,112 +1,84 @@
-import { useState } from 'react';
-import { useLocale, useTranslations } from 'next-intl';
+'use client';
 
-import { formatTableAmount } from '@/utils';
+import { useMemo } from 'react';
+import { useTranslations } from 'next-intl';
 
-import {
-  TablePrimary,
-  TablePrimaryBody,
-  TablePrimaryCell,
-  TablePrimaryContainer,
-  TablePrimaryHead,
-  TablePrimaryHeadCell,
-  TablePrimaryRow,
-} from '@/components/styled';
-import { CustomPagination } from '@/components/common/CustomPagination';
-import { AddressLink } from '@/components/common/AddressLink';
-import { TableHeaderHelp } from '@/components/tables/TableHeaderHelp';
+import { DataTable, type DataTableColumn } from '@/components/ui/data-table';
+import type { LedgerStateProps } from '@/components/tables/ledger-props';
 import type { Recipient } from '@/services/api/types';
 
 export type { Recipient };
 
-interface UniqueRecipientsRowProps {
-  recipient?: Recipient;
-  locale: string;
-}
-
-const UniqueRecipientsRow = ({ recipient, locale }: UniqueRecipientsRowProps) => {
-  const t = useTranslations('tables');
-
-  if (!recipient) {
-    return <TablePrimaryRow />;
-  }
-
-  return (
-    <TablePrimaryRow>
-      <TablePrimaryCell label={t('columns.recipientAddress')}>
-        <AddressLink address={recipient.WinnerAddr} url={`/user/${recipient.WinnerAddr}`} />
-      </TablePrimaryCell>
-      <TablePrimaryCell label={t('columns.allocationsReceived')} align="right">
-        {recipient.AllocationsCount}
-      </TablePrimaryCell>
-      <TablePrimaryCell label={t('columns.maxAllocationEth')} align="right">
-        {formatTableAmount(recipient.MaxWinAmountEth, locale)}
-      </TablePrimaryCell>
-      <TablePrimaryCell label={t('columns.allocationsSumEth')} align="right">
-        {formatTableAmount(recipient.PrizesSum, locale)}
-      </TablePrimaryCell>
-    </TablePrimaryRow>
-  );
-};
-
-interface UniqueRecipientsTableProps {
+interface UniqueRecipientsTableProps extends LedgerStateProps {
   list: Recipient[];
 }
 
-export const UniqueRecipientsTable = ({ list }: UniqueRecipientsTableProps) => {
+/**
+ * Every wallet that has received an allocation: how many allocations of
+ * every kind (ETH, CST and NFTs alike), its largest Signature Allocation,
+ * and the ETH it has received in all. The count and the ETH sum measure
+ * different things, so a wallet with eight NFT and CST allocations reads
+ * "8" beside "0" ETH; the headers and the one explanation on the sum say so.
+ */
+export const UniqueRecipientsTable = ({ list, ...state }: UniqueRecipientsTableProps) => {
   const t = useTranslations('tables');
-  const locale = useLocale();
-  const perPage = 5;
-  const [page, setPage] = useState(1);
 
-  if (list.length === 0) {
-    return <p>{t('empty.recipients')}</p>;
-  }
+  const columns = useMemo<DataTableColumn<Recipient>[]>(
+    () => [
+      {
+        id: 'recipient',
+        kind: 'address',
+        header: t('columns.recipient'),
+        value: (row) => row.WinnerAddr,
+        phone: 'title',
+      },
+      {
+        id: 'allocations',
+        kind: 'count',
+        header: t('columns.allocationsReceived'),
+        // A count missing from the payload reads as unavailable, never as 0.
+        value: (row) => (typeof row.AllocationsCount === 'number' ? row.AllocationsCount : null),
+        sortable: true,
+      },
+      {
+        id: 'maxAllocation',
+        kind: 'amount',
+        header: t('columns.maxAllocationEth'),
+        help: t('statisticsTooltips.maxAllocationEth'),
+        // 0 means the wallet never received one (its allocations came from
+        // other tracks): a dash that says "None", not a column of zeros.
+        value: (row) => (row.MaxWinAmountEth > 0 ? row.MaxWinAmountEth : null),
+        whenBlank: 'none',
+        showUnit: false,
+        sortable: true,
+        // Most recipients have none: on a phone the ledger keeps the address,
+        // the count and the ETH received, and stays a table like the other
+        // ledgers of the page instead of a stack of dashes.
+        priority: 'secondary',
+      },
+      {
+        id: 'allocationsSum',
+        kind: 'amount',
+        header: t('columns.allocationsSumEth'),
+        help: t('statisticsTooltips.allocationsSumEth'),
+        value: (row) => row.PrizesSum,
+        showUnit: false,
+        sortable: true,
+      },
+    ],
+    [t],
+  );
 
   return (
-    <>
-      <TablePrimaryContainer>
-        <TablePrimary>
-          <TablePrimaryHead>
-            <tr>
-              <TablePrimaryHeadCell align="left">
-                <TableHeaderHelp
-                  desktop={t('columns.recipientAddress')}
-                  tooltip={t('statisticsTooltips.recipientAddress')}
-                />
-              </TablePrimaryHeadCell>
-              <TablePrimaryHeadCell align="right">
-                <TableHeaderHelp
-                  desktop={t('columns.allocationsReceived')}
-                  tooltip={t('statisticsTooltips.allocationsReceived')}
-                />
-              </TablePrimaryHeadCell>
-              <TablePrimaryHeadCell align="right">
-                <TableHeaderHelp
-                  desktop={t('columns.maxAllocationEth')}
-                  tooltip={t('statisticsTooltips.maxAllocationEth')}
-                />
-              </TablePrimaryHeadCell>
-              <TablePrimaryHeadCell align="right">
-                <TableHeaderHelp
-                  desktop={t('columns.allocationsSumEth')}
-                  tooltip={t('statisticsTooltips.allocationsSumEth')}
-                />
-              </TablePrimaryHeadCell>
-            </tr>
-          </TablePrimaryHead>
-          <TablePrimaryBody>
-            {list.slice((page - 1) * perPage, page * perPage).map((recipient) => (
-              <UniqueRecipientsRow
-                recipient={recipient}
-                locale={locale}
-                key={recipient.WinnerAid}
-              />
-            ))}
-          </TablePrimaryBody>
-        </TablePrimary>
-      </TablePrimaryContainer>
-      <CustomPagination page={page} setPage={setPage} totalLength={list.length} perPage={perPage} />
-    </>
+    <DataTable
+      data={list}
+      columns={columns}
+      ariaLabel={t('names.recipients')}
+      getRowKey={(row) => row.WinnerAid}
+      // Most allocations first, as the API lists them: the header shows it.
+      initialSort={{ id: 'allocations', direction: 'desc' }}
+      emptyTitle={t('empty.recipients')}
+      {...state}
+    />
   );
 };

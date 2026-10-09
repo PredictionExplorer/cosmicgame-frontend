@@ -25,6 +25,22 @@ export const UK_TERMINOLOGY_RULES: readonly TerminologyRule[] = [
     variants: ['ціна жесту', 'кошт жесту'],
   },
   {
+    concept: 'Gesture method',
+    canonical: 'спосіб жесту',
+    // A gesture is not a purchase: the method selector never says «спосіб
+    // оплати». Phrase variants anchor on the first word, so list its cases.
+    variants: [
+      'спосіб',
+      'способу',
+      'способом',
+      'способі',
+      'способи',
+      'способів',
+      'способам',
+      'способами',
+    ].map((form) => `${form} оплати`),
+  },
+  {
     concept: 'Performance Cycle',
     canonical: 'перформанс-цикл (у щільному інтерфейсі — «цикл»)',
     // Phrase variants are listed in every case of «цикл» because the stem
@@ -121,9 +137,10 @@ export const UK_TERMINOLOGY_RULES: readonly TerminologyRule[] = [
     variants: ['галері'],
   },
   {
-    concept: 'Learn Hub',
-    canonical: 'навчальний центр',
-    variants: ['освітній хаб', 'навчальний хаб', 'хаб знань'],
+    concept: 'Learn (was Learn Hub)',
+    canonical: 'навчання',
+    // The retired canonical stays banned so it cannot drift back in.
+    variants: ['освітній хаб', 'навчальний хаб', 'хаб знань', 'навчальний центр'],
   },
   {
     concept: 'Site Map',

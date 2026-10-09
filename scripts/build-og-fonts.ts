@@ -1,85 +1,54 @@
 #!/usr/bin/env tsx
 /**
- * Regenerates the checked-in weight-700 CJK subsets that the Open Graph image
- * generators embed (lib/og/fonts.ts) — one per Chinese locale, cut from the
- * Noto Sans family whose glyph forms match that locale's regional standard.
+ * Regenerates the checked-in font subsets the share cards embed
+ * (lib/og/fonts.ts): Inter and JetBrains Mono for every locale, Onest for
+ * Ukrainian and Vietnamese titles, and the regional Noto Sans CJK cuts; then
+ * the web fonts cut from them for the site's display aliases (WEB_FONT_CUTS).
  *
- *   npm run og:fonts              # every CJK locale
- *   npm run og:fonts -- zh-HK     # one locale
+ *   npm run og:fonts                          # every subset and web cut
+ *   npm run og:fonts -- Inter-400.subset.ttf  # selected files, and their cuts
  *
- * Glyph set per locale: every character of its OG copy
- * (`messages/<locale>/seo.json` → `og.*`), printable ASCII for dynamic values
- * (counts, `#42`, addresses, the footer domain), and the CJK punctuation the
- * card may emit. Sources are the variable TTFs of the google/fonts repository
- * at a pinned commit, instanced at wght=700 and subset with harfbuzz
- * (subset-font), so a rebuild is reproducible. Rerun after changing any
- * Chinese `seo.json` og copy; lib/og/__tests__/og-localization.test.ts fails
- * when a subset no longer covers its copy.
+ * Glyph set per file: every character the cards of the locales that embed it
+ * can draw — their `messages/<locale>/seo.json` og copy without alt text, the
+ * reading pages' card copy (app/[locale]/(landing)/readingCardCopy.ts), the
+ * uppercase eyebrows of cased scripts, printable ASCII, the footer host and
+ * the card's punctuation (./build-og-fonts-core.ts) — restricted to what the
+ * source covers. Sources are the variable TTFs of the google/fonts repository
+ * at a pinned commit, instanced at the registry's axis values and subset with
+ * harfbuzz (subset-font), so a rebuild is reproducible byte for byte. The run
+ * fails when any locale's stacks would leave a character uncovered. Rerun
+ * after changing any `seo.json` og copy or a reading page's title, eyebrow or
+ * guide template (the Learn, white paper, quiz and About content modules).
  */
 
 /* eslint-disable no-console -- CLI output; runs via npm scripts, never ships to the browser. */
 
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
-import { join, resolve } from 'node:path';
+import { basename, join, resolve } from 'node:path';
 
 import subsetFont from 'subset-font';
 
-import { getOgTypography } from '../lib/og/fonts';
-import { routing, type AppLocale } from '../i18n/routing';
-
-import { uncoveredCharacters } from './font-cmap';
+import {
+  GOOGLE_FONTS_COMMIT,
+  OG_SUBSET_SOURCES,
+  sourceRegistryProblems,
+  subsetGlyphText,
+  WEB_FONT_CUTS,
+  type FontSource,
+} from './build-og-fonts-core';
+import { fontCodePoints, uncoveredCharacters } from './font-cmap';
+import { ogCoverageProblems } from './og-font-coverage';
 
 const ROOT = resolve(process.cwd());
-const GOOGLE_FONTS_COMMIT = 'f6b2b7e8545e086ad3f821af21895d732b6485cf';
 const CACHE_DIR = join(ROOT, 'node_modules', '.cache', 'og-fonts', GOOGLE_FONTS_COMMIT);
 const OUTPUT_DIR = join(ROOT, 'assets', 'fonts');
 
-interface FontSource {
-  /** Path inside the google/fonts repository. */
-  readonly path: string;
-  /** Output file name under assets/fonts (must match lib/og/fonts.ts). */
-  readonly output: string;
-}
-
-const SOURCES: Readonly<Partial<Record<AppLocale, FontSource>>> = {
-  zh: { path: 'ofl/notosanssc/NotoSansSC[wght].ttf', output: 'NotoSansSC-700.subset.ttf' },
-  'zh-TW': { path: 'ofl/notosanstc/NotoSansTC[wght].ttf', output: 'NotoSansTC-700.subset.ttf' },
-  'zh-HK': { path: 'ofl/notosanshk/NotoSansHK[wght].ttf', output: 'NotoSansHK-700.subset.ttf' },
-};
-
-/** Punctuation the card layout may render around the copy, in either script. */
-const CJK_PUNCTUATION = '，。、：；！？「」『』（）《》〈〉【】—…·／％－～　';
-
-const PRINTABLE_ASCII = Array.from({ length: 0x7f - 0x20 }, (_, index) =>
-  String.fromCharCode(0x20 + index),
-).join('');
-
-function collectStrings(value: unknown, out: string[]): void {
-  if (typeof value === 'string') out.push(value);
-  else if (Array.isArray(value)) value.forEach((item) => collectStrings(item, out));
-  else if (value && typeof value === 'object') {
-    Object.values(value as Record<string, unknown>).forEach((item) => collectStrings(item, out));
-  }
-}
-
-/** Every distinct character the locale's OG images can render. */
-export function ogGlyphText(locale: AppLocale): string {
-  const seo = JSON.parse(readFileSync(join(ROOT, 'messages', locale, 'seo.json'), 'utf8')) as {
-    og: unknown;
-  };
-  const strings: string[] = [];
-  collectStrings(seo.og, strings);
-  return Array.from(new Set([...strings.join(''), ...PRINTABLE_ASCII, ...CJK_PUNCTUATION])).join(
-    '',
-  );
-}
-
 async function fetchSource(source: FontSource): Promise<Buffer> {
-  const cached = join(CACHE_DIR, source.output.replace('-700.subset.ttf', '[wght].ttf'));
+  const cached = join(CACHE_DIR, basename(source.path));
   if (existsSync(cached)) return readFileSync(cached);
   const url = `https://raw.githubusercontent.com/google/fonts/${GOOGLE_FONTS_COMMIT}/${encodeURI(source.path)}`;
   console.log(`fetch ${url}`);
-  const response = await fetch(url);
+  const response = await fetch(url, { signal: AbortSignal.timeout(60_000) });
   if (!response.ok) throw new Error(`${url}: HTTP ${response.status}`);
   const buffer = Buffer.from(await response.arrayBuffer());
   mkdirSync(CACHE_DIR, { recursive: true });
@@ -87,43 +56,65 @@ async function fetchSource(source: FontSource): Promise<Buffer> {
   return buffer;
 }
 
-async function build(locale: AppLocale): Promise<void> {
-  const source = SOURCES[locale];
-  if (!source) {
-    throw new Error(
-      `${locale} embeds a CJK OG font (lib/og/fonts.ts) but has no source in scripts/build-og-fonts.ts`,
-    );
-  }
-  const text = ogGlyphText(locale);
-  const subset = await subsetFont(await fetchSource(source), text, {
+async function build(file: string): Promise<void> {
+  const source = OG_SUBSET_SOURCES[file]!;
+  const font = await fetchSource(source);
+  const covered = fontCodePoints(new Uint8Array(font));
+  // A face that is one of several in a stack (Inter in a CJK body stack) only
+  // draws what it has; the coverage check below proves every stack is whole.
+  const text = Array.from(subsetGlyphText(ROOT, file))
+    .filter((char) => covered.has(char.codePointAt(0)!))
+    .join('');
+  const subset = await subsetFont(font, text, {
     targetFormat: 'sfnt',
-    variationAxes: { wght: 700 },
+    variationAxes: source.axes,
     // The subset is only ever rasterized by satori at display sizes.
     noHinting: true,
   });
   const missing = uncoveredCharacters(subset, text);
-  if (missing.length > 0) {
-    throw new Error(`${source.output} lacks glyphs for: ${missing.join(' ')}`);
-  }
-  const target = join(OUTPUT_DIR, source.output);
-  writeFileSync(target, subset);
+  if (missing.length > 0) throw new Error(`${file} lacks glyphs for: ${missing.join(' ')}`);
+  mkdirSync(OUTPUT_DIR, { recursive: true });
+  writeFileSync(join(OUTPUT_DIR, file), subset);
   console.log(
-    `write assets/fonts/${source.output}  ${subset.byteLength.toLocaleString('en-US')} bytes, ${
+    `write assets/fonts/${file}  ${subset.byteLength.toLocaleString('en-US')} bytes, ${
       Array.from(text).length
     } code points`,
   );
 }
 
+/** Cuts a display alias's web font from the checked-in subset it names. */
+async function cut(target: string): Promise<void> {
+  const { from, glyphs } = WEB_FONT_CUTS[target]!;
+  const source = readFileSync(join(OUTPUT_DIR, from));
+  const missing = uncoveredCharacters(source, glyphs);
+  if (missing.length > 0)
+    throw new Error(`${from} lacks glyphs for ${target}: ${missing.join(' ')}`);
+  const woff2 = await subsetFont(source, glyphs, { targetFormat: 'woff2' });
+  writeFileSync(join(ROOT, target), woff2);
+  console.log(`write ${target}  ${woff2.byteLength.toLocaleString('en-US')} bytes, from ${from}`);
+}
+
 async function main(): Promise<void> {
+  const problems = sourceRegistryProblems();
+  if (problems.length > 0) throw new Error(problems.join('\n'));
+
+  const files = Object.keys(OG_SUBSET_SOURCES);
   const requested = process.argv.slice(2).filter((arg) => !arg.startsWith('-'));
-  const cjkLocales = routing.locales.filter((locale) => getOgTypography(locale).cjk);
-  const locales = requested.length > 0 ? requested : cjkLocales;
-  for (const locale of locales) {
-    if (!(cjkLocales as readonly string[]).includes(locale)) {
-      throw new Error(`${locale} is not a CJK locale; candidates: ${cjkLocales.join(', ')}`);
-    }
-    await build(locale as AppLocale);
+  for (const file of requested) {
+    if (!files.includes(file))
+      throw new Error(`${file} is not a subset; known: ${files.join(', ')}`);
   }
+  const built = requested.length > 0 ? requested : files;
+  for (const file of built) await build(file);
+  for (const target of Object.keys(WEB_FONT_CUTS)) {
+    if (built.includes(WEB_FONT_CUTS[target]!.from)) await cut(target);
+  }
+
+  const gaps = ogCoverageProblems(ROOT);
+  if (gaps.length > 0) {
+    throw new Error(`Share-card stacks leave characters uncovered:\n${gaps.join('\n')}`);
+  }
+  console.log('every locale’s share-card stacks cover its copy');
 }
 
 main().catch((error: unknown) => {

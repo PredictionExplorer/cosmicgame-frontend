@@ -1,16 +1,14 @@
 import '@testing-library/jest-dom';
 
-import { convertTimestampToDateTime } from '@/utils';
-
 import { render, screen, checkA11y } from '@/test-utils';
 
 // eslint-disable-next-line import/order
 import { AdminEventsTable, type AdminEventRow } from '@/components/tables/AdminEventsTable';
 
 describe('AdminEventsTable', () => {
-  test('with no records shows "No events yet."', () => {
+  test('with no records says no configuration changes were recorded', () => {
     render(<AdminEventsTable list={[]} />);
-    expect(screen.getByText('tables.empty.events')).toBeInTheDocument();
+    expect(screen.getByText('tables.adminEvents.empty')).toBeInTheDocument();
   });
 
   test('with mock data renders event rows', () => {
@@ -22,6 +20,7 @@ describe('AdminEventsTable', () => {
         TimeStamp: 1701346718,
         TxHash: '0xabc123def456',
         IntegerValue: 25,
+        FloatValue: 0,
         AddressValue: '',
         StringValue: '',
       },
@@ -29,11 +28,9 @@ describe('AdminEventsTable', () => {
 
     render(<AdminEventsTable list={mockData} />);
 
-    expect(
-      screen.getByText(convertTimestampToDateTime(mockData[0]!.TimeStamp)),
-    ).toBeInTheDocument();
-    // RecordType 1 is 'CharityPercentageChanged' with type 'percentage'
-    expect(screen.getByText('CharityPercentageChanged')).toBeInTheDocument();
+    expect(screen.getByText('Nov 30, 2023, 12:18')).toBeInTheDocument();
+    // The event is presented as a readable description, with its percentage.
+    expect(screen.getByText('Public Goods percentage changed')).toBeInTheDocument();
     expect(screen.getByText('25%')).toBeInTheDocument();
   });
 
@@ -46,6 +43,7 @@ describe('AdminEventsTable', () => {
         TimeStamp: 1701346718,
         TxHash: '0xabc123def456',
         IntegerValue: 25,
+        FloatValue: 0,
         AddressValue: '',
         StringValue: '',
       },
@@ -68,6 +66,7 @@ describe('AdminEventsTable', () => {
         TimeStamp: 1701346718,
         TxHash: '0xdef789',
         IntegerValue: 50,
+        FloatValue: 0,
         AddressValue: '',
         StringValue: '',
       },
@@ -83,6 +82,111 @@ describe('AdminEventsTable', () => {
     expect(datetimeHeaders.length).toBeGreaterThanOrEqual(1);
     const newValueHeaders = screen.getAllByText('tables.columns.newValue');
     expect(newValueHeaders.length).toBeGreaterThanOrEqual(1);
+  });
+
+  describe('time added per gesture', () => {
+    // Regression: the V2 event reports microseconds, and the table once formatted
+    // 3,672,360,000 µs as seconds ("42504d 4h") instead of 1h 1m 12s.
+    const timeIncrementRow: AdminEventRow = {
+      EvtLogId: '26006',
+      RecordType: 21,
+      TransferType: 0,
+      TimeStamp: 1786491506,
+      TxHash: '0x40e9',
+      FloatValue: 0,
+      IntegerValue: 3_672_360_000,
+      AddressValue: '',
+      StringValue: '',
+    };
+
+    afterEach(() => jest.restoreAllMocks());
+
+    test('converts the microsecond value before formatting it', () => {
+      render(<AdminEventsTable list={[timeIncrementRow]} />);
+
+      expect(screen.getByText('1h 1m 12s')).toBeInTheDocument();
+      expect(screen.queryByText(/42504d/)).not.toBeInTheDocument();
+    });
+
+    test('formats the converted duration with the locale units', () => {
+      jest
+        .spyOn(jest.requireMock<typeof import('next-intl')>('next-intl'), 'useLocale')
+        .mockReturnValue('zh');
+
+      render(<AdminEventsTable list={[timeIncrementRow]} />);
+
+      expect(screen.getByText('1小时1分12秒')).toBeInTheDocument();
+    });
+
+    test('keeps second-based durations in seconds', () => {
+      render(
+        <AdminEventsTable
+          list={[{ ...timeIncrementRow, EvtLogId: '25530', RecordType: 7, IntegerValue: 3600 }]}
+        />,
+      );
+
+      expect(screen.getByText('1h')).toBeInTheDocument();
+    });
+  });
+
+  describe('event values', () => {
+    const base: AdminEventRow = {
+      EvtLogId: '1',
+      RecordType: 2,
+      TransferType: 0,
+      TimeStamp: 1701346718,
+      TxHash: '0xdef789',
+      IntegerValue: 0,
+      FloatValue: 0,
+      AddressValue: '',
+      StringValue: '',
+    };
+
+    test('explains an event on its own name, not with an icon after every row', () => {
+      render(<AdminEventsTable list={[base]} />);
+      // The name is the trigger (a dotted underline, one tab stop), so the
+      // row carries no ⓘ button and no warning icon.
+      const name = document.querySelector('tbody td [role="button"]');
+      expect(name).toHaveAttribute('aria-describedby');
+      expect(name).toHaveAttribute('tabindex', '0');
+      expect(document.querySelector('[data-slot="info-tooltip"]')).toBeNull();
+      expect(document.querySelector('.lucide-circle-alert, .lucide-alert-circle')).toBeNull();
+    });
+
+    test('shows what a parameter changed from, beside what it changed to', () => {
+      const { container } = render(
+        <AdminEventsTable
+          list={[
+            { ...base, EvtLogId: 1, RecordType: 25, IntegerValue: 1800, TimeStamp: 1_700_000_000 },
+            { ...base, EvtLogId: 2, RecordType: 25, IntegerValue: 3600, TimeStamp: 1_700_100_000 },
+          ]}
+        />,
+      );
+      const rows = [...container.querySelectorAll('tbody tr')].map((row) =>
+        [...row.querySelectorAll('td')].map((cell) => cell.textContent),
+      );
+      // Newest first: 1h replaced 30m; the first change has no earlier value.
+      expect(rows[0]).toEqual(expect.arrayContaining(['1h', '30m']));
+      expect(rows[1]?.at(-1)).toBe('');
+      expect(
+        screen.getByRole('columnheader', { name: /tables\.columns\.previousValue/ }),
+      ).toHaveAttribute('data-priority', 'secondary');
+    });
+
+    test('reads the CST Calibration Window length as a duration', () => {
+      // RoundStartCSTAuctionLengthChanged: seconds, not a bare number.
+      render(<AdminEventsTable list={[{ ...base, RecordType: 25, IntegerValue: 1800 }]} />);
+      expect(screen.getByText('30m')).toBeInTheDocument();
+      expect(screen.queryByText('1800')).not.toBeInTheDocument();
+    });
+
+    test('shows a dash for an empty text value instead of an empty link', () => {
+      const { container } = render(
+        <AdminEventsTable list={[{ ...base, RecordType: 31, StringValue: '' }]} />,
+      );
+      expect(container.querySelector('a[href=""]')).toBeNull();
+      expect(screen.getByText('tables.status.unavailable')).toBeInTheDocument();
+    });
   });
 
   it('has no accessibility violations', async () => {

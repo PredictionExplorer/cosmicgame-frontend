@@ -1,6 +1,6 @@
 {
   "gallery": {
-    "placeholder": "Пошук за ID або ім’ям токена…",
+    "placeholder": "Номер або ім’я",
     "ariaLabel": "Пошук NFT",
     "clear": "Очистити пошук",
     "submit": "Шукати",

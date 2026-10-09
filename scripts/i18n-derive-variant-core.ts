@@ -15,7 +15,7 @@ import * as OpenCC from 'opencc-js';
 
 import type { AppLocale } from '../i18n/routing';
 
-import { HK_STANDARD_FORMS } from './i18n-script-conventions-core';
+import { HK_STANDARD_FORMS } from './i18n-conventions-core';
 
 type Preset = 'cn' | 'tw' | 'twp' | 'hk' | 'hkp';
 
@@ -244,27 +244,7 @@ export function createVariantConverter(
   };
 }
 
-/** `Zh` → `ZhTw`, `_ZH` → `_ZH_TW`: the identifier suffix convention of copy modules. */
-export function identifierSuffix(locale: AppLocale): { camel: string; upper: string } {
-  const parts = locale.split('-');
-  return {
-    camel: parts.map((part) => part[0]!.toUpperCase() + part.slice(1).toLowerCase()).join(''),
-    upper: parts.map((part) => part.toUpperCase()).join('_'),
-  };
-}
-
-/** Renames a copy module's exports and sibling imports from one locale to another. */
-export function renameIdentifiers(source: string, from: AppLocale, to: AppLocale): string {
-  const fromSuffix = identifierSuffix(from);
-  const toSuffix = identifierSuffix(to);
-  return source
-    .replace(
-      new RegExp(`\\b([A-Za-z][A-Za-z0-9]*)${fromSuffix.camel}\\b`, 'g'),
-      `$1${toSuffix.camel}`,
-    )
-    .replace(new RegExp(`\\b([A-Z][A-Z0-9_]*)_${fromSuffix.upper}\\b`, 'g'), `$1_${toSuffix.upper}`)
-    .replace(new RegExp(`(from '\\./[^']*\\.)${from}'`, 'g'), `$1${to}'`);
-}
+export { identifierSuffix, renameIdentifiers } from './locale-identifiers';
 
 /**
  * Converts a catalog as raw JSON text, not re-serialized: formatting and key

@@ -25,7 +25,7 @@ import { defineRouting } from 'next-intl/routing';
 // `routing.defaultLocale` as the whole locale union, which would collapse
 // `TranslatedLocale` to `never` and turn every translated-locale registry
 // into an unchecked `{}`.
-const LOCALES = ['en', 'zh', 'zh-TW', 'zh-HK', 'uk'] as const;
+const LOCALES = ['en', 'zh', 'zh-TW', 'zh-HK', 'uk', 'ko', 'ja', 'vi'] as const;
 const DEFAULT_LOCALE = 'en' satisfies (typeof LOCALES)[number];
 
 export const routing = defineRouting({
@@ -57,6 +57,9 @@ export const LOCALE_LABELS: Record<AppLocale, string> = {
   'zh-TW': '繁體中文（台灣）',
   'zh-HK': '繁體中文（香港）',
   uk: 'Українська',
+  ko: '한국어',
+  ja: '日本語',
+  vi: 'Tiếng Việt',
 };
 
 /**
@@ -76,4 +79,10 @@ export const LOCALE_ALIASES: Record<AppLocale, readonly string[]> = {
   'zh-TW': ['zh-Hant'],
   'zh-HK': ['zh-MO'],
   uk: [],
+  // `ko-KR` and `ko-KP` resolve by same-language affinity; the bare tag is the catch-all.
+  ko: [],
+  // `ja-JP` is the only regional tag browsers send; same-language affinity covers it.
+  ja: [],
+  // `vi-VN` is the only regional tag browsers send; same-language affinity covers it.
+  vi: [],
 };

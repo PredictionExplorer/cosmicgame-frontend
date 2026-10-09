@@ -1,0 +1,78 @@
+{
+  "error": {
+    "title": "Không tải được bộ sưu tập",
+    "message": "Không đọc được bộ sưu tập Cosmic Signature. Hãy thử lại để tải kho lưu trữ."
+  },
+  "jsonLd": {
+    "name": "Phòng trưng bày Cosmic Signature"
+  },
+  "filters": {
+    "ariaLabel": "Lọc NFT",
+    "all": {
+      "label": "Tất cả",
+      "tooltip": "Hiển thị mọi NFT trong bộ sưu tập"
+    },
+    "anchored": {
+      "label": "Đang neo giữ",
+      "tooltip": "Các NFT đang neo giữ và nhận phân phối neo giữ"
+    },
+    "named": {
+      "label": "Đã đặt tên",
+      "tooltip": "Các NFT được chủ sở hữu đặt tên tùy chỉnh"
+    }
+  },
+  "sort": {
+    "ariaLabel": "Thứ tự sắp xếp",
+    "newest": "Mới nhất trước",
+    "oldest": "Cũ nhất trước",
+    "cycleDesc": "Chu kỳ (cao → thấp)",
+    "cycleAsc": "Chu kỳ (thấp → cao)",
+    "rarity": "Hiếm nhất trước",
+    "chaosDesc": "Hỗn độn (cao → thấp)",
+    "chaosAsc": "Hỗn độn (thấp → cao)",
+    "syzygiesDesc": "Nhiều sóc vọng nhất"
+  },
+  "list": {
+    "headers": {
+      "artwork": "Tác phẩm",
+      "token": "Token",
+      "structure": "Cấu trúc",
+      "palette": "Bảng màu",
+      "spectral": "Lớp",
+      "chaos": "Hỗn độn",
+      "fate": "Vận mệnh",
+      "allocation": "Phân bổ",
+      "cycle": "Chu kỳ",
+      "age": "Đã khắc"
+    }
+  },
+  "view": {
+    "ariaLabel": "Chế độ xem",
+    "grid": "Xem dạng lưới",
+    "list": "Xem dạng danh sách"
+  },
+  "pagination": {
+    "perPage": "Mỗi trang"
+  },
+  "empty": {
+    "title": "Không tìm thấy NFT nào",
+    "description": "Không có Signature nào khớp với các bộ lọc này. Xóa bộ lọc để xem toàn bộ bộ sưu tập.",
+    "collectionTitle": "Chưa có Signature nào",
+    "collectionDescription": "Mỗi Signature xuất hiện ở đây khi chu kỳ của nó hoàn tất và nó được khắc."
+  },
+  "about": {
+    "title": "Về bộ sưu tập",
+    "description": "Mỗi Cosmic Signature là một tác phẩm nghệ thuật tạo sinh độc nhất, được tạo từ seed trên chuỗi bằng mô phỏng vật lý ba vật thể. Ai cũng có thể tái tạo tác phẩm từ bản ghi giao thức, và mỗi tác phẩm thuộc về chu kỳ đã khắc nó. Một chu kỳ điển hình khắc 24 tác phẩm Signature mới: bốn dành cho những người giữ vai trò của chu kỳ, mười cho người tham gia được chọn qua Tinh tuyển, và mười cho người neo giữ Random Walk NFT."
+  },
+  "toolbar": {
+    "filters": "Bộ lọc",
+    "filtersWithCount": "Bộ lọc · {count}",
+    "show": "Hiển thị",
+    "showResults": "{count, plural, other {Hiển thị # NFT}}"
+  },
+  "results": {
+    "total": "{count, plural, other {# NFT}}",
+    "filtered": "{count, number} trong số {total, plural, other {# NFT}}",
+    "regionLabel": "Các Signature"
+  }
+}

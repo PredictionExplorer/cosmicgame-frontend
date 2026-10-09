@@ -1,10 +1,35 @@
 {
-  "faqPage": {
-    "heading": "釋疑",
-    "description": "坦率解答關於 Cosmic Signature 的重要問題：協議是什麼、落筆如何運作，以及它不是什麼。"
-  },
   "languageSwitcher": {
-    "label": "語言"
+    "label": "語言",
+    "current": "語言：{language}",
+    "currentShort": "語言：{language}，簡稱{short}"
+  },
+  "themeSwitcher": {
+    "label": "配色",
+    "description": "色彩煥新，Cosmic Signature 依然如初。",
+    "sitewide": "所選配色會套用至全站。",
+    "themes": {
+      "midnight": {
+        "name": "午夜",
+        "description": "墨黑與柔和薰衣草紫"
+      },
+      "classic-blue": {
+        "name": "經典藍",
+        "description": "最初的宇宙藍"
+      },
+      "aurora": {
+        "name": "極光",
+        "description": "深青與海玻璃綠"
+      },
+      "nebula": {
+        "name": "星雲",
+        "description": "深梅紫與微光丁香紫"
+      },
+      "ember": {
+        "name": "餘燼",
+        "description": "暖炭灰與香檳金"
+      }
+    }
   },
   "accessibility": {
     "skipToMain": "跳至主要內容",
@@ -15,12 +40,63 @@
     "home": "主頁",
     "gallery": "畫廊"
   },
+  "pageHeader": {
+    "snapshot": "數據快照：{date}",
+    "lastReviewed": "最後審閱：{date}",
+    "lastUpdated": "最後更新：{date}",
+    "relatedPages": "相關頁面",
+    "readMore": "展開全文",
+    "readLess": "收起",
+    "crumbs": {
+      "participants": "參與者",
+      "allocationRecipients": "分配名錄",
+      "cycle": "第 {cycle} 個週期"
+    }
+  },
   "status": {
     "loading": "載入中",
     "loadingEllipsis": "載入中…",
     "loadingDots": "載入中…",
-    "noData": "暫無數據",
-    "nothingHere": "暫無內容"
+    "unavailable": "暫不可用"
+  },
+  "liveStatus": {
+    "connecting": "連接中…",
+    "live": "即時",
+    "updated": "{age}更新",
+    "reconnecting": "重新連接中…",
+    "delayed": "更新延遲 · 最後更新：{age}",
+    "delayedCaveat": "更新延遲 · 最後更新：{age}。此後倒數可能已被延長。",
+    "offline": "離線",
+    "offlineDetail": "網絡連接已中斷。最後更新：{age}。",
+    "offlineCaveat": "網絡連接已中斷。最後更新：{age}。此後倒數可能已被延長。",
+    "age": {
+      "justNow": "剛剛",
+      "seconds": "{count} 秒前",
+      "minutes": "{count} 分鐘前",
+      "hours": "{count} 小時前",
+      "days": "{count} 天前"
+    },
+    "delayedShort": "更新延遲"
+  },
+  "attention": {
+    "menuLabel": "提示與聲音",
+    "title": "提示與聲音",
+    "intro": "以下選項預設全部關閉，開啟後只會儲存在此瀏覽器中。",
+    "sound": {
+      "label": "有人在你之後落筆時播放提示音",
+      "description": "其他參與者在你最近一次落筆之後落筆時，播放一聲短提示音。需要連接錢包並保持此分頁開啟。"
+    },
+    "alert": {
+      "label": "收官前提示",
+      "description": "在週期收官時間之前發送瀏覽器通知。請保持此分頁開啟。",
+      "minutes": "{minutes} 分鐘",
+      "blocked": "此網站的通知已被封鎖。如需使用提示，請在瀏覽器設定中允許通知。",
+      "unsupported": "此瀏覽器不支援通知。"
+    },
+    "tabTitle": {
+      "label": "在分頁標題中顯示倒數",
+      "description": "在週期的最後一小時，於瀏覽器分頁中顯示剩餘時間。"
+    }
   },
   "actions": {
     "copyAddress": "複製地址",
@@ -32,9 +108,15 @@
   "externalLink": {
     "title": "即將離開 Cosmic Signature",
     "description": "此連結來自參與者儲存在鏈上的訊息，未經審核或驗證。請確認下方網址無誤。",
+    "site": "網站",
     "copy": "複製連結",
     "copied": "已複製連結",
     "warning": "切勿在外部網站輸入錢包助記詞或私鑰。",
     "open": "打開連結"
+  },
+  "signature": {
+    "untitled": "簽名作品 {id}",
+    "cycle": "第 {n} 個週期",
+    "anchored": "已錨定"
   }
 }

@@ -1,0 +1,76 @@
+{
+  "invalid": {
+    "title": "一筆IDが無効です",
+    "help": "URLの一筆IDには0以上の数値を指定してください。"
+  },
+  "header": {
+    "title": "一筆#{position}",
+    "fallback": "一筆の記録{id}",
+    "explorer": "トランザクションを見る"
+  },
+  "empty": {
+    "title": "一筆の情報が見つかりません。",
+    "help": "IDが正しくないか、一筆のデータがまだ反映されていない可能性があります。",
+    "action": "現在のサイクルを見る"
+  },
+  "error": {
+    "title": "一筆の記録を読み込めませんでした",
+    "message": "接続を確認して、もう一度お試しください。"
+  },
+  "figures": {
+    "cost": "一筆の費用",
+    "participationCst": "参加CST",
+    "held": "保持時間",
+    "heldInfo": "この一筆が最新の一筆だった時間です。次の一筆、またはサイクルの確定まで数えます。",
+    "heldLive": "現在も最新の一筆"
+  },
+  "method": {
+    "eth": "ETH",
+    "ethRandomWalk": "ETH + Random Walk NFT",
+    "cst": "CST"
+  },
+  "sections": {
+    "details": {
+      "title": "記録"
+    },
+    "message": {
+      "title": "メッセージ"
+    },
+    "nft": {
+      "title": "添付されたNFT"
+    }
+  },
+  "rows": {
+    "participant": "参加者",
+    "finalizationTime": "この一筆の後の確定時刻",
+    "clockExtended": "{duration}延長",
+    "transaction": "トランザクション",
+    "copyHash": "トランザクションハッシュをコピー",
+    "hashCopied": "トランザクションハッシュをコピーしました",
+    "erc20": "添付されたERC-20",
+    "erc20Amount": "添付されたERC-20トークンの数量",
+    "nftContract": "添付されたNFTトークンのアドレス",
+    "nftId": "添付されたNFTトークンID",
+    "cstToOutbid": "上回られた参加者へ"
+  },
+  "nav": {
+    "aria": "前後の一筆",
+    "previous": "前の一筆",
+    "next": "次の一筆",
+    "all": "サイクル{cycle}のすべての一筆"
+  },
+  "nftPreview": {
+    "collectionName": "コレクション名",
+    "artist": "アーティスト",
+    "platform": "プラットフォーム",
+    "description": "説明"
+  },
+  "randomWalk": {
+    "heading": "Random Walk NFT"
+  },
+  "rail": {
+    "position": "{total}件中{position}番目の一筆",
+    "positionLive": "これまでの{total}件中{position}番目の一筆",
+    "liveNote": "このサイクルはまだ進行中です。シグネチャーはサイクルの確定時に刻印されます。"
+  }
+}

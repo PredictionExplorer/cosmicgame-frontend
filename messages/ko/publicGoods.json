@@ -1,0 +1,32 @@
+{
+  "loadError": "공공재 기록을 불러오지 못했습니다.",
+  "vault": {
+    "description": "사이클이 마감되면 사이클 준비금 중 공공재 몫이 금고로 옮겨지고, {beneficiary} 앞으로 회수될 때까지 보관됩니다.",
+    "due": "이번 사이클 적립분",
+    "dueCaption": "현재 사이클 준비금의 {percent}",
+    "inVault": "현재 금고 보관",
+    "retrieved": "누적 회수액",
+    "beneficiaryNote": "<guild>Protocol Guild</guild>는 이더리움 핵심 프로토콜 기여자를 지원하는 공동 자금 지원 체계입니다.",
+    "forwardNote": "누구나 금고 잔액을 Protocol Guild로 전달할 수 있으며, 가스비만 듭니다."
+  },
+  "ledger": {
+    "contributions": "기여 기록",
+    "retrievals": "회수 기록"
+  },
+  "contribute": {
+    "title": "금고에 기여하기",
+    "description": "{network} 네트워크에서 ETH를 공공재 금고로 직접 보낼 수 있습니다. 프로토콜 몫과 함께 {beneficiary} 앞으로 회수될 때까지 금고에 보관됩니다.",
+    "networkWarning": "{network} 네트워크에서만 보내 주세요. 다른 네트워크에서 이 주소로 보낸 ETH는 금고에 도착하지 않습니다.",
+    "network": "네트워크",
+    "form": {
+      "label": "공공재 금고에 ETH 기여하기",
+      "amountHint": "{network} 지갑에서 0보다 큰 금액을 보낼 수 있습니다.",
+      "connectHint": "기여하려면 {network} 지갑을 연결해 주세요.",
+      "summary": "{amount} 전액이 {beneficiary} 앞으로 공공재 금고에 들어갑니다.",
+      "submit": "ETH 기여",
+      "submitAmount": "{amount} 기여하기",
+      "confirmed": "공공재 금고에 대한 {amount} ETH 기여가 확인되었습니다.",
+      "failed": "기여를 완료하지 못했습니다. 지갑을 확인한 뒤 다시 시도해 주세요."
+    }
+  }
+}

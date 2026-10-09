@@ -33,11 +33,83 @@ export interface WhitePaperTable {
   readonly footnote?: string;
 }
 
+/** One symbol of a formula's plain notation and what it stands for. */
+export interface WhitePaperFormulaSymbol {
+  readonly symbol: string;
+  readonly meaning: string;
+}
+
+/** Chrome of the web edition: wayfinding, block labels and the reading-time line. */
+export interface WhitePaperReadingCopy {
+  /** Accessible name of the sticky contents rail ("On this page"). */
+  readonly railLabel: string;
+  /** The floating button that opens the contents on phones. */
+  readonly openContentsLabel: string;
+  readonly backToTopLabel: string;
+  /** `{title}` placeholder: the accessible name of a heading's anchor link. */
+  readonly headingLinkTemplate: string;
+  readonly formulaLabel: string;
+  readonly noteLabel: string;
+  /** Summary of the disclosure that shows a formula as the contracts write it. */
+  readonly contractExpressionLabel: string;
+  /** `{number}` placeholder: a figure's label ("Figure 1"). */
+  readonly figureTemplate: string;
+  /** `{minutes}` placeholder. */
+  readonly readingTimeTemplate: string;
+  /** Visually hidden after a link that opens a new tab. */
+  readonly newTabNote: string;
+}
+
+/** One stage of the cycle timeline figure. */
+export interface WhitePaperTimelineStep {
+  readonly label: string;
+  readonly detail: string;
+}
+
+/** Copy of the web edition's figures (the PDF has none). */
+export interface WhitePaperFiguresCopy {
+  /** §3: a cycle from its opening to the next one, in five stages. */
+  readonly cycle: {
+    readonly title: string;
+    readonly caption: string;
+    readonly steps: readonly [
+      WhitePaperTimelineStep,
+      WhitePaperTimelineStep,
+      WhitePaperTimelineStep,
+      WhitePaperTimelineStep,
+      WhitePaperTimelineStep,
+    ];
+  };
+  /** §5.1: the ETH split as one bar; its track names come from the section's table. */
+  readonly allocation: {
+    readonly title: string;
+    readonly caption: string;
+  };
+  /** §6: finished Signatures on their plates. */
+  readonly art: {
+    readonly title: string;
+    readonly caption: string;
+    readonly seedLabel: string;
+  };
+}
+
 export type WhitePaperBlock =
   | { readonly kind: 'paragraph'; readonly text: string }
   | { readonly kind: 'list'; readonly items: readonly string[] }
   | { readonly kind: 'table'; readonly table: WhitePaperTable }
-  | { readonly kind: 'formula'; readonly formula: string; readonly caption?: string }
+  | {
+      readonly kind: 'formula';
+      /** The expression as written in the contracts; the PDF prints it as is. */
+      readonly formula: string;
+      readonly caption?: string;
+      /**
+       * The same rule in plain notation with neutral symbols, which the web
+       * page shows first (the contract expression stays one click away).
+       */
+      readonly notation?: string;
+      /** What each symbol of `notation` stands for. */
+      readonly legend?: readonly WhitePaperFormulaSymbol[];
+    }
   /** A boxed aside for disclaimers and similar small print. */
   | { readonly kind: 'note'; readonly text: string };
 
@@ -97,4 +169,6 @@ export interface WhitePaperContent {
   };
   readonly citation: string;
   readonly licenseNote: string;
+  readonly reading: WhitePaperReadingCopy;
+  readonly figures: WhitePaperFiguresCopy;
 }

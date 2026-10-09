@@ -80,7 +80,7 @@ All habits and forbidden patterns of the Simplified guide §3 apply. Hong Kong-s
 | Week start (calendar UI) | Sunday                | 週日 — Hong Kong calendars start on Sunday (`weekStartsMonday: false`) |
 | Number grouping          | 1,000,000             | 1,000,000 in data; prose may say 一百萬                                |
 | Large numbers in prose   | 100,000 orbits        | 十萬條候選軌道                                                         |
-| Ordinal cycle            | Cycle #12             | 第 12 個週期                                                           |
+| Ordinal cycle            | Cycle 12              | 第 12 個週期                                                           |
 
 Hong Kong everyday usage favours the 12-hour clock (下午 2:05); data displays keep
 24-hour time so timestamps line up across locales, and the compact timer omits CJK–Latin

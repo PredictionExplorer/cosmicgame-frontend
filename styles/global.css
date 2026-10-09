@@ -1,11 +1,18 @@
 @import 'tailwindcss';
 @import './tokens.css';
+@import './themes.css';
 @import './typography.css';
 @import './focus-ring.css';
+@import './tables.css';
 
 @custom-variant dark (&:is(.dark *));
 
+/*
+ * Tailwind theme: maps the palette tokens (styles/themes.css) and the scales
+ * (styles/tokens.css) onto utilities. docs/design-system.md lists them all.
+ */
 @theme inline {
+  --color-surface-deep: hsl(var(--surface-deep));
   --color-background: hsl(var(--background));
   --color-foreground: hsl(var(--foreground));
   --color-card: hsl(var(--card));
@@ -30,17 +37,93 @@
   --color-chart-3: hsl(var(--chart-3));
   --color-chart-4: hsl(var(--chart-4));
   --color-chart-5: hsl(var(--chart-5));
-  --radius-sm: calc(var(--radius) - 4px);
-  --radius-md: calc(var(--radius) - 2px);
-  --radius-lg: var(--radius);
-  --radius-xl: calc(var(--radius) + 4px);
+
+  /* Third text tier: text-subtle (text-subtle-foreground is the long name). */
+  --color-subtle: hsl(var(--subtle-foreground));
+  --color-subtle-foreground: hsl(var(--subtle-foreground));
+
+  /* Surface ladder and rules: bg-surface-sunken, bg-surface, bg-surface-raised,
+     border-rule, border-rule-faint, divide-rule-faint. */
+  --color-surface-sunken: hsl(var(--surface-sunken));
+  --color-surface: hsl(var(--surface));
+  --color-surface-raised: hsl(var(--surface-raised));
+  --color-rule: hsl(var(--rule));
+  --color-rule-faint: var(--rule-faint);
+
+  /* Live state: text-positive, bg-positive-surface, … */
+  --color-positive: hsl(var(--positive));
+  --color-positive-surface: var(--positive-surface);
+  --color-attention: hsl(var(--attention));
+  --color-attention-surface: var(--attention-surface);
+  --color-critical: hsl(var(--critical));
+  --color-critical-surface: var(--critical-surface);
+  --color-live: hsl(var(--live));
+  --color-live-surface: var(--live-surface);
+  --color-success: hsl(var(--success));
+  --color-warning: hsl(var(--warning));
+
+  /* Data series, allocation tracks and gesture methods. */
+  --color-data-1: hsl(var(--data-1));
+  --color-data-2: hsl(var(--data-2));
+  --color-data-3: hsl(var(--data-3));
+  --color-data-4: hsl(var(--data-4));
+  --color-data-5: hsl(var(--data-5));
+  --color-data-6: hsl(var(--data-6));
+  --color-data-7: hsl(var(--data-7));
+  --color-data-8: hsl(var(--data-8));
+  --color-track-signature: hsl(var(--track-signature));
+  --color-track-endurance: hsl(var(--track-endurance));
+  --color-track-chrono: hsl(var(--track-chrono));
+  --color-track-stellar-eth: hsl(var(--track-stellar-eth));
+  --color-track-stellar-nft: hsl(var(--track-stellar-nft));
+  --color-track-anchoring: hsl(var(--track-anchoring));
+  --color-track-public-goods: hsl(var(--track-public-goods));
+  --color-track-outreach: hsl(var(--track-outreach));
+  --color-track-compounding: hsl(var(--track-compounding));
+  --color-method-eth: hsl(var(--method-eth));
+  --color-method-eth-rwlk: hsl(var(--method-eth-rwlk));
+  --color-method-cst: hsl(var(--method-cst));
+
+  /* The art plate: bg-art-ground, aspect-art. */
+  --color-art-ground: hsl(var(--art-ground));
+  --aspect-art: var(--art-ratio);
+
+  /*
+   * Text that the palette's surface colours cannot carry. `--accent` is a
+   * surface (hover fills), so `text-accent` used as an icon colour drew at
+   * about 1.3:1; `--destructive` is a fill for a white label, so error text
+   * in it drew at 3.2:1. The text-* utilities resolve to readable tiers
+   * while bg-*, border-* and the -foreground pairs keep their meaning.
+   */
+  --text-color-accent: hsl(var(--secondary));
+  --text-color-destructive: hsl(var(--critical));
+
+  /* Every Tailwind radius lands on the four-value scale (styles/tokens.css). */
+  --radius-sm: var(--radius-control);
+  --radius-md: var(--radius-control);
+  --radius-lg: var(--radius-surface);
+  --radius-xl: var(--radius-surface);
+  --radius-2xl: var(--radius-surface);
+  --radius-3xl: var(--radius-surface);
+
+  /* The one elevation: shadow-float. */
+  --shadow-float: var(--elevation-float);
+
   /*
    * Indirected through --display-font-stack so a locale can swap the whole
-   * display face (see the html[lang] rules below) and every consumer — the
+   * display face (see the html:lang() rules below) and every consumer — the
    * type-display / type-heading utilities and ad-hoc font-family declarations
    * — follows without per-element overrides.
    */
   --font-family-display: var(--display-font-stack);
+  --font-display: var(--display-font-stack);
+  --font-mono: var(--mono-font-stack);
+  /*
+   * The brand face (`font-brand`): Clash Display in every locale. The
+   * wordmark is a Latin logotype, so no html:lang() rule may swap it; the
+   * uk and vi display stacks would otherwise redraw the logo in Onest.
+   */
+  --font-brand: var(--font-clash-display), 'ClashDisplay-Variable', system-ui, sans-serif;
 
   /*
    * Tailwind v4 only generates `xs:` / `max-xs:` variants for a breakpoint it
@@ -60,81 +143,337 @@
  * maintenance banner at 88px/96px, for one bar that actually rendered at ~73px.
  * The header is now exactly `--header-height` tall and everything that needs to
  * sit below it derives from this one value.
+ *
+ * On phones it is 56px: every control in it is a 44px target, so 72px only
+ * took space from the page, and with a sticky sub-navigation under it about
+ * a seventh of an 844px screen never scrolled away.
  */
 :root {
-  --header-height: 4.5rem; /* 72px */
+  --header-height: 3.5rem; /* 56px on phones */
   /* Breathing room between the header and anything pinned beneath it. */
   --sticky-offset: calc(var(--header-height) + 0.75rem);
   /*
-   * CJK companion faces (docs/i18n/README.md §5). Neither Latin face carries
-   * CJK glyphs, so Chinese text falls through to this stack per glyph. The
-   * default is the Simplified cut; the html:lang() rules below swap in the
-   * Taiwan and Hong Kong cuts, whose glyph forms follow those regions'
-   * standards. Every font-family that may render Chinese (body, display,
-   * mono) references this one property instead of naming a face.
+   * Room a fixed bottom bar takes from the end of the page: the footer pads
+   * its last row by it, so the legal links and the colophon stay reachable.
+   * Zero unless a bar is on the page (below).
    */
-  --cjk-font-stack: var(--font-noto-sc), 'PingFang SC', 'Microsoft YaHei';
+  --dock-clearance: 0px;
+
   /*
-   * Display face for Latin-script locales. CJK glyphs fall through to the
-   * CJK stack per glyph; Cyrillic locales replace the whole stack below.
+   * Companion faces (docs/i18n/README.md §5, lib/fonts.ts). Each names the
+   * family its @font-face rules declare. The rules themselves are linked
+   * only on the pages of the locales that use the face (CompanionFontFaces),
+   * so on every other page these names resolve to nothing and the stack
+   * moves on to the next family. Defining them here, rather than through a
+   * next/font class on <html>, keeps every stack valid on every page.
+   */
+  --font-noto-sc: 'Noto Sans SC';
+  --font-noto-tc: 'Noto Sans TC';
+  --font-noto-hk: 'Noto Sans HK';
+  --font-noto-kr: 'Noto Sans KR';
+  --font-noto-jp: 'Noto Sans JP';
+  --font-onest: 'Onest';
+
+  /*
+   * CJK glyphs. Neither Latin face carries Han, kana or Hangul, so CJK text
+   * falls through to this stack per glyph. Pages in other languages (a
+   * Chinese chat message on an English page, the language menu's endonyms)
+   * use the platform's CJK faces; each CJK locale swaps in its own Noto Sans
+   * cut below. Every font-family that may render CJK (body, display, mono)
+   * references this one property instead of naming a face.
+   */
+  --cjk-font-stack:
+    'PingFang SC', 'Hiragino Sans', 'Apple SD Gothic Neo', 'Microsoft YaHei', 'Malgun Gothic';
+
+  /* Text face: Inter, then the CJK stack. */
+  --body-font-stack: var(--font-inter), Inter, var(--cjk-font-stack), sans-serif;
+  /*
+   * Display face for Latin-script locales. Digits and "#" come from Inter
+   * ('CS Display Figures'), so Clash's round zero never sets a number; CJK
+   * glyphs fall through to the CJK stack per glyph; Cyrillic and Vietnamese
+   * replace the whole stack below.
    */
   --display-font-stack:
-    var(--font-clash-display), 'ClashDisplay-Variable', var(--cjk-font-stack), sans-serif;
+    'CS Display Figures', var(--font-clash-display), 'ClashDisplay-Variable', var(--cjk-font-stack),
+    sans-serif;
+  /*
+   * Identifiers. A named web mono first (lib/fonts.ts), then the platform
+   * monos, then the CJK stack so Han, kana and Hangul inside an identifier
+   * never fall back to an OS-dependent face.
+   */
+  --mono-font-stack:
+    var(--font-jetbrains-mono), ui-monospace, 'SF Mono', 'Cascadia Mono', Menlo, Consolas,
+    'Liberation Mono', 'DejaVu Sans Mono', var(--cjk-font-stack), monospace;
+
+  /*
+   * Display voice, per script. Clash Display is drawn for weight 500 and has
+   * a narrow space glyph: heavier cuts and negative tracking close the gaps
+   * between words ("MakeYourGesture"), so display text never goes bold and
+   * small display headings get a little extra word spacing. The type-display,
+   * type-heading and type-section utilities read these tokens, and so does
+   * the `font-display` guard below.
+   */
+  --display-weight: 500;
+  --display-weight-strong: 600;
+  --display-tracking-scale: 1;
+  --display-word-spacing: 0.06em;
+  /*
+   * The two largest tiers track tightest (-0.03em, -0.025em), which closes
+   * the narrow space further: "Art, shaped by" read as "Art,shaped by". A
+   * third more opening, and none where the base token is 0 (Onest).
+   */
+  --display-word-spacing-lg: calc(var(--display-word-spacing) * 4 / 3);
+}
+
+@media (width >= 40rem) {
+  :root {
+    --header-height: 4.5rem; /* 72px */
+  }
 }
 
 /*
- * Traditional Chinese locales: same layout as the Simplified default, but the
+ * Chinese punctuation in a Chinese face. Inter, first in the text stack,
+ * carries the ellipsis and the em dash, so 搜尋問題…… rendered as six tight
+ * Latin dots and —— as a short Latin dash inside Chinese copy. These aliases
+ * cover only those code points (plus the curly quotes Simplified Chinese
+ * uses) and point at the platform's regional CJK face, so the marks take the
+ * full-width Chinese forms; where no such face is installed the alias does
+ * not load and Inter draws them as before.
+ */
+@font-face {
+  font-family: 'CS CJK Punctuation SC';
+  src:
+    local('PingFang SC Regular'), local('PingFangSC-Regular'), local('Noto Sans CJK SC Regular'),
+    local('NotoSansCJKsc-Regular'), local('Source Han Sans SC Regular'), local('Microsoft YaHei');
+  unicode-range: U+2014, U+2026, U+201C-201D;
+}
+
+@font-face {
+  font-family: 'CS CJK Punctuation TC';
+  src:
+    local('PingFang TC Regular'), local('PingFangTC-Regular'), local('Noto Sans CJK TC Regular'),
+    local('NotoSansCJKtc-Regular'), local('Source Han Sans TC Regular'), local('Microsoft JhengHei');
+  unicode-range: U+2014, U+2026;
+}
+
+@font-face {
+  font-family: 'CS CJK Punctuation HK';
+  src:
+    local('PingFang HK Regular'), local('PingFangHK-Regular'), local('Noto Sans CJK HK Regular'),
+    local('NotoSansCJKhk-Regular'), local('Source Han Sans HC Regular'), local('Microsoft JhengHei');
+  unicode-range: U+2014, U+2026;
+}
+
+/*
+ * Korean display punctuation. Hangul in a heading falls through Clash to the
+ * Korean cut, but ASCII ! , . : ? stay in Clash, whose period is a heavy
+ * square block beside the thin Hangul strokes (만듭니다.). This alias, first
+ * in the Korean display stack, sets only those marks in the platform's
+ * Korean face; Latin words (Cosmic Signature, ETH) keep Clash. Where no
+ * Korean face is installed under those names (Android, most Linux), the
+ * last source is a 2 KB self-hosted cut of the five marks from Noto Sans KR.
+ * One face covers every weight, so the marks are never synthesised bold.
+ */
+@font-face {
+  font-family: 'CS Korean Display Punctuation';
+  src:
+    local('Apple SD Gothic Neo'),
+    local('AppleSDGothicNeo-Regular'),
+    local('Noto Sans CJK KR'),
+    local('NotoSansCJKkr-Regular'),
+    local('Noto Sans KR'),
+    local('Source Han Sans K'),
+    local('Malgun Gothic'),
+    url('/fonts/noto-sans-kr/NotoSansKR-punctuation.ttf') format('truetype');
+  font-weight: 100 900;
+  unicode-range: U+0021, U+002C, U+002E, U+003A, U+003F;
+}
+
+/*
+ * Display figures. Clash Display's zero is a circle that reads as O, so a
+ * number in a heading ("Cycle #12", "Signature #000025", "Anchor
+ * Distributions for Cosmic Signature #000045") mistook itself for letters
+ * and set the one figure policy aside: every number is Inter (docs/design-
+ * system.md → Typography). This alias, first in the Latin display stack,
+ * sets only 0-9 and "#" in Inter 500 and leaves every word in Clash. A 6 KB
+ * self-hosted cut of the checked-in assets/fonts/Inter-500.subset.ttf (SIL
+ * OFL; `npm run og:fonts` rebuilds it, WEB_FONT_CUTS), loaded only where a
+ * Latin display heading shows a digit. The CJK stacks take their own digits
+ * below; uk and vi set headings in Onest.
+ */
+@font-face {
+  font-family: 'CS Display Figures';
+  src: url('/fonts/display-figures/Inter-figures.woff2') format('woff2');
+  font-weight: 100 900;
+  font-display: swap;
+  unicode-range: U+0023, U+0030-0039;
+}
+
+/*
+ * CJK display digits. In a Chinese, Japanese or Korean heading a digit
+ * ("第 2 个周期", "サイクル2の現況") fell through to Clash Display, whose wide
+ * geometric figures sit off the CJK face's baseline and weight, so the
+ * heading read as two typefaces. This alias, first in the CJK display stacks,
+ * sets only 0-9 in Noto Sans CJK (its Latin digits are one design across the
+ * regional cuts); Latin words (Cosmic Signature, ETH) keep Clash. A 3 KB
+ * self-hosted cut of the checked-in share-card subset
+ * assets/fonts/NotoSansSC-700.subset.ttf (SIL OFL; `npm run og:fonts`
+ * rebuilds it), loaded only where a CJK heading shows a digit.
+ */
+@font-face {
+  font-family: 'CS CJK Display Digits';
+  src: url('/fonts/noto-sans-cjk/NotoSansCJK-digits.woff2') format('woff2');
+  font-weight: 100 900;
+  font-display: swap;
+  unicode-range: U+0030-0039;
+}
+
+/*
+ * Simplified Chinese: the mainland cut of Noto Sans CJK, then the platform
+ * faces. Unlayered next to :root for the same reason as the Ukrainian
+ * override below.
+ */
+html:lang(zh) {
+  --cjk-font-stack: var(--font-noto-sc), 'PingFang SC', 'Microsoft YaHei';
+  --body-font-stack:
+    'CS CJK Punctuation SC', var(--font-inter), Inter, var(--cjk-font-stack), sans-serif;
+  --display-font-stack:
+    'CS CJK Display Digits', var(--font-clash-display), 'ClashDisplay-Variable',
+    var(--cjk-font-stack), sans-serif;
+}
+
+/*
+ * Traditional Chinese locales: same layout as the Simplified locale, but the
  * Noto Sans cut (and the system fallbacks) match the regional glyph standard.
- * Unlayered next to :root for the same reason as the Ukrainian override below.
+ * `:lang(zh)` also matches these two, so they must follow it.
  */
 html:lang(zh-TW) {
   --cjk-font-stack: var(--font-noto-tc), 'PingFang TC', 'Microsoft JhengHei';
+  --body-font-stack:
+    'CS CJK Punctuation TC', var(--font-inter), Inter, var(--cjk-font-stack), sans-serif;
 }
 
 html:lang(zh-HK) {
   --cjk-font-stack: var(--font-noto-hk), 'PingFang HK', 'Microsoft JhengHei';
+  --body-font-stack:
+    'CS CJK Punctuation HK', var(--font-inter), Inter, var(--cjk-font-stack), sans-serif;
 }
 
 /*
- * Ukrainian locale typography (docs/i18n/README.md §5). Clash Display has no
- * Cyrillic glyphs, so the display stack switches to the Onest companion face
- * as a whole — appending Onest after Clash in the shared stack would set Latin
- * letters (ETH, CST, brand names) in Clash and Cyrillic in Onest inside one
- * heading, with mismatched x-heights. Body copy stays in Inter, whose Cyrillic
- * slices load on demand.
+ * Korean: Hangul falls through to the Korean cut of Noto Sans CJK the same
+ * way Chinese falls through to its regional cut; Latin tokens keep the Latin
+ * faces. `keep-all` stops the browser from breaking a Korean word between
+ * syllables (the CJK default), which is the single most visible typographic
+ * defect in Korean web copy. It also keeps a counter on its digit
+ * ("3시간 20분 25초" breaks only at its spaces); addresses and hashes still
+ * wrap through `overflow-wrap: anywhere` on .font-mono and type-hash.
+ */
+html:lang(ko) {
+  --cjk-font-stack: var(--font-noto-kr), 'Apple SD Gothic Neo', 'Malgun Gothic';
+  --display-font-stack:
+    'CS Korean Display Punctuation', 'CS CJK Display Digits', var(--font-clash-display),
+    'ClashDisplay-Variable', var(--cjk-font-stack), sans-serif;
+  word-break: keep-all;
+}
+
+/*
+ * Japanese: the JIS-form cut of Noto Sans CJK, with the Japanese system faces
+ * as fallbacks. Japanese breaks lines between any two characters like
+ * Chinese, so `keep-all` would be wrong here; `line-break: strict` applies the
+ * stricter kinsoku rules (no line may start with a small kana or the
+ * prolonged-sound mark ー), which the default `auto` relaxes.
+ */
+html:lang(ja) {
+  --cjk-font-stack:
+    var(--font-noto-jp), 'Hiragino Sans', 'Hiragino Kaku Gothic ProN', 'Yu Gothic', 'Meiryo';
+  --display-font-stack:
+    'CS CJK Display Digits', var(--font-clash-display), 'ClashDisplay-Variable',
+    var(--cjk-font-stack), sans-serif;
+  line-break: strict;
+}
+
+/*
+ * Chinese, Japanese and Korean display: CJK strokes read thin at the Latin
+ * display weight, and system fallbacks without a 500 cut (Hiragino, Meiryo)
+ * resolve it down to W3, so display text sets at 600, which every CJK face
+ * in the stacks carries. Latin tracking and extra word spacing have no
+ * meaning for these scripts.
+ */
+html:lang(zh),
+html:lang(ja),
+html:lang(ko) {
+  --display-weight: 600;
+  --display-tracking-scale: 0;
+}
+
+/*
+ * Ukrainian and Vietnamese typography (docs/i18n/README.md §5). Clash Display
+ * has no Cyrillic glyphs and lacks most Vietnamese letters (the stacked
+ * diacritics ế, ợ, ữ and the horned Ơ/Ư), so both locales switch the display
+ * stack to the Onest companion face as a whole — appending Onest after Clash
+ * in the shared stack would set Latin letters (ETH, CST, brand names) in
+ * Clash and the rest of the heading in Onest, with mismatched x-heights and,
+ * in Vietnamese, per-letter font changes inside one word. Body copy stays in
+ * Inter, whose Cyrillic and Vietnamese slices load on demand. Onest and Inter
+ * are narrower than Clash, so display tracking is roughly halved, and Onest's
+ * word space needs no help.
  *
  * Deliberately unlayered, next to :root: both rules target the <html>
  * element, and an unlayered :root declaration would beat any override placed
  * inside @layer base no matter its specificity.
  */
-html[lang='uk'] {
+html:lang(uk),
+html:lang(vi) {
   --display-font-stack: var(--font-onest), var(--font-inter), Inter, system-ui, sans-serif;
+  --display-tracking-scale: 0.45;
+  /* A length, not a bare 0: --display-word-spacing-lg multiplies it in calc(). */
+  --display-word-spacing: 0em;
 }
 
 /*
- * Title-Case button labels are an English convention: the Button variants
- * apply Tailwind's `capitalize`, which would turn «Під’єднати гаманець» into
- * «Під’єднати Гаманець». Every other language writes UI labels in sentence
- * case (CJK has no case), so the transform is English-only. Unlayered so it
- * outranks the utilities layer that defines `.capitalize`.
+ * Language islands: an element whose own `lang` differs from the page's (the
+ * language menu's endonyms) takes that language's CJK cut, so 日本語 renders
+ * in Japanese glyph forms on an English page and 简体中文 in Simplified forms
+ * on a Japanese one. The rule re-declares the text stack on the island
+ * itself, because a stack variable is resolved where it is declared (<html>),
+ * not where it is used. On pages that do not load the island's Noto cut the
+ * regional platform face stands in. `text-spacing-trim` removes the dead half
+ * of a full-width parenthesis in 繁體中文（台灣）.
  */
-html:not([lang='en']) .capitalize {
-  text-transform: none;
+:where([lang]:not(html)):lang(zh) {
+  --cjk-font-stack: var(--font-noto-sc), 'PingFang SC', 'Microsoft YaHei';
+}
+
+:where([lang]:not(html)):lang(zh-TW) {
+  --cjk-font-stack: var(--font-noto-tc), 'PingFang TC', 'Microsoft JhengHei';
+}
+
+:where([lang]:not(html)):lang(zh-HK) {
+  --cjk-font-stack: var(--font-noto-hk), 'PingFang HK', 'Microsoft JhengHei';
+}
+
+:where([lang]:not(html)):lang(ja) {
+  --cjk-font-stack:
+    var(--font-noto-jp), 'Hiragino Sans', 'Hiragino Kaku Gothic ProN', 'Yu Gothic', 'Meiryo';
+}
+
+:where([lang]:not(html)):lang(ko) {
+  --cjk-font-stack: var(--font-noto-kr), 'Apple SD Gothic Neo', 'Malgun Gothic';
+}
+
+:where([lang]:not(html)):is(:lang(zh), :lang(ja), :lang(ko)) {
+  font-family: var(--font-inter), Inter, var(--cjk-font-stack), sans-serif;
+  text-spacing-trim: trim-both;
 }
 
 /*
  * The home control desk uses a tighter header offset than generic inner
- * pages. When maintenance copy adds a second fixed bar, restore enough
- * clearance without making every normal visit pay for an absent banner.
+ * pages. When maintenance copy adds a second fixed bar, it clears the bar's
+ * measured height (`--banner-clearance`, published by the banner), as every
+ * PageShell does, without making a normal visit pay for an absent banner.
  */
 body:has([data-maintenance-banner]) .home-control-shell {
-  padding-top: calc(var(--header-height) + 3.75rem);
-}
-
-@media (max-width: 639px) {
-  body:has([data-maintenance-banner]) .home-control-shell {
-    padding-top: calc(var(--header-height) + 5rem);
-  }
+  padding-top: calc(var(--header-height) + 1.5rem + var(--banner-clearance, 3.5rem));
 }
 
 /*
@@ -145,7 +484,7 @@ body:has([data-maintenance-banner]) .home-control-shell {
  * (`z-[10003]`, an inline `zIndex: 10000`) are the ones that caused trouble.
  */
 @theme inline {
-  --z-backdrop: -10; /* ambient gradients, particles */
+  --z-backdrop: -10; /* the ambient backdrop */
   --z-base: 1; /* page shell and ordinary card content */
   --z-raised: 10; /* pinned rails and toolbars */
   --z-sticky-nav: 30; /* sticky sub-navigation bars */
@@ -156,31 +495,16 @@ body:has([data-maintenance-banner]) .home-control-shell {
 }
 
 :root {
-  --background: 235 68% 10%;
-  --foreground: 0 0% 100%;
-  --card: 235 60% 16%;
-  --card-foreground: 0 0% 100%;
-  --popover: 235 60% 16%;
-  --popover-foreground: 0 0% 100%;
-  --primary: 196 98% 54%;
-  --primary-foreground: 235 68% 10%;
-  --secondary: 205 100% 71%;
-  --secondary-foreground: 0 0% 100%;
-  --accent: 271 98% 60%;
-  --accent-foreground: 0 0% 100%;
-  --muted: 235 40% 20%;
-  --muted-foreground: 0 0% 100% / 0.68;
-  --destructive: 0 62% 50%;
-  --destructive-foreground: 0 0% 100%;
-  --border: 235 30% 20%;
-  --input: 235 30% 20%;
-  --ring: 196 98% 54%;
-  --radius: 0.5rem;
-  --chart-1: 196 98% 54%;
-  --chart-2: 271 98% 60%;
-  --chart-3: 205 100% 71%;
-  --chart-4: 45 93% 52%;
-  --chart-5: 0 62% 50%;
+  /* shadcn/ui's base radius: the control step of the scale. */
+  --radius: var(--radius-control);
+}
+
+/*
+ * The home's action dock (`[data-action-dock]`) floats 12-16px above the
+ * bottom edge and is about 64px tall, at every width.
+ */
+:root:has([data-action-dock]) {
+  --dock-clearance: 5.5rem;
 }
 
 @layer base {
@@ -189,46 +513,151 @@ body:has([data-maintenance-banner]) .home-control-shell {
   }
 
   html {
+    color-scheme: dark;
     scroll-behavior: smooth;
+    /* A sticky bar under the header publishes its reach (useStickyClearance, WCAG 2.4.11). */
+    scroll-padding-top: calc(
+      var(--sticky-offset) + var(--sticky-bar-clearance, 0px) + var(--banner-clearance, 0px)
+    );
+    /* Focus scrolled into view clears a fixed bottom bar (WCAG 2.4.11). */
+    scroll-padding-bottom: calc(var(--dock-clearance) + env(safe-area-inset-bottom, 0px));
   }
 
   body {
     @apply bg-background text-foreground;
-    font-family: var(--font-inter), Inter, var(--cjk-font-stack), sans-serif;
+    font-family: var(--body-font-stack);
     font-size: 16px;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     -webkit-tap-highlight-color: transparent;
-    -webkit-touch-callout: none;
+    /* No -webkit-touch-callout: a long press keeps Open in New Tab, Copy Link,
+     * link previews and Save Image on every link and Signature. Only the
+     * lightbox's pan surface, where a press starts a drag, turns it off. */
   }
 
   /*
-   * Chinese typography (docs/i18n/README.md §5), shared by every Chinese
-   * locale: `:lang(zh)` matches `zh`, `zh-TW`, and `zh-HK` alike. The Latin
-   * display face (Clash Display) has no CJK glyphs, so Chinese headings fall
-   * through to the locale's Noto Sans cut. CJK must never inherit Latin
-   * display tracking, and the lighter display weights read too thin in CJK
-   * strokes.
+   * Paragraph-level wrapping: avoid a lone word (or a lone 「す。」) on the
+   * last line of a paragraph. Browsers without `pretty` wrap as before.
    */
-  html:lang(zh) .type-display,
-  html:lang(zh) h1,
-  html:lang(zh) h2,
-  html:lang(zh) h3 {
-    letter-spacing: 0 !important;
-    font-weight: 700;
+  p,
+  li,
+  dd,
+  figcaption,
+  blockquote {
+    text-wrap: pretty;
   }
 
-  /* Tailwind tracking utilities are tuned for Latin labels. On a Chinese
-     document, translated nav/table/status copy must keep natural CJK spacing. */
-  html:lang(zh) [class*='tracking-'] {
+  /*
+   * An unstyled link inside running text is an inline link: it must not rely
+   * on hue alone (WCAG 1.4.1), so it carries the quiet underline of the
+   * `link` utility. Styled links (buttons, nav, cards) are untouched.
+   */
+  :where(p, li, dd, figcaption, blockquote, td) a:not([class]) {
+    color: hsl(var(--primary));
+    text-decoration-line: underline;
+    text-decoration-thickness: 1px;
+    text-decoration-color: color-mix(in oklab, currentColor 45%, transparent);
+    text-underline-offset: 0.2em;
+  }
+
+  :where(p, li, dd, figcaption, blockquote, td) a:not([class]):hover {
+    text-decoration-color: currentColor;
+  }
+
+  /*
+   * CJK headings (docs/i18n/README.md §5), shared by every Chinese locale
+   * (`:lang(zh)` matches `zh`, `zh-TW`, and `zh-HK` alike), by Korean, and by
+   * Japanese. The Latin display face has no CJK, Hangul, or kana glyphs, so
+   * these headings fall through to the locale's Noto Sans cut. CJK never
+   * inherits Latin display tracking, and class-less headings (prose, legal,
+   * FAQ) take the CJK display weight; headings with a type utility already
+   * read the same --display-weight token.
+   */
+  :is(h1, h2, h3, [class*='type-display-'], [class*='type-heading-'], .type-section):lang(zh),
+  :is(h1, h2, h3, [class*='type-display-'], [class*='type-heading-'], .type-section):lang(ko),
+  :is(h1, h2, h3, [class*='type-display-'], [class*='type-heading-'], .type-section):lang(ja) {
     letter-spacing: 0 !important;
   }
 
-  /* Keep Latin identifiers monospaced while routing CJK glyphs through the
-     project font instead of an OS-dependent monospace fallback. */
-  html:lang(zh) .font-mono {
-    font-family:
-      ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, var(--cjk-font-stack), monospace !important;
+  :is(h1, h2, h3):lang(zh),
+  :is(h1, h2, h3):lang(ko),
+  :is(h1, h2, h3):lang(ja) {
+    font-weight: var(--display-weight);
+    line-height: 1.25;
+    text-wrap: balance;
+  }
+
+  /*
+   * Chinese has no phrase-aware breaking, and balanced lines break wherever
+   * the midpoint falls, often inside a word (让周 / 期储备, 由链 / 上种子).
+   * `keep-all` breaks Han text only at punctuation and spaces, so a heading
+   * turns its line at a comma (十余条轨道， / 让周期储备循轨而行。); a clause too
+   * long for the line still wraps through `overflow-wrap: anywhere`, which
+   * also keeps the heading's min-content from widening its column. Korean
+   * keeps its document-wide keep-all and Japanese its auto-phrase below.
+   *
+   * That overflow break ignores the line-start rules: a clause that just
+   * misses the line splits a word or pushes its 。 onto a line of its own.
+   * Long display copy therefore carries authored break points (zero-width
+   * spaces, as BudouX inserts), and <PhrasedText> (lib/phrases.ts) glues
+   * each mark to its character, so no line ever starts with 。 or ，.
+   */
+  :is(h1, h2, h3, [class*='type-display-'], [class*='type-heading-'], .type-section):lang(zh) {
+    word-break: keep-all;
+    overflow-wrap: anywhere;
+  }
+
+  /*
+   * A Chinese placeholder (搜索问题……) is Chinese text in a field whose face
+   * is Inter first: set it in the locale's CJK stack so its ellipsis takes
+   * the Chinese face's wide marks rather than six tight Inter dots, even
+   * where the punctuation alias finds no platform face. Noto Sans SC and
+   * PingFang both still seat the ellipsis on the baseline, not centred.
+   */
+  :where(input, textarea):lang(zh)::placeholder {
+    font-family: var(--cjk-font-stack), sans-serif;
+  }
+
+  /*
+   * Japanese has no spaces to break at, so short text wraps wherever the line
+   * ends — often mid-word (シグネチャー配 | 分, 確 | 定できる). `auto-phrase`
+   * asks the browser to break between phrases instead (Chrome 119+, BudouX);
+   * engines without it keep the default per-character behavior. Long running
+   * prose (FAQ answers, legal) keeps normal breaking plus `text-wrap: pretty`.
+   */
+  :is(
+    h1,
+    h2,
+    h3,
+    h4,
+    [class*='type-display-'],
+    [class*='type-heading-'],
+    .type-section,
+    .type-title,
+    .type-lede,
+    .type-body-lg,
+    [class*='type-body-md'],
+    [class*='type-body-sm'],
+    .type-label,
+    [class*='type-eyebrow'],
+    .type-caption,
+    summary,
+    button,
+    dt,
+    dd,
+    figcaption,
+    [role='tab']
+  ):lang(ja) {
+    word-break: auto-phrase;
+  }
+
+  /* Tailwind tracking utilities are tuned for Latin labels. On a Chinese,
+     Korean, or Japanese document, translated nav/table/status copy must keep
+     natural CJK spacing. */
+  [class*='tracking-']:lang(zh),
+  [class*='tracking-']:lang(ko),
+  [class*='tracking-']:lang(ja) {
+    letter-spacing: 0 !important;
   }
 
   button,
@@ -242,13 +671,81 @@ body:has([data-maintenance-banner]) .home-control-shell {
   }
 
   /*
-   * Monospace in this app is always an address, hash, token id or IPFS URI —
-   * 40+ characters with no natural break opportunity, which is wider than a
+   * Monospace in this app is an address, hash, token id or IPFS URI — 40+
+   * characters with no natural break opportunity, which is wider than a
    * phone screen. `anywhere` (rather than `break-word`) also lowers the
    * min-content width, so flex and grid children can actually shrink.
+   * Korean keeps its document-wide `keep-all` here too: a countdown or a
+   * duration set in mono must not split a counter from its digit.
    */
   .font-mono {
     overflow-wrap: anywhere;
+    font-feature-settings: 'zero' 1;
+  }
+}
+
+/*
+ * Chinese headings, continued. The base-layer rule above gives them
+ * `keep-all` and `overflow-wrap: anywhere`, but every type tier sets
+ * `overflow-wrap: break-word` from the utilities layer, which wins, and a
+ * tier inside a heading (the FAQ question's type-title button) inherits the
+ * keep-all without the anywhere. Keep-all with break-word leaves a Han clause
+ * no break at all: its min-content widened the FAQ past a 320px phone. In
+ * the utilities layer, after the tiers and with a two-part selector that
+ * outranks their single class, this restores `anywhere` wherever the
+ * heading's keep-all reaches.
+ */
+@layer utilities {
+  :is(h1, h2, h3, [class*='type-display-'], [class*='type-heading-'], .type-section):lang(zh),
+  :is(h1, h2, h3, [class*='type-display-'], [class*='type-heading-'], .type-section):lang(zh) * {
+    overflow-wrap: anywhere;
+  }
+}
+
+/*
+ * Display-face guard. Clash Display is drawn for 500; at 600-700 with
+ * `tracking-tight` its narrow space closes up and small headings read as
+ * one word. Until every call site moves to type-heading-3 / type-title
+ * (Inter) or a display tier, `font-display` caps bold at 600, relaxes tight
+ * tracking and opens the word space. Two-class selectors outrank the single
+ * utilities they correct.
+ */
+@layer utilities {
+  .font-display {
+    word-spacing: var(--display-word-spacing);
+  }
+
+  .font-display:is(.font-bold, .font-extrabold, .font-black) {
+    font-weight: var(--display-weight-strong);
+  }
+
+  .font-display:is(.tracking-tight, .tracking-tighter) {
+    letter-spacing: calc(-0.01em * var(--display-tracking-scale));
+  }
+}
+
+/*
+ * Retired dimmed-text utilities. Opacity on a text colour produced a
+ * different, usually failing, contrast in every palette (muted-foreground at
+ * 60% was 4.1:1, at 40% 2.4:1). These exact classes now render in the subtle
+ * text tier, which is 5.1:1 or more on every surface. New code writes
+ * `text-subtle`; styles/__tests__/token-usage.test.ts stops the count of
+ * these classes from growing.
+ *
+ * The correction sits in the utilities layer, after Tailwind's own
+ * utilities, with the same single-class specificity. It replaces the base
+ * utility by source order, while every state variant on the same element
+ * (hover:, group-hover:, focus-visible:, aria-*:, data-[…]:) adds a
+ * pseudo-class or an attribute to its class and still wins, so
+ * `text-muted-foreground/50 hover:text-primary` turns primary on hover.
+ */
+@layer utilities {
+  .text-muted-foreground\/40,
+  .text-muted-foreground\/50,
+  .text-muted-foreground\/60,
+  .text-white\/40,
+  .text-white\/45 {
+    color: hsl(var(--subtle-foreground));
   }
 }
 
@@ -256,35 +753,6 @@ body:has([data-maintenance-banner]) .home-control-shell {
   syntax: '<length>';
   inherits: true;
   initial-value: 0;
-}
-
-@property --border {
-  syntax: '<length>';
-  inherits: true;
-  initial-value: 0;
-}
-
-.cm-scroller::-webkit-scrollbar {
-  width: 12px;
-  height: 12px;
-}
-
-.cm-scroller::-webkit-scrollbar-track {
-  border-radius: 200px;
-  background: #161b3c;
-}
-
-.cm-scroller::-webkit-scrollbar-thumb {
-  background: #15bffd;
-  border-radius: 200px;
-}
-
-.cm-scroller::-webkit-scrollbar-thumb:hover {
-  background: #088dbe;
-}
-
-.cm-scroller::-webkit-scrollbar-corner {
-  display: none;
 }
 
 /*
@@ -301,154 +769,233 @@ body:has([data-maintenance-banner]) .home-control-shell {
 }
 
 /*
- * Mobile card layout for `.cs-table` (see components/ui/responsive-table.tsx).
- *
- * Each cell becomes a label/value grid row. The label comes from the cell's own
- * `data-label`, so it cannot drift from the column it belongs to, and no extra
- * DOM node is needed. `minmax(0, 1fr)` on the value column is what lets long
- * addresses and messages wrap instead of pushing the card wider than the screen.
+ * The one content edge, shared by the header, pages and footer on both
+ * hosts: --gutter on each side (16px on phones, up to 80px on wide screens),
+ * at most 80rem wide.
  */
-@media screen and (max-width: 39.99em) {
-  .cs-table,
-  .cs-table thead,
-  .cs-table tbody,
-  .cs-table tr,
-  .cs-table td {
-    display: block;
-  }
+@utility site-container {
+  width: min(100% - 2 * var(--gutter), 80rem);
+  margin-inline: auto;
+}
 
-  /* Headers stay in the accessibility tree; each cell repeats them visually. */
-  .cs-table thead {
-    position: absolute;
-    width: 1px;
-    height: 1px;
-    overflow: hidden;
-    clip-path: inset(50%);
-    white-space: nowrap;
-  }
-
-  .cs-table tbody tr {
-    margin-bottom: 0.75rem;
-    border: 1px solid rgb(255 255 255 / 0.08);
-    border-radius: 0.75rem;
-    background: rgb(255 255 255 / 0.02);
-    overflow: hidden;
-  }
-
-  .cs-table tbody tr:last-child {
-    margin-bottom: 0;
-  }
-
-  .cs-table tbody td {
+/*
+ * The reading template from `lg`: the contents rail at --rail-w, then the
+ * text, --rail-gap apart (a third more from `xl`). Below `lg` the rail
+ * gives way to the page's in-flow contents, so this is one column.
+ */
+@utility reading-grid {
+  @media (width >= 64rem) {
     display: grid;
-    grid-template-columns: minmax(4.5rem, 34%) minmax(0, 1fr);
-    align-items: baseline;
-    gap: 0.75rem;
-    padding: 0.625rem 0.875rem;
-    border-bottom: 1px solid rgb(255 255 255 / 0.04);
-    /* Long hashes and addresses must break rather than widen the card. */
-    overflow-wrap: anywhere;
-    word-break: break-word;
-    /* Safety net: a stray `whitespace-nowrap` utility must not reintroduce
-       horizontal overflow in a card. */
-    white-space: normal;
+    grid-template-columns: minmax(0, var(--rail-w)) minmax(0, 1fr);
+    column-gap: var(--rail-gap);
   }
 
-  .cs-table tbody td:last-child {
-    border-bottom: 0;
-  }
-
-  .cs-table tbody td::before {
-    content: attr(data-label);
-    color: rgb(255 255 255 / 0.5);
-    font-size: 0.625rem;
-    font-weight: 500;
-    line-height: 1.6;
-    letter-spacing: 0.05em;
-    text-align: left;
-    text-transform: uppercase;
-    overflow-wrap: anywhere;
-  }
-
-  /*
-   * A cell's direct children are grid items, so they blockify and their box
-   * collapses onto the cell's 12px line box — about 17px, under the 24px WCAG
-   * 2.5.8 target for a text link. The value column always spans far more than
-   * 24px, so raising the line box alone turns the whole line into the target;
-   * `min-height` covers links whose content is an icon rather than text.
-   */
-  .cs-table tbody td > a {
-    min-height: 1.5rem;
-    line-height: 1.5rem;
-  }
-
-  /* A labelled blank row is noise; drop cells with nothing to show. */
-  .cs-table td[data-empty='true'] {
-    display: none;
-  }
-
-  /* Columns explicitly marked redundant on a phone. */
-  .cs-table td[data-priority='secondary'],
-  .cs-table th[data-priority='secondary'] {
-    display: none;
+  @media (width >= 80rem) {
+    column-gap: calc(var(--rail-gap) * 4 / 3);
   }
 }
 
-@keyframes pulse-glow {
-  0%,
-  100% {
-    opacity: 1;
-    box-shadow: 0 0 8px rgba(21, 191, 253, 0.3);
-  }
-  50% {
-    opacity: 0.85;
-    box-shadow: 0 0 20px rgba(21, 191, 253, 0.5);
+/*
+ * Glass: the sticky header and sub-navigation bars, sheets and menus only.
+ * Visitors who ask for less transparency get the opaque page colour instead.
+ * A bar that floats over figures and fields (the Observatory's dock) is not
+ * glass: it sits on the opaque raised surface, so nothing reads through.
+ */
+@utility glass {
+  background-color: var(--glass-fill);
+  -webkit-backdrop-filter: blur(var(--glass-blur));
+  backdrop-filter: blur(var(--glass-blur));
+
+  @media (prefers-reduced-transparency: reduce) {
+    background-color: hsl(var(--background));
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
   }
 }
 
-@keyframes gradient-shift {
-  0% {
-    background-position: 0% 50%;
+/*
+ * Text links. A link inside running text must not rely on hue alone: it
+ * carries a quiet underline that strengthens on hover. `link` is the inline
+ * style; `link-quiet` is for link lists and navigation that already read as
+ * links by position, and underlines on hover and focus only.
+ */
+@utility link {
+  color: hsl(var(--primary));
+  text-decoration-line: underline;
+  text-decoration-thickness: 1px;
+  text-decoration-color: color-mix(in oklab, currentColor 45%, transparent);
+  text-underline-offset: 0.2em;
+  transition: text-decoration-color var(--duration-fast) var(--ease-out-soft);
+
+  &:hover {
+    text-decoration-color: currentColor;
   }
-  50% {
-    background-position: 100% 50%;
-  }
-  100% {
-    background-position: 0% 50%;
+
+  /* touch-link-target, below */
+  @media (pointer: coarse) {
+    min-block-size: 1.5rem;
+    min-inline-size: 1.5rem;
+    align-content: center;
   }
 }
 
-@keyframes urgency-pulse {
-  0%,
-  100% {
-    opacity: 1;
+/*
+ * A link to a record (an address's profile, a cycle, a token) where it sits
+ * as a value on a record page or in a ledger: the text keeps its colour and
+ * carries a hairline underline in the rule colour at rest, solid on hover
+ * and focus, so it reads as a way in without turning a column of values
+ * into a column of accent colour.
+ */
+@utility link-entity {
+  text-decoration-line: underline;
+  text-decoration-thickness: 1px;
+  text-decoration-color: hsl(var(--rule));
+  text-underline-offset: 4px;
+  transition: text-decoration-color var(--duration-fast) var(--ease-out-soft);
+
+  &:hover,
+  &:focus-visible {
+    text-decoration-color: currentColor;
   }
-  50% {
-    opacity: 0.6;
+
+  /* touch-link-target, below */
+  @media (pointer: coarse) {
+    min-block-size: 1.5rem;
+    min-inline-size: 1.5rem;
+    align-content: center;
   }
 }
 
+@utility link-quiet {
+  text-decoration-line: underline;
+  text-decoration-thickness: 1px;
+  text-decoration-color: transparent;
+  text-underline-offset: 0.2em;
+  transition: text-decoration-color var(--duration-fast) var(--ease-out-soft);
+
+  &:hover,
+  &:focus-visible {
+    text-decoration-color: currentColor;
+  }
+
+  /* touch-link-target, below */
+  @media (pointer: coarse) {
+    min-block-size: 1.5rem;
+    min-inline-size: 1.5rem;
+    align-content: center;
+  }
+}
+
+/*
+ * Touch targets on coarse pointers (WCAG 2.5.8; measured by
+ * e2e/mobile-tap-targets.mobile.spec.ts). Both grow the element's own box,
+ * which is what hit-testing and the audit see; neither draws a pad with a
+ * pseudo-element.
+ *
+ * touch-link-target: a text link laid out as a box (a flex item, an
+ * inline-flex row, a block) is at least 24×24px, its text centred in it. A
+ * link that flows inside a sentence stays `display: inline`, where min sizes
+ * do not apply, which is WCAG's inline exception. `link` and `link-quiet`
+ * already include it.
+ *
+ * touch-hit-area: a control that must not move the layout (a figure label, a
+ * standalone explained term) reaches 44px. Padding grows its border box and
+ * an equal negative margin hands the space back, on inline and block boxes
+ * alike, so nothing around it shifts. The focus ring moves in by the inline
+ * pad so it still hugs the text. The block pad assumes content about 1.1em
+ * tall, which Inter, Clash and the CJK faces all exceed, so the box is never
+ * under 44px. Never put it on a word inside a sentence: the pad would cover
+ * the lines above and below.
+ */
+@utility touch-link-target {
+  @media (pointer: coarse) {
+    min-block-size: 1.5rem;
+    min-inline-size: 1.5rem;
+    align-content: center;
+  }
+}
+
+@utility touch-hit-area {
+  @media (pointer: coarse) {
+    --touch-pad-block: max(0px, calc((2.75rem - 1.1em) / 2));
+    --touch-pad-inline: 0.625rem;
+    padding-block: var(--touch-pad-block);
+    padding-inline: var(--touch-pad-inline);
+    margin-block: calc(var(--touch-pad-block) * -1);
+    margin-inline: calc(var(--touch-pad-inline) * -1);
+    outline-offset: calc(var(--focus-ring-offset) - var(--touch-pad-inline));
+  }
+}
+
+/*
+ * The art plate: a pure black ground at the native 3456:2234 ratio, with
+ * its 1px edge as the only hover and focus signal. Put an <img> inside with
+ * object-fit: contain; nothing ever overlays the artwork.
+ */
+@utility art-plate {
+  position: relative;
+  aspect-ratio: var(--art-ratio);
+  overflow: hidden;
+  border-radius: var(--radius-edge);
+  background-color: hsl(var(--art-ground));
+  box-shadow: var(--art-edge);
+  transition: box-shadow var(--duration-fast) var(--ease-out-soft);
+
+  &:hover,
+  &:focus-within {
+    box-shadow: var(--art-edge-active);
+  }
+
+  & > :is(img, video, picture) {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+  }
+}
+
+/*
+ * The hero starfield (AmbientBackdrop variant="hero"): the --starfield
+ * points in the palette's foreground colour, masked to the gutters outside
+ * the content column (fading in over 2rem beyond its edge), so no point ever
+ * sits behind a card or a line of text. Screens without a gutter wider than
+ * the content edge show no stars at all. The column is --starfield-column:
+ * 100rem by default, the width of the app home's control desk
+ * (`xl:max-w-[100rem]`), the widest hero content; a hero page with a
+ * narrower column may set a smaller value on the backdrop.
+ */
+@utility starfield {
+  --starfield-edge: calc(var(--starfield-column, 100rem) / 2);
+  --starfield-gutters: linear-gradient(
+    90deg,
+    #000 0,
+    #000 calc(50% - var(--starfield-edge) - 2rem),
+    transparent calc(50% - var(--starfield-edge)),
+    transparent calc(50% + var(--starfield-edge)),
+    #000 calc(50% + var(--starfield-edge) + 2rem)
+  );
+  background-color: hsl(var(--foreground));
+  -webkit-mask-image: var(--starfield), var(--starfield-gutters);
+  mask-image: var(--starfield), var(--starfield-gutters);
+  -webkit-mask-size:
+    720px 720px,
+    100% 100%;
+  mask-size:
+    720px 720px,
+    100% 100%;
+  -webkit-mask-repeat: repeat, no-repeat;
+  mask-repeat: repeat, no-repeat;
+  -webkit-mask-composite: source-in;
+  mask-composite: intersect;
+}
+
+/* A live dot breathes; it never grows. */
 @keyframes live-dot {
   0%,
   100% {
-    transform: scale(1);
     opacity: 1;
   }
   50% {
-    transform: scale(1.5);
-    opacity: 0.5;
-  }
-}
-
-@keyframes live-flash {
-  0% {
-    box-shadow: 0 0 0 0 rgba(21, 191, 253, 0.42);
-  }
-  70% {
-    box-shadow: 0 0 0 10px rgba(21, 191, 253, 0);
-  }
-  100% {
-    box-shadow: 0 0 0 0 rgba(21, 191, 253, 0);
+    opacity: 0.35;
   }
 }
 
@@ -461,30 +1008,171 @@ body:has([data-maintenance-banner]) .home-control-shell {
   }
 }
 
-.animate-pulse-glow {
-  animation: pulse-glow 2s ease-in-out infinite;
-}
-
-.animate-gradient-shift {
-  background-size: 200% 200%;
-  animation: gradient-shift 4s ease infinite;
-}
-
-.animate-urgency-pulse {
-  animation: urgency-pulse 1s ease-in-out infinite;
-}
-
 .animate-live-dot {
-  animation: live-dot 2s ease-in-out infinite;
-}
-
-.animate-live-flash {
-  animation: live-flash 900ms ease-out 1;
+  animation: live-dot 2.4s ease-in-out infinite;
 }
 
 .animate-shimmer {
   background-size: 200% 100%;
   animation: shimmer 3s linear infinite;
+}
+
+/*
+ * Accordion bodies (components/ui/accordion) open and close over the height
+ * Radix measures into --radix-accordion-content-height, only when motion is
+ * welcome. Utilities, so the primitive's data-[state] variants apply them.
+ */
+@keyframes accordion-down {
+  from {
+    height: 0;
+  }
+  to {
+    height: var(--radix-accordion-content-height);
+  }
+}
+
+@keyframes accordion-up {
+  from {
+    height: var(--radix-accordion-content-height);
+  }
+  to {
+    height: 0;
+  }
+}
+
+/*
+ * Overlay motion: dialogs, sheets, menus, popovers, tooltips and the
+ * explanation card enter and leave through these (the class names of
+ * tailwindcss-animate, which the primitives were written against, defined
+ * here so no dependency is needed). `animate-in` plays `enter` from the
+ * values the modifiers set (`fade-in-0`, `zoom-in-95`, `slide-in-from-top-2`,
+ * `slide-in-from-right`); `animate-out` plays `exit` to theirs. Radix waits
+ * for the exit before unmounting. Both run only when motion is welcome, so a
+ * reduced-motion visitor sees overlays appear and go at once, and the
+ * `motion-reduce:animate-none` guards at call sites hold.
+ */
+@keyframes enter {
+  from {
+    opacity: var(--tw-enter-opacity, 1);
+    transform: translate3d(var(--tw-enter-translate-x, 0), var(--tw-enter-translate-y, 0), 0)
+      scale(var(--tw-enter-scale, 1));
+  }
+}
+
+@keyframes exit {
+  to {
+    opacity: var(--tw-exit-opacity, 1);
+    transform: translate3d(var(--tw-exit-translate-x, 0), var(--tw-exit-translate-y, 0), 0)
+      scale(var(--tw-exit-scale, 1));
+  }
+}
+
+@utility animate-in {
+  @media (prefers-reduced-motion: no-preference) {
+    animation: enter var(--tw-duration, var(--duration-fast)) var(--tw-ease, var(--ease-out-expo));
+  }
+}
+
+@utility animate-out {
+  @media (prefers-reduced-motion: no-preference) {
+    animation: exit var(--tw-duration, var(--duration-fast)) var(--tw-ease, var(--ease-out-soft))
+      forwards;
+  }
+}
+
+@utility fade-in-* {
+  --tw-enter-opacity: calc(--value(integer) / 100);
+}
+
+@utility fade-out-* {
+  --tw-exit-opacity: calc(--value(integer) / 100);
+}
+
+@utility zoom-in-* {
+  --tw-enter-scale: calc(--value(integer) / 100);
+  --tw-enter-scale: --value([number]);
+}
+
+@utility zoom-out-* {
+  --tw-exit-scale: calc(--value(integer) / 100);
+  --tw-exit-scale: --value([number]);
+}
+
+@utility slide-in-from-top-* {
+  --tw-enter-translate-y: calc(var(--spacing) * --value(integer) * -1);
+}
+
+@utility slide-in-from-bottom-* {
+  --tw-enter-translate-y: calc(var(--spacing) * --value(integer));
+}
+
+@utility slide-in-from-left-* {
+  --tw-enter-translate-x: calc(var(--spacing) * --value(integer) * -1);
+}
+
+@utility slide-in-from-right-* {
+  --tw-enter-translate-x: calc(var(--spacing) * --value(integer));
+}
+
+@utility slide-out-to-top-* {
+  --tw-exit-translate-y: calc(var(--spacing) * --value(integer) * -1);
+}
+
+@utility slide-out-to-bottom-* {
+  --tw-exit-translate-y: calc(var(--spacing) * --value(integer));
+}
+
+@utility slide-out-to-left-* {
+  --tw-exit-translate-x: calc(var(--spacing) * --value(integer) * -1);
+}
+
+@utility slide-out-to-right-* {
+  --tw-exit-translate-x: calc(var(--spacing) * --value(integer));
+}
+
+/* Whole-panel slides for sheets: in from, and out to, their own edge. */
+@utility slide-in-from-top {
+  --tw-enter-translate-y: -100%;
+}
+
+@utility slide-in-from-bottom {
+  --tw-enter-translate-y: 100%;
+}
+
+@utility slide-in-from-left {
+  --tw-enter-translate-x: -100%;
+}
+
+@utility slide-in-from-right {
+  --tw-enter-translate-x: 100%;
+}
+
+@utility slide-out-to-top {
+  --tw-exit-translate-y: -100%;
+}
+
+@utility slide-out-to-bottom {
+  --tw-exit-translate-y: 100%;
+}
+
+@utility slide-out-to-left {
+  --tw-exit-translate-x: -100%;
+}
+
+@utility slide-out-to-right {
+  --tw-exit-translate-x: 100%;
+}
+
+@utility animate-accordion-down {
+  @media (prefers-reduced-motion: no-preference) {
+    animation: accordion-down var(--duration-base) var(--ease-gallery);
+  }
+}
+
+@utility animate-accordion-up {
+  @media (prefers-reduced-motion: no-preference) {
+    animation: accordion-up var(--duration-fast) var(--ease-gallery);
+  }
 }
 
 .gradient-border-card {
@@ -496,7 +1184,7 @@ body:has([data-maintenance-banner]) .home-control-shell {
   inset: 0;
   border-radius: inherit;
   padding: 1px;
-  background: linear-gradient(135deg, rgba(21, 191, 253, 0.4), rgba(156, 55, 253, 0.4));
+  background: linear-gradient(135deg, hsl(var(--secondary) / 0.3), hsl(var(--border)));
   -webkit-mask:
     linear-gradient(#fff 0 0) content-box,
     linear-gradient(#fff 0 0);
@@ -506,7 +1194,7 @@ body:has([data-maintenance-banner]) .home-control-shell {
 }
 
 .gradient-border-card-accent::before {
-  background: linear-gradient(135deg, rgba(21, 191, 253, 0.6), rgba(156, 55, 253, 0.6));
+  background: linear-gradient(135deg, hsl(var(--secondary) / 0.5), hsl(var(--secondary) / 0.15));
 }
 
 /*
@@ -527,11 +1215,6 @@ body:has([data-maintenance-banner]) .home-control-shell {
 
   body {
     background-color: hsl(var(--background)) !important;
-  }
-
-  /* Canvas particles do not reproduce; rely on solid page background */
-  #tsparticles {
-    display: none !important;
   }
 
   [data-sonner-toaster] {
@@ -559,23 +1242,12 @@ body:has([data-maintenance-banner]) .home-control-shell {
   }
 
   /*
-   * Gradient borders use masks; print engines often composite them as opaque and cover text.
-   * Stat cards fall back to a normal border (see StatCard print:border on featured).
+   * Gradient borders use masks; print engines often composite them as opaque and cover text,
+   * so a Surface prints with its plain border.
    */
   .gradient-border-card::before,
   .gradient-border-card-accent::before {
     display: none !important;
-  }
-
-  /*
-   * bg-clip-text + text-transparent often prints as blank; StatCard also forces solid text via utilities.
-   */
-  .bg-clip-text.text-transparent {
-    color: hsl(var(--foreground)) !important;
-    -webkit-text-fill-color: hsl(var(--foreground)) !important;
-    background-image: none !important;
-    -webkit-background-clip: border-box !important;
-    background-clip: border-box !important;
   }
 
   /*
@@ -588,103 +1260,6 @@ body:has([data-maintenance-banner]) .home-control-shell {
     visibility: visible !important;
   }
 
-  /*
-   * My Statistics hero: ensure stat values render as ink (featured uses text-white on screen).
-   * Activity overview: keep the card visible; do not force transform:none on all descendants —
-   * Chrome print can collapse flex text when every nested node is reset that way.
-   */
-  [data-testid='hero-stats'],
-  [data-testid='hero-stats'] > div {
-    opacity: 1 !important;
-    transform: none !important;
-    visibility: visible !important;
-  }
-
-  [data-testid='hero-stats'] .stat-card-value {
-    color: hsl(var(--foreground)) !important;
-    -webkit-text-fill-color: hsl(var(--foreground)) !important;
-    background-image: none !important;
-    -webkit-background-clip: border-box !important;
-    background-clip: border-box !important;
-    opacity: 1 !important;
-  }
-
-  [data-testid='activity-summary'] {
-    opacity: 1 !important;
-    transform: none !important;
-    visibility: visible !important;
-    overflow: visible !important;
-    max-height: none !important;
-  }
-
-  /*
-   * Activity Overview (My Statistics): Skia PDF often drops text that sits under
-   * backdrop-filter + overflow-hidden on the Card, or mis-lays out sm:divide-x grids.
-   */
-  [data-testid='activity-summary'] .activity-overview-card {
-    overflow: visible !important;
-    backdrop-filter: none !important;
-    -webkit-backdrop-filter: none !important;
-    box-shadow: none !important;
-    background-color: hsl(var(--background)) !important;
-    background-image: none !important;
-    color: hsl(var(--foreground)) !important;
-  }
-
-  [data-testid='activity-summary'] .activity-overview-grid {
-    display: block !important;
-    width: 100% !important;
-  }
-
-  [data-testid='activity-summary'] .activity-overview-grid > .activity-overview-group {
-    display: block !important;
-    width: 100% !important;
-    border-left: none !important;
-    padding-left: 0 !important;
-    margin-left: 0 !important;
-    opacity: 1 !important;
-    visibility: visible !important;
-    color: hsl(var(--foreground)) !important;
-  }
-
-  [data-testid='activity-summary'] .activity-overview-heading,
-  [data-testid='activity-summary'] .activity-overview-group-title,
-  [data-testid='activity-summary'] .activity-overview-label {
-    color: hsl(var(--foreground)) !important;
-    -webkit-text-fill-color: hsl(var(--foreground)) !important;
-    opacity: 1 !important;
-    visibility: visible !important;
-  }
-
-  [data-testid='activity-summary'] .activity-stat-value {
-    color: hsl(var(--foreground)) !important;
-    -webkit-text-fill-color: hsl(var(--foreground)) !important;
-    opacity: 1 !important;
-  }
-
-  /* Special Prize Leaders: mask-free borders only; force legible text in Skia PDF */
-  [data-special-prize-leaders] {
-    position: relative;
-    z-index: 2;
-    display: block !important;
-    width: 100% !important;
-    height: auto !important;
-    max-height: none !important;
-    opacity: 1 !important;
-    visibility: visible !important;
-    overflow: visible !important;
-    break-inside: auto;
-    page-break-inside: auto;
-  }
-
-  [data-special-prize-leaders] h3,
-  [data-special-prize-leaders] a,
-  [data-special-prize-leaders] .font-mono {
-    color: hsl(var(--foreground)) !important;
-    -webkit-print-color-adjust: exact !important;
-    print-color-adjust: exact !important;
-  }
-
   /* Content area was spaced for a fixed header; tighten for flowed header */
   main {
     overflow: visible !important;
@@ -695,73 +1270,13 @@ body:has([data-maintenance-banner]) .home-control-shell {
     z-index: 1;
     color: hsl(var(--foreground));
   }
-
-  /*
-   * Chrome's print/PDF pass can match the narrow media query and collapse the
-   * card layout into an unreadable single column. Force real table geometry
-   * and drop the repeated per-cell labels on paper.
-   */
-  .cs-table {
-    display: table !important;
-    width: 100% !important;
-    border-collapse: collapse !important;
-  }
-
-  .cs-table thead {
-    position: static !important;
-    display: table-header-group !important;
-    width: auto !important;
-    height: auto !important;
-    overflow: visible !important;
-    clip-path: none !important;
-  }
-
-  .cs-table tbody {
-    display: table-row-group !important;
-  }
-
-  .cs-table thead tr,
-  .cs-table tbody tr {
-    display: table-row !important;
-    margin: 0 !important;
-    border-radius: 0 !important;
-  }
-
-  .cs-table th,
-  .cs-table td {
-    display: table-cell !important;
-    padding: 0.5rem 0.75rem !important;
-    color: hsl(var(--foreground)) !important;
-    -webkit-print-color-adjust: exact !important;
-    print-color-adjust: exact !important;
-  }
-
-  .cs-table td::before {
-    content: none !important;
-  }
-
-  /* Nothing is hidden on paper — width is no longer a constraint. */
-  .cs-table td[data-empty='true'],
-  .cs-table td[data-priority='secondary'],
-  .cs-table th[data-priority='secondary'] {
-    display: table-cell !important;
-  }
-
-  .cs-table a {
-    color: hsl(var(--foreground)) !important;
-    text-decoration: underline !important;
-  }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  #tsparticles {
-    display: none !important;
+  html {
+    scroll-behavior: auto;
   }
-  .animate-pulse-glow,
-  .animate-gradient-shift,
-  .animate-urgency-pulse,
   .animate-live-dot,
-  .animate-live-flash,
   .animate-shimmer {
     animation: none;
   }

@@ -1,0 +1,75 @@
+{
+  "breadcrumbs": {
+    "home": "홈",
+    "code": "소스 코드"
+  },
+  "viewer": {
+    "title": "코드 뷰어",
+    "description": "각 시드를 이미지와 영상으로 바꾸는 Rust 프로그램입니다. 같은 파일이 IPFS에도 게시되어 있습니다.",
+    "language": "Rust",
+    "lines": "{count, plural, other {#줄}}",
+    "codeAria": "이미지 생성 소스 코드(Rust)",
+    "copy": "코드 복사",
+    "copied": "복사됨",
+    "wrap": "줄 바꿈",
+    "ipfs": "IPFS",
+    "github": "GitHub",
+    "cid": "IPFS 콘텐츠 식별자",
+    "copyCid": "IPFS 식별자 복사"
+  },
+  "pipeline": {
+    "heading": "시드에서 이미지까지",
+    "description": "아래 코드가 NFT의 시드를 단계별로 작품으로 바꾸는 과정입니다.",
+    "galleryLink": "갤러리에서 이미지 보기",
+    "steps": {
+      "seed": {
+        "label": "시드",
+        "description": "NFT의 시드로, 각인될 때 온체인에 기록됩니다."
+      },
+      "stream": {
+        "label": "SHA3-256 무작위 스트림",
+        "description": "시드를 해시하여 재현 가능한 무작위 바이트 스트림을 만듭니다."
+      },
+      "simulation": {
+        "label": "삼체 시뮬레이션",
+        "description": "스트림에서 세 천체의 질량, 위치, 속도를 정하고 궤도를 계산합니다."
+      },
+      "renderer": {
+        "label": "스펙트럼 렌더러",
+        "description": "각 천체의 경로를 스펙트럼을 따라 조금씩 변하는 색으로 그립니다."
+      },
+      "image": {
+        "label": "Cosmic Signature NFT 이미지",
+        "description": "마지막 프레임이 이미지가 되고, 모든 프레임이 모여 영상이 됩니다. 같은 시드는 항상 같은 결과를 냅니다."
+      }
+    }
+  },
+  "seo": {
+    "heading": "Cosmic Signature 소스 코드"
+  },
+  "repositories": {
+    "heading": "프로젝트 저장소",
+    "items": {
+      "frontend": {
+        "title": "프론트엔드",
+        "description": "Next.js로 만든 웹사이트와 애플리케이션 인터페이스입니다."
+      },
+      "backend": {
+        "title": "Go 백엔드(Augur Explorer)",
+        "description": "온체인 이벤트를 인덱싱하고 API로 프로토콜 데이터를 제공합니다."
+      },
+      "contracts": {
+        "title": "스마트 컨트랙트",
+        "description": "Arbitrum에서 Cosmic Signature 프로토콜을 정의하는 Solidity 컨트랙트입니다."
+      },
+      "images": {
+        "title": "이미지 생성",
+        "description": "Cosmic Signature 이미지와 영상을 생성하는 Rust 기반 삼체 시뮬레이션과 렌더러입니다."
+      }
+    }
+  },
+  "page": {
+    "lede": "Cosmic Signature 각 부분의 소스 코드와 각 시드를 작품으로 바꾸는 프로그램입니다.",
+    "license": "라이선스: CC0 1.0"
+  }
+}

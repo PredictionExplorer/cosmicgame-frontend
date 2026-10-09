@@ -1,36 +1,33 @@
 'use client';
 
+import type { ReactNode } from 'react';
 import { useTranslations } from 'next-intl';
 
-import { PageHeader } from '@/components/layout/PageHeader';
-import { PageShell } from '@/components/ui/page-shell';
+import { LedgerPage } from '@/components/ledger/LedgerPage';
 import CharityWithdrawalTable, {
   type CharityWithdrawal,
 } from '@/components/tables/CharityWithdrawalTable';
 import { useCharityWithdrawals } from '@/hooks/useApiQuery';
 
-const CharityWithdrawals = () => {
+/**
+ * Public Goods retrievals: ETH forwarded out of the Public Goods Vault to its
+ * beneficiary. `header` is the server-rendered page header, with the group's
+ * tabs on its rule.
+ */
+const CharityWithdrawals = ({ header }: { header: ReactNode }) => {
   const t = useTranslations('publicGoods');
-  const { data: charityWithdrawals = [], isLoading: loading } = useCharityWithdrawals();
+  const { data, isLoading, isError, refetch } = useCharityWithdrawals();
 
   return (
-    <PageShell variant="data" backdrop="signature">
-      <PageHeader
-        title={t('retrievals.title')}
-        titleLevel={2}
-        subtitle={t('retrievals.subtitle')}
+    <LedgerPage header={header}>
+      <CharityWithdrawalTable
+        list={(data ?? []) as CharityWithdrawal[]}
+        loading={isLoading}
+        error={isError ? t('loadError') : undefined}
+        onRetry={() => void refetch()}
+        title={t('ledger.retrievals')}
       />
-      <p className="text-sm text-muted-foreground leading-relaxed mb-8 max-w-3xl">
-        {t('retrievals.description')}
-      </p>
-      {loading ? (
-        <p className="text-lg font-semibold" role="status">
-          {t('loading')}
-        </p>
-      ) : (
-        <CharityWithdrawalTable list={charityWithdrawals as CharityWithdrawal[]} />
-      )}
-    </PageShell>
+    </LedgerPage>
   );
 };
 

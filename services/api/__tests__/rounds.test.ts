@@ -18,6 +18,7 @@ import {
   unban_gesture,
   get_bid_eth_price,
 } from '@/services/api/rounds';
+import { isRecordNotFound } from '@/services/api/readError';
 
 jest.mock('axios', () => {
   const actual = jest.requireActual<typeof import('axios')>('axios');
@@ -38,6 +39,13 @@ const mockedAxios = axios as jest.Mocked<typeof axios>;
 const make400 = () =>
   Object.assign(new Error('Bad Request'), {
     response: { status: 400 },
+    isAxiosError: true,
+  });
+
+/** The API's answer for a record it does not hold. */
+const make400RecordNotFound = () =>
+  Object.assign(new Error('Bad Request'), {
+    response: { status: 400, data: { error: 'record not found', status: 0 } },
     isAxiosError: true,
   });
 
@@ -86,7 +94,6 @@ const mockDashboard = (overrides: Record<string, unknown> = {}) => ({
   PrizeClaimTs: 1_700_000_000,
   TsRoundStart: 1_699_000_000,
   LastBidderAddr: '0xabc',
-  GestureCostEth: 0.001,
   StakingAmountEth: 0.5,
   NumRaffleNFTWinnersBidding: 3,
   NumRaffleNFTWinnersStakingRWalk: 2,
@@ -341,9 +348,18 @@ describe('rounds API', () => {
       );
     });
 
-    it('propagates a 400 instead of resolving to null', async () => {
+    it('propagates a 400 "record not found" instead of resolving to null, as a missing record', async () => {
+      mockedAxios.get.mockRejectedValue(make400RecordNotFound());
+      const rejection = await get_round_info(1).catch((error: unknown) => error);
+      expect((rejection as Error).message).toBe('Network response was not OK');
+      // The live cycle answers 400 "record not found": pages show "no record", not an error.
+      expect(isRecordNotFound(rejection)).toBe(true);
+    });
+
+    it('reads any other 400 as a failed read, not a missing record', async () => {
       mockedAxios.get.mockRejectedValue(make400());
-      await expect(get_round_info(1)).rejects.toThrow('Network response was not OK');
+      const rejection = await get_round_info(1).catch((error: unknown) => error);
+      expect(isRecordNotFound(rejection)).toBe(false);
     });
 
     it('throws on network error', async () => {
@@ -378,7 +394,7 @@ describe('rounds API', () => {
   describe('get_claim_history', () => {
     it('returns flattened claim history on success', async () => {
       mockedAxios.get.mockResolvedValue({
-        data: { GlobalPrizeHistory: [mockTx(1), mockTx(2)] },
+        data: { GlobalPrizeHistory: [mockClaim(1), mockClaim(2)] },
       });
 
       const result = await get_claim_history();
@@ -386,9 +402,18 @@ describe('rounds API', () => {
       expect(result).toHaveLength(2);
       expect(result[0]).toHaveProperty('TxHash', '0x1');
       expect(result[1]).toHaveProperty('TxHash', '0x2');
+      expect(result[0]).toHaveProperty('RecordType', 0);
       expect(mockedAxios.get).toHaveBeenCalledWith(
         expect.stringMatching(/prizes\/history\/global/),
       );
+    });
+
+    it('rejects rows without a RecordType, since totals depend on it', async () => {
+      mockedAxios.get.mockResolvedValue({
+        data: { GlobalPrizeHistory: [mockTx(1)] },
+      });
+
+      await expect(get_claim_history()).rejects.toThrow(/schemaMismatch:WinningHistory\[global\]/);
     });
 
     it('returns empty array when GlobalPrizeHistory is missing', async () => {
@@ -637,29 +662,26 @@ describe('rounds API', () => {
   });
 
   describe('get_banned_bids', () => {
-    it('returns banned gestures from the main API', async () => {
-      const gestures = [{ BidId: 1, UserAddr: '0x1' }];
+    it('returns the hidden list from the main API', async () => {
+      const gestures = [{ bid_id: 1 }];
       mockedAxios.get.mockResolvedValue({ data: gestures });
 
-      const result = await get_banned_bids();
-
-      expect(result).toEqual(gestures);
+      expect(await get_banned_bids()).toEqual(gestures);
       expect(mockedAxios.get).toHaveBeenCalledWith(expect.stringMatching(/get_banned_bids/));
     });
 
-    it('returns empty array on 400 response', async () => {
-      mockedAxios.get.mockRejectedValue(make400());
-      expect(await get_banned_bids()).toEqual([]);
+    // Moderation fails closed: a refused or failed read is never "nothing hidden".
+    it.each([
+      ['400', make400],
+      ['403', make403],
+    ])('rejects on a %s response instead of resolving empty', async (_status, make) => {
+      mockedAxios.get.mockRejectedValue(make());
+      await expect(get_banned_bids()).rejects.toThrow();
     });
 
-    it('returns empty array on 403 response', async () => {
-      mockedAxios.get.mockRejectedValue(make403());
-      expect(await get_banned_bids()).toEqual([]);
-    });
-
-    it('throws on network error', async () => {
+    it('rejects on a network error', async () => {
       mockedAxios.get.mockRejectedValue(new Error('fail'));
-      await expect(get_banned_bids()).rejects.toThrow('Network response was not OK');
+      await expect(get_banned_bids()).rejects.toThrow();
     });
   });
 

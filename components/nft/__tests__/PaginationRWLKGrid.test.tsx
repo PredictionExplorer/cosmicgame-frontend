@@ -25,19 +25,43 @@ jest.mock(
 import PaginationRWLKGrid from '../PaginationRWLKGrid';
 
 describe('PaginationRWLKGrid', () => {
-  it('renders loading spinner', () => {
-    const { container } = render(<PaginationRWLKGrid loading={true} data={[]} />);
-    expect(container.querySelector('.animate-spin')).toBeInTheDocument();
+  it('says the wallet’s NFTs are loading, with nothing to search yet', () => {
+    render(<PaginationRWLKGrid loading={true} data={[]} />);
+    const status = screen.getByRole('status');
+    expect(status).toHaveTextContent('home.rwlkGrid.loading');
+    // The grid's own shape waits in skeleton cards, not a spinner and a caption.
+    expect(within(status).getByText('home.rwlkGrid.loading')).toHaveClass('sr-only');
+    // One plate-shaped skeleton per card (its number line waits under it).
+    expect(status.querySelectorAll('[data-slot="skeleton"].aspect-art')).toHaveLength(6);
+    expect(screen.queryByRole('searchbox')).not.toBeInTheDocument();
+    expect(screen.queryByText('home.rwlkGrid.empty')).not.toBeInTheDocument();
   });
 
-  it('renders empty state when no data', () => {
+  it('says a wallet without NFTs holds none and links to imprint one (F091)', () => {
     render(<PaginationRWLKGrid loading={false} data={[]} />);
-    expect(screen.getByText('home.rwlkGrid.empty')).toBeInTheDocument();
+    expect(screen.getByText('home.rwlkGrid.none')).toBeInTheDocument();
+    expect(screen.queryByText('home.rwlkGrid.empty')).not.toBeInTheDocument();
+    expect(screen.queryByRole('searchbox')).not.toBeInTheDocument();
+    expect(screen.getByRole('link', { name: 'home.rwlkGrid.imprint' })).toHaveAttribute(
+      'href',
+      '/imprint',
+    );
   });
 
   it('renders search input', () => {
-    render(<PaginationRWLKGrid loading={false} data={[]} />);
+    render(<PaginationRWLKGrid loading={false} data={[10]} />);
     expect(screen.getByPlaceholderText('home.rwlkGrid.searchPlaceholder')).toBeInTheDocument();
+    // The first paint already lists the NFTs: no "no match" flash.
+    expect(screen.queryByText('home.rwlkGrid.empty')).not.toBeInTheDocument();
+  });
+
+  it('says so when a search matches no NFT', () => {
+    render(<PaginationRWLKGrid loading={false} data={[10, 20]} />);
+    fireEvent.change(screen.getByPlaceholderText('home.rwlkGrid.searchPlaceholder'), {
+      target: { value: '99' },
+    });
+    expect(screen.queryAllByTestId('rwlk-card')).toHaveLength(0);
+    expect(screen.getByRole('status')).toHaveTextContent('home.rwlkGrid.empty');
   });
 
   it('renders RWLK NFT cards when data is provided', () => {
@@ -72,7 +96,7 @@ describe('PaginationRWLKGrid', () => {
         setSelectedToken={setSelected}
       />,
     );
-    fireEvent.click(screen.getAllByTestId('rwlk-card')[0]!.closest('[class*="cursor"]')!);
+    fireEvent.click(screen.getByRole('button', { name: 'home.rwlkGrid.tokenAria(id=#000010)' }));
     expect(setSelected).toHaveBeenCalledWith(10);
   });
 
@@ -86,15 +110,70 @@ describe('PaginationRWLKGrid', () => {
         setSelectedToken={setSelected}
       />,
     );
-    fireEvent.click(screen.getAllByTestId('rwlk-card')[0]!.closest('[class*="cursor"]')!);
+    fireEvent.click(screen.getAllByTestId('rwlk-option')[0]!);
     expect(setSelected).toHaveBeenCalledWith(-1);
   });
 
-  it('card click is no-op when setSelectedToken is not provided', () => {
+  it('renders plain cards, not buttons, when nothing can be selected', () => {
     render(<PaginationRWLKGrid loading={false} data={[10]} />);
-    expect(() =>
-      fireEvent.click(screen.getByTestId('rwlk-card').closest('[class*="cursor"]')!),
-    ).not.toThrow();
+    expect(screen.getByTestId('rwlk-card')).toBeInTheDocument();
+    expect(screen.queryByTestId('rwlk-option')).not.toBeInTheDocument();
+  });
+
+  it('makes each token a labelled toggle button that reports its selection', () => {
+    render(
+      <PaginationRWLKGrid
+        loading={false}
+        data={[10, 20]}
+        selectedToken={20}
+        setSelectedToken={jest.fn()}
+      />,
+    );
+    const group = screen.getByRole('group', { name: 'home.form.rwlk.title' });
+    const options = within(group).getAllByRole('button');
+    expect(options).toHaveLength(2);
+    expect(options[0]).toHaveAttribute('type', 'button');
+    expect(options[0]).toHaveAttribute('aria-pressed', 'false');
+    expect(options[1]).toHaveAttribute('aria-pressed', 'true');
+  });
+
+  it('is labelled by the picker heading when one is given', () => {
+    render(
+      <>
+        <h3 id="rwlk-heading">Your NFTs</h3>
+        <PaginationRWLKGrid
+          loading={false}
+          data={[10]}
+          setSelectedToken={jest.fn()}
+          labelledBy="rwlk-heading"
+        />
+      </>,
+    );
+    expect(screen.getByRole('group', { name: 'Your NFTs' })).toBeInTheDocument();
+  });
+
+  it('selects a token from the keyboard', () => {
+    const setSelected = jest.fn();
+    render(
+      <PaginationRWLKGrid
+        loading={false}
+        data={[10]}
+        selectedToken={-1}
+        setSelectedToken={setSelected}
+      />,
+    );
+    const option = screen.getByTestId('rwlk-option');
+    option.focus();
+    expect(option).toHaveFocus();
+    // Native buttons turn Enter and Space into clicks.
+    fireEvent.click(option);
+    expect(setSelected).toHaveBeenCalledWith(10);
+  });
+
+  it('labels the search field and keeps its icon out of the accessibility tree', () => {
+    const { container } = render(<PaginationRWLKGrid loading={false} data={[10]} />);
+    expect(screen.getByRole('searchbox', { name: 'home.rwlkGrid.searchAria' })).toBeInTheDocument();
+    expect(container.querySelector('svg')).toHaveAttribute('aria-hidden', 'true');
   });
 
   it('search input filters displayed items', () => {
@@ -158,6 +237,23 @@ describe('PaginationRWLKGrid', () => {
 
   it('has no accessibility violations', async () => {
     const { container } = render(<PaginationRWLKGrid loading={false} data={[]} />);
+    await checkA11y(container);
+  });
+
+  it('has no accessibility violations while loading', async () => {
+    const { container } = render(<PaginationRWLKGrid loading data={[]} />);
+    await checkA11y(container);
+  });
+
+  it('has no accessibility violations with selectable tokens', async () => {
+    const { container } = render(
+      <PaginationRWLKGrid
+        loading={false}
+        data={[10, 20]}
+        selectedToken={10}
+        setSelectedToken={jest.fn()}
+      />,
+    );
     await checkA11y(container);
   });
 });

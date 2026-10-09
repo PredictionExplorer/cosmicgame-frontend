@@ -1,0 +1,75 @@
+{
+  "breadcrumbs": {
+    "home": "Trang chủ",
+    "code": "Mã nguồn"
+  },
+  "viewer": {
+    "title": "Trình xem mã",
+    "description": "Chương trình Rust biến mỗi seed thành hình ảnh và video. Cùng tệp này cũng được công bố trên IPFS.",
+    "language": "Rust",
+    "lines": "{count, plural, other {# dòng}}",
+    "codeAria": "Mã nguồn tạo hình ảnh bằng Rust",
+    "copy": "Sao chép mã",
+    "copied": "Đã sao chép",
+    "wrap": "Ngắt dòng",
+    "ipfs": "IPFS",
+    "github": "GitHub",
+    "cid": "Mã định danh nội dung IPFS",
+    "copyCid": "Sao chép mã định danh IPFS"
+  },
+  "pipeline": {
+    "heading": "Từ seed đến hình ảnh",
+    "description": "Cách đoạn mã bên dưới biến seed của NFT thành tác phẩm, từng bước một.",
+    "galleryLink": "Xem các hình ảnh trong phòng trưng bày",
+    "steps": {
+      "seed": {
+        "label": "Seed",
+        "description": "Seed của NFT, được ghi trên chuỗi khi NFT được khắc."
+      },
+      "stream": {
+        "label": "Dòng ngẫu nhiên SHA3-256",
+        "description": "Băm seed thành một dòng byte ngẫu nhiên có thể tái tạo."
+      },
+      "simulation": {
+        "label": "Mô phỏng ba vật thể",
+        "description": "Lấy khối lượng, vị trí và vận tốc của ba vật thể từ dòng ngẫu nhiên rồi tính quỹ đạo của chúng."
+      },
+      "renderer": {
+        "label": "Bộ kết xuất quang phổ",
+        "description": "Vẽ đường đi của mỗi vật thể bằng một màu chuyển dần theo quang phổ."
+      },
+      "image": {
+        "label": "Hình ảnh Cosmic Signature NFT",
+        "description": "Khung hình cuối cùng là hình ảnh, tất cả khung hình ghép thành video. Cùng một seed luôn cho cùng một kết quả."
+      }
+    }
+  },
+  "seo": {
+    "heading": "Mã nguồn Cosmic Signature"
+  },
+  "repositories": {
+    "heading": "Kho mã nguồn dự án",
+    "items": {
+      "frontend": {
+        "title": "Giao diện",
+        "description": "Trang web và giao diện ứng dụng được xây dựng bằng Next.js."
+      },
+      "backend": {
+        "title": "Backend Go (Augur Explorer)",
+        "description": "Lập chỉ mục sự kiện trên chuỗi và cung cấp dữ liệu giao thức qua API."
+      },
+      "contracts": {
+        "title": "Hợp đồng thông minh",
+        "description": "Các hợp đồng Solidity định nghĩa giao thức Cosmic Signature trên Arbitrum."
+      },
+      "images": {
+        "title": "Tạo hình ảnh",
+        "description": "Mô phỏng ba vật thể và bộ kết xuất viết bằng Rust để tạo hình ảnh và video Cosmic Signature."
+      }
+    }
+  },
+  "page": {
+    "lede": "Mã nguồn của mọi phần trong Cosmic Signature, cùng chương trình biến mỗi seed thành tác phẩm.",
+    "license": "Giấy phép: CC0 1.0"
+  }
+}

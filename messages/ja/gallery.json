@@ -1,0 +1,78 @@
+{
+  "error": {
+    "title": "刻印アーカイブを読み込めません",
+    "message": "コレクションを読み込めませんでした。もう一度お試しください。"
+  },
+  "jsonLd": {
+    "name": "Cosmic Signatureギャラリー"
+  },
+  "filters": {
+    "ariaLabel": "NFTを絞り込む",
+    "all": {
+      "label": "すべて",
+      "tooltip": "コレクションのすべてのNFTを表示"
+    },
+    "anchored": {
+      "label": "係留中",
+      "tooltip": "現在係留中で係留配分を受け取っているNFT"
+    },
+    "named": {
+      "label": "名前付き",
+      "tooltip": "所有者が固有の名前を付けたNFT"
+    }
+  },
+  "sort": {
+    "ariaLabel": "並び順",
+    "newest": "新しい順",
+    "oldest": "古い順",
+    "cycleDesc": "サイクル（大→小）",
+    "cycleAsc": "サイクル（小→大）",
+    "rarity": "希少なものから",
+    "chaosDesc": "カオス（高→低）",
+    "chaosAsc": "カオス（低→高）",
+    "syzygiesDesc": "朔望の多い順"
+  },
+  "list": {
+    "headers": {
+      "artwork": "アートワーク",
+      "token": "トークン",
+      "structure": "構造",
+      "palette": "パレット",
+      "spectral": "型",
+      "chaos": "カオス",
+      "fate": "運命",
+      "allocation": "配分",
+      "cycle": "サイクル",
+      "age": "刻印"
+    }
+  },
+  "view": {
+    "ariaLabel": "表示モード",
+    "grid": "グリッド表示",
+    "list": "リスト表示"
+  },
+  "pagination": {
+    "perPage": "1ページあたり"
+  },
+  "empty": {
+    "title": "NFTが見つかりません",
+    "description": "この条件に合うシグネチャーはありません。条件をクリアすると、コレクション全体を表示します。",
+    "collectionTitle": "シグネチャーはまだありません",
+    "collectionDescription": "各シグネチャーは、サイクルが確定して刻印されるとここに表示されます。"
+  },
+  "about": {
+    "title": "コレクションについて",
+    "description": "Cosmic Signatureは一点ごとに、オンチェーンのシードから三体の物理シミュレーションを経て生まれた、唯一のジェネラティブアート作品です。誰でもプロトコルの記録から再現でき、各作品はそれを刻印したサイクルに属します。標準的なサイクルでは24点の新しいシグネチャー作品が刻印されます。4点はサイクルの役割の受領者に、10点は星選で決まった参加者に、残る10点はRandom Walk NFTの係留者に届きます。"
+  },
+  "toolbar": {
+    "filters": "絞り込み",
+    "filtersWithCount": "絞り込み · {count}",
+    "show": "表示",
+    "showResults": "{count, plural, other {#点のNFTを表示}}"
+  },
+  "results": {
+    "total": "{count, plural, other {#点のNFT}}",
+    "filtered": "{total, plural, other {全#点中{count, number}点}}",
+    "regionLabel": "シグネチャー"
+  }
+}

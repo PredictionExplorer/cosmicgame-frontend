@@ -86,6 +86,23 @@ describe('useAttachedErc20Metadata', () => {
     );
   });
 
+  it('cleans the symbol and name the token contract supplies', async () => {
+    readContract.mockImplementation(({ functionName }: { functionName: string }) => {
+      if (functionName === 'symbol')
+        return Promise.resolve(` GL${String.fromCodePoint(0x202e)}XY\n`);
+      if (functionName === 'decimals') return Promise.resolve(6);
+      if (functionName === 'name')
+        return Promise.resolve(`Galaxy${String.fromCodePoint(0x200b)} Credits`);
+      return Promise.resolve(undefined);
+    });
+    useAttachedErc20Metadata(TOKEN);
+
+    await expect(getOptions().queryFn()).resolves.toMatchObject({
+      symbol: 'GLXY',
+      name: 'Galaxy Credits',
+    });
+  });
+
   it('keeps working when logo lookup fails', async () => {
     (global.fetch as jest.Mock).mockRejectedValueOnce(new Error('no logo'));
     useAttachedErc20Metadata(TOKEN);

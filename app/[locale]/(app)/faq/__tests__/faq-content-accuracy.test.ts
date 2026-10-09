@@ -130,8 +130,8 @@ describe('FAQ contract accuracy', () => {
     });
   });
 
-  describe('Stellar Selection (draws with replacement)', () => {
-    it('states that selections are drawn with replacement', () => {
+  describe('Stellar Selection (selections with replacement)', () => {
+    it('states that selections are made with replacement', () => {
       expect(answerOf('how-does-the-stellarSelection-work')).toMatch(/with replacement/i);
     });
 

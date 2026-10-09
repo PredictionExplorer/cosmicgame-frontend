@@ -131,8 +131,9 @@ const roundInfo = {
   AllPrizes: [],
 };
 
+// The server's own field name (see get_staking_cst_actions_info).
 const anchorAction = {
-  CombinedAnchorRecordInfo: {
+  CombinedStakingRecordInfo: {
     Stake: {
       Tx: mockTransaction(7_300),
       ActionId: SPRINT4_MOCK_ACTION_ID,
@@ -177,6 +178,10 @@ const rewardsByToken = {
  * so no assertion depends on the current protocol cycle.
  */
 export async function mockSprint4Api(page: Page): Promise<void> {
+  // Keep capability probes inside this synthetic legacy backend as well.
+  await page.route('**/api/v2/cosmicgame/**', (route) =>
+    route.fulfill({ status: 404, json: { error: 'V2 API unavailable in legacy fixture' } }),
+  );
   await page.route('**/api/cosmicgame/**', async (route) => {
     const path = new URL(route.request().url()).pathname;
 
@@ -236,6 +241,13 @@ export async function mockSprint4Api(page: Page): Promise<void> {
     }
     if (path.includes('/staking/cst/rewards/by_user/by_token/details/')) {
       await route.fulfill({ json: rewardsByToken });
+      return;
+    }
+    // The anchor-holder's actions: where the token's anchor stands.
+    if (path.includes('/staking/cst/actions/by_user/')) {
+      await route.fulfill({
+        json: { StakingCSTActions: [anchorAction.CombinedStakingRecordInfo.Stake] },
+      });
       return;
     }
 

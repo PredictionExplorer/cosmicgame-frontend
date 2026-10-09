@@ -2,12 +2,9 @@ import type { Metadata, Viewport } from 'next';
 
 import { getLocaleConfig } from '@/i18n/localeConfig';
 import { LANDING_ORIGIN } from '@/lib/hostRouting';
-
-// Browsers cache favicons separately from normal HTTP cache entries and per
-// origin. Increment this value whenever either favicon asset is replaced.
-export const FAVICON_VERSION = '20260825';
-export const FAVICON_SVG_URL = `/favicon.svg?v=${FAVICON_VERSION}`;
-export const FAVICON_ICO_URL = `/favicon.ico?v=${FAVICON_VERSION}`;
+import { BRAND_ICON_URLS } from '@/lib/og/brandIcons';
+import { SITE_NAME, X_HANDLE } from '@/utils/seo';
+import { DEFAULT_SITE_THEME, THEME_CHROME } from '@/lib/theme/config';
 
 export interface RootMetadataCopy {
   defaultTitle: string;
@@ -18,16 +15,18 @@ export interface RootMetadataCopy {
 export interface RootMetadataOptions {
   origin: string;
   canonical: string;
+  /** The web app manifest to link; only the app host installs, so the landing passes none. */
+  manifest?: string;
 }
 
 // Default OG/Twitter title is intentionally punchier than the document
 // title — most embed cards crop after ~70 chars and we want the
 // brand-line tagline visible in Discord/Slack/X previews.
 const englishRootMetadataCopy: RootMetadataCopy = {
-  defaultTitle: 'Cosmic Signature',
+  defaultTitle: SITE_NAME,
   defaultOgTitle: 'Cosmic Signature \u2014 Every Gesture Shapes the Signature.',
   defaultDescription:
-    'A procedural on-chain art protocol on Arbitrum. Every gesture you make shapes the cycle\u2019s final Signature. When the cycle finalizes, the protocol distributes its reserves across more than ten allocation tracks \u2014 including Protocol Guild, the funding mechanism for 170+ Ethereum core contributors.',
+    'A procedural on-chain art protocol on Arbitrum. Every gesture you make shapes the cycle\u2019s final Signature. When the cycle finalizes, the protocol distributes its reserves across a fixed set of allocation tracks \u2014 including Protocol Guild, the funding mechanism for 170+ Ethereum core contributors.',
 };
 
 /** Maps a routing locale to the OpenGraph `og:locale` value. */
@@ -36,8 +35,9 @@ export function openGraphLocale(locale: string): string {
 }
 
 /**
- * Site-wide metadata defaults shared by both root layouts
- * (`app/[locale]/(app)/layout.tsx` and `app/[locale]/(landing)/layout.tsx`).
+ * Site-wide metadata defaults shared by every root layout
+ * (`app/[locale]/(app)/layout.tsx`, `app/[locale]/(landing)/layout.tsx` and
+ * `app/[locale]/(embed)/layout.tsx`).
  *
  * `openGraph.images` and `twitter.images` are intentionally not set here.
  * Next.js auto-populates them from the file-system convention
@@ -47,18 +47,26 @@ export function openGraphLocale(locale: string): string {
  */
 export function createRootMetadata(
   copy: RootMetadataCopy,
-  { origin, canonical }: RootMetadataOptions,
+  { origin, canonical, manifest }: RootMetadataOptions,
 ): Metadata {
   return {
     metadataBase: new URL(origin),
     title: { default: copy.defaultTitle, template: '%s' },
     description: copy.defaultDescription,
+    // Every current browser shows the SVG (lib/og/brandIcons.ts, `npm run
+    // brand:icons`). Chromium scores an `any`-sized icon 1 and an exact size
+    // match 1 too, keeping document order on a tie, so the SVG comes first and
+    // the ICO declares only its 48px frame, which no tab size matches exactly.
+    // Browsers without SVG favicons take the ICO and pick their own frame;
+    // iOS takes the apple-touch icon.
     icons: {
       icon: [
-        { url: FAVICON_SVG_URL, type: 'image/svg+xml' },
-        { url: FAVICON_ICO_URL, sizes: 'any' },
+        { url: BRAND_ICON_URLS.faviconSvg, type: 'image/svg+xml', sizes: 'any' },
+        { url: BRAND_ICON_URLS.faviconIco, sizes: '48x48' },
       ],
+      apple: [{ url: BRAND_ICON_URLS.appleTouchIcon, sizes: '180x180', type: 'image/png' }],
     },
+    ...(manifest ? { manifest } : {}),
     verification: {
       google: 'ZUw5gzqw7CFIEZgCJ2pLy-MhDe7Fdotpc31fS75v3dE',
     },
@@ -78,36 +86,20 @@ export function createRootMetadata(
     },
     openGraph: {
       type: 'website',
-      siteName: copy.defaultTitle,
+      siteName: SITE_NAME,
       title: copy.defaultOgTitle,
       description: copy.defaultDescription,
       locale: 'en_US',
     },
     twitter: {
       card: 'summary_large_image',
-      site: '@CosmicSignature',
+      site: X_HANDLE,
       title: copy.defaultOgTitle,
       description: copy.defaultDescription,
     },
-    keywords: [
-      'Cosmic Signature',
-      'NFT',
-      'procedural art protocol',
-      'Arbitrum',
-      'Ethereum',
-      'generative art',
-      'three-body problem',
-      'anchoring',
-      'CC0',
-      'formally verified',
-      'on-chain art',
-      'public goods',
-      'Protocol Guild',
-      'ERC-721',
-      'RandomWalkNFT',
-      'Cosmic Signature CST Token',
-      'CST',
-    ],
+    // No site-wide `keywords`: one English list served on every locale's
+    // pages helped no search engine, and the landing home sets its own
+    // localized list (content/landing).
   };
 }
 
@@ -116,8 +108,24 @@ export const rootMetadata: Metadata = createRootMetadata(englishRootMetadataCopy
   canonical: LANDING_ORIGIN,
 });
 
+/**
+ * `themeColor` is the default palette's page colour. The theme bootstrap
+ * (lib/theme/config.ts) rewrites it before first paint for the visitor's
+ * palette, so mobile browser chrome always blends into the page.
+ *
+ * `viewportFit: 'cover'` lets iOS report the safe-area insets: without it
+ * `env(safe-area-inset-*)` is 0, and the dock, the gesture sheet's submit
+ * row and the floating pills sat in the home-indicator zone. The content
+ * edge (`--gutter`, styles/tokens.css) keeps clear of the notch in landscape.
+ */
 export const rootViewport: Viewport = {
   width: 'device-width',
   initialScale: 1,
-  themeColor: '#15BFFD',
+  viewportFit: 'cover',
+  themeColor: THEME_CHROME[DEFAULT_SITE_THEME],
+  // Every palette is dark. Declared in the head, the browser paints its dark
+  // canvas before the stylesheet arrives, so no document ever flashes white:
+  // not a slow first paint, and not the bare shell Next.js streams when a
+  // route segment calls notFound() before the 404 renders on the client.
+  colorScheme: 'dark',
 };

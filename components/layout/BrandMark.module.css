@@ -1,0 +1,15 @@
+.mark {
+  /* The orbit mark's alpha, every path and proportion intact; the favicon and
+   * the app icons draw the same file (lib/og/brandIcons.ts). */
+  background-color: hsl(var(--primary));
+  -webkit-mask: url('/images/brand/orbit-mark.svg') center / contain no-repeat;
+  mask: url('/images/brand/orbit-mark.svg') center / contain no-repeat;
+  mask-mode: alpha;
+}
+
+@media (forced-colors: active) {
+  .mark {
+    background-color: CanvasText;
+    forced-color-adjust: none;
+  }
+}

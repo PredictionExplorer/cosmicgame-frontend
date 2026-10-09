@@ -31,7 +31,7 @@
 
 // lexicon-allow-start: backend wire-format field names mirror the Go server
 
-import { z } from 'zod';
+import * as z from 'zod';
 
 import { reportError } from '@/utils/errors';
 
@@ -54,6 +54,8 @@ export const TxInfoSchema = z
     DateTime: z.string().optional(),
   })
   .loose();
+export type TxInfoParsed = z.infer<typeof TxInfoSchema>;
+
 /* ------------------------------------------------------------------------- *
  *  Dashboard / Statistics
  * ------------------------------------------------------------------------- */
@@ -106,6 +108,7 @@ const ContractAddressesSchema = z
     ImplementationAddr: AddressSchema.optional(),
     MarketingWalletAddr: AddressSchema,
     PrizesWalletAddr: AddressSchema,
+    PrizesWalletAddrs: z.array(AddressSchema).optional(),
     StakingWalletCSTAddr: AddressSchema,
     StakingWalletRWalkAddr: AddressSchema,
   })
@@ -120,7 +123,6 @@ export const DashboardInfoSchema = z
     PrizeClaimTs: z.number(),
     TsRoundStart: z.number(),
     LastBidderAddr: AddressSchema,
-    GestureCostEth: z.number(),
     StakingAmountEth: z.number(),
     MainStats: MainStatsSchema,
     ContractAddrs: ContractAddressesSchema.optional(),
@@ -128,6 +130,8 @@ export const DashboardInfoSchema = z
     NumRaffleNFTWinnersStakingRWalk: z.number(),
   })
   .loose();
+export type DashboardInfoParsed = z.infer<typeof DashboardInfoSchema>;
+
 /* ------------------------------------------------------------------------- *
  *  Rounds
  * ------------------------------------------------------------------------- */
@@ -171,6 +175,7 @@ export const StellarSelectionETHDepositSchema = z
     Amount: z.number().optional(),
     WinnerAddr: AddressSchema.optional(),
     Claimed: z.boolean().optional(),
+    WalletAddr: AddressSchema.optional(),
   })
   .loose();
 
@@ -194,6 +199,8 @@ export const RoundInfoSchema = z
     /** V3 multi-NFT main prize (1 on V1/V2 cycles, default 3 on V3). */
     NumCSNfts: z.number().optional(),
     NftTokenIds: z.array(z.number()).optional(),
+    /** The imprinted Signature's seed, hoisted by `flattenRoundInfo` from `MainPrize.Seed`. */
+    TokenSeed: z.union([z.string(), z.number()]).optional(),
     /**
      * Claim-transaction fields, hoisted by `flattenRoundInfo` from
      * `ClaimPrizeTx.Tx`. A cycle that has not been finalized has no claim
@@ -219,6 +226,8 @@ export const RoundInfoSchema = z
     ChronoWarriorAddr: AddressSchema,
   })
   .loose();
+export type RoundInfoParsed = z.infer<typeof RoundInfoSchema>;
+
 /* ------------------------------------------------------------------------- *
  *  Gestures
  * ------------------------------------------------------------------------- */
@@ -250,6 +259,8 @@ export const GestureInfoSchema = z
     PrizeTime: z.number().optional(),
   })
   .loose();
+export type GestureInfoParsed = z.infer<typeof GestureInfoSchema>;
+
 /* ------------------------------------------------------------------------- *
  *  Users
  * ------------------------------------------------------------------------- */
@@ -293,6 +304,8 @@ export const SpecialRecipientsSchema = z
     SourceBlockTimeStamp: z.number().optional(),
   })
   .loose();
+export type SpecialRecipientsParsed = z.infer<typeof SpecialRecipientsSchema>;
+
 /* ------------------------------------------------------------------------- *
  *  Claim / allocation data
  * ------------------------------------------------------------------------- */
@@ -392,15 +405,26 @@ export const ParticipantSchema = z
   })
   .loose();
 
+/**
+ * Raw `statistics/unique/winners` row. The count is the wire's `PrizesCount`, or
+ * `AllocationsCount` once the backend renames it: `get_unique_winners` reads either (the
+ * same contract as `toRecipient`). A row with neither is a contract break worth
+ * reporting; the table still renders it, with the count unknown.
+ */
 export const RecipientSchema = z
   .object({
     WinnerAid: IdSchema,
     WinnerAddr: AddressSchema,
+    PrizesCount: z.number().optional(),
     AllocationsCount: z.number().optional(),
     MaxWinAmountEth: z.number(),
     PrizesSum: z.number(),
   })
-  .loose();
+  .loose()
+  .refine((row) => row.PrizesCount !== undefined || row.AllocationsCount !== undefined, {
+    message: 'expected PrizesCount or AllocationsCount',
+    path: ['PrizesCount'],
+  });
 
 export const UniqueEthDonorSchema = z
   .object({
@@ -585,19 +609,6 @@ export const BidFrequencyBucketSchema = z
     BucketTs: z.number(),
     NumBids: z.number(),
     UniqueBidders: z.number(),
-  })
-  .loose();
-
-export const BidTypeRatioBucketSchema = z
-  .object({
-    BucketTs: z.number(),
-    EthBids: z.number(),
-    RwalkBids: z.number(),
-    CstBids: z.number(),
-    TotalBids: z.number(),
-    EthPct: z.number(),
-    RwalkPct: z.number(),
-    CstPct: z.number(),
   })
   .loose();
 

@@ -5,22 +5,71 @@
   },
   "viewer": {
     "title": "代码查看器",
-    "subtitle": "查看将种子转换为图像的生成代码",
-    "description": "以下代码会把智能合约生成的种子转换为图像。你也可以在 IPFS 上查看：",
-    "github": "公开的 GitHub 组织位于 <link>github.com/PredictionExplorer</link>。"
+    "description": "把每个种子转换为图像和视频的 Rust 程序。同一文件也发布在 IPFS 上。",
+    "language": "Rust",
+    "lines": "{count, plural, other {# 行}}",
+    "codeAria": "图像生成源代码（Rust）",
+    "copy": "复制代码",
+    "copied": "已复制",
+    "wrap": "自动换行",
+    "ipfs": "IPFS",
+    "github": "GitHub",
+    "cid": "IPFS 内容标识符",
+    "copyCid": "复制 IPFS 标识符"
+  },
+  "pipeline": {
+    "heading": "从种子到图像",
+    "description": "下方代码如何一步步把 NFT 的种子变成艺术作品。",
+    "galleryLink": "在画廊中查看这些图像",
+    "steps": {
+      "seed": {
+        "label": "种子",
+        "description": "NFT 的种子，在铭刻时记录在链上。"
+      },
+      "stream": {
+        "label": "SHA3-256 随机流",
+        "description": "将种子哈希为可复现的随机字节流。"
+      },
+      "simulation": {
+        "label": "三体模拟",
+        "description": "从随机流中取得三个天体的质量、位置和速度，并计算它们的轨道。"
+      },
+      "renderer": {
+        "label": "光谱渲染器",
+        "description": "以沿光谱渐变的颜色描绘每个天体的轨迹。"
+      },
+      "image": {
+        "label": "Cosmic Signature NFT 图像",
+        "description": "最后一帧即为图像，全部帧组成视频。同一个种子总是得到同样的结果。"
+      }
+    }
   },
   "seo": {
-    "eyebrow": "源代码 · 确定性艺术",
-    "heading": "Cosmic Signature 源代码",
-    "description": "Cosmic Signature 公开确定性艺术流水线的源代码资源；这套流水线将链上种子转换为三体 NFT 艺术。下方客户端查看器支持交互，本段服务端渲染摘要则让抓取工具无需等待 JavaScript 即可读取核心事实。",
-    "excerpt": "种子 -> SHA3-256 随机流 -> 三体模拟 -> 光谱渲染器 -> Cosmic Signature NFT 图像",
-    "relatedAria": "源代码相关页面",
-    "links": {
-      "ipfs": "打开已发布的 IPFS 源代码制品",
-      "github": "打开 GitHub 组织",
-      "contracts": "查看已验证合约",
-      "security": "阅读安全说明",
-      "gallery": "浏览生成的 NFT 艺术"
+    "heading": "Cosmic Signature 源代码"
+  },
+  "repositories": {
+    "heading": "项目代码仓库",
+    "items": {
+      "frontend": {
+        "title": "前端",
+        "description": "基于 Next.js 的网站与应用界面。"
+      },
+      "backend": {
+        "title": "Go 后端（Augur Explorer）",
+        "description": "索引链上事件，并通过 API 提供协议数据。"
+      },
+      "contracts": {
+        "title": "智能合约",
+        "description": "以 Solidity 编写，定义 Arbitrum 上的 Cosmic Signature 协议。"
+      },
+      "images": {
+        "title": "图像生成",
+        "description": "以 Rust 编写的三体模拟与渲染器，用于生成 Cosmic Signature 图像和视频。"
+      }
     }
+  },
+  "page": {
+    "lede": "Cosmic Signature 各个部分的源代码，以及把每个种子变成作品的程序。",
+    "license": "许可：CC0 1.0"
   }
 }

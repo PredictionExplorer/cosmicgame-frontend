@@ -1,8 +1,13 @@
 /**
- * Touch target sizing for phones (WCAG 2.5.5, verified by
- * `e2e/mobile-tap-targets.mobile.spec.ts`).
+ * Target sizing (WCAG 2.5.8 and 2.5.5, verified by
+ * `e2e/mobile-tap-targets.mobile.spec.ts` and the axe smoke suite).
  *
- * Everything here is scoped below `sm` so pointer layouts keep their density.
+ * The 24px minimum of 2.5.8 applies at every width, because it covers a
+ * mouse as much as a finger: {@link TOUCH_TARGET_TEXT_LINK_CLASS} is never
+ * scoped. The 44px box-growing classes are scoped below `sm`, so pointer
+ * layouts keep their density; the extended pad follows the pointer instead
+ * (coarse pointers, whatever the width), like InfoTooltip's 44px button and
+ * the touch-hit-area utility in styles/global.css.
  *
  * These use `min-*` rather than `h-*`/`w-*` on purpose. A control is very often
  * a flex item, and along a flex container's main axis `flex-basis` supersedes
@@ -27,18 +32,29 @@ export const TOUCH_TARGET_ICON_CLASS =
 export const TOUCH_TARGET_HEIGHT_CLASS = 'min-h-11 sm:min-h-0';
 
 /**
- * Lifts a block-level text link to the 24px WCAG 2.5.8 target on phones.
+ * Lifts a block-level text link to the 24px WCAG 2.5.8 target at every width.
  *
  * Text links get 24px rather than 44px because padding out every breadcrumb and
  * footer list to 44px is precisely what 2.5.8 exists to avoid. Growing the line
  * box rather than setting `min-height` keeps the text optically centred instead
- * of stranding it against the top of a taller box.
+ * of stranding it against the top of a taller box. Tailwind emits `leading-*`
+ * after the `type-*` utilities, so it wins over their line height.
  */
-export const TOUCH_TARGET_TEXT_LINK_CLASS = 'max-sm:leading-6';
+export const TOUCH_TARGET_TEXT_LINK_CLASS = 'leading-6';
 
 /**
- * Extends a control's hit area to 44x44 with a transparent pseudo-element,
- * leaving layout untouched. Pair it with `data-touch-target="extended"` so the
+ * Grows an inline text trigger (an explained term inside a label or a
+ * sentence) to a hit area at least 24px tall on coarse pointers (WCAG
+ * 2.5.8): a transparent pseudo-element reaches 6px above and below the
+ * word, as wide as the word itself, so its line keeps its height and a
+ * mouse user's layout is untouched.
+ */
+export const TOUCH_TARGET_INLINE_TEXT_CLASS =
+  "pointer-coarse:relative pointer-coarse:after:absolute pointer-coarse:after:inset-x-0 pointer-coarse:after:-inset-y-1.5 pointer-coarse:after:content-['']";
+
+/**
+ * Extends a control's hit area to 44x44 on coarse pointers with a transparent
+ * pseudo-element, leaving layout untouched. Pair it with `data-touch-target="extended"` so the
  * audit measures the pseudo-element rather than the control's own box.
  *
  * The content utility must be written in the single-quote form. Tailwind does
@@ -46,4 +62,7 @@ export const TOUCH_TARGET_TEXT_LINK_CLASS = 'max-sm:leading-6';
  * first attempt at this technique in the codebase failed exactly that way.
  */
 export const TOUCH_TARGET_EXTENDED_CLASS =
-  "relative after:absolute after:left-1/2 after:top-1/2 after:h-11 after:w-11 after:-translate-x-1/2 after:-translate-y-1/2 after:content-[''] sm:after:hidden";
+  // On coarse pointers, not below a width: a touch tablet gets the pad, a
+  // narrow desktop window none, the same rule as InfoTooltip's 44px button and
+  // the touch-hit-area utility (styles/global.css) that grows a real box.
+  "relative pointer-coarse:after:absolute pointer-coarse:after:left-1/2 pointer-coarse:after:top-1/2 pointer-coarse:after:h-11 pointer-coarse:after:w-11 pointer-coarse:after:-translate-x-1/2 pointer-coarse:after:-translate-y-1/2 pointer-coarse:after:content-['']";
