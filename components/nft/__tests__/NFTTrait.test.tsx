@@ -14,6 +14,10 @@ import NFTTrait from '../NFTTrait';
 /** The connected wallet; mixed case, as wallets report it. */
 const OWNER = '0xAbCdEf0123456789aBcDeF0123456789AbCdEf01';
 
+jest.mock('@/hooks/useInkFilms', () => ({
+  useInkFilms: () => ({ data: undefined }),
+}));
+
 /* ── framer-motion mock ───────────────────────────────────────── */
 jest.mock('framer-motion', () => {
   const React = require('react');

@@ -1,6 +1,6 @@
 'use client';
 
-import { useMemo, useState, type KeyboardEvent } from 'react';
+import { useMemo, useRef, useState, type KeyboardEvent } from 'react';
 import * as DialogPrimitive from '@radix-ui/react-dialog';
 import { ArrowLeft, ArrowRight, ImageIcon, Play } from 'lucide-react';
 import { useLocale, useTranslations } from 'next-intl';
@@ -21,6 +21,7 @@ import { TraitSheet } from '@/components/nft/traits';
 import { Button, buttonVariants } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogDescription } from '@/components/ui/dialog';
 import { Skeleton } from '@/components/ui/skeleton';
+import { InkFilmDialog } from '@/components/nft/InkFilmDialog';
 
 /** The list fields the quick view needs for one token. */
 export interface NftQuickViewItem {
@@ -88,6 +89,8 @@ export function NftQuickView({
   const locale = useLocale();
   const signatureAlt = useSignatureAlt();
   const reducedMotion = usePrefersReducedMotion();
+  const sweepRef = useRef<HTMLVideoElement>(null);
+  const returnFocusRef = useRef<HTMLElement | null>(null);
   // The sweep is remembered per token, so moving to another Signature
   // naturally falls back to its artwork without an effect.
   const [sweepTokenId, setSweepTokenId] = useState<number | null>(null);
@@ -128,6 +131,17 @@ export function NftQuickView({
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent
+        onOpenAutoFocus={() => {
+          // This controlled dialog has gallery buttons outside DialogTrigger.
+          // Capture their focus before Radix moves it into the quick view.
+          returnFocusRef.current =
+            document.activeElement instanceof HTMLElement ? document.activeElement : null;
+        }}
+        onCloseAutoFocus={(event) => {
+          if (!returnFocusRef.current?.isConnected) return;
+          event.preventDefault();
+          returnFocusRef.current.focus();
+        }}
         onKeyDown={handleKeyDown}
         className="flex max-h-[92dvh] w-[calc(100vw-1.5rem)] max-w-5xl flex-col gap-0 overflow-y-auto overscroll-contain border-rule bg-surface-raised p-0 shadow-float sm:rounded-surface lg:grid lg:h-[min(92dvh,46rem)] lg:grid-cols-[minmax(0,1.15fr)_minmax(0,1fr)] lg:overflow-hidden"
         data-testid="nft-quick-view"
@@ -138,6 +152,7 @@ export function NftQuickView({
               <div className="flex items-center lg:min-h-0 lg:flex-1">
                 {showSweep ? (
                   <video
+                    ref={sweepRef}
                     key={String(seed)}
                     src={getSpectralSweepUrl(seed)}
                     controls
@@ -145,6 +160,7 @@ export function NftQuickView({
                     // then it waits, paused, for the video's own Play.
                     autoPlay={!prefersStillArt(reducedMotion)}
                     playsInline
+                    muted
                     loop
                     className="aspect-art w-full bg-art-ground object-contain"
                     data-testid="spectral-sweep-video"
@@ -173,6 +189,15 @@ export function NftQuickView({
                     {showSweep ? <ImageIcon aria-hidden /> : <Play aria-hidden />}
                     {showSweep ? t('quickView.hideSweep') : t('quickView.playSweep')}
                   </Button>
+                ) : null}
+                {seed ? (
+                  <InkFilmDialog
+                    seed={seed}
+                    subject={name ?? t('quickView.title', { id })}
+                    onOpenChange={(isOpen) => {
+                      if (isOpen) sweepRef.current?.pause();
+                    }}
+                  />
                 ) : null}
                 <div className="ms-auto flex items-center gap-1">
                   <Button

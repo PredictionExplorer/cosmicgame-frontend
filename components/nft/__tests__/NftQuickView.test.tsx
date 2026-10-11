@@ -1,3 +1,5 @@
+import userEvent from '@testing-library/user-event';
+
 import { deriveCollectionTraits } from '@/hooks/useNftTraits';
 import {
   TOKEN_1_METADATA_V2,
@@ -5,14 +7,20 @@ import {
   TOKEN_7_METADATA_V2,
 } from '@/lib/nftMetadata/__fixtures__/metadata';
 import { normalizeTraitEntry, parseCosmicSignatureMetadata } from '@/lib/nftMetadata';
+import type { InkFilms } from '@/lib/nftMetadata/ink';
 
-import { render, screen, checkA11y, fireEvent } from '@/test-utils';
+import { render, screen, checkA11y, fireEvent, waitFor } from '@/test-utils';
 
 import { NftQuickView } from '../NftQuickView';
 
 let mockReducedMotion = false;
 jest.mock('@/hooks/usePrefersReducedMotion', () => ({
   usePrefersReducedMotion: () => mockReducedMotion,
+}));
+
+const mockUseInkFilms = jest.fn();
+jest.mock('@/hooks/useInkFilms', () => ({
+  useInkFilms: (...args: unknown[]) => mockUseInkFilms(...args),
 }));
 
 jest.mock('next/image', () => ({
@@ -48,9 +56,34 @@ const items = [
   { TokenId: 43, Seed: 'a43', TokenName: '' },
 ];
 
+const inkFilms: InkFilms = {
+  films: (['short', 'medium', 'slow'] as const).map((variant, index) => ({
+    variant,
+    url: `https://media.example/${variant}.mp4`,
+    durationSeconds: [30, 113, 283][index]!,
+  })),
+  poster: 'https://media.example/ink.webp',
+};
+
+// jsdom has no media pipeline; retain each call's element so pausing the
+// sweep can be distinguished from disposing of an ink film.
+const pause = jest.fn(function (this: HTMLMediaElement) {
+  Object.defineProperty(this, 'paused', { configurable: true, value: true });
+});
+const load = jest.fn();
+
+beforeAll(() => {
+  jest.spyOn(HTMLMediaElement.prototype, 'pause').mockImplementation(pause);
+  jest.spyOn(HTMLMediaElement.prototype, 'load').mockImplementation(load);
+});
+
+afterAll(() => jest.restoreAllMocks());
+
 describe('NftQuickView', () => {
   beforeEach(() => {
+    jest.clearAllMocks();
     mockReducedMotion = false;
+    mockUseInkFilms.mockReturnValue({ data: undefined });
   });
 
   it('stays closed without a token', () => {
@@ -64,6 +97,72 @@ describe('NftQuickView', () => {
       />,
     );
     expect(screen.queryByTestId('nft-quick-view')).not.toBeInTheDocument();
+    expect(mockUseInkFilms).not.toHaveBeenCalled();
+  });
+
+  it('opens ink on request, pauses the sweep, and restores the quick view after Escape', async () => {
+    const user = userEvent.setup();
+    const onOpenChange = jest.fn();
+    const onNavigate = jest.fn();
+    mockUseInkFilms.mockReturnValue({ data: inkFilms });
+    render(
+      <NftQuickView
+        tokenId={7}
+        items={items}
+        onOpenChange={onOpenChange}
+        onNavigate={onNavigate}
+        collectionTraits={collectionTraits}
+      />,
+    );
+    expect(mockUseInkFilms).toHaveBeenCalledWith('a7');
+    expect(mockUseInkFilms.mock.calls.every(([seed]) => seed === 'a7')).toBe(true);
+    expect(screen.queryByTestId('ink-film-video')).toBeNull();
+    await user.click(screen.getByRole('button', { name: /Play spectral sweep/ }));
+    const sweep = screen.getByTestId('spectral-sweep-video') as HTMLVideoElement;
+    const inkTrigger = screen.getByRole('button', { name: 'detail.ink.trigger' });
+    await user.click(inkTrigger);
+    expect(pause.mock.contexts.filter((element) => element === sweep)).toHaveLength(1);
+    expect(sweep.paused).toBe(true);
+    expect(screen.getByTestId('ink-film-video')).toHaveAttribute('src', inkFilms.films[1]!.url);
+    const inkDialog = screen.getByTestId('ink-film-dialog');
+    fireEvent.keyDown(inkDialog, { key: 'ArrowLeft' });
+    fireEvent.keyDown(inkDialog, { key: 'ArrowRight' });
+    expect(onNavigate).not.toHaveBeenCalled();
+
+    await user.keyboard('{Escape}');
+    await waitFor(() => expect(screen.queryByTestId('ink-film-dialog')).toBeNull());
+    expect(screen.getByTestId('nft-quick-view')).toBeInTheDocument();
+    expect(sweep).toBeInTheDocument();
+    expect(pause.mock.contexts.filter((element) => element === sweep)).toHaveLength(1);
+    expect(inkTrigger).toHaveFocus();
+    expect(onOpenChange).not.toHaveBeenCalled();
+    await user.keyboard('{ArrowRight}');
+    expect(onNavigate).toHaveBeenLastCalledWith(43);
+  });
+
+  it('closes ink and forgets its selected length when navigating to another artwork', () => {
+    mockUseInkFilms.mockReturnValue({ data: inkFilms });
+    const props = {
+      items,
+      onOpenChange: jest.fn(),
+      onNavigate: jest.fn(),
+      collectionTraits,
+    };
+    const { rerender } = render(<NftQuickView {...props} tokenId={1} />);
+    fireEvent.click(screen.getByRole('button', { name: 'detail.ink.trigger' }));
+    fireEvent.click(screen.getByRole('radio', { name: 'detail.ink.minutes(minutes=5)' }));
+    const previousFilm = screen.getByTestId('ink-film-video');
+    expect(previousFilm).toHaveAttribute('src', inkFilms.films[2]!.url);
+
+    rerender(<NftQuickView {...props} tokenId={7} />);
+    expect(mockUseInkFilms).toHaveBeenLastCalledWith('a7');
+    expect(previousFilm).not.toBeInTheDocument();
+    expect(screen.queryByTestId('ink-film-dialog')).toBeNull();
+    fireEvent.click(screen.getByRole('button', { name: 'detail.ink.trigger' }));
+    expect(screen.getByTestId('ink-film-dialog')).toHaveAccessibleName(
+      'detail.ink.title(subject=Cosmic Signature #000007)',
+    );
+    expect(screen.getByTestId('ink-film-video')).toHaveAttribute('src', inkFilms.films[1]!.url);
   });
 
   it('shows the artwork, the label and the trait sheet of the selected token', () => {

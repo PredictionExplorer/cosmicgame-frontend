@@ -83,5 +83,16 @@
     "panHint": "Kéo hoặc dùng phím mũi tên để di chuyển quanh tác phẩm. Nhấn 0 để vừa màn hình.",
     "motionError": "Không thể tải hoạt ảnh.",
     "motionLabel": "Hoạt ảnh của {subject}"
+  },
+  "ink": {
+    "trigger": "Phim nét mực",
+    "title": "Phác họa bằng mực · {subject}",
+    "description": "Cùng những quỹ đạo ấy, được vẽ lại bằng mực trên giấy.",
+    "lengthLabel": "Thời lượng phim",
+    "seconds": "{seconds} giây",
+    "minutes": "≈{minutes} phút",
+    "videoLabel": "Phim nét mực của {subject}",
+    "loadError": "Không thể tải phim nét mực này.",
+    "retry": "Thử lại"
   }
 }

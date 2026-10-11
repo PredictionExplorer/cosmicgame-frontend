@@ -83,5 +83,16 @@
     "panHint": "拖曳或使用方向鍵移動作品。按 0 鍵恢復為符合視窗大小。",
     "motionError": "動畫無法載入。",
     "motionLabel": "{subject} 的動畫"
+  },
+  "ink": {
+    "trigger": "墨繪影片",
+    "title": "墨繪習作 · {subject}",
+    "description": "相同的軌跡，以墨跡在紙上重現。",
+    "lengthLabel": "影片長度",
+    "seconds": "{seconds} 秒",
+    "minutes": "約 {minutes} 分鐘",
+    "videoLabel": "{subject} 的墨繪影片",
+    "loadError": "墨繪影片無法載入。",
+    "retry": "再試一次"
   }
 }

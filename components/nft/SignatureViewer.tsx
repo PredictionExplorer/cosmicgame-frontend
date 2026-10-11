@@ -11,6 +11,7 @@ import { ART_PLATE_CLASS, ArtFrame, type ArtStatus } from '@/components/ui/art-f
 import { SegmentedControl } from '@/components/ui/segmented-control';
 
 import { ArtLightbox } from './ArtLightbox';
+import { InkFilmDialog } from './InkFilmDialog';
 import { signatureSources, type SignatureMedia } from './signatureArt';
 
 /** Still (the render) or In motion (the 30-second animation of the simulation). */
@@ -30,6 +31,8 @@ function fullscreenElement(): Element | null {
 const FULLSCREEN_CHANGE_EVENTS = ['fullscreenchange', 'webkitfullscreenchange'] as const;
 
 export interface SignatureViewerProps {
+  /** Optional ink studies are discovered only on a focused artwork. */
+  seed?: string | number;
   /** The token's published media; `null` until the indexer has its seed. */
   media: SignatureMedia | null;
   /** Alt text composed from the token's traits. */
@@ -75,6 +78,7 @@ export function prefersStillArt(reducedMotion: boolean): boolean {
  * browser's own full screen for the animation.
  */
 export function SignatureViewer({
+  seed,
   media,
   alt,
   subject,
@@ -305,6 +309,17 @@ export function SignatureViewer({
             </Button>
           ) : null}
         </div>
+        {seed != null ? (
+          <InkFilmDialog
+            seed={seed}
+            subject={subject}
+            onOpenChange={(open) => {
+              if (!open) return;
+              autoPaused.current = false;
+              videoRef.current?.pause();
+            }}
+          />
+        ) : null}
         {motionFailed ? (
           <p role="status" className="w-full type-caption text-subtle">
             {t('viewer.motionError')}

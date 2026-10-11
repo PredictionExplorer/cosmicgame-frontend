@@ -1,3 +1,5 @@
+import type { InkFilms } from '@/lib/nftMetadata/ink';
+
 import { render, screen, fireEvent, checkA11y, within, act, waitFor } from '@/test-utils';
 
 import { SignatureViewer } from '../SignatureViewer';
@@ -8,7 +10,20 @@ jest.mock('../../../hooks/usePrefersReducedMotion', () => ({
   usePrefersReducedMotion: () => mockReducedMotion,
 }));
 
+const mockUseInkFilms = jest.fn();
+jest.mock('@/hooks/useInkFilms', () => ({
+  useInkFilms: (...args: unknown[]) => mockUseInkFilms(...args),
+}));
+
 const media = signatureMedia('abc123')!;
+const inkFilms: InkFilms = {
+  films: (['short', 'medium', 'slow'] as const).map((variant, index) => ({
+    variant,
+    url: `https://media.example/${variant}.mp4`,
+    durationSeconds: [30, 113, 283][index]!,
+  })),
+  poster: 'https://media.example/ink.webp',
+};
 
 // jsdom has no media pipeline: play() and pause() only flip `paused`; the
 // tests fire the play and pause events a browser would.
@@ -19,15 +34,20 @@ const play = jest.fn(function (this: HTMLMediaElement) {
 const pause = jest.fn(function (this: HTMLMediaElement) {
   Object.defineProperty(this, 'paused', { configurable: true, value: true });
 });
+const load = jest.fn();
 
 beforeAll(() => {
-  Object.defineProperty(HTMLMediaElement.prototype, 'play', { configurable: true, value: play });
-  Object.defineProperty(HTMLMediaElement.prototype, 'pause', { configurable: true, value: pause });
+  jest.spyOn(HTMLMediaElement.prototype, 'play').mockImplementation(play);
+  jest.spyOn(HTMLMediaElement.prototype, 'pause').mockImplementation(pause);
+  jest.spyOn(HTMLMediaElement.prototype, 'load').mockImplementation(load);
 });
+
+afterAll(() => jest.restoreAllMocks());
 
 beforeEach(() => {
   jest.clearAllMocks();
   mockReducedMotion = false;
+  mockUseInkFilms.mockReturnValue({ data: undefined });
 });
 
 function renderViewer(overrides: Partial<Parameters<typeof SignatureViewer>[0]> = {}) {
@@ -92,6 +112,67 @@ describe('SignatureViewer', () => {
     expect(play).not.toHaveBeenCalled();
     fireEvent.click(screen.getByRole('button', { name: 'detail.viewer.play' }));
     expect(play).toHaveBeenCalledTimes(1);
+  });
+
+  it('keeps ink secondary to the still, opening only the selected medium film', () => {
+    mockUseInkFilms.mockReturnValue({ data: inkFilms });
+    renderViewer({ seed: 'abc123' });
+    expect(mockUseInkFilms).toHaveBeenCalledWith('abc123');
+    const still = screen.getByAltText('“Twisted Mind”, Cosmic Signature #000025');
+    expect(modeButton(/detail.viewer.still/)).toBeChecked();
+    expect(document.querySelector('video')).toBeNull();
+
+    fireEvent.click(screen.getByRole('button', { name: 'detail.ink.trigger' }));
+    const dialog = screen.getByTestId('ink-film-dialog');
+    expect(dialog).toHaveAccessibleName('detail.ink.title(subject=Twisted Mind)');
+    expect(within(dialog).getAllByRole('radio')).toHaveLength(3);
+    expect(
+      within(dialog).getByRole('radio', { name: 'detail.ink.minutes(minutes=2)' }),
+    ).toBeChecked();
+    expect(screen.getByTestId('ink-film-video')).toHaveAttribute('src', inkFilms.films[1]!.url);
+    expect(document.querySelectorAll('video')).toHaveLength(1);
+    expect(still).toBeInTheDocument();
+  });
+
+  it('keeps the primary animation paused through ink playback, tab changes, and closing', async () => {
+    mockUseInkFilms.mockReturnValue({ data: inkFilms });
+    renderViewer({ seed: 'abc123' });
+    fireEvent.click(modeButton(/detail.viewer.motion/));
+    const primary = screen.getByTestId('signature-motion') as HTMLVideoElement;
+    await waitFor(() => expect(play).toHaveBeenCalledTimes(1));
+    fireEvent.play(primary);
+    const primaryPauses = pause.mock.contexts.filter((element) => element === primary).length;
+
+    fireEvent.click(screen.getByRole('button', { name: 'detail.ink.trigger' }));
+    expect(primary.paused).toBe(true);
+    expect(pause.mock.contexts.filter((element) => element === primary)).toHaveLength(
+      primaryPauses + 1,
+    );
+    fireEvent.pause(primary);
+    const visibility = jest.spyOn(document, 'visibilityState', 'get');
+    try {
+      visibility.mockReturnValue('hidden');
+      act(() => document.dispatchEvent(new Event('visibilitychange')));
+      visibility.mockReturnValue('visible');
+      act(() => document.dispatchEvent(new Event('visibilitychange')));
+      expect(play).toHaveBeenCalledTimes(1);
+
+      fireEvent.click(
+        within(screen.getByTestId('ink-film-dialog')).getByRole('button', {
+          name: 'common.actions.close',
+        }),
+      );
+      await waitFor(() => expect(screen.queryByTestId('ink-film-video')).toBeNull());
+      expect(primary).toBeInTheDocument();
+      expect(primary.paused).toBe(true);
+      expect(pause.mock.contexts.filter((element) => element === primary)).toHaveLength(
+        primaryPauses + 1,
+      );
+      expect(play).toHaveBeenCalledTimes(1);
+      expect(screen.getByRole('button', { name: 'detail.viewer.play' })).toBeInTheDocument();
+    } finally {
+      visibility.mockRestore();
+    }
   });
 
   it('pauses while the tab is hidden and resumes when it returns', async () => {

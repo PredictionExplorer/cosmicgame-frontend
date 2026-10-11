@@ -120,6 +120,17 @@ and `fill`, inline styles), import the colour from `lib/theme/dataColors.ts`:
 the image inside with `object-fit: contain`. Nothing overlays, crops, dims or tints the
 artwork.
 
+**Ink studies.** The optional ink films stay behind a quiet “Ink films” action in
+the detail viewer and gallery quick view. They open in a separate dialog, leaving
+the primary still and animation prominent. `InkFilmDialog` discovers available
+lengths from the focused artwork's asset manifest; gallery cards do not request
+manifests. The medium film is the default, then short, then slow when earlier
+choices are absent. Only the selected film and its poster load, and closing or
+switching releases the video source. Use native playback controls, respect reduced
+motion, pause the primary animation, and return focus to the original control.
+Approximate length labels describe the three editions; the video's timeline shows
+its actual running time.
+
 **Wall labels.** Every Signature is captioned by one rule, on both hosts, through
 `components/ui/signature-label` (`SignatureWallLabel`, or `useSignatureLabel()` where a
 card lays out its own lines):

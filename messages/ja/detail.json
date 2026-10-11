@@ -83,5 +83,16 @@
     "panHint": "ドラッグまたは矢印キーで作品を移動します。0キーで画面に合わせます。",
     "motionError": "アニメーションを読み込めませんでした。",
     "motionLabel": "{subject}のアニメーション"
+  },
+  "ink": {
+    "trigger": "インク映像",
+    "title": "インクの習作：{subject}",
+    "description": "同じ軌跡を、紙の上にインクで描きます。",
+    "lengthLabel": "映像の長さ",
+    "seconds": "{seconds}秒",
+    "minutes": "約{minutes}分",
+    "videoLabel": "{subject}のインク映像",
+    "loadError": "インク映像を読み込めませんでした。",
+    "retry": "もう一度試す"
   }
 }

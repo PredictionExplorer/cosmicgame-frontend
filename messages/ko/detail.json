@@ -83,5 +83,16 @@
     "panHint": "드래그하거나 화살표 키로 작품을 살펴봅니다. 0 키를 누르면 화면에 맞춥니다.",
     "motionError": "애니메이션을 불러올 수 없습니다.",
     "motionLabel": "{subject} 애니메이션"
+  },
+  "ink": {
+    "trigger": "잉크 영상",
+    "title": "잉크 습작 · {subject}",
+    "description": "같은 궤적을 종이 위에 잉크로 그립니다.",
+    "lengthLabel": "영상 길이",
+    "seconds": "{seconds}초",
+    "minutes": "약 {minutes}분",
+    "videoLabel": "{subject} 잉크 영상",
+    "loadError": "잉크 영상을 불러올 수 없습니다.",
+    "retry": "다시 시도"
   }
 }

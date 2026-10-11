@@ -83,5 +83,16 @@
     "panHint": "Drag or use the arrow keys to move around the artwork. Press 0 to fit it to the screen.",
     "motionError": "The animation could not be loaded.",
     "motionLabel": "Animation of {subject}"
+  },
+  "ink": {
+    "trigger": "Ink films",
+    "title": "Ink study · {subject}",
+    "description": "The same paths, traced in ink on paper.",
+    "lengthLabel": "Film length",
+    "seconds": "{seconds} sec",
+    "minutes": "≈{minutes} min",
+    "videoLabel": "Ink film of {subject}",
+    "loadError": "This ink film could not be loaded.",
+    "retry": "Try again"
   }
 }

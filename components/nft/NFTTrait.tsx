@@ -246,6 +246,8 @@ const NFTTrait = ({ tokenId, initialMetadata, initialToken }: NFTTraitProps) => 
     <div className="site-container">
       <section aria-labelledby={titleId} className={DETAIL_GRID_CLASS} data-testid="hero-section">
         <SignatureViewer
+          key={tokenId}
+          seed={nft?.Seed}
           media={media}
           alt={alt}
           subject={subject}
