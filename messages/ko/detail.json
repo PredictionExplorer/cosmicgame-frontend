@@ -71,6 +71,10 @@
     "artworkUnavailable": "작품을 불러올 수 없습니다"
   },
   "viewer": {
+    "editionLabel": "작품 버전",
+    "original": "원본",
+    "spectral": "스펙트럼 스윕",
+    "spectralLabel": "{subject} 스펙트럼 스윕",
     "modeLabel": "작품 보기 방식",
     "still": "정지 화면",
     "motion": "움직임",
@@ -85,14 +89,21 @@
     "motionLabel": "{subject} 애니메이션"
   },
   "ink": {
-    "trigger": "잉크 영상",
-    "title": "잉크 습작 · {subject}",
+    "trigger": "잉크 습작",
     "description": "같은 궤적을 종이 위에 잉크로 그립니다.",
-    "lengthLabel": "영상 길이",
+    "mediaLabel": "잉크 습작 형식",
+    "image": "이미지",
     "seconds": "{seconds}초",
     "minutes": "약 {minutes}분",
     "videoLabel": "{subject} 잉크 영상",
+    "imageLabel": "{subject} 잉크 이미지",
+    "shareView": "선택한 보기 링크 복사",
+    "shareMedia": "미디어 링크 복사",
+    "loading": "잉크 습작 불러오는 중…",
+    "unavailable": "이 작품에는 선택한 형식의 잉크 습작이 없습니다.",
+    "availabilityError": "잉크 습작을 확인할 수 없습니다. 다시 시도해 주세요.",
     "loadError": "잉크 영상을 불러올 수 없습니다.",
+    "imageError": "잉크 이미지를 불러올 수 없습니다.",
     "retry": "다시 시도"
   }
 }

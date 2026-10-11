@@ -71,6 +71,10 @@
     "artworkUnavailable": "作品暂不可用"
   },
   "viewer": {
+    "editionLabel": "作品版本",
+    "original": "原作",
+    "spectral": "光谱扫描",
+    "spectralLabel": "{subject} 的光谱扫描",
     "modeLabel": "作品视图",
     "still": "静态",
     "motion": "动态",
@@ -85,14 +89,21 @@
     "motionLabel": "{subject} 的动画"
   },
   "ink": {
-    "trigger": "墨绘短片",
-    "title": "墨绘习作 · {subject}",
+    "trigger": "墨绘习作",
     "description": "同样的轨迹，以墨迹在纸上重现。",
-    "lengthLabel": "影片时长",
+    "mediaLabel": "墨绘版本",
+    "image": "图片",
     "seconds": "{seconds} 秒",
     "minutes": "约 {minutes} 分钟",
     "videoLabel": "{subject} 的墨绘短片",
+    "imageLabel": "{subject} 的墨绘图片",
+    "shareView": "复制此版本链接",
+    "shareMedia": "复制媒体链接",
+    "loading": "正在加载墨绘习作…",
+    "unavailable": "这件作品没有所选墨绘版本。",
+    "availabilityError": "无法确认墨绘习作是否可用，请重试。",
     "loadError": "墨绘短片无法加载。",
+    "imageError": "墨绘图片无法加载。",
     "retry": "重试"
   }
 }

@@ -50,6 +50,12 @@ const preview = {
   role: 'ember_web_preview',
   path: 'images/web/ember_preview.webp',
 };
+const sourceImage = {
+  role: 'ember_source_master',
+  path: 'images/source/ember.png',
+  kind: 'image',
+  format: 'png',
+};
 const manifest = (assets: unknown[] = [short, medium, slow, poster]) => ({
   schema_version: 2,
   generated_at: '2026-10-10T13:23:00.544726286-05:00',
@@ -71,7 +77,9 @@ afterEach(() => {
 
 describe('fetchInkFilms', () => {
   it('discovers all advertised films in duration order using actual running times', async () => {
-    mockFetch.mockResolvedValue(response(manifest([slow, medium, preview, short, poster])));
+    mockFetch.mockResolvedValue(
+      response(manifest([sourceImage, slow, medium, preview, short, poster])),
+    );
     await expect(fetchInkFilms(`0x${seed.toUpperCase()}`)).resolves.toEqual({
       films: [
         {
@@ -83,6 +91,10 @@ describe('fetchInkFilms', () => {
         { variant: 'slow', url: getSeedPackageUrl(seed, slow.path), durationSeconds: 283.35 },
       ],
       poster: getSeedPackageUrl(seed, poster.path),
+      image: {
+        url: getSeedPackageUrl(seed, poster.path),
+        sourceUrl: getSeedPackageUrl(seed, sourceImage.path),
+      },
     });
     // Discovery is one small JSON read, never a video or image availability probe.
     expect(mockFetch).toHaveBeenCalledTimes(1);
@@ -109,11 +121,41 @@ describe('fetchInkFilms', () => {
     const films = await fetchInkFilms(seed);
     expect(films?.films.map((film) => film.variant)).toEqual(variants);
     expect(films?.poster).toBeUndefined();
+    expect(films?.image).toBeUndefined();
   });
 
-  it('uses the advertised preview when the full ink poster is absent', async () => {
+  it('uses a preview as a poster without advertising a full ink image', async () => {
     mockFetch.mockResolvedValue(response(manifest([medium, preview])));
-    expect((await fetchInkFilms(seed))?.poster).toBe(getSeedPackageUrl(seed, preview.path));
+    const data = await fetchInkFilms(seed);
+    expect(data?.poster).toBe(getSeedPackageUrl(seed, preview.path));
+    expect(data?.image).toBeUndefined();
+  });
+
+  it('exposes a full image even when no films have been published', async () => {
+    mockFetch.mockResolvedValue(response(manifest([poster])));
+    await expect(fetchInkFilms(seed)).resolves.toEqual({
+      films: [],
+      poster: getSeedPackageUrl(seed, poster.path),
+      image: { url: getSeedPackageUrl(seed, poster.path) },
+    });
+  });
+
+  it.each([[sourceImage], [sourceImage, preview], [sourceImage, short]])(
+    'uses the original PNG when no full WebP image is advertised',
+    async (...assets) => {
+      mockFetch.mockResolvedValue(response(manifest(assets)));
+      const data = await fetchInkFilms(seed);
+      expect(data?.image).toEqual({
+        url: getSeedPackageUrl(seed, sourceImage.path),
+        sourceUrl: getSeedPackageUrl(seed, sourceImage.path),
+      });
+      expect(mockFetch).toHaveBeenCalledTimes(1);
+    },
+  );
+
+  it('does not use a source image as a video poster', async () => {
+    mockFetch.mockResolvedValue(response(manifest([short, sourceImage])));
+    expect((await fetchInkFilms(seed))?.poster).toBeUndefined();
   });
 
   it('ignores unrelated, HQ, and unknown future roles', async () => {
@@ -130,10 +172,12 @@ describe('fetchInkFilms', () => {
     expect((await fetchInkFilms(seed))?.films.map((film) => film.variant)).toEqual(['medium']);
   });
 
-  it('returns null for a valid package without films or a confirmed missing manifest', async () => {
+  it('returns null without full ink media or for a confirmed missing manifest', async () => {
     mockFetch
-      .mockResolvedValueOnce(response(manifest([poster])))
+      .mockResolvedValueOnce(response(manifest([])))
+      .mockResolvedValueOnce(response(manifest([preview])))
       .mockResolvedValueOnce(response(null, 404));
+    await expect(fetchInkFilms(seed)).resolves.toBeNull();
     await expect(fetchInkFilms(seed)).resolves.toBeNull();
     await expect(fetchInkFilms(seed)).resolves.toBeNull();
     expect(mockFailover).not.toHaveBeenCalled();
@@ -182,10 +226,35 @@ describe('fetchInkFilms', () => {
   it.each([
     [medium, medium],
     [short, poster, poster],
+    [sourceImage, sourceImage],
+    [preview, preview],
     [short, { ...preview, path: '../poster.webp' }],
-  ])('rejects duplicate roles and invalid posters', async (...assets) => {
+  ])('rejects duplicate recognized roles and invalid images', async (...assets) => {
     mockFetch.mockResolvedValue(response(manifest(assets)));
     await expect(fetchInkFilms(seed)).rejects.toMatchObject({ retryable: false });
+  });
+
+  it.each([poster, preview, sourceImage])(
+    'rejects recognized image roles with the wrong format or kind ($role)',
+    async (asset) => {
+      for (const change of [{ format: 'jpeg' }, { format: undefined }, { kind: 'video' }]) {
+        mockFetch.mockResolvedValue(response(manifest([{ ...asset, ...change }])));
+        await expect(fetchInkFilms(seed)).rejects.toThrow('invalid image');
+      }
+    },
+  );
+
+  it.each([
+    '/images/source/ember.png',
+    'images/source/../ember.png',
+    'images/source/ember.png?redirect=https://untrusted.example',
+    'images/source/%2e%2e/ember.png',
+    'https://untrusted.example/ember.png',
+    '//untrusted.example/ember.png',
+    'images/web/ember_full.webp',
+  ])('rejects an untrusted or mismatched source image path (%s)', async (path) => {
+    mockFetch.mockResolvedValue(response(manifest([{ ...sourceImage, path }])));
+    await expect(fetchInkFilms(seed)).rejects.toThrow('invalid image');
   });
 
   it('rejects invalid JSON without retrying the media mirror', async () => {
@@ -219,8 +288,28 @@ describe('fetchInkFilms', () => {
           'https://media.example',
         ),
       );
+      expect(data?.image?.url).toBe(
+        getSeedPackageUrl(seed, poster.path).replace(
+          'http://test-api.example',
+          'https://media.example',
+        ),
+      );
     },
   );
+
+  it('resolves source image URLs on the mirror after failing over', async () => {
+    mockFailover.mockReturnValue(alternateUrl);
+    mockFetch
+      .mockRejectedValueOnce(new TypeError('Failed to fetch'))
+      .mockResolvedValueOnce(response(manifest([sourceImage])));
+    const mirrorSourceUrl = getSeedPackageUrl(seed, sourceImage.path).replace(
+      'http://test-api.example',
+      'https://media.example',
+    );
+    await expect(fetchInkFilms(seed)).resolves.toMatchObject({
+      image: { url: mirrorSourceUrl, sourceUrl: mirrorSourceUrl },
+    });
+  });
 
   it('fails over on a network error and never cycles back to the first server', async () => {
     mockFailover.mockReturnValue(alternateUrl);

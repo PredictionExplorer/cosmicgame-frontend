@@ -11,9 +11,17 @@ export interface InkFilm {
   durationSeconds: number;
 }
 
+export interface InkImage {
+  /** Full-size browser rendition, or the source image when it is the only rendition. */
+  url: string;
+  /** Original image, when advertised by the package. */
+  sourceUrl?: string;
+}
+
 export interface InkFilms {
   films: InkFilm[];
   poster: string | undefined;
+  image?: InkImage;
 }
 
 const MANIFEST_PATH = 'metadata/assets.json';
@@ -23,9 +31,10 @@ const FILM_ASSETS = [
   { variant: 'medium', role: 'ember_medium_web', path: 'videos/web/ember_medium.mp4' },
   { variant: 'slow', role: 'ember_slow_web', path: 'videos/web/ember_slow.mp4' },
 ] as const;
-const POSTER_ASSETS = [
-  { role: 'ember_web_full', path: 'images/web/ember_full.webp' },
-  { role: 'ember_web_preview', path: 'images/web/ember_preview.webp' },
+const IMAGE_ASSETS = [
+  { role: 'ember_web_full', path: 'images/web/ember_full.webp', format: 'webp' },
+  { role: 'ember_web_preview', path: 'images/web/ember_preview.webp', format: 'webp' },
+  { role: 'ember_source_master', path: 'images/source/ember.png', format: 'png' },
 ] as const;
 
 const ManifestSchema = z.object({
@@ -67,6 +76,8 @@ function parseManifest(raw: unknown, manifestUrl: string): InkFilms | null {
   const packageUrl = manifestUrl.slice(0, -MANIFEST_PATH.length);
   const films: InkFilm[] = [];
   let poster: string | undefined;
+  let fullImageUrl: string | undefined;
+  let sourceUrl: string | undefined;
 
   for (const expected of FILM_ASSETS) {
     const matches = parsed.data.assets.filter((asset) => asset.role === expected.role);
@@ -90,7 +101,7 @@ function parseManifest(raw: unknown, manifestUrl: string): InkFilms | null {
     });
   }
 
-  for (const expected of POSTER_ASSETS) {
+  for (const expected of IMAGE_ASSETS) {
     const matches = parsed.data.assets.filter((asset) => asset.role === expected.role);
     if (matches.length === 0) continue;
     const asset = matches[0]!;
@@ -98,15 +109,23 @@ function parseManifest(raw: unknown, manifestUrl: string): InkFilms | null {
       matches.length !== 1 ||
       asset.path !== expected.path ||
       asset.kind !== 'image' ||
-      asset.format !== 'webp'
+      asset.format !== expected.format
     ) {
-      throw new InkFilmsError('Ink film manifest contains an invalid poster');
+      throw new InkFilmsError('Ink film manifest contains an invalid image');
     }
-    poster ??= `${packageUrl}${expected.path}`;
+    const url = `${packageUrl}${expected.path}`;
+    if (expected.role === 'ember_source_master') {
+      sourceUrl = url;
+    } else {
+      poster ??= url;
+      if (expected.role === 'ember_web_full') fullImageUrl = url;
+    }
   }
 
-  // An older package can have a perfectly valid manifest without ink films.
-  return films.length > 0 ? { films, poster } : null;
+  const imageUrl = fullImageUrl ?? sourceUrl;
+  const image = imageUrl ? { url: imageUrl, ...(sourceUrl ? { sourceUrl } : {}) } : undefined;
+  // A preview alone is not a full ink image. Older packages may have neither.
+  return films.length > 0 || image ? { films, poster, ...(image ? { image } : {}) } : null;
 }
 
 async function readManifest(url: string, signal?: AbortSignal): Promise<InkFilms | null> {
@@ -150,8 +169,8 @@ async function readManifest(url: string, signal?: AbortSignal): Promise<InkFilms
 }
 
 /**
- * Discovers advertised ink films without requesting any video bytes. A missing
- * manifest or one without ink films resolves to null; malformed data and failed
+ * Discovers advertised ink films and images without requesting any media bytes. A missing
+ * manifest or one without full ink media resolves to null; malformed data and failed
  * reads reject. Temporary failures try the next configured media server once.
  */
 export async function fetchInkFilms(

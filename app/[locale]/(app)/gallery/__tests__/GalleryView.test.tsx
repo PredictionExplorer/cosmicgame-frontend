@@ -396,7 +396,7 @@ describe('GalleryView', () => {
     fireEvent.click(screen.getByLabelText('Quick view of Cosmic Signature #000001'));
     expect(mockUseInkFilms.mock.calls.every(([seed]) => seed === 'a1')).toBe(true);
     expect(mockUseInkFilms).toHaveBeenCalledWith('a1');
-    expect(screen.queryByRole('button', { name: 'detail.ink.trigger' })).toBeNull();
+    expect(screen.queryByRole('radio', { name: 'detail.ink.trigger' })).toBeNull();
     expect(document.querySelector('video')).toBeNull();
 
     mockUseInkFilms.mockClear();
@@ -407,6 +407,33 @@ describe('GalleryView', () => {
     );
     expect(screen.queryByTestId('nft-quick-view')).toBeNull();
     expect(mockUseInkFilms).not.toHaveBeenCalled();
+  });
+
+  it('keeps gallery filters intact while an optional ink image is viewed', () => {
+    mockUseInkFilms.mockReturnValue({
+      data: {
+        films: [],
+        poster: undefined,
+        image: { url: 'https://media.example/ink-full.webp' },
+      },
+    });
+    render(<GalleryView search="show=named" />);
+    expect(cardIds()).toEqual([1]);
+    expect(mockUseInkFilms).not.toHaveBeenCalled();
+    expect(screen.queryByTestId('ink-image-view')).toBeNull();
+
+    fireEvent.click(screen.getByLabelText('Quick view of Cosmic Signature #000001'));
+    expect(screen.queryByTestId('ink-image-view')).toBeNull();
+    fireEvent.click(screen.getByRole('radio', { name: 'detail.ink.trigger' }));
+    expect(
+      within(screen.getByTestId('signature-viewer')).getByTestId('ink-image-view'),
+    ).toBeInTheDocument();
+    expect(screen.getAllByRole('dialog')).toHaveLength(1);
+    expect(screen.getByTestId('trait-sheet')).toBeVisible();
+    expect(document.querySelector('video')).toBeNull();
+    expect(cardIds()).toEqual([1]);
+    expect(mockReplace).not.toHaveBeenCalled();
+    expect(mockPush).not.toHaveBeenCalled();
   });
 
   it('keeps trait sort orders and the DNA out of reach while the index is unavailable', () => {

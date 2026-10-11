@@ -1,8 +1,8 @@
 'use client';
 
-import { useMemo, useRef, useState, type KeyboardEvent } from 'react';
+import { useMemo, useRef, type KeyboardEvent } from 'react';
 import * as DialogPrimitive from '@radix-ui/react-dialog';
-import { ArrowLeft, ArrowRight, ImageIcon, Play } from 'lucide-react';
+import { ArrowLeft, ArrowRight } from 'lucide-react';
 import { useLocale, useTranslations } from 'next-intl';
 
 import { getSpectralSweepUrl } from '@/utils/urls';
@@ -12,16 +12,14 @@ import type { CollectionTraits } from '@/hooks/useNftTraits';
 import type { CategoricalTraitKey } from '@/lib/nftMetadata';
 import { AnchoringIcon } from '@/lib/conceptIcons';
 import { Link } from '@/i18n/navigation';
-import { ArtFrame, WallLabelMeta } from '@/components/ui/art-frame';
-import { usePrefersReducedMotion } from '@/hooks/usePrefersReducedMotion';
+import { WallLabelMeta } from '@/components/ui/art-frame';
 import { signatureMedia, useSignatureAlt } from '@/components/nft/signatureArt';
 import { useSignatureArtLabel } from '@/components/nft/useSignatureArtLabel';
-import { prefersStillArt } from '@/components/nft/SignatureViewer';
+import { SignatureViewer } from '@/components/nft/SignatureViewer';
 import { TraitSheet } from '@/components/nft/traits';
 import { Button, buttonVariants } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogDescription } from '@/components/ui/dialog';
 import { Skeleton } from '@/components/ui/skeleton';
-import { InkFilmDialog } from '@/components/nft/InkFilmDialog';
 
 /** The list fields the quick view needs for one token. */
 export interface NftQuickViewItem {
@@ -36,7 +34,7 @@ export interface NftQuickViewItem {
 
 /**
  * Where the arrow keys belong to the focused control rather than to the
- * dialog's previous / next: the sweep's video controls, fields, sliders and
+ * dialog's previous / next: the media controls, fields, sliders and
  * composite widgets that move their own selection.
  */
 const ARROW_OWNING_SELECTOR = [
@@ -70,7 +68,7 @@ export interface NftQuickViewProps {
 /**
  * NftQuickView — a Signature in focus without leaving the gallery. From `lg`
  * the art hangs centred on the black ground of its own column (the plate
- * never scrolls away), with the still / spectral sweep switch and previous /
+ * never scrolls away), with the shared edition and media controls and previous /
  * next beneath it; the label column scrolls on its own: the name, a caption
  * (number, rarity, anchored), the way to the full page, and the same trait
  * sheet the detail page shows. Below `lg` (where the trait tiles would be
@@ -88,13 +86,7 @@ export function NftQuickView({
   const t = useTranslations('traits');
   const locale = useLocale();
   const signatureAlt = useSignatureAlt();
-  const reducedMotion = usePrefersReducedMotion();
-  const sweepRef = useRef<HTMLVideoElement>(null);
   const returnFocusRef = useRef<HTMLElement | null>(null);
-  // The sweep is remembered per token, so moving to another Signature
-  // naturally falls back to its artwork without an effect.
-  const [sweepTokenId, setSweepTokenId] = useState<number | null>(null);
-  const showSweep = sweepTokenId !== null && sweepTokenId === tokenId;
 
   const index = useMemo(
     () => items.findIndex((item) => item.TokenId === tokenId),
@@ -113,10 +105,12 @@ export function NftQuickView({
   const rarityTotal = collectionTraits?.rarity.total ?? 0;
   const media = signatureMedia(seed);
   const alt = signatureAlt({ id, name, entry });
-  const { label: unavailableLabel } = useSignatureArtLabel(item?.TimeStamp);
+  const { label: unavailableLabel, renderPending } = useSignatureArtLabel(item?.TimeStamp);
 
   function handleKeyDown(event: KeyboardEvent<HTMLDivElement>) {
     const target = event.target;
+    if (target instanceof Element && target.closest('[role="dialog"]') !== event.currentTarget)
+      return;
     if (target instanceof Element && target.closest(ARROW_OWNING_SELECTOR)) return;
     if (event.altKey || event.ctrlKey || event.metaKey || event.shiftKey) return;
     if (event.key === 'ArrowLeft' && previous) {
@@ -148,77 +142,39 @@ export function NftQuickView({
       >
         {item ? (
           <>
-            <div className="flex shrink-0 flex-col bg-art-ground">
-              <div className="flex items-center lg:min-h-0 lg:flex-1">
-                {showSweep ? (
-                  <video
-                    ref={sweepRef}
-                    key={String(seed)}
-                    src={getSpectralSweepUrl(seed)}
-                    controls
-                    // Asked for, so it plays, unless the reader keeps motion off:
-                    // then it waits, paused, for the video's own Play.
-                    autoPlay={!prefersStillArt(reducedMotion)}
-                    playsInline
-                    muted
-                    loop
-                    className="aspect-art w-full bg-art-ground object-contain"
-                    data-testid="spectral-sweep-video"
-                  />
-                ) : (
-                  <ArtFrame
-                    sources={media ? [media.webImage, media.sourceImage] : []}
-                    alt={alt}
-                    unavailableLabel={unavailableLabel}
-                    unavailableDetail={id}
-                    sizes="(max-width: 1023px) 100vw, 36rem"
-                    // The plate sits on its own black ground: no print edge.
-                    className="rounded-none shadow-none after:hidden hover:shadow-none"
-                    priority
-                  />
-                )}
-              </div>
-              <div className="flex flex-wrap items-center gap-2 p-3">
-                {seed ? (
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => setSweepTokenId(showSweep ? null : tokenId)}
-                    title={t('quickView.sweepNote')}
-                  >
-                    {showSweep ? <ImageIcon aria-hidden /> : <Play aria-hidden />}
-                    {showSweep ? t('quickView.hideSweep') : t('quickView.playSweep')}
-                  </Button>
-                ) : null}
-                {seed ? (
-                  <InkFilmDialog
-                    seed={seed}
-                    subject={name ?? t('quickView.title', { id })}
-                    onOpenChange={(isOpen) => {
-                      if (isOpen) sweepRef.current?.pause();
-                    }}
-                  />
-                ) : null}
-                <div className="ms-auto flex items-center gap-1">
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    disabled={!previous}
-                    onClick={() => previous && onNavigate(previous.TokenId)}
-                    aria-label={t('quickView.previous')}
-                  >
-                    <ArrowLeft aria-hidden className="rtl:-scale-x-100" />
-                  </Button>
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    disabled={!next}
-                    onClick={() => next && onNavigate(next.TokenId)}
-                    aria-label={t('quickView.next')}
-                  >
-                    <ArrowRight aria-hidden className="rtl:-scale-x-100" />
-                  </Button>
-                </div>
+            <div className="flex min-w-0 flex-col justify-center gap-4 bg-surface p-3 sm:p-4 lg:min-h-0 lg:overflow-y-auto lg:overscroll-contain">
+              <SignatureViewer
+                key={item.TokenId}
+                tokenId={item.TokenId}
+                seed={seed}
+                media={media}
+                subject={name ?? t('quickView.title', { id })}
+                alt={alt}
+                tokenLabel={id}
+                unavailableLabel={unavailableLabel}
+                renderPending={renderPending}
+                sizes="(max-width: 1023px) 100vw, 36rem"
+                spectralSweepUrl={seed ? getSpectralSweepUrl(seed) : undefined}
+              />
+              <div className="flex items-center justify-end gap-1 border-t border-rule-faint pt-2">
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  disabled={!previous}
+                  onClick={() => previous && onNavigate(previous.TokenId)}
+                  aria-label={t('quickView.previous')}
+                >
+                  <ArrowLeft aria-hidden className="rtl:-scale-x-100" />
+                </Button>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  disabled={!next}
+                  onClick={() => next && onNavigate(next.TokenId)}
+                  aria-label={t('quickView.next')}
+                >
+                  <ArrowRight aria-hidden className="rtl:-scale-x-100" />
+                </Button>
               </div>
             </div>
 

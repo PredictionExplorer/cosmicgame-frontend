@@ -9,7 +9,7 @@ import {
 import { normalizeTraitEntry, parseCosmicSignatureMetadata } from '@/lib/nftMetadata';
 import type { InkFilms } from '@/lib/nftMetadata/ink';
 
-import { render, screen, checkA11y, fireEvent, waitFor } from '@/test-utils';
+import { render, screen, checkA11y, fireEvent, within } from '@/test-utils';
 
 import { NftQuickView } from '../NftQuickView';
 
@@ -73,6 +73,12 @@ const pause = jest.fn(function (this: HTMLMediaElement) {
 const load = jest.fn();
 
 beforeAll(() => {
+  jest.spyOn(HTMLMediaElement.prototype, 'play').mockImplementation(function (
+    this: HTMLMediaElement,
+  ) {
+    Object.defineProperty(this, 'paused', { configurable: true, value: false });
+    return Promise.resolve();
+  });
   jest.spyOn(HTMLMediaElement.prototype, 'pause').mockImplementation(pause);
   jest.spyOn(HTMLMediaElement.prototype, 'load').mockImplementation(load);
 });
@@ -100,7 +106,7 @@ describe('NftQuickView', () => {
     expect(mockUseInkFilms).not.toHaveBeenCalled();
   });
 
-  it('opens ink on request, pauses the sweep, and restores the quick view after Escape', async () => {
+  it('replaces the sweep with ink inside the same quick view and releases its media', async () => {
     const user = userEvent.setup();
     const onOpenChange = jest.fn();
     const onNavigate = jest.fn();
@@ -117,30 +123,37 @@ describe('NftQuickView', () => {
     expect(mockUseInkFilms).toHaveBeenCalledWith('a7');
     expect(mockUseInkFilms.mock.calls.every(([seed]) => seed === 'a7')).toBe(true);
     expect(screen.queryByTestId('ink-film-video')).toBeNull();
-    await user.click(screen.getByRole('button', { name: /Play spectral sweep/ }));
+    const quickView = screen.getByTestId('nft-quick-view');
+    await user.click(screen.getByRole('radio', { name: 'detail.viewer.spectral' }));
     const sweep = screen.getByTestId('spectral-sweep-video') as HTMLVideoElement;
-    const inkTrigger = screen.getByRole('button', { name: 'detail.ink.trigger' });
-    await user.click(inkTrigger);
-    expect(pause.mock.contexts.filter((element) => element === sweep)).toHaveLength(1);
+    const pausesBeforeSwitch = pause.mock.contexts.filter((element) => element === sweep).length;
+    await user.click(screen.getByRole('radio', { name: 'detail.ink.trigger' }));
+    expect(pause.mock.contexts.filter((element) => element === sweep)).toHaveLength(
+      pausesBeforeSwitch + 1,
+    );
     expect(sweep.paused).toBe(true);
-    expect(screen.getByTestId('ink-film-video')).toHaveAttribute('src', inkFilms.films[1]!.url);
-    const inkDialog = screen.getByTestId('ink-film-dialog');
-    fireEvent.keyDown(inkDialog, { key: 'ArrowLeft' });
-    fireEvent.keyDown(inkDialog, { key: 'ArrowRight' });
+    expect(sweep).not.toBeInTheDocument();
+    expect(sweep).not.toHaveAttribute('src');
+    const ink = screen.getByTestId('ink-film-video');
+    expect(ink).toHaveAttribute('src', inkFilms.films[1]!.url);
+    expect(within(quickView).getByTestId('ink-film-video')).toBe(ink);
+    expect(screen.getAllByRole('dialog')).toHaveLength(1);
+    expect(screen.getByTestId('trait-sheet')).toBeVisible();
+    fireEvent.keyDown(ink, { key: 'ArrowLeft' });
+    fireEvent.keyDown(ink, { key: 'ArrowRight' });
     expect(onNavigate).not.toHaveBeenCalled();
 
-    await user.keyboard('{Escape}');
-    await waitFor(() => expect(screen.queryByTestId('ink-film-dialog')).toBeNull());
-    expect(screen.getByTestId('nft-quick-view')).toBeInTheDocument();
-    expect(sweep).toBeInTheDocument();
-    expect(pause.mock.contexts.filter((element) => element === sweep)).toHaveLength(1);
-    expect(inkTrigger).toHaveFocus();
+    await user.click(screen.getByRole('radio', { name: 'detail.viewer.original' }));
+    expect(ink).not.toBeInTheDocument();
+    expect(ink).not.toHaveAttribute('src');
+    expect(screen.getByTestId('art-frame')).toBeInTheDocument();
+    expect(screen.queryByTestId('spectral-sweep-video')).toBeNull();
     expect(onOpenChange).not.toHaveBeenCalled();
-    await user.keyboard('{ArrowRight}');
+    fireEvent.keyDown(quickView, { key: 'ArrowRight' });
     expect(onNavigate).toHaveBeenLastCalledWith(43);
   });
 
-  it('closes ink and forgets its selected length when navigating to another artwork', () => {
+  it('returns to the original and forgets the selected ink length when navigating to another artwork', () => {
     mockUseInkFilms.mockReturnValue({ data: inkFilms });
     const props = {
       items,
@@ -149,7 +162,7 @@ describe('NftQuickView', () => {
       collectionTraits,
     };
     const { rerender } = render(<NftQuickView {...props} tokenId={1} />);
-    fireEvent.click(screen.getByRole('button', { name: 'detail.ink.trigger' }));
+    fireEvent.click(screen.getByRole('radio', { name: 'detail.ink.trigger' }));
     fireEvent.click(screen.getByRole('radio', { name: 'detail.ink.minutes(minutes=5)' }));
     const previousFilm = screen.getByTestId('ink-film-video');
     expect(previousFilm).toHaveAttribute('src', inkFilms.films[2]!.url);
@@ -158,11 +171,56 @@ describe('NftQuickView', () => {
     expect(mockUseInkFilms).toHaveBeenLastCalledWith('a7');
     expect(previousFilm).not.toBeInTheDocument();
     expect(screen.queryByTestId('ink-film-dialog')).toBeNull();
-    fireEvent.click(screen.getByRole('button', { name: 'detail.ink.trigger' }));
-    expect(screen.getByTestId('ink-film-dialog')).toHaveAccessibleName(
-      'detail.ink.title(subject=Cosmic Signature #000007)',
+    fireEvent.click(screen.getByRole('radio', { name: 'detail.ink.trigger' }));
+    expect(screen.getByTestId('ink-film-video')).toHaveAccessibleName(
+      'detail.ink.videoLabel(subject=Cosmic Signature #000007)',
     );
+    expect(screen.getAllByRole('dialog')).toHaveLength(1);
     expect(screen.getByTestId('ink-film-video')).toHaveAttribute('src', inkFilms.films[1]!.url);
+  });
+
+  it('opens an image-only study on request without changing the gallery URL', async () => {
+    const user = userEvent.setup();
+    const onOpenChange = jest.fn();
+    mockUseInkFilms.mockReturnValue({
+      data: {
+        films: [],
+        poster: undefined,
+        image: { url: 'https://media.example/ink-full.webp' },
+      },
+    });
+    const originalUrl = window.location.href;
+    render(
+      <NftQuickView
+        tokenId={1}
+        items={items}
+        onOpenChange={onOpenChange}
+        onNavigate={jest.fn()}
+        collectionTraits={collectionTraits}
+      />,
+    );
+    const mainArt = screen.getByTestId('art-frame');
+    expect(screen.queryByTestId('ink-image-view')).toBeNull();
+    await user.click(screen.getByRole('radio', { name: 'detail.ink.trigger' }));
+    expect(screen.getByAltText('detail.ink.imageLabel(subject=NUMBA 1)')).toHaveAttribute(
+      'src',
+      'https://media.example/ink-full.webp',
+    );
+    expect(document.querySelector('video')).toBeNull();
+    expect(mainArt).not.toBeInTheDocument();
+    expect(screen.getAllByRole('dialog')).toHaveLength(1);
+    expect(screen.getByTestId('trait-sheet')).toBeVisible();
+    expect(window.location.href).toBe(originalUrl);
+
+    await user.click(screen.getByRole('radio', { name: 'detail.viewer.original' }));
+    expect(screen.queryByTestId('ink-image-view')).toBeNull();
+    expect(screen.getByTestId('nft-quick-view')).toBeInTheDocument();
+    expect(screen.getByTestId('art-frame')).toBeInTheDocument();
+    expect(screen.getByRole('radio', { name: 'detail.viewer.original' })).toHaveFocus();
+    expect(onOpenChange).not.toHaveBeenCalled();
+    await user.keyboard('{Escape}');
+    expect(onOpenChange).toHaveBeenCalledWith(false);
+    expect(window.location.href).toBe(originalUrl);
   });
 
   it('shows the artwork, the label and the trait sheet of the selected token', () => {
@@ -180,7 +238,8 @@ describe('NftQuickView', () => {
     const art = screen.getByAltText(
       '“NUMBA 1”, Cosmic Signature #000001: Orbit Ribbons structure, Glacial Split palette, spectral class B',
     );
-    expect(art).toHaveAttribute('src', expect.stringContaining('/0xa1/images/web/full.webp'));
+    expect(art).toHaveAttribute('srcset', expect.stringContaining('/0xa1/thumb_card.webp 640w'));
+    expect(art).toHaveAttribute('loading', 'eager');
     // Nothing is layered over the art: the hue strip belongs to the trait sheet.
     expect(screen.getByTestId('art-frame')).not.toContainElement(
       screen.getAllByTestId('hue-strip')[0]!,
@@ -251,7 +310,7 @@ describe('NftQuickView', () => {
         collectionTraits={collectionTraits}
       />,
     );
-    fireEvent.click(screen.getByRole('button', { name: /Play spectral sweep/ }));
+    fireEvent.click(screen.getByRole('radio', { name: 'detail.viewer.spectral' }));
     const video = screen.getByTestId('spectral-sweep-video');
     fireEvent.keyDown(video, { key: 'ArrowLeft' });
     fireEvent.keyDown(video, { key: 'ArrowRight' });
@@ -269,13 +328,13 @@ describe('NftQuickView', () => {
       />
     );
     const { unmount } = render(view);
-    fireEvent.click(screen.getByRole('button', { name: /Play spectral sweep/ }));
+    fireEvent.click(screen.getByRole('radio', { name: 'detail.viewer.spectral' }));
     expect(screen.getByTestId('spectral-sweep-video')).toHaveAttribute('autoplay');
     unmount();
 
     mockReducedMotion = true;
     render(view);
-    fireEvent.click(screen.getByRole('button', { name: /Play spectral sweep/ }));
+    fireEvent.click(screen.getByRole('radio', { name: 'detail.viewer.spectral' }));
     expect(screen.getByTestId('spectral-sweep-video')).not.toHaveAttribute('autoplay');
   });
 
@@ -318,12 +377,12 @@ describe('NftQuickView', () => {
         collectionTraits={collectionTraits}
       />,
     );
-    fireEvent.click(screen.getByRole('button', { name: /Play spectral sweep/ }));
+    fireEvent.click(screen.getByRole('radio', { name: 'detail.viewer.spectral' }));
     expect(screen.getByTestId('spectral-sweep-video')).toHaveAttribute(
       'src',
       expect.stringContaining('/videos/web/spectral_sweep.mp4'),
     );
-    fireEvent.click(screen.getByRole('button', { name: /Back to artwork/ }));
+    fireEvent.click(screen.getByRole('radio', { name: 'detail.viewer.still' }));
     expect(screen.queryByTestId('spectral-sweep-video')).not.toBeInTheDocument();
   });
 

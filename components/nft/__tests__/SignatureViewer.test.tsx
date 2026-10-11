@@ -23,6 +23,7 @@ const inkFilms: InkFilms = {
     durationSeconds: [30, 113, 283][index]!,
   })),
   poster: 'https://media.example/ink.webp',
+  image: { url: 'https://media.example/ink-full.webp' },
 };
 
 // jsdom has no media pipeline: play() and pause() only flip `paused`; the
@@ -35,6 +36,20 @@ const pause = jest.fn(function (this: HTMLMediaElement) {
   Object.defineProperty(this, 'paused', { configurable: true, value: true });
 });
 const load = jest.fn();
+const originalObserver = global.IntersectionObserver;
+const observations = new Map<Element, IntersectionObserverCallback>();
+function observation(target: Element, isIntersecting: boolean): IntersectionObserverEntry {
+  const rect = target.getBoundingClientRect();
+  return {
+    target,
+    isIntersecting,
+    intersectionRatio: isIntersecting ? 1 : 0,
+    boundingClientRect: rect,
+    intersectionRect: rect,
+    rootBounds: rect,
+    time: 0,
+  };
+}
 
 beforeAll(() => {
   jest.spyOn(HTMLMediaElement.prototype, 'play').mockImplementation(play);
@@ -42,17 +57,32 @@ beforeAll(() => {
   jest.spyOn(HTMLMediaElement.prototype, 'load').mockImplementation(load);
 });
 
-afterAll(() => jest.restoreAllMocks());
+afterAll(() => {
+  jest.restoreAllMocks();
+  global.IntersectionObserver = originalObserver;
+});
 
 beforeEach(() => {
   jest.clearAllMocks();
   mockReducedMotion = false;
+  observations.clear();
+  global.IntersectionObserver = jest
+    .fn()
+    .mockImplementation((callback: IntersectionObserverCallback) => ({
+      observe: (element: Element) => {
+        observations.set(element, callback);
+        callback([observation(element, true)], {} as IntersectionObserver);
+      },
+      unobserve: jest.fn(),
+      disconnect: jest.fn(),
+    }));
   mockUseInkFilms.mockReturnValue({ data: undefined });
 });
 
 function renderViewer(overrides: Partial<Parameters<typeof SignatureViewer>[0]> = {}) {
   return render(
     <SignatureViewer
+      tokenId={25}
       media={media}
       alt="“Twisted Mind”, Cosmic Signature #000025"
       subject="Twisted Mind"
@@ -114,65 +144,22 @@ describe('SignatureViewer', () => {
     expect(play).toHaveBeenCalledTimes(1);
   });
 
-  it('keeps ink secondary to the still, opening only the selected medium film', () => {
-    mockUseInkFilms.mockReturnValue({ data: inkFilms });
-    renderViewer({ seed: 'abc123' });
-    expect(mockUseInkFilms).toHaveBeenCalledWith('abc123');
-    const still = screen.getByAltText('“Twisted Mind”, Cosmic Signature #000025');
-    expect(modeButton(/detail.viewer.still/)).toBeChecked();
-    expect(document.querySelector('video')).toBeNull();
-
-    fireEvent.click(screen.getByRole('button', { name: 'detail.ink.trigger' }));
-    const dialog = screen.getByTestId('ink-film-dialog');
-    expect(dialog).toHaveAccessibleName('detail.ink.title(subject=Twisted Mind)');
-    expect(within(dialog).getAllByRole('radio')).toHaveLength(3);
-    expect(
-      within(dialog).getByRole('radio', { name: 'detail.ink.minutes(minutes=2)' }),
-    ).toBeChecked();
-    expect(screen.getByTestId('ink-film-video')).toHaveAttribute('src', inkFilms.films[1]!.url);
-    expect(document.querySelectorAll('video')).toHaveLength(1);
-    expect(still).toBeInTheDocument();
-  });
-
-  it('keeps the primary animation paused through ink playback, tab changes, and closing', async () => {
+  it('releases the original animation when changing editions and returns to a still', async () => {
     mockUseInkFilms.mockReturnValue({ data: inkFilms });
     renderViewer({ seed: 'abc123' });
     fireEvent.click(modeButton(/detail.viewer.motion/));
     const primary = screen.getByTestId('signature-motion') as HTMLVideoElement;
-    await waitFor(() => expect(play).toHaveBeenCalledTimes(1));
-    fireEvent.play(primary);
-    const primaryPauses = pause.mock.contexts.filter((element) => element === primary).length;
-
-    fireEvent.click(screen.getByRole('button', { name: 'detail.ink.trigger' }));
+    await waitFor(() => expect(play).toHaveBeenCalled());
+    fireEvent.click(screen.getByRole('radio', { name: 'detail.ink.trigger' }));
+    expect(primary).not.toBeInTheDocument();
+    expect(primary).not.toHaveAttribute('src');
     expect(primary.paused).toBe(true);
-    expect(pause.mock.contexts.filter((element) => element === primary)).toHaveLength(
-      primaryPauses + 1,
-    );
-    fireEvent.pause(primary);
-    const visibility = jest.spyOn(document, 'visibilityState', 'get');
-    try {
-      visibility.mockReturnValue('hidden');
-      act(() => document.dispatchEvent(new Event('visibilitychange')));
-      visibility.mockReturnValue('visible');
-      act(() => document.dispatchEvent(new Event('visibilitychange')));
-      expect(play).toHaveBeenCalledTimes(1);
-
-      fireEvent.click(
-        within(screen.getByTestId('ink-film-dialog')).getByRole('button', {
-          name: 'common.actions.close',
-        }),
-      );
-      await waitFor(() => expect(screen.queryByTestId('ink-film-video')).toBeNull());
-      expect(primary).toBeInTheDocument();
-      expect(primary.paused).toBe(true);
-      expect(pause.mock.contexts.filter((element) => element === primary)).toHaveLength(
-        primaryPauses + 1,
-      );
-      expect(play).toHaveBeenCalledTimes(1);
-      expect(screen.getByRole('button', { name: 'detail.viewer.play' })).toBeInTheDocument();
-    } finally {
-      visibility.mockRestore();
-    }
+    expect(screen.queryByRole('dialog')).toBeNull();
+    expect(screen.getByTestId('ink-film-video')).toHaveAttribute('src', inkFilms.films[1]!.url);
+    fireEvent.click(screen.getByRole('radio', { name: 'detail.viewer.original' }));
+    expect(screen.queryByTestId('ink-film-video')).toBeNull();
+    expect(screen.getByAltText('“Twisted Mind”, Cosmic Signature #000025')).toBeInTheDocument();
+    expect(modeButton(/detail.viewer.still/)).toBeChecked();
   });
 
   it('pauses while the tab is hidden and resumes when it returns', async () => {
@@ -202,7 +189,7 @@ describe('SignatureViewer', () => {
     expect(modeButton(/detail.viewer.motion/)).toBeDisabled();
   });
 
-  it('opens the full-screen viewer from the keyboard-reachable button and from the art', () => {
+  it('opens the full-screen viewer only from its explicit control', () => {
     renderViewer();
     fireEvent.click(screen.getByRole('button', { name: /detail.viewer.fullscreen/ }));
     expect(screen.getByRole('dialog', { name: 'Twisted Mind' })).toBeInTheDocument();
@@ -210,7 +197,7 @@ describe('SignatureViewer', () => {
     expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
 
     fireEvent.click(screen.getByAltText('“Twisted Mind”, Cosmic Signature #000025'));
-    expect(screen.getByRole('dialog', { name: 'Twisted Mind' })).toBeInTheDocument();
+    expect(screen.queryByRole('dialog')).toBeNull();
   });
 
   it('uses the browser’s own full screen for the animation', () => {
@@ -268,6 +255,41 @@ describe('SignatureViewer', () => {
     expect(
       screen.queryByRole('button', { name: /detail.viewer.fullscreen/ }),
     ).not.toBeInTheDocument();
+  });
+
+  it('rejects initial and delayed playback while the browser tab is hidden', () => {
+    const visibility = jest.spyOn(document, 'visibilityState', 'get').mockReturnValue('hidden');
+    try {
+      renderViewer();
+      fireEvent.click(modeButton(/detail.viewer.motion/));
+      const video = screen.getByTestId('signature-motion');
+      expect(play).not.toHaveBeenCalled();
+      fireEvent.play(video);
+      expect(pause.mock.contexts).toContain(video);
+      expect(screen.getByRole('button', { name: 'detail.viewer.play' })).toBeInTheDocument();
+    } finally {
+      visibility.mockRestore();
+    }
+  });
+
+  it('never resumes an offscreen animation just because the browser tab becomes visible', async () => {
+    renderViewer();
+    fireEvent.click(modeButton(/detail.viewer.motion/));
+    await waitFor(() => expect(play).toHaveBeenCalledTimes(1));
+    const stage = screen.getByTestId('artwork-stage');
+    act(() => observations.get(stage)!([observation(stage, false)], {} as IntersectionObserver));
+    const visibility = jest.spyOn(document, 'visibilityState', 'get');
+    try {
+      visibility.mockReturnValue('hidden');
+      act(() => document.dispatchEvent(new Event('visibilitychange')));
+      visibility.mockReturnValue('visible');
+      act(() => document.dispatchEvent(new Event('visibilitychange')));
+      expect(play).toHaveBeenCalledTimes(1);
+      act(() => observations.get(stage)!([observation(stage, true)], {} as IntersectionObserver));
+      expect(play).toHaveBeenCalledTimes(2);
+    } finally {
+      visibility.mockRestore();
+    }
   });
 
   it('has no accessibility violations', async () => {

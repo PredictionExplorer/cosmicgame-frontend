@@ -1,4 +1,4 @@
-import { test, expect, type Page } from '@playwright/test';
+import { test, expect, type Locator, type Page } from '@playwright/test';
 
 import { mockZhQualityApi } from './zh-quality-mocks';
 
@@ -18,12 +18,20 @@ const VIDEO = Buffer.from(
   'base64',
 );
 
-async function mockInkGallery(page: Page, variants: Variant[] = ALL_VARIANTS) {
+async function mockInkGallery(
+  page: Page,
+  variants: Variant[] = ALL_VARIANTS,
+  { hasImage = true }: { hasImage?: boolean } = {},
+) {
   await mockZhQualityApi(page);
   const inkRequests: string[] = [];
   const manifests: string[] = [];
   const posterRequests: string[] = [];
-  const state = { failVideos: false };
+  const state = {
+    failVideos: false,
+    manifestStatus: 200,
+    holdManifest: undefined as Promise<void> | undefined,
+  };
 
   // Wire keys and URLs match the existing backend fixture contract.
   const tokens = [
@@ -63,7 +71,9 @@ async function mockInkGallery(page: Page, variants: Variant[] = ALL_VARIANTS) {
     const url = route.request().url();
     if (url.endsWith('/metadata/assets.json')) {
       manifests.push(url);
+      await state.holdManifest;
       await route.fulfill({
+        status: state.manifestStatus,
         json: {
           schema_version: 2,
           assets: [
@@ -72,12 +82,16 @@ async function mockInkGallery(page: Page, variants: Variant[] = ALL_VARIANTS) {
               kind: 'video',
               format: 'mp4',
             })),
-            {
-              role: 'ember_web_full',
-              path: 'images/web/ember_full.webp',
-              kind: 'image',
-              format: 'webp',
-            },
+            ...(hasImage
+              ? [
+                  {
+                    role: 'ember_web_full',
+                    path: 'images/web/ember_full.webp',
+                    kind: 'image',
+                    format: 'webp',
+                  },
+                ]
+              : []),
           ],
         },
       });
@@ -106,76 +120,182 @@ function requestedVariants(urls: string[]) {
   return new Set(urls.map((url) => new URL(url).pathname.split('/').at(-1)));
 }
 
-async function expectDialogFits(page: Page) {
-  const dialog = page.getByTestId('ink-film-dialog');
-  const box = await dialog.boundingBox();
-  const viewport = page.viewportSize()!;
-  expect(box).not.toBeNull();
-  expect(box!.x).toBeGreaterThanOrEqual(0);
-  expect(box!.y).toBeGreaterThanOrEqual(0);
-  expect(box!.x + box!.width).toBeLessThanOrEqual(viewport.width + 1);
-  expect(box!.y + box!.height).toBeLessThanOrEqual(viewport.height + 1);
-  expect(await dialog.evaluate((element) => element.scrollWidth <= element.clientWidth + 1)).toBe(
-    true,
-  );
-  await expect(dialog.getByRole('button', { name: 'Close', exact: true })).toBeInViewport();
-  await dialog.getByRole('radiogroup', { name: 'Film length' }).scrollIntoViewIfNeeded();
-  await expect(dialog.getByRole('radio', { name: '≈5 min' }).locator('..')).toBeInViewport();
+async function captureClipboard(page: Page) {
+  await page.addInitScript(() => {
+    const copied: string[] = [];
+    Object.defineProperty(window, '__copiedInkLinks', { value: copied });
+    Object.defineProperty(navigator, 'clipboard', {
+      configurable: true,
+      value: { writeText: async (value: string) => void copied.push(value) },
+    });
+  });
+  return () =>
+    page.evaluate(() =>
+      (window as typeof window & { __copiedInkLinks: string[] }).__copiedInkLinks.at(-1),
+    );
 }
 
-test.describe('Ink films', () => {
-  test('keeps media lazy, starts with medium, and pauses the primary animation', async ({
+function viewer(page: Page) {
+  return page.getByTestId('signature-viewer');
+}
+
+async function selectView(scope: Locator, name: string) {
+  // Native radios keep their standard keyboard behavior; their labels are
+  // the pointer targets and must remain usable on touch screens as well.
+  await scope.getByRole('radio', { name, exact: true }).locator('..').click();
+}
+
+async function expectInlineStage(page: Page, kind: 'image' | 'film' | 'original') {
+  const stage = viewer(page).getByTestId('artwork-stage');
+  await expect(stage).toBeVisible();
+  await expect(stage.locator('img, video')).toHaveCount(1);
+  if (kind === 'image')
+    await expect(stage.getByTestId('ink-image-view').locator('img')).toBeVisible();
+  if (kind === 'film') await expect(stage.getByTestId('ink-film-video')).toBeVisible();
+  if (kind === 'original') {
+    await expect(stage.getByTestId('ink-image-view')).toHaveCount(0);
+    await expect(stage.getByTestId('ink-film-video')).toHaveCount(0);
+  }
+  // Selecting an edition never covers or hides the rest of the detail page.
+  await expect(page.getByRole('dialog')).toHaveCount(0);
+  await expect(page.getByRole('banner')).toBeVisible();
+  await expect(page.getByRole('heading', { level: 1 })).toHaveText('Ink fixture A');
+  expect(
+    await page.locator('h1').evaluate((element) => element.closest('[aria-hidden="true"]')),
+  ).toBeNull();
+}
+
+async function expectViewerFits(page: Page) {
+  const scope = viewer(page);
+  const viewport = page.viewportSize()!;
+  const touchTargets =
+    viewport.width < 640 || (await page.evaluate(() => matchMedia('(pointer: coarse)').matches));
+  const box = await scope.boundingBox();
+  expect(box).not.toBeNull();
+  expect(box!.x).toBeGreaterThanOrEqual(0);
+  expect(box!.x + box!.width).toBeLessThanOrEqual(viewport.width + 1);
+  expect(await scope.evaluate((element) => element.scrollWidth <= element.clientWidth + 1)).toBe(
+    true,
+  );
+  expect(
+    await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth + 1),
+  ).toBe(true);
+  for (const name of ['Original', 'Ink study', 'Image', '30 sec', '≈2 min', '≈5 min']) {
+    const label = scope.getByRole('radio', { name, exact: true }).locator('..');
+    await label.scrollIntoViewIfNeeded();
+    await expect(label).toBeInViewport();
+    const target = await label.boundingBox();
+    expect(target!.width).toBeGreaterThanOrEqual(44);
+    expect(target!.height).toBeGreaterThanOrEqual(touchTargets ? 44 : 36);
+  }
+  const share = scope.getByRole('button', { name: 'Share', exact: true });
+  await share.scrollIntoViewIfNeeded();
+  await expect(share).toBeInViewport();
+}
+
+test.describe('Inline ink studies', () => {
+  test('keeps ink lazy and replaces the primary artwork with the selected medium film', async ({
     page,
   }, testInfo) => {
     const fixture = await mockInkGallery(page);
     await page.goto('/detail/420');
-    const trigger = page.getByRole('button', { name: 'Ink films', exact: true });
-    await expect(trigger).toBeVisible();
+    const scope = viewer(page);
+    const ink = scope.getByRole('radio', { name: 'Ink study', exact: true });
+    await expect(ink).toBeVisible();
+    await expect(scope.getByRole('radio', { name: 'Original', exact: true })).toBeChecked();
+    await expect(scope.getByRole('radio', { name: 'Still', exact: true })).toBeChecked();
+    await expectInlineStage(page, 'original');
     expect(fixture.inkRequests).toEqual([]);
     expect(fixture.posterRequests).toEqual([]);
-    await expect(page.getByTestId('ink-film-video')).toHaveCount(0);
     await page.screenshot({
-      path: testInfo.outputPath('detail-primary.png'),
+      path: testInfo.outputPath('detail-original.png'),
       animations: 'disabled',
     });
 
-    // Native radios are visually hidden; pointer users select their full labels.
-    await page.getByRole('radio', { name: 'In motion', exact: true }).locator('..').click();
-    const primary = page.getByTestId('signature-motion');
+    await selectView(scope, 'In motion');
+    const primary = scope.getByTestId('signature-motion');
     await expect
       .poll(() => primary.evaluate((video: HTMLVideoElement) => video.paused))
       .toBe(false);
-    await trigger.click();
-    const dialog = page.getByTestId('ink-film-dialog');
-    const video = page.getByTestId('ink-film-video');
-    await expect(dialog.getByRole('radio', { name: '≈2 min' })).toBeChecked();
+    const previousPrimary = await primary.elementHandle();
+    await selectView(scope, 'Ink study');
+    const video = scope.getByTestId('ink-film-video');
+    await expect(scope.getByRole('radio', { name: '≈2 min' })).toBeChecked();
+    await expect(page).toHaveURL(/\/detail\/420\?ink=medium$/);
     await expect(video).toHaveAttribute('src', /\/ember_medium\.mp4$/);
+    await expect(primary).toHaveCount(0);
+    expect(
+      await previousPrimary!.evaluate((element: HTMLVideoElement) => ({
+        paused: element.paused,
+        src: element.getAttribute('src'),
+      })),
+    ).toEqual({ paused: true, src: null });
+    await previousPrimary!.dispose();
+    await expectInlineStage(page, 'film');
     await expect.poll(() => fixture.inkRequests.length).toBeGreaterThan(0);
     expect(requestedVariants(fixture.inkRequests)).toEqual(new Set(['ember_medium.mp4']));
     await page.screenshot({
-      path: testInfo.outputPath('detail-ink-open.png'),
+      path: testInfo.outputPath('detail-inline-ink.png'),
       animations: 'disabled',
     });
-    await expect
-      .poll(() => primary.evaluate((element: HTMLVideoElement) => element.paused))
-      .toBe(true);
 
-    await dialog.getByRole('radio', { name: '≈5 min' }).locator('..').click();
+    await selectView(scope, '≈5 min');
     await expect(video).toHaveAttribute('src', /\/ember_slow\.mp4$/);
     await expect.poll(() => requestedVariants(fixture.inkRequests).size).toBe(2);
     expect(requestedVariants(fixture.inkRequests)).toEqual(
       new Set(['ember_medium.mp4', 'ember_slow.mp4']),
     );
+    const previousVideo = await video.elementHandle();
+    await selectView(scope, 'Image');
+    await expect(scope.getByTestId('ink-image-view').locator('img')).toHaveAttribute(
+      'src',
+      /\/ember_full\.webp$/,
+    );
+    await expectInlineStage(page, 'image');
+    expect(
+      await previousVideo!.evaluate((element: HTMLVideoElement) => ({
+        paused: element.paused,
+        src: element.getAttribute('src'),
+      })),
+    ).toEqual({ paused: true, src: null });
+    await previousVideo!.dispose();
 
-    await page.keyboard.press('Escape');
-    await expect(dialog).toBeHidden();
-    await expect(video).toHaveCount(0);
-    await expect(trigger).toBeFocused();
-    await expect
-      .poll(() => primary.evaluate((element: HTMLVideoElement) => element.paused))
-      .toBe(true);
-    await trigger.click();
-    await expect(dialog.getByRole('radio', { name: '≈2 min' })).toBeChecked();
+    await selectView(scope, 'Original');
+    await expect(page).toHaveURL(/\/detail\/420$/);
+    await expect(scope.getByRole('radio', { name: 'Original', exact: true })).toBeFocused();
+    await expect(scope.getByRole('radio', { name: 'Still', exact: true })).toBeChecked();
+    await expectInlineStage(page, 'original');
+    await selectView(scope, 'Ink study');
+    await expect(scope.getByRole('radio', { name: '≈2 min' })).toBeChecked();
+  });
+
+  test('preserves the exhibition stage dimensions across every image and film', async ({
+    page,
+  }) => {
+    await mockInkGallery(page);
+    await page.goto('/detail/420');
+    const scope = viewer(page);
+    const stage = scope.getByTestId('artwork-stage');
+    await expect(stage.locator('img')).toBeVisible();
+    const initial = await stage.boundingBox();
+    expect(initial!.height).toBeGreaterThan(100);
+    for (const name of [
+      'In motion',
+      'Still',
+      'Ink study',
+      'Image',
+      '30 sec',
+      '≈2 min',
+      '≈5 min',
+      'Original',
+    ]) {
+      await selectView(scope, name);
+      await expect(stage.locator('img, video')).toHaveCount(1);
+      const current = await stage.boundingBox();
+      expect(Math.abs(current!.height - initial!.height)).toBeLessThanOrEqual(1);
+      expect(Math.abs(current!.width - initial!.width)).toBeLessThanOrEqual(1);
+      await expect(page.getByRole('dialog')).toHaveCount(0);
+    }
   });
 
   for (const { variants, selected, missing } of [
@@ -185,16 +305,13 @@ test.describe('Ink films', () => {
     test(`offers only published versions (${variants.join(', ')})`, async ({ page }) => {
       const fixture = await mockInkGallery(page, variants);
       await page.goto('/detail/420');
-      await page.getByRole('button', { name: 'Ink films', exact: true }).click();
-      const dialog = page.getByTestId('ink-film-dialog');
-      if (variants.length === 1) {
-        await expect(dialog.getByRole('radio')).toHaveCount(0);
-        await expect(dialog.getByText(`Film length · ${selected}`)).toBeVisible();
-      } else {
-        await expect(dialog.getByRole('radio')).toHaveCount(variants.length);
-        await expect(dialog.getByRole('radio', { name: selected })).toBeChecked();
-      }
-      await expect(dialog.getByRole('radio', { name: missing })).toHaveCount(0);
+      const scope = viewer(page);
+      await selectView(scope, 'Ink study');
+      const options = scope.getByRole('radiogroup', { name: 'Ink view' });
+      await expect(options.getByRole('radio')).toHaveCount(variants.length + 1);
+      await expect(options.getByRole('radio', { name: 'Image', exact: true })).toBeVisible();
+      await expect(options.getByRole('radio', { name: selected })).toBeChecked();
+      await expect(options.getByRole('radio', { name: missing })).toHaveCount(0);
       await expect.poll(() => fixture.inkRequests.length).toBeGreaterThan(0);
       expect(requestedVariants(fixture.inkRequests)).toEqual(
         new Set([FILMS[variants[0]!].path.split('/').at(-1)]),
@@ -202,22 +319,254 @@ test.describe('Ink films', () => {
     });
   }
 
-  test('leaves the primary viewer alone when no ink films are published', async ({ page }) => {
-    const fixture = await mockInkGallery(page, []);
+  test('leaves the primary viewer alone when no ink media are published', async ({ page }) => {
+    const fixture = await mockInkGallery(page, [], { hasImage: false });
     await page.goto('/detail/420');
-    await expect(page.getByTestId('signature-viewer')).toBeVisible();
+    const scope = viewer(page);
+    await expect(scope).toBeVisible();
     await expect.poll(() => fixture.manifests.length).toBeGreaterThan(0);
-    await expect(page.getByRole('button', { name: 'Ink films', exact: true })).toHaveCount(0);
-    await expect(page.getByRole('radio', { name: 'Still', exact: true })).toBeChecked();
+    await expect(scope.getByRole('radio', { name: 'Ink study', exact: true })).toHaveCount(0);
+    await expect(scope.getByRole('radio', { name: 'Still', exact: true })).toBeChecked();
+    await expectInlineStage(page, 'original');
     expect(fixture.inkRequests).toEqual([]);
     expect(fixture.posterRequests).toEqual([]);
+  });
+
+  for (const view of ['image', ...ALL_VARIANTS] as const) {
+    test(`opens and shares the exact ${view} view inline from a direct link`, async ({ page }) => {
+      const lastCopied = await captureClipboard(page);
+      const fixture = await mockInkGallery(page);
+      await page.goto(`/detail/420?ink=${view}`);
+      const scope = viewer(page);
+      const label = { image: 'Image', short: '30 sec', medium: '≈2 min', slow: '≈5 min' }[view];
+      await expect(scope.getByRole('radio', { name: label, exact: true })).toBeChecked();
+      await expect(scope.getByRole('radio', { name: 'Ink study', exact: true })).toBeChecked();
+      const media =
+        view === 'image'
+          ? scope.getByTestId('ink-image-view').locator('img')
+          : scope.getByTestId('ink-film-video');
+      const assetPath = view === 'image' ? 'images/web/ember_full.webp' : FILMS[view].path;
+      await expect(media).toHaveAttribute(
+        'src',
+        new RegExp(`/${assetPath.replaceAll('.', '\\.')}$`),
+      );
+      await expectInlineStage(page, view === 'image' ? 'image' : 'film');
+      if (view === 'image') {
+        expect(fixture.inkRequests).toEqual([]);
+      } else {
+        await expect.poll(() => fixture.inkRequests.length).toBeGreaterThan(0);
+        expect(requestedVariants(fixture.inkRequests)).toEqual(
+          new Set([assetPath.split('/').at(-1)]),
+        );
+      }
+      await scope.getByRole('button', { name: 'Share', exact: true }).click();
+      await page.getByRole('menuitem', { name: 'Copy link to this view', exact: true }).click();
+      await expect.poll(lastCopied).toBe(new URL(`/detail/420?ink=${view}`, page.url()).href);
+      await scope.getByRole('button', { name: 'Share', exact: true }).click();
+      await page.getByRole('menuitem', { name: 'Copy media link', exact: true }).click();
+      await expect
+        .poll(lastCopied)
+        .toBe(fixture.manifests[0]!.replace('metadata/assets.json', assetPath));
+
+      await page.reload();
+      await expect(scope.getByRole('radio', { name: label, exact: true })).toBeChecked();
+      await expect(media).toHaveAttribute(
+        'src',
+        new RegExp(`/${assetPath.replaceAll('.', '\\.')}$`),
+      );
+      if (view === 'image') expect(fixture.inkRequests).toEqual([]);
+      await selectView(scope, 'Original');
+      await expect(page).toHaveURL(/\/detail\/420$/);
+      await expectInlineStage(page, 'original');
+    });
+  }
+
+  test('offers the image when no films have been published', async ({ page }) => {
+    const fixture = await mockInkGallery(page, []);
+    await page.goto('/detail/420');
+    const scope = viewer(page);
+    await selectView(scope, 'Ink study');
+    await expect(page).toHaveURL(/\/detail\/420\?ink=image$/);
+    await expect(scope.getByTestId('ink-image-view').locator('img')).toHaveAttribute(
+      'src',
+      /\/ember_full\.webp$/,
+    );
+    await expect(scope.getByRole('radio', { name: /sec|min/ })).toHaveCount(0);
+    await expectInlineStage(page, 'image');
+    expect(fixture.inkRequests).toEqual([]);
+  });
+
+  test('keeps Back and Forward in sync without navigating or stacking each selection', async ({
+    page,
+  }) => {
+    await mockInkGallery(page);
+    const serverNavigations: string[] = [];
+    page.on('request', (request) => {
+      const url = new URL(request.url());
+      if (
+        url.pathname === '/detail/420' &&
+        (request.isNavigationRequest() || request.headers().rsc === '1')
+      )
+        serverNavigations.push(request.url());
+    });
+    await page.goto('/detail/420?ref=archive#artwork');
+    const scope = viewer(page);
+    await expect(scope.getByRole('radio', { name: 'Ink study', exact: true })).toBeVisible();
+    const initialRequests = serverNavigations.length;
+    const initialHistory = await page.evaluate(() => window.history.length);
+    await selectView(scope, 'Ink study');
+    await expect(page).toHaveURL(/\?ref=archive&ink=medium#artwork$/);
+    await selectView(scope, '≈5 min');
+    await selectView(scope, 'Image');
+    await expect(page).toHaveURL(/\?ref=archive&ink=image#artwork$/);
+    expect(await page.evaluate(() => window.history.length)).toBe(initialHistory + 1);
+    await page.goBack();
+    await expect(page).toHaveURL(/\/detail\/420\?ref=archive#artwork$/);
+    await expect(scope.getByRole('radio', { name: 'Original', exact: true })).toBeChecked();
+    await expectInlineStage(page, 'original');
+    await page.goForward();
+    await expect(scope.getByRole('radio', { name: 'Image', exact: true })).toBeChecked();
+    await expect(page).toHaveURL(/\?ref=archive&ink=image#artwork$/);
+    await selectView(scope, 'Original');
+    await expect(page).toHaveURL(/\/detail\/420\?ref=archive#artwork$/);
+    await expectInlineStage(page, 'original');
+    expect(serverNavigations).toHaveLength(initialRequests);
+  });
+
+  test('shares a localized artwork link without unrelated query parameters', async ({ page }) => {
+    const lastCopied = await captureClipboard(page);
+    await mockInkGallery(page);
+    await page.goto('/uk/detail/420?ref=archive&ink=image#artwork');
+    const scope = viewer(page);
+    await expect(scope.getByTestId('ink-image-view').locator('img')).toBeVisible();
+    await scope.getByRole('button', { name: 'Поділитися', exact: true }).click();
+    await page
+      .getByRole('menuitem', { name: 'Копіювати посилання на цей варіант', exact: true })
+      .click();
+    await expect.poll(lastCopied).toBe(new URL('/uk/detail/420?ink=image', page.url()).href);
+    await expect(page.getByRole('dialog')).toHaveCount(0);
+  });
+
+  test('shows an unavailable requested film without silently loading an alternative', async ({
+    page,
+  }) => {
+    const fixture = await mockInkGallery(page, ['short', 'slow']);
+    await page.goto('/detail/420?ink=medium');
+    const scope = viewer(page);
+    await expect(scope.getByRole('status')).toHaveText(
+      'This ink view is not available for this artwork.',
+    );
+    const options = scope.getByRole('radiogroup', { name: 'Ink view' });
+    await expect(options.getByRole('radio', { checked: true })).toHaveCount(0);
+    await expect(options.getByRole('radio', { name: '≈2 min' })).toHaveCount(0);
+    await expect(scope.getByTestId('artwork-stage').locator('img, video')).toHaveCount(0);
+    expect(fixture.inkRequests).toEqual([]);
+    expect(fixture.posterRequests).toEqual([]);
+    await expect(page).toHaveURL(/\?ink=medium$/);
+    await selectView(scope, '30 sec');
+    await expect(scope.getByTestId('ink-film-video')).toHaveAttribute('src', /\/ember\.mp4$/);
+    await expect(page).toHaveURL(/\?ink=short$/);
+  });
+
+  test('keeps missing image links inline with available films to choose', async ({ page }) => {
+    const fixture = await mockInkGallery(page, ['medium'], { hasImage: false });
+    await page.goto('/detail/420?ink=image');
+    const scope = viewer(page);
+    await expect(scope.getByRole('status')).toHaveText(
+      'This ink view is not available for this artwork.',
+    );
+    await expect(scope.getByTestId('artwork-stage').locator('img')).toHaveCount(0);
+    expect(fixture.inkRequests).toEqual([]);
+    await selectView(scope, '≈2 min');
+    await expect(scope.getByTestId('ink-film-video')).toHaveAttribute(
+      'src',
+      /\/ember_medium\.mp4$/,
+    );
+    await expect(page).toHaveURL(/\?ink=medium$/);
+  });
+
+  test('keeps the surrounding page and Original choice available for an entirely missing ink edition', async ({
+    page,
+  }) => {
+    const fixture = await mockInkGallery(page, [], { hasImage: false });
+    await page.goto('/detail/420?ink=image');
+    const scope = viewer(page);
+    await expect(scope.getByRole('status')).toHaveText(
+      'This ink view is not available for this artwork.',
+    );
+    await expect(scope.getByRole('radio', { name: 'Ink study', exact: true })).toBeChecked();
+    await expect(page.getByRole('heading', { level: 1 })).toHaveText('Ink fixture A');
+    await expect(page.getByRole('dialog')).toHaveCount(0);
+    expect(fixture.inkRequests).toEqual([]);
+    expect(fixture.posterRequests).toEqual([]);
+    await selectView(scope, 'Original');
+    await expect(page).toHaveURL(/\/detail\/420$/);
+    await expectInlineStage(page, 'original');
+  });
+
+  test('leaves unknown or ambiguous ink query values inert', async ({ page }) => {
+    const fixture = await mockInkGallery(page);
+    for (const query of ['ink=unknown', 'ink=IMAGE', 'ink=short&ink=slow']) {
+      await page.goto(`/detail/420?${query}`);
+      await expect(
+        viewer(page).getByRole('radio', { name: 'Original', exact: true }),
+      ).toBeChecked();
+      await expectInlineStage(page, 'original');
+      expect(fixture.inkRequests).toEqual([]);
+      expect(fixture.posterRequests).toEqual([]);
+    }
+  });
+
+  test('shows availability loading in the stage before displaying a directly linked image', async ({
+    page,
+  }) => {
+    const fixture = await mockInkGallery(page);
+    let releaseManifest!: () => void;
+    fixture.state.holdManifest = new Promise<void>((resolve) => {
+      releaseManifest = resolve;
+    });
+    try {
+      await page.goto('/detail/420?ink=image');
+      const scope = viewer(page);
+      const stage = scope.getByTestId('artwork-stage');
+      await expect(stage.getByRole('status')).toHaveText('Loading ink study…');
+      await expect(page.getByRole('dialog')).toHaveCount(0);
+      expect(fixture.inkRequests).toEqual([]);
+      expect(fixture.posterRequests).toEqual([]);
+      const loadingBox = await stage.boundingBox();
+      releaseManifest();
+      await expectInlineStage(page, 'image');
+      expect(
+        Math.abs((await stage.boundingBox())!.height - loadingBox!.height),
+      ).toBeLessThanOrEqual(1);
+      expect(fixture.inkRequests).toEqual([]);
+    } finally {
+      releaseManifest();
+    }
+  });
+
+  test('allows a directly linked image to recover from a manifest error', async ({ page }) => {
+    const fixture = await mockInkGallery(page);
+    fixture.state.manifestStatus = 400;
+    await page.goto('/detail/420?ink=image');
+    const scope = viewer(page);
+    await expect(scope.getByRole('status')).toHaveText(
+      'The ink study could not be checked. Try again.',
+    );
+    expect(fixture.inkRequests).toEqual([]);
+    expect(fixture.posterRequests).toEqual([]);
+    fixture.state.manifestStatus = 200;
+    await scope.getByRole('button', { name: 'Try again' }).click();
+    await expectInlineStage(page, 'image');
+    await expect(page).toHaveURL(/\?ink=image$/);
+    expect(fixture.inkRequests).toEqual([]);
   });
 
   test('waits for explicit playback when motion is reduced', async ({ page }) => {
     await page.emulateMedia({ reducedMotion: 'reduce' });
     const fixture = await mockInkGallery(page);
     await page.goto('/detail/420');
-    await page.getByRole('button', { name: 'Ink films', exact: true }).click();
+    await selectView(viewer(page), 'Ink study');
     const video = page.getByTestId('ink-film-video');
     await expect(video).not.toHaveAttribute('autoplay');
     await expect(video).toHaveAttribute('preload', 'none');
@@ -236,65 +585,179 @@ test.describe('Ink films', () => {
     const fixture = await mockInkGallery(page);
     fixture.state.failVideos = true;
     await page.goto('/detail/420');
-    await page.getByRole('button', { name: 'Ink films', exact: true }).click();
-    const dialog = page.getByTestId('ink-film-dialog');
-    await expect(dialog.getByRole('status')).toHaveText('This ink film could not be loaded.');
-    // Local environments may configure one media server; production has mirrors.
+    const scope = viewer(page);
+    await selectView(scope, 'Ink study');
+    await expect(scope.getByRole('status')).toHaveText('This ink film could not be loaded.');
     expect(fixture.inkRequests.length).toBeGreaterThan(0);
     expect(requestedVariants(fixture.inkRequests)).toEqual(new Set(['ember_medium.mp4']));
-    await expect(dialog.getByRole('radio', { name: '≈2 min' })).toBeChecked();
-
+    await expect(scope.getByRole('radio', { name: '≈2 min' })).toBeChecked();
+    const stageBox = await scope.getByTestId('artwork-stage').boundingBox();
     fixture.state.failVideos = false;
-    await dialog.getByRole('button', { name: 'Try again' }).click();
-    const video = dialog.getByTestId('ink-film-video');
+    await scope.getByRole('button', { name: 'Try again' }).click();
+    const video = scope.getByTestId('ink-film-video');
     await expect(video).toHaveAttribute('src', /\/ember_medium\.mp4$/);
     await expect
       .poll(() => video.evaluate((element: HTMLVideoElement) => element.readyState))
       .toBeGreaterThanOrEqual(2);
-    await expect(dialog.getByRole('status')).toHaveCount(0);
+    await expect(scope.getByRole('status')).toHaveCount(0);
+    expect(
+      Math.abs((await scope.getByTestId('artwork-stage').boundingBox())!.height - stageBox!.height),
+    ).toBeLessThanOrEqual(1);
   });
 
-  test('keeps the film and its controls reachable in portrait and landscape', async ({ page }) => {
+  test('keeps the inline film and touch controls reachable in portrait and landscape', async ({
+    page,
+  }) => {
     await mockInkGallery(page);
-    await page.goto('/detail/420');
-    await page.getByRole('button', { name: 'Ink films', exact: true }).click();
+    await page.goto('/detail/420?ink=medium');
     for (const viewport of [
       { width: 390, height: 844 },
       { width: 844, height: 390 },
     ]) {
       await page.setViewportSize(viewport);
-      await expectDialogFits(page);
+      await expectViewerFits(page);
+      await expect(page.getByRole('dialog')).toHaveCount(0);
     }
   });
 
-  test('keeps nested keyboard navigation and focus inside the film', async ({ page, isMobile }) => {
+  test('lets keyboard users switch editions without trapping focus or treating Escape as close', async ({
+    page,
+  }) => {
+    await mockInkGallery(page);
+    await page.goto('/detail/420');
+    const scope = viewer(page);
+    const original = scope.getByRole('radio', { name: 'Original', exact: true });
+    await original.focus();
+    await page.keyboard.press('ArrowRight');
+    const ink = scope.getByRole('radio', { name: 'Ink study', exact: true });
+    await expect(ink).toBeChecked();
+    await expect(ink).toBeFocused();
+    await scope.getByRole('radio', { name: '≈2 min', exact: true }).focus();
+    await page.keyboard.press('ArrowRight');
+    await expect(scope.getByRole('radio', { name: '≈5 min', exact: true })).toBeChecked();
+    await expect(scope.getByRole('radio', { name: '≈5 min', exact: true })).toBeFocused();
+    await page.keyboard.press('Escape');
+    await expect(page).toHaveURL(/\?ink=slow$/);
+    await expectInlineStage(page, 'film');
+    await ink.focus();
+    await page.keyboard.press('ArrowLeft');
+    await expect(original).toBeChecked();
+    await expect(original).toBeFocused();
+    await expect(page).toHaveURL(/\/detail\/420$/);
+  });
+
+  test('opens an image lightbox only on explicit Full screen and restores its trigger', async ({
+    page,
+  }) => {
+    await mockInkGallery(page);
+    await page.goto('/detail/420?ink=image');
+    const scope = viewer(page);
+    await expectInlineStage(page, 'image');
+    await scope.getByTestId('ink-image-view').locator('img').click();
+    await expectInlineStage(page, 'image');
+    const fullscreen = scope.getByRole('button', { name: 'Full screen', exact: true });
+    await fullscreen.click();
+    const lightbox = page.getByRole('dialog');
+    await expect(lightbox).toBeVisible();
+    await expect(lightbox.locator('img')).toHaveAttribute('src', /\/ember_full\.webp$/);
+    await page.keyboard.press('Escape');
+    await expect(lightbox).toBeHidden();
+    await expect(fullscreen).toBeFocused();
+    await expect(page).toHaveURL(/\?ink=image$/);
+    await expectInlineStage(page, 'image');
+  });
+
+  test('keeps ink, sharing, and keyboard selection inside the one gallery quick view', async ({
+    page,
+    isMobile,
+  }) => {
     test.skip(isMobile, 'Quick view is a pointer-fine shortcut; touch cards open the detail page.');
+    const lastCopied = await captureClipboard(page);
     const fixture = await mockInkGallery(page);
-    await page.goto('/gallery');
+    await page.goto('/gallery?sort=oldest');
+    const galleryUrl = page.url();
     const card = page.getByTestId('signature-card').filter({ hasText: 'Ink fixture A' });
     await expect(card).toBeVisible();
     expect(fixture.manifests).toEqual([]);
     await card.getByTestId('quick-view-button').click();
     const quickView = page.getByTestId('nft-quick-view');
-    const trigger = quickView.getByRole('button', { name: 'Ink films', exact: true });
-    await trigger.click();
-    const dialog = page.getByTestId('ink-film-dialog');
-    const close = dialog.getByRole('button', { name: 'Close', exact: true });
-    await close.focus();
+    const scope = quickView.getByTestId('signature-viewer');
+    await expect(scope.getByRole('radio', { name: 'Still', exact: true })).toBeChecked();
+    await selectView(scope, 'Ink study');
+    await expect(page.getByRole('dialog')).toHaveCount(1);
+    await expect(scope.getByTestId('artwork-stage').getByTestId('ink-film-video')).toBeVisible();
+    await scope.getByRole('radio', { name: '≈2 min' }).focus();
     await page.keyboard.press('ArrowRight');
-    await expect(dialog.getByRole('heading')).toContainText('Ink fixture A');
-    await dialog.getByRole('radio', { name: '≈2 min' }).focus();
-    await page.keyboard.press('ArrowRight');
-    await expect(dialog.getByRole('radio', { name: '≈5 min' })).toBeChecked();
-    await expect(dialog.getByRole('heading')).toContainText('Ink fixture A');
-
-    await page.keyboard.press('Escape');
-    await expect(dialog).toBeHidden();
-    await expect(quickView).toBeVisible();
-    await expect(trigger).toBeFocused();
+    await expect(scope.getByRole('radio', { name: '≈5 min' })).toBeChecked();
     await expect(quickView.getByRole('heading')).toHaveText('Ink fixture A');
+    await scope.getByRole('button', { name: 'Share', exact: true }).click();
+    await page.getByRole('menuitem', { name: 'Copy link to this view', exact: true }).click();
+    await expect.poll(lastCopied).toBe(new URL('/detail/420?ink=slow', page.url()).href);
+    await expect(page).toHaveURL(galleryUrl);
+    await expect(scope.getByRole('button', { name: 'Share', exact: true })).toBeFocused();
     await page.keyboard.press('Escape');
     await expect(quickView).toBeHidden();
     await expect(card.getByTestId('quick-view-button')).toBeFocused();
+  });
+
+  test('keeps explicit fullscreen arrow keys within the selected gallery artwork', async ({
+    page,
+    isMobile,
+  }) => {
+    test.skip(isMobile, 'Quick view is a pointer-fine shortcut; touch cards open the detail page.');
+    await mockInkGallery(page);
+    await page.goto('/gallery?sort=oldest');
+    const card = page.getByTestId('signature-card').filter({ hasText: 'Ink fixture A' });
+    await card.getByTestId('quick-view-button').click();
+    const quickView = page.getByTestId('nft-quick-view');
+    const scope = quickView.getByTestId('signature-viewer');
+    await selectView(scope, 'Ink study');
+    await selectView(scope, 'Image');
+    const fullscreen = scope.getByRole('button', { name: 'Full screen', exact: true });
+    await fullscreen.click();
+    const lightbox = page.getByTestId('art-lightbox');
+    await expect(lightbox).toBeVisible();
+    await lightbox.getByRole('button', { name: 'Close', exact: true }).focus();
+    await page.keyboard.press('ArrowRight');
+    await expect(lightbox).toBeVisible();
+    await expect(lightbox.getByRole('heading')).toHaveText('Ink fixture A');
+    await page.keyboard.press('Escape');
+    await expect(lightbox).toBeHidden();
+    await expect(quickView.getByRole('heading')).toHaveText('Ink fixture A');
+    await expect(scope.getByRole('radio', { name: 'Image', exact: true })).toBeChecked();
+    await expect(fullscreen).toBeFocused();
+  });
+
+  test('releases the selected ink film and restores Original when the gallery advances to another artwork', async ({
+    page,
+    isMobile,
+  }) => {
+    test.skip(isMobile, 'Quick view is a pointer-fine shortcut; touch cards open the detail page.');
+    await mockInkGallery(page);
+    await page.goto('/gallery?sort=oldest');
+    const card = page.getByTestId('signature-card').filter({ hasText: 'Ink fixture A' });
+    await card.getByTestId('quick-view-button').click();
+    const quickView = page.getByTestId('nft-quick-view');
+    const scope = quickView.getByTestId('signature-viewer');
+    await selectView(scope, 'Ink study');
+    const previousVideo = await scope.getByTestId('ink-film-video').elementHandle();
+    const previousStage = await scope.getByTestId('artwork-stage').boundingBox();
+    await quickView.getByRole('button', { name: 'Next Signature', exact: true }).click();
+    await expect(quickView.getByRole('heading')).toHaveText('Ink fixture B');
+    await expect(scope.getByRole('radio', { name: 'Still', exact: true })).toBeChecked();
+    await expect(scope.getByTestId('ink-film-video')).toHaveCount(0);
+    expect(
+      await previousVideo!.evaluate((element: HTMLVideoElement) => ({
+        paused: element.paused,
+        src: element.getAttribute('src'),
+      })),
+    ).toEqual({ paused: true, src: null });
+    await previousVideo!.dispose();
+    expect(
+      Math.abs(
+        (await scope.getByTestId('artwork-stage').boundingBox())!.height - previousStage!.height,
+      ),
+    ).toBeLessThanOrEqual(1);
+    await expect(page.getByRole('dialog')).toHaveCount(1);
   });
 });

@@ -54,7 +54,7 @@ export function NFTIdentity({
   return (
     <div
       className={cn(
-        'flex min-w-0 flex-col gap-6',
+        'flex min-w-0 flex-col gap-8',
         // Tablets: the label and actions on the left, the ledger on the right;
         // the second row takes the ledger's extra height so the actions sit
         // right under the label.
@@ -71,10 +71,10 @@ export function NFTIdentity({
         title={label.text({ tokenId, name })}
         titleId={titleId}
         breadcrumbs={[{ label: tCommon('breadcrumbs.gallery'), href: '/gallery' }]}
-        className="mb-0 border-b-0 pb-0 pt-0 sm:mb-0 sm:pb-0 md:max-lg:col-start-1 [&_h1]:[overflow-wrap:anywhere]"
+        className="mb-0 border-b-0 pb-0 pt-0 sm:mb-0 sm:pb-0 md:max-lg:col-start-1 [&_h1]:text-balance [&_h1]:[overflow-wrap:anywhere]"
       >
         <WallLabelMeta
-          className="mt-3"
+          className="mt-4"
           // An unnamed Signature already carries its number in the title.
           items={label.meta({
             tokenId,
@@ -85,12 +85,13 @@ export function NFTIdentity({
         />
       </PageHeader>
 
+      {/* One rule introduces the provenance; space separates its entries. */}
       <NFTSpecList
         nft={nft}
         entry={entry}
         rarity={rarity}
         rarityTotal={rarityTotal}
-        className="md:max-lg:col-start-2 md:max-lg:row-span-2 md:max-lg:row-start-1"
+        className="divide-y-0 border-b-0 md:max-lg:col-start-2 md:max-lg:row-span-2 md:max-lg:row-start-1"
       />
 
       {actions ? (

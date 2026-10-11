@@ -71,6 +71,10 @@
     "artworkUnavailable": "Tác phẩm không khả dụng"
   },
   "viewer": {
+    "editionLabel": "Phiên bản tác phẩm",
+    "original": "Bản gốc",
+    "spectral": "Quét quang phổ",
+    "spectralLabel": "Quét quang phổ của {subject}",
     "modeLabel": "Chế độ xem tác phẩm",
     "still": "Ảnh tĩnh",
     "motion": "Chuyển động",
@@ -85,14 +89,21 @@
     "motionLabel": "Hoạt ảnh của {subject}"
   },
   "ink": {
-    "trigger": "Phim nét mực",
-    "title": "Phác họa bằng mực · {subject}",
+    "trigger": "Phác họa bằng mực",
     "description": "Cùng những quỹ đạo ấy, được vẽ lại bằng mực trên giấy.",
-    "lengthLabel": "Thời lượng phim",
+    "mediaLabel": "Phiên bản nét mực",
+    "image": "Ảnh",
     "seconds": "{seconds} giây",
     "minutes": "≈{minutes} phút",
     "videoLabel": "Phim nét mực của {subject}",
+    "imageLabel": "Ảnh nét mực của {subject}",
+    "shareView": "Sao chép liên kết đến phiên bản này",
+    "shareMedia": "Sao chép liên kết tệp",
+    "loading": "Đang tải phác họa bằng mực…",
+    "unavailable": "Tác phẩm này không có phiên bản nét mực đã chọn.",
+    "availabilityError": "Không kiểm tra được phác họa bằng mực. Hãy thử lại.",
     "loadError": "Không thể tải phim nét mực này.",
+    "imageError": "Không thể tải ảnh nét mực này.",
     "retry": "Thử lại"
   }
 }

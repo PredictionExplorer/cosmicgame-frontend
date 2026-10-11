@@ -1,84 +1,115 @@
 'use client';
 
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { Suspense, useCallback, useEffect, useRef, useState } from 'react';
 import { Expand, Film, ImageIcon, Pause, Play } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 
 import { cn } from '@/lib/utils';
+import { useInkFilms } from '@/hooks/useInkFilms';
 import { usePrefersReducedMotion } from '@/hooks/usePrefersReducedMotion';
+import { chooseDefaultInkFilm } from '@/lib/nftMetadata/ink';
 import { Button } from '@/components/ui/button';
 import { ART_PLATE_CLASS, ArtFrame, type ArtStatus } from '@/components/ui/art-frame';
-import { SegmentedControl } from '@/components/ui/segmented-control';
+import { SegmentedControl, type SegmentedOption } from '@/components/ui/segmented-control';
 
 import { ArtLightbox } from './ArtLightbox';
-import { InkFilmDialog } from './InkFilmDialog';
+import { InkFilmVideo } from './InkFilmVideo';
+import { InkImageView } from './InkImageView';
+import { InkShareMenu } from './InkShareMenu';
+import { NFTShareMenu } from './NFTShareMenu';
+import type { InkView } from './inkLinks';
+import { useInkViewLink } from './useInkViewLink';
 import { signatureSources, type SignatureMedia } from './signatureArt';
 
-/** Still (the render) or In motion (the 30-second animation of the simulation). */
-export type ArtMode = 'still' | 'motion';
-
-/** Safari's element fullscreen for `<video>` (iOS has no Fullscreen API on other elements). */
+export type ArtMode = 'still' | 'motion' | 'sweep';
 interface WebkitVideoElement extends HTMLVideoElement {
   webkitEnterFullscreen?: () => void;
 }
-
-/** The element in full screen, with Safari's prefixed property as a fallback. */
 function fullscreenElement(): Element | null {
   const doc = document as Document & { webkitFullscreenElement?: Element | null };
   return doc.fullscreenElement ?? doc.webkitFullscreenElement ?? null;
 }
-
+function enterVideoFullscreen(video: WebkitVideoElement | null) {
+  if (video?.requestFullscreen) void video.requestFullscreen().catch(() => {});
+  else video?.webkitEnterFullscreen?.();
+}
 const FULLSCREEN_CHANGE_EVENTS = ['fullscreenchange', 'webkitfullscreenchange'] as const;
 
 export interface SignatureViewerProps {
-  /** Optional ink studies are discovered only on a focused artwork. */
   seed?: string | number;
-  /** The token's published media; `null` until the indexer has its seed. */
+  tokenId?: number;
+  /** Mirror the selected ink view in the full detail page's URL. */
+  inkLinkable?: boolean;
   media: SignatureMedia | null;
-  /** Alt text composed from the token's traits. */
   alt: string;
-  /** The name, or "Cosmic Signature #000025": titles the viewer and names the animation. */
   subject: string;
-  /** The formatted token number, shown on the unavailable plate. */
   tokenLabel: string;
-  /** Caption of the unavailable state ("Rendering" while the render may still be on its way). */
   unavailableLabel: string;
-  /**
-   * The token was imprinted within the render window: until the still
-   * loads, there is no animation to offer either, so Still / In motion
-   * stays hidden.
-   */
   renderPending?: boolean;
-  /** The plate's rendered width at each breakpoint, for the srcset choice. */
   sizes: string;
+  /** The gallery also offers the spectral interpretation, within this same frame. */
+  spectralSweepUrl?: string;
   className?: string;
-  /** Classes for the plate itself (e.g. no radius where it bleeds to the screen edge). */
   plateClassName?: string;
-  /** Classes for the label row under the plate. */
   controlsClassName?: string;
 }
+interface InkState {
+  query: ReturnType<typeof useInkFilms>;
+  view: InkView | null;
+  select: (view: InkView) => void;
+  exit: () => void;
+}
 
-/**
- * Whether art should stay still until asked: the reader's reduced-motion
- * setting, or the site's own motion switch (`data-motion="reduced"`).
- */
 export function prefersStillArt(reducedMotion: boolean): boolean {
-  if (reducedMotion) return true;
-  if (typeof document === 'undefined') return false;
-  return document.documentElement.dataset.motion === 'reduced';
+  return (
+    reducedMotion ||
+    (typeof document !== 'undefined' && document.documentElement.dataset.motion === 'reduced')
+  );
 }
 
 /**
- * SignatureViewer — the art on its plate with the label row beneath: Still /
- * In motion, play and pause, and full screen.
- * The still is the default; the animation plays in the same plate only when
- * asked for (never on its own under reduced motion), pauses while scrolled
- * out of view or in a hidden tab, and falls back to the still if it cannot
- * load. Full screen opens the zoomable ArtLightbox for the still and the
- * browser's own full screen for the animation.
+ * One frame for every edition. The query reader has a server-renderable original
+ * as its Suspense fallback, preserving the artwork and the page's ISR policy.
+ * Gallery previews share the same frame and controls, with local selection only.
  */
-export function SignatureViewer({
-  seed,
+export function SignatureViewer(props: SignatureViewerProps) {
+  if (props.seed == null || props.tokenId == null) return <SignatureViewerFrame {...props} />;
+  return props.inkLinkable ? (
+    <Suspense fallback={<SignatureViewerFrame {...props} />}>
+      <LinkedSignatureViewer key={String(props.seed)} {...props} />
+    </Suspense>
+  ) : (
+    <LocalSignatureViewer key={String(props.seed)} {...props} />
+  );
+}
+function LinkedSignatureViewer(props: SignatureViewerProps) {
+  const query = useInkFilms(props.seed);
+  const link = useInkViewLink(true);
+  return (
+    <SignatureViewerFrame
+      {...props}
+      ink={{
+        query,
+        view: link.view,
+        select: link.view ? link.select : link.open,
+        exit: link.close,
+      }}
+    />
+  );
+}
+function LocalSignatureViewer(props: SignatureViewerProps) {
+  const query = useInkFilms(props.seed);
+  const [view, setView] = useState<InkView | null>(null);
+  return (
+    <SignatureViewerFrame
+      {...props}
+      ink={{ query, view, select: setView, exit: () => setView(null) }}
+    />
+  );
+}
+
+function SignatureViewerFrame({
+  tokenId,
   media,
   alt,
   subject,
@@ -86,162 +117,246 @@ export function SignatureViewer({
   unavailableLabel,
   renderPending = false,
   sizes,
+  spectralSweepUrl,
   className,
   plateClassName,
   controlsClassName,
-}: SignatureViewerProps) {
+  ink,
+}: SignatureViewerProps & { ink?: InkState }) {
   const t = useTranslations('detail');
   const reducedMotion = usePrefersReducedMotion();
   const [mode, setMode] = useState<ArtMode>('still');
   const [artStatus, setArtStatus] = useState<ArtStatus>('loading');
-  const [motionFailed, setMotionFailed] = useState(false);
+  const [inkStatus, setInkStatus] = useState<ArtStatus>('loading');
+  const [failedMotions, setFailedMotions] = useState<Partial<Record<ArtMode, boolean>>>({});
   const [playing, setPlaying] = useState(false);
-  const [lightboxOpen, setLightboxOpen] = useState(false);
   const videoRef = useRef<WebkitVideoElement>(null);
+  const inkVideoRef = useRef<HTMLVideoElement>(null);
   const plateRef = useRef<HTMLDivElement>(null);
-  const fullscreenButtonRef = useRef<HTMLButtonElement>(null);
-  // Paused by the viewer (scrolled away, tab hidden), not by the reader.
   const autoPaused = useRef(false);
+  const visible = useRef(true);
+  const showInk = ink?.view != null;
+  const inkMedia = ink?.query.data;
+  const hasInk = Boolean(inkMedia?.films.length || inkMedia?.image);
+  const inkFilm = inkMedia?.films.find((film) => film.variant === ink?.view);
+  const inkImage = ink?.view === 'image' ? inkMedia?.image : undefined;
+  const inkUrl = inkImage?.url ?? inkFilm?.url;
+  const motionUrl = mode === 'sweep' ? spectralSweepUrl : media?.video;
+  const showMotion = !showInk && mode !== 'still' && Boolean(motionUrl) && !failedMotions[mode];
+  const motionFailed = Boolean(failedMotions.motion || failedMotions.sweep);
 
-  const motionAvailable = Boolean(media) && !motionFailed;
-  const showMotion = mode === 'motion' && motionAvailable;
+  // Release even the original film on edition changes. Ref setup also restores
+  // the source after StrictMode's setup/cleanup replay in development.
+  const attachVideo = useCallback(
+    (video: WebkitVideoElement | null) => {
+      videoRef.current = video;
+      if (!video) return;
+      if (motionUrl && video.getAttribute('src') !== motionUrl)
+        video.setAttribute('src', motionUrl);
+      return () => {
+        video.pause();
+        video.removeAttribute('src');
+        video.load();
+        videoRef.current = null;
+      };
+    },
+    [motionUrl],
+  );
 
-  const selectMode = (next: ArtMode) => {
-    setMode(next);
-    if (next === 'still') setPlaying(false);
-  };
-
-  // Start the animation when the reader switches to it, unless they asked
-  // the whole site to keep still: then it waits, paused, for Play.
   useEffect(() => {
     const video = videoRef.current;
-    if (!showMotion || !video || prefersStillArt(reducedMotion)) return;
-    void video.play()?.catch(() => {
-      /* Refused autoplay leaves the poster and the Play button. */
-    });
-  }, [showMotion, reducedMotion]);
+    if (
+      !showMotion ||
+      !video ||
+      prefersStillArt(reducedMotion) ||
+      document.visibilityState === 'hidden'
+    )
+      return;
+    void video.play()?.catch(() => {});
+  }, [showMotion, motionUrl, reducedMotion]);
 
-  // Only the art moves, and only while someone can see it.
   useEffect(() => {
     const video = videoRef.current;
     const plate = plateRef.current;
     if (!showMotion || !video || !plate) return;
-
-    const pauseForViewer = () => {
+    const pause = () => {
       if (!video.paused) {
         autoPaused.current = true;
         video.pause();
       }
     };
-    const resumeForViewer = () => {
-      if (autoPaused.current) {
+    const resume = () => {
+      if (autoPaused.current && visible.current && document.visibilityState !== 'hidden') {
         autoPaused.current = false;
         void video.play()?.catch(() => {});
       }
     };
-    const onVisibility = () =>
-      document.visibilityState === 'hidden' ? pauseForViewer() : resumeForViewer();
-
+    const onVisibility = () => (document.visibilityState === 'hidden' ? pause() : resume());
     document.addEventListener('visibilitychange', onVisibility);
     const observer =
       typeof IntersectionObserver === 'undefined'
         ? null
-        : new IntersectionObserver(([entry]) =>
-            entry?.isIntersecting ? resumeForViewer() : pauseForViewer(),
-          );
+        : new IntersectionObserver(([entry]) => {
+            visible.current = Boolean(entry?.isIntersecting);
+            if (visible.current) resume();
+            else pause();
+          });
     observer?.observe(plate);
     return () => {
       document.removeEventListener('visibilitychange', onVisibility);
       observer?.disconnect();
       autoPaused.current = false;
+      visible.current = true;
     };
-  }, [showMotion]);
+  }, [showMotion, motionUrl]);
 
-  // Full screen leaves the label row behind, so the animation gets the
-  // browser's own controls (pause, scrub, exit) while it fills the screen,
-  // and hands them back when it returns to the plate.
   useEffect(() => {
     const video = videoRef.current;
     if (!showMotion || !video) return;
     const syncControls = () => {
-      video.controls = fullscreenElement() === video;
+      video.controls = fullscreenElement() === video || mode === 'sweep';
     };
-    for (const type of FULLSCREEN_CHANGE_EVENTS) document.addEventListener(type, syncControls);
+    for (const event of FULLSCREEN_CHANGE_EVENTS) document.addEventListener(event, syncControls);
     return () => {
-      for (const type of FULLSCREEN_CHANGE_EVENTS) {
-        document.removeEventListener(type, syncControls);
-      }
-      video.controls = false;
+      for (const event of FULLSCREEN_CHANGE_EVENTS)
+        document.removeEventListener(event, syncControls);
     };
-  }, [showMotion]);
+  }, [showMotion, motionUrl, mode]);
 
-  const togglePlayback = useCallback(() => {
+  const selectMode = (next: ArtMode) => {
+    setMode(next);
+    setPlaying(false);
+    autoPaused.current = false;
+  };
+  const selectEdition = (edition: 'original' | 'ink') => {
+    selectMode('still');
+    if (edition === 'original') ink?.exit();
+    else {
+      const next =
+        chooseDefaultInkFilm(inkMedia?.films ?? [])?.variant ?? (inkMedia?.image ? 'image' : null);
+      if (next) ink?.select(next);
+    }
+  };
+  const togglePlayback = () => {
     const video = videoRef.current;
     if (!video) return;
     autoPaused.current = false;
     if (video.paused) void video.play()?.catch(() => {});
     else video.pause();
-  }, []);
-
-  // With native controls showing, a click on the video already toggles it.
-  const handleVideoClick = () => {
-    if (!videoRef.current?.controls) togglePlayback();
   };
-
-  const openFullscreen = () => {
-    const video = videoRef.current;
-    if (showMotion && video) {
-      if (video.requestFullscreen) void video.requestFullscreen().catch(() => {});
-      else video.webkitEnterFullscreen?.();
-      return;
-    }
-    setLightboxOpen(true);
-  };
-
-  const handleMotionError = () => {
-    setMotionFailed(true);
-    setMode('still');
-    setPlaying(false);
-  };
-
-  const canOpenFullscreen = showMotion || (media !== null && artStatus !== 'unavailable');
-  // Offer the animation only for art that exists: never beside the
-  // unavailable plate, nor while a fresh imprint's render is still pending.
-  const showModes =
+  const canFullscreen = showInk
+    ? Boolean(inkUrl) && inkStatus !== 'unavailable'
+    : showMotion || (media !== null && artStatus !== 'unavailable');
+  const showOriginalModes =
     media !== null &&
     artStatus !== 'unavailable' &&
     (!renderPending || artStatus === 'loaded' || showMotion);
+  const inkOptions: SegmentedOption<InkView>[] = [
+    ...(inkMedia?.image
+      ? [{ value: 'image' as const, label: t('ink.image'), icon: <ImageIcon aria-hidden /> }]
+      : []),
+    ...(inkMedia?.films ?? []).map((film) => ({
+      value: film.variant,
+      label:
+        film.variant === 'short'
+          ? t('ink.seconds', { seconds: 30 })
+          : t('ink.minutes', { minutes: film.variant === 'medium' ? 2 : 5 }),
+    })),
+  ];
+  const lightboxSources =
+    showInk && inkImage
+      ? [inkImage.url, inkImage.sourceUrl]
+      : media
+        ? [media.webImage, media.sourceImage]
+        : [];
 
   return (
-    <div className={cn('flex min-w-0 flex-col gap-3', className)} data-testid="signature-viewer">
-      <div ref={plateRef} className="relative">
-        {showMotion && media ? (
-          <div className={cn(ART_PLATE_CLASS, 'w-full', plateClassName)}>
-            {/* The click is the pointer shortcut for the Play / Pause button below. */}
-            <video
-              ref={videoRef}
-              src={media.video}
-              poster={media.webImage}
-              muted
-              loop
-              playsInline
-              preload="auto"
-              aria-label={t('viewer.motionLabel', { subject })}
-              onPlay={() => setPlaying(true)}
-              onPause={() => setPlaying(false)}
-              onError={handleMotionError}
-              onClick={handleVideoClick}
-              className="relative z-[1] cursor-pointer"
-              data-testid="signature-motion"
+    <div
+      role="group"
+      aria-label={subject}
+      className={cn('flex min-w-0 flex-col gap-3', className)}
+      data-testid="signature-viewer"
+    >
+      <div
+        ref={plateRef}
+        className={cn(
+          ART_PLATE_CLASS,
+          'relative aspect-art w-full overflow-hidden',
+          plateClassName,
+        )}
+        data-testid="artwork-stage"
+        data-edition={showInk ? 'ink' : 'original'}
+      >
+        {showInk ? (
+          inkImage ? (
+            <InkImageView image={inkImage} subject={subject} onStatusChange={setInkStatus} />
+          ) : inkFilm ? (
+            <InkFilmVideo
+              key={inkFilm.variant}
+              film={inkFilm}
+              poster={inkMedia?.poster}
+              subject={subject}
+              videoRef={inkVideoRef}
+              onStatusChange={setInkStatus}
             />
-          </div>
+          ) : (
+            <div className="flex h-full w-full flex-col items-center justify-center gap-4 bg-art-ground px-6 text-center">
+              <p role="status" className="type-body-sm text-subtle">
+                {ink?.query.isPending
+                  ? t('ink.loading')
+                  : ink?.query.isError
+                    ? t('ink.availabilityError')
+                    : t('ink.unavailable')}
+              </p>
+              {ink?.query.isError ? (
+                <Button
+                  variant="outline"
+                  size="sm"
+                  loading={ink.query.isFetching}
+                  onClick={() => void ink.query.refetch()}
+                >
+                  {t('ink.retry')}
+                </Button>
+              ) : null}
+            </div>
+          )
+        ) : showMotion && media ? (
+          <video
+            key={motionUrl}
+            ref={attachVideo}
+            src={motionUrl}
+            poster={media.webImage}
+            muted
+            loop
+            playsInline
+            preload="auto"
+            controls={mode === 'sweep'}
+            autoPlay={!prefersStillArt(reducedMotion)}
+            aria-label={
+              mode === 'sweep'
+                ? t('viewer.spectralLabel', { subject })
+                : t('viewer.motionLabel', { subject })
+            }
+            onPlay={() => {
+              if (document.visibilityState === 'hidden' || !visible.current) {
+                autoPaused.current = true;
+                videoRef.current?.pause();
+                setPlaying(false);
+              } else setPlaying(true);
+            }}
+            onPause={() => setPlaying(false)}
+            onError={() => {
+              setFailedMotions((failed) => ({ ...failed, [mode]: true }));
+              selectMode('still');
+            }}
+            onClick={() => {
+              if (!videoRef.current?.controls) togglePlayback();
+            }}
+            className="relative z-[1] h-full w-full cursor-pointer object-contain"
+            data-testid={mode === 'sweep' ? 'spectral-sweep-video' : 'signature-motion'}
+          />
         ) : (
-          // The click is the pointer shortcut for the Full screen button below,
-          // which keyboard and assistive-technology users reach instead.
-          <div
-            onClick={canOpenFullscreen ? openFullscreen : undefined}
-            className={cn(canOpenFullscreen && 'cursor-zoom-in')}
-          >
+          <div className="h-full w-full">
             <ArtFrame
               sources={signatureSources(media)}
               alt={alt}
@@ -250,7 +365,7 @@ export function SignatureViewer({
               unavailableLabel={unavailableLabel}
               unavailableDetail={tokenLabel}
               onStatusChange={setArtStatus}
-              className={plateClassName}
+              className="h-full rounded-none shadow-none after:hidden hover:shadow-none [&_img]:h-full [&_img]:object-contain"
             />
           </div>
         )}
@@ -258,86 +373,166 @@ export function SignatureViewer({
 
       <div
         className={cn(
-          'flex flex-wrap items-center gap-x-2 gap-y-3 max-sm:justify-between',
+          'space-y-3 pointer-coarse:[&_label]:min-h-11 pointer-coarse:[&_button]:min-h-11 pointer-coarse:[&_button]:min-w-11',
           controlsClassName,
         )}
       >
-        <div className="flex items-center gap-2 max-sm:w-full">
-          {showModes ? (
-            // The system's one segmented control, as on the gallery's filters.
+        <div className="flex min-h-11 flex-wrap items-center justify-between gap-x-4 gap-y-2 border-b border-rule-faint">
+          {hasInk || showInk ? (
+            <SegmentedControl
+              label={t('viewer.editionLabel')}
+              hideLabel
+              variant="underline"
+              value={showInk ? 'ink' : 'original'}
+              onValueChange={selectEdition}
+              options={[
+                { value: 'original', label: t('viewer.original') },
+                { value: 'ink', label: t('ink.trigger') },
+              ]}
+            />
+          ) : (
+            <span className="type-label text-subtle">{t('viewer.original')}</span>
+          )}
+          <div className="flex items-center gap-1">
+            {canFullscreen && ((!showInk && !showMotion) || inkImage) ? (
+              <ImageFullscreenControl
+                key={showInk ? 'ink' : 'original'}
+                sources={lightboxSources.filter((source): source is string => Boolean(source))}
+                alt={showInk ? t('ink.imageLabel', { subject }) : alt}
+                title={subject}
+                unavailableLabel={showInk ? t('ink.imageError') : unavailableLabel}
+              />
+            ) : canFullscreen ? (
+              <Button
+                type="button"
+                variant="quiet"
+                size="sm"
+                onClick={() =>
+                  enterVideoFullscreen(showInk ? inkVideoRef.current : videoRef.current)
+                }
+                className="font-normal text-subtle"
+              >
+                <Expand aria-hidden />
+                <span className="max-sm:sr-only">{t('viewer.fullscreen')}</span>
+              </Button>
+            ) : null}
+            {showInk ? (
+              tokenId != null && inkUrl && ink?.view ? (
+                <InkShareMenu tokenId={tokenId} view={ink.view} mediaUrl={inkUrl} />
+              ) : null
+            ) : media ? (
+              <NFTShareMenu
+                imageUrl={media.sourceImage}
+                videoUrl={mode === 'sweep' ? spectralSweepUrl : media.video}
+                variant="quiet"
+              />
+            ) : null}
+          </div>
+        </div>
+        <div className="flex min-h-11 flex-wrap items-center gap-2">
+          {showInk && ink ? (
+            inkOptions.length === 1 && inkUrl ? (
+              <p className="type-caption text-subtle">
+                {t('ink.mediaLabel')} · {inkOptions[0]!.label}
+              </p>
+            ) : inkOptions.length > 0 ? (
+              <SegmentedControl
+                label={t('ink.mediaLabel')}
+                hideLabel
+                value={ink.view!}
+                onValueChange={ink.select}
+                options={inkOptions}
+              />
+            ) : null
+          ) : showOriginalModes ? (
             <SegmentedControl<ArtMode>
               label={t('viewer.modeLabel')}
               hideLabel
-              value={showMotion ? 'motion' : 'still'}
+              value={showMotion ? mode : 'still'}
               onValueChange={selectMode}
-              className="shrink-0"
               options={[
                 { value: 'still', label: t('viewer.still'), icon: <ImageIcon aria-hidden /> },
                 {
                   value: 'motion',
                   label: t('viewer.motion'),
                   icon: <Film aria-hidden />,
-                  disabled: !motionAvailable,
+                  disabled: !media?.video || failedMotions.motion,
                 },
+                ...(spectralSweepUrl
+                  ? [
+                      {
+                        value: 'sweep' as const,
+                        label: t('viewer.spectral'),
+                        disabled: failedMotions.sweep,
+                      },
+                    ]
+                  : []),
               ]}
             />
           ) : null}
-          {showMotion ? (
+          {showMotion && mode === 'motion' ? (
             <Button
               type="button"
               variant="ghost"
               size="sm"
               onClick={togglePlayback}
               aria-label={playing ? t('viewer.pause') : t('viewer.play')}
-              className="text-muted-foreground max-sm:min-w-11"
+              className="text-subtle"
               data-testid="signature-playback"
             >
               {playing ? <Pause aria-hidden /> : <Play aria-hidden />}
             </Button>
           ) : null}
-          {canOpenFullscreen ? (
-            <Button
-              ref={fullscreenButtonRef}
-              type="button"
-              variant="ghost"
-              size="sm"
-              onClick={openFullscreen}
-              className="font-medium normal-case text-muted-foreground max-sm:ml-auto max-sm:min-w-11"
-            >
-              <Expand aria-hidden />
-              <span className="max-sm:sr-only">{t('viewer.fullscreen')}</span>
-            </Button>
-          ) : null}
         </div>
-        {seed != null ? (
-          <InkFilmDialog
-            seed={seed}
-            subject={subject}
-            onOpenChange={(open) => {
-              if (!open) return;
-              autoPaused.current = false;
-              videoRef.current?.pause();
-            }}
-          />
-        ) : null}
-        {motionFailed ? (
-          <p role="status" className="w-full type-caption text-subtle">
+        {showInk ? (
+          <p className="type-caption text-subtle">{t('ink.description')}</p>
+        ) : motionFailed ? (
+          <p role="status" className="type-caption text-subtle">
             {t('viewer.motionError')}
           </p>
         ) : null}
       </div>
-
-      {media ? (
-        <ArtLightbox
-          open={lightboxOpen}
-          onOpenChange={setLightboxOpen}
-          sources={[media.webImage, media.sourceImage]}
-          alt={alt}
-          title={subject}
-          unavailableLabel={unavailableLabel}
-          returnFocusRef={fullscreenButtonRef}
-        />
-      ) : null}
     </div>
+  );
+}
+
+/** Fullscreen is an explicit utility; changing the inline view disposes it. */
+function ImageFullscreenControl({
+  sources,
+  alt,
+  title,
+  unavailableLabel,
+}: {
+  sources: string[];
+  alt: string;
+  title: string;
+  unavailableLabel: string;
+}) {
+  const t = useTranslations('detail');
+  const [open, setOpen] = useState(false);
+  const buttonRef = useRef<HTMLButtonElement>(null);
+  return (
+    <>
+      <Button
+        ref={buttonRef}
+        type="button"
+        variant="quiet"
+        size="sm"
+        onClick={() => setOpen(true)}
+        className="font-normal text-subtle"
+      >
+        <Expand aria-hidden />
+        <span className="max-sm:sr-only">{t('viewer.fullscreen')}</span>
+      </Button>
+      <ArtLightbox
+        open={open}
+        onOpenChange={setOpen}
+        sources={sources}
+        alt={alt}
+        title={title}
+        unavailableLabel={unavailableLabel}
+        returnFocusRef={buttonRef}
+      />
+    </>
   );
 }
