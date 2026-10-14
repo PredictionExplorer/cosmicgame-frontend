@@ -178,10 +178,14 @@ export const protocolFacts = {
     stellarSelectionEthPercentage: 5,
     anchorDistributionPercentage: 5,
     publicGoodsPercentage: 5,
-    /** CST Gesture Cost declines ~1 CST per minute at launch (cstBidPriceDeclineMultiplier ≈ 1 ether / 60 per second). */
+    /**
+     * CST Gesture Cost declines ~1 CST per minute at launch. There is no
+     * stored decline parameter: the decline rate equals the Participation CST
+     * reward rate (bidCstRewardAmountMultiplier /
+     * mainPrizeTimeIncrementInMicroSeconds), so the auction always decays to
+     * zero over exactly one Cycle Finalization increment.
+     */
     cstGestureCostDeclinePerMinuteAtLaunch: 1,
-    /** The decline speed shifts ~1% per gesture (change divisor 100): up on ETH gestures, down on CST gestures. */
-    cstGestureCostDeclineChangePercentPerGesture: 1,
     /** The CST Calibration ceiling floor drops from 200 CST to 1 CST at reinitialize. */
     cstCalibrationCeilingMinCst: 1,
     /** Signature Allocation recipient receives this many sequential Cosmic Signature NFTs. */

@@ -277,24 +277,11 @@ export const ADMIN_EVENTS = [
     description: 'The exponent for the Late-Gesture Window cost premium has been changed.',
   },
   {
-    name: 'CstBidPriceDeclineMultiplierChanged',
-    messageKey: 'cstGestureCostDeclineRate',
-    type: 'float',
-    description: 'The CST Gesture Cost decline rate (CST per second) has been changed.',
-  },
-  {
     name: 'MainPrizeNumCosmicSignatureNftsChanged',
     messageKey: 'signatureAllocationNftCount',
     type: 'number',
     description:
       'The number of Cosmic Signature NFTs imprinted for the Signature Allocation recipient has been changed.',
-  },
-  {
-    name: 'CstBidPriceDeclineMultiplierChangeDivisorChanged',
-    messageKey: 'cstGestureCostDeclineChangeDivisor',
-    type: 'number',
-    description:
-      'The divisor controlling how much each gesture shifts the CST Gesture Cost decline rate has been changed.',
   },
   {
     name: 'EthBidRefundAmountInGasToSwallowMaxLimitChanged',

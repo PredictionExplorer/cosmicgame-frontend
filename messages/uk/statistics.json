@@ -778,9 +778,7 @@
       "lateGestureWindowDivisor": "Змінено дільник, що задає тривалість вікна пізніх жестів.",
       "lateGesturePremiumBaseMultiplier": "Змінено базовий множник надбавки до вартості у вікні пізніх жестів.",
       "lateGesturePremiumExponent": "Змінено показник степеня надбавки до вартості у вікні пізніх жестів.",
-      "cstGestureCostDeclineRate": "Змінено швидкість зниження вартості жесту CST (CST за секунду).",
       "signatureAllocationNftCount": "Змінено кількість Cosmic Signature NFT, що закарбовуються для отримувача розподілу Сигнатури.",
-      "cstGestureCostDeclineChangeDivisor": "Змінено дільник, що визначає, наскільки кожен жест зсуває швидкість зниження вартості жесту CST.",
       "ethGestureRefundGasLimit": "Змінено максимальний обсяг газу для поглинання дрібних відшкодувань ETH-жестів."
     }
   },

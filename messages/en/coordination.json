@@ -66,8 +66,6 @@
     "ethCalibrationEndingCostDivisor": "ETH Calibration Window ending cost divisor changed",
     "chronoWarriorEthPercentage": "Chrono-Warrior ETH allocation percentage changed",
     "cstCalibrationDurationChangeDivisor": "CST Calibration Window duration change divisor changed",
-    "cstGestureCostDeclineChangeDivisor": "CST Gesture Cost decline rate change divisor changed",
-    "cstGestureCostDeclineRate": "CST Gesture Cost decline rate changed",
     "ethGestureRefundGasLimit": "ETH gesture refund gas allowance changed",
     "lateGesturePremiumBaseMultiplier": "Late-gesture premium base multiplier changed",
     "lateGesturePremiumExponent": "Late-gesture premium exponent changed",

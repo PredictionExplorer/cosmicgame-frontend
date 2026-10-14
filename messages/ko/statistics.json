@@ -778,9 +778,7 @@
       "lateGestureWindowDivisor": "막판 제스처 구간 길이를 정하는 제수가 변경되었습니다.",
       "lateGesturePremiumBaseMultiplier": "막판 제스처 구간 비용 할증의 기본 배수가 변경되었습니다.",
       "lateGesturePremiumExponent": "막판 제스처 구간 비용 할증의 지수가 변경되었습니다.",
-      "cstGestureCostDeclineRate": "CST 제스처 비용 하락 속도(초당 CST)가 변경되었습니다.",
       "signatureAllocationNftCount": "시그니처 배분 수령자에게 각인되는 Cosmic Signature NFT 수가 변경되었습니다.",
-      "cstGestureCostDeclineChangeDivisor": "각 제스처가 CST 제스처 비용 하락 속도를 얼마나 움직이는지 제어하는 제수가 변경되었습니다.",
       "ethGestureRefundGasLimit": "소액 ETH 제스처 환불을 흡수하는 데 쓰는 최대 가스량이 변경되었습니다."
     }
   },

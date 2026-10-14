@@ -3242,30 +3242,6 @@
     "type": "function"
   },
   {
-    "inputs": [
-      {
-        "internalType": "uint256",
-        "name": "roundNum",
-        "type": "uint256"
-      }
-    ],
-    "name": "championDurations",
-    "outputs": [
-      {
-        "internalType": "uint256",
-        "name": "enduranceChampion",
-        "type": "uint256"
-      },
-      {
-        "internalType": "uint256",
-        "name": "chronoWarrior",
-        "type": "uint256"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
     "inputs": [],
     "name": "getRoundLateBidDuration",
     "outputs": [
@@ -3378,7 +3354,7 @@
       {
         "indexed": false,
         "internalType": "uint256",
-        "name": "cstBidPriceDeclineMultiplier",
+        "name": "cstDutchAuctionBeginningBidPrice",
         "type": "uint256"
       },
       {
@@ -3484,32 +3460,6 @@
         "type": "uint256"
       }
     ],
-    "name": "CstBidPriceDeclineMultiplierChangeDivisorChanged",
-    "type": "event"
-  },
-  {
-    "anonymous": false,
-    "inputs": [
-      {
-        "indexed": false,
-        "internalType": "uint256",
-        "name": "newValue",
-        "type": "uint256"
-      }
-    ],
-    "name": "CstBidPriceDeclineMultiplierChanged",
-    "type": "event"
-  },
-  {
-    "anonymous": false,
-    "inputs": [
-      {
-        "indexed": false,
-        "internalType": "uint256",
-        "name": "newValue",
-        "type": "uint256"
-      }
-    ],
     "name": "CstDutchAuctionDurationChangeDivisorChanged",
     "type": "event"
   },
@@ -3584,32 +3534,6 @@
   },
   {
     "inputs": [],
-    "name": "cstBidPriceDeclineMultiplier",
-    "outputs": [
-      {
-        "internalType": "uint256",
-        "name": "",
-        "type": "uint256"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [],
-    "name": "cstBidPriceDeclineMultiplierChangeDivisor",
-    "outputs": [
-      {
-        "internalType": "uint256",
-        "name": "",
-        "type": "uint256"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [],
     "name": "reinitialize",
     "outputs": [],
     "stateMutability": "nonpayable",
@@ -3624,32 +3548,6 @@
       }
     ],
     "name": "setBidCstRewardAmountMultiplier",
-    "outputs": [],
-    "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "uint256",
-        "name": "newValue_",
-        "type": "uint256"
-      }
-    ],
-    "name": "setCstBidPriceDeclineMultiplier",
-    "outputs": [],
-    "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "uint256",
-        "name": "newValue_",
-        "type": "uint256"
-      }
-    ],
-    "name": "setCstBidPriceDeclineMultiplierChangeDivisor",
     "outputs": [],
     "stateMutability": "nonpayable",
     "type": "function"
@@ -3776,11 +3674,51 @@
         "type": "uint256"
       }
     ],
-    "name": "bidsInfo",
+    "name": "roundStats",
     "outputs": [
       {
         "internalType": "uint256",
-        "name": "numItems",
+        "name": "numBids",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "numCstBids",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "totalSpentEthAmount",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "totalSpentCstAmount",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "maxEthBidPrice",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "maxCstBidPrice",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "enduranceChampionDuration",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "chronoWarriorDuration",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "flags",
         "type": "uint256"
       }
     ],
@@ -3982,5 +3920,37 @@
     ],
     "name": "EthTransferToCharityFailed",
     "type": "event"
+  },
+  {
+    "inputs": [],
+    "name": "getNextCstBidPriceBase",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "int256",
+        "name": "currentTimeOffset_",
+        "type": "int256"
+      }
+    ],
+    "name": "getNextCstBidPriceBaseAdvanced",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
   }
 ]

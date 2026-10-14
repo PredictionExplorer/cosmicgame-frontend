@@ -69,9 +69,7 @@
     "lateGestureWindowDivisor": "臨近收官落筆窗口除數已變更",
     "lateGesturePremiumBaseMultiplier": "臨近收官落筆溢價基礎乘數已變更",
     "lateGesturePremiumExponent": "臨近收官落筆溢價指數已變更",
-    "cstGestureCostDeclineRate": "CST 價格下降速率已變更",
     "signatureAllocationNftCount": "簽名配額 NFT 數量已變更",
-    "cstGestureCostDeclineChangeDivisor": "CST 價格下降速率調整除數已變更",
     "ethGestureRefundGasLimit": "ETH 落筆退款燃氣上限已變更"
   }
 }

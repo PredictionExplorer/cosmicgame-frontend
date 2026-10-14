@@ -182,19 +182,29 @@ function LiveProtocolConfiguration({
     if (!contract) return;
     let cancelled = false;
     // V3-only getters: absent on V2, where the reads fail with unrecognized-selector
-    // errors — expected, so they are swallowed rather than reported.
+    // errors — expected, so they are swallowed rather than reported. The CST cost
+    // decline rate has no dedicated getter on V3: it equals the Participation CST
+    // reward rate, bidCstRewardAmountMultiplier / mainPrizeTimeIncrementInMicroSeconds
+    // (wei of CST per second). getNextCstBidPriceBase() is the V3 marker selector.
     void (async () => {
       try {
-        const [declineMultiplier, numNfts, lateBidDuration] = await Promise.all([
-          contract.read.cstBidPriceDeclineMultiplier?.() as Promise<bigint | undefined>,
-          contract.read.mainPrizeNumCosmicSignatureNfts?.() as Promise<bigint | undefined>,
-          contract.read.getRoundLateBidDuration?.() as Promise<bigint | undefined>,
-        ]);
-        if (cancelled || declineMultiplier === undefined || numNfts === undefined) return;
+        const [v3Marker, numNfts, lateBidDuration, rewardMultiplier, timeIncrementUs] =
+          await Promise.all([
+            contract.read.getNextCstBidPriceBase?.() as Promise<bigint | undefined>,
+            contract.read.mainPrizeNumCosmicSignatureNfts?.() as Promise<bigint | undefined>,
+            contract.read.getRoundLateBidDuration?.() as Promise<bigint | undefined>,
+            contract.read.bidCstRewardAmountMultiplier?.() as Promise<bigint | undefined>,
+            contract.read.mainPrizeTimeIncrementInMicroSeconds?.() as Promise<bigint | undefined>,
+          ]);
+        if (cancelled || v3Marker === undefined || numNfts === undefined) return;
+        const declinePerSecondWei =
+          rewardMultiplier !== undefined && timeIncrementUs !== undefined && timeIncrementUs > 0n
+            ? rewardMultiplier / timeIncrementUs
+            : 0n;
         setV3Config({
           mainPrizeNumNfts: Number(numNfts),
           lateBidDurationSeconds: Number(lateBidDuration ?? 0n),
-          cstBidPriceDeclinePerSecond: Number(formatEther(declineMultiplier)),
+          cstBidPriceDeclinePerSecond: Number(formatEther(declinePerSecondWei)),
         });
       } catch (e) {
         // On V2 the selectors are absent; behind the proxy this surfaces as a reasonless revert.
