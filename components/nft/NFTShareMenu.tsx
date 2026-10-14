@@ -20,6 +20,8 @@ export interface NFTShareMenuProps {
   /** The artwork's animation, when published. */
   videoUrl?: string | null;
   className?: string;
+  /** Under the artwork, sharing is a quiet utility rather than a framed action. */
+  variant?: 'outline' | 'quiet';
 }
 
 /**
@@ -27,7 +29,12 @@ export interface NFTShareMenuProps {
  * "Copied" confirmation only when the copy happened (a refused clipboard
  * says the link could not be copied instead).
  */
-export function NFTShareMenu({ imageUrl, videoUrl, className }: NFTShareMenuProps) {
+export function NFTShareMenu({
+  imageUrl,
+  videoUrl,
+  className,
+  variant = 'outline',
+}: NFTShareMenuProps) {
   const t = useTranslations('detail');
   const tCommon = useTranslations('common');
   const { copy } = useClipboard();
@@ -47,9 +54,13 @@ export function NFTShareMenu({ imageUrl, videoUrl, className }: NFTShareMenuProp
       <DropdownMenuTrigger asChild>
         <Button
           type="button"
-          variant="outline"
+          variant={variant}
           size="sm"
-          className={cn('group px-3 font-medium normal-case', className)}
+          className={cn(
+            'group px-3 font-medium normal-case',
+            variant === 'quiet' && 'font-normal text-subtle',
+            className,
+          )}
         >
           <Share2 aria-hidden />
           {t('share.trigger')}

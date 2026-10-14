@@ -22,6 +22,8 @@ export interface SegmentedControlProps<T extends string> {
   label: string;
   /** Hide the label visually; it still names the group. */
   hideLabel?: boolean;
+  /** A quiet edition selector can use the shared underline treatment. */
+  variant?: 'segmented' | 'underline';
   options: readonly SegmentedOption<T>[];
   value: T;
   onValueChange: (value: T) => void;
@@ -51,6 +53,7 @@ export interface SegmentedControlProps<T extends string> {
 export function SegmentedControl<T extends string>({
   label,
   hideLabel = false,
+  variant = 'segmented',
   options,
   value,
   onValueChange,
@@ -65,7 +68,7 @@ export function SegmentedControl<T extends string>({
       role="radiogroup"
       aria-labelledby={labelId}
       className={cn(
-        tabsListVariants({ variant: 'segmented' }),
+        tabsListVariants({ variant }),
         'justify-start',
         scroll ? 'w-max flex-nowrap' : 'max-w-full flex-wrap',
       )}
@@ -78,7 +81,7 @@ export function SegmentedControl<T extends string>({
             data-state={checked ? 'active' : 'inactive'}
             data-disabled={option.disabled || undefined}
             className={cn(
-              tabsTriggerVariants({ variant: 'segmented', scroll: true }),
+              tabsTriggerVariants({ variant, scroll: true }),
               'focus-ring-within cursor-pointer tabular-nums max-sm:min-w-11',
               'data-[disabled]:cursor-not-allowed data-[disabled]:opacity-50 data-[disabled]:hover:text-muted-foreground',
             )}

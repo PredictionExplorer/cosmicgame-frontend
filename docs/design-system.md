@@ -120,6 +120,32 @@ and `fill`, inline styles), import the colour from `lib/theme/dataColors.ts`:
 the image inside with `object-fit: contain`. Nothing overlays, crops, dims or tints the
 artwork.
 
+**One artwork frame.** `SignatureViewer` serves the detail page and gallery quick
+view. Original and Ink study are quiet underline edition choices beneath one
+fixed-ratio frame; each edition exposes only its own image and film controls.
+Switching replaces the visible media in place, leaving the wall label and
+provenance visible. Full screen is an explicit utility, never the default ink view.
+Share belongs beside the frame and follows the selected edition.
+
+The focused artwork discovers ink availability from its asset manifest; gallery
+cards do not request manifests. Medium is the default ink film, then short, then
+slow; an image-only package opens its image. Only the selected media and its poster
+load. Switching releases the old video source, and hidden/offscreen films pause.
+Use native ink-film controls, respect reduced motion, and keep touch controls at
+44px even in landscape. Approximate labels describe the film editions; the native
+timeline shows actual running time.
+
+On the detail page, `?ink=image|short|medium|slow` opens an exact view. Opening
+adds one history entry, switching replaces it, and Back/Forward restores the
+selection. Returning to Original from a fresh shared link stays on the artwork. A missing linked
+view shows an unavailable state with any published alternatives, never a different
+film played automatically. Share offers a localized detail link to the selected
+view and a direct media-file link; links from gallery quick view always target the
+detail page. The query reader's Suspense fallback renders the original frame, so
+the primary artwork and provenance retain server rendering and the page's existing
+cache policy. The provenance label uses one top rule with open spacing between
+its entries, rather than enclosing every fact in a row.
+
 **Wall labels.** Every Signature is captioned by one rule, on both hosts, through
 `components/ui/signature-label` (`SignatureWallLabel`, or `useSignatureLabel()` where a
 card lays out its own lines):

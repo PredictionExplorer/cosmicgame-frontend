@@ -71,6 +71,10 @@
     "artworkUnavailable": "作品暫不可用"
   },
   "viewer": {
+    "editionLabel": "作品版本",
+    "original": "原作",
+    "spectral": "光譜掃描",
+    "spectralLabel": "{subject} 的光譜掃描",
     "modeLabel": "作品檢視",
     "still": "靜態",
     "motion": "動態",
@@ -83,5 +87,23 @@
     "panHint": "拖曳或使用方向鍵移動作品。按 0 鍵恢復為符合視窗大小。",
     "motionError": "動畫無法載入。",
     "motionLabel": "{subject} 的動畫"
+  },
+  "ink": {
+    "trigger": "墨繪習作",
+    "description": "相同的軌跡，以墨跡在紙上重現。",
+    "mediaLabel": "墨繪版本",
+    "image": "圖片",
+    "seconds": "{seconds} 秒",
+    "minutes": "約 {minutes} 分鐘",
+    "videoLabel": "{subject} 的墨繪影片",
+    "imageLabel": "{subject} 的墨繪圖片",
+    "shareView": "複製此版本連結",
+    "shareMedia": "複製媒體連結",
+    "loading": "正在載入墨繪習作…",
+    "unavailable": "這件作品沒有所選的墨繪版本。",
+    "availabilityError": "無法確認墨繪習作是否可用，請再試一次。",
+    "loadError": "墨繪影片無法載入。",
+    "imageError": "墨繪圖片無法載入。",
+    "retry": "再試一次"
   }
 }

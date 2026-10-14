@@ -71,6 +71,10 @@
     "artworkUnavailable": "Artwork unavailable"
   },
   "viewer": {
+    "editionLabel": "Artwork edition",
+    "original": "Original",
+    "spectral": "Spectral sweep",
+    "spectralLabel": "Spectral sweep of {subject}",
     "modeLabel": "Artwork view",
     "still": "Still",
     "motion": "In motion",
@@ -83,5 +87,23 @@
     "panHint": "Drag or use the arrow keys to move around the artwork. Press 0 to fit it to the screen.",
     "motionError": "The animation could not be loaded.",
     "motionLabel": "Animation of {subject}"
+  },
+  "ink": {
+    "trigger": "Ink study",
+    "description": "The same paths, traced in ink on paper.",
+    "mediaLabel": "Ink view",
+    "image": "Image",
+    "seconds": "{seconds} sec",
+    "minutes": "≈{minutes} min",
+    "videoLabel": "Ink film of {subject}",
+    "imageLabel": "Ink image of {subject}",
+    "shareView": "Copy link to this view",
+    "shareMedia": "Copy media link",
+    "loading": "Loading ink study…",
+    "unavailable": "This ink view is not available for this artwork.",
+    "availabilityError": "The ink study could not be checked. Try again.",
+    "loadError": "This ink film could not be loaded.",
+    "imageError": "This ink image could not be loaded.",
+    "retry": "Try again"
   }
 }

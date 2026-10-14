@@ -31,7 +31,6 @@ import { NFTOwnerActions } from './NFTOwnerActions';
 import { NFTDetailSkeleton } from './NFTDetailSkeleton';
 import { NFTIdentity } from './NFTIdentity';
 import { NFTNeighbourNav, neighbourIds } from './NFTNeighbourNav';
-import { NFTShareMenu } from './NFTShareMenu';
 import { SignatureViewer } from './SignatureViewer';
 import { isRenderPending, signatureMedia, useSignatureAlt } from './signatureArt';
 import { NftTraitPanel } from './traits/NftTraitPanel';
@@ -246,6 +245,10 @@ const NFTTrait = ({ tokenId, initialMetadata, initialToken }: NFTTraitProps) => 
     <div className="site-container">
       <section aria-labelledby={titleId} className={DETAIL_GRID_CLASS} data-testid="hero-section">
         <SignatureViewer
+          key={tokenId}
+          tokenId={tokenId}
+          inkLinkable
+          seed={nft?.Seed}
           media={media}
           alt={alt}
           subject={subject}
@@ -256,7 +259,7 @@ const NFTTrait = ({ tokenId, initialMetadata, initialToken }: NFTTraitProps) => 
           // Never taller than the screen leaves room for; full-bleed on phones.
           // Beside a taller column (the owner's tools open) the plate stays in
           // view while the tools scroll, instead of leaving a band of ground.
-          className="mx-auto w-full max-w-[max(20rem,calc((100svh_-_var(--header-height)_-_11rem)_*_var(--art-ratio)))] max-sm:-mx-[var(--gutter)] max-sm:w-auto max-sm:max-w-none lg:sticky lg:top-[var(--sticky-offset)]"
+          className="mx-auto w-full max-w-[max(20rem,calc((100svh_-_var(--header-height)_-_14rem)_*_var(--art-ratio)))] max-sm:-mx-[var(--gutter)] max-sm:w-auto max-sm:max-w-none lg:sticky lg:top-[var(--sticky-offset)]"
           plateClassName="max-sm:rounded-none"
           controlsClassName="max-sm:px-[var(--gutter)]"
         />
@@ -271,12 +274,7 @@ const NFTTrait = ({ tokenId, initialMetadata, initialToken }: NFTTraitProps) => 
             entry={traitEntry}
             rarity={rarity}
             rarityTotal={collectionTraits?.rarity.total ?? 0}
-            actions={
-              <>
-                <NFTShareMenu imageUrl={media?.sourceImage} videoUrl={media?.video} />
-                <NftMarketplaceButton size="sm" />
-              </>
-            }
+            actions={<NftMarketplaceButton size="sm" />}
           />
           {/*
            * The walk through the collection closes the wall label, so on a

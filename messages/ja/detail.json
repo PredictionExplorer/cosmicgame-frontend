@@ -71,6 +71,10 @@
     "artworkUnavailable": "アートワークを利用できません"
   },
   "viewer": {
+    "editionLabel": "作品のバージョン",
+    "original": "オリジナル",
+    "spectral": "スペクトルスイープ",
+    "spectralLabel": "{subject}のスペクトルスイープ",
     "modeLabel": "アートワークの表示",
     "still": "静止画",
     "motion": "動画",
@@ -83,5 +87,23 @@
     "panHint": "ドラッグまたは矢印キーで作品を移動します。0キーで画面に合わせます。",
     "motionError": "アニメーションを読み込めませんでした。",
     "motionLabel": "{subject}のアニメーション"
+  },
+  "ink": {
+    "trigger": "インクの習作",
+    "description": "同じ軌跡を、紙の上にインクで描きます。",
+    "mediaLabel": "インクの表示形式",
+    "image": "画像",
+    "seconds": "{seconds}秒",
+    "minutes": "約{minutes}分",
+    "videoLabel": "{subject}のインク映像",
+    "imageLabel": "{subject}のインク画像",
+    "shareView": "この表示へのリンクをコピー",
+    "shareMedia": "メディアのリンクをコピー",
+    "loading": "インクの習作を読み込み中…",
+    "unavailable": "このインクの表示形式は、この作品では利用できません。",
+    "availabilityError": "インクの習作を確認できませんでした。もう一度お試しください。",
+    "loadError": "インク映像を読み込めませんでした。",
+    "imageError": "インク画像を読み込めませんでした。",
+    "retry": "もう一度試す"
   }
 }

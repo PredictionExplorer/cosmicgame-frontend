@@ -1,8 +1,8 @@
 [
   {
-    "id": "GHSA-VFJ7-8CJW-P6XM",
+    "id": "GHSA-vfj7-8cjw-p6xm",
     "package": "braces",
-    "reason": "Tooling-only (lint-staged > micromatch); no patched release exists — the advisory covers every version through the latest 3.0.3. Glob patterns come from our own lint-staged config, never untrusted input.",
-    "expires": "2027-01-02"
+    "reason": "Tooling only: glob matching in lint/test commands uses repository-controlled patterns; braces is absent from the production dependency tree. As of 2026-10-11 no patched braces release exists, and even @next/eslint-plugin-next 16.4.0 still depends on fast-glob -> micromatch -> braces 3.0.3. Updating lint-staged to 16.4.0 removes one consumer but cannot remove that chain. Remove this exception as soon as braces is patched or the remaining consumers migrate. Advisory: https://github.com/advisories/GHSA-vfj7-8cjw-p6xm",
+    "expires": "2026-10-25"
   }
 ]

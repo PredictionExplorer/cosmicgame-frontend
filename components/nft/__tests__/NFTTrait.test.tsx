@@ -14,6 +14,11 @@ import NFTTrait from '../NFTTrait';
 /** The connected wallet; mixed case, as wallets report it. */
 const OWNER = '0xAbCdEf0123456789aBcDeF0123456789AbCdEf01';
 
+const mockUseInkFilms = jest.fn();
+jest.mock('@/hooks/useInkFilms', () => ({
+  useInkFilms: (...args: unknown[]) => mockUseInkFilms(...args),
+}));
+
 /* ── framer-motion mock ───────────────────────────────────────── */
 jest.mock('framer-motion', () => {
   const React = require('react');
@@ -74,8 +79,10 @@ jest.mock('../../../hooks/web3', () => ({
 }));
 
 const mockRouterPush = jest.fn();
+let mockSearch = '';
 jest.mock('next/navigation', () => ({
   useRouter: () => ({ push: mockRouterPush }),
+  useSearchParams: () => new URLSearchParams(mockSearch),
 }));
 
 const mockTotalSupply = jest.fn().mockResolvedValue(BigInt(100));
@@ -149,6 +156,8 @@ jest.mock('../../../components/tables/TransferHistoryTable', () => ({
 beforeEach(() => {
   jest.clearAllMocks();
   mockRouterPush.mockClear();
+  mockSearch = '';
+  mockUseInkFilms.mockReturnValue({ data: undefined });
 });
 
 const baseNft = {
@@ -186,6 +195,36 @@ const withNameHistory = (names: Array<{ TokenName: string }> = [{ TokenName: 'My
   });
 
 describe('NFTTrait', () => {
+  it('places a directly linked ink image in the main artwork frame without hiding its identity', () => {
+    withDashboard();
+    withNft();
+    withNameHistory();
+    mockSearch = 'ink=image';
+    mockUseInkFilms.mockReturnValue({
+      data: {
+        films: [],
+        poster: undefined,
+        image: { url: 'https://media.example/ink-full.webp' },
+      },
+    });
+    render(<NFTTrait tokenId={5} />);
+
+    expect(mockUseInkFilms).toHaveBeenCalledWith('abc123');
+    expect(screen.queryByRole('dialog')).toBeNull();
+    expect(screen.getByRole('radio', { name: 'detail.ink.trigger' })).toBeChecked();
+    expect(screen.getByAltText('detail.ink.imageLabel(subject=MyToken)')).toHaveAttribute(
+      'src',
+      'https://media.example/ink-full.webp',
+    );
+    expect(
+      within(screen.getByTestId('signature-viewer')).getByTestId('ink-image-view'),
+    ).toBeInTheDocument();
+    expect(screen.queryByTestId('art-frame')).toBeNull();
+    expect(screen.getByTestId('token-identity')).toBeVisible();
+    expect(screen.getByRole('heading', { name: 'MyToken', level: 1 })).toBeVisible();
+    expect(document.querySelector('video')).toBeNull();
+  });
+
   it('shows the layout-matched skeleton only while the token record loads', () => {
     mockUseCSTInfo.mockReturnValue({ data: undefined, isLoading: true, refetch: jest.fn() });
     render(<NFTTrait tokenId={5} />);
