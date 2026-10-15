@@ -92,12 +92,24 @@ describe('ScrollRail', () => {
     type Box = { left: number; right: number };
     function layout(track: HTMLElement, boxes: Box[], trackBox: Box) {
       const row = track.firstElementChild as HTMLElement;
+      // Item boxes shift with the scroll and scrollTo moves scrollLeft, as in
+      // a real browser. A reveal that runs after another — the mount reveal's
+      // rAF landing after the mutation-driven reveal under a busy scheduler —
+      // then sees the row resting where the first left it and stands down;
+      // with static boxes it would re-derive the same scroll from scrollLeft
+      // 0 and compound the end room it had already made (30px became 60px).
       Array.from(row.children).forEach((item, index) => {
         (item as HTMLElement).getBoundingClientRect = () =>
-          ({ ...boxes[index], width: boxes[index]!.right - boxes[index]!.left }) as DOMRect;
+          ({
+            left: boxes[index]!.left - track.scrollLeft,
+            right: boxes[index]!.right - track.scrollLeft,
+            width: boxes[index]!.right - boxes[index]!.left,
+          }) as DOMRect;
       });
       track.getBoundingClientRect = () => trackBox as DOMRect;
-      const scrollTo = jest.fn();
+      const scrollTo = jest.fn(({ left }: ScrollToOptions) => {
+        track.scrollLeft = left ?? 0;
+      });
       Object.assign(track, { scrollTo });
       return scrollTo;
     }
