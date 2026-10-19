@@ -2002,7 +2002,7 @@ export const cosmicGameAbi = [
     name: 'getCstDutchAuctionDurations',
     outputs: [
       { name: '', internalType: 'uint256', type: 'uint256' },
-      { name: '', internalType: 'int256', type: 'int256' },
+      { name: '', internalType: 'uint256', type: 'uint256' },
     ],
     stateMutability: 'view',
   },
@@ -2819,16 +2819,6 @@ export const cosmicGameAbi = [
   },
   {
     type: 'function',
-    inputs: [{ name: 'roundNum', internalType: 'uint256', type: 'uint256' }],
-    name: 'championDurations',
-    outputs: [
-      { name: 'enduranceChampion', internalType: 'uint256', type: 'uint256' },
-      { name: 'chronoWarrior', internalType: 'uint256', type: 'uint256' },
-    ],
-    stateMutability: 'view',
-  },
-  {
-    type: 'function',
     inputs: [],
     name: 'getRoundLateBidDuration',
     outputs: [{ name: '', internalType: 'uint256', type: 'uint256' }],
@@ -3211,13 +3201,6 @@ export const cosmicGameAbi = [
     ],
     stateMutability: 'view',
   },
-  {
-    type: 'function',
-    inputs: [{ name: 'roundNum', internalType: 'uint256', type: 'uint256' }],
-    name: 'bidsInfo',
-    outputs: [{ name: 'numItems', internalType: 'uint256', type: 'uint256' }],
-    stateMutability: 'view',
-  },
   { type: 'error', inputs: [], name: 'BidHasBeenPlacedInCurrentRound' },
   {
     type: 'error',
@@ -3329,6 +3312,31 @@ export const cosmicGameAbi = [
       },
     ],
     name: 'EthTransferToCharityFailed',
+  },
+  {
+    type: 'function',
+    inputs: [{ name: 'roundNum', internalType: 'uint256', type: 'uint256' }],
+    name: 'roundStats',
+    outputs: [
+      { name: 'numBids', internalType: 'uint256', type: 'uint256' },
+      { name: 'numCstBids', internalType: 'uint256', type: 'uint256' },
+      { name: 'totalSpentEthAmount', internalType: 'uint256', type: 'uint256' },
+      { name: 'totalSpentCstAmount', internalType: 'uint256', type: 'uint256' },
+      { name: 'maxEthBidPrice', internalType: 'uint256', type: 'uint256' },
+      { name: 'maxCstBidPrice', internalType: 'uint256', type: 'uint256' },
+      {
+        name: 'enduranceChampionDuration',
+        internalType: 'uint256',
+        type: 'uint256',
+      },
+      {
+        name: 'chronoWarriorDuration',
+        internalType: 'uint256',
+        type: 'uint256',
+      },
+      { name: 'flags', internalType: 'uint256', type: 'uint256' },
+    ],
+    stateMutability: 'view',
   },
 ] as const;
 
@@ -5776,7 +5784,7 @@ export const ethDonationsAbi = [
     name: 'getCstDutchAuctionDurations',
     outputs: [
       { name: '', internalType: 'uint256', type: 'uint256' },
-      { name: '', internalType: 'int256', type: 'int256' },
+      { name: '', internalType: 'uint256', type: 'uint256' },
     ],
     stateMutability: 'view',
   },
@@ -10024,7 +10032,7 @@ export const systemManagementAbi = [
     name: 'getCstDutchAuctionDurations',
     outputs: [
       { name: '', internalType: 'uint256', type: 'uint256' },
-      { name: '', internalType: 'int256', type: 'int256' },
+      { name: '', internalType: 'uint256', type: 'uint256' },
     ],
     stateMutability: 'view',
   },

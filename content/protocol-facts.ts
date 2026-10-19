@@ -142,8 +142,10 @@ export const protocolFacts = {
    * new getters) should prefer these once the upgrade lands; the top-level facts above
    * keep describing the live V2 deployment until then.
    *
-   * Verified against the v3-2026-07-24 branch Solidity defaults at commit 51221556
-   * (`CosmicSignatureConstants.sol`, `docs/v3-vs-v2-changes.md`).
+   * Verified against the v3.1-2026-10-13 deployment branch Solidity defaults at
+   * commit 9d1a6447 (`CosmicSignatureConstants.sol`). Values are unchanged from
+   * the earlier v3-2026-07-24 verification at commit 51221556; that branch only
+   * added the two Calibration Window safeguards noted below.
    */
   v3: {
     /** Linear Participation CST (replaces the V2 sqrt formula). */
@@ -184,6 +186,18 @@ export const protocolFacts = {
     cstGestureCostDeclineChangePercentPerGesture: 1,
     /** The CST Calibration ceiling floor drops from 200 CST to 1 CST at reinitialize. */
     cstCalibrationCeilingMinCst: 1,
+    /**
+     * Hard floor on the CST Calibration Window (CST_DUTCH_AUCTION_DURATION_MIN_LIMIT,
+     * not owner-configurable): a decline-speed increase from an ETH gesture is
+     * skipped whenever it would let the cost reach zero in under 3 minutes.
+     */
+    cstCalibrationWindowMinMinutes: 3,
+    /**
+     * After a CST gesture the next Calibration Ceiling restarts at
+     * max(2 x the cost just paid, the 1 CST ceiling floor, decline speed x 3 minutes),
+     * so the window never opens shorter than the 3-minute floor.
+     */
+    cstCalibrationCeilingRestartMultiplier: 2,
     /** Signature Allocation recipient receives this many sequential Cosmic Signature NFTs. */
     mainPrizeNftsPerCycleDefault: 3,
     /** 24 V2-era NFTs + 2 extra Signature Allocation NFTs; CST imprint totals are unchanged. */

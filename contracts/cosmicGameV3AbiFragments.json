@@ -1,29 +1,5 @@
 [
   {
-    "inputs": [
-      {
-        "internalType": "uint256",
-        "name": "roundNum",
-        "type": "uint256"
-      }
-    ],
-    "name": "championDurations",
-    "outputs": [
-      {
-        "internalType": "uint256",
-        "name": "enduranceChampion",
-        "type": "uint256"
-      },
-      {
-        "internalType": "uint256",
-        "name": "chronoWarrior",
-        "type": "uint256"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
     "inputs": [],
     "name": "getRoundLateBidDuration",
     "outputs": [
@@ -452,11 +428,51 @@
         "type": "uint256"
       }
     ],
-    "name": "bidsInfo",
+    "name": "roundStats",
     "outputs": [
       {
         "internalType": "uint256",
-        "name": "numItems",
+        "name": "numBids",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "numCstBids",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "totalSpentEthAmount",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "totalSpentCstAmount",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "maxEthBidPrice",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "maxCstBidPrice",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "enduranceChampionDuration",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "chronoWarriorDuration",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "flags",
         "type": "uint256"
       }
     ],

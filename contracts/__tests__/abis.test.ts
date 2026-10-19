@@ -67,10 +67,13 @@ describe('generated ABI barrel', () => {
     expect(signatures).toContain('roundLateBidDurationDivisor()');
     expect(signatures).toContain('roundLateBidPricePremiumAmountBaseMultiplier()');
     expect(signatures).toContain('roundLateBidPricePremiumAmountExponent()');
-    // v3.1-2026-08-19: raffle weights live in the BidInfo struct (bidsInfo /
-    // getBidInfoAt replace the earlier bidRaffleCumulativeWeights mapping).
+    // v3.1-2026-10-13 (deployment branch): raffle weights live in the BidInfo
+    // struct read via getBidInfoAt; per-round aggregates moved into roundStats.
+    // The interim bidsInfo / championDurations draft getters never shipped.
     expect(signatures).toContain('getBidInfoAt(uint256,uint256)');
-    expect(signatures).toContain('bidsInfo(uint256)');
+    expect(signatures).toContain('roundStats(uint256)');
+    expect(signatures).not.toContain('bidsInfo(uint256)');
+    expect(signatures).not.toContain('championDurations(uint256)');
     expect(signatures).not.toContain('bidRaffleCumulativeWeights(uint256,uint256)');
     // Retired V3-prototype getter: 100% of the CST reward now goes to the outbid bidder.
     expect(signatures).not.toContain('lastBidderBidCstRewardAmountPercentage()');
