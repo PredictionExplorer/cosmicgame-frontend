@@ -104,6 +104,55 @@ describe('cstGesture utilities', () => {
     });
   });
 
+  it('preserves the exact on-chain decline rate while advancing elapsed time', () => {
+    const declineRate = 29387798623316358n;
+    const data = mapCTPriceInfo(
+      null,
+      {
+        AuctionDuration: 2773,
+        SecondsElapsed: 33,
+        updatedAtMs: 10_000,
+        cstDeclineRateWeiPerSecond: declineRate,
+      },
+      80n * 10n ** 18n,
+    );
+
+    expect(data.cstDeclineRateWeiPerSecond).toBe(declineRate);
+    expect(deriveLiveCstGestureData(data, { nowMs: 15_000 })).toMatchObject({
+      SecondsElapsed: 38,
+      cstDeclineRateWeiPerSecond: declineRate,
+    });
+  });
+
+  it.each([undefined, null, 0n, -1n])(
+    'keeps an unavailable or invalid decline rate unknown: %s',
+    (cstDeclineRateWeiPerSecond) => {
+      expect(
+        mapCTPriceInfo(null, {
+          AuctionDuration: 3600,
+          SecondsElapsed: 600,
+          cstDeclineRateWeiPerSecond,
+        }).cstDeclineRateWeiPerSecond,
+      ).toBeNull();
+    },
+  );
+
+  it('does not pair a contract rate with fallback API timing after an invalid timing sample', () => {
+    expect(
+      mapCTPriceInfo(
+        { AuctionDuration: '3600', SecondsElapsed: '900', CSTPrice: '20000000000000000000' },
+        {
+          AuctionDuration: Number.NaN,
+          SecondsElapsed: 600,
+          cstDeclineRateWeiPerSecond: 30_000_000_000_000_000n,
+        },
+      ),
+    ).toMatchObject({
+      AuctionDuration: 3600,
+      cstDeclineRateWeiPerSecond: null,
+    });
+  });
+
   it('marks CST as free when price is zero', () => {
     const result = mapCTPriceInfo({
       AuctionDuration: '43200',

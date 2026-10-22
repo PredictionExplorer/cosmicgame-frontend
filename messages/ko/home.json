@@ -378,7 +378,10 @@
     "floor": "0 CST",
     "reachesFloorIn": "{duration} 후 0 CST",
     "windowEndsIn": "{duration} 후 구간 종료",
-    "windowDetails": "구간 길이: {duration}. 경과: {elapsed}.",
+    "windowLengthLabel": "구간 길이",
+    "declineRateLabel": "기본 비용 감소 속도",
+    "declineRatePerMinute": "{rate} CST/분",
+    "declineRateExplanation": "감소 속도는 분당 CST로 표시하며, 기본 비용이 0에 도달할 때까지 적용됩니다.",
     "floorIn": "{duration} 후",
     "cstSubtitleV3": "CST 기본 비용은 현재 온체인 속도로 내려갑니다. ETH 제스처는 속도를 높일 수 있고, CST 제스처는 속도를 낮추며 상한을 다시 설정합니다. 늦은 제스처 할증은 별도로 더합니다."
   },

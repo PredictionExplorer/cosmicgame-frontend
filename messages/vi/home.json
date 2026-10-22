@@ -378,7 +378,10 @@
     "floor": "0 CST",
     "reachesFloorIn": "0 CST sau {duration}",
     "windowEndsIn": "Cửa sổ kết thúc sau {duration}",
-    "windowDetails": "Độ dài cửa sổ: {duration}. Đã trôi qua: {elapsed}.",
+    "windowLengthLabel": "Độ dài cửa sổ",
+    "declineRateLabel": "Mức giảm chi phí cơ sở",
+    "declineRatePerMinute": "{rate} CST/phút",
+    "declineRateExplanation": "Tốc độ giảm được tính bằng CST mỗi phút và áp dụng cho đến khi chi phí cơ sở về không.",
     "floorIn": "sau {duration}",
     "cstSubtitleV3": "Chi phí CST cơ sở giảm theo tốc độ hiện tại trên chuỗi. Nét bút ETH có thể tăng tốc độ; nét bút CST giảm tốc độ và đặt lại mức trần. Phụ phí cuối chu kỳ được cộng riêng."
   },

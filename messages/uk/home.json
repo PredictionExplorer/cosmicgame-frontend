@@ -378,7 +378,10 @@
     "floor": "0 CST",
     "reachesFloorIn": "0 CST через {duration}",
     "windowEndsIn": "Вікно завершиться через {duration}",
-    "windowDetails": "Тривалість вікна: {duration}. Минуло: {elapsed}.",
+    "windowLengthLabel": "Тривалість вікна",
+    "declineRateLabel": "Зниження базової вартості",
+    "declineRatePerMinute": "{rate} CST/хв",
+    "declineRateExplanation": "Швидкість зниження вимірюється в CST за хвилину й застосовується, доки базова вартість не досягне нуля.",
     "floorIn": "через {duration}",
     "cstSubtitleV3": "Базова вартість CST падає з поточною ончейн-швидкістю. ETH-жести можуть її збільшувати, CST-жести зменшують її й перезапускають стелю. Пізня надбавка додається окремо."
   },

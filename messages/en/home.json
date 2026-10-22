@@ -378,7 +378,10 @@
     "floor": "0 CST",
     "reachesFloorIn": "0 CST in {duration}",
     "windowEndsIn": "Window ends in {duration}",
-    "windowDetails": "Window length: {duration}. Elapsed: {elapsed}.",
+    "windowLengthLabel": "Window length",
+    "declineRateLabel": "Base cost decline",
+    "declineRatePerMinute": "{rate} CST/min",
+    "declineRateExplanation": "The decline rate is measured in CST per minute and applies until the base cost reaches zero.",
     "floorIn": "in {duration}",
     "cstSubtitleV3": "CST base cost declines at the live rate. ETH gestures can increase that rate; CST gestures reduce it and restart the ceiling. A late-gesture premium is added separately."
   },

@@ -378,7 +378,10 @@
     "floor": "0 CST",
     "reachesFloorIn": "あと{duration}で0 CST",
     "windowEndsIn": "あと{duration}で期間終了",
-    "windowDetails": "期間の長さ：{duration}。経過：{elapsed}。",
+    "windowLengthLabel": "期間の長さ",
+    "declineRateLabel": "基本費用の下降速度",
+    "declineRatePerMinute": "{rate} CST/分",
+    "declineRateExplanation": "下降速度は毎分減少するCSTの量で表し、基本費用がゼロになるまで適用されます。",
     "floorIn": "あと{duration}",
     "cstSubtitleV3": "CST基本費用は現在のオンチェーン下降速度で下がります。ETH一筆は速度を上げる場合があり、CST一筆は速度を下げて上限を再設定します。終盤の加算は別に加えます。"
   },

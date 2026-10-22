@@ -48,11 +48,22 @@ const mockWaitForTransactionReceipt = jest.fn().mockResolvedValue({ status: 'suc
 const mockGetCode = jest.fn().mockResolvedValue('0x1234');
 const mockGetBalance = jest.fn().mockResolvedValue(BigInt(10e18));
 const mockReadContract = jest.fn().mockResolvedValue(true);
+const mockMulticall = jest.fn();
 const mockEstimateContractGas = jest.fn().mockResolvedValue(BigInt(500_000));
 const mockWriteContract = jest.fn().mockResolvedValue('0xhash');
 const mockSwitchChainAsync = jest.fn().mockResolvedValue(undefined);
 const mockWalletGetChainId = jest.fn().mockResolvedValue(421614);
 const mockGetSignerChainId = jest.fn().mockResolvedValue(421614);
+const mockPublicClient = {
+  chain: undefined as { contracts?: { multicall3?: { address: string } } } | undefined,
+  waitForTransactionReceipt: mockWaitForTransactionReceipt,
+  getCode: mockGetCode,
+  getBalance: mockGetBalance,
+  readContract: mockReadContract,
+  multicall: mockMulticall,
+  estimateContractGas: mockEstimateContractGas,
+};
+const mockUsePublicClient = jest.fn(() => mockPublicClient);
 
 jest.mock('wagmi', () => ({
   useConfig: jest.fn(() => ({})),
@@ -60,13 +71,7 @@ jest.mock('wagmi', () => ({
   useConnection: jest.fn(() => ({ address: '0xUser', isConnected: true, chainId: 421614 })),
   useSwitchChain: jest.fn(() => ({ mutateAsync: mockSwitchChainAsync })),
   useConnectorClient: jest.fn(() => ({ data: undefined })),
-  usePublicClient: jest.fn(() => ({
-    waitForTransactionReceipt: mockWaitForTransactionReceipt,
-    getCode: mockGetCode,
-    getBalance: mockGetBalance,
-    readContract: mockReadContract,
-    estimateContractGas: mockEstimateContractGas,
-  })),
+  usePublicClient: () => mockUsePublicClient(),
   useWalletClient: jest.fn(() => ({
     data: {
       writeContract: mockWriteContract,
@@ -285,6 +290,19 @@ beforeEach(() => {
     if (functionName === 'balanceOf') return CST_BALANCE;
     return true;
   });
+  mockUsePublicClient.mockReturnValue(mockPublicClient);
+  mockMulticall.mockImplementation(
+    async ({ contracts }: { contracts: { functionName: string }[] }) =>
+      Promise.all(
+        contracts.map(async (contract) => {
+          try {
+            return { status: 'success', result: await mockReadContract(contract) };
+          } catch (error) {
+            return { status: 'failure', error };
+          }
+        }),
+      ),
+  );
   mockWriteContract.mockResolvedValue('0xhash');
   mockSwitchChainAsync.mockResolvedValue(undefined);
   mockWalletGetChainId.mockResolvedValue(421614);
@@ -448,6 +466,154 @@ describe('useGestureForm', () => {
     });
   });
 
+  it('reads the exact CST base decline rate with the window timing, independently of the quote', async () => {
+    const declineRate = 29387798623316358n;
+    mockReadContract.mockImplementation(async ({ functionName }: { functionName: string }) => {
+      if (functionName === 'getCstDutchAuctionDurations') return [2773n, 33n];
+      if (functionName === 'cstBidPriceDeclineMultiplier') return declineRate;
+      return true;
+    });
+    // A final quote can carry a premium, so it cannot determine the base decline rate.
+    mockGetNextCstGestureCost.mockResolvedValue(400n * 10n ** 18n);
+
+    const { result } = renderHook(() => useGestureForm());
+    await waitFor(() =>
+      expect(result.current.cstGestureData.cstDeclineRateWeiPerSecond).toBe(declineRate),
+    );
+
+    expect(result.current.cstGestureData).toMatchObject({
+      AuctionDuration: 2773,
+      SecondsElapsed: 33,
+      CSTPrice: 400,
+    });
+    expect(mockMulticall).toHaveBeenCalledWith({
+      allowFailure: true,
+      deployless: true,
+      contracts: [
+        expect.objectContaining({ functionName: 'getCstDutchAuctionDurations' }),
+        expect.objectContaining({ functionName: 'cstBidPriceDeclineMultiplier' }),
+      ],
+    });
+  });
+
+  it('uses deployed Multicall3 when the client chain provides it', async () => {
+    mockUsePublicClient.mockReturnValue({
+      ...mockPublicClient,
+      chain: {
+        contracts: {
+          multicall3: { address: '0xcA11bde05977b3631167028862bE2a173976CA11' },
+        },
+      },
+    });
+
+    renderHook(() => useGestureForm());
+    await waitFor(() =>
+      expect(mockMulticall).toHaveBeenCalledWith(expect.objectContaining({ deployless: false })),
+    );
+  });
+
+  it('refreshes the decline rate when a gesture changes it', async () => {
+    let declineRate = 30_000_000_000_000_000n;
+    mockReadContract.mockImplementation(async ({ functionName }: { functionName: string }) => {
+      if (functionName === 'getCstDutchAuctionDurations') return [3600n, 900n];
+      if (functionName === 'cstBidPriceDeclineMultiplier') return declineRate;
+      return true;
+    });
+    const { result } = renderHook(() => useGestureForm());
+    await waitFor(() =>
+      expect(result.current.cstGestureData.cstDeclineRateWeiPerSecond).toBe(declineRate),
+    );
+    await flushAsyncWork();
+
+    declineRate = 30_300_000_000_000_000n;
+    act(() => window.dispatchEvent(new CustomEvent('cosmic:gesture-placed')));
+
+    await waitFor(() =>
+      expect(result.current.cstGestureData.cstDeclineRateWeiPerSecond).toBe(declineRate),
+    );
+  });
+
+  it('keeps legacy timing usable when the V3 decline-rate selector is unavailable', async () => {
+    mockReadContract.mockImplementation(async ({ functionName }: { functionName: string }) => {
+      if (functionName === 'getCstDutchAuctionDurations') return [7200n, 900n];
+      if (functionName === 'cstBidPriceDeclineMultiplier') {
+        throw new Error('function selector was not recognized');
+      }
+      return true;
+    });
+    const { result } = renderHook(() => useGestureForm());
+
+    await waitFor(() => expect(result.current.cstGestureData.AuctionDuration).toBe(7200));
+    expect(result.current.cstGestureData.cstDeclineRateWeiPerSecond).toBeNull();
+    expect(result.current.cstGestureData.timingAvailable).toBe(true);
+  });
+
+  it('clears an unverified decline rate after a failed refresh and recovers on the next read', async () => {
+    const declineRate = 30_000_000_000_000_000n;
+    mockReadContract.mockImplementation(async ({ functionName }: { functionName: string }) => {
+      if (functionName === 'getCstDutchAuctionDurations') return [3600n, 900n];
+      if (functionName === 'cstBidPriceDeclineMultiplier') return declineRate;
+      return true;
+    });
+    const { result } = renderHook(() => useGestureForm());
+    await waitFor(() =>
+      expect(result.current.cstGestureData.cstDeclineRateWeiPerSecond).toBe(declineRate),
+    );
+    await flushAsyncWork();
+
+    mockMulticall.mockRejectedValueOnce(new Error('Failed to fetch'));
+    act(() => window.dispatchEvent(new CustomEvent('cosmic:gesture-placed')));
+    await waitFor(() =>
+      expect(result.current.cstGestureData.cstDeclineRateWeiPerSecond).toBeNull(),
+    );
+    // A failed rate read must not turn into a zero rate or discard the last timing sample.
+    expect(result.current.cstGestureData.AuctionDuration).toBe(3600);
+    await flushAsyncWork();
+
+    act(() => window.dispatchEvent(new CustomEvent('cosmic:gesture-placed')));
+    await waitFor(() =>
+      expect(result.current.cstGestureData.cstDeclineRateWeiPerSecond).toBe(declineRate),
+    );
+  });
+
+  it('clears the old decline rate when the public client changes and ignores its pending read', async () => {
+    const declineRate = 30_000_000_000_000_000n;
+    mockReadContract.mockImplementation(async ({ functionName }: { functionName: string }) => {
+      if (functionName === 'getCstDutchAuctionDurations') return [3600n, 900n];
+      if (functionName === 'cstBidPriceDeclineMultiplier') return declineRate;
+      return true;
+    });
+    const { result, rerender } = renderHook(() => useGestureForm());
+    await waitFor(() =>
+      expect(result.current.cstGestureData.cstDeclineRateWeiPerSecond).toBe(declineRate),
+    );
+    await flushAsyncWork();
+
+    let finishOldRead!: (value: unknown) => void;
+    mockMulticall.mockImplementationOnce(
+      () =>
+        new Promise((resolve) => {
+          finishOldRead = resolve;
+        }),
+    );
+    act(() => window.dispatchEvent(new CustomEvent('cosmic:gesture-placed')));
+    mockUsePublicClient.mockReturnValue({
+      ...mockPublicClient,
+      multicall: jest.fn(() => new Promise(() => {})),
+    });
+    rerender();
+    expect(result.current.cstGestureData.cstDeclineRateWeiPerSecond).toBeNull();
+
+    await act(async () => {
+      finishOldRead([
+        { status: 'success', result: [3600n, 950n] },
+        { status: 'success', result: declineRate },
+      ]);
+      await flushAsyncWork();
+    });
+    expect(result.current.cstGestureData.cstDeclineRateWeiPerSecond).toBeNull();
+  });
+
   it('refreshes live CST reward and duration data on an interval', async () => {
     const liveCstGlobals = globalThis as LiveCstPreviewTestGlobals;
     liveCstGlobals.__COSMIC_ENABLE_LIVE_CST_PREVIEW_TEST_TIMERS__ = true;
@@ -458,10 +624,12 @@ describe('useGestureForm', () => {
       [43200n, 1200n],
       [43200n, 1201n],
     ];
+    const rateValues = [30_000_000_000_000_000n, 30_300_000_000_000_000n];
 
     let rewardReadCount = 0;
     let priceReadCount = 0;
     let durationReadCount = 0;
+    let rateReadCount = 0;
     mockGetNextCstGestureCost.mockImplementation(
       async () => priceValues[Math.min(priceReadCount++, priceValues.length - 1)]!,
     );
@@ -471,6 +639,9 @@ describe('useGestureForm', () => {
     mockReadContract.mockImplementation(async ({ functionName }: { functionName: string }) => {
       if (functionName === 'getCstDutchAuctionDurations') {
         return durationValues[Math.min(durationReadCount++, durationValues.length - 1)]!;
+      }
+      if (functionName === 'cstBidPriceDeclineMultiplier') {
+        return rateValues[Math.min(rateReadCount++, rateValues.length - 1)]!;
       }
       if (functionName === 'allowance') return MAX_UINT256;
       return true;
@@ -484,6 +655,7 @@ describe('useGestureForm', () => {
     expect(result.current.gestureCstRewardAmount).toBe(125);
     expect(result.current.cstGestureData.SecondsElapsed).toBe(1201);
     expect(result.current.cstGestureData.CSTPrice).toBe(2);
+    expect(result.current.cstGestureData.cstDeclineRateWeiPerSecond).toBe(rateValues[1]);
   });
 
   it('refreshes the CST preview immediately when a gesture event lands', async () => {
@@ -568,11 +740,12 @@ describe('useGestureForm', () => {
 
   it('cleans up the CST preview timer and gesture event listener on unmount', async () => {
     (globalThis as LiveCstPreviewTestGlobals).__COSMIC_ENABLE_LIVE_CST_PREVIEW_TEST_TIMERS__ = true;
+    const setTimeoutSpy = jest.spyOn(window, 'setTimeout');
     const clearTimeoutSpy = jest.spyOn(window, 'clearTimeout');
     const removeEventListenerSpy = jest.spyOn(window, 'removeEventListener');
 
     const { unmount } = renderHook(() => useGestureForm());
-    await flushAsyncWork();
+    await waitFor(() => expect(setTimeoutSpy).toHaveBeenCalledWith(expect.any(Function), 1000));
 
     unmount();
 

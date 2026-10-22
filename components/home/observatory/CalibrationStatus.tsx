@@ -1,6 +1,6 @@
 'use client';
 
-import { zeroAddress } from 'viem';
+import { formatEther, zeroAddress } from 'viem';
 import { useTranslations } from 'next-intl';
 
 import { historicalV2ProtocolFacts, isV3Mechanics } from '@/content/protocol-facts';
@@ -13,7 +13,7 @@ import { cn } from '@/lib/utils';
 import type { DashboardInfo } from '@/services/api';
 import { getCstAuctionProgress, type CstGestureData } from '@/utils/cstGesture';
 import { formatEthMethodQuote } from '@/utils/gestureQuote';
-import { NBSP } from '@/utils/format';
+import { NBSP, UNAVAILABLE_VALUE } from '@/utils/format';
 
 import { ValuePending } from './ValuePending';
 
@@ -116,8 +116,8 @@ function PriceTrack({ percent, valueText, label }: PriceTrackProps) {
  * now, standing over the point of the descending track that marks now, the
  * floor at the track's end, and when it gets there, as a clock like every
  * countdown on the desk. Before the first Gesture it is the opening ETH
- * window; after it, the CST window. The window's length and elapsed time
- * live in the explanation. Before the timing arrives the same structure
+ * window; after it, the CST window. The base decline rate and window timing
+ * sit below the track; the tooltip explains the mechanics. Before timing arrives
  * renders with the figures pending, so nothing reflows when they land.
  */
 export function CalibrationStatus({
@@ -127,6 +127,7 @@ export function CalibrationStatus({
   className,
 }: CalibrationStatusProps) {
   const t = useTranslations('home');
+  const tCommon = useTranslations('common');
   const format = useFormat();
   const firstGesture = data?.LastBidderAddr === zeroAddress;
   const title = t(firstGesture ? 'calibration.firstGestureTitle' : 'calibration.cstTitle');
@@ -191,11 +192,25 @@ export function CalibrationStatus({
     firstGesture || cstGestureData.source === 'empty'
       ? t('calibration.defaultEndedMessage')
       : t('calibration.cstEndedMessage');
-  const explanation = progress
-    ? `${subtitle} ${t('calibration.windowDetails', {
-        duration: format.duration(progress.auctionDuration),
-        elapsed: format.duration(progress.secondsElapsed),
-      })}`
+  const showDeclineRate = !firstGesture && isV3Mechanics;
+  // Keep atomic units through the per-minute conversion. This is the base
+  // decline, independent of the final quote's late-gesture premium.
+  const rateWei = cstGestureData.cstDeclineRateWeiPerSecond;
+  const ratePerMinute =
+    data && typeof rateWei === 'bigint' && rateWei > 0n ? Number(formatEther(rateWei * 60n)) : null;
+  const declineRate =
+    ratePerMinute != null && Number.isFinite(ratePerMinute)
+      ? t('calibration.declineRatePerMinute', {
+          rate: format.number(ratePerMinute, {
+            maximumSignificantDigits: 5,
+            // Keep extreme on-chain rates readable without rounding a
+            // small positive decline to a misleading zero.
+            notation: ratePerMinute < 0.0001 || ratePerMinute >= 1e9 ? 'scientific' : 'standard',
+          }),
+        })
+      : null;
+  const explanation = showDeclineRate
+    ? `${subtitle} ${t('calibration.declineRateExplanation')}`
     : subtitle;
 
   return (
@@ -203,7 +218,7 @@ export function CalibrationStatus({
       aria-labelledby="calibration-status-title"
       data-testid="calibration-status"
       data-window={firstGesture ? 'eth' : 'cst'}
-      className={cn('min-w-0', className)}
+      className={cn('@container min-w-0', className)}
     >
       <div className="flex min-w-0 flex-wrap items-baseline justify-between gap-x-4 gap-y-1">
         <div className="flex min-w-0 items-center gap-1.5">
@@ -279,6 +294,54 @@ export function CalibrationStatus({
           )}
         </p>
       )}
+
+      <dl
+        data-testid="calibration-metrics"
+        className={cn(
+          'mt-3 grid grid-cols-2 gap-x-5 gap-y-3 border-t border-rule-faint pt-3',
+          showDeclineRate && '@min-[26rem]:grid-cols-[1.25fr_1fr_1fr]',
+        )}
+      >
+        {showDeclineRate && (
+          <div className="col-span-2 flex min-w-0 flex-col @min-[26rem]:col-span-1">
+            <dt className="type-caption text-subtle">{t('calibration.declineRateLabel')}</dt>
+            <dd
+              data-testid="calibration-decline-rate"
+              className="type-figure-sm mt-auto pt-1 text-foreground"
+            >
+              {declineRate ?? (
+                <span aria-label={tCommon('status.unavailable')}>{UNAVAILABLE_VALUE}</span>
+              )}
+            </dd>
+          </div>
+        )}
+        <div className="flex min-w-0 flex-col">
+          <dt className="type-caption text-subtle">{t('calibration.windowLengthLabel')}</dt>
+          <dd
+            data-testid="calibration-window-length"
+            className="type-figure-sm mt-auto pt-1 text-foreground"
+          >
+            {progress ? (
+              format.duration(progress.auctionDuration, { style: 'clock' })
+            ) : (
+              <ValuePending ch={8} />
+            )}
+          </dd>
+        </div>
+        <div className="flex min-w-0 flex-col">
+          <dt className="type-caption text-subtle">{t('calibration.elapsedLabel')}</dt>
+          <dd
+            data-testid="calibration-elapsed"
+            className="type-figure-sm mt-auto pt-1 text-foreground"
+          >
+            {progress ? (
+              format.duration(progress.secondsElapsed, { style: 'clock' })
+            ) : (
+              <ValuePending ch={8} />
+            )}
+          </dd>
+        </div>
+      </dl>
     </section>
   );
 }

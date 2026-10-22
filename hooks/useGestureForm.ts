@@ -38,7 +38,11 @@ import {
   type TxWriteRequest,
 } from '@/hooks/useTxFlow';
 import { useCTPrice, useGestureEthCost, useUsedRWLKNFTs } from '@/hooks/useApiQuery';
-import { mapCTPriceInfo, type CstAuctionDurations, type CstGestureData } from '@/utils/cstGesture';
+import {
+  mapCTPriceInfo,
+  type CstCalibrationSnapshot,
+  type CstGestureData,
+} from '@/utils/cstGesture';
 import { REQUIRED_CHAIN_NAME } from '@/lib/chainGuard';
 import { sumImprintedTo } from '@/lib/receiptTransfers';
 import { clampCollisionBufferPercent } from '@/utils/gestureQuote';
@@ -202,7 +206,7 @@ export function useGestureForm({
     account: string;
     failed: boolean;
   } | null>(null);
-  const [contractCstDurations, setContractCstDurations] = useState<CstAuctionDurations | null>(
+  const [contractCstDurations, setContractCstDurations] = useState<CstCalibrationSnapshot | null>(
     null,
   );
   const [contractCstPriceWei, setContractCstPriceWei] = useState<bigint | null>(null);
@@ -378,8 +382,9 @@ export function useGestureForm({
       (cstRewardGuardChoice === 'auto' && connectedIsLatestGesturer));
 
   useEffect(() => {
+    // A new reader or deployment must not inherit the previous window's rate.
+    setContractCstDurations(null);
     if (uxScenario) {
-      setContractCstDurations(null);
       setContractCstPriceWei(null);
       setGestureCstRewardAmountWei(100n * 10n ** 18n);
       setIsCstRewardLoading(false);
@@ -446,34 +451,70 @@ export function useGestureForm({
         await Promise.all([
           canReadDurations
             ? publicClient!
-                .readContract({
-                  address: contractAddrs.cosmicGame as `0x${string}`,
-                  abi: cosmicGameAbi,
-                  functionName: 'getCstDutchAuctionDurations',
+                .multicall({
+                  allowFailure: true,
+                  // Local Hardhat networks do not deploy Multicall3.
+                  deployless: !publicClient!.chain?.contracts?.multicall3,
+                  // One EVM call keeps the rate and window on the same block,
+                  // even when a gesture changes both during a refresh.
+                  contracts: [
+                    {
+                      address: contractAddrs.cosmicGame as `0x${string}`,
+                      abi: cosmicGameAbi,
+                      functionName: 'getCstDutchAuctionDurations',
+                    },
+                    {
+                      address: contractAddrs.cosmicGame as `0x${string}`,
+                      abi: cosmicGameAbi,
+                      functionName: 'cstBidPriceDeclineMultiplier',
+                    },
+                  ],
                 })
-                .then((value) => {
-                  if (cancelled || !Array.isArray(value)) return;
-                  const [auctionDuration, secondsElapsed] = value;
-                  if (typeof auctionDuration !== 'bigint' || typeof secondsElapsed !== 'bigint') {
+                .then(([timing, rate]) => {
+                  if (cancelled) return;
+                  if (rate?.status === 'failure' && !isMissingFunctionReadError(rate.error)) {
+                    reportPreviewError(rate.error, 'cstBidPriceDeclineMultiplier');
+                  }
+                  if (timing?.status !== 'success' || !Array.isArray(timing.result)) {
+                    setContractCstDurations((current) =>
+                      current ? { ...current, cstDeclineRateWeiPerSecond: null } : null,
+                    );
+                    if (timing?.status === 'failure') {
+                      reportPreviewError(timing.error, 'getCstDutchAuctionDurations');
+                    }
                     return;
                   }
-                  const next = {
+                  const [auctionDuration, secondsElapsed] = timing.result;
+                  if (
+                    typeof auctionDuration !== 'bigint' ||
+                    typeof secondsElapsed !== 'bigint' ||
+                    auctionDuration < 0n ||
+                    secondsElapsed < 0n ||
+                    auctionDuration > BigInt(Number.MAX_SAFE_INTEGER) ||
+                    secondsElapsed > BigInt(Number.MAX_SAFE_INTEGER)
+                  ) {
+                    setContractCstDurations(null);
+                    return;
+                  }
+                  setContractCstDurations({
                     AuctionDuration: Number(auctionDuration),
                     SecondsElapsed: Number(secondsElapsed),
                     updatedAtMs: Date.now(),
-                  };
-                  setContractCstDurations((current) => {
-                    if (
-                      current?.AuctionDuration === next.AuctionDuration &&
-                      current?.SecondsElapsed === next.SecondsElapsed
-                    ) {
-                      return { ...current, updatedAtMs: next.updatedAtMs };
-                    }
-                    return next;
+                    cstDeclineRateWeiPerSecond:
+                      rate?.status === 'success' &&
+                      typeof rate.result === 'bigint' &&
+                      rate.result > 0n
+                        ? rate.result
+                        : null,
                   });
                 })
                 .catch((e) => {
-                  if (!cancelled) reportPreviewError(e, 'getCstDutchAuctionDurations');
+                  if (!cancelled) {
+                    setContractCstDurations((current) =>
+                      current ? { ...current, cstDeclineRateWeiPerSecond: null } : null,
+                    );
+                    reportPreviewError(e, 'CST calibration preview');
+                  }
                 })
             : Promise.resolve(),
           canReadPrice

@@ -9,7 +9,12 @@ export interface CstAuctionDurations {
   updatedAtMs?: number;
 }
 
-export interface CstGestureData extends CstAuctionDurations {
+export interface CstCalibrationSnapshot extends CstAuctionDurations {
+  /** V3 base-cost decline in smallest CST units per second, read with the timing sample. */
+  cstDeclineRateWeiPerSecond?: bigint | null;
+}
+
+export interface CstGestureData extends CstCalibrationSnapshot {
   CSTPrice: number;
   CSTPriceWei: bigint;
   isFree: boolean;
@@ -42,6 +47,7 @@ const EMPTY_CST_GESTURE_DATA: CstGestureData = {
   isFree: false,
   source: 'empty',
   timingAvailable: false,
+  cstDeclineRateWeiPerSecond: null,
 };
 
 function parseDuration(value: unknown): number | null {
@@ -76,7 +82,7 @@ export function isCstGestureFree({
 
 export function mapCTPriceInfo(
   raw: CTPriceInfo | null | undefined,
-  contractDurations?: CstAuctionDurations | null,
+  contractDurations?: CstCalibrationSnapshot | null,
   contractCstPriceWei?: bigint | null,
 ): CstGestureData {
   if (!raw && !contractDurations && contractCstPriceWei == null) return EMPTY_CST_GESTURE_DATA;
@@ -108,6 +114,12 @@ export function mapCTPriceInfo(
     CSTPriceWei: hasQuote ? cstPriceWei : 0n,
     SecondsElapsed: secondsElapsed,
     timingAvailable: hasContractTiming || hasApiTiming,
+    cstDeclineRateWeiPerSecond:
+      hasContractTiming &&
+      typeof contractDurations?.cstDeclineRateWeiPerSecond === 'bigint' &&
+      contractDurations.cstDeclineRateWeiPerSecond > 0n
+        ? contractDurations.cstDeclineRateWeiPerSecond
+        : null,
     isFree: false,
     // Timing and price reads resolve independently. A duration sample alone
     // must not promote a missing (or malformed) quote into a free gesture.

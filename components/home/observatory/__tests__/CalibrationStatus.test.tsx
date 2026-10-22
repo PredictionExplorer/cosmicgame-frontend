@@ -67,12 +67,59 @@ describe('CalibrationStatus', () => {
     expect(screen.getByTestId('calibration-floor')).toHaveClass('self-end');
   });
 
-  it('keeps the window length and elapsed time in the explanation', () => {
+  it('shows full length and elapsed time separately from the remaining countdown', () => {
     render(<CalibrationStatus {...makeProps()} />);
-    // The three abstract durations are no longer figures on the desk.
-    expect(screen.queryByText('home.calibration.dynamicDuration')).not.toBeInTheDocument();
-    expect(screen.queryByText('home.calibration.elapsedLabel')).not.toBeInTheDocument();
-    expect(screen.getByRole('button', { name: /home\.calibration\.cstTitle/ })).toBeInTheDocument();
+    expect(screen.getByText('home.calibration.windowLengthLabel')).toBeVisible();
+    expect(screen.getByTestId('calibration-window-length')).toHaveTextContent('01:00:00');
+    expect(screen.getByText('home.calibration.elapsedLabel')).toBeVisible();
+    expect(screen.getByTestId('calibration-elapsed')).toHaveTextContent('00:15:00');
+    expect(screen.getByTestId('calibration-floor-in')).toHaveTextContent('duration=00:45:00');
+    expect(
+      screen.getByRole('button', { name: /home\.calibration\.cstTitle/ }),
+    ).toHaveAccessibleDescription(
+      'home.calibration.cstSubtitleV3 home.calibration.declineRateExplanation',
+    );
+  });
+
+  it('shows the on-chain base decline per minute, independent of the final cost quote', () => {
+    const props = {
+      ...makeProps(),
+      cstGestureData: { ...cstGestureData, cstDeclineRateWeiPerSecond: 29387798623316358n },
+    };
+    const { rerender } = render(<CalibrationStatus {...props} />);
+    expect(screen.getByText('home.calibration.declineRateLabel')).toBeVisible();
+    expect(screen.getByTestId('calibration-decline-rate')).toHaveTextContent('rate=1.7633');
+
+    // A premium can change the final quote without changing the base decline.
+    rerender(
+      <CalibrationStatus
+        {...props}
+        cstGestureData={{ ...props.cstGestureData, CSTPrice: 100, CSTPriceWei: 100n * 10n ** 18n }}
+      />,
+    );
+    expect(screen.getByTestId('calibration-decline-rate')).toHaveTextContent('rate=1.7633');
+  });
+
+  it.each([undefined, null, 0n, -1n])('does not invent a decline rate from %s', (rate) => {
+    render(
+      <CalibrationStatus
+        {...makeProps()}
+        cstGestureData={{ ...cstGestureData, cstDeclineRateWeiPerSecond: rate }}
+      />,
+    );
+    const metric = screen.getByTestId('calibration-decline-rate');
+    expect(within(metric).getByLabelText('common.status.unavailable')).toBeVisible();
+    expect(metric).not.toHaveTextContent(/\d/);
+  });
+
+  it('keeps a tiny positive rate readable without displaying it as zero', () => {
+    render(
+      <CalibrationStatus
+        {...makeProps()}
+        cstGestureData={{ ...cstGestureData, cstDeclineRateWeiPerSecond: 1n }}
+      />,
+    );
+    expect(screen.getByTestId('calibration-decline-rate')).toHaveTextContent('rate=6E-17');
   });
 
   it('shows the opening ETH window before the first Gesture', () => {
@@ -86,6 +133,9 @@ describe('CalibrationStatus', () => {
     );
     // The ETH window's floor is not zero, so none is named.
     expect(within(window).queryByText('home.calibration.floor')).not.toBeInTheDocument();
+    expect(within(window).queryByTestId('calibration-decline-rate')).not.toBeInTheDocument();
+    expect(within(window).getByTestId('calibration-window-length')).toHaveTextContent('00:30:00');
+    expect(within(window).getByTestId('calibration-elapsed')).toHaveTextContent('00:15:00');
   });
 
   it('switches to the CST window once the first Gesture is present', () => {
@@ -194,6 +244,8 @@ describe('CalibrationStatus', () => {
     expect(ended.className).not.toMatch(/positive|emerald|green/);
     expect(screen.getByTestId('calibration-cost-now')).toHaveTextContent('0 CST');
     expect(screen.getByRole('progressbar')).toHaveAttribute('aria-valuenow', '100');
+    expect(screen.getByTestId('calibration-window-length')).toHaveTextContent('01:00:00');
+    expect(screen.getByTestId('calibration-elapsed')).toHaveTextContent('01:06:40');
   });
 
   it('closes a finished window without a quote with the generic message', () => {

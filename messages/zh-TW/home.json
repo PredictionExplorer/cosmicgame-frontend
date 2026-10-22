@@ -378,7 +378,10 @@
     "floor": "0 CST",
     "reachesFloorIn": "{duration}後降至 0 CST",
     "windowEndsIn": "{duration}後窗口結束",
-    "windowDetails": "窗口時長：{duration}。已經過：{elapsed}。",
+    "windowLengthLabel": "窗口時長",
+    "declineRateLabel": "基礎價格下降速率",
+    "declineRatePerMinute": "{rate} CST/分鐘",
+    "declineRateExplanation": "下降速率表示每分鐘減少的 CST 數額，直到基礎價格降至零。",
     "floorIn": "{duration}後",
     "cstSubtitleV3": "CST 基礎價格依即時下降速率降低。ETH 落筆可加快速率，CST 落筆會減慢速率並重設上限；臨近收官溢價另計。"
   },
