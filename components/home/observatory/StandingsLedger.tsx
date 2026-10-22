@@ -5,6 +5,7 @@ import { ArrowRight, MessageSquare, type LucideIcon } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 
 import { AddressChip } from '@/components/ui/address-chip';
+import { GestureCstCredit } from '@/components/gestures/GestureCstCredit';
 import { Amount } from '@/components/ui/amount';
 import { Badge } from '@/components/ui/badge';
 import { DateTime } from '@/components/ui/date-time';
@@ -35,7 +36,6 @@ import {
   getAttachedAssetLabels,
   getCstGestureCost,
   getEthGestureCost,
-  getParticipationCST,
   hasRandomWalkToken,
   resolveGestureType,
 } from '@/utils/gesturePayment';
@@ -340,7 +340,7 @@ function LedgerFacts({ facts }: { facts: LedgerFact[] }) {
   );
 }
 
-/** What the Last Gesture paid, received and when: one wall-label line, never a grid of boxes. */
+/** The gesture cost and time, followed by a separate recipient-qualified CST credit. */
 function GestureFacts({ gesture, pending }: { gesture: GestureInfo | null; pending: boolean }) {
   const t = useTranslations('home.observatory');
   const tTables = useTranslations('tables');
@@ -364,13 +364,12 @@ function GestureFacts({ gesture, pending }: { gesture: GestureInfo | null; pendi
 
   const isCst = resolveGestureType(gesture) === 2;
   const paid = isCst ? getCstGestureCost(gesture) : getEthGestureCost(gesture);
-  const received = getParticipationCST(gesture);
   const unavailable = tTables('status.unavailable');
   const carriedMessage = gesture.Message?.trim() ?? '';
   const message =
     carriedMessage && mayShowMessage(moderation, gesture.EvtLogId) ? carriedMessage : '';
   const messagePending = carriedMessage !== '' && moderation.status === 'pending';
-  // Paid and received carry visible labels; the method shows only when the
+  // The cost carries a visible label; the method shows only when the
   // unit does not already say it (a Random Walk NFT), and the time and the
   // position read as themselves, labelled for screen readers.
   const facts: {
@@ -389,17 +388,6 @@ function GestureFacts({ gesture, pending }: { gesture: GestureInfo | null; pendi
           <UnknownValue label={unavailable} />
         ) : (
           <Amount value={paid} unit={isCst ? 'CST' : 'ETH'} context={isCst ? 'card' : 'exact'} />
-        ),
-    },
-    {
-      key: 'received',
-      testId: 'latest-participant-cst-received',
-      label: t('ledger.received'),
-      value:
-        received === undefined ? (
-          <UnknownValue label={unavailable} />
-        ) : (
-          <Amount value={received} unit="CST" context="card" />
         ),
     },
     {
@@ -464,6 +452,7 @@ function GestureFacts({ gesture, pending }: { gesture: GestureInfo | null; pendi
           </div>
         ))}
       </dl>
+      <GestureCstCredit gesture={gesture} compact />
       {message ? (
         <p
           data-testid="latest-participant-message"

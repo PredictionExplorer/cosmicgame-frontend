@@ -802,7 +802,7 @@ describe('HomePage', () => {
     expect(screen.getByTestId('latest-participant-paid-amount')).toHaveTextContent(
       /home\.observatory\.ledger\.paid\s*0\.05 ETH/,
     );
-    expect(screen.getByTestId('latest-participant-cst-received')).toHaveTextContent('123.45 CST');
+    expect(screen.getByTestId('gesture-cst-credit')).toHaveTextContent('123.45 CST');
     expect(screen.getByTestId('latest-participant-method')).toHaveTextContent('Random Walk');
     expect(screen.getByTestId('latest-participant-gesture-id')).toHaveTextContent('#7');
     expect(screen.getByTestId('latest-participant-attached-assets')).toHaveTextContent(

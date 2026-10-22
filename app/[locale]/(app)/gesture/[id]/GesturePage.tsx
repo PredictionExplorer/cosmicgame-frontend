@@ -12,6 +12,7 @@ import { RecordRow } from '@/components/detail-page/RecordRow';
 import { PageHeader } from '@/components/layout/PageHeader';
 import { AddressChip } from '@/components/ui/address-chip';
 import { Amount } from '@/components/ui/amount';
+import { GestureCstCredit } from '@/components/gestures/GestureCstCredit';
 import { Badge } from '@/components/ui/badge';
 import type { BreadcrumbItem } from '@/components/ui/breadcrumbs';
 import { buttonVariants } from '@/components/ui/button';
@@ -79,23 +80,6 @@ export function gestureCost(gesture: GestureInfo): {
     unit: 'ETH',
     value: firstAmount(gesture.GestureCostEth, gesture.EthPriceEth),
   };
-}
-
-/** The Participation CST the gesture imprinted. */
-export function participationCst(gesture: GestureInfo): number | undefined {
-  return firstAmount(gesture.ParticipationCST, gesture.CSTRewardEth, gesture.ERC20RewardAmountEth);
-}
-
-/**
- * V3 Participation CST attribution: the entire per-gesture imprint goes to the
- * outbid (previous) participant. Returns the imprinted amount, or undefined for
- * V1/V2 gestures and a cycle's opening gesture (nothing went to a previous
- * participant), so the figure can be hidden.
- */
-export function cstToPreviousParticipantOf(gesture: GestureInfo): number | undefined {
-  const previous = gesture.PreviousBidderCstRewardAmountEth;
-  if (typeof previous !== 'number' || previous <= 0) return undefined;
-  return previous;
 }
 
 type CommonTranslate = (key: string, values?: Record<string, string | number>) => string;
@@ -409,8 +393,6 @@ const GesturePage = ({
   }
 
   const cost = gestureCost(gestureInfo);
-  const reward = participationCst(gestureInfo);
-  const cstToPreviousParticipant = cstToPreviousParticipantOf(gestureInfo);
   const timestamp = toFiniteNumber(gestureInfo.TimeStamp);
   const hold = gestureHold({
     timestamp: timestamp !== null && timestamp > 0 ? timestamp : null,
@@ -522,7 +504,7 @@ const GesturePage = ({
               value:
                 cost.value === undefined ? null : (
                   // An ETH price reads as the wallet quoted it; CST at two decimals, like the
-                  // Participation CST beside it (the exact amount is on hover).
+                  // separate CST credit below it (the exact amount is on hover).
                   <Amount
                     value={cost.value}
                     unit={cost.unit}
@@ -530,23 +512,6 @@ const GesturePage = ({
                   />
                 ),
             },
-            {
-              id: 'participationCst',
-              label: t('figures.participationCst'),
-              value: reward === undefined ? null : <Amount value={reward} unit="CST" />,
-            },
-            // V3 attribution: the entire per-gesture imprint went to the outbid
-            // (previous) participant. Absent on V1/V2 gestures and on a cycle's
-            // opening gesture (nothing went to a previous participant).
-            ...(cstToPreviousParticipant === undefined
-              ? []
-              : [
-                  {
-                    id: 'cstToOutbid',
-                    label: t('rows.cstToOutbid'),
-                    value: <Amount value={cstToPreviousParticipant} unit="CST" />,
-                  },
-                ]),
             {
               // How long it led, not a bare cycle number: the trail and the cycle
               // column already name the cycle.
@@ -571,6 +536,7 @@ const GesturePage = ({
 
         <div className="grid gap-x-12 gap-y-16 lg:grid-cols-12 xl:gap-x-16">
           <div className={cn(RECORD_WIDTH_CLASS, 'min-w-0 space-y-12 lg:col-span-8')}>
+            <GestureCstCredit gesture={gestureInfo} />
             {message ? (
               <figure data-testid="gesture-message" className="max-w-3xl">
                 <figcaption className="type-label text-subtle">

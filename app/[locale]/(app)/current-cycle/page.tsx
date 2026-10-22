@@ -38,6 +38,7 @@ export default async function Page({ params }: PageProps) {
         'contracts',
         'currentCycle',
         'detail',
+        'gesture',
         'glossary',
         'home',
         'marketing',

@@ -647,8 +647,7 @@
         "passesIn": "이 기록을 넘어서기까지",
         "progressAria": "시간의 전사 기록 대비 수호 챔피언의 현재 유지 구간"
       },
-      "paid": "지불",
-      "received": "받음"
+      "paid": "제스처 비용"
     },
     "standing": {
       "title": "내 사이클 현황",

@@ -19,10 +19,22 @@
   },
   "figures": {
     "cost": "落笔价格",
-    "participationCst": "参与 CST",
     "held": "保持时长",
     "heldInfo": "这次落笔作为最新落笔保持的时长：直到下一次落笔，或直到周期收官。",
     "heldLive": "仍是最新落笔"
+  },
+  "credit": {
+    "titlePrevious": "上一笔参与者收到的 CST",
+    "titleCurrent": "本次参与者收到的 CST",
+    "titleUnknown": "CST 入账",
+    "recipient": "获配者",
+    "recipientUnavailable": "获配者未知",
+    "sameWallet": "同一钱包",
+    "firstGesture": "本周期首笔落笔未发放参与 CST",
+    "zero": "此次落笔未发放 CST",
+    "amountUnavailable": "CST 数量未知",
+    "incomplete": "部分 CST 入账详情不可用。",
+    "bodyPrevious": "本次落笔执行时，CST 发放给上一笔落笔的参与者。"
   },
   "method": {
     "eth": "ETH",
@@ -50,8 +62,7 @@
     "erc20": "已附加 ERC-20",
     "erc20Amount": "已附加 ERC-20 代币数量",
     "nftContract": "已附加 NFT 代币地址",
-    "nftId": "已附加 NFT 代币 ID",
-    "cstToOutbid": "归被超越的参与者"
+    "nftId": "已附加 NFT 代币 ID"
   },
   "nav": {
     "aria": "相邻落笔",

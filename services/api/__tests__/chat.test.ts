@@ -1,4 +1,6 @@
 // lexicon-allow-start: fixtures use the sealed backend message/context field names.
+import { getGestureCstCredits } from '@/utils/gestureCstCredit';
+
 import { apiGet } from '../client';
 import {
   ChatApiUnavailableError,
@@ -6,6 +8,7 @@ import {
   getChatApiUrl,
   getChatContext,
   getChatMessages,
+  getChatLegacyGestures,
 } from '../chat';
 
 jest.mock('../client', () => ({ ...jest.requireActual('../client'), apiGet: jest.fn() }));
@@ -41,6 +44,47 @@ const failure = (status: number, type?: string) =>
   });
 
 beforeEach(() => jest.clearAllMocks());
+
+it('preserves recipient aliases on the full latest-detail row used by the standings', async () => {
+  const recipient = '0x30E6E8EEEC88aA8Ea35B54807671458B3F01665e';
+  respond({
+    BidsByRound: [
+      {
+        Tx: {
+          EvtLogId: 30748,
+          BlockNum: 517075891,
+          TxId: 10169,
+          TxHash: '0x79',
+          TimeStamp: 1792630457,
+          DateTime: '2026-10-22T00:54:17Z',
+        },
+        RoundNum: 3,
+        BidPosition: 79,
+        BidType: 0,
+        BidderAddr: '0xe7eD7F31cd76CeD85861ec5bD37879cBA053e887',
+        EthPriceEth: 0.001738302851295673,
+        PreviousBidderAddr: recipient,
+        PreviousCstRewardAmountEth: 0.21,
+        ThisCstRewardAmountEth: 0,
+      },
+    ],
+  });
+  const rows = await getChatLegacyGestures(3, options, 1);
+  expect(rows[0]).toMatchObject({
+    PreviousBidderCstRewardAmountEth: 0.21,
+    ThisBidderCstRewardAmountEth: 0,
+  });
+  expect(getGestureCstCredits(rows[0]!)).toMatchObject({
+    status: 'credited',
+    credits: [{ role: 'previous', amount: 0.21, recipient }],
+  });
+});
+
+it('keeps compact message records without credit data unattributed', async () => {
+  respond(page());
+  const result = await getChatMessages(7, options);
+  expect(getGestureCstCredits(result.gestures[0]!)).toEqual({ status: 'unknown', credits: [] });
+});
 
 it('maps a slim message and uses exactly 50 rows on the pinned backend', async () => {
   const signal = new AbortController().signal;

@@ -78,7 +78,9 @@ function collectUsedNamespaces(entry: string): Set<string> {
     visited.add(file);
     const source = readFileSync(file, 'utf-8');
 
-    const usageRe = /useTranslations\(\s*['"]([a-zA-Z]+)['"]/g;
+    // Nested calls such as useTranslations('gesture.credit') still require
+    // the root catalog to be present in the page's provider.
+    const usageRe = /useTranslations\(\s*['"]([a-zA-Z]+)(?:\.[^'"]+)?['"]/g;
     let match: RegExpExecArray | null;
     while ((match = usageRe.exec(source)) !== null) {
       if (match[1]) used.add(match[1]);
@@ -135,6 +137,12 @@ describe('app route group i18n scoping', () => {
   it('found the app pages and nested layouts (walker sanity)', () => {
     expect(pageFiles.length).toBeGreaterThan(30);
     expect(pageFiles.some((file) => file.endsWith('statistics/layout.tsx'))).toBe(true);
+  });
+
+  it('follows nested translation namespaces from the shared CST credit block', () => {
+    expect(
+      collectUsedNamespaces(resolve(REPO_ROOT, 'components/gestures/GestureCstCredit.tsx')),
+    ).toContain('gesture');
   });
 
   it.each(pageFiles.map((file) => [relative(APP_GROUP_ROOT, file), file] as const))(

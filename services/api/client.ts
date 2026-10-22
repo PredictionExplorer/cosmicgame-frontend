@@ -60,6 +60,7 @@ import {
   rebaseUrl,
 } from '@/lib/serverRotation';
 import { reportError } from '@/utils/errors';
+import { normalizeGestureCstCreditFields } from '@/utils/gestureCstCredit';
 
 import { RATE_LIMIT_RETRIES, TOO_MANY_REQUESTS, rateLimitDelayMs, waitMs } from './rateLimit';
 import { ApiReadError } from './readError';
@@ -364,6 +365,7 @@ export const normalizeGestureRecord = (item: unknown) => {
   if (!flat || typeof flat !== 'object') return flat;
 
   const rec = { ...(flat as Record<string, unknown>) };
+  normalizeGestureCstCreditFields(rec);
   const backendGestureType = rec.BidType;
   if (rec.GestureType === undefined && typeof backendGestureType === 'number') {
     rec.GestureType = backendGestureType;

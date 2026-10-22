@@ -19,10 +19,22 @@
   },
   "figures": {
     "cost": "一筆の費用",
-    "participationCst": "参加CST",
     "held": "保持時間",
     "heldInfo": "この一筆が最新の一筆だった時間です。次の一筆、またはサイクルの確定まで数えます。",
     "heldLive": "現在も最新の一筆"
+  },
+  "credit": {
+    "titlePrevious": "直前の参加者に付与されたCST",
+    "titleCurrent": "この参加者に付与されたCST",
+    "titleUnknown": "CSTの付与",
+    "recipient": "受領者",
+    "recipientUnavailable": "受領者不明",
+    "sameWallet": "同じウォレット",
+    "firstGesture": "サイクル最初の一筆ではCSTは付与されません。",
+    "zero": "CSTの付与なし",
+    "amountUnavailable": "CST数量不明",
+    "incomplete": "CST付与の詳細を一部確認できません。",
+    "bodyPrevious": "この一筆で、直前の一筆を入れた参加者にCSTが付与されました。"
   },
   "method": {
     "eth": "ETH",
@@ -50,8 +62,7 @@
     "erc20": "添付されたERC-20",
     "erc20Amount": "添付されたERC-20トークンの数量",
     "nftContract": "添付されたNFTトークンのアドレス",
-    "nftId": "添付されたNFTトークンID",
-    "cstToOutbid": "上回られた参加者へ"
+    "nftId": "添付されたNFTトークンID"
   },
   "nav": {
     "aria": "前後の一筆",

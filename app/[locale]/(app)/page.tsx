@@ -89,7 +89,7 @@ export default async function Page({ params }: PageProps) {
   // not silently swap the page for an empty fallback.
   return (
     <PageMessages
-      namespaces={['currentCycle', 'detail', 'glossary', 'home', 'statistics', 'tables']}
+      namespaces={['currentCycle', 'detail', 'gesture', 'glossary', 'home', 'statistics', 'tables']}
     >
       {/* Structured data for the running cycle, from the same ISR seed as the
           page itself (no request-state reads; ±15s staleness is fine). */}

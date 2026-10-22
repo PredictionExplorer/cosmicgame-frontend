@@ -19,10 +19,22 @@
   },
   "figures": {
     "cost": "Chi phí nét bút",
-    "participationCst": "CST tham gia",
     "held": "Thời gian giữ",
     "heldInfo": "Khoảng thời gian nét bút này là nét bút gần nhất: đến nét bút tiếp theo, hoặc đến khi chu kỳ hoàn tất.",
     "heldLive": "Vẫn là nét bút gần nhất"
+  },
+  "credit": {
+    "titlePrevious": "CST ghi có cho người tham gia trước",
+    "titleCurrent": "CST ghi có cho người tham gia này",
+    "titleUnknown": "CST ghi có",
+    "recipient": "Người nhận",
+    "recipientUnavailable": "Không có thông tin người nhận",
+    "sameWallet": "Cùng ví",
+    "firstGesture": "Nét bút đầu tiên không ghi có CST",
+    "zero": "Không ghi có CST",
+    "amountUnavailable": "Không có dữ liệu số lượng CST",
+    "incomplete": "Một số thông tin về CST ghi có không có sẵn.",
+    "bodyPrevious": "Nét bút này ghi có CST cho người đã đặt nét bút ngay trước đó."
   },
   "method": {
     "eth": "ETH",
@@ -50,8 +62,7 @@
     "erc20": "ERC-20 đính kèm",
     "erc20Amount": "Số lượng token ERC-20 đính kèm",
     "nftContract": "Địa chỉ token NFT đính kèm",
-    "nftId": "Mã token NFT đính kèm",
-    "cstToOutbid": "Cho người tham gia bị vượt"
+    "nftId": "Mã token NFT đính kèm"
   },
   "nav": {
     "aria": "Các nét bút liền kề",

@@ -19,6 +19,7 @@ import {
   get_bid_eth_price,
 } from '@/services/api/rounds';
 import { isRecordNotFound } from '@/services/api/readError';
+import { getGestureCstCredits } from '@/utils/gestureCstCredit';
 
 jest.mock('axios', () => {
   const actual = jest.requireActual<typeof import('axios')>('axios');
@@ -81,6 +82,63 @@ const mockGesture = (id: number, overrides: Record<string, unknown> = {}) => ({
   BidType: 0,
   EthPriceEth: 0.01,
   ...overrides,
+});
+
+const livePreviousParticipant = '0x30E6E8EEEC88aA8Ea35B54807671458B3F01665e';
+const liveCreditRecord = {
+  Tx: {
+    EvtLogId: 30748,
+    BlockNum: 517075891,
+    TxId: 10169,
+    TxHash: '0xd2ac465cdddccef54bd39e843c71686588d2289007724a2a46abed671c39b2ec',
+    TimeStamp: 1792630457,
+    DateTime: '2026-10-22T00:54:17Z',
+  },
+  RoundNum: 3,
+  BidPosition: 79,
+  BidType: 0,
+  BidderAddr: '0xe7eD7F31cd76CeD85861ec5bD37879cBA053e887',
+  EthPriceEth: 0.001738302851295673,
+  CSTReward: '210294532050989629',
+  CSTRewardEth: 0.21029453205098964,
+  PreviousBidderAddr: livePreviousParticipant,
+  PreviousBidderCstRewardAmount: '210294532050989629',
+  PreviousCstRewardAmountEth: 0.21029453205098964,
+  ThisBidderCstRewardAmount: '0',
+};
+
+describe('recipient credit data across gesture endpoints', () => {
+  it.each(['detail', 'list', 'cycle'] as const)(
+    'preserves the actual recipient through the %s path',
+    async (path) => {
+      mockedAxios.get.mockResolvedValue({
+        data:
+          path === 'detail'
+            ? { BidInfo: liveCreditRecord }
+            : path === 'list'
+              ? { Bids: [liveCreditRecord] }
+              : { BidsByRound: [liveCreditRecord] },
+      });
+      const result =
+        path === 'detail'
+          ? await get_bid_info(30748)
+          : path === 'list'
+            ? (await get_bid_list())[0]
+            : (await get_bid_list_by_round(3, 'desc'))[0];
+      expect(result).toMatchObject({
+        EvtLogId: 30748,
+        BlockNum: 517075891,
+        PreviousBidderCstRewardAmountEth: 0.21029453205098964,
+        ThisBidderCstRewardAmountEth: 0,
+      });
+      expect(getGestureCstCredits(result!)).toMatchObject({
+        status: 'credited',
+        credits: [
+          { role: 'previous', amountWei: '210294532050989629', recipient: livePreviousParticipant },
+        ],
+      });
+    },
+  );
 });
 
 /** Allocation-claim row: `WinningHistoryEntrySchema` requires the cycle and record type. */

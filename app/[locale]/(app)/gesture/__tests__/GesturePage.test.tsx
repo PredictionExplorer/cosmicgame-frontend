@@ -267,7 +267,7 @@ describe('GesturePage', () => {
     ).toHaveAttribute('href', '/allocation/5');
   });
 
-  it('carries the cost exactly, the Participation CST and how long it held as header figures', () => {
+  it('keeps cost and hold in the header and attributes CST in a separate block', () => {
     mockNeighbours.mockReturnValue({
       previous: null,
       next: neighbour(108, 8, baseGestureInfo.TimeStamp + 6768),
@@ -276,7 +276,11 @@ describe('GesturePage', () => {
     const { container } = renderGesture();
     expect(figure(container, 'cost')).toHaveTextContent('0.10211');
     expect(figure(container, 'cost')).toHaveTextContent('ETH');
-    expect(figure(container, 'participationCst')).toHaveTextContent('100');
+    expect(figure(container, 'participationCst')).toBeNull();
+    expect(screen.getByTestId('gesture-cst-credit')).toHaveTextContent('100');
+    expect(screen.getByTestId('gesture-cst-credit')).toHaveTextContent(
+      'gesture.credit.recipientUnavailable',
+    );
     // Held until the next gesture, as a clock like every duration figure (V201, V239).
     expect(figure(container, 'held')?.querySelector('dd time')).toHaveTextContent('01:52:48');
     // No bare cycle number as a headline figure: the trail and the cycle column name it.

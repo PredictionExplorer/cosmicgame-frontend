@@ -177,10 +177,19 @@ describe('StandingsLedger', () => {
     }
   });
 
-  it('shows what the Last Gesture paid, received and when, with its record one tap away', () => {
+  it('separates gesture cost from a CST credit whose recipient is not established', () => {
     render(<StandingsLedger {...baseProps} />);
     expect(visibleText(screen.getByTestId('latest-participant-paid-amount'))).toContain('214.92');
-    expect(visibleText(screen.getByTestId('latest-participant-cst-received'))).toContain('210.03');
+    expect(visibleText(screen.getByTestId('gesture-cst-credit'))).toContain('210.03');
+    expect(screen.getByTestId('gesture-cst-credit')).toHaveTextContent(
+      'gesture.credit.recipientUnavailable',
+    );
+    expect(
+      screen
+        .getByTestId('gesture-cst-credit')
+        .parentElement?.querySelector('dl')
+        ?.contains(screen.getByTestId('gesture-cst-credit')),
+    ).toBe(false);
     expect(
       within(screen.getByTestId('latest-participant-gesture-id')).getByRole('link'),
     ).toHaveAttribute('href', '/gesture/77');

@@ -19,10 +19,22 @@
   },
   "figures": {
     "cost": "Gesture Cost",
-    "participationCst": "Participation CST",
     "held": "Time held",
     "heldInfo": "How long this gesture was the Last Gesture: until the next gesture, or until the cycle finalized.",
     "heldLive": "Still the Last Gesture"
+  },
+  "credit": {
+    "titlePrevious": "CST credited to previous participant",
+    "titleCurrent": "CST credited to this participant",
+    "titleUnknown": "CST credit",
+    "recipient": "Recipient",
+    "recipientUnavailable": "Recipient unavailable",
+    "sameWallet": "Same wallet",
+    "firstGesture": "First gesture — no CST credit",
+    "zero": "No CST credited",
+    "amountUnavailable": "CST amount unavailable",
+    "incomplete": "Some CST credit details are unavailable.",
+    "bodyPrevious": "This gesture credited the participant who made the preceding gesture."
   },
   "method": {
     "eth": "ETH",
@@ -50,8 +62,7 @@
     "erc20": "Attached ERC-20",
     "erc20Amount": "Attached ERC-20 token amount",
     "nftContract": "Attached NFT contract address",
-    "nftId": "Attached NFT ID",
-    "cstToOutbid": "To outbid participant"
+    "nftId": "Attached NFT ID"
   },
   "nav": {
     "aria": "Neighbouring gestures",

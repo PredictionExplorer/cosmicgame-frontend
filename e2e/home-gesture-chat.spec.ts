@@ -327,7 +327,7 @@ test.describe('home gesture chat', () => {
       latest.locator('a[href="/user/0x3333333333333333333333333333333333333333"]'),
     ).toBeVisible();
     await expect(page.getByTestId('latest-participant-paid-amount')).toContainText('20 CST');
-    await expect(page.getByTestId('latest-participant-cst-received')).toContainText('100 CST');
+    await expect(page.getByTestId('gesture-cst-credit')).toContainText('100 CST');
     await expect(page.getByTestId('latest-participant-gesture-id')).toContainText('#4');
     await expect(page.getByTestId('latest-participant-message')).toContainText(
       'Newest message from a gesture',
@@ -385,7 +385,7 @@ test.describe('home gesture chat', () => {
     ).toHaveCount(0);
     await expect(page.getByTestId('latest-participant-gesture-details')).toBeVisible();
     await expect(page.getByTestId('latest-participant-paid-amount')).toContainText('20 CST');
-    await expect(page.getByTestId('latest-participant-cst-received')).toContainText('100 CST');
+    await expect(page.getByTestId('gesture-cst-credit')).toContainText('100 CST');
   });
 
   test('keeps a syncing Last Gesture panel when the gesture list trails the dashboard', async ({

@@ -152,7 +152,9 @@ test.describe('zh Sprint 3 — core dApp routes', () => {
       page.getByRole('main').getByRole('heading', { level: 2, name: '记录', exact: true }),
     ).toBeVisible();
     await expect(page.locator('[data-figure="cost"]')).toContainText('落笔价格');
-    await expect(page.locator('[data-figure="participationCst"]')).toContainText('参与 CST');
+    await expect(page.locator('[data-figure="participationCst"]')).toHaveCount(0);
+    await expect(page.getByTestId('gesture-cst-credit')).toContainText('CST 入账');
+    await expect(page.getByTestId('gesture-cst-credit')).toContainText('获配者未知');
   });
 
   test('/zh/how-it-works renders the Chinese protocol guide', async ({ page }) => {

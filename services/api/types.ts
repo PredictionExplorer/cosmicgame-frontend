@@ -300,15 +300,24 @@ export interface GestureInfo extends TxInfo {
   ERC20RewardAmountEth?: number;
   CSTRewardEth?: number;
   /**
-   * V3 gesture CST reward split (90/10 by default). The outbid (previous last) gesture
-   * participant receives `PreviousBidder*`; the participant placing this gesture receives
-   * `ThisBidder*`. For V1/V2 gestures the backend reports the whole reward under
-   * `ThisBidder*` and `PreviousBidder*` is 0, so one rendering path covers both eras.
+   * Recipient-specific Participation CST. Current V3 credits the entire
+   * amount to the previous participant; V1/V2 credited the gesturing address.
+   * These fields are optional: absence must not be interpreted as zero or
+   * as proof of either contract version. Raw strings use 18-decimal units.
    */
+  PreviousBidderAddr?: string;
   PreviousBidderCstRewardAmount?: string;
+  /** Canonical decimal alias normalized from PreviousCstRewardAmountEth. */
   PreviousBidderCstRewardAmountEth?: number;
+  /** Backend decimal amount, in CST despite the Eth suffix. */
+  PreviousCstRewardAmountEth?: number;
   ThisBidderCstRewardAmount?: string;
+  /** Canonical decimal alias normalized from ThisCstRewardAmountEth. */
   ThisBidderCstRewardAmountEth?: number;
+  /** Backend decimal amount, in CST despite the Eth suffix. */
+  ThisCstRewardAmountEth?: number;
+  /** Exact aggregate Participation CST created by the gesture, in base units. */
+  CSTReward?: string;
   EthPriceEth?: number;
   CstPriceEth?: number;
   RWalkNFTId?: number;

@@ -26,6 +26,8 @@ import {
   DEFAULT_API_PAGE_LIMIT,
 } from '@/services/api/client';
 import { ApiReadError, apiErrorStatus, isRecordNotFound } from '@/services/api/readError';
+import type { GestureInfo } from '@/services/api/types';
+import { getGestureCstCredits } from '@/utils/gestureCstCredit';
 
 import { reportError } from '../../../utils/errors';
 
@@ -676,6 +678,37 @@ describe('client helper functions', () => {
   });
 
   describe('normalizeGestureRecord', () => {
+    it('normalizes recipient aliases independently of the gesture type without mutating input', () => {
+      const input = {
+        PreviousCstRewardAmountEth: 0.21,
+        ThisCstRewardAmountEth: 0,
+        PreviousBidderAddr: '0x1111111111111111111111111111111111111111',
+      };
+      const normalized = normalizeGestureRecord(input) as GestureInfo;
+      expect(normalized).toMatchObject({
+        PreviousBidderCstRewardAmountEth: 0.21,
+        ThisBidderCstRewardAmountEth: 0,
+        PreviousBidderAddr: input.PreviousBidderAddr,
+      });
+      expect(input).not.toHaveProperty('PreviousBidderCstRewardAmountEth');
+      expect(getGestureCstCredits(normalized)).toMatchObject({
+        status: 'credited',
+        credits: [{ role: 'previous', amount: 0.21, recipient: input.PreviousBidderAddr }],
+      });
+    });
+
+    it('does not turn an invalid canonical amount into a valid alias during normalization', () => {
+      const normalized = normalizeGestureRecord({
+        PreviousBidderCstRewardAmountEth: -1,
+        PreviousCstRewardAmountEth: 0.21,
+        PreviousBidderAddr: '0x1111111111111111111111111111111111111111',
+      }) as GestureInfo;
+      expect(getGestureCstCredits(normalized)).toMatchObject({
+        status: 'unknown',
+        credits: [{ role: 'previous', amount: undefined }],
+      });
+    });
+
     it('maps BidType to GestureType and aliases CST price and reward fields', () => {
       const result = normalizeGestureRecord({
         BidType: 2,

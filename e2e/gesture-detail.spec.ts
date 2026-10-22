@@ -89,13 +89,11 @@ test.describe('Gesture detail page', () => {
 
     await page.goto('/gesture/18482', { waitUntil: 'networkidle' });
 
-    // The header figures: what was paid (CST at two decimals, the exact amount on hover)
-    // and what it imprinted.
+    // The cost is separate from an aggregate whose recipient this payload does not identify.
     await expect(page.locator('[data-figure="cost"]')).toContainText('411.53 CST');
-    await expect(page.locator('[data-figure="participationCst"]')).toContainText(
-      'Participation CST',
-    );
-    await expect(page.locator('[data-figure="participationCst"]')).toContainText('100 CST');
+    await expect(page.locator('[data-figure="participationCst"]')).toHaveCount(0);
+    await expect(page.getByTestId('gesture-cst-credit')).toContainText('100 CST');
+    await expect(page.getByTestId('gesture-cst-credit')).toContainText('Recipient unavailable');
     await expect(page.locator('[data-figure="cost"]')).not.toContainText(/^Gesture Cost\s*0 CST$/);
     // A message is quoted only when there is one.
     await expect(page.getByTestId('gesture-message')).toContainText('rewards system');
