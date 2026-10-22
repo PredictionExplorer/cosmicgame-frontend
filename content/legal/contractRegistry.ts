@@ -7,10 +7,10 @@ import { ARBITRUM_ONE_CHAIN_ID } from './officialAddresses';
 
 /**
  * Every Cosmic Signature contract, for the one address list (/contracts) and
- * the operator settings: on Arbitrum One the addresses are the verified set
+ * the operator settings: on Arbitrum One the addresses are the checked set
  * in `protocolFacts`, whatever the indexer answers, so a trust page never
  * loses a contract to an outage and the API never silently replaces a
- * verified address. The indexer's answer is kept only to show drift.
+ * checked address. The indexer's answer is kept only to show drift.
  */
 
 /** The address list's groups, in reading order. */
@@ -19,7 +19,7 @@ export type ContractCategory = (typeof CONTRACT_CATEGORIES)[number];
 
 type ProtocolAddressKey = keyof typeof protocolFacts.contractAddresses;
 
-/** Each contract: its group, its verified address, and the dashboard field that reports it. */
+/** Each contract: its group, its checked address, and the dashboard field that reports it. */
 const REGISTRY = [
   { id: 'protocol', category: 'core', verified: 'proxy', api: 'CosmicGameAddr' },
   { id: 'implementation', category: 'core', verified: 'implementation', api: 'ImplementationAddr' },
@@ -59,7 +59,7 @@ export interface ContractEntry {
   description: string;
   category: ContractCategory;
   /**
-   * The address the indexer reports when it differs from the verified one:
+   * The address the indexer reports when it differs from the checked one:
    * shown as a caption, never in its place.
    */
   reported?: string;
@@ -104,13 +104,10 @@ export function buildContracts(
       return reportedAddress ? [{ id, category, ...copy[id], address: reportedAddress }] : [];
     }
     const address = protocolFacts.contractAddresses[verifiedKey];
-    // The dashboard lags a proxy upgrade (it still reports the implementation
-    // before V2); the verified one is read from the proxy's EIP-1967 slot, so
-    // a different implementation from the API is not drift.
+    // Include implementation drift: a stale indexer must not silently disagree
+    // with the independently checked EIP-1967 implementation.
     const drifted =
-      id !== 'implementation' &&
-      reportedAddress !== '' &&
-      reportedAddress.toLowerCase() !== address.toLowerCase();
+      reportedAddress !== '' && reportedAddress.toLowerCase() !== address.toLowerCase();
     return [
       { id, category, ...copy[id], address, ...(drifted ? { reported: reportedAddress } : {}) },
     ];

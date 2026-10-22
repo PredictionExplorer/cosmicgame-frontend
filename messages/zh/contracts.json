@@ -64,7 +64,7 @@
   "addresses": {
     "title": "合约地址",
     "description": "Cosmic Signature 在 Arbitrum One 上的全部合约。可复制地址，或在 Arbiscan 上核对地址、在 Sourcify 上核对源代码。",
-    "verified": "附有 Sourcify 链接的地址均在 Sourcify 上完全匹配，核对日期：{date}。",
+    "verified": "配套合约与历史 V2 实现的公开匹配记录已于 {date} 核对。当前 V3 实现尚未在 Sourcify 验证，请查询其自身的记录。",
     "markets": "市场",
     "reported": "索引服务报告的地址为 {address}，该地址尚未验证。"
   },
@@ -75,7 +75,7 @@
     "segments": {
       "signature": {
         "label": "签名分配",
-        "tooltip": "完成收官之笔的参与者取回的 ETH 比例；同时还会获得 1,000 CST 与 1 枚 Cosmic Signature NFT。"
+        "tooltip": "实际收官者取回的 ETH 份额，另含合计 1,000 CST 与三枚编号连续的 Cosmic Signature NFT。"
       },
       "chrono": {
         "label": "时之勇士",
@@ -83,7 +83,7 @@
       },
       "stellar": {
         "label": "星选",
-        "tooltip": "周期收官时，通过程序化随机方式分配给获配者的份额。"
+        "tooltip": "V3 按每笔未减免、未含溢价的 ETH 基础价格加权；CST 落笔也采用同一时刻的 ETH 基础价格。"
       },
       "anchor": {
         "label": "锚定派发",
@@ -91,7 +91,7 @@
       },
       "publicGoods": {
         "label": "公共物品",
-        "tooltip": "每个周期转拨给公共物品受益方 Protocol Guild。"
+        "tooltip": "先分配至公共物品金库，再经单独的无需许可交易转给配置的受益方。"
       },
       "next": {
         "label": "滚动储备",
@@ -113,7 +113,7 @@
       },
       "cstPreview": {
         "label": "当前参与 CST 预览",
-        "tooltip": "若此刻落笔，预计铭刻的参与 CST。数量会动态变化，并采用公式 {formula}。"
+        "tooltip": "V3 中，下一笔向上一笔参与者铭刻的预估数量。公式为 {formula}，结果以 CST 最小单位计。首笔不发放，收官也不另行结算。"
       },
       "finalization": {
         "label": "专属收官期限",
@@ -125,12 +125,12 @@
       },
       "message": {
         "label": "消息长度上限",
-        "tooltip": "落笔消息允许输入的最大字符数。"
+        "tooltip": "落笔消息允许的 UTF-8 字节长度上限。"
       },
       "v3CstDecline": {
         "label": "CST 价格下降速率",
         "value": "{amount} CST/分钟",
-        "tooltip": "CST 落笔价格在 CST 校准窗口中的下降速度。每次参与 CST 铭刻全额记入被超越的参与者。"
+        "tooltip": "实时 CST 基础价格下降速率。ETH 落笔可在检查通过后加快速率；CST 落笔减慢速率并重设上限。参与 CST 铭刻量另行计算。"
       },
       "v3SignatureNfts": {
         "label": "签名配额 NFT 数量",
@@ -164,7 +164,7 @@
     },
     "ceiling": "起始价格",
     "cstDurationTooltip": "CST 校准窗口当前存储在链上的时长。每笔 CST 落笔会使其延长约 {increase}%，每笔 ETH 落笔会使其缩短约 {decrease}%。",
-    "cstCeilingTooltip": "当前所示 CST 校准窗口的起始落笔价格。价格会在实时存储的窗口时长内线性下降。",
+    "cstCeilingTooltip": "当前窗口的起始基础价格，按链上速率下降；临近收官溢价另行计算。",
     "publicGoodsAddress": "公共物品受益方",
     "publicGoodsAddressTooltip": "当前从公共物品金库合约接收公共物品分配的链上地址。",
     "selection": {
@@ -177,7 +177,8 @@
     },
     "cstComplete": "窗口已走完全程，CST 落笔价格将停留在最低点，直到下一次 CST 落笔重新开始窗口。",
     "ethClosed": "本周期的首次落笔已关闭该窗口；此后 ETH 落笔价格随每次落笔递增。",
-    "ethComplete": "窗口已走完全程，ETH 落笔价格将停留在最低点，直到本周期的首次落笔。"
+    "ethComplete": "窗口已走完全程，ETH 落笔价格将停留在最低点，直到本周期的首次落笔。",
+    "cstDurationTooltipV3": "V3 窗口时长由当前上限与价格下降速率推算。落笔调整速率，CST 落笔还会重设上限，不再使用旧版的存储时长百分比规则。"
   },
   "vault": {
     "title": "公共物品",
@@ -192,6 +193,6 @@
   },
   "seo": {
     "heading": "Cosmic Signature 合约",
-    "partialFallback": "实时数据暂时不可用。下方地址来自已验证的列表。"
+    "partialFallback": "实时数据暂不可用，下方列出此前核对的地址。"
   }
 }

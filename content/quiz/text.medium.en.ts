@@ -16,7 +16,7 @@ export const mediumQuestionsTextEn = {
   'eth-opening-price-discovery': {
     prompt: 'How does a new cycle discover its opening ETH Gesture Cost?',
     options: {
-      a: `The ETH Calibration Window starts at ${protocolFacts.ethCalibrationCeilingMultiplier}x the previous cycle\u2019s opening cost paid and declines linearly toward a floor of one two-hundredth of that, plus one wei.`,
+      a: `The ceiling starts at ${protocolFacts.ethCalibrationCeilingMultiplier}x the previous cycle’s opening undiscounted ETH base cost and descends toward floor(ceiling / ${protocolFacts.ethCalibrationFloorDivisor}) + one wei.`,
       b: `Every cycle opens at a fixed ${protocolFacts.initialGestureCostEth} ETH.`,
       c: 'The Cosmic Council votes on each cycle\u2019s opening cost.',
       d: 'The cost doubles every hour until someone gestures.',
@@ -25,14 +25,14 @@ export const mediumQuestionsTextEn = {
     referenceLabel: 'White paper \u00a73.1 \u2014 The ETH Calibration Window',
   },
   'eth-step-up': {
-    prompt: 'Pax makes an ETH gesture. What happens to the cost of the next ETH gesture?',
+    prompt: 'Pax makes an ETH gesture. What happens to the next premium-free ETH base cost?',
     options: {
       a: `It rises by ${protocolFacts.ethGestureCostStepUpPercent}%, plus one wei \u2014 the sequence is public and exact.`,
       b: 'It doubles.',
       c: 'It stays the same until the cycle finalizes.',
       d: `It falls by ${protocolFacts.ethGestureCostStepUpPercent}% to invite more activity.`,
     },
-    explanation: `After the opening gesture, each ETH gesture raises the next ETH Gesture Cost by ${protocolFacts.ethGestureCostStepUpPercent}%, plus one wei. The current cost can be read from the contract before submitting a gesture, but it may change before the transaction executes.`,
+    explanation: `Every ETH gesture, including the opening one, advances the premium-free base by ${protocolFacts.ethGestureCostStepUpPercent}% plus one wei, subject to integer rounding. The late premium and retained overpayment do not enter that base. The actual quoted total also depends on the late window and can change before execution.`,
     funFact:
       'The extra wei matters: it guarantees strict growth even when a cost is so small that a percentage of it rounds to zero.',
     referenceLabel: 'White paper \u00a74.1 \u2014 ETH gestures',
@@ -53,12 +53,12 @@ export const mediumQuestionsTextEn = {
   'cst-window-restart': {
     prompt: 'Lyra makes a CST gesture. What does that do to the CST Calibration Window?',
     options: {
-      a: `It restarts the window from ${protocolFacts.cstCalibrationCeilingMultiplier}x the cost she just paid \u2014 never below ${cst(protocolFacts.cstCalibrationCeilingMinCst)} CST \u2014 descending linearly to zero again.`,
+      a: 'It resets the ceiling to the largest of twice the premium-free CST base cost, the configured minimum and the updated decline rate times the safeguard interval.',
       b: 'Nothing \u2014 the window keeps descending where it was.',
       c: `The cost locks at ${cst(protocolFacts.cstCalibrationCeilingMinCst)} CST for the rest of the cycle.`,
       d: 'The window closes and CST gestures pause until the next cycle.',
     },
-    explanation: `Every CST gesture restarts the window from its new starting value: ${protocolFacts.cstCalibrationCeilingMultiplier}x the last cost paid, with a floor of ${cst(protocolFacts.cstCalibrationCeilingMinCst)} CST on the starting point. From there the cost descends linearly to zero over the window\u2019s duration. The CST spent on each gesture is burned.`,
+    explanation: `After reducing the decline rate, a CST gesture resets the ceiling to max(2 × premium-free base cost, ${cst(protocolFacts.cstCalibrationCeilingMinCst)} CST, new rate × ${protocolFacts.cstCalibrationRestartMinimumSeconds} seconds). The late premium is excluded. This safeguard is not a cooldown between gestures.`,
     referenceLabel: 'White paper \u00a74.3 \u2014 CST gestures',
   },
   'cst-free-quiet': {
@@ -75,27 +75,27 @@ export const mediumQuestionsTextEn = {
     referenceLabel: 'White paper \u00a74.3 \u2014 CST gestures',
   },
   'window-feedback-loop': {
-    prompt:
-      'A burst of ETH gestures sweeps through the cycle. What does that do to the CST Calibration Window\u2019s duration?',
+    prompt: 'How do ETH gestures affect the V3 CST decline rate?',
     options: {
-      a: `Each ETH gesture shortens it by about ${protocolFacts.cstCalibrationWindowDecreasePercentPerEthGesture}%, so the CST cost descends faster and CST gestures become attractive sooner.`,
-      b: `Each ETH gesture lengthens it by about ${protocolFacts.cstCalibrationWindowIncreasePercentPerCstGesture}%, slowing the CST descent.`,
+      a: 'They attempt to increase the rate, subject to the minimum-window safeguard, making CST base cost decline faster when accepted.',
+      b: 'They always reduce the rate, slowing the decline.',
       c: 'Nothing \u2014 the two currencies are independent.',
       d: 'The window resets to its original duration.',
     },
-    explanation: `The window duration changes on-chain after each gesture. ETH gestures shorten it by about ${protocolFacts.cstCalibrationWindowDecreasePercentPerEthGesture}%, while CST gestures lengthen it by about ${protocolFacts.cstCalibrationWindowIncreasePercentPerCstGesture}%. Frequent ETH gestures therefore speed up the CST price decline, while frequent CST gestures slow it down.`,
+    explanation: `At divisor ${protocolFacts.cstDeclineRateChangeDivisor}, ETH proposes rate + floor(rate / 100), accepted only if rate times ${protocolFacts.cstCalibrationRestartMinimumSeconds} seconds stays within the current ceiling. CST instead uses rate − floor(rate / 101), then resets the ceiling. V3 does not change the old stored duration by fixed percentages.`,
     referenceLabel: 'White paper \u00a74.3 \u2014 CST gestures',
   },
   'participation-cst-timing': {
     prompt:
       'Two gestures imprint Participation CST at launch parameters: one lands 1 second after the previous gesture, the other ends a full day of silence. Roughly how much does each imprint?',
     options: {
-      a: `About ${oneSecondExample.cst} CST and about ${oneDayExample.cst} CST \u2014 the amount grows with the square root of the elapsed time.`,
+      a: `About ${oneSecondExample.cst} CST and ${oneDayExample.cst} CST, credited to the previous participant by a subsequent gesture under the linear rule.`,
       b: `A flat ${cst(100)} CST each, regardless of timing.`,
       c: 'Equal amounts \u2014 timing never matters.',
       d: 'Zero for both \u2014 only finalization imprints CST.',
     },
-    explanation: `Participation CST grows with the square root of the time since the previous gesture: a gesture arriving one second later imprints almost nothing (about ${oneSecondExample.cst} CST), while one that ends a day of silence imprints hundreds (about ${oneDayExample.cst} CST). The flat ${cst(100)} CST per gesture was the original V1 rule \u2014 it turned machine-speed sequences into free CST, which is exactly why V2 replaced it.`,
+    explanation:
+      'V3’s linear amount is proportional to elapsed time at the original one-hour increment. The examples are approximate and the live rate changes as the increment grows. The next gesture credits the previous participant; the opening gesture credits none, and finalization pays no final dynamic amount.',
     funFact:
       'Longer gaps produce more Participation CST per gesture. Rapid successive gestures can imprint little or no Participation CST; Recognition CST and the Outreach Reserve are separate issuance mechanisms.',
     referenceLabel: 'White paper \u00a77.1 \u2014 Imprint rules',
@@ -158,7 +158,7 @@ export const mediumQuestionsTextEn = {
       c: `${cst(protocolFacts.outreachReserveCst)} CST, selected once.`,
       d: `One NFT only, selected ${protocolFacts.typicalNftsPerCycle} times.`,
     },
-    explanation: `The NFT Stellar Selection selects ${protocolFacts.nftStellarSelectionRecipients} entries; each carries ${cst(protocolFacts.specialAllocationCst)} CST and one NFT. Recognition CST always travels with its NFT \u2014 every NFT distribution at finalization pairs the two.`,
+    explanation: `The participant NFT track selects ${protocolFacts.nftStellarSelectionRecipients} entries using the same base-ETH-cost weights as participant ETH selection. Each selected allocation receives ${cst(protocolFacts.specialAllocationCst)} CST and one NFT. The separate main allocation receives ${cst(protocolFacts.specialAllocationCst)} CST once for its ${protocolFacts.mainPrizeNftsPerCycle} NFTs.`,
     referenceLabel: 'White paper \u00a75.1 \u2014 Distribution at finalization',
   },
   'draws-with-replacement': {
@@ -170,7 +170,7 @@ export const mediumQuestionsTextEn = {
       d: 'Only if the Cosmic Council approves the repeat.',
     },
     explanation:
-      'Selections are made with replacement, so an address can be selected more than once. Each gesture adds one entry to the pool. More entries increase an address’s selection weight, without guaranteeing a selection.',
+      'Both participant selection tracks allow repeats and use accumulated undiscounted, premium-free ETH base cost as weight, including the concurrent ETH base cost for CST gestures. An address can receive more than one selection; gesture count alone does not determine relative weight.',
     referenceLabel: 'White paper \u00a75.3 \u2014 Stellar Selections',
   },
   'anchored-rwlk-track': {
@@ -228,7 +228,7 @@ export const mediumQuestionsTextEn = {
       c: `At least ${cst(protocolFacts.outreachReserveCst)} CST.`,
       d: 'Any amount \u2014 there is no threshold.',
     },
-    explanation: `The proposal threshold is ${protocolFacts.councilProposalThresholdCst} CST of delegated weight \u2014 modest on purpose, so proposing stays accessible. The ${cst(protocolFacts.specialAllocationCst)} CST figure is the Recognition CST paired with each NFT distribution, a different constant that is easy to confuse with it.`,
+    explanation: `The threshold is ${protocolFacts.councilProposalThresholdCst} CST of historical delegated weight. The ${cst(protocolFacts.specialAllocationCst)} CST figure is a fixed recognition allocation, not the proposal threshold; the main allocation receives that amount once for all its NFTs.`,
     referenceLabel: 'White paper \u00a79 \u2014 The Cosmic Council',
   },
   'council-timeline': {
@@ -280,12 +280,12 @@ export const mediumQuestionsTextEn = {
   'typical-cst-fixed': {
     prompt: 'How much fixed CST does a typical cycle imprint, and how does it break down?',
     options: {
-      a: `${cst(protocolFacts.typicalCstImprintsPerCycle)} CST \u2014 ${cst(protocolFacts.specialAllocationCst)} CST paired with each of ${protocolFacts.typicalNftsPerCycle} NFT distributions, plus ${cst(protocolFacts.outreachReserveCst)} CST to the Outreach Reserve.`,
+      a: `${cst(protocolFacts.typicalCstImprintsPerCycle)} CST: ${protocolFacts.nftBearingAllocations} recognition allocations of ${cst(protocolFacts.specialAllocationCst)} CST, plus ${cst(protocolFacts.outreachReserveCst)} CST for outreach.`,
       b: `${cst(protocolFacts.specialAllocationCst)} CST, all to the cycle beneficiary.`,
       c: `${cst(protocolFacts.outreachReserveCst)} CST, all for community outreach.`,
       d: 'It varies unpredictably from cycle to cycle.',
     },
-    explanation: `The fixed flows are exact: ${protocolFacts.typicalNftsPerCycle} NFT-paired imprints of ${cst(protocolFacts.specialAllocationCst)} CST plus ${cst(protocolFacts.outreachReserveCst)} CST of outreach, totalling ${cst(protocolFacts.typicalCstImprintsPerCycle)} CST in a typical cycle. Dynamic Participation CST from individual gestures is additional and depends on timing.`,
+    explanation: `A full-track cycle has ${protocolFacts.nftBearingAllocations} recognition allocations and ${protocolFacts.typicalNftsPerCycle} NFTs: the main allocation carries ${protocolFacts.mainPrizeNftsPerCycle} NFTs with one CST amount. The fixed total is ${cst(protocolFacts.typicalCstImprintsPerCycle)} CST including outreach. Missing tracks reduce this; dynamic Participation CST is additional.`,
     referenceLabel: 'White paper \u00a77.1 \u2014 Imprint rules',
   },
   'attached-assets-destination': {
@@ -303,12 +303,12 @@ export const mediumQuestionsTextEn = {
   'next-cycle-delay': {
     prompt: 'A cycle has just been finalized. When does the next one activate?',
     options: {
-      a: `After a short delay \u2014 ${protocolFacts.defaultNextCycleDelayMinutes} minutes by default, though the live on-chain value is adjustable and governs.`,
+      a: `After the on-chain configured delay, currently ${protocolFacts.currentNextCycleDelayDays} days; the owner can change it.`,
       b: 'Immediately, in the same transaction.',
       c: `Exactly ${protocolFacts.finalGestureExclusivityHours} hours later.`,
       d: 'Only when the owner manually starts it.',
     },
-    explanation: `After finalization the next cycle activates following a short delay, ${protocolFacts.defaultNextCycleDelayMinutes} minutes by default. The live delay is stored on-chain and owner-configurable, so the contract \u2014 not the default \u2014 is the source of truth. Once activated, the new cycle\u2019s Calibration Windows open.`,
+    explanation: `The next activation is scheduled from successful finalization using the configured delay. The checked deployment uses ${protocolFacts.currentNextCycleDelayDays} days. The ${protocolFacts.defaultNextCycleDelayMinutes}-minute Solidity default is historical configuration, not the live delay.`,
     referenceLabel: 'White paper \u00a73.3 \u2014 Finalization',
   },
 } as const satisfies QuizTierQuestionsText<'medium'>;

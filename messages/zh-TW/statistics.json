@@ -65,7 +65,7 @@
       "links": {
         "currentCycle": "檢視目前演繹週期",
         "howItWorks": "了解 Cosmic Signature 的運作原理",
-        "contracts": "檢視已驗證的 Arbitrum 合約",
+        "contracts": "查看 Arbitrum 合約與驗證狀態",
         "faq": "閱讀 Cosmic Signature 常見問題"
       },
       "gesturesCaption": "本週期落筆 {count, number} 次"
@@ -572,9 +572,9 @@
       "typeEth": "ETH 落筆（縮短）",
       "typeRandomWalk": "ETH + Random Walk 落筆（縮短）",
       "typeCst": "CST 落筆（延長）",
-      "description": "CST 校準窗口決定 CST 落筆價格從起始值衰減到免費所需的時間。每次 ETH 落筆都會略微縮短窗口；每次 CST 落筆則會延長它。折線在每次落筆時躍變為之後生效的窗口長度；表格列出每次落筆及其類型。",
-      "note": "每次 ETH 落筆都會略微縮短窗口；每次 CST 落筆則會延長它。",
-      "empty": "此週期沒有逐筆校準窗口資料。V2 事件之前索引的週期不包含該資料。",
+      "description": "這條歷史時間線只顯示 V2 時長事件。V3 的對應事件欄位記錄下降速率，該數值不應當作時長繪製。",
+      "note": "只顯示 V2 時長歷史，V3 下降速率不是時長。",
+      "empty": "本週期沒有可用的落筆時長資料，V3 速率事件及缺少時長的舊事件不會顯示於此。",
       "selectCycle": "請選擇要檢視的週期。",
       "loadErrorTitle": "未能載入校準窗口時間線",
       "loadErrorMessage": "未能取得此週期的落筆歷史。",
@@ -593,7 +593,7 @@
       "clockBefore": "落筆前剩餘時間",
       "gestureBy": "落筆者",
       "clickHint": "點選圓點可檢視交易。",
-      "description": "每個圓點代表一次 CST 落筆的實際支付金額（對數刻度，空心圓點表示免費）。每次 CST 落筆後，價格會以約兩倍於落筆價格重新開始，並在校準窗口內回落到免費。下方面板表示每次落筆前分配時鐘的剩餘時間：當時鐘接近歸零時，密集落筆讓價格來不及回落，落筆價格隨之飆升。",
+      "description": "每個點表示實際支付的 CST，包含臨近收官溢價，空心點表示零花費。V3 重設上限時採未含溢價的基礎價格與鏈上下限，溢價不會提高下一筆基礎價格。",
       "note": "對數刻度；空心圓點為免費落筆。當下方時鐘接近歸零時，密集落筆讓價格來不及回落。",
       "empty": "此週期沒有 CST 落筆。",
       "selectCycle": "請選擇要檢視的週期。",

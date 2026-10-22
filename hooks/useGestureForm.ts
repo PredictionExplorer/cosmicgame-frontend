@@ -877,7 +877,7 @@ export function useGestureForm({
     if (gestureType === 'RandomWalk') {
       // The contract charges ceil(price / 2) for RandomWalk gestures; round the
       // late cap up so it still covers the charge at the exact maximum.
-      price = lateCap != null ? (price + 1n) / 2n : (price * parseEther('50')) / parseEther('100');
+      price = (price + 1n) / 2n;
     }
     return price;
   };

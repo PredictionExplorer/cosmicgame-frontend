@@ -1,6 +1,6 @@
 import { useLocale, useTranslations } from 'next-intl';
 
-import { isV3Mechanics, protocolFacts } from '@/content/protocol-facts';
+import { historicalV2ProtocolFacts, isV3Mechanics } from '@/content/protocol-facts';
 
 import { Link } from '@/i18n/navigation';
 import { SectionHeader } from '@/components/ui/section-header';
@@ -18,6 +18,7 @@ import { CYCLE_SECTION_SCROLL_MARGIN } from './CycleSectionNav';
  */
 export function CycleRules({ data, headingId }: { data: DashboardInfo; headingId: string }) {
   const t = useTranslations('currentCycle');
+  const tHome = useTranslations('home');
   const locale = useLocale();
   const count = (value: unknown) => {
     const n = toFiniteNumber(value);
@@ -29,14 +30,18 @@ export function CycleRules({ data, headingId }: { data: DashboardInfo; headingId
 
   const rules = [
     // V3 accrues dynamic Participation CST to the previous gesturer; V2 paid a
-    // fixed amount to the gesturer directly.
+    // elapsed-time square-root amount to the gesturer directly.
     t.rich(isV3Mechanics ? 'rules.participationV3' : 'rules.participation', {
       em: (chunks) => <strong className="font-medium text-foreground">{chunks}</strong>,
     }),
-    t('rules.calibration', {
-      decreasePercent: protocolFacts.cstCalibrationWindowDecreasePercentPerEthGesture,
-      increasePercent: protocolFacts.cstCalibrationWindowIncreasePercentPerCstGesture,
-    }),
+    isV3Mechanics
+      ? tHome('calibration.cstSubtitleV3')
+      : t('rules.calibration', {
+          decreasePercent:
+            historicalV2ProtocolFacts.cstCalibrationWindowDecreasePercentPerEthGesture,
+          increasePercent:
+            historicalV2ProtocolFacts.cstCalibrationWindowIncreasePercentPerCstGesture,
+        }),
     // V3 weighs each entry by the gesture's ETH cost; V2 weighed all equally.
     t(isV3Mechanics ? 'rules.stellarSelectionV3' : 'rules.stellarSelection', {
       ethEntries: count(data.NumRaffleEthWinnersBidding),

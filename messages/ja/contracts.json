@@ -21,7 +21,7 @@
     },
     "cst": {
       "name": "Cosmic Signature CSTトークン",
-      "description": "一筆ごとに刻印され、宇宙評議会で調整ウェイトを表すために使われるERC-20トークン（CST）"
+      "description": "V3では、次の一筆が直前の一筆を入れた参加者に参加CSTの全額を刻印します。数量は二つの一筆の間の時間に比例します。サイクル最初の一筆ではこのCSTは発生せず、確定時にも最後の参加者の未精算区間へ追加の参加CSTは支払われません。両方の一筆が同じアドレスなら、そのアドレス自身が受け取ります。"
     },
     "nft": {
       "name": "Cosmic Signature NFT",
@@ -64,9 +64,9 @@
   "addresses": {
     "title": "コントラクトアドレス",
     "description": "Arbitrum One上のCosmic Signatureのすべてのコントラクトです。アドレスをコピーするか、Arbiscanでアドレスを、Sourcifyでソースコードを確認できます。",
-    "verified": "Sourcifyへのリンクがあるアドレスは、すべてSourcifyで完全一致しています（{date}に確認）。",
+    "verified": "アドレスの確認日：{date}。各実装の現在の公開検証状況はSourcifyで個別に確認してください。",
     "markets": "マーケット",
-    "reported": "インデクサーが報告するアドレス{address}は検証されていません。"
+    "reported": "インデクサーが別のアドレスを報告しています：{address}。現在のオンチェーン状態と照合してください。"
   },
   "funds": {
     "title": "配分トラック",
@@ -75,7 +75,7 @@
     "segments": {
       "signature": {
         "label": "シグネチャー配分",
-        "tooltip": "最後の一筆を入れた参加者が受け取るETHの割合。1,000 CSTとCosmic Signature NFTも受け取ります"
+        "tooltip": "確定の受領者に連続IDのCosmic Signature NFT3点と合計1,000 CSTを配分します。確定権には優先期間と公開期間があります。"
       },
       "chrono": {
         "label": "時の戦士",
@@ -83,7 +83,7 @@
       },
       "stellar": {
         "label": "星選",
-        "tooltip": "サイクルが確定したときに、無作為に選ばれた参加者へ配られる部分"
+        "tooltip": "一筆の時点における、割引も終盤の加算もないETH基本費用をウェイトとして選びます。同じアドレスを複数回選ぶことがあります。"
       },
       "anchor": {
         "label": "係留配分",
@@ -91,7 +91,7 @@
       },
       "publicGoods": {
         "label": "公共財",
-        "tooltip": "サイクルごとに公共財の受け手（Protocol Guild）へ送られます"
+        "tooltip": "該当額は公共財金庫に入ります。誰でも別のトランザクションで、現在の受け手であるProtocol Guildへ金庫の残高を送れます。"
       },
       "next": {
         "label": "累積準備金",
@@ -113,7 +113,7 @@
       },
       "cstPreview": {
         "label": "現在の参加CSTのプレビュー",
-        "tooltip": "今一筆を入れた場合の参加CSTの見込み。量は動的で、{formula}を使います。"
+        "tooltip": "V3では次の一筆が直前の参加者へ、CST最小単位の式{formula}による数量を刻印します。最初の一筆では刻印せず、確定時にも追加精算しません。"
       },
       "finalization": {
         "label": "確定タイムアウト",
@@ -125,12 +125,12 @@
       },
       "message": {
         "label": "メッセージの最大長",
-        "tooltip": "一筆のメッセージに許される最大文字数"
+        "tooltip": "一筆のメッセージのUTF-8バイト長の上限"
       },
       "v3CstDecline": {
         "label": "CST価格の下降レート",
         "value": "{amount} CST/分",
-        "tooltip": "CST調律期間中にCST一筆費用が下がる速さです。刻印される参加CSTは、上回られた参加者に全額付与されます。"
+        "tooltip": "現在のCST上限と下降速度から求める長さです。V3は速度を変え、CST一筆の後に上限を再設定します。保存済みの期間を固定割合で変える仕組みではありません。"
       },
       "v3SignatureNfts": {
         "label": "シグネチャー配分NFT数",
@@ -164,7 +164,7 @@
     },
     "ceiling": "開始時の費用",
     "cstDurationTooltip": "CST調律期間のライブの保存された長さ。CST一筆は約{increase}%長くし、ETH一筆は約{decrease}%短くします。",
-    "cstCeilingTooltip": "現在表示されているCST調律期間の開始時の一筆の費用。費用は保存された長さの間に線形に下がります。",
+    "cstCeilingTooltip": "現在のCST上限と下降速度から求める長さです。V3は速度を変え、CST一筆の後に上限を再設定します。保存済みの期間を固定割合で変える仕組みではありません。",
     "publicGoodsAddress": "公共財の受け手",
     "publicGoodsAddressTooltip": "公共財金庫コントラクトから公共財配分を現在受け取っているオンチェーンアドレス",
     "selection": {
@@ -177,7 +177,8 @@
     },
     "cstComplete": "期間が最後まで経過したため、次のCSTの一筆で始まり直すまで、CSTの一筆の費用は最低値のままです。",
     "ethClosed": "このサイクルの最初の一筆でこの期間は閉じました。以後、ETHの一筆の費用は一筆ごとに上がります。",
-    "ethComplete": "期間が最後まで経過したため、このサイクルの最初の一筆まで、ETHの一筆の費用は最低値のままです。"
+    "ethComplete": "期間が最後まで経過したため、このサイクルの最初の一筆まで、ETHの一筆の費用は最低値のままです。",
+    "cstDurationTooltipV3": "現在のCST上限と下降速度から求める長さです。V3は速度を変え、CST一筆の後に上限を再設定します。保存済みの期間を固定割合で変える仕組みではありません。"
   },
   "vault": {
     "title": "公共財",

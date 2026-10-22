@@ -66,5 +66,9 @@
     "resumeAnimation": "アニメーションを再開",
     "replayAnimation": "もう一度再生",
     "unavailable": "アートワークを利用できません"
+  },
+  "whitePaperHistorical": {
+    "body": "過去の版{version}は以前のルールを説明します。現在の英語版{currentVersion}はデプロイ済みV3を反映しています。",
+    "link": "現在の英語版を読む"
   }
 }

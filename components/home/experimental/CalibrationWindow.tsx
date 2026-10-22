@@ -4,7 +4,7 @@ import { useId } from 'react';
 import { zeroAddress } from 'viem';
 import { useLocale, useTranslations } from 'next-intl';
 
-import { protocolFacts } from '@/content/protocol-facts';
+import { historicalV2ProtocolFacts, isV3Mechanics } from '@/content/protocol-facts';
 
 import { Duration } from '@/components/ui/duration';
 import { ExplainedTerm } from '@/components/ui/explain-popover';
@@ -48,10 +48,16 @@ export function CalibrationWindow({
   const title = t(firstGesture ? 'calibration.firstGestureTitle' : 'calibration.cstTitle');
   const definition = firstGesture
     ? t('calibration.firstGestureSubtitle')
-    : t('calibration.cstSubtitle', {
-        decreasePercent: String(protocolFacts.cstCalibrationWindowDecreasePercentPerEthGesture),
-        increasePercent: String(protocolFacts.cstCalibrationWindowIncreasePercentPerCstGesture),
-      });
+    : isV3Mechanics
+      ? t('calibration.cstSubtitleV3')
+      : t('calibration.cstSubtitle', {
+          decreasePercent: String(
+            historicalV2ProtocolFacts.cstCalibrationWindowDecreasePercentPerEthGesture,
+          ),
+          increasePercent: String(
+            historicalV2ProtocolFacts.cstCalibrationWindowIncreasePercentPerCstGesture,
+          ),
+        });
 
   const hasEthTiming =
     ethGestureInfo != null &&

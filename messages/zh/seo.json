@@ -135,7 +135,7 @@
         "links": {
           "myAllocations": "取回你的分配",
           "statistics": "查看汇总统计",
-          "contracts": "查阅已验证合约"
+          "contracts": "查阅合约与验证状态"
         },
         "cards": {
           "records": {
@@ -213,7 +213,7 @@
       },
       "public-goods-contributions-cg": {
         "heading": "协议公共物品资助",
-        "description": "每个收官周期的周期储备中有 7% 进入公共物品金库，供其受益方取回：目前为资助以太坊核心贡献者的 Protocol Guild。",
+        "description": "周期收官时，合约尝试将周期储备的 5% 转入公共物品金库；另一次交易才将余额转给当前受益方 Protocol Guild。",
         "links": {
           "learn": "了解公共物品机制",
           "contracts": "查看金库合约"
@@ -309,7 +309,7 @@
     "links": {
       "learn": "了解演绎周期如何运作",
       "statistics": "查看协议统计",
-      "contracts": "查阅已验证合约"
+      "contracts": "查阅合约与验证状态"
     }
   },
   "jsonLd": {
@@ -335,7 +335,7 @@
       "alt": "Cosmic Signature · 每一笔，都在塑造签名",
       "title": "每一笔，都在塑造签名。",
       "subhead": "运行于 Arbitrum 的程序化链上艺术协议。",
-      "fact": "CC0 · 开源 · 7% 转拨至 Protocol Guild"
+      "fact": "CC0 · 开源 · 5% 公共物品金库份额"
     },
     "gallery": {
       "alt": "Cosmic Signature · 画廊",
@@ -363,7 +363,7 @@
       "eyebrow": "常见问题",
       "title": "值得直截了当回答的问题。",
       "subhead": "演绎周期、落笔、分配、锚定与协议协调。",
-      "fact": "CC0 · 开源 · 7% 转拨至 Protocol Guild"
+      "fact": "CC0 · 开源 · 5% 公共物品金库份额"
     },
     "howItWorks": {
       "alt": "Cosmic Signature · 运作原理",

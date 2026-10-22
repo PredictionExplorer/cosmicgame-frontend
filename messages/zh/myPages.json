@@ -131,7 +131,7 @@
       "share": "{total} 次落笔中的 {mine} 次",
       "caption": "周期收官时，协议会从本周期的全部落笔中选取 {eth} 次 ETH 星选与 {nft} 次 NFT 星选，同一笔落笔可再次获选。每次落笔计为一次。",
       "captionGeneric": "周期收官时，协议会从本周期的全部落笔中进行星选，同一笔落笔可再次获选。每次落笔计为一次。",
-      "weightedNote": "自 V3 周期起，ETH 池中的份额按每笔落笔当时的 ETH 价格加权。"
+      "weightedNote": "V3 的参与者 ETH 与 NFT 星选均按每笔当时未减免、未含溢价的 ETH 基础价格加权。"
     },
     "overview": {
       "title": "概览",

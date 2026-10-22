@@ -18,7 +18,7 @@
 import { createPublicClient, http, parseAbi, formatEther, type Abi } from 'viem';
 import { arbitrum } from 'viem/chains';
 
-import { protocolFacts } from '../content/protocol-facts';
+import { protocolFacts, whitePaperV13Facts } from '../content/protocol-facts';
 
 const RPC_URL =
   process.env.RPC_URL ?? process.env.NEXT_PUBLIC_RPC_URL ?? 'https://arb1.arbitrum.io/rpc';
@@ -27,6 +27,12 @@ const client = createPublicClient({ chain: arbitrum, transport: http(RPC_URL) })
 
 // lexicon-allow-start: verbatim on-chain ABI method names (sealed contract surface, cannot be renamed)
 const gameAbi = parseAbi([
+  'function mainPrizeNumCosmicSignatureNfts() view returns (uint256)',
+  'function cstBidPriceDeclineMultiplierChangeDivisor() view returns (uint256)',
+  'function bidCstRewardAmountMultiplier() view returns (uint256)',
+  'function roundLateBidDurationDivisor() view returns (uint256)',
+  'function roundLateBidPricePremiumAmountBaseMultiplier() view returns (uint256)',
+  'function roundLateBidPricePremiumAmountExponent() view returns (uint256)',
   'function mainEthPrizeAmountPercentage() view returns (uint256)',
   'function chronoWarriorEthPrizeAmountPercentage() view returns (uint256)',
   'function raffleTotalEthPrizeAmountForBiddersPercentage() view returns (uint256)',
@@ -94,10 +100,13 @@ function info(fact: string, note: string, live: string | number | bigint) {
 
 async function main(): Promise<void> {
   const game = protocolFacts.contractAddresses.proxy as `0x${string}`;
+  const blockNumber = await client.getBlockNumber();
+  info('blockNumber', 'all reads pinned to this block', blockNumber);
 
   // EIP-1967 implementation slot.
   const implementationSlot = await client.getStorageAt({
     address: game,
+    blockNumber,
     slot: '0x360894a13ba1a3210667c828492db98dca3e2076cc3735a920a3ca505d382bbc',
   });
   check(
@@ -110,7 +119,7 @@ async function main(): Promise<void> {
     functionName: string,
     abi: Abi = gameAbi as Abi,
     address: `0x${string}` = game,
-  ) => client.readContract({ address, abi, functionName }) as Promise<T>;
+  ) => client.readContract({ address, abi, functionName, blockNumber }) as Promise<T>;
 
   const [
     mainPercent,
@@ -209,6 +218,31 @@ async function main(): Promise<void> {
     formatEther(cstCeilingMinWei),
   );
   check('gestureMessageMaxLength', protocolFacts.gestureMessageMaxLength, messageMax);
+
+  const [mainNftCount, declineDivisor, rewardMultiplier, lateDivisor, lateBase, lateExponent] =
+    await Promise.all([
+      read<bigint>('mainPrizeNumCosmicSignatureNfts'), // lexicon-allow-abi
+      read<bigint>('cstBidPriceDeclineMultiplierChangeDivisor'), // lexicon-allow-abi
+      read<bigint>('bidCstRewardAmountMultiplier'), // lexicon-allow-abi
+      read<bigint>('roundLateBidDurationDivisor'), // lexicon-allow-abi
+      read<bigint>('roundLateBidPricePremiumAmountBaseMultiplier'), // lexicon-allow-abi
+      read<bigint>('roundLateBidPricePremiumAmountExponent'), // lexicon-allow-abi
+    ]);
+  check('mainPrizeNftsPerCycle', protocolFacts.mainPrizeNftsPerCycle, mainNftCount);
+  check('cstDeclineRateChangeDivisor', protocolFacts.cstDeclineRateChangeDivisor, declineDivisor);
+  check(
+    'Participation CST multiplier',
+    protocolFacts.participationCstRewardMultiplier,
+    rewardMultiplier,
+  );
+  check('lateWindowDurationDivisor', whitePaperV13Facts.lateWindowDurationDivisor, lateDivisor);
+  check('latePremiumBaseMultiplier', whitePaperV13Facts.latePremiumBaseMultiplier, lateBase);
+  check('latePremiumExponent', whitePaperV13Facts.latePremiumExponent, lateExponent);
+  check(
+    'currentNextCycleDelayDays',
+    protocolFacts.currentNextCycleDelayDays,
+    nextCycleDelay / 86400n,
+  );
 
   const [token, nft, randomWalk, prizesWallet, stakingCst, stakingRwlk, marketing, charity] =
     await Promise.all([

@@ -27,6 +27,7 @@ import {
 } from '@/components/home/observatory/ControlDesk';
 import { HomeStory } from '@/components/home/observatory/HomeStory';
 import { CycleClock } from '@/components/home/observatory/CycleClock';
+import { useLiveAllocationFacts } from '@/hooks/useLiveAllocationFacts';
 import { CalibrationStatus } from '@/components/home/observatory/CalibrationStatus';
 import { CycleStanding } from '@/components/home/observatory/CycleStanding';
 import { GesturePanel } from '@/components/home/observatory/GesturePanel';
@@ -138,6 +139,7 @@ const HomePage = ({
   initialTimingSample = null,
   initialRenderAtMs = 0,
 }: HomePageProps) => {
+  const { signatureNftCount } = useLiveAllocationFacts();
   const t = useTranslations('home');
   const locale = useLocale();
   const { account } = useActiveWeb3React();
@@ -699,6 +701,7 @@ const HomePage = ({
               claimWait={claimWait}
               onFinalize={() => void handleFinalize('clock')}
               ethUsdPrice={ethUsdPrice}
+              signatureNftCount={signatureNftCount}
               attachedAssetCount={attachedAssetCount}
               attachedAssetsHref={`#${ATTACHED_ASSETS_ID}`}
               // The alerts are about the clock reaching zero: they sit beside it.

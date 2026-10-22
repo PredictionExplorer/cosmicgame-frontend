@@ -36,7 +36,7 @@ export const aboutContentVi = {
     heading: 'Khởi nguồn',
     paragraphs: [
       `Cosmic Signature do ${WHITE_PAPER_SHARED.authorName} thiết kế, người cũng là tác giả của sách trắng. Dự án bắt đầu từ hai niềm tin: nghệ thuật tạo sinh thú vị nhất khi không có gì trong đó là tùy tiện, mỗi hình ảnh là sản phẩm của một quá trình vật lý mà ai cũng có thể chạy lại từ cùng một seed; và một giao thức giữ ETH thay cho người tham gia phải trả lời rõ ràng từng wei đi về đâu.`,
-      'Vì vậy, nghệ thuật ở đây là vật lý chứ không phải một mô hình: ba thiên thể dưới lực hấp dẫn Newton, được một quy trình mã nguồn mở kết xuất từ seed ghi trên chuỗi và phát hành theo CC0. Việc phân bổ là cơ học: hợp đồng thực thi mọi khoản phân bổ, và không ví nào của đội ngũ nhận ETH từ nét bút. Vai trò của đội ngũ cũng có giới hạn: quyền chủ sở hữu bị khóa khi chu kỳ đang chạy và sẽ được gỡ bỏ hoàn toàn khi các bản nâng cấp còn lại hoàn tất.',
+      'Chủ sở hữu vẫn có quyền đổi tham số và bản triển khai theo điều kiện của hợp đồng. Các thay đổi chính bị giới hạn khi chu kỳ chưa hoạt động, nhưng thời điểm kích hoạt, thời gian chờ chu kỳ sau và các hợp đồng phụ có quyền riêng. V3 không tự động chuyển quyền cho Hội đồng Vũ trụ hoặc tự động từ bỏ quyền chủ sở hữu.',
     ],
   },
   milestones: {
@@ -49,18 +49,18 @@ export const aboutContentVi = {
       },
       v2: {
         label: 'V2',
-        status: 'Phiên bản hiện tại',
-        text: 'Năm thay đổi rút ra từ cách giao thức được sử dụng, trong đó có CST tham gia tăng theo khoảng thời gian giữa hai nét bút và thời hạn dài hơn để người đặt nét bút cuối cùng hoàn tất chu kỳ.',
+        status: 'Phiên bản trước',
+        text: 'V2 là phiên bản trước và hiện đã được thay bằng V3.',
       },
       v3: {
         label: 'V3',
-        status: 'Dự kiến',
-        text: 'Một khoản phụ phí cho nét bút trong vài phút cuối trước hạn chót, để việc tham gia bền bỉ có trọng lượng hơn thời điểm phút chót. Bản này đang được phát triển trong kho mã công khai.',
+        status: 'Đã triển khai',
+        text: 'V3 đã được triển khai. Bản này thay đổi công thức và người nhận CST tham gia, trọng số của cả ETH Tinh tuyển và NFT Tinh tuyển dành cho người tham gia, tốc độ giảm chi phí CST, tỷ lệ ETH, số NFT của Phân bổ Signature và bổ sung phụ phí cuối chu kỳ.',
       },
       handover: {
         label: 'Sau đó',
-        status: 'Đã cam kết',
-        text: 'Khi thiết kế đã hoàn thiện, quyền kiểm soát của chủ sở hữu sẽ rời địa chỉ triển khai vĩnh viễn: chuyển cho Hội đồng Vũ trụ hoặc từ bỏ, với cách thức được công bố trước.',
+        status: 'Không tự động thực hiện',
+        text: 'Chủ sở hữu vẫn có quyền đổi tham số và bản triển khai theo điều kiện của hợp đồng. Các thay đổi chính bị giới hạn khi chu kỳ chưa hoạt động, nhưng thời điểm kích hoạt, thời gian chờ chu kỳ sau và các hợp đồng phụ có quyền riêng. V3 không tự động chuyển quyền cho Hội đồng Vũ trụ hoặc tự động từ bỏ quyền chủ sở hữu.',
       },
     },
   },
@@ -71,7 +71,7 @@ export const aboutContentVi = {
       { id: 'app', label: 'Ứng dụng Cosmic Signature', href: ABOUT_RESOURCE_HREFS.app },
       {
         id: 'contracts',
-        label: 'Hợp đồng Arbitrum đã xác minh',
+        label: 'Hợp đồng Arbitrum',
         href: ABOUT_RESOURCE_HREFS.contracts,
       },
       { id: 'code', label: 'Tài nguyên mã nguồn', href: ABOUT_RESOURCE_HREFS.code },

@@ -1,9 +1,5 @@
-import {
-  ethDistributionFacts,
-  isV3Mechanics,
-  nftAllocationFacts,
-  protocolFacts,
-} from '@/content/protocol-facts';
+import { nftAllocationFacts } from '@/content/protocol-facts';
+import { protocolFacts } from '@/content/protocol-facts';
 
 import { copyNumbers } from './copyNumbers';
 import type { HowItWorksText } from './structure';
@@ -44,19 +40,19 @@ export const howItWorksTextZh = {
       {
         title: '动态参与 CST',
         description:
-          '每一笔都可能铭刻 CST，数量按距上一笔经过时间的平方根计算：紧随上一笔的落笔可能铭刻 0 CST，沉寂越久，铭刻越多。',
+          '下一笔执行时，按间隔时长线性计算的参与 CST 会全额铭刻给上一笔参与者。首笔不发放，收官也不结算最后一笔之后的累计量。',
       },
       {
         title: '星选资格',
-        description: `每一笔都会计入一次星选资格。周期收官时，协议从中随机选出 ${eth} 个资格，均分周期储备中 ${ethDistributionFacts.stellarSelectionEthPercentage}% 的 ETH。`,
+        description: `每笔按当时未减免、未含溢价的 ETH 基础价格增加权重，CST 落笔也一样。收官时 ${eth} 次加权选择均分 ${protocolFacts.stellarSelectionEthPercentage}% ETH。`,
       },
       {
         title: 'Cosmic Signature NFT 星选',
-        description: `另有 ${nft} 个资格被选出，每个获配 ${cst} CST 与 1 枚 Cosmic Signature NFT。同一地址可能多次入选；资格再多，也不保证入选。`,
+        description: `另按同一权重规则进行 ${nft} 次放回选择，每次分配 ${cst} CST 与 1 枚 NFT。同一地址可多次获配，累计权重不保证获配。`,
       },
       {
         title: '签名分配',
-        description: `写下收官之笔的参与者可收官本周期，并取回周期储备中 ${ethDistributionFacts.mainEthPercentage}% 的 ETH、${cst} CST 与 ${nftAllocationFacts.mainPrizeNftPhrase.zh}。`,
+        description: `实际收官者获得 ${protocolFacts.mainEthPercentage}% ETH、合计 ${cst} CST 与 ${nftAllocationFacts.mainPrizeNftPhrase.zh}；收官之笔参与者享有专属收官窗口。`,
       },
     ],
   },
@@ -70,7 +66,7 @@ export const howItWorksTextZh = {
       },
       {
         title: 'ETH 价格逐笔上调',
-        body: `每一笔 ETH 落笔都会让下一笔 ETH 落笔价格上调 ${protocolFacts.ethGestureCostStepUpPercent}%。只有每个周期开启时的 ETH 校准窗口会让价格回落。`,
+        body: `每笔 ETH 落笔使下一笔不含溢价的基础价格上调 ${protocolFacts.ethGestureCostStepUpPercent}% 后取整，再加 1 wei。临近收官溢价单独计算，不抬高下一笔基础价格；最终报价可能随溢价窗口而变化。`,
       },
       {
         title: 'Gas 费另计',
@@ -92,13 +88,13 @@ export const howItWorksTextZh = {
     phases: [
       {
         label: '周期开启',
-        description: `新的演绎周期开启。ETH 与 CST 落笔价格各自在校准窗口中回落；CST 校准窗口从 ${protocolFacts.initialCstCalibrationWindowHours} 小时的基准出发，之后随参与变化。周期储备的起点，是上一周期滚入的部分。`,
+        description:
+          '达到启用时间后，周期等待首笔 ETH 落笔。ETH 开场基础价格在校准窗口中下降；首笔才启动收官倒计时与 CST 首个窗口。起始储备包括上一周期的留存。',
       },
       {
         label: '参与者落笔',
-        description: isV3Mechanics
-          ? '每一笔都会按当前时间增量延长收官倒计时。每笔 CST 落笔会以其成交价的两倍重启 CST 校准窗口，之后价格按恒定速率下降。'
-          : `每一笔都会按当前时间增量延长收官倒计时。ETH 落笔会使 CST 校准窗口缩短约 ${protocolFacts.cstCalibrationWindowDecreasePercentPerEthGesture}%，CST 落笔则使其延长约 ${protocolFacts.cstCalibrationWindowIncreasePercentPerCstGesture}%。`,
+        description:
+          '后续落笔把当前增量加到已存储的收官时间，即使它已过期；不会从现在重新计时。ETH 落笔尝试加快 CST 价格下降速率，CST 落笔减慢速率并重设窗口上限。',
       },
       {
         label: '收官倒计时归零',
@@ -106,21 +102,21 @@ export const howItWorksTextZh = {
       },
       {
         label: '周期收官',
-        description: `收官后，各项分配随即发放。收官者获得签名分配：周期储备的 ${ethDistributionFacts.mainEthPercentage}%、${cst} CST 与 ${nftAllocationFacts.mainPrizeNftPhrase.zh}。`,
+        description: `收官交易成功后，实际收官者获得 ${protocolFacts.mainEthPercentage}% ETH、合计 ${cst} CST 与 ${protocolFacts.mainPrizeNftsPerCycle} 枚编号连续的 NFT；其他轨道按条件发放。`,
       },
       {
         label: '星选',
-        description: `${eth} 位 ETH 星选获配者均分周期储备的 ${ethDistributionFacts.stellarSelectionEthPercentage}%。参与者 NFT 星选选出 ${nft} 位获配者，锚定 NFT 星选再从已锚定的 Random Walk NFT 中选出 ${anchored} 位，每位获配 ${cst} CST 与 1 枚 Cosmic Signature NFT。星选资格随每一笔计入；ETH 星选与参与者 NFT 星选都从本周期的全部落笔中选取，同一笔落笔可再次获选。`,
+        description: `参与者 ETH 与 NFT 星选都以每笔当时的 ETH 基础价格加权，并允许重复选择。ETH 轨道选择 ${eth} 次，NFT 轨道选择 ${nft} 次。Random Walk NFT 锚定轨道另按已锚定 NFT 资格选择 ${anchored} 次；没有该类锚定时跳过。`,
       },
       {
         label: '下一周期',
-        description: `其余 ${protocolFacts.compoundingReservePercentage}% 的周期储备作为滚动储备滚入下一周期，新周期以全新的校准窗口开启。`,
+        description: `通常约 ${protocolFacts.compoundingReservePercentage}% 储备留至下一周期，另有取整与条件转账影响。下一次启用按收官时的配置延迟安排，当前为 ${protocolFacts.currentNextCycleDelayDays} 天，可由所有者调整。`,
       },
     ],
   },
   payoff: {
     heading: '每个周期都以一幅签名收官',
-    body: `每一次落笔都在塑造本周期的作品。周期收官时，这幅签名会铭刻为 Cosmic Signature NFT，随签名分配交给收官者：倒计时归零后的 ${protocolFacts.finalGestureExclusivityHours} 小时内，只有写下收官之笔的参与者可以收官，此后任何人都可收官。`,
+    body: `收官时会铭刻各轨道的 NFT。签名分配包含 ${protocolFacts.mainPrizeNftsPerCycle} 枚编号连续的 NFT 和合计 ${cst} CST。收官之笔参与者享有 ${protocolFacts.finalGestureExclusivityHours} 小时专属窗口，之后任何人都可收官并取得该分配。`,
     linkLabel: '查看这幅签名',
   },
   stepByStep: {
@@ -141,7 +137,7 @@ export const howItWorksTextZh = {
         title: '查看落笔价格',
         highlights: [
           '落笔前，先确认当前的 ETH 或 CST 落笔价格。',
-          '查看参与 CST 的实时预览；数量会随距上一笔的时间长短而变化。',
+          '核对参与 CST 的收取对象：V3 在你的下一笔执行时向上一笔参与者发放，而非保证立即向你铭刻。',
           '确保钱包中除落笔价格外，还留有少量 ETH 用作 Gas 费；确认前，钱包会显示具体金额。',
         ],
       },
@@ -162,7 +158,7 @@ export const howItWorksTextZh = {
     tips: [
       {
         title: '两个校准窗口',
-        body: `ETH 落笔价格只在每个周期开启时的校准窗口中回落一次。CST 落笔价格则在每一笔 CST 落笔后开启新的窗口：从刚支付价格的两倍（至少 ${protocolFacts.cstCalibrationCeilingMinCst} CST）逐步降至零。`,
+        body: 'CST 基础价格随时间下降。CST 落笔后，上限重设为不含溢价的基础花费两倍、配置下限及新下降速率乘以 180 秒三者中的最大值。临近收官溢价另计，并可能使最终价格上升。',
       },
       {
         title: '每枚 Random Walk NFT 仅可使用一次',

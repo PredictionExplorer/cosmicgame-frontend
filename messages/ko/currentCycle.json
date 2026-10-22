@@ -57,12 +57,13 @@
       "fixedCstEach": "각 1,000 CST",
       "nft": "Cosmic Signature NFT 1개",
       "nftEach": "각 Cosmic Signature NFT 1개",
-      "attachedTokens": "첨부 토큰 (있는 경우)"
+      "attachedTokens": "첨부 토큰 (있는 경우)",
+      "nftCount": "{count, plural, other {Cosmic Signature NFT #개}}"
     },
     "cards": {
       "signature": {
         "name": "시그니처 배분",
-        "tooltip": "마감 시각이 지나면 최종 제스처를 남긴 참여자가 사이클을 마감할 수 있습니다. 시그니처 배분에는 ETH, 1,000 CST, Cosmic Signature NFT 1개와 첨부 토큰이 포함됩니다. 최종 제스처 참여자가 우선 마감 구간 안에 마감하지 않으면 마감 실행자가 이 배분을 받습니다."
+        "tooltip": "마감 수령자는 연속 ID의 Cosmic Signature NFT 3개와 총 1,000 CST를 받습니다. 마감 권한에는 우선 마감 구간과 공개 마감 구간이 적용됩니다."
       },
       "chronoWarrior": {
         "name": "시간의 전사 배분",
@@ -79,7 +80,7 @@
       },
       "publicGoods": {
         "name": "공공재",
-        "tooltip": "모든 사이클 준비금의 {percent}%는 170명 이상의 이더리움 핵심 기여자를 위한 자금 지원 메커니즘인 Protocol Guild로 전달됩니다.",
+        "tooltip": "{percent}%는 공공재 금고에 배분됩니다. 누구나 별도로 잔액을 설정된 수령처인 Protocol Guild에 전달할 수 있습니다.",
         "recipientLabel": "Protocol Guild"
       },
       "nftStellar": {
@@ -136,10 +137,10 @@
   "rules": {
     "howItWorks": "작동 원리",
     "participation": "제스처를 남기면 <em>동적 참여 CST</em>를 각인할 수 있습니다. 각인량은 이전 제스처 이후 흐른 시간을 바탕으로 제곱근 공식에 따라 정해집니다.",
-    "participationV3": "제스처를 남기면 <em>동적 참여 CST</em>를 각인할 수 있습니다. 각인량은 이전 제스처 이후 흐른 시간에 따라 일정한 속도로 쌓입니다.",
+    "participationV3": "다음 제스처가 이전 참여자에게 경과 시간에 선형으로 비례하는 <em>동적 참여 CST</em>를 각인합니다. 첫 제스처와 마감에서는 추가 지급하지 않습니다.",
     "calibration": "ETH 제스처는 CST 보정 구간을 약 {decreasePercent}% 단축하고, CST 제스처는 약 {increasePercent}% 연장합니다.",
     "stellarSelection": "제스처 한 건마다 별빛 선정 자격이 하나씩 기록됩니다. 선정된 {ethEntries}건의 자격에는 사이클 준비금의 {rafflePercent}%가 배분됩니다. 추가로 선정된 수령자 {nftEntries}명과 Random Walk NFT 앵커링 보유자 {anchorHolders}명은 Cosmic Signature NFT를 받습니다.",
-    "stellarSelectionV3": "제스처 한 건마다 별빛 선정 자격이 하나씩 기록되며, 각 자격의 가중치는 그 순간의 ETH 비용입니다. 선정된 {ethEntries}건의 자격에는 사이클 준비금의 {rafflePercent}%가 배분됩니다. 추가로 선정된 수령자 {nftEntries}명과 Random Walk NFT 앵커링 보유자 {anchorHolders}명은 Cosmic Signature NFT를 받습니다.",
+    "stellarSelectionV3": "두 참여자 경로 모두 비용 감소와 할증을 제외한 ETH 기본 비용을 가중치로 사용하며 CST 제스처도 당시 ETH 기본 비용을 사용합니다. ETH {rafflePercent}%를 {ethEntries}건이 나누며, 참여자 NFT {nftEntries}건과 활성 Random Walk NFT 최대 {anchorHolders}건의 선정에 NFT와 CST를 배분합니다. 중복 선정이 가능합니다.",
     "publicGoods": "Protocol Guild는 사이클마다 사이클 준비금의 {percent}%(최소 {amount} ETH)를 받습니다.",
     "learnMore": "사이클 작동 원리"
   },

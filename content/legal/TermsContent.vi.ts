@@ -1,12 +1,10 @@
 import { protocolFacts } from '@/content/protocol-facts';
 
+import { formatCount } from '@/utils/format/numbers';
+
 import type { TermsCopy } from './TermsContent';
 
-const cstAmount = protocolFacts.specialAllocationCst.toLocaleString('vi-VN');
-const cstWindowDecrease =
-  protocolFacts.cstCalibrationWindowDecreasePercentPerEthGesture.toLocaleString('vi-VN');
-const cstWindowIncrease =
-  protocolFacts.cstCalibrationWindowIncreasePercentPerCstGesture.toLocaleString('vi-VN');
+const cstAmount = formatCount(protocolFacts.specialAllocationCst, 'vi');
 
 export const termsCopyVi = {
   title: 'Điều khoản dịch vụ',
@@ -60,12 +58,12 @@ export const termsCopyVi = {
         {
           id: 'dynamic-cst',
           subtitle: 'Lần khắc CST động',
-          text: 'Lượng CST tham gia được khắc khi đặt nét bút không cố định. Lượng này phụ thuộc vào khoảng thời gian đã trôi qua kể từ nét bút trước và được tính theo công thức căn bậc hai. Hai nét bút quá gần nhau có thể khiến lượng CST được khắc bằng 0.',
+          text: 'Trong V3, nét bút tiếp theo khắc toàn bộ CST tham gia cho người đặt nét bút trước. Số lượng tăng tuyến tính theo thời gian giữa hai nét bút. Nét bút đầu tiên của chu kỳ không khắc CST theo quy tắc này, và hoàn tất không thanh toán thêm khoảng thời gian cuối cho người đặt nét bút cuối cùng. Nếu cả hai nét bút thuộc cùng một địa chỉ, địa chỉ đó nhận CST.',
         },
         {
           id: 'cst-window',
           subtitle: 'Cửa sổ hiệu chỉnh CST',
-          text: `Chi phí nét bút CST giảm dần qua một cửa sổ hiệu chỉnh được lưu trên chuỗi. Mỗi nét bút CST tăng cửa sổ đó khoảng ${cstWindowIncrease}%, và mỗi nét bút ETH giảm nó khoảng ${cstWindowDecrease}%.`,
+          text: 'V3 lưu tốc độ giảm chi phí CST; độ dài cửa sổ được tính từ tốc độ và mức trần. Nét bút ETH thử tăng tốc độ theo rate + floor(rate / 100), còn nét bút CST giảm theo rate - floor(rate / 101). Nếu mức tăng vi phạm điều kiện thời lượng tối thiểu, nó không được áp dụng. Nét bút CST đặt lại mức trần bằng giá trị lớn nhất giữa hai lần chi phí CST cơ sở chưa có phụ phí, mức tối thiểu đã cấu hình, và tốc độ mới nhân 180 giây. Bạn vẫn có thể đặt nét bút tiếp theo ngay lập tức.',
         },
         {
           id: 'smart-contract',
@@ -91,12 +89,12 @@ export const termsCopyVi = {
         {
           id: 'distribution',
           subtitle: 'Phân phối phân bổ',
-          text: `Phân bổ được phân phối tự động theo quy tắc của hợp đồng thông minh. Trong một chu kỳ điển hình, ${protocolFacts.typicalNftsPerCycle} Cosmic Signature NFT và ${protocolFacts.typicalCstImprintsPerCycle.toLocaleString('vi-VN')} CST được khắc qua các luồng phân bổ dưới đây.`,
+          text: `Khi có đủ các luồng, một chu kỳ khắc ${protocolFacts.typicalNftsPerCycle} Cosmic Signature NFT và ${formatCount(protocolFacts.typicalCstImprintsPerCycle, 'vi')} CST trong các phân bổ cố định. Phân bổ Signature gồm ${protocolFacts.mainPrizeNftsPerCycle} NFT nhưng chỉ một khoản tổng cộng ${formatCount(protocolFacts.specialAllocationCst, 'vi')} CST. Chiến binh Thời gian, Quán quân Bền bỉ và nét bút CST cuối cùng mỗi luồng có một NFT cùng CST tương ứng; hai luồng NFT Tinh tuyển bổ sung phần còn lại. Nếu không có nét bút CST hoặc Random Walk NFT neo giữ thì luồng tương ứng bị bỏ qua. CST tham gia được tính riêng.`,
         },
         {
           id: 'signature',
           subtitle: 'Phân bổ Signature',
-          text: `Người tham gia đặt nét bút cuối cùng có thể nhận về ${protocolFacts.mainEthPercentage}% ETH, ${cstAmount} CST ghi nhận, một Cosmic Signature NFT và các token đính kèm trong chu kỳ, nếu có.`,
+          text: `Địa chỉ hoàn tất chu kỳ thành công nhận ${protocolFacts.mainEthPercentage}% Dự trữ chu kỳ, tổng cộng ${formatCount(protocolFacts.specialAllocationCst, 'vi')} CST và ${protocolFacts.mainPrizeNftsPerCycle} Cosmic Signature NFT có ID liên tiếp. Trong ${protocolFacts.finalGestureExclusivityHours} giờ đầu sau thời điểm hoàn tất, chỉ người đặt nét bút cuối cùng được thực hiện; sau đó bất kỳ ai cũng có thể hoàn tất và tự nhận phân bổ.`,
         },
         {
           id: 'chrono',
@@ -116,7 +114,7 @@ export const termsCopyVi = {
         {
           id: 'eth-selection',
           subtitle: 'ETH Tinh tuyển',
-          text: `${protocolFacts.ethStellarSelectionRecipients} người tham gia được chọn chia ${protocolFacts.stellarSelectionEthPercentage}% ETH từ Dự trữ chu kỳ.`,
+          text: `Khi hoàn tất, giao thức thử chuyển ${protocolFacts.publicGoodsPercentage}% Dự trữ chu kỳ vào Kho Hàng hóa công. Sau đó bất kỳ ai cũng có thể dùng một giao dịch riêng để chuyển số dư kho tới đơn vị thụ hưởng hiện tại là Protocol Guild. Chủ sở hữu có thể thay đổi đơn vị thụ hưởng. Nếu chuyển từ giao thức vào kho thất bại, phần này có thể ở lại dự trữ mà không hủy hoàn tất.`,
         },
         {
           id: 'nft-selection',
@@ -136,7 +134,7 @@ export const termsCopyVi = {
         {
           id: 'public-goods',
           subtitle: 'Hàng hóa công',
-          text: `${protocolFacts.publicGoodsPercentage}% ETH được chuyển đến Protocol Guild, đơn vị thụ hưởng Hàng hóa công hiện tại.`,
+          text: 'Cả ETH Tinh tuyển và NFT Tinh tuyển dành cho người tham gia đều dùng trọng số từng nét bút. Trọng số là chi phí ETH cơ sở tại thời điểm đó, chưa giảm bằng Random Walk NFT và chưa cộng phụ phí cuối chu kỳ. Nét bút CST dùng cùng chi phí ETH cơ sở đương thời. Các lượt chọn có hoàn lại, nên một địa chỉ có thể được chọn nhiều lần. Tinh tuyển NFT neo giữ xét riêng các Random Walk NFT đang neo giữ.',
         },
         {
           id: 'compounding',

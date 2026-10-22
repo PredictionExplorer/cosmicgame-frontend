@@ -21,7 +21,7 @@ export const securityCopyZh: SecurityCopy = {
     },
     contractsHeading: 'Arbitrum One 上的核心合约',
     contractsIntro:
-      '每个合约公开的源代码在 Sourcify 上均为完全匹配（核对日期：{date}），因此链上的字节码就是你能读到的代码。<contracts>合约页面</contracts>列出了所有地址。',
+      '配套合约与历史 V2 实现的公开匹配记录于 {date} 核对。当前 V3 尚未在 Sourcify 验证；旧版本的记录不能代替当前实现的证据。<contracts>合约页面</contracts>列出各地址及状态。',
     explorerLink: 'Arbiscan',
     sourcifyLink: 'Sourcify',
     copyLabel: '复制 {value}',
@@ -45,7 +45,8 @@ export const securityCopyZh: SecurityCopy = {
       },
       {
         term: '周期进行中',
-        detail: '从周期启用（发生在首笔落笔之前）到该周期收官，核心参数都处于锁定状态。',
+        detail:
+          '核心设置与升级要求当前时间早于周期启用时间。只要首笔尚未执行，所有者仍可推迟启用时间，从而重新进入可维护窗口。外围权限另有各自规则。',
       },
       {
         term: '任何时候',
@@ -55,12 +56,12 @@ export const securityCopyZh: SecurityCopy = {
       {
         term: '升级',
         detail:
-          '协议运行在 UUPS 代理之后，因此地址始终不变。所有者只能在周期之间将其指向新代码；当前使用的是上方列出的、已公开验证的 V2 实现。',
+          '协议运行在 UUPS 代理之后，升级会更换实现而保留代理地址。当前实现为 V3；升级须由所有者在合约允许的未启用状态下执行。源码验证与安全审计是不同事项，必须分别核对。',
       },
       {
         term: '宇宙议会',
         detail:
-          '计划在协议稳定后将所有权移交宇宙议会。此后，参数只能通过达到协调法定权重的协议协调提案变更。',
+          '宇宙议会只能行使实际授予它的权限，目前并不拥有核心协议。V3 不会自动移交或放弃所有权；每个所有者角色都需要单独的链上操作。',
       },
     ],
   },
@@ -104,7 +105,7 @@ export const securityCopyZh: SecurityCopy = {
   verify: {
     heading: '自行验证',
     paragraph:
-      '最有力的安全信号，是应用显示的内容、已验证合约、源代码与 Arbitrum 实时数据彼此一致。这些都可以在不依赖本网站的情况下自行核对。',
+      '将应用显示与 Arbitrum 实时状态、当前安装的实现、源码及验证范围交叉核对。历史版本的匹配或审计记录不会自动覆盖升级后的实现。',
     resources: [
       {
         link: 'contracts',

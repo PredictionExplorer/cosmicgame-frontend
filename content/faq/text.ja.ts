@@ -7,17 +7,6 @@ import type { FAQText } from './structure';
 const cst = formatCount(protocolFacts.specialAllocationCst, 'ja');
 const outreachCst = formatCount(protocolFacts.outreachReserveCst, 'ja');
 
-const ELAPSED_JA: Record<
-  (typeof protocolFacts.dynamicCstRewardExamples)[number]['elapsed'],
-  string
-> = {
-  '0 seconds': '0秒',
-  '1 second': '1秒',
-  '60 seconds': '60秒',
-  '1 hour': '1時間',
-  '1 day': '1日',
-};
-
 /** Japanese FAQ copy, keyed by the skeleton in structure.ts. */
 export const faqTextJa = {
   'getting-started': {
@@ -31,12 +20,13 @@ export const faqTextJa = {
       },
       'how-does-the-bidding-game-work': {
         question: 'パフォーマンス・サイクルはどのように進みますか？',
-        answer: `各サイクルは、最初の一筆のためのETH調律期間で始まります。その最初の一筆がサイクル確定時刻を動かします。現在の既定はおよそ24時間です。その後のETHまたはCSTの一筆は、保存された確定時刻に現在の時間増分を加えます。増分はちょうど一時間から始まり、確定したサイクルごとに${protocolFacts.cycleTimeIncrementIncreasePercentPerCycle}%ずつ大きくなります。サイクル確定時刻を過ぎると、最後の一筆を入れた参加者には、サイクルを確定してシグネチャー配分を受け取るための${protocolFacts.finalGestureExclusivityHours}時間の優先期間があります。サイクルが実際に確定するまで、一筆は引き続き入れられます。`,
+        answer:
+          'サイクル最初の一筆はETHで入れ、確定時計を始めます。以降の一筆は、時刻を過ぎた後も保存済みの確定時刻に現在の加算時間を足します。現在時刻から時計を再開するわけではありません。確定処理が成功するまでは一筆を入れられます。',
       },
       'what-type-of-gestures-are-available': {
         question: 'どんな種類の一筆がありますか？',
         answer:
-          '一筆はETHまたはCSTトークン（ERC-20）で入れられます。各サイクルの最初の一筆はETH一筆でなければなりません。その後はETH一筆とCST一筆を自由に混ぜられます。Random Walk NFTをETH一筆に添付すると、ETH一筆の費用が50%引き下げられます。Cosmic Signature NFT（ERC-721）は配分と係留のためのアセットで、一筆の支払いには使えません。CST一筆には固有の調律期間があります。期間が進む間にCST一筆の費用は下がり、期間の長さ自体もETHまたはCSTの一筆ごとに変わります。',
+          'ETHとCSTの基本費用は別々のルールに従います。開始時のETH費用は調律期間中に下がり、ETH一筆ごとに次の基本費用が上がります。CST費用は保存された下降速度で下がります。確定時刻が近づくと両方に終盤の加算が付きますが、次の基本費用や星選のウェイトは増やしません。サイクル最初の一筆はETHで入れ、確定時計を始めます。以降の一筆は、時刻を過ぎた後も保存済みの確定時刻に現在の加算時間を足します。現在時刻から時計を再開するわけではありません。確定処理が成功するまでは一筆を入れられます。各Random Walk NFTはETH費用の割引に一度だけ使えます。コントラクトは所有権を確認して使用済みと記録し、NFT自体は移しません。係留とは別の権利です。',
       },
       'can-i-participate-without-nfts': {
         question: 'NFTを一つも持っていなくても参加できますか？',
@@ -50,12 +40,13 @@ export const faqTextJa = {
       },
       'how-long-does-each-round-last': {
         question: '各パフォーマンス・サイクルはどれくらい続きますか？',
-        answer: `各サイクルは最初のETH一筆が入れられたときに始まり、その時点でサイクル確定時刻は現在の時間増分のおよそ24倍（開始時はおよそ一日）に設定されます。その後の一筆はそれぞれ現在の時間増分を加えます。増分はちょうど一時間から始まり、確定したサイクルごとに${protocolFacts.cycleTimeIncrementIncreasePercentPerCycle}%ずつ大きくなります。確定の前に一筆が届き続ければ、サイクルは一日よりずっと長く続くこともあります。`,
+        answer:
+          'サイクル最初の一筆はETHで入れ、確定時計を始めます。以降の一筆は、時刻を過ぎた後も保存済みの確定時刻に現在の加算時間を足します。現在時刻から時計を再開するわけではありません。確定処理が成功するまでは一筆を入れられます。',
       },
       'can-i-place-multiple-gestures': {
         question: '一つのサイクルで複数の一筆を入れられますか？',
         answer:
-          'はい。各一筆はウォレットに参加CSTを刻印することがあり、星選の対象件数を増やし、変化し続けるサイクルのシグネチャーを形づくります。参加CSTの量は動的で、前の一筆からどれだけ時間が経ったかに依存します。静かな時間が長いほど、続けざまの一筆より大きなCSTの刻印になります。',
+          'V3では、次の一筆が直前の一筆を入れた参加者に参加CSTの全額を刻印します。数量は二つの一筆の間の時間に比例します。サイクル最初の一筆ではこのCSTは発生せず、確定時にも最後の参加者の未精算区間へ追加の参加CSTは支払われません。両方の一筆が同じアドレスなら、そのアドレス自身が受け取ります。',
       },
     },
   },
@@ -65,24 +56,30 @@ export const faqTextJa = {
     items: {
       'what-is-the-main-allocation': {
         question: 'シグネチャー配分とは何ですか？',
-        answer: `シグネチャー配分は、サイクルを確定した参加者が受け取ります。サイクル確定時刻を過ぎてから${protocolFacts.finalGestureExclusivityHours}時間は、最後の一筆を入れた参加者だけが確定でき、その後は誰でも確定できます。Cosmic Signature NFT 1点、${cst} CSTの功労CST、サイクル準備金の${protocolFacts.mainEthPercentage}%のETH、そしてサイクル中に参加者の一筆に添付されたトークンやNFTが含まれます。`,
+        answer: `確定処理を成功させたアドレスが、サイクル準備金の${protocolFacts.mainEthPercentage}%、合計${formatCount(protocolFacts.specialAllocationCst, 'ja')} CST、連続したIDのCosmic Signature NFT${protocolFacts.mainPrizeNftsPerCycle}点を受け取ります。確定時刻後の最初の${protocolFacts.finalGestureExclusivityHours}時間は最後の一筆の参加者だけが実行でき、その後は誰でも実行して自分で受け取れます。`,
       },
       'what-rewards-per-bid': {
         question: '一筆ごとに何を受け取れますか？',
-        answer: `すべての一筆は、サイクル終了時の星選の対象を1件記録し、持久チャンピオンと時の戦士のトラックに向けた持久の期間への寄与を更新し、参加CSTを刻印することがあります。参加CSTは平方根の式で計算されます：${protocolFacts.dynamicCstRewardFormula}。平たく言えば、量は前の一筆からの時間とともに増えますが、増え方は緩やかになっていきます。ごく短い間隔の一筆は0 CSTになることがあり、間隔が長ければずっと大きなCSTの刻印になります。`,
+        answer:
+          'V3では、次の一筆が直前の一筆を入れた参加者に参加CSTの全額を刻印します。数量は二つの一筆の間の時間に比例します。サイクル最初の一筆ではこのCSTは発生せず、確定時にも最後の参加者の未精算区間へ追加の参加CSTは支払われません。両方の一筆が同じアドレスなら、そのアドレス自身が受け取ります。',
       },
       'how-does-the-stellarSelection-work': {
         question: '星選はどのような仕組みですか？',
-        answer: `一筆ごとに星選の対象が1件記録されます。各サイクルの終わりに、スマートコントラクトがプールから無作為に対象を選びます。${protocolFacts.ethStellarSelectionRecipients}件の選定がサイクル準備金の${protocolFacts.stellarSelectionEthPercentage}%をETHで分け合い、${protocolFacts.nftStellarSelectionRecipients}件の選定がそれぞれ${cst} CSTとCosmic Signature NFTを受け取り、係留中のRandom Walk NFTの中からの${protocolFacts.anchoredRwlkNftSelectionRecipients}件の選定も${cst} CSTとCosmic Signature NFTを受け取ります。選定は復元抽出で行われるため、同じアドレスが一つのサイクルで複数回選ばれることもあります。選ばれる頻度は入れた一筆の数に応じて高まります。`,
+        answer:
+          '参加者向けのETH星選とNFT星選は、どちらも一筆ごとのウェイトを使います。ウェイトは、その時点のETH基本費用からRandom Walk NFTによる割引と終盤の加算を除いた値です。CST一筆にも同時点のETH基本費用を使います。復元を伴う選定なので、同じアドレスが複数回選ばれることがあります。係留NFT星選は、係留中のRandom Walk NFTを別に対象とします。',
       },
       'how-random-selection-works': {
         question: '無作為な選定はどのように行われますか？',
         answer:
-          '星選は、サイクル確定時のオンチェーンの乱数源——Arbitrumが提供するブロックの文脈と予備のエントロピー源——を使います。参加者の星選は対象件数で重み付けされます。一筆ごとに対象が1件加わるので、一筆が多いほど選ばれる頻度が高まります。係留NFT星選は別のもので、参加者の一筆による対象プールではなく、係留中のRandom Walk NFTの対象資格に基づきます。',
+          '参加者向けのETH星選とNFT星選は、どちらも一筆ごとのウェイトを使います。ウェイトは、その時点のETH基本費用からRandom Walk NFTによる割引と終盤の加算を除いた値です。CST一筆にも同時点のETH基本費用を使います。復元を伴う選定なので、同じアドレスが複数回選ばれることがあります。係留NFT星選は、係留中のRandom Walk NFTを別に対象とします。',
       },
       'how-do-i-claim-my-allocation': {
         question: '受領者になったら、配分はどう受け取りますか？',
-        answer: `受領者はアプリとプロトコルのコントラクトを通じて配分を受け取ります。最後の一筆の参加者には、サイクル確定時刻の後、サイクルを確定してシグネチャー配分を受け取るための${protocolFacts.finalGestureExclusivityHours}時間の優先時間があります。\n\nその後は公開確定期間が始まります。誰でもサイクルを確定でき、スマートコントラクトは確定した人をサイクル受領者として扱います。確定実行者がシグネチャー配分全体（ETHの分、${cst} CSTの刻印、Cosmic Signature NFT、添付されたアセットへの優先権）を受け取ります。\n\n二次的なETHや、添付されたトークン・NFTの配分は配分ウォレットのエスクローに置かれ、既定で${protocolFacts.secondaryRetrievalTimeoutWeeks}週間の別の受け取りタイムアウトがあります。それが切れると、コントラクトは未受け取りの配分を誰でも自分のものとして受け取ることを許します。早めに受け取ってください。`,
+        answer: `確定処理を成功させたアドレスが、サイクル準備金の${protocolFacts.mainEthPercentage}%、合計${formatCount(protocolFacts.specialAllocationCst, 'ja')} CST、連続したIDのCosmic Signature NFT${protocolFacts.mainPrizeNftsPerCycle}点を受け取ります。
+
+確定時刻後の最初の${protocolFacts.finalGestureExclusivityHours}時間は最後の一筆の参加者だけが実行でき、その後は誰でも実行して自分で受け取れます。
+
+二次ETH配分と添付資産は配分ウォレットから別に受け取ります。現在の期限である${protocolFacts.secondaryRetrievalTimeoutWeeks}週間を過ぎると、未受領の資産を誰でも自分のために受け取れます。期限だけで自動送付されるわけではありません。`,
       },
       'how-does-anchoring-work': {
         question: '係留はどのような仕組みですか？',
@@ -94,12 +91,12 @@ export const faqTextJa = {
       },
       'how-many-nfts-minted': {
         question: '各サイクルで刻印されるCosmic Signature NFTはいくつですか？',
-        answer: `大多数のサイクルでは${protocolFacts.typicalNftsPerCycle}点のCosmic Signature NFTが刻印されます。シグネチャー配分の受領者に1点、最後のCST一筆の受領者に1点、持久チャンピオンに1点、時の戦士に1点、NFT星選の受領者に${protocolFacts.nftStellarSelectionRecipients}点、そして係留NFT星選で選ばれたRandom Walk NFT係留者に${protocolFacts.anchoredRwlkNftSelectionRecipients}点です。これら${protocolFacts.typicalNftsPerCycle}件のNFT配分にはそれぞれ${cst} CSTも含まれます。サイクルにCST一筆がなかったり、係留中のRandom Walk NFTがなかったりすると、そのサイクルでは該当する刻印は行われません。`,
+        answer: `すべてのトラックがある場合、サイクルは${protocolFacts.typicalNftsPerCycle}枚のCosmic Signature NFTと固定配分の${formatCount(protocolFacts.typicalCstImprintsPerCycle, 'ja')} CSTを刻印します。シグネチャー配分はNFT${protocolFacts.mainPrizeNftsPerCycle}点に対して、合計${formatCount(protocolFacts.specialAllocationCst, 'ja')} CSTを一度だけ受け取ります。時の戦士、持久チャンピオン、最後のCST一筆には各1点と対応するCSTがあり、二つのNFT星選が残りを加えます。CST一筆や係留中のRandom Walk NFTがなければ該当トラックは省略されます。参加CSTは別です。`,
       },
       'what-happens-to-remaining-eth': {
         question: 'サイクル準備金に残ったETHはどうなりますか？',
         answer:
-          'サイクル準備金のおよそ半分は、累積準備金として次のパフォーマンス・サイクルへ持ち越され、次のサイクルの開始残高を増やします。プロトコルは引き出すのではなく、蓄えていきます。',
+          'ETHのおよそ半分が次のサイクルへ持ち越されます。整数の丸め、省略されたトラック、送付失敗により残高が増える場合があります。次の開始準備金が前より大きくなる保証はありません。',
       },
       'what-happens-to-attached-assets': {
         question: '一筆に添付されたトークンやNFTはどうなりますか？',
@@ -107,8 +104,7 @@ export const faqTextJa = {
       },
       'who-receives-10-percent': {
         question: 'サイクル準備金からの公共財配分は誰が受け取りますか？',
-        answer:
-          'サイクル準備金の7%は確定時に公共財金庫へ送られ、その後は誰でも金庫の残高を設定済みの公共財の受け手へ送ることができます。現在の受け手はProtocol Guild——170人以上のEthereumコア貢献者の共同資金支援メカニズムです。現在、受け手のアドレスはプロトコルの所有者が設定していますが、所有権が評議会の管理下に移った後は、宇宙評議会がそれを決める構想です。',
+        answer: `確定時に、プロトコルはサイクル準備金の${protocolFacts.publicGoodsPercentage}%を公共財金庫へ送ろうとします。その後、誰でも別のトランザクションで残高を現在の受け手であるProtocol Guildへ送れます。所有者は受け手を変更できます。プロトコルから金庫への送付が失敗しても、確定を取り消さずにその分を準備金へ残す場合があります。`,
       },
     },
   },
@@ -119,28 +115,32 @@ export const faqTextJa = {
       'how-does-price-increase': {
         question: '一筆の費用はサイクルの中でどう変わりますか？',
         answer:
-          'ETHとCSTの一筆の費用は、オンチェーンで別々の道筋をたどります。ETH一筆の費用はETH調律期間を使い、その後はETH一筆ごとに段階的に上がります。CST一筆の費用は現在のCST調律期間を通じて下がります。このCSTの期間は固定ではありません。ETH一筆はわずかに短くし、CST一筆はわずかに長くするので、費用の道筋はETHとCSTの参加のバランスに反応します。',
+          'ETHとCSTの基本費用は別々のルールに従います。開始時のETH費用は調律期間中に下がり、ETH一筆ごとに次の基本費用が上がります。CST費用は保存された下降速度で下がります。確定時刻が近づくと両方に終盤の加算が付きますが、次の基本費用や星選のウェイトは増やしません。',
       },
       'what-is-dutch-auction': {
         question: '調律期間とは何ですか？',
-        answer: `調律期間とは、一筆の費用が調律上限から既知の長さの間に線形に下がっていく、費用決定の期間です。ETH一筆とCST一筆は、下限の異なる別々の期間を使います。ETH一筆の費用は上限の約1/${protocolFacts.ethCalibrationFloorDivisor}の下限まで下がり、CST一筆の費用は${protocolFacts.cstCalibrationFloorCst}まで下がりきります。期間が完全に経過すれば、費用なしのCST一筆も可能です。CST調律期間は現在${protocolFacts.initialCstCalibrationWindowHours}時間の基準から始まりますが、オンチェーンに保存され、一筆ごとに変わります。CST一筆はそれぞれ期間を約${protocolFacts.cstCalibrationWindowIncreasePercentPerCstGesture}%増やし、ETH一筆はそれぞれ約${protocolFacts.cstCalibrationWindowDecreasePercentPerEthGesture}%減らします。`,
+        answer:
+          'V3が保存するのはCST費用の下降速度で、期間の長さは速度と上限から求めます。ETH一筆はrate + floor(rate / 100)への増加を試み、CST一筆はrate - floor(rate / 101)へ減少させます。最短期間の条件に反する増加は行いません。CST一筆の後の上限は、加算前のCST基本費用の2倍、設定された最小値、新しい速度と180秒の積のうち最大の値です。次の一筆をすぐに入れることはできます。',
       },
       'how-is-participation-cst-calculated': {
         question: '参加CSTはどのように計算されますか？',
-        answer: `参加CSTは、前の一筆からの経過時間に基づく平方根の式を使います：${protocolFacts.dynamicCstRewardFormula}。平方根を使うため、前の一筆から時間が空くほど数量は増えますが、増加のペースは次第に緩やかになります。\n\n開始時のパラメーター（時間増分がちょうど一時間）では、例はおよそ${protocolFacts.dynamicCstRewardExamples.map((example) => `${ELAPSED_JA[example.elapsed]}後に${example.cst} CST`).join('、')}です。増分は確定したサイクルごとに${protocolFacts.cycleTimeIncrementIncreasePercentPerCycle}%ずつ大きくなるので、実際の量は時間とともにこれらよりわずかに下へずれていきます。一筆が届いた瞬間の正確な量は、アプリのライブプレビューとコントラクトが基準です。`,
+        answer: `参加CSTの最小単位での数量は${protocolFacts.dynamicCstRewardFormula}です。経過時間は秒、サイクルの加算時間はマイクロ秒で扱います。CST数量で表示するには結果を10^18で割ります。
+
+次の一筆が直前の参加者へ全額を刻印します。最初の一筆では発生せず、確定時にも最後の区間は追加精算されません。`,
       },
       'why-minimum-cst-reward-protection': {
         question: '最低参加CST保護とは何ですか？',
         answer:
-          '一筆を送信する前に、アプリは見込みの参加CSTの量をプレビューし、受け入れてもよい最小のCST量を送ります。別の一筆が先に届くと、見込みの量が変わることがあります。最低参加CST保護は、結果として刻印されるCSTが選んだ最小値を下回る場合にトランザクションを止めることができます。費用の確認が通れば一筆を進めたい場合は、0 CSTを含むどの量でも受け入れることも選べます。',
+          '参加CSTの最小値は、次の一筆が直前の参加者へ刻印する数量を制限します。送信者への支払いを保証する値ではありません。両者が同じアドレスなら送信者自身が受け取ります。0はこの制限を無効にし、サイクル最初のETH一筆はこの確認を省略します。最大費用とネットワーク手数料は別の条件です。',
       },
       'how-cst-calibration-window-changes': {
         question: '各一筆はCST調律期間をどう変えますか？',
-        answer: `ETHまたはCSTの一筆はすべて、保存されたCST調律期間を更新します。CST一筆は期間を長さ / ${protocolFacts.cstCalibrationWindowChangeDivisor}だけ長くします。整数への切り捨て前でおよそ+${protocolFacts.cstCalibrationWindowIncreasePercentPerCstGesture}%です。ETH一筆はおよそ長さ / ${protocolFacts.cstCalibrationWindowChangeDivisor + 1}だけ短くします。約-${protocolFacts.cstCalibrationWindowDecreasePercentPerEthGesture}%です。期間が短いほどCST一筆の費用は速く下がり、長いほど緩やかに下がります。`,
+        answer:
+          'V3が保存するのはCST費用の下降速度で、期間の長さは速度と上限から求めます。ETH一筆はrate + floor(rate / 100)への増加を試み、CST一筆はrate - floor(rate / 101)へ減少させます。最短期間の条件に反する増加は行いません。CST一筆の後の上限は、加算前のCST基本費用の2倍、設定された最小値、新しい速度と180秒の積のうち最大の値です。次の一筆をすぐに入れることはできます。',
       },
       'what-is-open-finalization-window': {
         question: '公開確定期間とは何ですか？',
-        answer: `サイクル確定時刻を過ぎると、最後の一筆の参加者にはサイクルを確定するための${protocolFacts.finalGestureExclusivityHours}時間の優先時間があります。その優先期間の間に確定しなければ、誰でも確定のトランザクションを呼び出せます。そしてスマートコントラクトは、確定した人をサイクル受領者にします。確定実行者はシグネチャー配分の全体（ETHの分、${cst} CST、Cosmic Signature NFT、添付されたアセットへの優先権）を受け取るので、最後の一筆の参加者は期間が終わる前に確定するべきです。公開確定は、最後の一筆の参加者がいなくなってもプロトコルが止まらないようにします。`,
+        answer: `確定処理を成功させたアドレスが、サイクル準備金の${protocolFacts.mainEthPercentage}%、合計${formatCount(protocolFacts.specialAllocationCst, 'ja')} CST、連続したIDのCosmic Signature NFT${protocolFacts.mainPrizeNftsPerCycle}点を受け取ります。確定時刻後の最初の${protocolFacts.finalGestureExclusivityHours}時間は最後の一筆の参加者だけが実行でき、その後は誰でも実行して自分で受け取れます。`,
       },
       'what-is-endurance-champion': {
         question: '持久チャンピオンとは何ですか？',
@@ -168,7 +168,7 @@ export const faqTextJa = {
       'how-time-increase-affects-game': {
         question: '一筆ごとの時間の増加はプロトコルにどう影響しますか？',
         answer:
-          '一筆ごとに加わる時間が増えるにつれて、サイクルは平均して長く続くようになります。変化は緩やかで、滑らかな参加体験を保ちながら、長い時間軸でのCosmic Signature NFTの総供給量を抑えます。',
+          '加算時間が増えると確定頻度に影響しますが、NFT供給の固定上限や一定期間の新作数を保証するものではありません。',
       },
       'what-if-two-gestures-same-time': {
         question: '二つの一筆が同時に送信されたらどうなりますか？',
@@ -189,7 +189,7 @@ export const faqTextJa = {
       'what-are-cst-and-dao': {
         question: 'CSTトークンと宇宙評議会とは何ですか？',
         answer:
-          'すべての一筆はCSTトークンを刻印することがあり、CSTは宇宙評議会で調整ウェイトを表します。評議会はプロトコルをオンチェーンで調整します。CST保有者は調整提案を提出し、支持または反対を表明します（CSTを自分または別のアドレスへ委任すると、そのウェイトが有効になります）。評議会は、コントラクトの所有権が評議会の管理下に移った後、7%の配分を受け取る公共財の受け手を含むプロトコルのパラメーターを決めるよう設計されています。現在、それらの設定はまだプロトコルの所有者が管理しています。',
+          'CSTは一筆に使えるほか、委任後は宇宙評議会の調整ウェイトになります。評議会が扱えるのは実際に持つ資産と権限だけです。現在は主要プロトコルの所有者ではなく、移管や放棄には別のオンチェーン操作が必要です。',
       },
       'what-can-i-do-with-cst': {
         question: 'CSTトークンで何ができますか？',
@@ -199,7 +199,7 @@ export const faqTextJa = {
       'what-makes-nfts-unique': {
         question: 'Cosmic Signature NFTの何がユニークなのですか？',
         answer:
-          'Cosmic Signature NFTはオンチェーンで自立しています。各NFTは、スマートコントラクトに保存された無作為に生成されたシードとともに刻印されます。画像と動画は、オープンソースのRustパイプラインを使ってこのシードからレンダリングされます。シードが三つの天体の初期条件を決め、NFTごとに唯一のカオスな軌跡を生み出します。',
+          'NFTのシードはオンチェーンに保存され、画像と動画はオフチェーンで生成されます。再現には同じシード、適切なレンダラーの版と設定、互換性のあるツールが必要です。シードだけで異なる版の出力まで一致するとは限りません。',
       },
       'how-are-nft-images-created': {
         question: 'NFTの画像はどのように作られますか？',
@@ -209,16 +209,17 @@ export const faqTextJa = {
       'significance-of-random-seed': {
         question: 'なぜ各NFTはオンチェーンのシードから生成されるのですか？',
         answer:
-          'シードに基づくパイプラインは、長期的な再現性を保証します。画像を中央のサーバーに頼るNFTプロジェクトとは異なり、すべてのCosmic Signature NFTのシードはArbitrumに保存されています。誰でもいつでも、オープンソースのRustパイプラインを使ってNFTの画像と動画を独立に再生成できます。元とピクセル単位で同一です。',
+          'NFTのシードはオンチェーンに保存され、画像と動画はオフチェーンで生成されます。再現には同じシード、適切なレンダラーの版と設定、互換性のあるツールが必要です。シードだけで異なる版の出力まで一致するとは限りません。',
       },
       'is-nft-supply-limited': {
         question: 'Cosmic Signature NFTの数には上限がありますか？',
-        answer: `コントラクトに固定の供給上限はありません。一筆ごとに加わる時間は、サイクルが確定するたびに${protocolFacts.cycleTimeIncrementIncreasePercentPerCycle}%ずつ大きくなります。この仕組みによりサイクルは長くなる傾向があり、NFTの刻印ペースが抑えられます。実際のペースは参加状況によっても変わります。`,
+        answer:
+          '加算時間が増えると確定頻度に影響しますが、NFT供給の固定上限や一定期間の新作数を保証するものではありません。',
       },
       'impact-of-limiting-nfts': {
         question: 'サイクルの長さは、新しく刻印されるNFTの数にどう影響しますか？',
         answer:
-          '一筆ごとに加わる時間が大きくなるとサイクルは長くなる傾向があり、同じ期間に刻印されるNFTは少なくなります。Cosmic Signature NFTはそれぞれプロトコルの歴史の一部を記録しており、総数に固定の上限はありません。',
+          '加算時間が増えると確定頻度に影響しますが、NFT供給の固定上限や一定期間の新作数を保証するものではありません。',
       },
       'connection-with-randomwalknft': {
         question: 'Random Walk NFTとの関係は何ですか？',
@@ -300,7 +301,7 @@ export const faqTextJa = {
       'game-security': {
         question: 'プロトコルのセキュリティはどう確保されていますか？',
         answer:
-          'Cosmic Signatureはコントラクトアドレス、ソースコードのリソース、検証の背景を公開しているので、コミュニティは振る舞いを独立に調べられます。スマートコントラクトは独立したセキュリティ企業Hackenの監査を受けており、報告書の全文は監査ページからリンクしています。',
+          '公開監査は、確認された過去のコントラクト版を対象としています。その後のV2やV3の全変更を独立に監査したことにはなりません。公開ソースとデプロイ済みコードの一致確認も、安全性評価とは別です。 現在のプロトコル実装はV3です。実装アドレスはプロキシのEIP-1967スロットと照合してください。V3の公開ソース検証はまだ確認されておらず、過去のV2の検証は新しい実装には適用されません。',
       },
       'fees-involved': {
         question: '手数料はかかりますか？',
@@ -321,17 +322,17 @@ export const faqTextJa = {
       'team-controls': {
         question: 'チームはプロトコルに対してどんな権限を持っていますか？',
         answer:
-          '当初、チームは一筆ごとの時間増分や配分トラックの割合など、プロトコルの一部のパラメーターを調整できます。この権限はスマートコントラクトの「Ownable」パターンで実装され、サイクル間の期間に限られます。次のサイクルが有効になると——これはその最初の一筆の前に起こります——中核となるプロトコルのパラメーターはそのサイクルが確定するまでロックされます。\n\nこのロックの外でも、より狭い権限がいくつか残ります。所有者は、最初の一筆が届くまでサイクルの有効化を延期でき、次のサイクルまでの遅延をいつでも調整でき、周辺のコントラクト（公共財金庫の受け手、NFTメタデータのURI、配分ウォレットの受け取りタイムアウト）をいつでも管理できます。\n\nプロトコルのコントラクトは所有者によってアップグレード可能（UUPS）でもありますが、サイクルの間だけです。現在デプロイされている実装は、公開検証済みのV2です。',
+          '所有者は、コントラクトの条件に従ってパラメーターと実装を変更する権限を保持します。\n\n主要な変更はサイクル非稼働時に制限されますが、開始時刻、次の待機時間、周辺コントラクトには別の権限があります。\n\nV3は宇宙評議会への移管や権限放棄を自動実行しません。',
       },
       'will-team-always-have-control': {
         question: 'チームは常にプロトコルのパラメーターを管理し続けるのですか？',
         answer:
-          'いいえ。プロトコルが安定したら、所有権は宇宙評議会へ移ります。それ以降のパラメーターの変更は、調整定足数を満たしたプロトコル調整提案を通じてのみ行われます。',
+          '所有者は、コントラクトの条件に従ってパラメーターと実装を変更する権限を保持します。主要な変更はサイクル非稼働時に制限されますが、開始時刻、次の待機時間、周辺コントラクトには別の権限があります。V3は宇宙評議会への移管や権限放棄を自動実行しません。',
       },
       'what-is-renounce-ownership': {
         question: '「所有権の放棄」とはどういう意味ですか？',
         answer:
-          '所有権の放棄はOwnableコントラクトの関数で、デプロイしたアドレスから管理権限を永久に手放します。一度呼び出されると、どの特権ロールもコントラクトのパラメーターを変更できなくなります。',
+          '所有者は、コントラクトの条件に従ってパラメーターと実装を変更する権限を保持します。主要な変更はサイクル非稼働時に制限されますが、開始時刻、次の待機時間、周辺コントラクトには別の権限があります。V3は宇宙評議会への移管や権限放棄を自動実行しません。',
       },
       'why-renounce-ownership': {
         question: 'チームはなぜ所有権を放棄するのですか？',

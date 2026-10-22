@@ -10,6 +10,19 @@ const CYCLE_ONE = {
 };
 
 describe('cycleReserveSplit', () => {
+  it.each([null, 0, -1, 101, NaN, Infinity])(
+    'does not infer a reserve from invalid historical percentage %s',
+    (percentage) => {
+      const split = cycleReserveSplit(CYCLE_ONE, percentage);
+      expect(split.reserve).toBeNull();
+      expect(split.shares.every((share) => share.percent === null)).toBe(true);
+      expect(split.shares.find((share) => share.id === 'nextCycle')?.amount).toBeNull();
+      expect(split.shares.find((share) => share.id === 'signature')?.amount).toBe(
+        CYCLE_ONE.signature,
+      );
+    },
+  );
+
   it('reads each track as a share of the Cycle Reserve, the split /allocation draws', () => {
     const split = cycleReserveSplit(CYCLE_ONE, 25);
     const percents = Object.fromEntries(

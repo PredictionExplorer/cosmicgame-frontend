@@ -1,9 +1,4 @@
-import {
-  ethDistributionFacts,
-  isV3Mechanics,
-  nftAllocationFacts,
-  protocolFacts,
-} from '@/content/protocol-facts';
+import { ethDistributionFacts, nftAllocationFacts, protocolFacts } from '@/content/protocol-facts';
 
 import { copyNumbers } from './copyNumbers';
 import type { HowItWorksText } from './structure';
@@ -46,15 +41,15 @@ export const howItWorksTextEn = {
       {
         title: 'Dynamic Participation CST',
         description:
-          'A gesture may imprint CST. The amount follows the square root of the time since the previous gesture: a gesture right after another can imprint 0 CST, and a longer quiet period imprints more.',
+          'V3 credits Participation CST to the previous participant when another gesture arrives. The amount grows linearly with elapsed time. The opening gesture credits none, and finalization does not settle the final participant’s additional dynamic CST.',
       },
       {
         title: 'Stellar Selection entry',
-        description: `Each gesture records one entry. When the cycle finalizes, ${entriesAre(ethRecipients)} selected at random to share ${ethDistributionFacts.stellarSelectionEthPercentage}% of the Cycle Reserve in ETH.`,
+        description: `Each gesture records an entry weighted by its undiscounted, premium-free ETH base cost. CST gestures use the concurrent ETH base cost. At finalization, ${entriesAre(ethRecipients)} selected with these weights to share ${ethDistributionFacts.stellarSelectionEthPercentage}% of the Cycle Reserve.`,
       },
       {
         title: 'Cosmic Signature NFT selection',
-        description: `Another ${entriesAre(nftRecipients)} selected to receive ${cst} CST and a Cosmic Signature NFT each. The same address can be selected more than once, and no number of entries guarantees a selection.`,
+        description: `Another ${entriesAre(nftRecipients)} selected using those same weights, each receiving ${cst} CST and one NFT. Repeats are possible; no number of gestures guarantees a selection.`,
       },
       {
         title: 'Signature Allocation',
@@ -72,7 +67,7 @@ export const howItWorksTextEn = {
       },
       {
         title: 'The ETH cost steps up',
-        body: `Each ETH gesture raises the next ETH Gesture Cost by ${protocolFacts.ethGestureCostStepUpPercent}%. It falls only in the ETH Calibration Window that opens each cycle.`,
+        body: `Each ETH gesture increases the next premium-free ETH base cost by ${protocolFacts.ethGestureCostStepUpPercent}% plus one wei. Opening base cost declines through its Calibration Window. Near the deadline, ETH and CST can also carry a late premium of up to approximately ${protocolFacts.v3.lateGestureMaxCostMultiplier}x total cost.`,
       },
       {
         title: 'Gas is paid separately',
@@ -94,13 +89,13 @@ export const howItWorksTextEn = {
     phases: [
       {
         label: 'The cycle opens',
-        description: `A new Performance Cycle opens. The ETH and CST Gesture Costs each fall through a Calibration Window; the CST window starts from a ${protocolFacts.initialCstCalibrationWindowHours}-hour reference that changes with participation. The Cycle Reserve starts with what the previous cycle carried forward.`,
+        description:
+          'A cycle opens at its scheduled activation time. Its first gesture must use ETH and starts the finalization clock. The reserve contains the preceding carryover and any direct ETH contributions; the carried CST ceiling and decline rate determine its first CST window.',
       },
       {
         label: 'Participants gesture',
-        description: isV3Mechanics
-          ? 'Each gesture adds the current time increment to the Cycle Finalization Time. Each CST gesture restarts the CST Calibration Window at twice the price it paid; the cost then declines at a steady rate.'
-          : `Each gesture adds the current time increment to the Cycle Finalization Time. An ETH gesture shortens the CST Calibration Window by about ${protocolFacts.cstCalibrationWindowDecreasePercentPerEthGesture}%; a CST gesture lengthens it by about ${protocolFacts.cstCalibrationWindowIncreasePercentPerCstGesture}%.`,
+        description:
+          'Later gestures add the integer-truncated time increment to the stored deadline, even after expiry. V3 adjusts the CST decline rate. Each CST gesture restarts its ceiling using twice the premium-free base cost and the on-chain minimums.',
       },
       {
         label: 'The Cycle Finalization Time expires',
@@ -112,17 +107,17 @@ export const howItWorksTextEn = {
       },
       {
         label: 'Stellar Selections',
-        description: `The ETH Stellar Selection chooses ${recipients(ethRecipients)}, who share ${ethDistributionFacts.stellarSelectionEthPercentage}% of the Cycle Reserve. The NFT Stellar Selection chooses ${numbers.count(nftRecipients)}, and the Anchored-NFT Stellar Selection chooses ${numbers.count(anchoredRecipients)} among anchored Random Walk NFTs; each of them receives ${cst} CST and a Cosmic Signature NFT. Each gesture adds one entry, and the ETH and NFT selections are made from all of the cycle’s entries, so one entry can be selected more than once.`,
+        description: `Participant ETH and NFT selections both use the accumulated premium-free, undiscounted ETH base cost as weight; CST gestures use the concurrent ETH base cost. ${recipients(ethRecipients)} share ${ethDistributionFacts.stellarSelectionEthPercentage}% ETH. ${numbers.count(nftRecipients)} participant selections and up to ${numbers.count(anchoredRecipients)} Anchored-NFT Stellar Selection entries from active Random Walk NFTs each receive ${cst} CST and one NFT. Repeats are possible.`,
       },
       {
         label: 'The next cycle begins',
-        description: `The remaining ${protocolFacts.compoundingReservePercentage}% of the Cycle Reserve rolls forward as the Compounding Cycle Reserve, and the next cycle opens with fresh Calibration Windows.`,
+        description: `About ${protocolFacts.compoundingReservePercentage}% of the Cycle Reserve carries forward, with rounding and conditional-transfer exceptions. The next activation is scheduled from finalization; the current configured delay is ${protocolFacts.currentNextCycleDelayDays} days and can be changed by the owner.`,
       },
     ],
   },
   payoff: {
     heading: 'Every cycle ends in a Signature',
-    body: `Every gesture shapes the cycle’s artwork. When the cycle finalizes, its Signature is imprinted as a Cosmic Signature NFT and goes, with the Signature Allocation, to whoever finalizes the cycle. For the first ${protocolFacts.finalGestureExclusivityHours} hours after the countdown reaches zero, only the participant who made the Final Gesture can.`,
+    body: `The Signature Allocation goes to whoever finalizes the cycle. It includes ${nftAllocationFacts.mainPrizeNftPhrase.en} and ${cst} CST in total. For ${protocolFacts.finalGestureExclusivityHours} hours after the deadline, only the Final Gesture participant can finalize. After that, any caller can finalize and receive this allocation.`,
     linkLabel: 'View this Signature',
   },
   stepByStep: {
@@ -143,7 +138,7 @@ export const howItWorksTextEn = {
         title: 'Check the Gesture Cost',
         highlights: [
           'Check the current Gesture Cost in ETH or CST before you commit.',
-          'Review the Participation CST preview; it changes with the time since the previous gesture.',
+          'Check the Participation CST recipient: V3 credits the previous participant when your gesture executes, rather than promising an immediate imprint to you.',
           'Make sure your wallet holds the Gesture Cost plus a little ETH for the network fee, which your wallet shows before you confirm.',
         ],
       },
@@ -164,7 +159,7 @@ export const howItWorksTextEn = {
     tips: [
       {
         title: 'Two Calibration Windows',
-        body: `The ETH Gesture Cost falls through its Calibration Window once, as each cycle opens. The CST Gesture Cost starts a new window after every CST gesture: from twice the cost just paid (at least ${protocolFacts.cstCalibrationCeilingMinCst} CST) down to zero.`,
+        body: `The ETH opening window runs until the first gesture. A CST gesture resets its ceiling to the greatest of twice its premium-free CST base cost, ${protocolFacts.cstCalibrationCeilingMinCst} CST, and the updated decline rate times ${protocolFacts.cstCalibrationRestartMinimumSeconds} seconds. ETH and CST gestures adjust that rate. The restart safeguard is not a cooldown.`,
       },
       {
         title: 'Each Random Walk NFT works once',
@@ -178,7 +173,7 @@ export const howItWorksTextEn = {
   },
   callToAction: {
     heading: 'Ready to make your first gesture?',
-    body: 'Join the active Performance Cycle. Connect your wallet and make your first gesture to start imprinting CST and shaping the cycle’s Signature.',
+    body: 'Connect a wallet, review the current costs and mechanics, and make a gesture in an active Performance Cycle.',
     primaryCtaLabel: 'Make a gesture',
     faqCtaLabel: 'Browse the FAQ',
     discordCtaLabel: 'Discord',

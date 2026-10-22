@@ -1,5 +1,7 @@
 import { protocolFacts } from '@/content/protocol-facts';
 
+import { formatCount } from '@/utils/format/numbers';
+
 import type { QuizTierQuestionsText } from './structure';
 
 /**
@@ -125,13 +127,13 @@ export const basicQuestionsTextKo = {
     prompt:
       '토큰 #42의 온체인 시드를 그대로 넣어 오픈 소스 아트 파이프라인을 다시 실행합니다. 무엇이 나오나요?',
     options: {
-      a: '어떤 기기에서든 픽셀 하나까지 동일한 이미지가 나옵니다.',
+      a: 'NFT 시드는 온체인에 저장되고 이미지와 영상은 오프체인에서 생성됩니다. 재현하려면 같은 시드, 해당 렌더러 버전과 설정, 호환되는 도구가 필요합니다. 시드만 같다고 서로 다른 버전의 결과가 동일하다는 보장은 없습니다.',
       b: '작은 무작위 변화가 섞인 비슷한 이미지가 나옵니다.',
       c: '하드웨어가 다르면 다른 이미지가 나옵니다.',
       d: '저해상도 미리 보기만 나옵니다. 완전한 작품에는 프로젝트 서버가 필요합니다.',
     },
     explanation:
-      '결정론은 가정이 아니라 강제되는 원칙입니다. 같은 시드는 어떤 기기에서든 비트 하나까지 같은 이미지를 만듭니다. 렌더링된 프레임의 SHA-256 해시를 지속적 통합에서 검사하므로, 출력이 조금이라도 어긋나면 빌드가 실패합니다.',
+      'NFT 시드는 온체인에 저장되고 이미지와 영상은 오프체인에서 생성됩니다. 재현하려면 같은 시드, 해당 렌더러 버전과 설정, 호환되는 도구가 필요합니다. 시드만 같다고 서로 다른 버전의 결과가 동일하다는 보장은 없습니다. 저장소에는 수동으로 실행하는 이미지 재현 확인 절차가 있습니다. 현재 지속적 통합 과정은 생성된 프레임의 해시를 비교하지 않습니다.',
     referenceLabel: '백서 §6.2 — 재현 가능성과 라이선스',
   },
   'cst-supply-origin': {
@@ -159,15 +161,14 @@ export const basicQuestionsTextKo = {
     referenceLabel: '백서 §7.2 — 소각과 공급량 변화',
   },
   'public-goods-beneficiary': {
-    prompt: `모든 사이클은 준비금의 ${protocolFacts.publicGoodsPercentage}%를 공공재 배분으로 전달합니다. 지금은 누가 받고 있나요?`,
+    prompt: '현재 공공재 금고의 수령처는 어디인가요?',
     options: {
       a: '이더리움 핵심 기여자 170여 명을 지원하는 자금 지원 메커니즘인 Protocol Guild',
       b: '프로토콜 팀의 운영 지갑',
       c: 'Arbitrum 검증자',
       d: '무작위로 선정된 NFT 보유자',
     },
-    explanation:
-      '공공재 금고는 자기 몫을 Protocol Guild로 전달하며, 이 전달은 마감의 일부로 온체인에서 강제됩니다. 사이클마다 누군가가 이행 여부를 결정하지 않습니다. 이유는 이렇습니다. 공공 인프라 위에서 살아가는 프로토콜은 그 인프라에 기계적으로, 정해진 일정에 따라, 공개적으로 자금을 대야 합니다.',
+    explanation: `마감 시 프로토콜은 사이클 준비금의 ${protocolFacts.publicGoodsPercentage}%를 공공재 금고로 보내려고 시도합니다. 이후 누구나 별도 트랜잭션으로 금고 잔액을 현재 공공재 수령처인 Protocol Guild에 전달할 수 있습니다. 소유자는 수령처를 바꿀 수 있습니다. 프로토콜에서 금고로 보내는 작업이 실패하면 마감을 취소하지 않고 해당 몫이 준비금에 남을 수 있습니다.`,
     referenceLabel: '백서 §10 — 공공재',
   },
   'anchoring-basic': {
@@ -240,7 +241,7 @@ export const basicQuestionsTextKo = {
       d: '앱의 백엔드 서버가 전송을 실행합니다.',
     },
     explanation:
-      '기계적 배분은 프로토콜을 떠받치는 세 가지 특성 가운데 하나입니다. 참여자와 배분 규칙 사이에 재량을 행사하는 계정은 없고, 제스처의 ETH를 받는 팀 지갑도 없습니다. 앱과 서버는 컨트랙트가 이미 한 일을 보여 줄 뿐입니다.',
+      '소유자는 컨트랙트의 조건 아래 매개변수와 구현을 바꿀 권한을 유지합니다. 핵심 변경은 사이클이 비활성일 때로 제한되지만 활성화 시각, 다음 지연 시간, 주변 컨트랙트에는 별도 권한이 있습니다. V3가 우주 평의회에 제어권을 자동 이전하거나 소유자 권한을 자동 해제하지는 않습니다.',
     referenceLabel: '백서 §1 — 서론',
   },
   'nft-count-typical': {
@@ -251,7 +252,7 @@ export const basicQuestionsTextKo = {
       c: `${protocolFacts.nftStellarSelectionRecipients}개`,
       d: '100개',
     },
-    explanation: `일반적인 사이클은 NFT ${protocolFacts.typicalNftsPerCycle}개를 각인합니다. 역할 NFT ${protocolFacts.roleNftsPerCycle}개(사이클 수령자, 시간의 전사, 수호 챔피언, 최종 CST 제스처), 참여자 대상 별빛 선정 NFT ${protocolFacts.nftStellarSelectionRecipients}개, 앵커링된 Random Walk 별빛 선정 NFT ${protocolFacts.anchoredRwlkNftSelectionRecipients}개입니다. 경로 하나를 건너뛴 사이클은 그보다 적게 각인합니다.`,
+    explanation: `모든 경로가 있으면 한 사이클에서 Cosmic Signature NFT ${protocolFacts.typicalNftsPerCycle}개와 고정 배분 CST ${formatCount(protocolFacts.typicalCstImprintsPerCycle, 'ko')}개가 각인됩니다. 시그니처 배분은 NFT ${protocolFacts.mainPrizeNftsPerCycle}개에 대해 CST ${formatCount(protocolFacts.specialAllocationCst, 'ko')}개를 합계로 한 번 받습니다. 시간의 전사, 수호 챔피언, 최종 CST 제스처는 각각 NFT 1개와 해당 CST를 받으며, 두 NFT 선정 경로가 나머지를 더합니다. CST 제스처나 앵커링된 Random Walk NFT가 없으면 해당 경로는 생략합니다. 참여 CST는 별도입니다.`,
     referenceLabel: '백서 §5.1 — 마감 시 배분',
   },
   'chrono-endurance-exist': {
@@ -269,13 +270,13 @@ export const basicQuestionsTextKo = {
   'stellar-selection-what': {
     prompt: '별빛 선정이란 무엇인가요?',
     options: {
-      a: '사이클 동안 제스처마다 기록된 자격 가운데 마감 시 컨트랙트가 수령자를 선정하는 메커니즘',
+      a: '제스처 당시의 ETH 기본 비용을 가중치로 선정하며, 비용 감소와 늦은 할증은 제외합니다. 같은 주소가 여러 번 선정될 수 있습니다.',
       b: '활동량으로 참여자 순위를 매기는 순위표',
       c: 'NFT 작품에 부여되는 희귀도 등급',
       d: '작품 속 별자리에 이름을 붙이는 체계',
     },
     explanation:
-      '각 제스처는 사이클의 별빛 선정 풀에 자격 하나를 기록합니다. 마감 시 컨트랙트가 ETH 별빛 선정과 NFT 별빛 선정을 위해 자격을 선정하므로, 선정되는 빈도는 참여에 비례합니다. 이는 순위가 아니라 배분 메커니즘입니다.',
+      '참여자 ETH 별빛 선정과 NFT 별빛 선정 모두 제스처별 가중치를 사용합니다. 가중치는 해당 시점의 ETH 기본 비용이며, Random Walk NFT 비용 감소와 늦은 제스처 할증은 제외합니다. CST 제스처에도 같은 시점의 ETH 기본 비용을 적용합니다. 복원 선정이므로 같은 주소가 여러 번 선정될 수 있습니다. 앵커링 NFT 별빛 선정은 활성 Random Walk NFT를 별도로 대상으로 합니다.',
     referenceLabel: '백서 §5.3 — 별빛 선정',
   },
   'ecosystem-optionality': {

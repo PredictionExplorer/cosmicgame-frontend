@@ -17,8 +17,8 @@
     },
     "calibrationWindow": {
       "term": "Calibration Window",
-      "short": "A window in which the Gesture Cost descends from its Calibration Ceiling toward its Calibration Floor, so the cost falls the longer you wait.",
-      "long": "ETH and CST gestures follow separate windows. The CST window is stored on-chain and changes after every gesture: a CST gesture lengthens it slightly and an ETH gesture shortens it."
+      "short": "A period in which a base Gesture Cost declines. A late-gesture premium can apply separately.",
+      "long": "ETH and CST have separate base-cost paths. V3 CST cost declines at an adaptive on-chain rate; ETH can increase the rate subject to a safeguard, while CST reduces it and resets the ceiling. Its duration is derived from ceiling and rate."
     },
     "cycleReserve": {
       "term": "Cycle Reserve",
@@ -27,7 +27,7 @@
     },
     "signatureAllocation": {
       "term": "Signature Allocation",
-      "short": "The allocation for whoever finalizes a cycle: a share of the Cycle Reserve in ETH, Recognition CST and a Cosmic Signature NFT.",
+      "short": "The allocation for whoever finalizes the cycle: an ETH share, one Recognition CST amount and a configured NFT allocation.",
       "long": "The participant holding the Last Gesture may finalize the cycle and retrieve it, with priority over the tokens and NFTs attached to gestures. If they do not finalize within their exclusive window, whoever finalizes the cycle receives it."
     },
     "finalCstGesture": {
@@ -48,7 +48,7 @@
     "stellarSelection": {
       "term": "Stellar Selection",
       "short": "The protocol’s random selection at finalization, which distributes allocations among the recorded entries.",
-      "long": "Every gesture records an entry; from protocol version 3 an entry weighs as much as the gesture’s ETH cost at the moment it was made, while earlier cycles weighed every entry equally. At finalization the contract selects entries with on-chain randomness for ETH and Cosmic Signature NFT allocations, and anchored Random Walk NFTs take part in a separate selection. The same address can be selected more than once."
+      "long": "In V3, both participant ETH and NFT selections use each gesture’s undiscounted, premium-free ETH base cost as weight, including the concurrent ETH base cost for CST gestures. Earlier cycles used equal entries. Repeated selections are allowed; the anchored Random Walk NFT track is separate."
     },
     "anchoring": {
       "term": "Anchoring",
@@ -88,7 +88,7 @@
     "cst": {
       "term": "CST",
       "short": "Cosmic Signature Token, the protocol’s ERC-20 token.",
-      "long": "Gestures can imprint CST, and CST pays for CST gestures, which burn it. Delegated CST carries Coordination Weight on the Cosmic Council."
+      "long": "V3 Participation CST credits the previous participant when the next gesture arrives. Fixed allocations create CST at finalization; CST gestures burn their cost. Delegated CST carries Coordination Weight."
     }
   }
 }

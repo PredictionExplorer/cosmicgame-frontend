@@ -36,7 +36,7 @@ export const aboutContentEn = {
     heading: 'Origin',
     paragraphs: [
       `Cosmic Signature was designed by ${WHITE_PAPER_SHARED.authorName}, who also wrote its white paper. It began with two convictions: that generative art is most interesting when nothing about it is arbitrary, each image the output of a physical process anyone can rerun from its seed; and that a protocol holding ETH for its participants owes them a readable answer to where every wei goes.`,
-      'So the art is physics, not a model: three bodies under Newtonian gravity, rendered from a seed recorded on-chain by an open-source pipeline and released under CC0. The distribution is mechanical: the contracts execute every allocation, and no team wallet receives ETH from gestures. And the team’s role is finite: its owner powers are locked while a cycle runs and are set to end once the remaining upgrades land.',
+      'The artwork comes from an on-chain seed and an open-source physics renderer. Reproduction uses the matching renderer revision and configuration. The contracts execute configured allocation rules, while substantial owner powers remain. Those powers have no automatic expiry, and V3 does not transfer them to the Cosmic Council.',
     ],
   },
   milestones: {
@@ -49,18 +49,18 @@ export const aboutContentEn = {
       },
       v2: {
         label: 'V2',
-        status: 'Live today',
-        text: 'Five changes shaped by how the protocol is used, among them Participation CST that grows with the time between gestures and a longer window for the Final Gesture participant to finalize.',
+        status: 'Historical',
+        text: 'The June 2026 implementation introduced elapsed-time Participation CST for the submitting participant and revised timing protections. V3 has since replaced it.',
       },
       v3: {
         label: 'V3',
-        status: 'Planned',
-        text: 'A premium on gestures in the last minutes before the deadline, so sustained participation counts for more than last-second timing. It is in development in the public repository.',
+        status: 'Live today',
+        text: 'Installed on October 21, 2026. V3 credits linear Participation CST to the previous participant, weights both participant selection tracks, adapts CST price decline, changes allocations, and adds a late cost premium.',
       },
       handover: {
         label: 'Then',
-        status: 'Committed',
-        text: 'Once the design is final, owner control leaves the deploying address for good: transferred to the Cosmic Council or renounced, with the mechanism announced in advance.',
+        status: 'Not executed',
+        text: 'Owner control remains observable on-chain. Transferring it to the Cosmic Council and renouncing it have different consequences. Neither is scheduled or required automatically by V3.',
       },
     },
   },
@@ -71,7 +71,7 @@ export const aboutContentEn = {
       { id: 'app', label: 'Cosmic Signature app', href: ABOUT_RESOURCE_HREFS.app },
       {
         id: 'contracts',
-        label: 'Verified Arbitrum contracts',
+        label: 'Arbitrum contract addresses',
         href: ABOUT_RESOURCE_HREFS.contracts,
       },
       { id: 'code', label: 'Source code resources', href: ABOUT_RESOURCE_HREFS.code },

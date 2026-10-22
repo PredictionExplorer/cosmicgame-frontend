@@ -5,6 +5,7 @@ import { ChevronRight } from 'lucide-react';
 import { useLocale, useTranslations } from 'next-intl';
 
 import { ALLOCATION_TRACK_COLORS, type AllocationTrackId } from '@/config/allocationTracks';
+import { useLiveAllocationFacts } from '@/hooks/useLiveAllocationFacts';
 import { cn } from '@/lib/utils';
 import { Amount } from '@/components/ui/amount';
 import { SectionHeader } from '@/components/ui/section-header';
@@ -106,6 +107,7 @@ function AllocationDefinitions({ rows, summary }: { rows: AllocationRow[]; summa
  * separate explanations.
  */
 export function CycleAllocations({ data, headingId }: { data: DashboardInfo; headingId: string }) {
+  const { signatureNftCount } = useLiveAllocationFacts();
   const t = useTranslations('currentCycle');
   const tContracts = useTranslations('contracts');
   const tCommon = useTranslations('common');
@@ -141,7 +143,7 @@ export function CycleAllocations({ data, headingId }: { data: DashboardInfo; hea
       receives: joinParts([
         eth(data.PrizeAmountEth),
         cst,
-        nft,
+        t('allocations.amounts.nftCount', { count: signatureNftCount }),
         t('allocations.amounts.attachedTokens'),
       ]),
       recipients: recipients(1),

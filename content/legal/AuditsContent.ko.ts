@@ -4,7 +4,7 @@ import type { AuditsCopy } from './AuditsContent';
 export const auditsCopyKo: AuditsCopy = {
   title: '보안 감사',
   intro:
-    'Hacken의 Cosmic Signature 컨트랙트 독립 보안 감사, 컨트랙트 저장소에 있는 정형 검증과 분석, 그리고 컨트랙트를 직접 확인하는 방법을 정리했습니다.',
+    '공개 감사는 검토된 과거 컨트랙트 버전에 해당합니다. 이후 V2와 V3의 모든 변경을 독립적으로 검토했다는 뜻은 아닙니다. 공개 소스와 배포 코드가 일치한다는 검증도 보안 평가와 다릅니다.',
   summary: {
     label: '보안 감사 요약',
     auditor: '감사 기관',
@@ -28,7 +28,7 @@ export const auditsCopyKo: AuditsCopy = {
   audit: {
     heading: 'Hacken의 독립 보안 감사',
     paragraphs: [
-      `Hacken은 2025년 말 Cosmic Signature 스마트 컨트랙트의 독립 보안 검토를 수행했습니다. 검토는 공개 저장소의 운영 컨트랙트를 대상으로 하여, 각 사이클을 운영하는 핵심 프로토콜부터 CST 토큰, 두 NFT 컬렉션, 앵커링 지갑, 그리고 이를 지원하는 지갑 및 시스템 관리 컨트랙트까지 아울렀습니다. Hacken은 2026년 1월에 최종 보고서를 공개했습니다.`,
+      '공개 감사는 검토된 과거 컨트랙트 버전에 해당합니다. 이후 V2와 V3의 모든 변경을 독립적으로 검토했다는 뜻은 아닙니다. 공개 소스와 배포 코드가 일치한다는 검증도 보안 평가와 다릅니다.',
       '보고서는 각 발견 사항을 심각도 및 상태와 함께 제시하며, 위의 요약이 그 수를 집계합니다. 치명 또는 높음 심각도 항목은 없으며, 대부분은 팀이 검토하고 수용한 설계상의 절충을 설명한 것입니다.',
       '수동 검토와 함께 Hacken은 시스템 불변 조건을 대상으로 퍼즈 테스트를 실행했습니다. 불변 조건이란 예컨대 프로토콜이 보유한 ETH가 항상 적립된 금액에서 회수된 금액을 뺀 값과 같아야 한다는 성질입니다. 모든 불변 조건이 유지되었습니다.',
     ],
@@ -67,8 +67,8 @@ export const auditsCopyKo: AuditsCopy = {
     intro: '컨트랙트와 상호작용하기 전에 아래 항목을 직접 확인할 수 있습니다.',
     steps: [
       '<contracts>컨트랙트 페이지</contracts>에서 컨트랙트 주소를 찾아 주세요. 공식 주소 목록은 이곳 하나뿐입니다.',
-      '<explorer>Arbiscan</explorer>에서 그 주소를 열어 Arbitrum One에 있고 소스 코드가 검증되었는지 확인해 주세요.',
-      '그 소스를 <contractsRepository>공개 저장소</contractsRepository>와 비교하거나 <sourcify>Sourcify</sourcify>에서 완전 일치를 확인해 주세요.',
+      '현재 프로토콜 구현은 V3입니다. 구현 주소는 프록시의 EIP-1967 슬롯과 대조해야 합니다. V3의 공개 소스 검증은 아직 확인되지 않았으며, 과거 V2의 검증은 새 구현에 적용되지 않습니다. 자세히: <explorer>Arbiscan</explorer>.',
+      '공개 감사는 검토된 과거 컨트랙트 버전에 해당합니다. 이후 V2와 V3의 모든 변경을 독립적으로 검토했다는 뜻은 아닙니다. 공개 소스와 배포 코드가 일치한다는 검증도 보안 평가와 다릅니다. 자세히: <contractsRepository>공개 저장소</contractsRepository>, <sourcify>Sourcify</sourcify>.',
       '<hacken>Hacken 보고서</hacken>에서 각 발견 사항과 상태를 읽어 주세요.',
       '앱에 표시되는 내용이 온체인 컨트랙트의 동작과 일치하는지 확인해 주세요.',
     ],

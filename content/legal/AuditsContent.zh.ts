@@ -4,7 +4,7 @@ import type { AuditsCopy } from './AuditsContent';
 export const auditsCopyZh: AuditsCopy = {
   title: '审计',
   intro:
-    'Hacken 对 Cosmic Signature 合约的独立审计、合约仓库中的形式化验证与分析，以及如何自行核对合约。',
+    'Hacken 的历史合约审查、仓库中的验证工具，以及如何核对当前部署。历史报告并非对每一项后续 V3 改动的独立审计。',
   summary: {
     label: '审计概览',
     auditor: '审计方',
@@ -28,7 +28,7 @@ export const auditsCopyZh: AuditsCopy = {
   audit: {
     heading: 'Hacken 独立审计',
     paragraphs: [
-      `2025年末，Hacken 对 Cosmic Signature 智能合约进行了独立安全审查。审查范围覆盖公开仓库中的全部生产合约：驱动每个周期的核心协议、CST 代币、两个 NFT 系列、锚定钱包，以及配套的钱包与系统管理合约。最终报告于2026年1月发布。`,
+      'Hacken 于 2025 年末审查了 Cosmic Signature 的较早合约版本，最终报告于 2026 年 1 月发布。审计范围以报告列明的代码版本为准，并不自动覆盖此后每一项 V2 或 V3 改动。',
       '报告逐项列出每项发现的严重级别与处理状态，上方摘要按级别统计了数量。其中没有严重或高危级别问题，多数属于团队已审阅并接受的设计取舍。',
       '除人工审查外，Hacken 还对系统不变量进行了模糊测试，例如协议持有的 ETH 总额必须等于存入减去取回。所有不变量均保持成立。',
     ],
@@ -67,8 +67,8 @@ export const auditsCopyZh: AuditsCopy = {
     intro: '与合约交互前，你可以自行确认以下各项：',
     steps: [
       '在<contracts>合约页面</contracts>找到合约地址，这是官方地址的唯一清单。',
-      '在 <explorer>Arbiscan</explorer> 上打开该地址，确认它位于 Arbitrum One 且源代码已验证。',
-      '将该源代码与<contractsRepository>公开仓库</contractsRepository>比对，或在 <sourcify>Sourcify</sourcify> 上核对完全匹配。',
+      '在 <explorer>Arbiscan</explorer> 打开地址，确认网络为 Arbitrum One，并检查当前实现及其真实的源码验证状态。',
+      '将公开源码与<contractsRepository>代码仓库</contractsRepository>比对，并查询 <sourcify>Sourcify</sourcify>。目前 V3 尚无 Sourcify 验证记录；不能沿用 V2 的完全匹配作为 V3 证据。',
       '阅读 <hacken>Hacken 报告</hacken>，了解每项发现及其处理状态。',
       '确认应用显示的内容与合约在链上的行为一致。',
     ],

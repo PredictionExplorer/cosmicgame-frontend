@@ -1568,6 +1568,24 @@ describe('useGestureForm first Gesture of a cycle', () => {
 });
 
 describe('useGestureForm Random Walk token', () => {
+  it('rounds an odd-wei reduced cost up with zero extra headroom', async () => {
+    mockGetNextEthGestureCost.mockResolvedValue(1001n);
+    mockReadContract.mockImplementation(async ({ functionName }: { functionName: string }) => {
+      if (functionName === 'ownerOf') return '0xUser';
+      if (functionName === 'usedRandomWalkNfts') return 0n;
+      return true;
+    });
+    const { result } = renderHook(() => useGestureForm());
+    await waitFor(() => expect(result.current.rwlknftIds).toEqual([3, 1]));
+    act(() => {
+      result.current.setBidType('RandomWalk');
+      result.current.setRwlkId(3);
+      result.current.setBidPricePlus(0);
+    });
+    expect(await result.current.onGesture()).toBe(true);
+    expect(mockTx.writeContract).toHaveBeenCalledWith(expect.objectContaining({ value: 501n }));
+  });
+
   it("lets go of a token that is not one of this wallet's unused NFTs, and says which", async () => {
     const { result } = renderHook(() => useGestureForm());
     act(() => {

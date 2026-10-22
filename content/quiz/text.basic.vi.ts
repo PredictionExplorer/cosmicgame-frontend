@@ -1,5 +1,7 @@
 import { protocolFacts } from '@/content/protocol-facts';
 
+import { formatCount } from '@/utils/format/numbers';
+
 import type { QuizTierQuestionsText } from './structure';
 
 /**
@@ -125,13 +127,13 @@ export const basicQuestionsTextVi = {
     prompt:
       'Bạn chạy lại quy trình nghệ thuật mã nguồn mở với đúng seed lưu trên chuỗi của token #42. Kết quả là gì?',
     options: {
-      a: 'Hình ảnh giống hệt, đến từng điểm ảnh, trên bất kỳ máy nào.',
+      a: 'Seed của NFT được lưu trên chuỗi, còn hình ảnh và video được tạo ngoài chuỗi. Tái tạo cần cùng seed, đúng phiên bản và cấu hình bộ kết xuất, cùng công cụ tương thích. Chỉ có cùng seed không bảo đảm kết quả giống nhau giữa các phiên bản.',
       b: 'Một hình ảnh tương tự với những biến thể ngẫu nhiên nhỏ.',
       c: 'Một hình ảnh khác trên phần cứng khác.',
       d: 'Chỉ một bản xem trước độ phân giải thấp; tác phẩm đầy đủ cần máy chủ của dự án.',
     },
     explanation:
-      'Tính tất định được bảo đảm bằng cơ chế, không phải giả định: cùng seed tạo ra cùng hình ảnh, đến từng bit, trên bất kỳ máy nào. Mã băm SHA-256 của các khung hình đã kết xuất được kiểm định trong tích hợp liên tục, nên bất kỳ sai lệch đầu ra nào cũng làm bản dựng thất bại.',
+      'Seed của NFT được lưu trên chuỗi, còn hình ảnh và video được tạo ngoài chuỗi. Tái tạo cần cùng seed, đúng phiên bản và cấu hình bộ kết xuất, cùng công cụ tương thích. Chỉ có cùng seed không bảo đảm kết quả giống nhau giữa các phiên bản. Kho mã có các bước kiểm tra hình ảnh tham chiếu chạy thủ công. Quy trình tích hợp liên tục hiện tại không so sánh mã băm của các khung hình được tạo.',
     referenceLabel: 'Sách trắng \u00a76.2 \u2014 Khả năng tái tạo và giấy phép',
   },
   'cst-supply-origin': {
@@ -159,15 +161,14 @@ export const basicQuestionsTextVi = {
     referenceLabel: 'Sách trắng \u00a77.2 \u2014 Đốt và động lực nguồn cung',
   },
   'public-goods-beneficiary': {
-    prompt: `Mỗi chu kỳ chuyển ${protocolFacts.publicGoodsPercentage}% dự trữ làm phân bổ Hàng hóa công. Ai nhận nó hôm nay?`,
+    prompt: 'Hiện ai là đơn vị thụ hưởng của Kho Hàng hóa công?',
     options: {
       a: 'Protocol Guild \u2014 cơ chế tài trợ cho hơn 170 người đóng góp cốt lõi cho Ethereum.',
       b: 'Ví vận hành của đội ngũ giao thức.',
       c: 'Các validator của Arbitrum.',
       d: 'Một người nắm giữ NFT được chọn ngẫu nhiên.',
     },
-    explanation:
-      'Kho Hàng hóa công chuyển phần của mình đến Protocol Guild, và việc chuyển này được thực thi trên chuỗi như một phần của hoàn tất \u2014 không ai quyết định mỗi chu kỳ có tôn trọng nó hay không. Lý do: một giao thức sống trên hạ tầng công cộng nên tài trợ cho nó một cách cơ học, theo lịch, công khai.',
+    explanation: `Khi hoàn tất, giao thức thử chuyển ${protocolFacts.publicGoodsPercentage}% Dự trữ chu kỳ vào Kho Hàng hóa công. Sau đó bất kỳ ai cũng có thể dùng một giao dịch riêng để chuyển số dư kho tới đơn vị thụ hưởng hiện tại là Protocol Guild. Chủ sở hữu có thể thay đổi đơn vị thụ hưởng. Nếu chuyển từ giao thức vào kho thất bại, phần này có thể ở lại dự trữ mà không hủy hoàn tất.`,
     referenceLabel: 'Sách trắng \u00a710 \u2014 Hàng hóa công',
   },
   'anchoring-basic': {
@@ -239,7 +240,7 @@ export const basicQuestionsTextVi = {
       d: 'Máy chủ backend của ứng dụng phát lệnh chuyển.',
     },
     explanation:
-      'Phân phối theo quy tắc là một trong ba nguyên tắc của giao thức: không tài khoản tùy quyết nào đứng giữa người tham gia và quy tắc phân phối, và không ví nào của đội ngũ nhận ETH từ nét bút. Ứng dụng và máy chủ chỉ hiển thị những gì hợp đồng đã làm.',
+      'Chủ sở hữu vẫn có quyền đổi tham số và bản triển khai theo điều kiện của hợp đồng. Các thay đổi chính bị giới hạn khi chu kỳ chưa hoạt động, nhưng thời điểm kích hoạt, thời gian chờ chu kỳ sau và các hợp đồng phụ có quyền riêng. V3 không tự động chuyển quyền cho Hội đồng Vũ trụ hoặc tự động từ bỏ quyền chủ sở hữu.',
     referenceLabel: 'Sách trắng \u00a71 \u2014 Giới thiệu',
   },
   'nft-count-typical': {
@@ -250,7 +251,7 @@ export const basicQuestionsTextVi = {
       c: `${protocolFacts.nftStellarSelectionRecipients}`,
       d: '100',
     },
-    explanation: `Một chu kỳ điển hình khắc ${protocolFacts.typicalNftsPerCycle} NFT: ${protocolFacts.roleNftsPerCycle} NFT theo vai trò (người nhận, Chiến binh Thời gian, Quán quân Bền bỉ, nét bút CST cuối cùng), ${protocolFacts.nftStellarSelectionRecipients} NFT Tinh tuyển cho người tham gia và ${protocolFacts.anchoredRwlkNftSelectionRecipients} NFT Tinh tuyển cho Random Walk đang neo giữ. Chu kỳ bỏ qua một luồng thì khắc ít hơn.`,
+    explanation: `Khi có đủ các luồng, một chu kỳ khắc ${protocolFacts.typicalNftsPerCycle} Cosmic Signature NFT và ${formatCount(protocolFacts.typicalCstImprintsPerCycle, 'vi')} CST trong các phân bổ cố định. Phân bổ Signature gồm ${protocolFacts.mainPrizeNftsPerCycle} NFT nhưng chỉ một khoản tổng cộng ${formatCount(protocolFacts.specialAllocationCst, 'vi')} CST. Chiến binh Thời gian, Quán quân Bền bỉ và nét bút CST cuối cùng mỗi luồng có một NFT cùng CST tương ứng; hai luồng NFT Tinh tuyển bổ sung phần còn lại. Nếu không có nét bút CST hoặc Random Walk NFT neo giữ thì luồng tương ứng bị bỏ qua. CST tham gia được tính riêng.`,
     referenceLabel: 'Sách trắng \u00a75.1 \u2014 Phân phối khi hoàn tất',
   },
   'chrono-endurance-exist': {
@@ -268,13 +269,13 @@ export const basicQuestionsTextVi = {
   'stellar-selection-what': {
     prompt: 'Tinh tuyển là gì?',
     options: {
-      a: 'Các lượt theo từng nét bút được ghi nhận trong chu kỳ, từ đó hợp đồng chọn ra người nhận khi hoàn tất.',
+      a: 'Trọng số là chi phí ETH cơ sở lúc đặt nét bút, không gồm mức giảm hay phụ phí cuối chu kỳ. Một địa chỉ có thể được chọn nhiều lần.',
       b: 'Một bảng xếp hạng người tham gia theo mức độ hoạt động.',
       c: 'Các bậc độ hiếm gán cho tác phẩm NFT.',
       d: 'Một cách đặt tên chòm sao trong nghệ thuật.',
     },
     explanation:
-      'Mỗi nét bút ghi nhận một lượt vào quỹ Tinh tuyển của chu kỳ. Khi hoàn tất, hợp đồng chọn các lượt cho ETH Tinh tuyển và NFT Tinh tuyển, nên tần suất được chọn tỷ lệ với mức tham gia. Đây là một cơ chế phân phối, không phải một bảng xếp hạng.',
+      'Cả ETH Tinh tuyển và NFT Tinh tuyển dành cho người tham gia đều dùng trọng số từng nét bút. Trọng số là chi phí ETH cơ sở tại thời điểm đó, chưa giảm bằng Random Walk NFT và chưa cộng phụ phí cuối chu kỳ. Nét bút CST dùng cùng chi phí ETH cơ sở đương thời. Các lượt chọn có hoàn lại, nên một địa chỉ có thể được chọn nhiều lần. Tinh tuyển NFT neo giữ xét riêng các Random Walk NFT đang neo giữ.',
     referenceLabel: 'Sách trắng \u00a75.3 \u2014 Tinh tuyển',
   },
   'ecosystem-optionality': {

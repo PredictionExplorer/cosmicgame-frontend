@@ -21,7 +21,7 @@ export const securityCopyVi: SecurityCopy = {
     },
     contractsHeading: 'Hợp đồng cốt lõi trên Arbitrum One',
     contractsIntro:
-      'Mã nguồn công bố của mỗi hợp đồng khớp chính xác trên Sourcify (kiểm tra ngày {date}), nên bytecode trên chuỗi chính là mã bạn đọc được. <contracts>Trang hợp đồng</contracts> liệt kê mọi địa chỉ.',
+      'Bản triển khai hiện tại của giao thức là V3. Hãy đối chiếu địa chỉ triển khai với ô EIP-1967 của proxy. Việc xác minh công khai mã nguồn V3 chưa được xác nhận; xác minh V2 trước đây không áp dụng cho bản triển khai mới. Chi tiết: <contracts>Trang hợp đồng</contracts>.',
     explorerLink: 'Arbiscan',
     sourcifyLink: 'Sourcify',
     copyLabel: 'Sao chép {value}',
@@ -50,7 +50,7 @@ export const securityCopyVi: SecurityCopy = {
       {
         term: 'Trong một chu kỳ',
         detail:
-          'Các tham số cốt lõi bị khóa từ lúc một chu kỳ kích hoạt, trước nét bút đầu tiên của nó, cho đến khi chu kỳ đó hoàn tất.',
+          'Chủ sở hữu vẫn có quyền đổi tham số và bản triển khai theo điều kiện của hợp đồng. Các thay đổi chính bị giới hạn khi chu kỳ chưa hoạt động, nhưng thời điểm kích hoạt, thời gian chờ chu kỳ sau và các hợp đồng phụ có quyền riêng. V3 không tự động chuyển quyền cho Hội đồng Vũ trụ hoặc tự động từ bỏ quyền chủ sở hữu.',
       },
       {
         term: 'Bất cứ lúc nào',
@@ -60,12 +60,12 @@ export const securityCopyVi: SecurityCopy = {
       {
         term: 'Nâng cấp',
         detail:
-          'Giao thức chạy sau một proxy UUPS nên địa chỉ không bao giờ đổi. Chủ sở hữu chỉ có thể trỏ nó tới mã mới giữa các chu kỳ; mã đang dùng là bản triển khai V2 đã được xác minh công khai, liệt kê ở trên.',
+          'Bản triển khai hiện tại của giao thức là V3. Hãy đối chiếu địa chỉ triển khai với ô EIP-1967 của proxy. Việc xác minh công khai mã nguồn V3 chưa được xác nhận; xác minh V2 trước đây không áp dụng cho bản triển khai mới.',
       },
       {
         term: 'Hội đồng Vũ trụ',
         detail:
-          'Quyền sở hữu dự kiến được chuyển giao cho Hội đồng Vũ trụ khi giao thức ổn định. Từ đó, tham số chỉ thay đổi qua các đề xuất điều phối giao thức đạt túc số điều phối.',
+          'Chủ sở hữu vẫn có quyền đổi tham số và bản triển khai theo điều kiện của hợp đồng. Các thay đổi chính bị giới hạn khi chu kỳ chưa hoạt động, nhưng thời điểm kích hoạt, thời gian chờ chu kỳ sau và các hợp đồng phụ có quyền riêng. V3 không tự động chuyển quyền cho Hội đồng Vũ trụ hoặc tự động từ bỏ quyền chủ sở hữu.',
       },
     ],
   },
@@ -109,7 +109,7 @@ export const securityCopyVi: SecurityCopy = {
   verify: {
     heading: 'Tự kiểm chứng',
     paragraph:
-      'Tín hiệu bảo mật mạnh nhất là sự thống nhất giữa những gì ứng dụng hiển thị, hợp đồng đã xác minh, mã nguồn và dữ liệu trực tiếp trên Arbitrum. Bạn có thể tự kiểm tra từng thứ mà không cần tin vào trang web này.',
+      'Bản kiểm toán công khai áp dụng cho phiên bản hợp đồng lịch sử đã được xem xét. Nó không phải kiểm toán độc lập mọi thay đổi V2 hoặc V3 sau đó. Xác minh mã nguồn trùng với mã triển khai cũng không phải đánh giá bảo mật. Bản triển khai hiện tại của giao thức là V3. Hãy đối chiếu địa chỉ triển khai với ô EIP-1967 của proxy. Việc xác minh công khai mã nguồn V3 chưa được xác nhận; xác minh V2 trước đây không áp dụng cho bản triển khai mới.',
     resources: [
       {
         link: 'contracts',

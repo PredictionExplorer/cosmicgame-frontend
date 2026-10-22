@@ -15,10 +15,11 @@ describe('CallToAction', () => {
   });
 
   it('renders the body with a typographic apostrophe', () => {
-    render(<CallToAction callToAction={callToAction} />);
-    expect(screen.getByText(callToAction.body)).toBeInTheDocument();
+    const copy = { ...callToAction, body: 'Review the cycle’s mechanics.' };
+    render(<CallToAction callToAction={copy} />);
+    expect(screen.getByText(copy.body)).toBeInTheDocument();
     // Regression guard: the copy once rendered a literal "’" from JSX text.
-    expect(screen.getByText(/shaping the cycle’s Signature\./)).toBeInTheDocument();
+    expect(screen.getByText(/cycle’s mechanics\./)).toBeInTheDocument();
     expect(screen.queryByText(/\\u2019/)).not.toBeInTheDocument();
   });
 

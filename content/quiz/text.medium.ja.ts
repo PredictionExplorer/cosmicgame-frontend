@@ -1,5 +1,7 @@
 import { protocolFacts } from '@/content/protocol-facts';
 
+import { formatCount } from '@/utils/format/numbers';
+
 import type { QuizTierQuestionsText } from './structure';
 
 const cst = (amount: number): string => amount.toLocaleString('en-US');
@@ -16,7 +18,7 @@ export const mediumQuestionsTextJa = {
   'eth-opening-price-discovery': {
     prompt: '新しいサイクルは、開始時のETH一筆の費用をどのように見つけますか？',
     options: {
-      a: `ETH調律期間は、前のサイクルで支払われた開始時の費用の${protocolFacts.ethCalibrationCeilingMultiplier}倍から始まり、その200分の1に1 weiを加えた下限へ向かって線形に下がる。`,
+      a: 'ETHとCSTの基本費用は別々のルールに従います。開始時のETH費用は調律期間中に下がり、ETH一筆ごとに次の基本費用が上がります。CST費用は保存された下降速度で下がります。確定時刻が近づくと両方に終盤の加算が付きますが、次の基本費用や星選のウェイトは増やしません。',
       b: `すべてのサイクルは固定の${protocolFacts.initialGestureCostEth} ETHで開く。`,
       c: '宇宙評議会が各サイクルの開始時の費用を決める。',
       d: '誰かが一筆を入れるまで、費用は1時間ごとに倍になる。',
@@ -32,7 +34,8 @@ export const mediumQuestionsTextJa = {
       c: 'サイクルが確定するまで同じまま。',
       d: `活動を促すために${protocolFacts.ethGestureCostStepUpPercent}%下がる。`,
     },
-    explanation: `最初の一筆の後、ETH一筆はそれぞれ次のETH一筆の費用を${protocolFacts.ethGestureCostStepUpPercent}%と1 weiだけ上げるので、費用は常に増えます。誰でも動く前にコントラクトから現在の費用を読み取れます。費用の上がり方はルールで決まっており、事前に確認できます。`,
+    explanation:
+      'ETHとCSTの基本費用は別々のルールに従います。開始時のETH費用は調律期間中に下がり、ETH一筆ごとに次の基本費用が上がります。CST費用は保存された下降速度で下がります。確定時刻が近づくと両方に終盤の加算が付きますが、次の基本費用や星選のウェイトは増やしません。',
     funFact:
       '追加の1 weiには意味があります。費用が小さすぎて、その一定割合がゼロに丸められる場合でも、厳密な増加を保証します。',
     referenceLabel: 'ホワイトペーパー §4.1——ETH一筆',
@@ -53,12 +56,13 @@ export const mediumQuestionsTextJa = {
   'cst-window-restart': {
     prompt: 'LyraがCST一筆を入れました。CST調律期間はどう変わりますか？',
     options: {
-      a: `彼女が支払った費用の${protocolFacts.cstCalibrationCeilingMultiplier}倍——ただし${cst(protocolFacts.cstCalibrationCeilingMinCst)} CSTを下回らない——から期間をやり直し、再びゼロへ向かって線形に下がる。`,
+      a: 'V3が保存するのはCST費用の下降速度で、期間の長さは速度と上限から求めます。ETH一筆はrate + floor(rate / 100)への増加を試み、CST一筆はrate - floor(rate / 101)へ減少させます。最短期間の条件に反する増加は行いません。CST一筆の後の上限は、加算前のCST基本費用の2倍、設定された最小値、新しい速度と180秒の積のうち最大の値です。次の一筆をすぐに入れることはできます。',
       b: '何もしない。期間はそのまま下がり続ける。',
       c: `費用はサイクルの残りの間${cst(protocolFacts.cstCalibrationCeilingMinCst)} CSTに固定される。`,
       d: '期間は閉じ、CST一筆は次のサイクルまで止まる。',
     },
-    explanation: `すべてのCST一筆は、新しい開始値から期間をやり直します。最後に支払われた費用の${protocolFacts.cstCalibrationCeilingMultiplier}倍で、開始点には${cst(protocolFacts.cstCalibrationCeilingMinCst)} CSTの下限があります。そこから費用は期間の長さをかけてゼロへ線形に下がります。使われたCSTは、その途中で焼却されます。`,
+    explanation:
+      'V3が保存するのはCST費用の下降速度で、期間の長さは速度と上限から求めます。ETH一筆はrate + floor(rate / 100)への増加を試み、CST一筆はrate - floor(rate / 101)へ減少させます。最短期間の条件に反する増加は行いません。CST一筆の後の上限は、加算前のCST基本費用の2倍、設定された最小値、新しい速度と180秒の積のうち最大の値です。次の一筆をすぐに入れることはできます。',
     referenceLabel: 'ホワイトペーパー §4.3——CST一筆',
   },
   'cst-free-quiet': {
@@ -77,26 +81,27 @@ export const mediumQuestionsTextJa = {
   'window-feedback-loop': {
     prompt: 'ETH一筆が続けて入りました。CST調律期間の長さはどう変わりますか？',
     options: {
-      a: `ETH一筆はそれぞれ約${protocolFacts.cstCalibrationWindowDecreasePercentPerEthGesture}%短くするので、CSTの費用はより速く下がり、CST一筆はより早く魅力的になる。`,
+      a: 'V3が保存するのはCST費用の下降速度で、期間の長さは速度と上限から求めます。ETH一筆はrate + floor(rate / 100)への増加を試み、CST一筆はrate - floor(rate / 101)へ減少させます。最短期間の条件に反する増加は行いません。CST一筆の後の上限は、加算前のCST基本費用の2倍、設定された最小値、新しい速度と180秒の積のうち最大の値です。次の一筆をすぐに入れることはできます。',
       b: `ETH一筆はそれぞれ約${protocolFacts.cstCalibrationWindowIncreasePercentPerCstGesture}%長くし、CSTの下降を遅くする。`,
       c: '何もしない。二つの通貨は独立している。',
       d: '期間は元の長さにリセットされる。',
     },
-    explanation: `期間の長さは参加状況に応じて変わり、ETHとCSTの利用を調整します。ETH一筆はそれぞれ約${protocolFacts.cstCalibrationWindowDecreasePercentPerEthGesture}%短くし、CST一筆はそれぞれ約${protocolFacts.cstCalibrationWindowIncreasePercentPerCstGesture}%長くします。ETHの活動が盛んならCSTの下降は速まり、CSTの活動が盛んならまた遅くなります。こうしてETHとCSTの利用状況が互いの費用に反映されます。`,
+    explanation:
+      'V3が保存するのはCST費用の下降速度で、期間の長さは速度と上限から求めます。ETH一筆はrate + floor(rate / 100)への増加を試み、CST一筆はrate - floor(rate / 101)へ減少させます。最短期間の条件に反する増加は行いません。CST一筆の後の上限は、加算前のCST基本費用の2倍、設定された最小値、新しい速度と180秒の積のうち最大の値です。次の一筆をすぐに入れることはできます。',
     referenceLabel: 'ホワイトペーパー §4.3——CST一筆',
   },
   'participation-cst-timing': {
     prompt:
       '開始時のパラメーターで、二つの一筆が参加CSTを刻印します。一つは前の一筆の1秒後に届き、もう一つはまる一日の沈黙を終わらせます。それぞれ、おおよそどれだけ刻印しますか？',
     options: {
-      a: `約${oneSecondExample.cst} CSTと約${oneDayExample.cst} CST。量は経過時間の平方根とともに増える。`,
+      a: `直前の参加者に約${oneSecondExample.cst} CSTと約${oneDayExample.cst} CSTです。時間に比例します。`,
       b: `タイミングにかかわらず、それぞれ一律${cst(100)} CST。`,
       c: '同じ量。タイミングは決して関係ない。',
       d: 'どちらもゼロ。CSTを刻印するのは確定だけ。',
     },
-    explanation: `参加CSTは前の一筆からの時間の平方根とともに増えます。1秒後に届く一筆はほとんど何も刻印しません（約${oneSecondExample.cst} CST）が、一日の沈黙を終わらせる一筆は数百を刻印します（約${oneDayExample.cst} CST）。一筆あたり一律${cst(100)} CSTは元のV1のルールでした。それは機械の速さの連続を無償のCSTに変えてしまい、まさにそれがV2が置き換えた理由です。`,
+    explanation: `参加CSTの最小単位での数量は${protocolFacts.dynamicCstRewardFormula}です。経過時間は秒、サイクルの加算時間はマイクロ秒で扱います。CST数量で表示するには結果を10^18で割ります。次の一筆が直前の参加者へ全額を刻印します。最初の一筆では発生せず、確定時にも最後の区間は追加精算されません。`,
     funFact:
-      '参加CSTは、前の一筆から時間が空くほど多くなります。ごく短い間隔で一筆を繰り返しても、各回の参加CSTはほぼゼロです。功労CSTと広報準備金には別の刻印ルールがあります。',
+      'V3では、次の一筆が直前の一筆を入れた参加者に参加CSTの全額を刻印します。数量は二つの一筆の間の時間に比例します。サイクル最初の一筆ではこのCSTは発生せず、確定時にも最後の参加者の未精算区間へ追加の参加CSTは支払われません。両方の一筆が同じアドレスなら、そのアドレス自身が受け取ります。',
     referenceLabel: 'ホワイトペーパー §7.1——刻印のルール',
   },
   'cst-max-cost-protection': {
@@ -157,19 +162,19 @@ export const mediumQuestionsTextJa = {
       c: `${cst(protocolFacts.outreachReserveCst)} CST。1回選ばれる。`,
       d: `NFT 1点のみ。${protocolFacts.typicalNftsPerCycle}回選ばれる。`,
     },
-    explanation: `NFT星選は${protocolFacts.nftStellarSelectionRecipients}件の対象を選び、それぞれが${cst(protocolFacts.specialAllocationCst)} CSTとNFT 1点を携えます。功労CSTはそのNFTとあわせて配分されます。確定時のすべてのNFTの分配は、この二つを対にします。`,
+    explanation: `すべてのトラックがある場合、サイクルはCosmic Signature NFT${protocolFacts.typicalNftsPerCycle}点と固定配分の${formatCount(protocolFacts.typicalCstImprintsPerCycle, 'ja')} CSTを刻印します。シグネチャー配分はNFT${protocolFacts.mainPrizeNftsPerCycle}点に対して、合計${formatCount(protocolFacts.specialAllocationCst, 'ja')} CSTを一度だけ受け取ります。時の戦士、持久チャンピオン、最後のCST一筆には各1点と対応するCSTがあり、二つのNFT星選が残りを加えます。CST一筆や係留中のRandom Walk NFTがなければ該当トラックは省略されます。参加CSTは別です。`,
     referenceLabel: 'ホワイトペーパー §5.1——確定時の分配',
   },
   'draws-with-replacement': {
     prompt: '同じ参加者が、一つのサイクルの星選で複数回選ばれることはありますか？',
     options: {
-      a: 'ある。選定は復元抽出で行われ、対象は入れた一筆の数に応じて増える。',
+      a: '一筆の時点における、割引も終盤の加算もないETH基本費用をウェイトとして選びます。同じアドレスを複数回選ぶことがあります。',
       b: 'ない。各参加者は最大1回しか選ばれない。',
       c: '一筆が10以上の参加者だけが繰り返し選ばれうる。',
       d: '宇宙評議会が繰り返しを承認した場合だけ。',
     },
     explanation:
-      '選定は復元抽出で行われるので、同じ参加者が複数回選ばれることがあります。各一筆は1件の対象を記録するので、選ばれる頻度は参加に比例します。この仕組みは、アドレスごとに1回の選定を配給するのではなく、活動に応じて広がります。',
+      '参加者向けのETH星選とNFT星選は、どちらも一筆ごとのウェイトを使います。ウェイトは、その時点のETH基本費用からRandom Walk NFTによる割引と終盤の加算を除いた値です。CST一筆にも同時点のETH基本費用を使います。復元を伴う選定なので、同じアドレスが複数回選ばれることがあります。係留NFT星選は、係留中のRandom Walk NFTを別に対象とします。',
     referenceLabel: 'ホワイトペーパー §5.3——星選',
   },
   'anchored-rwlk-track': {
@@ -215,8 +220,7 @@ export const mediumQuestionsTextJa = {
       c: '受領者の分を含め、すべてがエスクローで待つ。',
       d: 'エスクローされるのはCSTだけで、ETHはすべて直接送られる。',
     },
-    explanation:
-      '分配は意図的にプッシュとプルに分けられています。受領者のETHと公共財への送付は確定の間にプッシュされ、二次的なETH配分は各受領者が受け取るために配分ウォレットに置かれます。CSTとNFTは受領者へ直接刻印されます。',
+    explanation: `確定時に、プロトコルはサイクル準備金の${protocolFacts.publicGoodsPercentage}%を公共財金庫へ送ろうとします。その後、誰でも別のトランザクションで残高を現在の受け手であるProtocol Guildへ送れます。所有者は受け手を変更できます。プロトコルから金庫への送付が失敗しても、確定を取り消さずにその分を準備金へ残す場合があります。`,
     referenceLabel: 'ホワイトペーパー §5.4——配送、エスクロー、タイムアウト',
   },
   'council-proposal-threshold': {
@@ -227,7 +231,8 @@ export const mediumQuestionsTextJa = {
       c: `少なくとも${cst(protocolFacts.outreachReserveCst)} CST。`,
       d: 'いくらでも。しきい値はない。',
     },
-    explanation: `提案のしきい値は、委任されたウェイト${protocolFacts.councilProposalThresholdCst} CSTです。提案が身近なものであるよう、意図的に控えめにしてあります。${cst(protocolFacts.specialAllocationCst)} CSTという数字は各NFTの分配に伴う功労CSTで、混同しやすい別の定数です。`,
+    explanation:
+      'CSTは一筆に使えるほか、委任後は宇宙評議会の調整ウェイトになります。評議会が扱えるのは実際に持つ資産と権限だけです。現在は主要プロトコルの所有者ではなく、移管や放棄には別のオンチェーン操作が必要です。',
     referenceLabel: 'ホワイトペーパー §9——宇宙評議会',
   },
   'council-timeline': {
@@ -280,12 +285,12 @@ export const mediumQuestionsTextJa = {
   'typical-cst-fixed': {
     prompt: '標準的なサイクルはどれだけの固定CSTを刻印し、その内訳はどうなっていますか？',
     options: {
-      a: `${cst(protocolFacts.typicalCstImprintsPerCycle)} CST——${protocolFacts.typicalNftsPerCycle}件のNFTの分配それぞれに伴う${cst(protocolFacts.specialAllocationCst)} CSTと、広報準備金への${cst(protocolFacts.outreachReserveCst)} CST。`,
+      a: `すべてのトラックがある場合、サイクルはCosmic Signature NFT${protocolFacts.typicalNftsPerCycle}点と固定配分の${formatCount(protocolFacts.typicalCstImprintsPerCycle, 'ja')} CSTを刻印します。シグネチャー配分はNFT${protocolFacts.mainPrizeNftsPerCycle}点に対して、合計${formatCount(protocolFacts.specialAllocationCst, 'ja')} CSTを一度だけ受け取ります。時の戦士、持久チャンピオン、最後のCST一筆には各1点と対応するCSTがあり、二つのNFT星選が残りを加えます。CST一筆や係留中のRandom Walk NFTがなければ該当トラックは省略されます。参加CSTは別です。`,
       b: `${cst(protocolFacts.specialAllocationCst)} CST、すべてサイクルの受領者へ。`,
       c: `${cst(protocolFacts.outreachReserveCst)} CST、すべてコミュニティの広報へ。`,
       d: 'サイクルごとに予測できない形で変わる。',
     },
-    explanation: `固定の流れは正確です。${protocolFacts.typicalNftsPerCycle}件のNFTに伴う${cst(protocolFacts.specialAllocationCst)} CSTの刻印と、${cst(protocolFacts.outreachReserveCst)} CSTの広報分で、標準的なサイクルの合計は${cst(protocolFacts.typicalCstImprintsPerCycle)} CSTです。個々の一筆からの動的な参加CSTはこれに加わるもので、タイミングに依存します。`,
+    explanation: `すべてのトラックがある場合、サイクルはCosmic Signature NFT${protocolFacts.typicalNftsPerCycle}点と固定配分の${formatCount(protocolFacts.typicalCstImprintsPerCycle, 'ja')} CSTを刻印します。シグネチャー配分はNFT${protocolFacts.mainPrizeNftsPerCycle}点に対して、合計${formatCount(protocolFacts.specialAllocationCst, 'ja')} CSTを一度だけ受け取ります。時の戦士、持久チャンピオン、最後のCST一筆には各1点と対応するCSTがあり、二つのNFT星選が残りを加えます。CST一筆や係留中のRandom Walk NFTがなければ該当トラックは省略されます。参加CSTは別です。`,
     referenceLabel: 'ホワイトペーパー §7.1——刻印のルール',
   },
   'attached-assets-destination': {
@@ -303,12 +308,12 @@ export const mediumQuestionsTextJa = {
   'next-cycle-delay': {
     prompt: 'サイクルがちょうど確定しました。次のサイクルはいつ有効になりますか？',
     options: {
-      a: `短い遅延の後——既定では${protocolFacts.defaultNextCycleDelayMinutes}分。ただし、オンチェーンのライブの値は調整可能で、それが基準になる。`,
+      a: `次のサイクルは確定成功後、オンチェーンに設定された待機時間を経て開始します。現在は${protocolFacts.currentNextCycleDelayDays}日です。所有者が変更でき、初期既定値の${protocolFacts.defaultNextCycleDelayMinutes}分は現在の設定ではありません。`,
       b: '同じトランザクションの中で、すぐに。',
       c: `ちょうど${protocolFacts.finalGestureExclusivityHours}時間後。`,
       d: '所有者が手動で始めたときだけ。',
     },
-    explanation: `確定の後、次のサイクルは短い遅延——既定では${protocolFacts.defaultNextCycleDelayMinutes}分——を経て有効になります。ライブの遅延はオンチェーンに保存され、所有者が設定できるので、既定値ではなくコントラクトが基準です。有効になると、新しいサイクルの調律期間が開きます。`,
+    explanation: `次のサイクルは確定成功後、オンチェーンに設定された待機時間を経て開始します。現在は${protocolFacts.currentNextCycleDelayDays}日です。所有者が変更でき、初期既定値の${protocolFacts.defaultNextCycleDelayMinutes}分は現在の設定ではありません。`,
     referenceLabel: 'ホワイトペーパー §3.3——確定',
   },
 } as const satisfies QuizTierQuestionsText<'medium'>;

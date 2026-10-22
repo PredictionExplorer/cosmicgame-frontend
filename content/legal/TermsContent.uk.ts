@@ -1,9 +1,6 @@
-import {
-  ethDistributionFacts,
-  isV3Mechanics,
-  nftAllocationFacts,
-  protocolFacts,
-} from '@/content/protocol-facts';
+import { ethDistributionFacts, protocolFacts } from '@/content/protocol-facts';
+
+import { formatCount } from '@/utils/format/numbers';
 
 import type { TermsCopy } from './TermsContent';
 
@@ -59,16 +56,12 @@ export const termsCopyUk = {
         {
           id: 'dynamic-cst',
           subtitle: 'Динамічне закарбування CST',
-          text: isV3Mechanics
-            ? 'Кількість CST участі, яку закарбовує жест, не є фіксованою. Вона накопичується лінійно з часом, що минув від попереднього жесту, а частина кожного закарбування зараховується учаснику, чий жест було перевершено. Дуже швидкі жести можуть закарбувати 0 CST.'
-            : 'Кількість CST участі, яку закарбовує жест, не є фіксованою. Вона залежить від того, скільки часу минуло з попереднього жесту, і обчислюється за формулою квадратного кореня. Дуже швидкі жести можуть закарбувати 0 CST.',
+          text: 'У V3 наступний жест закарбовує всі CST участі для учасника попереднього жесту. Кількість лінійно залежить від часу між цими жестами. Перший жест циклу нічого не закарбовує за цим правилом, а завершення не виплачує додаткові CST участі учаснику із завершальним жестом. Якщо обидва жести належать одній адресі, вона отримує ці CST сама.',
         },
         {
           id: 'cst-window',
           subtitle: 'Вікно калібрування CST',
-          text: isV3Mechanics
-            ? 'Вартість CST-жесту знижується протягом вікна калібрування. Кожен CST-жест перезапускає вікно з подвоєною ціною свого виконання (з урахуванням ончейн-мінімуму), після чого вартість знижується зі сталою ончейн-швидкістю, доки не досягне нуля або не відбудеться інший CST-жест.'
-            : `Вартість CST-жесту знижується протягом вікна калібрування, яке зберігається в блокчейні. Кожен CST-жест збільшує це вікно приблизно на ${protocolFacts.cstCalibrationWindowIncreasePercentPerCstGesture}%, а кожен ETH-жест зменшує його приблизно на ${protocolFacts.cstCalibrationWindowDecreasePercentPerEthGesture}%.`,
+          text: 'У V3 зберігається швидкість зниження вартості CST, а тривалість вікна обчислюється з неї та стелі. ETH-жест намагається збільшити швидкість за правилом rate + floor(rate / 100); CST-жест зменшує її за правилом rate - floor(rate / 101). Збільшення пропускають, якщо воно порушило б мінімальну тривалість. CST-жест перезапускає стелю як найбільше з подвоєної базової вартості CST без надбавки, налаштованого мінімуму та швидкості, помноженої на 180 секунд. Це не забороняє одразу зробити наступний жест.',
         },
         {
           id: 'smart-contract',
@@ -94,42 +87,42 @@ export const termsCopyUk = {
         {
           id: 'distribution',
           subtitle: 'Виконання розподілів',
-          text: `Розподіли виконуються автоматично відповідно до правил смарт-контрактів. У типовому циклі протокол закарбовує ${nftAllocationFacts.typicalNftsPerCycle} Cosmic Signature NFT і ${protocolFacts.typicalCstImprintsPerCycle.toLocaleString('uk-UA')} CST за наведеними нижче напрямами розподілу.`,
+          text: `За наявності всіх напрямів цикл створює ${protocolFacts.typicalNftsPerCycle} Cosmic Signature NFT і ${formatCount(protocolFacts.typicalCstImprintsPerCycle, 'uk')} CST у фіксованих розподілах. Розподіл Сигнатури містить ${protocolFacts.mainPrizeNftsPerCycle} NFT і лише один загальний розподіл ${formatCount(protocolFacts.specialAllocationCst, 'uk')} CST. Воїн часу, Чемпіон витривалості та завершальний CST-жест отримують по одному NFT і відповідний CST; два NFT-відбори додають свої записи. Без CST-жесту або закріплених Random Walk NFT відповідні напрями пропускаються. CST участі нараховуються окремо.`,
         },
         {
           id: 'signature',
           subtitle: 'Розподіл Сигнатури',
-          text: `Учасник, який зробив завершальний жест, може забрати ${ethDistributionFacts.mainEthPercentage}% ETH, ${protocolFacts.specialAllocationCst.toLocaleString('uk-UA')} CST визнання, ${nftAllocationFacts.mainPrizeNftPhrase.uk}, а також долучені в цьому циклі токени, якщо такі є.`,
+          text: `Розподіл Сигнатури отримує той, хто успішно завершує цикл: ${protocolFacts.mainEthPercentage}% резерву циклу, загалом ${formatCount(protocolFacts.specialAllocationCst, 'uk')} CST і ${protocolFacts.mainPrizeNftsPerCycle} послідовні Cosmic Signature NFT. Протягом перших ${protocolFacts.finalGestureExclusivityHours} годин після часу завершення це може зробити лише учасник із завершальним жестом; потім — будь-хто для себе.`,
         },
         {
           id: 'chrono',
           subtitle: 'Воїн часу',
-          text: `Учасник, який найдовше безперервно утримував позицію Чемпіона витривалості, отримує ${ethDistributionFacts.chronoWarriorEthPercentage}% ETH, ${protocolFacts.specialAllocationCst.toLocaleString('uk-UA')} CST визнання та один Cosmic Signature NFT.`,
+          text: `Учасник, який найдовше безперервно утримував позицію Чемпіона витривалості, отримує ${ethDistributionFacts.chronoWarriorEthPercentage}% ETH, ${formatCount(protocolFacts.specialAllocationCst, 'uk')} CST визнання та один Cosmic Signature NFT.`,
         },
         {
           id: 'endurance',
           subtitle: 'Чемпіон витривалості',
-          text: `Учасник, чий жест найдовше безперервно залишався останнім, отримує ${protocolFacts.specialAllocationCst.toLocaleString('uk-UA')} CST визнання та один Cosmic Signature NFT.`,
+          text: `Учасник, чий жест найдовше безперервно залишався останнім, отримує ${formatCount(protocolFacts.specialAllocationCst, 'uk')} CST визнання та один Cosmic Signature NFT.`,
         },
         {
           id: 'final-cst',
           subtitle: 'Завершальний CST-жест',
-          text: `Учасник, який зробив останній CST-жест циклу, отримує ${protocolFacts.specialAllocationCst.toLocaleString('uk-UA')} CST визнання та один Cosmic Signature NFT.`,
+          text: `Учасник, який зробив останній CST-жест циклу, отримує ${formatCount(protocolFacts.specialAllocationCst, 'uk')} CST визнання та один Cosmic Signature NFT.`,
         },
         {
           id: 'eth-selection',
           subtitle: 'Зоряний відбір ETH',
-          text: `Зоряний відбір визначає ${protocolFacts.ethStellarSelectionRecipients} учасників, які розділяють між собою ${ethDistributionFacts.stellarSelectionEthPercentage}% ETH із резерву циклу.`,
+          text: `Під час завершення протокол намагається передати ${protocolFacts.publicGoodsPercentage}% резерву циклу до сховища суспільних благ. Окрема транзакція, доступна будь-кому, пересилає баланс сховища поточному бенефіціару — нині Protocol Guild. Власник може змінити бенефіціара. Якщо передання зі протоколу не вдається, ця частка може залишитися в резерві, не скасовуючи завершення.`,
         },
         {
           id: 'nft-selection',
           subtitle: 'Зоряний відбір NFT',
-          text: `Зоряний відбір визначає ${protocolFacts.nftStellarSelectionRecipients} учасників, кожен із яких отримує ${protocolFacts.specialAllocationCst.toLocaleString('uk-UA')} CST визнання та один Cosmic Signature NFT.`,
+          text: `Зоряний відбір визначає ${protocolFacts.nftStellarSelectionRecipients} учасників, кожен із яких отримує ${formatCount(protocolFacts.specialAllocationCst, 'uk')} CST визнання та один Cosmic Signature NFT.`,
         },
         {
           id: 'anchored-selection',
           subtitle: 'Зоряний відбір закріплених NFT',
-          text: `Зоряний відбір визначає ${protocolFacts.anchoredRwlkNftSelectionRecipients} власників закріплених Random Walk NFT, кожен із яких отримує ${protocolFacts.specialAllocationCst.toLocaleString('uk-UA')} CST визнання та один Cosmic Signature NFT.`,
+          text: `Зоряний відбір визначає ${protocolFacts.anchoredRwlkNftSelectionRecipients} власників закріплених Random Walk NFT, кожен із яких отримує ${formatCount(protocolFacts.specialAllocationCst, 'uk')} CST визнання та один Cosmic Signature NFT.`,
         },
         {
           id: 'anchor-distribution',
@@ -139,7 +132,7 @@ export const termsCopyUk = {
         {
           id: 'public-goods',
           subtitle: 'Суспільні блага',
-          text: `${ethDistributionFacts.publicGoodsPercentage}% ETH перераховується Protocol Guild — поточному бенефіціару суспільних благ.`,
+          text: 'І ETH-зоряний відбір, і NFT-зоряний відбір серед учасників використовують вагу кожного жесту. Вага — це базова вартість ETH-жесту на той момент, без зниження за Random Walk NFT і без надбавки за пізній жест. CST-жест отримує вагу за тією самою поточною базовою вартістю ETH. Відбір здійснюється з поверненням: одну адресу можна відібрати кілька разів. Зоряний відбір закріплених NFT окремо враховує активні Random Walk NFT.',
         },
         {
           id: 'compounding',

@@ -289,9 +289,9 @@
       "netPositive": "CST tham gia nhận được vượt chi phí CST nếu nét bút này được ghi nhận.",
       "netNegative": "Hầu hết nét bút CST tiêu nhiều CST hơn lượng nhận được.",
       "durationMismatch": "Đang dùng thời lượng trên chuỗi ({contractDuration}) vì API báo {apiDuration}.",
-      "economicsDescriptionV3": "Chi phí CST được trừ từ số dư của bạn. Lượng CST động mà nét bút này tạo ra được ghi trọn cho người tham gia bạn vừa vượt; CST của riêng bạn tích lũy trong lúc bạn còn là người tham gia mới nhất và được ghi khi nét bút kế tiếp xuất hiện.",
-      "previewDescriptionV3": "Lượng CST động ước tính mà nét bút này tạo ra. Toàn bộ số lượng được chuyển cho người tham gia bạn vừa vượt — và bạn nhận trọn CST của nét bút kế tiếp khi có người vượt bạn.",
-      "goesToOutbid": "Được trả trọn cho người tham gia bạn vừa vượt; khi bị vượt, bạn nhận CST của nét bút kế tiếp."
+      "economicsDescriptionV3": "Trong V3, nét bút tiếp theo khắc toàn bộ CST tham gia cho người đặt nét bút trước. Số lượng tăng tuyến tính theo thời gian giữa hai nét bút. Nét bút đầu tiên của chu kỳ không khắc CST theo quy tắc này, và hoàn tất không thanh toán thêm khoảng thời gian cuối cho người đặt nét bút cuối cùng. Nếu cả hai nét bút thuộc cùng một địa chỉ, địa chỉ đó nhận CST.",
+      "previewDescriptionV3": "Trong V3, nét bút tiếp theo khắc toàn bộ CST tham gia cho người đặt nét bút trước. Số lượng tăng tuyến tính theo thời gian giữa hai nét bút. Nét bút đầu tiên của chu kỳ không khắc CST theo quy tắc này, và hoàn tất không thanh toán thêm khoảng thời gian cuối cho người đặt nét bút cuối cùng. Nếu cả hai nét bút thuộc cùng một địa chỉ, địa chỉ đó nhận CST.",
+      "goesToOutbid": "Trong V3, nét bút tiếp theo khắc toàn bộ CST tham gia cho người đặt nét bút trước. Số lượng tăng tuyến tính theo thời gian giữa hai nét bút. Nét bút đầu tiên của chu kỳ không khắc CST theo quy tắc này, và hoàn tất không thanh toán thêm khoảng thời gian cuối cho người đặt nét bút cuối cùng. Nếu cả hai nét bút thuộc cùng một địa chỉ, địa chỉ đó nhận CST."
     },
     "preview": "Xem trước các tùy chọn nét bút trực tiếp tại đây. Kết nối ví để viết lời nhắn, đính kèm tài sản và gửi nét bút trên Arbitrum.",
     "advanced": {
@@ -322,7 +322,7 @@
         "guarded": "Yêu cầu tối thiểu bằng mức hiển thị, trừ dung sai",
         "toleranceLabel": "Dung sai",
         "toleranceHint": "Cho phép mức này dao động giữa lúc báo giá và lúc giao dịch được ghi nhận.",
-        "note": "CST tham gia của nét bút được khắc cho người tham gia bạn vừa vượt, nên mức sàn chỉ có ý nghĩa khi người đó là bạn. Nếu nét bút khác được ghi nhận trước, mức sàn có thể khiến nét bút của bạn bị hoàn tác.",
+        "note": "Mức CST tham gia tối thiểu giới hạn số lượng mà nét bút tiếp theo khắc cho người tham gia trước, không bảo đảm một khoản cho người gửi. Nếu hai địa chỉ giống nhau, người gửi tự nhận số lượng đó. Giá trị 0 tắt giới hạn này; nét bút ETH đầu tiên của chu kỳ bỏ qua kiểm tra. Chi phí tối đa và phí mạng là các điều kiện riêng.",
         "autoNote": "Được chọn sẵn: bạn là người tham gia mới nhất của chu kỳ, nên CST tham gia của nét bút này sẽ trở về ví của bạn."
       }
     },
@@ -379,7 +379,8 @@
     "reachesFloorIn": "0 CST sau {duration}",
     "windowEndsIn": "Cửa sổ kết thúc sau {duration}",
     "windowDetails": "Độ dài cửa sổ: {duration}. Đã trôi qua: {elapsed}.",
-    "floorIn": "sau {duration}"
+    "floorIn": "sau {duration}",
+    "cstSubtitleV3": "Chi phí CST cơ sở giảm theo tốc độ hiện tại trên chuỗi. Nét bút ETH có thể tăng tốc độ; nét bút CST giảm tốc độ và đặt lại mức trần. Phụ phí cuối chu kỳ được cộng riêng."
   },
   "allocation": {
     "title": "Chi tiết phân bổ",
@@ -400,7 +401,7 @@
       },
       "publicGoods": {
         "name": "Hàng hóa công",
-        "tooltip": "{percent}% của mỗi Dự trữ chu kỳ được chuyển đến Protocol Guild, cơ chế tài trợ cho hơn 170 người đóng góp cốt lõi cho Ethereum.",
+        "tooltip": "{percent}% được phân bổ vào Kho Hàng hóa công. Bất kỳ ai cũng có thể chuyển riêng số dư tới đơn vị thụ hưởng đã cấu hình, hiện là Protocol Guild.",
         "recipientLabel": "Protocol Guild"
       },
       "ethStellar": {
@@ -514,10 +515,10 @@
     "monument": {
       "reserveLabel": "Phân bổ Signature",
       "extras": {
-        "base": "+ 1.000 CST · 1 Cosmic Signature NFT",
-        "withNft": "+ 1.000 CST · 1 Cosmic Signature NFT · {nftCount, plural, other {# NFT đính kèm}}",
-        "withErc20": "+ 1.000 CST · 1 Cosmic Signature NFT · {erc20Count, plural, other {# khoản nạp token đính kèm}}",
-        "withBoth": "+ 1.000 CST · 1 Cosmic Signature NFT · {nftCount, plural, other {# NFT đính kèm}} · {erc20Count, plural, other {# khoản nạp token đính kèm}}"
+        "base": "+ 1.000 CST · {cscNftCount, plural, other {# Cosmic Signature NFT}}",
+        "withNft": "+ 1.000 CST · {cscNftCount, plural, other {# Cosmic Signature NFT}} · {nftCount, plural, other {# NFT đính kèm}}",
+        "withErc20": "+ 1.000 CST · {cscNftCount, plural, other {# Cosmic Signature NFT}} · {erc20Count, plural, other {# khoản nạp token đính kèm}}",
+        "withBoth": "+ 1.000 CST · {cscNftCount, plural, other {# Cosmic Signature NFT}} · {nftCount, plural, other {# NFT đính kèm}} · {erc20Count, plural, other {# khoản nạp token đính kèm}}"
       },
       "calendarTitle": "Chu kỳ Cosmic Signature {number} mở",
       "calendarBody": "Chu kỳ trình diễn tiếp theo mở cho nét bút. Nét bút đầu tiên khởi động đếm ngược hoàn tất.",
@@ -528,7 +529,7 @@
       "subtitle": "Mọi thứ chu kỳ này phân phối khi hoàn tất",
       "cstPlusNft": "1.000 CST + NFT",
       "cstPlusNftEach": "1.000 CST + NFT mỗi người",
-      "stellarStatus": "mỗi nét bút là một lượt",
+      "stellarStatus": "lượt có trọng số trong V3",
       "ethGroup": "ETH từ Dự trữ chu kỳ",
       "fixedGroup": "Phân bổ CST và NFT"
     },
@@ -538,7 +539,7 @@
       "galleryCta": "Phòng trưng bày",
       "viewAria": "Xem Cosmic Signature {id}",
       "alt": "Tác phẩm Cosmic Signature {id} — nghệ thuật tạo sinh ba vật thể tất định",
-      "pairingNote": "Nghệ thuật ba vật thể tất định, khắc trên chuỗi. Mỗi Signature đi cùng 1.000 CST.",
+      "pairingNote": "Phân bổ cố định có CST. Toàn bộ NFT của phân bổ chính đi cùng một khoản CST cố định duy nhất.",
       "watchDrawing": "Xem tác phẩm thành hình",
       "showFinished": "Hiện tác phẩm hoàn chỉnh"
     },
@@ -583,7 +584,7 @@
     "clock": {
       "reserveLabel": "Phân bổ Signature",
       "reserveExtraCst": "+ 1.000 CST",
-      "reserveExtraNft": "1 Cosmic Signature NFT",
+      "reserveExtraNft": "{count, plural, other {# Cosmic Signature NFT}}",
       "reserveAttached": "{count, plural, other {# tài sản đính kèm}}",
       "reserveUsd": "≈ {amount} USD",
       "calendarTitle": "Chu kỳ Cosmic Signature {number} mở",

@@ -14,6 +14,7 @@ import type { LegalDocumentLabels } from '@/content/legal/labels';
 import { LEGAL_LINKS } from '@/content/legal/links';
 import {
   OFFICIAL_CONTRACTS,
+  isSourcifyVerified,
   sourcifyContractUrl,
   type OfficialContractId,
 } from '@/content/legal/officialAddresses';
@@ -23,7 +24,7 @@ import { RiskContent } from '@/content/legal/RiskContent';
 import { SecurityContent, type ProtocolOwner } from '@/content/legal/SecurityContent';
 import { TermsContent } from '@/content/legal/TermsContent';
 import { TRUST_CENTER_TABS, TRUST_DOCUMENT_DATES } from '@/content/legal/trustCenter';
-import { protocolFacts } from '@/content/protocol-facts';
+import { nftAllocationFacts, protocolFacts } from '@/content/protocol-facts';
 
 import { routing } from '@/i18n/routing';
 import { checksumAddress } from '@/utils/format';
@@ -196,13 +197,15 @@ describe('Security', () => {
       .getAllByRole('link', { name: /Sourcify/ })
       .map((link) => link.getAttribute('href'));
     for (const { address } of OFFICIAL_CONTRACTS) {
-      expect(sourcifyLinks).toContain(sourcifyContractUrl(address));
+      if (isSourcifyVerified(address)) {
+        expect(sourcifyLinks).toContain(sourcifyContractUrl(address));
+      } else {
+        expect(sourcifyLinks).not.toContain(sourcifyContractUrl(address));
+      }
     }
     // The Sourcify match is stated once, with the day it was checked, not badged per row.
     expect(screen.queryByText('Exact match')).toBeNull();
-    expect(
-      screen.getByText(/exact match on Sourcify \(checked September 24, 2026\)/),
-    ).toBeInTheDocument();
+    expect(screen.getByText(/V3.*not.*verified.*Sourcify/i)).toBeInTheDocument();
     // The whole address, never shortened on phones: the page asks for a character-by-character check.
     for (const { address } of OFFICIAL_CONTRACTS) {
       expect(screen.getByTitle(checksumAddress(address))).toHaveTextContent(
@@ -476,9 +479,11 @@ describe('Terms of Service', () => {
     expect(tracks[0]).toHaveAttribute('id', 'allocations-signature');
     const figures = (track: Element | undefined) => track?.querySelector('[data-track-figures]');
     expect(figures(tracks[0])).toHaveTextContent(
-      `ETH ${protocolFacts.mainEthPercentage}% · CST ${protocolFacts.specialAllocationCst.toLocaleString('en')} · NFT 1`,
+      `ETH ${protocolFacts.mainEthPercentage}% · CST ${protocolFacts.specialAllocationCst.toLocaleString('en')} · NFT ${nftAllocationFacts.mainPrizeNfts}`,
     );
-    expect(list).toHaveTextContent('4%, shared by 3');
+    expect(list).toHaveTextContent(
+      `${protocolFacts.stellarSelectionEthPercentage}%, shared by ${protocolFacts.ethStellarSelectionRecipients}`,
+    );
     expect(
       tracks.filter((track) => figures(track)?.textContent?.includes('10 × 1,000')),
     ).toHaveLength(2);

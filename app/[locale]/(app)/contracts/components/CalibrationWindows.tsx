@@ -3,7 +3,7 @@
 import { useEffect, useState, type ReactNode } from 'react';
 import { useLocale, useTranslations } from 'next-intl';
 
-import { protocolFacts } from '@/content/protocol-facts';
+import { historicalV2ProtocolFacts, isV3Mechanics } from '@/content/protocol-facts';
 
 import { useNow } from '@/hooks/useNow';
 import { CalibrationWindowIcon } from '@/lib/conceptIcons';
@@ -113,10 +113,16 @@ function WindowsAt({
           title={t('parameters.cstTitle')}
           reading={cst}
           status={cstStatus}
-          durationDefinition={t('parameters.cstDurationTooltip', {
-            increase: protocolFacts.cstCalibrationWindowIncreasePercentPerCstGesture,
-            decrease: protocolFacts.cstCalibrationWindowDecreasePercentPerEthGesture,
-          })}
+          durationDefinition={
+            isV3Mechanics
+              ? t('parameters.cstDurationTooltipV3')
+              : t('parameters.cstDurationTooltip', {
+                  increase:
+                    historicalV2ProtocolFacts.cstCalibrationWindowIncreasePercentPerCstGesture,
+                  decrease:
+                    historicalV2ProtocolFacts.cstCalibrationWindowDecreasePercentPerEthGesture,
+                })
+          }
           note={cstStatus?.state === 'complete' ? t('parameters.cstComplete') : null}
           extra={{
             label: t('parameters.ceiling'),

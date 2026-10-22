@@ -1,19 +1,8 @@
 import { protocolFacts } from '@/content/protocol-facts';
 
-import { copyNumbers } from './copyNumbers';
-import type { HowItWorksText } from './structure';
+import { formatCount } from '@/utils/format/numbers';
 
-const numbers = copyNumbers('vi');
-const cstAmount = numbers.specialAllocationCst;
-const cstWindowDecrease = numbers.decimal(
-  protocolFacts.cstCalibrationWindowDecreasePercentPerEthGesture,
-);
-const cstWindowIncrease = numbers.decimal(
-  protocolFacts.cstCalibrationWindowIncreasePercentPerCstGesture,
-);
-const eth = numbers.count(numbers.ethRecipients);
-const nft = numbers.count(numbers.nftRecipients);
-const anchored = numbers.count(numbers.anchoredRecipients);
+import type { HowItWorksText } from './structure';
 
 /** Vietnamese how-it-works copy, keyed by the skeleton in structure.ts. */
 export const howItWorksTextVi = {
@@ -45,19 +34,21 @@ export const howItWorksTextVi = {
       {
         title: 'CST tham gia động',
         description:
-          'Một nét bút có thể khắc CST. Lượng CST tính theo căn bậc hai của thời gian kể từ nét bút trước: nét bút ngay sau một nét bút khác có thể khắc 0 CST, còn khoảng lặng dài hơn khắc nhiều hơn.',
+          'Trong V3, nét bút tiếp theo khắc toàn bộ CST tham gia cho người đặt nét bút trước. Số lượng tăng tuyến tính theo thời gian giữa hai nét bút. Nét bút đầu tiên của chu kỳ không khắc CST theo quy tắc này, và hoàn tất không thanh toán thêm khoảng thời gian cuối cho người đặt nét bút cuối cùng. Nếu cả hai nét bút thuộc cùng một địa chỉ, địa chỉ đó nhận CST.',
       },
       {
         title: 'Lượt Tinh tuyển',
-        description: `Mỗi nét bút ghi nhận một lượt. Khi chu kỳ hoàn tất, ${eth} lượt được chọn ngẫu nhiên để chia ${protocolFacts.stellarSelectionEthPercentage}% Dự trữ chu kỳ bằng ETH.`,
+        description:
+          'Trọng số là chi phí ETH cơ sở lúc đặt nét bút, không gồm mức giảm hay phụ phí cuối chu kỳ. Một địa chỉ có thể được chọn nhiều lần.',
       },
       {
         title: 'Tinh tuyển Cosmic Signature NFT',
-        description: `Thêm ${nft} lượt khác được chọn, mỗi lượt nhận ${cstAmount} CST và một Cosmic Signature NFT. Cùng một địa chỉ có thể được chọn nhiều lần, và không số lượt nào bảo đảm được chọn.`,
+        description:
+          'Trọng số là chi phí ETH cơ sở lúc đặt nét bút, không gồm mức giảm hay phụ phí cuối chu kỳ. Một địa chỉ có thể được chọn nhiều lần.',
       },
       {
         title: 'Phân bổ Signature',
-        description: `Người tham gia đặt nét bút cuối cùng có thể hoàn tất chu kỳ và nhận về ${protocolFacts.mainEthPercentage}% Dự trữ chu kỳ bằng ETH, ${cstAmount} CST và một Cosmic Signature NFT.`,
+        description: `Địa chỉ hoàn tất chu kỳ thành công nhận ${protocolFacts.mainEthPercentage}% Dự trữ chu kỳ, tổng cộng ${formatCount(protocolFacts.specialAllocationCst, 'vi')} CST và ${protocolFacts.mainPrizeNftsPerCycle} Cosmic Signature NFT có ID liên tiếp. Trong ${protocolFacts.finalGestureExclusivityHours} giờ đầu sau thời điểm hoàn tất, chỉ người đặt nét bút cuối cùng được thực hiện; sau đó bất kỳ ai cũng có thể hoàn tất và tự nhận phân bổ.`,
       },
     ],
   },
@@ -71,7 +62,7 @@ export const howItWorksTextVi = {
       },
       {
         title: 'Chi phí ETH tăng dần',
-        body: `Mỗi nét bút ETH làm chi phí nét bút ETH kế tiếp tăng ${protocolFacts.ethGestureCostStepUpPercent}%. Chi phí chỉ giảm trong cửa sổ hiệu chỉnh ETH mở ra đầu mỗi chu kỳ.`,
+        body: `Mỗi nét bút ETH tăng chi phí ETH cơ sở tiếp theo thêm ${protocolFacts.ethGestureCostStepUpPercent}% sau khi làm tròn số nguyên, cộng 1 wei. Phụ phí cuối chu kỳ và phần trả dư được giữ lại không đi vào chi phí cơ sở này. ETH và CST có quy tắc chi phí cơ sở riêng. Khi chu kỳ mở, chi phí ETH giảm trong cửa sổ hiệu chỉnh; mỗi nét bút ETH nâng chi phí cơ sở tiếp theo. Chi phí CST giảm theo tốc độ lưu trên chuỗi. Gần hạn hoàn tất, cả hai chi phí có phụ phí cuối chu kỳ, nhưng phụ phí không nâng chi phí cơ sở tiếp theo hay trọng số Tinh tuyển.`,
       },
       {
         title: 'Phí gas tính riêng',
@@ -93,11 +84,13 @@ export const howItWorksTextVi = {
     phases: [
       {
         label: 'Chu kỳ mở',
-        description: `Một chu kỳ trình diễn mới bắt đầu. Chi phí nét bút ETH và CST giảm dần trong cửa sổ hiệu chỉnh riêng của mỗi loại; cửa sổ hiệu chỉnh CST khởi đầu từ mốc tham chiếu ${protocolFacts.initialCstCalibrationWindowHours} giờ rồi thay đổi theo mức tham gia. Dự trữ chu kỳ bắt đầu từ phần chu kỳ trước chuyển sang.`,
+        description:
+          'Nét bút đầu tiên của chu kỳ phải dùng ETH và bắt đầu đồng hồ hoàn tất. Các nét bút sau cộng mức tăng hiện tại vào thời điểm hoàn tất đã lưu, kể cả sau khi hết giờ. Đồng hồ không bắt đầu lại từ thời điểm hiện tại. Bạn vẫn có thể đặt nét bút cho tới khi giao dịch hoàn tất thành công.',
       },
       {
         label: 'Người tham gia đặt nét bút',
-        description: `Mỗi nét bút cộng mức tăng thời gian hiện tại vào thời điểm hoàn tất chu kỳ. Nét bút ETH rút ngắn cửa sổ hiệu chỉnh CST khoảng ${cstWindowDecrease}%; nét bút CST kéo dài cửa sổ khoảng ${cstWindowIncrease}%.`,
+        description:
+          'V3 lưu tốc độ giảm chi phí CST; độ dài cửa sổ được tính từ tốc độ và mức trần. Nét bút ETH thử tăng tốc độ theo rate + floor(rate / 100), còn nét bút CST giảm theo rate - floor(rate / 101). Nếu mức tăng vi phạm điều kiện thời lượng tối thiểu, nó không được áp dụng. Nét bút CST đặt lại mức trần bằng giá trị lớn nhất giữa hai lần chi phí CST cơ sở chưa có phụ phí, mức tối thiểu đã cấu hình, và tốc độ mới nhân 180 giây. Bạn vẫn có thể đặt nét bút tiếp theo ngay lập tức.',
       },
       {
         label: 'Đếm ngược về 0',
@@ -105,21 +98,22 @@ export const howItWorksTextVi = {
       },
       {
         label: 'Chu kỳ hoàn tất',
-        description: `Việc hoàn tất phân phối mọi phân bổ. Người hoàn tất chu kỳ nhận phân bổ Signature: ${protocolFacts.mainEthPercentage}% Dự trữ chu kỳ, ${cstAmount} CST và một Cosmic Signature NFT.`,
+        description: `Địa chỉ hoàn tất chu kỳ thành công nhận ${protocolFacts.mainEthPercentage}% Dự trữ chu kỳ, tổng cộng ${formatCount(protocolFacts.specialAllocationCst, 'vi')} CST và ${protocolFacts.mainPrizeNftsPerCycle} Cosmic Signature NFT có ID liên tiếp. Trong ${protocolFacts.finalGestureExclusivityHours} giờ đầu sau thời điểm hoàn tất, chỉ người đặt nét bút cuối cùng được thực hiện; sau đó bất kỳ ai cũng có thể hoàn tất và tự nhận phân bổ.`,
       },
       {
         label: 'Tinh tuyển',
-        description: `${eth} người nhận ETH Tinh tuyển chia ${protocolFacts.stellarSelectionEthPercentage}% Dự trữ chu kỳ. ${nft} người nhận NFT Tinh tuyển, cùng ${anchored} người nhận Tinh tuyển NFT neo giữ được chọn từ các Random Walk NFT đang neo giữ, mỗi người nhận ${cstAmount} CST và một Cosmic Signature NFT. Lượt được ghi nhận theo từng nét bút, và các lượt chọn ETH và NFT được thực hiện trong toàn bộ lượt của chu kỳ, có hoàn lại.`,
+        description: `Khi hoàn tất, ${protocolFacts.ethStellarSelectionRecipients} lượt có trọng số chia ${protocolFacts.stellarSelectionEthPercentage}% dự trữ bằng ETH. Riêng ${protocolFacts.nftStellarSelectionRecipients} lượt NFT của người tham gia và tối đa ${protocolFacts.anchoredRwlkNftSelectionRecipients} lượt Random Walk NFT đang neo giữ nhận NFT và CST. Cả ETH Tinh tuyển và NFT Tinh tuyển dành cho người tham gia đều dùng trọng số từng nét bút. Trọng số là chi phí ETH cơ sở tại thời điểm đó, chưa giảm bằng Random Walk NFT và chưa cộng phụ phí cuối chu kỳ. Nét bút CST dùng cùng chi phí ETH cơ sở đương thời. Các lượt chọn có hoàn lại, nên một địa chỉ có thể được chọn nhiều lần. Tinh tuyển NFT neo giữ xét riêng các Random Walk NFT đang neo giữ.`,
       },
       {
         label: 'Chu kỳ tiếp theo',
-        description: `Phần còn lại, ${protocolFacts.compoundingReservePercentage}% Dự trữ chu kỳ, chuyển tiếp làm Dự trữ tích lũy, và chu kỳ tiếp theo mở ra với những cửa sổ hiệu chỉnh mới.`,
+        description:
+          'Khoảng một nửa ETH được giữ lại cho chu kỳ sau. Làm tròn số nguyên, luồng bị bỏ qua và chuyển không thành công có thể làm phần còn lại lớn hơn. Điều đó không bảo đảm dự trữ đầu chu kỳ sau sẽ lớn hơn.',
       },
     ],
   },
   payoff: {
     heading: 'Mỗi chu kỳ khép lại bằng một Signature',
-    body: `Mỗi nét bút góp phần tạo nên tác phẩm của chu kỳ. Khi chu kỳ hoàn tất, Signature được khắc thành một Cosmic Signature NFT và trao cùng phân bổ Signature cho người hoàn tất chu kỳ. Trong ${protocolFacts.finalGestureExclusivityHours} giờ đầu sau khi đếm ngược về 0, chỉ người đặt nét bút cuối cùng được hoàn tất; sau đó bất kỳ ai cũng có thể hoàn tất.`,
+    body: `Địa chỉ hoàn tất chu kỳ thành công nhận ${protocolFacts.mainEthPercentage}% Dự trữ chu kỳ, tổng cộng ${formatCount(protocolFacts.specialAllocationCst, 'vi')} CST và ${protocolFacts.mainPrizeNftsPerCycle} Cosmic Signature NFT có ID liên tiếp. Trong ${protocolFacts.finalGestureExclusivityHours} giờ đầu sau thời điểm hoàn tất, chỉ người đặt nét bút cuối cùng được thực hiện; sau đó bất kỳ ai cũng có thể hoàn tất và tự nhận phân bổ.`,
     linkLabel: 'Xem Signature này',
   },
   stepByStep: {
@@ -140,7 +134,7 @@ export const howItWorksTextVi = {
         title: 'Kiểm tra chi phí nét bút',
         highlights: [
           'Kiểm tra chi phí nét bút hiện tại bằng ETH hoặc CST trước khi quyết định.',
-          'Xem bản xem trước CST tham gia; lượng này thay đổi theo thời gian kể từ nét bút trước.',
+          'Mức CST tham gia tối thiểu giới hạn số lượng mà nét bút tiếp theo khắc cho người tham gia trước, không bảo đảm một khoản cho người gửi. Nếu hai địa chỉ giống nhau, người gửi tự nhận số lượng đó. Giá trị 0 tắt giới hạn này; nét bút ETH đầu tiên của chu kỳ bỏ qua kiểm tra. Chi phí tối đa và phí mạng là các điều kiện riêng.',
           'Đảm bảo ví có đủ chi phí nét bút cộng một ít ETH cho phí mạng; ví hiển thị khoản phí này trước khi bạn xác nhận.',
         ],
       },
@@ -161,7 +155,7 @@ export const howItWorksTextVi = {
     tips: [
       {
         title: 'Hai cửa sổ hiệu chỉnh',
-        body: `Chi phí nét bút ETH chỉ giảm dần trong cửa sổ hiệu chỉnh một lần, khi mỗi chu kỳ mở ra. Chi phí nét bút CST bắt đầu một cửa sổ mới sau mỗi nét bút CST: từ gấp đôi chi phí vừa trả (tối thiểu ${protocolFacts.cstCalibrationCeilingMinCst} CST) giảm dần về 0.`,
+        body: 'V3 lưu tốc độ giảm chi phí CST; độ dài cửa sổ được tính từ tốc độ và mức trần. Nét bút ETH thử tăng tốc độ theo rate + floor(rate / 100), còn nét bút CST giảm theo rate - floor(rate / 101). Nếu mức tăng vi phạm điều kiện thời lượng tối thiểu, nó không được áp dụng. Nét bút CST đặt lại mức trần bằng giá trị lớn nhất giữa hai lần chi phí CST cơ sở chưa có phụ phí, mức tối thiểu đã cấu hình, và tốc độ mới nhân 180 giây. Bạn vẫn có thể đặt nét bút tiếp theo ngay lập tức.',
       },
       {
         title: 'Mỗi Random Walk NFT chỉ dùng một lần',
@@ -175,7 +169,7 @@ export const howItWorksTextVi = {
   },
   callToAction: {
     heading: 'Sẵn sàng đặt nét bút đầu tiên?',
-    body: 'Kết nối ví để đặt nét bút trong chu kỳ hiện tại, định hình Signature và có thể khắc CST tham gia.',
+    body: 'Trong V3, nét bút tiếp theo khắc toàn bộ CST tham gia cho người đặt nét bút trước. Số lượng tăng tuyến tính theo thời gian giữa hai nét bút. Nét bút đầu tiên của chu kỳ không khắc CST theo quy tắc này, và hoàn tất không thanh toán thêm khoảng thời gian cuối cho người đặt nét bút cuối cùng. Nếu cả hai nét bút thuộc cùng một địa chỉ, địa chỉ đó nhận CST.',
     primaryCtaLabel: 'Đặt nét bút',
     faqCtaLabel: 'Xem câu hỏi thường gặp',
     discordCtaLabel: 'Discord',

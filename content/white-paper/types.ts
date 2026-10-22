@@ -1,8 +1,9 @@
-import type { AppLocale } from '@/i18n/locale';
+import { pickByLocale, type AppLocale, type LocaleRecord } from '@/i18n/locale';
 import { routing } from '@/i18n/routing';
 
 export const WHITE_PAPER_PATH = '/white-paper';
 
+/** Retained edition used by translations that have not yet been revised. */
 export const WHITE_PAPER_VERSION = '1.0';
 
 /** ISO date of this version of the paper. */
@@ -11,16 +12,33 @@ export const WHITE_PAPER_DATE_ISO = '2026-08-24';
 /** Human-readable date shown on the title block and the PDF cover. */
 export const WHITE_PAPER_DATE_DISPLAY = 'August 2026';
 
+const LEGACY_EDITION = { version: WHITE_PAPER_VERSION, dateIso: WHITE_PAPER_DATE_ISO };
+const WHITE_PAPER_EDITIONS: LocaleRecord<{ version: string; dateIso: string }> = {
+  en: { version: '1.3', dateIso: '2026-10-21' },
+  zh: LEGACY_EDITION,
+  'zh-TW': LEGACY_EDITION,
+  'zh-HK': LEGACY_EDITION,
+  uk: LEGACY_EDITION,
+  ko: LEGACY_EDITION,
+  ja: LEGACY_EDITION,
+  vi: LEGACY_EDITION,
+};
+
+/** Translations retain their published edition until separately revised. */
+export function getWhitePaperEdition(locale: string) {
+  return pickByLocale(WHITE_PAPER_EDITIONS, locale);
+}
+
 /**
  * The committed, versioned PDF artifacts under `public/`, one per locale:
  * the default locale is unsuffixed, every other locale carries its code
  * (`…-v1.0-zh.pdf`, `…-v1.0-uk.pdf`). Regenerate with `npm run white-paper:pdf`
- * whenever a content module changes, and bump WHITE_PAPER_VERSION for
- * substantive revisions.
+ * whenever a content module changes, and update that locale's entry in
+ * WHITE_PAPER_EDITIONS for substantive revisions.
  */
 export function whitePaperPdfPath(locale: AppLocale): string {
   const suffix = locale === routing.defaultLocale ? '' : `-${locale}`;
-  return `/white-paper/cosmic-signature-white-paper-v${WHITE_PAPER_VERSION}${suffix}.pdf`;
+  return `/white-paper/cosmic-signature-white-paper-v${getWhitePaperEdition(locale).version}${suffix}.pdf`;
 }
 
 /** English (default-locale) PDF path, kept for call sites that only cite the original. */

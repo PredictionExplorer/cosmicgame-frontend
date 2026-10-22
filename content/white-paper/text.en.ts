@@ -1,16 +1,16 @@
-import { protocolFacts } from '@/content/protocol-facts';
+import { whitePaperV13Facts as protocolFacts } from '@/content/protocol-facts';
 
 import type { WhitePaperText } from './structure';
-import { WHITE_PAPER_DATE_DISPLAY, WHITE_PAPER_VERSION } from './types';
+import { getWhitePaperEdition } from './types';
 
 const cst = (amount: number): string => amount.toLocaleString('en-US');
 
 /** English white-paper copy, keyed by the skeleton in structure.ts. */
 export const whitePaperTextEn = {
   metadata: {
-    title: 'Cosmic Signature White Paper | A Procedural On-Chain Art Protocol',
+    title: 'Cosmic Signature White Paper 1.3 | Contract V3',
     description:
-      'The reference description of Cosmic Signature: Performance Cycles, gestures, allocation tracks, deterministic three-body NFT art, CST, anchoring, the Cosmic Council, protocol upgrades, and the path to full decentralization.',
+      'English white paper 1.3 describes deployed contract V3: Gesture costs, late-cycle premiums, weighted Stellar Selections, Participation CST, allocations, art provenance, and owner powers.',
   },
   breadcrumbLabel: 'White paper',
   breadcrumbs: {
@@ -20,15 +20,16 @@ export const whitePaperTextEn = {
   hero: {
     eyebrow: 'White paper',
     subtitle: 'A Procedural On-Chain Art Protocol on Arbitrum',
-    versionLabel: `Version ${WHITE_PAPER_VERSION}`,
-    dateLabel: WHITE_PAPER_DATE_DISPLAY,
+    versionLabel: `Version ${getWhitePaperEdition('en').version}`,
+    dateLabel: 'October 21, 2026',
     downloadLabel: 'Download PDF',
   },
   abstract: {
     heading: 'Abstract',
     paragraphs: [
-      'Cosmic Signature is a procedural art protocol on Arbitrum One. It runs as a sequence of timed Performance Cycles. During a cycle, participants make gestures with ETH or with CST, the protocol\u2019s ERC-20 token. Every gesture extends the cycle\u2019s countdown, records an entry in the cycle\u2019s Stellar Selections, and can imprint new CST. When the countdown expires and the cycle is finalized, the protocol distributes its ETH reserve across a fixed set of allocation tracks, imprints a new generation of Cosmic Signature NFTs, and forwards a fixed share to Protocol Guild, the funding mechanism for more than 170 Ethereum core contributors. About half of the reserve rolls forward, so each cycle begins larger than the last.',
-      'Each Cosmic Signature NFT is a deterministic rendering of the gravitational three-body problem, generated from an on-chain seed and reproducible by anyone, pixel for pixel. No neural network touches the image. This paper describes the mechanics and token design in full, documents the V2 upgrade that is live today, presents the planned V3 upgrade, and sets out the commitment to remove every form of privileged control from the deploying address once the design is complete.',
+      'Cosmic Signature is a procedural art protocol on Arbitrum One. Participants make Gestures with ETH or CST, extending timed Performance Cycles and recording participation for Stellar Selections. A successful finalization distributes configured portions of the ETH reserve, creates Cosmic Signature NFTs with seeds recorded on-chain, and schedules the next cycle. The remaining reserve carries forward; growth between cycles is not guaranteed.',
+      'This English edition 1.3 describes deployed contract V3, checked at Arbitrum One block 517046699 on October 21, 2026 at 22:29:53 UTC. V3 pays linear Participation CST to the previous participant when a later Gesture arrives, weights participant selections by the contemporary ETH base cost, adds a late-cycle cost premium, adapts the CST decline rate, and changes allocation percentages and the main NFT count. The contract upgrade executed on October 21, 2026; publishing this paper does not change the contracts. Translated editions currently remain version 1.0.',
+      'The contracts determine timing, allocations, ownership, and seed provenance. Artwork is generated off-chain; reproduction depends on the renderer revision and configuration as well as the seed. The protocol remains upgradeable and owner-configurable within the conditions described here. V3 does not automatically transfer or remove owner powers.',
     ],
   },
   tocHeading: 'Contents',
@@ -42,7 +43,7 @@ export const whitePaperTextEn = {
         },
         {
           kind: 'paragraph',
-          text: 'The result is a protocol built around time. A Performance Cycle opens, fills with gestures, and closes when its countdown runs out. A gesture is a small on-chain act: it carries ETH or CST, it may carry a short message or an attached asset, and it pushes the cycle\u2019s finalization time further into the future. The participant whose gesture stands last when the countdown expires, the Final Gesture, finalizes the cycle. Finalization distributes the reserve, imprints the cycle\u2019s NFTs, and prepares the next cycle.',
+          text: 'A Performance Cycle opens at its activation time and accepts Gestures until finalization succeeds. Its countdown is a condition for finalization, not an automatic closing transaction. The Final Gesture participant has the first right to finalize; the open window in Section 3.3 later permits another caller to become the beneficiary. Further Gestures remain possible after expiry and can change that position.',
         },
         {
           kind: 'paragraph',
@@ -51,14 +52,14 @@ export const whitePaperTextEn = {
         {
           kind: 'list',
           items: [
-            'Determinism. The artwork is computed from a seed recorded on-chain at imprint time. The rendering pipeline is open source, and the same seed always produces the same image and video, bit for bit.',
-            'Mechanical distribution. The deployed contracts execute the allocation rules at finalization. No discretionary account sits between participants and those rules, and no team wallet receives ETH from gestures.',
-            'A finite role for the team. Owner powers are narrow, are locked while a cycle runs, and are scheduled to be removed entirely once the remaining upgrades land.',
+            'Recorded provenance. Each NFT stores a seed on-chain. The open-source renderer computes artwork from that seed and its software configuration; image and video files are not stored by the protocol.',
+            'Explicit distribution. Finalization executes the configured allocation rules. Owner powers, transfer failures, integer rounding, and omitted tracks matter when reading those rules.',
+            'Visible administration. Core configuration and upgrades have restrictions, but owner powers are substantial. There is no automatic expiry or compulsory transfer to the Cosmic Council.',
           ],
         },
         {
           kind: 'paragraph',
-          text: 'This paper is the reference description of the protocol. Section 2 sketches the system. Sections 3 through 5 specify cycles, gestures, and allocations. Section 6 covers the art. Sections 7 through 10 cover CST, anchoring, the Cosmic Council, and Public Goods. Section 11 covers security and verifiability. Sections 12 and 13 record the upgrade history and the road to full decentralization, and Section 14 states plainly what the protocol is not. Numbers quoted in this paper are contract constants or launch values of on-chain parameters; the deployed contracts, listed in Appendix A, remain the final authority.',
+          text: 'Sections 2 through 5 explain the system, timing, costs, and allocations. Sections 6 through 10 cover art, CST, Anchoring, the Cosmic Council, and Public Goods. Sections 11 through 14 describe security limits, deployment history, administration, and risks. Amounts use integer smallest units: ETH and CST each have 18 decimal places. Time uses seconds except the stored cycle increment, which uses microseconds. Defaults and the dated snapshot are identified separately; the intended deployment remains authoritative.',
         },
       ],
     },
@@ -80,7 +81,7 @@ export const whitePaperTextEn = {
               ],
               [
                 'CST (ERC-20)',
-                'Participation token. Imprinted only by the protocol, burned when spent on gestures, and expresses Coordination Weight once delegated.',
+                'Participation token. Created by the protocol, burned for CST Gestures or by holders and approved spenders, and used for delegated Coordination Weight.',
               ],
               [
                 'Cosmic Signature NFT (ERC-721)',
@@ -92,7 +93,7 @@ export const whitePaperTextEn = {
               ],
               [
                 'Allocations Wallet',
-                'Escrow for secondary ETH allocations and assets attached to gestures, with an open retrieval timeout.',
+                'Holds secondary ETH balances and attached NFTs; separate per-cycle token holders hold attached ERC-20s. Retrieval permissions have deadlines.',
               ],
               [
                 'Anchoring wallets',
@@ -100,7 +101,7 @@ export const whitePaperTextEn = {
               ],
               [
                 'Public Goods Vault',
-                'Receives and forwards the per-cycle Public Goods Allocation. The beneficiary is currently Protocol Guild.',
+                'Receives the Public Goods Allocation. A separate permissionless operation forwards the accumulated balance to its configured beneficiary, currently Protocol Guild.',
               ],
               [
                 'Outreach Reserve',
@@ -115,7 +116,7 @@ export const whitePaperTextEn = {
         },
         {
           kind: 'paragraph',
-          text: 'Around the contracts, an ecosystem has grown: the app at app.cosmicsignature.com, the Axiom Zero marketplace for the NFTs, Uniswap liquidity for CST on Arbitrum, and Chaos Zero, a prediction venue for cycle outcomes. None of these are required. Every mechanic in this paper can be exercised directly against the contracts.',
+          text: 'The website, indexer, media hosting, and external marketplaces support discovery and interaction. They do not determine contract execution or guarantee liquidity. A core implementation upgrade does not replace companion contracts. An Allocations Wallet replacement requires a separate configuration action and does not migrate historical assets or deadlines (Section 5.4).',
         },
       ],
     },
@@ -124,7 +125,7 @@ export const whitePaperTextEn = {
       blocks: [
         {
           kind: 'paragraph',
-          text: 'A cycle is a window in time. It opens with descending-cost Calibration Windows, fills with gestures, and ends when the Cycle Finalization Time expires and someone finalizes it. This section covers the clock; Section 4 covers the gestures themselves.',
+          text: 'The first Gesture must use ETH and starts the cycle countdown and CST Calibration Window. Later ETH or CST Gestures extend the stored deadline. Finalization is a separate transaction after that deadline, subject to the eligibility rules in Section 3.3. Gesture pricing is described in Section 4.',
         },
       ],
       subsections: {
@@ -133,11 +134,11 @@ export const whitePaperTextEn = {
           blocks: [
             {
               kind: 'paragraph',
-              text: `Each cycle must open with an ETH gesture, and the ETH Calibration Window sets its cost. The window begins at ${protocolFacts.ethCalibrationCeilingMultiplier} times the opening cost actually paid in the previous cycle and declines linearly to a floor of one two-hundredth of that starting value, plus one wei. At launch parameters the descent takes about two days; its duration is tied to the cycle time increment, so it stretches slowly as the protocol ages. If the window fully elapses before anyone gestures, the cost simply rests at the floor. The first cycle opened at a fixed ${protocolFacts.initialGestureCostEth} ETH.`,
+              text: `The ETH Calibration Window begins at ${protocolFacts.ethCalibrationCeilingMultiplier} times the previous cycle's opening undiscounted base cost and descends linearly to floor(ceiling / ${protocolFacts.ethCalibrationFloorDivisor}) + 1 wei. A Random Walk NFT reduction, retained overpayment, or late premium does not enter that next-cycle ceiling. At the original one-hour increment, the descent lasts approximately two days; its duration scales with the increment. The original first cycle used a fixed ${protocolFacts.initialGestureCostEth} ETH base cost.`,
             },
             {
               kind: 'paragraph',
-              text: 'This opening mechanism performs price discovery without an order book. If the previous cycle opened too cheap, the doubling restores headroom; if the doubled value proves too high, the two-day descent finds the level at which someone is willing to begin.',
+              text: 'Integer interpolation subtracts floor((ceiling - floor) * elapsed / duration) from the ceiling until the floor is reached. The floor then remains unless configuration changes. After the window ends and before the first Gesture, a permitted owner operation can lower that floor further by changing the opening-window divisors.',
             },
           ],
         },
@@ -146,11 +147,11 @@ export const whitePaperTextEn = {
           blocks: [
             {
               kind: 'paragraph',
-              text: `The opening gesture starts the clock, setting the Cycle Finalization Time about ${protocolFacts.initialCycleFinalizationHoursAtLaunch} hours ahead at launch parameters. Every subsequent gesture, whether ETH or CST, adds the current time increment to the stored finalization time. The increment began at exactly one hour and grows by ${protocolFacts.cycleTimeIncrementIncreasePercentPerCycle}% with every finalized cycle, so cycles lengthen gradually and the pace of NFT imprinting slows over the years. There is no hard bound on a cycle\u2019s length while gestures keep arriving; in practice, rising Gesture Costs make indefinite extension expensive.`,
+              text: `The opening Gesture sets the deadline approximately ${protocolFacts.initialCycleFinalizationHoursAtLaunch} hours ahead at original launch settings. Every later Gesture adds floor(increment / 1,000,000) seconds to the stored deadline. The increment began at one hour and grows by approximately ${protocolFacts.cycleTimeIncrementIncreasePercentPerCycle}% per finalized cycle, subject to integer rounding. At the snapshot it is ${protocolFacts.currentCycleIncrementMicroseconds} microseconds. There is no fixed maximum cycle length.`,
             },
             {
               kind: 'paragraph',
-              text: 'Extensions apply to the stored time, not to the present moment. A gesture made after the countdown has expired, but before finalization executes, adds one increment to the stored value and takes over the Final Gesture position. It does not restart the clock.',
+              text: 'A Gesture after expiry still extends the old deadline and becomes the Final Gesture. The deadline can remain in the past after that extension, permitting a contract to make a Gesture and finalize in one transaction. Overtime does not automatically restart the countdown from the current time.',
             },
           ],
         },
@@ -163,11 +164,11 @@ export const whitePaperTextEn = {
             },
             {
               kind: 'paragraph',
-              text: `The Final Gesture participant holds this right exclusively for ${protocolFacts.finalGestureExclusivityHours} hours. After that, the Open-Finalization Window begins: anyone may finalize, and the contract treats whoever does as the cycle\u2019s beneficiary, with everything the role carries: the Signature Allocation\u2019s ETH share, its CST imprint, its NFT, and priority over attached assets. The rule is deliberately unforgiving. It keeps the protocol alive if a participant disappears, and it prices carelessness: a beneficiary who does not act within two days has left the role open to the first caller.`,
+              text: `The Final Gesture participant has exclusive finalization access for ${protocolFacts.finalGestureExclusivityHours} hours after the stored deadline. At or after that timeout, anyone may finalize and become the beneficiary, receiving the Signature Allocation's ETH, ${cst(protocolFacts.specialAllocationCst)} CST, ${protocolFacts.mainAllocationNfts} sequential NFTs, and priority over attached assets. The endurance calculations still use the participation history. A reverting finalization does not complete any of these changes.`,
             },
             {
               kind: 'paragraph',
-              text: `After finalization, the next cycle activates following a short delay, ${protocolFacts.defaultNextCycleDelayMinutes} minutes by default, and its Calibration Windows open.`,
+              text: `The next activation is scheduled from the successful finalization timestamp. The checked deployment uses ${protocolFacts.nextCycleDelayDaysAtSnapshot} days. The Solidity default is ${protocolFacts.defaultNextCycleDelayMinutes} minutes, but it is not the live delay. The owner can change this delay separately. The snapshot's upcoming cycle activation is October 22, 2026 at 00:00 UTC.`,
             },
           ],
         },
@@ -178,7 +179,7 @@ export const whitePaperTextEn = {
       blocks: [
         {
           kind: 'paragraph',
-          text: 'Gestures drive each Performance Cycle. Each one, regardless of currency, extends the countdown, records one entry in the cycle’s participant Stellar Selections, updates the endurance clocks of Section 5.2, and can imprint Participation CST as described in Section 7.1.',
+          text: "Each Gesture extends the countdown, records a weighted entry for participant Stellar Selections, updates endurance records, and may create Participation CST for the previous participant. ETH adds to the reserve; CST is burned instead. The premium and the amount actually paid do not determine an entry's weight.",
         },
       ],
       subsections: {
@@ -187,7 +188,7 @@ export const whitePaperTextEn = {
           blocks: [
             {
               kind: 'paragraph',
-              text: `After the opening gesture, each ETH gesture raises the next ETH Gesture Cost by ${protocolFacts.ethGestureCostStepUpPercent}%, plus one wei. The sequence is public and exact: anyone can read the current cost from the contract before acting. Overpayment above a dust threshold is refunded in the same transaction; below that threshold a refund would cost more in gas than it returns, so the difference stays in the reserve.`,
+              text: `Every ETH Gesture, including the opening one, sets the next ETH base cost to base + floor(base / 100) + 1 wei at the default ${protocolFacts.ethGestureCostStepUpPercent}% step. CST Gestures do not advance this sequence. The late premium of Section 12.3 is added to the current base cost. Excess ETH is refunded only when it exceeds the configured gas-based threshold; smaller excess remains in the reserve. A failed refund reverts the Gesture. Neither the premium nor excess payment increases the next base cost or selection weight (Section 5.3).`,
             },
           ],
         },
@@ -196,7 +197,7 @@ export const whitePaperTextEn = {
           blocks: [
             {
               kind: 'paragraph',
-              text: `A participant who owns a Random Walk NFT may attach it to one ETH gesture for a ${protocolFacts.randomWalkDiscountPercentage}% reduction in that gesture\u2019s cost. The NFT is not transferred; the contract marks it used. Each Random Walk NFT can be attached exactly once across all cycles, which makes the reduction a consumable resource and ties a fixed external collection into the protocol\u2019s economy.`,
+              text: `An eligible Random Walk NFT gives a ${protocolFacts.randomWalkDiscountPercentage}% ETH reduction after any late premium is added: the payable half is rounded upward in wei. The NFT remains with its owner and its ID is permanently marked used; a transfer does not restore this reduction. Selection weight still uses the undiscounted, premium-free ETH base cost. This record is independent of the NFT's one-time Anchoring eligibility.`,
             },
           ],
         },
@@ -205,19 +206,19 @@ export const whitePaperTextEn = {
           blocks: [
             {
               kind: 'paragraph',
-              text: `CST offers a second way in. The CST Calibration Window starts at ${protocolFacts.cstCalibrationCeilingMultiplier} times the cost paid for the previous CST gesture, and never below ${protocolFacts.cstCalibrationCeilingMinCst} CST, then declines linearly to zero over the window\u2019s duration. Every CST gesture restarts the window from its new starting value, and the CST spent is burned, permanently removed from supply.`,
+              text: `The CST base cost is max(0, beginning cost - elapsed seconds * decline rate), using CST smallest units. The late premium is added to this base. A CST Gesture burns the full amount due and restarts the window at the maximum of ${protocolFacts.cstCalibrationCeilingMultiplier} times its premium-free base cost, the configured ${protocolFacts.cstCalibrationCeilingMinCst} CST minimum, and the updated decline rate times ${protocolFacts.cstRestartMinimumSeconds} seconds. The premium does not raise the restarted base cost (Section 12.3).`,
             },
             {
               kind: 'paragraph',
-              text: `The window\u2019s duration is itself a live parameter, and it is one of the protocol\u2019s quieter feedback loops. It began at a ${protocolFacts.initialCstCalibrationWindowHours}-hour reference. Each ETH gesture shortens it by about ${protocolFacts.cstCalibrationWindowDecreasePercentPerEthGesture}%, and each CST gesture lengthens it by about ${protocolFacts.cstCalibrationWindowIncreasePercentPerCstGesture}%. Heavy ETH activity therefore speeds the CST descent, making CST gestures attractive sooner; heavy CST activity slows it back down. The loop nudges every cycle toward a balanced mix of the two currencies.`,
+              text: `At the default change divisor ${protocolFacts.cstDeclineRateChangeDivisor}, an ETH Gesture proposes rate + floor(rate / 100), while a CST Gesture adopts rate - floor(rate / 101). The ETH increase is accepted only when the candidate rate times ${protocolFacts.cstRestartMinimumSeconds} does not exceed the current beginning cost. After opening, an ETH Gesture changes the rate without resetting the window timestamp, so the new rate applies to its entire elapsed interval. The restart safeguard is not a cooldown; successive Gestures can arrive immediately.`,
             },
             {
               kind: 'paragraph',
-              text: 'Because the descent can reach zero, a long quiet period can make a CST gesture nearly free. That is intentional. It guarantees the cycle can always be extended by anyone holding even a small CST balance, and the burn on every CST gesture ties the token\u2019s supply to actual use. A participant submitting a CST gesture specifies the maximum cost they accept, so a gesture landing later than expected cannot spend more than authorized.',
+              text: 'A sufficiently old window reaches zero base cost and therefore zero premium. Gas and other transaction requirements still apply. The maximum accepted CST cost protects the sender if the amount due rises before execution; inside the late window, the total CST cost need not fall monotonically. The protocol burns CST directly without a token spending approval, and the required balance must exist before Participation CST is created under Section 7.1.',
             },
             {
               kind: 'paragraph',
-              text: 'The first gesture of every cycle must be ETH; CST gestures are available from the second gesture onward.',
+              text: 'CST cannot open a cycle. The decline rate carries between cycles, and the beginning cost produced by the first CST Gesture is carried into the following cycle. Without a CST Gesture that carried beginning cost stays unchanged. V3 retained the prior carried value; its new configured minimum does not immediately replace that first-window value. The first window of a later cycle can be shorter than the restart safeguard.',
             },
           ],
         },
@@ -226,7 +227,7 @@ export const whitePaperTextEn = {
           blocks: [
             {
               kind: 'paragraph',
-              text: `A gesture may carry a message of up to ${protocolFacts.gestureMessageMaxLength} bytes, recorded on-chain alongside it. A gesture may also attach ERC-20 tokens or an ERC-721 NFT. Attached assets do not join the ETH reserve; they are held by the Allocations Wallet, and the cycle\u2019s beneficiary has priority to retrieve them after finalization, subject to the open retrieval timeout of Section 5.4.`,
+              text: `A Gesture can include up to ${protocolFacts.gestureMessageMaxLength} bytes of message data, which may be fewer characters. Attached ERC-20s are held in a per-cycle token holder; attached ERC-721s are held by the Allocations Wallet. That wallet needs the relevant approval. The beneficiary has priority to retrieve them after finalization under Section 5.4. Dedicated ETH contribution methods add to the reserve without a Gesture, weight, or Participation CST; an empty-calldata ETH transfer instead attempts an ETH Gesture with default arguments.`,
             },
           ],
         },
@@ -237,7 +238,7 @@ export const whitePaperTextEn = {
       blocks: [
         {
           kind: 'paragraph',
-          text: 'All ETH paid for gestures accumulates in the protocol contract, together with roughly half of every previous cycle\u2019s reserve. This balance is the Cycle Reserve. Finalization reads it once and distributes fixed percentages of it.',
+          text: "The Cycle Reserve is the protocol's ETH balance, including Gesture payments, retained ETH, and direct contributions. Finalization calculates configured allocations against this balance before making outgoing transfers. The following V3 values were checked at the snapshot in Appendix A.",
         },
       ],
       subsections: {
@@ -286,7 +287,7 @@ export const whitePaperTextEn = {
             },
             {
               kind: 'paragraph',
-              text: 'The five distributed tracks account for about half of the reserve. The remainder carries forward into the next cycle. Its size depends on the ETH added and distributed; a larger reserve is not guaranteed each cycle. If no Cosmic Signature NFTs are anchored at finalization, the Anchor Distribution is skipped and its share also remains in the Cycle Reserve.',
+              text: 'The configured outgoing shares total half of the reserve. Integer rounding and split remainders can retain additional wei. If no Cosmic Signature NFTs are anchored, their allocation stays in the reserve; a failed Public Goods transfer also leaves its share there. Retention does not guarantee that the next cycle starts larger.',
             },
             {
               kind: 'table',
@@ -295,7 +296,7 @@ export const whitePaperTextEn = {
                 rows: [
                   [
                     'Signature Allocation',
-                    `${cst(protocolFacts.specialAllocationCst)} CST and one NFT`,
+                    `${cst(protocolFacts.specialAllocationCst)} CST total and ${protocolFacts.mainAllocationNfts} NFTs`,
                     'The cycle beneficiary.',
                   ],
                   [
@@ -346,7 +347,7 @@ export const whitePaperTextEn = {
             },
             {
               kind: 'paragraph',
-              text: 'The distinction is subtle but real. A participant who gestures during a slow afternoon and is not displaced for ten hours sets a strong endurance interval. Whether they end the cycle as its Chrono-Warrior depends on how long that record stands before another participant surpasses it. Endurance measures the gap you created; the Chrono track measures how long your record survived. Both resolve only at finalization.',
+              text: 'Records are evaluated on subsequent Gestures and finalization. The algorithm reconstructs when a new endurance record overtook the preceding one; the transaction noticing it is not necessarily the start of its reign. Strict comparisons and second-level rounding resolve ties. Repeated Gestures by one address remain distinct records. The final quiet interval is considered at finalization, so delaying that transaction can affect the recipients. The Participation CST rule in Section 7.1 is separate from this recognition.',
             },
           ],
         },
@@ -355,7 +356,7 @@ export const whitePaperTextEn = {
           blocks: [
             {
               kind: 'paragraph',
-              text: `Each gesture records one entry in the cycle\u2019s participant Selection pool. At finalization, the contract selects ${protocolFacts.ethStellarSelectionRecipients} entries for the ETH Stellar Selection, which share ${protocolFacts.stellarSelectionEthPercentage}% of the reserve equally, and ${protocolFacts.nftStellarSelectionRecipients} entries for the NFT Stellar Selection. Selections are made with replacement, so the same participant can be selected more than once, and entries scale with gestures made: selection frequency is proportional to participation.`,
+              text: `Each Gesture's weight is its contemporary undiscounted, premium-free ETH base cost, in wei. This includes CST Gestures, even at zero CST cost, and ETH Gestures using the Random Walk reduction. At finalization, ${protocolFacts.ethStellarSelectionRecipients} weighted selections share ${protocolFacts.stellarSelectionEthPercentage}% of the reserve, and ${protocolFacts.nftStellarSelectionRecipients} weighted selections receive NFTs and CST. Repeats are allowed. Intended relative proportions follow accumulated weight rather than Gesture count; integer sampling and block-derived randomness still have the limits in Section 11.3.`,
             },
             {
               kind: 'paragraph',
@@ -372,11 +373,11 @@ export const whitePaperTextEn = {
           blocks: [
             {
               kind: 'paragraph',
-              text: 'Distribution is deliberately split between push and pull. The Signature Allocation\u2019s ETH goes directly to the beneficiary during finalization, as does the Public Goods forwarding. The Chrono-Warrior\u2019s ETH and the ETH Selection shares are placed in the Allocations Wallet, an escrow contract, from which each recipient retrieves at their convenience. CST and NFTs are imprinted directly to their recipients during finalization.',
+              text: 'Signature Allocation ETH is sent directly to the successful finalization caller; a caller unable to receive it causes finalization to revert. Secondary ETH is recorded in the Allocations Wallet and retrieved separately. CST and NFTs are created directly for recipients; NFT creation does not call an ERC-721 receiver callback, so contract recipients need a way to manage those NFTs. Public Goods ETH first goes to the configured vault, not automatically to its final beneficiary.',
             },
             {
               kind: 'paragraph',
-              text: `Escrowed allocations and attached assets wait ${protocolFacts.secondaryRetrievalTimeoutWeeks} weeks. After that, the contracts permit anyone to retrieve an unretrieved allocation for themselves. The rule mirrors the Open-Finalization Window: nothing in the protocol waits forever on an absent participant, and every distribution eventually reaches a hand that wants it. Retrieve promptly.`,
+              text: `At cycle-end registration, the wallet records a retrieval deadline using its timeout, currently ${protocolFacts.secondaryRetrievalTimeoutWeeks} weeks. At or after expiry, another caller can retrieve eligible uncollected assets for themselves; expiry does not transfer them automatically. ETH balances and deadlines are separate for each cycle and recipient, and later allocations do not extend earlier deadlines. Changing the timeout affects future registrations. Historical assets remain in their original wallet after a wallet replacement.`,
             },
           ],
         },
@@ -387,11 +388,11 @@ export const whitePaperTextEn = {
       blocks: [
         {
           kind: 'paragraph',
-          text: 'Every Cosmic Signature NFT is a rendering of the gravitational three-body problem: three celestial bodies of comparable mass orbiting under Newtonian gravity. The three-body problem has no general closed-form solution, and its trajectories are chaotic; an imperceptible change in starting conditions produces a completely different dance. That chaos is the collection\u2019s engine. The seed decides the starting conditions, physics does the rest, and no two Signatures repeat.',
+          text: "Cosmic Signature artwork depicts the gravitational three-body problem. A seed is stored on-chain when each NFT is created; the creation event links it to a cycle. The NFT derives its seed using Keccak-256, distinct from the renderer's SHA3-256 pseudorandom stream. No explicit uniqueness check guarantees that every seed or visual output differs.",
         },
         {
           kind: 'paragraph',
-          text: 'No generative model is involved at any stage. There is no training data, no sampling, and no prompt. The pipeline is a physics simulation followed by a renderer, written in Rust, published as open source, and fully deterministic.',
+          text: 'Images are generated off-chain by a Rust physics simulation and renderer, without a generative model. Gestures affect finalization timing and its chain context; messages and paid amounts are not instructions for drawing particular image features. A contract upgrade neither installs a renderer nor proves that hosted media uses a particular renderer version. Seed inputs are discussed in Section 11.3.',
         },
       ],
       subsections: {
@@ -401,18 +402,18 @@ export const whitePaperTextEn = {
             {
               kind: 'list',
               items: [
-                'Seed. At imprint time the contract derives a 32-byte seed from on-chain data (Section 11.3) and stores it with the NFT. The seed initializes a SHA3-256 random number generator; everything downstream is a pure function of it.',
-                'Simulation. One hundred thousand candidate configurations are integrated for one million physics steps each, using a fourth-order Yoshida symplectic integrator, which preserves the system\u2019s energy behavior over long horizons.',
-                'Selection. A Borda rank aggregation scores candidates on chaos and on the equilateralness of the triangle the bodies form, then picks the most visually interesting orbit from the pool.',
-                'Camera. A slow elliptical camera drift moves the viewpoint through the orbit, giving each Signature a cinematic parallax.',
-                'Color. Colors are mixed in the OKLab perceptual space with 120-degree hue separation per body, modulated by drift and a sine wave.',
-                'Spectral rendering. Sixty-four wavelength bins spanning 380 to 700 nanometers render the orbit trails with velocity-dependent thickness and depth of field.',
-                'Finishing. AgX tonemapping, bloom, OpenSimplex nebula layers, and color grading complete the frame.',
+                "Seed. A recorded seed initializes the renderer's SHA3-256 pseudorandom stream. The result also depends on the renderer revision, configuration, and execution environment.",
+                'Simulation. Default search batches consider one hundred thousand candidates, with a configurable one-million-step setting for each warmup and recording phase. Candidates may be rejected early. A fourth-order Yoshida integrator advances the system.',
+                'Selection. Borda-style ranking considers chaos, equilateralness, and spatial interest, then an image-space aesthetic stage evaluates a shortlist, with retry batches when needed.',
+                'Camera. Seed-dependent camera and layer parameters control the view of the selected orbit.',
+                'Color. A continuous perceptual palette varies hue and other color properties; the current palette is not fixed to equal hue spacing among bodies.',
+                'Spectral rendering. The spectral edition uses sixty-four wavelength bins spanning 380 to 700 nanometers.',
+                'Finishing. AgX tonemapping and version-specific layers, including halation, prism, diffraction spikes, and stardust, shape the output.',
               ],
             },
             {
               kind: 'paragraph',
-              text: 'The output for every NFT is a 16-bit PNG and a 30-second H.265 video.',
+              text: 'The reviewed generator revision 4dc6d64e produces a 16-bit master image, web derivatives, video in web and archival formats, and metadata. The default video duration is approximately thirty seconds. These are renderer settings, not guarantees enforced by the NFT contract.',
             },
           ],
         },
@@ -421,7 +422,7 @@ export const whitePaperTextEn = {
           blocks: [
             {
               kind: 'paragraph',
-              text: 'Determinism is enforced, not assumed. The same seed produces the same image, pixel for pixel, on any machine, and SHA-256 hashes of generated frames are asserted in continuous integration. Because every seed is stored on-chain and the pipeline is public, the collection does not depend on any server. If every server disappeared tomorrow, every Signature could be regenerated from the chain.',
+              text: 'Reproduction requires the recorded seed, the correct generator revision and configuration, and a compatible toolchain. The repository provides deterministic reference checks, but the current continuous-integration workflow does not compare generated image hashes. Cross-version or cross-machine byte identity is not promised. Access to source and chain data permits regeneration in a suitable environment; it does not guarantee uninterrupted metadata or media hosting.',
             },
             {
               kind: 'paragraph',
@@ -436,7 +437,7 @@ export const whitePaperTextEn = {
       blocks: [
         {
           kind: 'paragraph',
-          text: 'CST is the protocol\u2019s ERC-20 token. Its supply starts at zero, and the token contract accepts imprint and burn instructions only from the protocol contract. Every CST in circulation traces back to participation in a cycle.',
+          text: 'CST is an ERC-20 participation and coordination token whose initial supply was zero. The immutable protocol address authorizes creation and protocol-directed burns. Holders may also burn their own CST, and approved spenders can use allowance-based burns.',
         },
       ],
       subsections: {
@@ -445,7 +446,7 @@ export const whitePaperTextEn = {
           blocks: [
             {
               kind: 'paragraph',
-              text: `CST enters circulation through three flows. Participation CST is imprinted at gesture time by the formula below. Recognition CST is imprinted at finalization: ${cst(protocolFacts.specialAllocationCst)} CST accompanies each of the cycle\u2019s NFT distributions, ${protocolFacts.typicalNftsPerCycle} in a typical cycle. Finally, ${cst(protocolFacts.outreachReserveCst)} CST per cycle goes to the Outreach Reserve, which the team uses for community outreach; it is the only recurring CST flow the team directs, and it carries no special powers.`,
+              text: `V3 creates Participation CST for the previous participant when a later Gesture arrives. If Alice gestures and Bob gestures next, Bob's transaction credits Alice for that elapsed interval; if Alice gestures twice, she receives it herself. The opening Gesture creates none. Finalization does not settle additional Participation CST for the Final Gesture participant. Fixed recognition allocations create ${cst(protocolFacts.specialAllocationCst)} CST each; the Signature Allocation receives that amount once in total for its ${protocolFacts.mainAllocationNfts} NFTs. The Outreach Reserve separately receives ${cst(protocolFacts.outreachReserveCst)} CST.`,
             },
             {
               kind: 'formula',
@@ -466,11 +467,11 @@ export const whitePaperTextEn = {
                 },
               ],
               caption:
-                'Participation CST imprinted by a gesture. Elapsed time is measured since the previous gesture and scaled against the current cycle time increment.',
+                'The result is in CST smallest units; divide by 10^18 to express CST. Elapsed seconds are multiplied by the configured multiplier, then divided by the increment in microseconds, truncating once.',
             },
             {
               kind: 'paragraph',
-              text: 'In plain terms, the amount grows with the square root of the time since the previous gesture. A gesture arriving one second after the last imprints almost nothing; a gesture that ends a day of silence imprints hundreds of CST.',
+              text: 'The formula is linear, with a V3 multiplier of 6 * 10^25. At the original one-hour increment it creates one CST per elapsed minute; the larger snapshot increment gives slightly less. A shared timestamp produces zero. The minimum Participation CST argument constrains the amount credited to the previous participant, not an amount promised to the sender; the opening ETH Gesture skips that check. Elapsed time alone is not a retrievable CST balance.',
             },
             {
               kind: 'table',
@@ -480,7 +481,7 @@ export const whitePaperTextEn = {
                   example.elapsed,
                   example.cst,
                 ]),
-                footnote: `Computed at the launch time increment of exactly ${protocolFacts.dynamicCstRewardExamplesAssumeIncrementHours} hour. Amounts drift slightly lower as the increment grows; the live app preview and the contract are the source of truth.`,
+                footnote: `Approximate displayed amounts, computed at the original time increment of exactly ${protocolFacts.dynamicCstRewardExamplesAssumeIncrementHours} hour. Amounts become lower as the increment grows; the contract reports the exact smallest-unit amount.`,
               },
             },
           ],
@@ -490,11 +491,11 @@ export const whitePaperTextEn = {
           blocks: [
             {
               kind: 'paragraph',
-              text: `CST leaves circulation whenever it is spent: the full cost of every CST gesture is burned. Supply is therefore shaped by behavior. Quiet cycles imprint little Participation CST, active CST usage burns supply back down, and the fixed Recognition and Outreach flows add ${cst(protocolFacts.typicalCstImprintsPerCycle)} CST per typical cycle. Supply started at zero and has no hard cap. The recurring team-directed CST flow is the Outreach Reserve described in Section 7.1.`,
+              text: `CST supply reflects Participation CST, fixed allocations, and burns. With every track present, finalization creates ${cst(protocolFacts.typicalCstImprintsPerCycle)} fixed CST, not one allocation for every individual NFT. Quiet intervals create Participation CST only when a subsequent Gesture executes. The complete CST cost, including the premium in Section 12.3, is burned before Participation CST is credited.`,
             },
             {
               kind: 'paragraph',
-              text: 'The square-root formula limits Participation CST and was introduced in the V2 upgrade (Section 12.2). The original design imprinted a flat 100 CST per gesture. Under the current rule, rapid successive gestures imprint little or no Participation CST, while longer intervals produce larger amounts. Recognition CST and the Outreach Reserve remain separate sources of supply.',
+              text: 'V1 created a fixed amount for the sender of each Gesture; V2 used a square-root elapsed-time formula for that sender. V3 uses the linear formula for the previous participant. There is no scheduled economic supply cap or guaranteed supply trajectory, although the inherited voting-token representation limits total supply to 2^208 - 1 smallest units.',
             },
           ],
         },
@@ -518,7 +519,7 @@ export const whitePaperTextEn = {
         },
         {
           kind: 'paragraph',
-          text: 'The once-ever rule replaces the usual lock-up schedule with a single irreversible choice, and it gives the anchored set a real cost of exit. Whether to keep an NFT anchored is a live decision every cycle; whether to release it is a permanent one.',
+          text: 'An anchor belongs to the recorded original participant until released. Ownership transfers do not restore used eligibility. Failed NFT return or ETH delivery reverts release. Integer accounting can leave residual ETH; once no Cosmic Signature NFTs remain anchored, the anchoring wallet owner can send its remaining ETH to a chosen nonzero address (Section 13).',
         },
         {
           kind: 'paragraph',
@@ -539,7 +540,7 @@ export const whitePaperTextEn = {
         },
         {
           kind: 'paragraph',
-          text: 'Today the Council coordinates alongside the team\u2019s scoped owner role. After the decentralization step of Section 13, it is the only coordination layer the protocol has.',
+          text: 'The Council uses historical checkpoints and has no separate execution timelock after a successful proposal. It can change its own coordination settings and exercise only the assets and permissions it actually controls. At the snapshot it does not own the protocol or the checked administrative wallets. Transferring an owner role to the Council and renouncing it are different operations, as Section 13 explains.',
         },
       ],
     },
@@ -548,11 +549,11 @@ export const whitePaperTextEn = {
       blocks: [
         {
           kind: 'paragraph',
-          text: `Every cycle forwards ${protocolFacts.publicGoodsPercentage}% of the Cycle Reserve to the Public Goods Vault, whose beneficiary is currently Protocol Guild, the collective funding mechanism for more than 170 Ethereum core protocol contributors. The forwarding is enforced on-chain as part of finalization; no one decides each cycle whether to honor it. The more the protocol is used, the more flows to the infrastructure Ethereum itself depends on.`,
+          text: `The configured Public Goods Allocation is ${protocolFacts.publicGoodsPercentage}% of the Cycle Reserve. Finalization attempts to send it to the Public Goods Vault. A separate permissionless vault operation forwards the accumulated balance to its configured beneficiary, currently Protocol Guild. The vault owner can change that beneficiary. A failed transfer from the protocol is recorded and leaves that ETH in the reserve; successful forwarding to the ultimate beneficiary is not guaranteed in the finalization transaction.`,
         },
         {
           kind: 'paragraph',
-          text: 'The reasoning is simple. Cosmic Signature exists because Ethereum\u2019s base layer keeps working, and a protocol that lives on public infrastructure should fund it the way it does everything else: mechanically, on a schedule, in public. The vault also accepts voluntary ETH contributions directly, outside any cycle.',
+          text: "This creates an explicit path for funding Ethereum's core development through Protocol Guild. The vault also accepts ETH directly outside a cycle. The Outreach Reserve is separate: its appointed treasurer distributes the CST it receives, and its owner appoints that treasurer. Neither role follows automatically from holding CST.",
         },
         {
           // lexicon-allow-start: tax-status disclaimer must name the concepts it denies.
@@ -571,15 +572,15 @@ export const whitePaperTextEn = {
           blocks: [
             {
               kind: 'paragraph',
-              text: 'In late 2025, Hacken carried out an independent security review of the Cosmic Signature contracts, covering the core protocol, the CST token, both NFT integrations, the anchoring wallets, and the supporting wallet and system-management contracts. The final report, published in January 2026, lists 23 findings: none critical, none high severity, 3 medium, 8 low, and 12 informational, most of them design trade-offs reviewed and accepted with written rationale.',
+              text: 'Hacken reviewed an earlier Cosmic Signature contract revision in late 2025; its final report was published in January 2026. Its findings and scope belong to that reviewed revision. The report is not an independent review of every later V2 or V3 change, and exact-match source verification is not a security assessment.',
             },
             {
               kind: 'paragraph',
-              text: 'Alongside the manual review, Hacken fuzz-tested 14 system invariants, properties such as the protocol\u2019s ETH balance always equaling deposits minus distributions. All 14 held across 10,000 runs. The full report is public and linked in the references.',
+              text: 'The historical report includes fuzz testing of fourteen specified system invariants over ten thousand runs. Those results are evidence within that test scope, not proof of all possible executions or of the deployed V3 implementation.',
             },
             {
               kind: 'paragraph',
-              text: 'Beyond external review, the repository carries Certora formal verification specifications, Solidity SMTChecker configuration, Slither static analysis, and a test suite that targets complete coverage of the Solidity sources.',
+              text: 'The repository contains contract tests, Certora specifications, SMTChecker configuration, and static-analysis tooling. Their presence alone does not establish complete coverage or a proof of the entire deployed system. Review reports, verification results, code revisions, and deployment addresses must be considered together.',
             },
           ],
         },
@@ -589,10 +590,10 @@ export const whitePaperTextEn = {
             {
               kind: 'list',
               items: [
-                'Reentrancy guards protect every external entry point of the core contract.',
-                'Pull over push: secondary ETH allocations and attached assets sit in escrow rather than being sent during finalization, so no recipient contract can block a cycle from closing.',
-                'Failure-tolerant forwarding: if the Public Goods transfer cannot complete, finalization proceeds anyway and the event is recorded for later handling.',
-                'Inter-cycle locks: core parameter changes and contract upgrades are impossible while a cycle is running (Section 13).',
+                'Reentrancy protection applies to guarded entry points; it is not a statement that every public function has the same guard.',
+                'Escrow. Secondary ETH is held for retrieval, but other failures can still revert finalization, including inability of its caller to receive the Signature Allocation.',
+                'Public Goods. Transfers have a specific failure-tolerant path. This does not make all external calls failure-tolerant or automatically retry a failed forwarding (Section 10).',
+                'Configuration locks. Most core settings and upgrades require the owner and an inactive cycle. The next-cycle delay, activation controls, ownership operations, and companion settings have different conditions.',
               ],
             },
           ],
@@ -606,7 +607,7 @@ export const whitePaperTextEn = {
             },
             {
               kind: 'paragraph',
-              text: 'This is deliberate minimalism: no oracle, no external committee, no callback that could strand a cycle. The trade-off is stated plainly. A sequencer could in principle influence block-level inputs, and the design bounds what that influence could reach. Stellar Selections and art seeds are the only consumers of randomness; the countdown, the Gesture Cost sequence, and every percentage in Section 5 are deterministic. The construction is consumed once per finalization, and finalization is a public transaction anyone can submit.',
+              text: 'Block-derived entropy is not an externally verified randomness service. Sequencers and transaction timing can influence inputs; the construction does not guarantee unbiased selections. Randomness affects selections and NFT seeds, while pricing, timing, and allocation arithmetic follow deterministic rules. Finalization eligibility still follows the exclusive and open windows described in Section 3.3.',
             },
           ],
         },
@@ -615,18 +616,18 @@ export const whitePaperTextEn = {
           blocks: [
             {
               kind: 'paragraph',
-              text: 'All contracts are source-verified with exact-match status on Sourcify for Arbitrum One (chain 42161), at the addresses fixed in Appendix A. The art pipeline\u2019s determinism is asserted in continuous integration with SHA-256 hashes of rendered frames. Project-owned code is CC0: anyone may fork the contracts, the renderer, or the site, and anyone can check any Signature by regenerating it from its seed.',
+              text: 'The V3 runtime was checked against the local production build, accounting for its implementation-address immutable values. At the snapshot the public Sourcify lookup did not report a match for V3; public exact-match source verification is therefore not asserted here. Exact-match verification, where available, connects source and bytecode but does not prove correctness or extend a historical audit to new code. Project-owned code is CC0; third-party dependencies retain their own licenses.',
             },
           ],
         },
       },
     },
     'upgrade-history': {
-      heading: 'Deployment history and the road ahead',
+      heading: 'Deployment history and V3',
       blocks: [
         {
           kind: 'paragraph',
-          text: 'Cosmic Signature is designed to be finished. Upgradability exists so the mechanics can be corrected against observed behavior during the protocol\u2019s early life, and it ends when the design does. This section records what has shipped and what remains.',
+          text: 'Paper edition numbers and implementation versions are separate. English edition 1.3 replaces the earlier frontend English 1.0 description and its obsolete V3 proposal; it does not imply intervening published editions 1.1 or 1.2. The prior English PDF and translated 1.0 editions remain available. The following deployment dates are based on transaction records.',
         },
       ],
       subsections: {
@@ -635,76 +636,77 @@ export const whitePaperTextEn = {
           blocks: [
             {
               kind: 'paragraph',
-              text: 'V1 launched the protocol on Arbitrum One behind a UUPS upgradeable proxy: cycles, gestures, the allocation tracks, anchoring, the Council, and the art pipeline, essentially as described in this paper. Upgrades require the owner and are only possible between cycles. There is deliberately no mechanism for changing the contract mid-cycle, whatever the circumstances.',
+              text: 'The current proxy was deployed on April 24, 2026 at 06:42:34 UTC, block 455767589, with implementation 0x7739148013777c485AD9f3d971e1005Eca686661. V1 established the cycles and companion system. Its timing and CST rules differ from later versions. Core upgrades require the owner and an inactive cycle under the current authorization logic.',
             },
           ],
         },
         v2: {
-          heading: 'The V2 upgrade, live today',
+          heading: 'V2: Historical implementation',
           blocks: [
             {
               kind: 'paragraph',
-              text: 'V2 is the implementation deployed today. It made five changes, each a response to observed or anticipated behavior.',
+              text: 'The V2 upgrade executed on June 21, 2026 at 19:38:53 UTC, block 475913365, with implementation 0x50eB3d05d2C463949DE9238D419385594f7AdB97. It has now been replaced by V3. Its principal changes were:',
             },
             {
               kind: 'list',
               items: [
-                'Dynamic Participation CST. The flat 100 CST per gesture became the square-root formula of Section 7.1. Flat imprinting turned rapid gesture sequences into free CST; the new rule imprints by patience, not by frequency.',
-                'Minimum-imprint guards. Every gesture method gained a parameter for the smallest Participation CST amount the participant will accept, protecting them from timing shifts between signing and execution.',
-                'A living CST Calibration Window. The window\u2019s duration became a stored value that responds to the gesture mix (Section 4.3), so the ETH and CST paths keep each other in balance.',
-                `A longer exclusivity window. The Final Gesture participant\u2019s exclusive finalization window grew from 24 to ${protocolFacts.finalGestureExclusivityHours} hours.`,
-                'Timing and arithmetic hardening. Countdown extensions now always apply to the stored finalization time, closing a loophole in which near-free CST gestures made after expiry could repeatedly push the deadline outward. The arithmetic that schedules the next cycle was also hardened so that no parameter configuration, however extreme, can prevent a cycle from finalizing.',
+                "Participation CST. V2 used a square-root formula and credited the current sender, unlike V3's linear credit to the previous participant.",
+                'Minimum-amount protection. Gesture methods gained a minimum accepted Participation CST argument.',
+                'Adaptive CST duration. The stored window duration changed with ETH and CST participation; V3 replaces its pricing role with a decline rate.',
+                'Longer exclusivity. The finalization timeout increased from one day to two days.',
+                'Stored-deadline extension. Later Gestures added to the stored deadline, even in overtime. Wrapping arithmetic addressed a particular next-cycle scheduling overflow path; it did not make every parameter configuration safe.',
               ],
             },
           ],
         },
         v3: {
-          heading: 'The planned V3 upgrade',
+          heading: 'V3: Deployed mechanics and late-cycle premium',
           blocks: [
             {
               kind: 'paragraph',
-              text: 'V3, currently in development in the public repository, changes exactly one thing: the cost of acting late. During the final 20 minutes before the Cycle Finalization Time, every Gesture Cost, whether ETH, ETH with a Random Walk NFT, or CST, is multiplied by a premium that ramps polynomially from 1x to 10x, reaching 10x at the deadline and staying there for any gesture made during overtime.',
+              text: 'V3 was installed on October 21, 2026 at 06:53:07 UTC, block 516839618, at implementation 0xc1b97E1b0baC86248653B18706dbC5c8898c5c06. It changes Participation CST timing and recipient, participant selection weights, CST decline-rate adaptation, ETH shares, and the main NFT count. It also adds a late premium to ETH and CST costs after opening. The window is floor(increment / 3000000) seconds: about twenty minutes at the original increment and 1236 seconds at the snapshot.',
             },
             {
               kind: 'formula',
-              formula: 'm(t) = 1 + 9 \u00b7 (t / T)^8, where T = 20 minutes',
+              formula:
+                'L = floor(I / D); e = clamp(L - (deadline - now), 0, L)\nq = floor(e * M / I)\npremium = floor(q^k * base / 2^(13*k)); due = base + premium',
               caption:
-                'Late-cycle cost premium, with t the time elapsed within the final 20-minute window.',
+                'I is the increment in microseconds; D = 3000000, M = 29228998656 and k = 8 at V3 initialization. The premium is skipped before opening and when e is zero.',
             },
             {
               kind: 'paragraph',
-              text: 'The exponent matters. Because the ramp is eighth-order, the premium is nearly invisible for most of the window and steep only at the very end: about 1.04x ten minutes before the deadline, about 1.9x at five minutes, about 7x at one minute, and 10x at zero.',
+              text: 'The smooth approximation is total cost / base = 1 + 4 * (e / L)^8. At default settings this approaches five times the base at expiry and remains capped in overtime; exact integer results differ slightly. It is not the ten-times premium described in edition 1.0. The Random Walk reduction applies after the premium. Premiums do not raise subsequent base costs or selection weights, and a zero base produces zero premium.',
             },
             {
               kind: 'paragraph',
-              text: 'The intent is to change the endgame. Under V2, waiting until the last seconds to gesture is nearly free, so a cycle can end in a flurry of low-signal timing moves. Under V3, a last-moment gesture is an expensive statement, sustained participation through the cycle is comparatively cheap, and the endurance tracks of Section 5.2 become much harder to ambush. Exact parameters may still be tuned before deployment; the mechanism is as described.',
+              text: "V3 initialization preserves settings it does not explicitly rewrite, including the increment, next-cycle delay, carried first CST beginning cost, and companion addresses. Historical statistics are not retroactively populated. Indexers must use the ordered proxy upgrade event as the version boundary: an unchanged event signature can carry changed meaning. The event's Participation CST amount belongs to the previous participant in V3, and its calibration value is a rate rather than the old duration. Historical wallet assets stay with the wallet that received them.",
             },
           ],
         },
       },
     },
     decentralization: {
-      heading: 'The path to full decentralization',
+      heading: 'Owner powers and possible future coordination',
       blocks: [
         {
           kind: 'paragraph',
-          text: 'The protocol currently has an owner: the address that deployed it. The role is real, and this paper does not minimize it. It is also narrow by construction and temporary by commitment.',
+          text: 'The snapshot identifies 0x14c82Ce4E5713E88C9462680E9c02BF4a3089871 as the core protocol owner and the checked administrative-wallet owner. The Council does not acquire these roles automatically. Ownership is observable state, not an assurance that control will later disappear.',
         },
         {
           kind: 'paragraph',
-          text: 'While a cycle is running, the core parameters are locked. The owner cannot change percentages, increments, or costs mid-cycle, and cannot upgrade the contract; owner actions live in the gap between cycles. Three narrower controls remain available at any time: postponing an upcoming cycle\u2019s activation, though only until its first gesture arrives; adjusting the delay before the next cycle; and managing peripheral contracts, meaning the Public Goods Vault\u2019s beneficiary, NFT metadata URIs, and the escrow retrieval timeout. No owner power reaches escrowed allocations, imprinted NFTs, recorded seeds, or anyone\u2019s CST balance, and no team wallet receives ETH from gestures.',
+          text: 'Most core setters and UUPS upgrade authorization require the owner and an inactive cycle, determined by activation time. The next-cycle delay can be changed separately; activation controls apply before the first Gesture. Ownership transfer and renunciation use inherited permissions. Companion owners separately control settings such as NFT metadata, the Public Goods beneficiary, future retrieval timeouts, the Outreach treasurer, and residual anchoring ETH when no NFTs remain anchored.',
         },
         {
           kind: 'paragraph',
-          text: 'These powers exist because the mechanism is novel. V2 exists because live behavior taught lessons no simulation would have caught, and V3 exists for the same reason. A bounded, public adjustment period is how the design gets finished. The strongest power in the list is the upgrade itself, and even it is public: a new implementation is visible and verifiable on-chain before the next cycle begins.',
+          text: "An authorized upgrade can replace implementation logic. Restrictions in today's implementation are not a guarantee that a future authorized implementation preserves them. Users should evaluate the actual owner, implementation, and settings before transacting.",
         },
         {
           kind: 'paragraph',
-          text: 'It ends as follows. Once the remaining upgrades are complete, beginning with V3, and the mechanics and token design are judged final, privileged control will be removed from the deploying address entirely. The owner role will leave the deployer permanently, either by transfer to the Cosmic Council or by outright renouncement, with the exact mechanism announced in advance. From that point, no private party can upgrade the protocol or change its parameters, and the deploying address holds nothing that any other address does not. What remains is the protocol as deployed, the Council as its coordination layer, and the art.',
+          text: "V3 contains no automatic sunset, compulsory Council transfer, or scheduled renunciation. Transferring ownership to the Council preserves the relevant powers under collective control. Renouncing ownership disables that role's owner-only operations. Each contract has its own ownership role, so these outcomes must be evaluated separately.",
         },
         {
           kind: 'paragraph',
-          text: 'Every step of this process is publicly visible on-chain, including the last one.',
+          text: 'Any future change in control should be described as completed only after its transaction is observable. Earlier statements of intention are not an executed transfer or a contract-enforced schedule.',
         },
       ],
     },
@@ -718,7 +720,7 @@ export const whitePaperTextEn = {
             // lexicon-allow-start: denial copy must name the concepts it denies, matching FAQ practice.
             {
               kind: 'paragraph',
-              text: 'Cosmic Signature is not a lottery, a casino, or a gambling product. There is no house, no dealer, and no bet. Participants exchange value for participation itself: every gesture is an expressive act that shapes the artwork, extends the cycle, and is recorded permanently on-chain. The protocol retains no operator\u2019s margin of any kind; every allocation track in Section 5 flows to participants, to anchored NFTs, to the compounding reserve, or to Public Goods.',
+              text: 'Cosmic Signature is designed for procedural art and participation. A Gesture extends the cycle and records participation; it does not specify particular visual features. At the snapshot there is no separately configured team ETH percentage. The Outreach Reserve does receive CST under the treasurer controls in Section 10. Contract mechanics alone do not determine the legal classification of participation in every jurisdiction.',
             },
             {
               kind: 'paragraph',
@@ -733,10 +735,10 @@ export const whitePaperTextEn = {
             {
               kind: 'list',
               items: [
-                'Smart contract risk. The contracts are reviewed, formally analyzed, and source-verified, and none of that is a guarantee. Unknown defects can exist in any software that holds value.',
-                'Randomness limits. Stellar Selections use block-derived entropy (Section 11.3). A sequencer could in principle influence it; the design bounds the consequences but cannot eliminate them.',
+                'Smart contract risk. Historical reviews, testing, and source verification have defined scopes. Defects can remain in software that holds assets.',
+                'Randomness limits. Stellar Selections use block-derived entropy and can be influenced by block production and transaction timing.',
                 `Timing responsibilities. The ${protocolFacts.finalGestureExclusivityHours}-hour finalization window and the ${protocolFacts.secondaryRetrievalTimeoutWeeks}-week escrow timeout are real deadlines. Allocations left unretrieved past them become available to others, by design.`,
-                'Parameter changes. Until the decentralization step completes, parameters can change between cycles as described in Section 13. Every change is public before the next cycle begins.',
+                'Administrative risk. Authorized owners can change configuration and implementation under the applicable conditions; V3 has no automatic removal of those powers.',
                 'Asset volatility. The values of ETH, CST, and NFTs move. Participation costs real money; treat gestures as expenditure on participation and art, not as a path to financial gain.',
                 'Regulatory uncertainty. The legal treatment of digital assets varies by jurisdiction and continues to evolve.',
               ],
@@ -750,12 +752,12 @@ export const whitePaperTextEn = {
       blocks: [
         {
           kind: 'paragraph',
-          text: 'Cosmic Signature is an attempt to build a generative art protocol that needs no one\u2019s permission and, eventually, no one\u2019s stewardship. The mechanics are small enough to specify completely: descending-cost windows, a countdown that gestures extend, fixed allocation percentages, a compounding reserve, and art that is a pure function of physics and a seed. The upgrades that remain are few and public. When they are done, the owner role goes away, and what is left is what this paper describes: a clock, a reserve, a token, a council, and an unbroken series of Signatures, each one the record of the hands that shaped it.',
+          text: 'Cosmic Signature connects a public clock, configured reserve allocations, participation records, and procedurally generated art. V3 changes both costs and recognition, including who receives Participation CST and how entries are weighted. The source, dated deployment evidence, and live configuration allow these rules to be checked; neither reserve growth, asset value, unbiased randomness, nor future removal of owner powers is guaranteed.',
         },
       ],
     },
     'appendix-a': {
-      heading: 'Appendix A: Verified contract addresses',
+      heading: 'Appendix A: Contract addresses at the snapshot',
       blocks: [
         {
           kind: 'table',
@@ -763,7 +765,7 @@ export const whitePaperTextEn = {
             columns: ['Contract', 'Address (Arbitrum One)'],
             rows: [
               ['Protocol contract (proxy)', protocolFacts.contractAddresses.proxy],
-              ['Protocol implementation (V2)', protocolFacts.contractAddresses.implementation],
+              ['Protocol implementation (V3)', protocolFacts.contractAddresses.implementation],
               ['CST token', protocolFacts.contractAddresses.cstToken],
               ['Cosmic Signature NFT', protocolFacts.contractAddresses.cosmicSignatureNft],
               ['Random Walk NFT', protocolFacts.contractAddresses.randomWalkNft],
@@ -781,7 +783,7 @@ export const whitePaperTextEn = {
               ],
             ],
             footnote:
-              'All contracts are exact-match verified on Sourcify for chain 42161. The proxy address is the protocol\u2019s permanent address; implementations change only through the public upgrade process described in Sections 12 and 13.',
+              'Arbitrum One, chain 42161, block 517046699, October 21, 2026 at 22:29:53 UTC. Block hash: 0x5bcc8f77b3674f5611f559353689ae1d87d59cb12a92add2b46581ef1448b395. The EIP-1967 implementation slot points to V3. These are dated observations; inspect live state before transacting. The upgrade history appears in Section 12.',
           },
         },
       ],
@@ -797,7 +799,7 @@ export const whitePaperTextEn = {
               ['Opening cost, first cycle', `${protocolFacts.initialGestureCostEth} ETH (fixed)`],
               [
                 'ETH Calibration Window ceiling',
-                `${protocolFacts.ethCalibrationCeilingMultiplier}x the previous cycle\u2019s opening cost paid`,
+                'Twice the preceding opening undiscounted base cost',
               ],
               [
                 'ETH Calibration Window floor',
@@ -813,12 +815,12 @@ export const whitePaperTextEn = {
               ],
               [
                 'CST Calibration Window ceiling',
-                `max(${protocolFacts.cstCalibrationCeilingMultiplier}x last CST cost paid, ${protocolFacts.cstCalibrationCeilingMinCst} CST)`,
+                'max(twice premium-free CST base, configured minimum, updated rate * 180 seconds)',
               ],
               ['CST Calibration Window floor', `${protocolFacts.cstCalibrationFloorCst} CST`],
               [
-                'CST Calibration Window duration',
-                `${protocolFacts.initialCstCalibrationWindowHours}-hour initial reference; about \u2212${protocolFacts.cstCalibrationWindowDecreasePercentPerEthGesture}% per ETH gesture, +${protocolFacts.cstCalibrationWindowIncreasePercentPerCstGesture}% per CST gesture`,
+                'CST decline-rate adaptation',
+                'ETH candidate: rate + floor(rate / 100), subject to safeguard; CST: rate - floor(rate / 101)',
               ],
               [
                 'Initial countdown after opening gesture',
@@ -845,10 +847,7 @@ export const whitePaperTextEn = {
                 'Compounding Cycle Reserve',
                 `about ${protocolFacts.compoundingReservePercentage}% rolls forward`,
               ],
-              [
-                'Recognition CST per NFT distribution',
-                `${cst(protocolFacts.specialAllocationCst)} CST`,
-              ],
+              ['Recognition CST per allocation', `${cst(protocolFacts.specialAllocationCst)} CST`],
               ['Outreach Reserve per cycle', `${cst(protocolFacts.outreachReserveCst)} CST`],
               [
                 'Typical imprints per cycle',
@@ -860,11 +859,9 @@ export const whitePaperTextEn = {
               ],
               [
                 'Delay before next cycle',
-                `${protocolFacts.defaultNextCycleDelayMinutes} minutes by default, owner-adjustable`,
+                `${protocolFacts.nextCycleDelayDaysAtSnapshot} days at snapshot; ${protocolFacts.defaultNextCycleDelayMinutes} minutes is the Solidity default`,
               ],
             ],
-            footnote:
-              'Launch values are shown where a parameter evolves or is adjustable; the contracts report live values.',
           },
         },
       ],
@@ -874,8 +871,8 @@ export const whitePaperTextEn = {
     heading: 'References',
     items: [
       {
-        label: 'Cosmic Signature contracts repository (source, tests, verification tooling)',
-        href: 'https://github.com/PredictionExplorer/Cosmic-Signature',
+        label: 'Cosmic Signature V3 source at reviewed revision 9d1a6447',
+        href: 'https://github.com/PredictionExplorer/Cosmic-Signature/tree/9d1a644744e0ee588ef5af1947f6decdf8bdb3f3/contracts/production',
       },
       {
         label: 'Cosmic Signature app',
@@ -898,8 +895,28 @@ export const whitePaperTextEn = {
         href: 'https://docs.openzeppelin.com/contracts/5.x/governance',
       },
       {
+        label: 'Reviewed art generator revision 4dc6d64e',
+        href: 'https://github.com/PredictionExplorer/CS-Image-Generation/tree/4dc6d64e8ec93bef5f4303ea034857b16189e6e9',
+      },
+      {
         label: 'Arbitrum One',
         href: 'https://arbitrum.io',
+      },
+      {
+        label: 'V3 upgrade transaction, October 21, 2026',
+        href: 'https://arbiscan.io/tx/0x6adb029eadca055f12ded5d48c606edd8f84dad3433e0eab08d841d7962569ad',
+      },
+      {
+        label: 'V3 implementation public source-verification lookup',
+        href: 'https://repo.sourcify.dev/42161/0xc1b97E1b0baC86248653B18706dbC5c8898c5c06',
+      },
+      {
+        label: 'Detailed V2-to-V3 change register',
+        href: 'https://github.com/PredictionExplorer/Cosmic-Signature/blob/e24542a4ac5f4cd28afa2f5f6d83d66975f4f753/docs/v3-vs-v2-changes.md',
+      },
+      {
+        label: 'Historical English white paper 1.0',
+        href: 'https://cosmicsignature.com/white-paper/cosmic-signature-white-paper-v1.0.pdf',
       },
     ],
   },
@@ -920,7 +937,8 @@ export const whitePaperTextEn = {
   figures: {
     cycle: {
       title: 'A Performance Cycle, from opening to the next cycle',
-      caption: 'Durations are launch values; Sections 3.1 through 3.3 give the exact rules.',
+      caption:
+        'Opening durations are original defaults; the next-cycle delay is the dated live setting. Section 3 distinguishes them.',
       steps: [
         {
           label: 'Opening',
@@ -929,7 +947,7 @@ export const whitePaperTextEn = {
         },
         {
           label: 'Gestures',
-          detail: `Each gesture adds the time increment to the countdown: ${protocolFacts.initialCycleTimeIncrementHours} hour at launch.`,
+          detail: `Each subsequent Gesture adds the time increment to the countdown: ${protocolFacts.initialCycleTimeIncrementHours} hour at launch.`,
         },
         {
           label: 'Final Gesture window',
@@ -941,7 +959,7 @@ export const whitePaperTextEn = {
         },
         {
           label: 'Next cycle',
-          detail: `The next cycle opens after a short delay, ${protocolFacts.defaultNextCycleDelayMinutes} minutes by default.`,
+          detail: `The next activation is scheduled ${protocolFacts.nextCycleDelayDaysAtSnapshot} days after finalization at the snapshot setting.`,
         },
       ],
     },
@@ -953,7 +971,7 @@ export const whitePaperTextEn = {
     art: {
       title: 'Two Signatures from the collection',
       caption:
-        'Each image is the pipeline\u2019s output for the seed printed under it; anyone can regenerate it, pixel for pixel.',
+        'Artwork derives from the recorded seed together with its renderer revision and configuration.',
       seedLabel: 'Seed',
     },
   },

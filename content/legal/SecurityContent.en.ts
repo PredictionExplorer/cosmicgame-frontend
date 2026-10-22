@@ -21,7 +21,7 @@ export const securityCopyEn: SecurityCopy = {
     },
     contractsHeading: 'Core contracts on Arbitrum One',
     contractsIntro:
-      'The published source code of each contract is an exact match on Sourcify (checked {date}), so the bytecode on-chain is the code you can read. The <contracts>contracts page</contracts> lists every address.',
+      'The companion contracts and historical V2 implementation have published source matches checked {date}. The current V3 implementation is listed separately and is not yet verified on Sourcify. A local runtime comparison is not public source verification or a security audit. Inspect the <contracts>contracts page</contracts> and each lookup.',
     explorerLink: 'Arbiscan',
     sourcifyLink: 'Sourcify',
     copyLabel: 'Copy {value}',
@@ -49,7 +49,7 @@ export const securityCopyEn: SecurityCopy = {
       {
         term: 'During a cycle',
         detail:
-          'The core parameters are locked from the moment a cycle activates, before its first gesture, until that cycle finalizes.',
+          'Core settings and upgrades require the time before cycle activation. While no first gesture exists, the owner can postpone activation and reopen that maintenance interval. After the first gesture, core settings remain locked until finalization.',
       },
       {
         term: 'At any time',
@@ -59,12 +59,12 @@ export const securityCopyEn: SecurityCopy = {
       {
         term: 'Upgrades',
         detail:
-          'The protocol runs behind a UUPS proxy, so its address never changes. The owner can point it at new code between cycles only; the code in use is the publicly verified V2 implementation listed above.',
+          'The UUPS proxy currently points to V3. The owner may upgrade before activation under the contract’s authorization rules. Inspect the current implementation address and verification status; an old implementation’s verification does not cover its replacement.',
       },
       {
         term: 'Cosmic Council',
         detail:
-          'Ownership is planned to move to the Cosmic Council once the protocol is stable. From then on, parameters change only through Coordination Proposals that clear the Coordination Quorum.',
+          'The Council does not currently own the core protocol. V3 contains no automatic transfer or removal of owner powers. A future transfer preserves those powers for the Council; renunciation disables that owner role. Each contract has its own controls.',
       },
     ],
   },
@@ -108,7 +108,7 @@ export const securityCopyEn: SecurityCopy = {
   verify: {
     heading: 'Verify it yourself',
     paragraph:
-      'The strongest security signal is agreement between what the app shows, the verified contracts, the source code and live Arbitrum data. Each of these can be checked without trusting this site.',
+      'Compare the app with live Arbitrum state, the implementation currently installed, its source and the scope of available verification. Published verification and audits have distinct meanings and must match the revision being inspected.',
     resources: [
       {
         link: 'contracts',

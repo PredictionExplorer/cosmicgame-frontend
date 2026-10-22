@@ -379,7 +379,8 @@
     "reachesFloorIn": "{duration}后降至 0 CST",
     "windowEndsIn": "{duration}后窗口结束",
     "windowDetails": "窗口时长：{duration}。已过去：{elapsed}。",
-    "floorIn": "{duration}后"
+    "floorIn": "{duration}后",
+    "cstSubtitleV3": "CST 基础价格按实时下降速率降低。ETH 落笔可加快速率，CST 落笔会减慢速率并重设上限；临近收官溢价另计。"
   },
   "allocation": {
     "title": "分配一览",
@@ -400,7 +401,7 @@
       },
       "publicGoods": {
         "name": "公共物品",
-        "tooltip": "每个周期，周期储备的 {percent}% 都会转拨给 Protocol Guild——为 170 多位以太坊核心贡献者提供资助的机制。",
+        "tooltip": "{percent}% 分配至公共物品金库；任何人都可另发一笔交易，将余额转给配置的受益方，目前为 Protocol Guild。",
         "recipientLabel": "Protocol Guild"
       },
       "ethStellar": {
@@ -514,10 +515,10 @@
     "monument": {
       "reserveLabel": "签名分配",
       "extras": {
-        "base": "+ 1,000 CST · 1 枚 Cosmic Signature NFT",
-        "withNft": "+ 1,000 CST · 1 枚 Cosmic Signature NFT · {nftCount, number} 枚附加 NFT",
-        "withErc20": "+ 1,000 CST · 1 枚 Cosmic Signature NFT · {erc20Count, number} 笔附加代币存入",
-        "withBoth": "+ 1,000 CST · 1 枚 Cosmic Signature NFT · {nftCount, number} 枚附加 NFT · {erc20Count, number} 笔附加代币存入"
+        "base": "+ 1,000 CST · {cscNftCount, plural, other {# 枚 Cosmic Signature NFT}}",
+        "withNft": "+ 1,000 CST · {cscNftCount, plural, other {# 枚 Cosmic Signature NFT}} · {nftCount, number} 枚附加 NFT",
+        "withErc20": "+ 1,000 CST · {cscNftCount, plural, other {# 枚 Cosmic Signature NFT}} · {erc20Count, number} 笔附加代币存入",
+        "withBoth": "+ 1,000 CST · {cscNftCount, plural, other {# 枚 Cosmic Signature NFT}} · {nftCount, number} 枚附加 NFT · {erc20Count, number} 笔附加代币存入"
       },
       "calendarTitle": "Cosmic Signature 第 {number} 个周期开启",
       "calendarBody": "下一演绎周期即将开放落笔。第一笔会启动收官倒计时。",
@@ -528,7 +529,7 @@
       "subtitle": "本周期收官时发放的全部内容",
       "cstPlusNft": "1,000 CST + NFT",
       "cstPlusNftEach": "每位 1,000 CST + NFT",
-      "stellarStatus": "每一次落笔都是一份星选资格",
+      "stellarStatus": "V3 加权资格",
       "ethGroup": "来自周期储备的 ETH",
       "fixedGroup": "CST 与 NFT 分配"
     },
@@ -538,7 +539,7 @@
       "galleryCta": "画廊",
       "viewAria": "查看 Cosmic Signature {id}",
       "alt": "Cosmic Signature 艺术作品 {id} —— 确定性三体生成艺术",
-      "pairingNote": "确定性三体艺术，铭刻于链上。每枚签名作品都配有 1,000 CST。",
+      "pairingNote": "艺术种子记录在链上。固定 CST 按分配轨道发放，签名分配的三枚 NFT 合计对应一次 1,000 CST。",
       "watchDrawing": "观看成形过程",
       "showFinished": "显示完成的作品"
     },
@@ -583,7 +584,7 @@
     "clock": {
       "reserveLabel": "签名分配",
       "reserveExtraCst": "+ 1,000 CST",
-      "reserveExtraNft": "1 枚 Cosmic Signature NFT",
+      "reserveExtraNft": "{count, plural, other {# 枚 Cosmic Signature NFT}}",
       "reserveAttached": "{count, plural, other {# 项附加资产}}",
       "reserveUsd": "≈ {amount} 美元",
       "calendarTitle": "Cosmic Signature 第 {number} 个周期开启",

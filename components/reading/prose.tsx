@@ -1,7 +1,7 @@
 import { createElement as h, type ReactNode } from 'react';
 import { ChevronRight, Hash, Info } from 'lucide-react';
 
-import { protocolFacts } from '@/content/protocol-facts';
+import { historicalV2ProtocolFacts as protocolFacts } from '@/content/protocol-facts';
 
 import { cn } from '@/lib/utils';
 

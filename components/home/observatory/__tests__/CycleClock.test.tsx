@@ -1,6 +1,8 @@
 import userEvent from '@testing-library/user-event';
 import { renderToString } from 'react-dom/server';
 
+import { nftAllocationFacts } from '@/content/protocol-facts';
+
 import { TooltipProvider } from '@/components/ui/tooltip';
 
 import { render, screen, within, checkA11y } from '@/test-utils';
@@ -45,6 +47,17 @@ beforeEach(() => {
 });
 
 describe('CycleClock', () => {
+  it('reflects changes to the live main-allocation NFT count', () => {
+    const { rerender } = render(<CycleClock {...baseProps} signatureNftCount={3} />);
+    expect(screen.getByTestId('clock-reserve-extras')).toHaveTextContent(
+      'home.observatory.clock.reserveExtraNft(count=3)',
+    );
+    rerender(<CycleClock {...baseProps} signatureNftCount={5} />);
+    expect(screen.getByTestId('clock-reserve-extras')).toHaveTextContent(
+      'home.observatory.clock.reserveExtraNft(count=5)',
+    );
+  });
+
   it('sets the countdown as type with localized units, the phase and a timer', () => {
     render(<CycleClock {...baseProps} allocationTime={Date.now() + 2 * 86_400_000 + 5_000} />);
 
@@ -166,7 +179,10 @@ describe('CycleClock', () => {
       within(extras)
         .getAllByRole('listitem')
         .map((item) => item.textContent),
-    ).toEqual(['home.observatory.clock.reserveExtraCst', 'home.observatory.clock.reserveExtraNft']);
+    ).toEqual([
+      'home.observatory.clock.reserveExtraCst',
+      `home.observatory.clock.reserveExtraNft(count=${nftAllocationFacts.mainPrizeNfts})`,
+    ]);
     expect(extras.textContent).not.toContain('·');
     expect(screen.getByTestId('clock-reserve-usd')).toHaveTextContent(
       'home.observatory.clock.reserveUsd(amount=5,500)',

@@ -3,7 +3,7 @@
 import { zeroAddress } from 'viem';
 import { useTranslations } from 'next-intl';
 
-import { protocolFacts } from '@/content/protocol-facts';
+import { historicalV2ProtocolFacts, isV3Mechanics } from '@/content/protocol-facts';
 
 import { InfoTooltip } from '@/components/ui/info-tooltip';
 import { LiveStatus } from '@/components/ui/live-status';
@@ -132,10 +132,16 @@ export function CalibrationStatus({
   const title = t(firstGesture ? 'calibration.firstGestureTitle' : 'calibration.cstTitle');
   const subtitle = firstGesture
     ? t('calibration.firstGestureSubtitle')
-    : t('calibration.cstSubtitle', {
-        decreasePercent: String(protocolFacts.cstCalibrationWindowDecreasePercentPerEthGesture),
-        increasePercent: String(protocolFacts.cstCalibrationWindowIncreasePercentPerCstGesture),
-      });
+    : isV3Mechanics
+      ? t('calibration.cstSubtitleV3')
+      : t('calibration.cstSubtitle', {
+          decreasePercent: String(
+            historicalV2ProtocolFacts.cstCalibrationWindowDecreasePercentPerEthGesture,
+          ),
+          increasePercent: String(
+            historicalV2ProtocolFacts.cstCalibrationWindowIncreasePercentPerCstGesture,
+          ),
+        });
   const sample = firstGesture ? ethGestureInfo : cstGestureData;
   const hasEthTiming =
     ethGestureInfo != null &&

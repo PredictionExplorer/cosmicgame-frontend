@@ -4,8 +4,7 @@ import { ArrowUpRight, Download } from 'lucide-react';
 import { getTranslations, setRequestLocale } from 'next-intl/server';
 
 import {
-  WHITE_PAPER_DATE_ISO,
-  WHITE_PAPER_VERSION,
+  getWhitePaperEdition,
   getWhitePaperContent,
   type WhitePaperBlock,
   type WhitePaperContent,
@@ -14,6 +13,7 @@ import {
 } from '@/content/white-paper';
 import { getLandingContent } from '@/content/landing';
 
+import { routing } from '@/i18n/routing';
 import { PageHeader } from '@/components/layout/PageHeader';
 import { buttonVariants } from '@/components/ui/button';
 import {
@@ -25,6 +25,7 @@ import {
   TableRow,
 } from '@/components/ui/table';
 import { AllocationBar, AllocationKey } from '@/components/reading/AllocationBar';
+import { whitePaperAllocationTracks } from '@/components/white-paper/allocationTracks';
 import { ReadingContents } from '@/components/reading/ContentsNav';
 import { MetaItems } from '@/components/reading/MetaItems';
 import type { ContentsEntry } from '@/components/reading/contents';
@@ -312,11 +313,16 @@ export default async function WhitePaperPage({ params }: PageProps) {
   const { locale } = await params;
   setRequestLocale(locale);
   const content = getWhitePaperContent(locale);
+  const edition = getWhitePaperEdition(locale);
+  const currentEdition = getWhitePaperEdition(routing.defaultLocale);
   const { reading, figures } = content;
   const inLanguage = jsonLdInLanguage(locale);
   const pageUrl = localeHref(LANDING_ORIGIN, content.metadata.path, locale);
   const pdfUrl = `${LANDING_ORIGIN}${content.hero.downloadHref}`;
-  const plateCopy = await getSignaturePlateCopy(locale);
+  const [plateCopy, tLanding] = await Promise.all([
+    getSignaturePlateCopy(locale),
+    getTranslations({ locale, namespace: 'landing' }),
+  ]);
   const minutes = readingMinutes(paperText(content), locale);
   const targets = referenceTargets(content);
   const renderText = (text: string) => withReferences(text, locale, targets);
@@ -328,8 +334,8 @@ export default async function WhitePaperPage({ params }: PageProps) {
     description: content.metadata.description,
     url: pageUrl,
     inLanguage,
-    datePublished: WHITE_PAPER_DATE_ISO,
-    version: WHITE_PAPER_VERSION,
+    datePublished: getWhitePaperEdition(locale).dateIso,
+    version: getWhitePaperEdition(locale).version,
     author: {
       '@type': 'Person',
       name: content.hero.authorName,
@@ -347,19 +353,10 @@ export default async function WhitePaperPage({ params }: PageProps) {
     mainEntityOfPage: pageUrl,
   };
 
-  const allocationTable = content.sections
-    .flatMap((section) => section.subsections ?? [])
-    .find((subsection) => subsection.id === 'distribution-at-finalization')
-    ?.blocks.find((block) => block.kind === 'table');
-  // The split as every page draws it (the landing's bar, the same order and
-  // colours), keyed with this paper's own track names: the §5.1 table lists
-  // the tracks in the bar's order and carries the figures.
-  const allocationTracks = getLandingContent(locale).tracks.eth.map((track, index) => ({
-    ...track,
-    title:
-      (allocationTable?.kind === 'table' ? allocationTable.table.rows[index]?.[0] : undefined) ??
-      track.title,
-  }));
+  const allocationTracks = whitePaperAllocationTracks(
+    content,
+    getLandingContent(locale).tracks.eth,
+  );
 
   // Figures in the reading order of the sections they illustrate, numbered in that order.
   const figureList: ReadonlyArray<{
@@ -482,6 +479,26 @@ export default async function WhitePaperPage({ params }: PageProps) {
           </a>
         }
       />
+
+      {edition.version !== currentEdition.version ? (
+        <aside
+          className="mb-8 rounded-surface border border-rule p-5"
+          data-testid="historical-paper-notice"
+        >
+          <p className="type-body-md text-muted-foreground">
+            {tLanding('whitePaperHistorical.body', {
+              version: edition.version,
+              currentVersion: currentEdition.version,
+            })}
+          </p>
+          <a
+            href={localeHref(LANDING_ORIGIN, content.metadata.path, routing.defaultLocale)}
+            className="link mt-3 inline-flex min-h-6 items-center type-label"
+          >
+            {tLanding('whitePaperHistorical.link')}
+          </a>
+        </aside>
+      ) : null}
 
       <div className={cn(READING_TEXT_EDGE_CLASS, 'reading-grid')}>
         <div className="lg:row-span-4">

@@ -27,7 +27,7 @@ export const TERMS_ALLOCATION_ROWS: readonly TermsAllocationRow[] = [
     id: 'signature',
     eth: { percent: facts.mainEthPercentage },
     cst: facts.specialAllocationCst,
-    nft: 1,
+    nft: facts.mainPrizeNftsPerCycle,
   },
   {
     id: 'chrono',

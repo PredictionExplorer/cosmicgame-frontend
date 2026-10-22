@@ -1,9 +1,5 @@
-import {
-  ethDistributionFacts,
-  isV3Mechanics,
-  nftAllocationFacts,
-  protocolFacts,
-} from '@/content/protocol-facts';
+import { nftAllocationFacts } from '@/content/protocol-facts';
+import { ethDistributionFacts, protocolFacts } from '@/content/protocol-facts';
 
 import type { LandingText } from './structure';
 
@@ -14,7 +10,7 @@ import type { LandingText } from './structure';
 export const landingTextZh = {
   meta: {
     title: 'Cosmic Signature · Arbitrum 上的程序化链上艺术协议',
-    description: `Cosmic Signature 是运行于 Arbitrum 的程序化链上艺术协议。参与者在每个演绎周期中落笔；周期收官后，新的签名作品随之铭刻，周期储备按规则分配至各条轨道，其中 ${ethDistributionFacts.publicGoodsPercentage}% 转拨给以太坊核心贡献者。`,
+    description: `Cosmic Signature 是运行于 Arbitrum 的程序化链上艺术协议。参与者在每个演绎周期中落笔；周期收官后，新的签名作品随之铭刻，周期储备按规则分配至各条轨道，其中 ${ethDistributionFacts.publicGoodsPercentage}% 分配至公共物品金库。`,
     keywords: [
       'Cosmic Signature',
       '程序化艺术协议',
@@ -32,7 +28,7 @@ export const landingTextZh = {
     eyebrow: '程序化链上艺术协议 · Arbitrum',
     headlineLead: '每一次落笔，',
     headlineAccent: '都在塑造\u200B艺术。',
-    subhead: `每一次落笔以 ETH 或 CST 完成，都会延长周期的收官倒计时。倒计时归零即可收官：为获配者铭刻新的签名作品，并将周期储备分配到各条轨道，其中 ${ethDistributionFacts.publicGoodsPercentage}% 转拨给以太坊核心贡献者。`,
+    subhead: `每一次落笔以 ETH 或 CST 完成，都会延长周期的收官倒计时。倒计时归零即可收官：为获配者铭刻新的签名作品，并将周期储备分配到各条轨道，其中 ${ethDistributionFacts.publicGoodsPercentage}% 分配至公共物品金库。`,
     secondaryCtaLabel: '了解周期如何运作',
     art: {
       viewAriaLabel: '在应用中查看 Cosmic Signature {tokenLabel}',
@@ -66,7 +62,7 @@ export const landingTextZh = {
     eyebrow: '艺术',
     heading: '三体轨迹，由链上种子\u200B生成。',
     description:
-      '每枚 Cosmic Signature NFT 都呈现 3 个天体在牛顿引力下的运动轨迹。三体运动天生混沌。没有 AI，没有训练数据，只有确定性的物理。同一种子生成的画面逐像素一致。',
+      '每枚 Cosmic Signature NFT 都呈现牛顿引力下的三体运动。种子记录在链上，图像与视频在链下渲染。使用对应的渲染器版本、配置与兼容工具链，才能核对复现结果。',
     showcase: {
       viewAriaLabel: '查看 Cosmic Signature {tokenLabel}',
       artworkAlt: 'Cosmic Signature 作品 {tokenLabel}',
@@ -83,7 +79,7 @@ export const landingTextZh = {
       },
       selection: {
         title: '筛选',
-        body: 'Borda 排序聚合会综合混沌度与等边性，从候选池中选出视觉张力最强的一条轨道。',
+        body: 'Borda 排序综合混沌度与等边性形成候选短名单，再通过图像层面的审美检查筛选。',
       },
       camera: {
         title: '镜头',
@@ -91,7 +87,7 @@ export const landingTextZh = {
       },
       color: {
         title: '色彩',
-        body: '色彩在 OKLab 感知色彩空间中混合，各天体色相相隔 120°，并由漂移与正弦波调制。',
+        body: '连续的 OKLCh 感知调色方案改变色相与其他色彩属性，不将三个天体固定为等间隔色相。',
       },
       'spectral-render': {
         title: '光谱渲染',
@@ -99,7 +95,7 @@ export const landingTextZh = {
       },
       signature: {
         title: '签名',
-        body: 'AgX 色调映射、辉光、OpenSimplex 星云层与色彩分级共同完成画面。最终生成一张 16 位 PNG 与一段 30 秒 H.265 视频。',
+        body: '轨迹经过色调与辉光等后处理，生成静态图像和动画；最终外观与输出格式取决于渲染器版本及配置。',
       },
     },
     facts: {
@@ -114,7 +110,7 @@ export const landingTextZh = {
     eyebrow: '分配轨道',
     heading: '每一份周期储备，都按规则分配。',
     description:
-      '周期收官后，协议会沿各条分配轨道发放 ETH 与 CST 储备，以表彰坚守、时机、投入与参与。约一半 ETH 储备会滚入下一周期。',
+      '收官时，合约按配置发放 ETH 份额，并铭刻固定 CST 与 NFT。通常约一半 ETH 储备留至下一周期，实际留存也受取整和条件转账影响。',
     ethLabel: '每个周期储备中的 ETH',
     fixedLabel: '每个周期的 CST 与 NFT',
     fixedEach: `每位获配者获配 ${protocolFacts.specialAllocationCst.toLocaleString('zh-CN')} CST 与 1 枚 Cosmic Signature NFT。`,
@@ -122,12 +118,12 @@ export const landingTextZh = {
     items: {
       'signature-allocation': {
         title: '签名分配',
-        body: `写下收官之笔的参与者获配。其中包括 1,000 CST 与 ${nftAllocationFacts.mainPrizeNftPhrase.zh}。`,
+        body: `归实际收官者，通常是收官之笔参与者。包括合计 1,000 CST 与 ${nftAllocationFacts.mainPrizeNftPhrase.zh}；专属窗口过后，其他收官者也可成为受益方。`,
       },
       'compounding-reserve': {
         percent: '约 50%',
         title: '滚动储备',
-        body: '储备滚入下一演绎周期，继续累积；协议不从中抽取任何部分。',
+        body: '未分配的 ETH 留作下一周期储备；取整与未转出份额可能增加留存，但不保证储备逐周期增长。',
       },
       'chrono-warrior': {
         title: '时之勇士分配',
@@ -135,7 +131,7 @@ export const landingTextZh = {
       },
       'public-goods': {
         title: '公共物品分配',
-        body: '转拨给 Protocol Guild——为 170 多位以太坊核心贡献者提供资助的机制。',
+        body: '先转入公共物品金库，再由另一次交易转给当前受益方 Protocol Guild。',
       },
       'anchor-distribution': {
         title: '锚定派发',
@@ -143,11 +139,11 @@ export const landingTextZh = {
       },
       'eth-stellar-selection': {
         title: 'ETH 星选',
-        body: `由程序化随机选出的 ${protocolFacts.ethStellarSelectionRecipients} 位参与者均分；入选频次随落笔次数增加。`,
+        body: `由 ${protocolFacts.ethStellarSelectionRecipients} 次加权选择均分。权重取每笔发生时未减免、未含溢价的 ETH 基础价格，允许重复获配。`,
       },
       'participant-nft-stellar-selection': {
         title: '参与者 NFT 星选',
-        body: '从本周期的参与者中程序化随机选出。',
+        body: '与参与者 ETH 星选使用相同权重规则，按每笔的 ETH 基础价格加权选择。',
       },
       'anchored-nft-stellar-selection': {
         title: '锚定 NFT 星选',
@@ -180,7 +176,7 @@ export const landingTextZh = {
   publicGoods: {
     eyebrow: '公共物品',
     heading: '每个周期的储备，都有一部分\u200B流向\u200B以太坊\u200B核心贡献者。',
-    body: `每个演绎周期都会将 ETH 储备中的固定份额转拨给 Protocol Guild——为 170 多位以太坊核心贡献者提供资助的集体机制。协议使用得越多，流向以太坊底层基础设施的资源也越多。`,
+    body: '收官时，协议尝试将固定 ETH 份额转入公共物品金库。任何人都可另发一笔交易，将金库余额转给目前的受益方 Protocol Guild，支持以太坊核心贡献者。金库所有者可更改受益方。',
     disclaimerHeading: '免责声明',
     // lexicon-allow-start: 明确否认慈善捐赠及相关税务定性。
     disclaimer:
@@ -188,7 +184,7 @@ export const landingTextZh = {
     // lexicon-allow-end
     card: {
       label: '周期分配',
-      description: '每个演绎周期都会将这部分储备转拨给 Protocol Guild。',
+      description: '收官时转入金库的份额，转给受益方需要另一次交易。',
       tableRows: {
         contributors: { label: 'Protocol Guild 贡献者' },
         enforcement: { label: '执行方式', value: '链上' },
@@ -221,7 +217,7 @@ export const landingTextZh = {
   verifiability: {
     eyebrow: '可验证性',
     heading: '开放、已验证、可复现。',
-    body: '任何人都能从种子重新生成签名作品，并对照应用中公开的合约、源代码与审计状态自行核验。',
+    body: '可查阅链上种子、对应的渲染器版本、合约地址，以及公开的验证和审计状态。不同证据各有范围。',
     pillars: {
       cc0: {
         title: 'CC0 1.0',
@@ -233,7 +229,7 @@ export const landingTextZh = {
       },
       reproducible: {
         title: '可复现艺术',
-        body: '持续集成会校验生成画面的 SHA-256 哈希。同一种子，得到完全相同的输出。',
+        body: '仓库提供手动执行的参考图像检查。复现需固定种子、渲染器版本、配置与兼容工具链；当前持续集成并不比较生成帧的哈希。',
       },
     },
     evidenceLabel: '亲自查证',
@@ -246,12 +242,13 @@ export const landingTextZh = {
     items: [
       {
         question: '参与者实际要做什么？',
-        answer: `你可以落笔。每一笔都是使用 ETH 或 CST 发起的链上交易，会延长收官倒计时、计入一次星选资格，还可能铭刻参与 CST，并共同塑造这一周期的签名。你还可以将 Cosmic Signature NFT 锚定至协议，使其按比例参与锚定派发；持有至少 ${protocolFacts.councilProposalThresholdCst} CST 时，也可以通过宇宙议会提交协调提案。`,
+        answer:
+          'ETH 或 CST 落笔会记录加权星选资格并延长已存储的收官时间。下一笔执行时，上一笔参与者可能获得按间隔线性计算的参与 CST。也可锚定 Cosmic Signature NFT 参与锚定派发；提交宇宙议会提案需满足历史委托权重门槛。',
       },
       {
         question: '这件艺术作品在技术上是什么？',
         answer:
-          '每枚 Cosmic Signature NFT 都由确定性三体模拟渲染而成，模拟遵循牛顿引力。链上种子从 100,000 条候选轨道中选出一条；这些轨道均由四阶 Yoshida 辛积分器模拟，再通过 64 个波长区间进行光谱渲染，并以 OKLab 混合色彩。整套管线以 CC0 完全开源，任何人都能从种子复现签名作品。',
+          '每枚 Cosmic Signature NFT 的种子与所有权记录保存在链上。图像和视频由链下开源渲染器生成，呈现牛顿引力下的三体运动。复现作品需要种子、对应渲染器版本、配置与兼容工具链；媒体文件并非全部存储在合约中。',
       },
       {
         question: 'ETH 分配来自哪里？',
@@ -261,7 +258,7 @@ export const landingTextZh = {
       // lexicon-allow-start: 明确否认慈善捐赠及相关税务定性。
       {
         question: '公共物品具体指什么？',
-        answer: `每个周期会将 ETH 储备的 ${ethDistributionFacts.publicGoodsPercentage}% 转拨至公共物品地址，目前为 Protocol Guild。Protocol Guild 是为 170 多位以太坊核心贡献者提供资助的集体机制。这是向公共物品地址转拨 ETH，并非美国税法意义上的慈善捐赠；Cosmic Signature 不对其税务处理作任何陈述。`,
+        answer: `每个周期会将 ETH 储备的 ${ethDistributionFacts.publicGoodsPercentage}% 先分配至公共物品金库，再由另一次交易转给当前受益方 Protocol Guild。Protocol Guild 是为 170 多位以太坊核心贡献者提供资助的集体机制。这是向公共物品地址转拨 ETH，并非美国税法意义上的慈善捐赠；Cosmic Signature 不对其税务处理作任何陈述。`,
       },
       // lexicon-allow-end
       // lexicon-allow-start: 明确否认彩票、赌场、赌博、庄家、荷官及赌注类别。
@@ -275,18 +272,18 @@ export const landingTextZh = {
       {
         question: '这属于投资吗？',
         answer:
-          '不是。CST 代币用于表达协议内的参与和协调权重，不代表股权、利润分成、股息或投资合同。团队钱包不会从参与者的落笔中接收 ETH。Cosmic Signature 不对代币价格或未来表现作任何陈述，也不以投资名义招揽参与。',
+          '不是。CST 代币用于表达协议内的参与和协调权重，不代表股权、利润分成、股息或投资合同。当前 ETH 分配没有单列团队份额。Cosmic Signature 不对代币价格或未来表现作任何陈述，也不以投资名义招揽参与。',
       },
       // lexicon-allow-end
       {
         question: '为什么参与 CST 的数量会变化？',
-        answer: isV3Mechanics
-          ? `参与 CST 的铭刻量随距上一笔经过的时间线性累积——按协议上线参数约为每分钟 ${protocolFacts.v3.dynamicCstRewardPerMinuteAtLaunch} CST。沉寂越久，CST 铭刻量按比例越大；紧随他人之后落笔则铭刻量接近 0 CST。提交前，应用会预览当前数额。`
-          : `参与 CST 的铭刻量采用平方根公式，取决于距上一笔经过的时间。沉寂越久，CST 铭刻量越大；平方根会让增幅逐渐放缓。落笔间隔极短时，可能铭刻 0 CST。提交前，应用会预览当前数额。`,
+        answer:
+          'V3 按两笔之间的时长线性计算参与 CST，在下一笔执行时全额铭刻给上一笔参与者。首笔不发放这项 CST，收官也不结算最后一笔之后的累计量。原始时间增量下约每分钟 1 CST；实时数量以合约为准。',
       },
       {
         question: 'ETH 与 CST 落笔会怎样影响 CST 校准窗口？',
-        answer: `CST 校准窗口保存在链上，每次落笔后都会变化。CST 落笔使窗口延长约 ${protocolFacts.cstCalibrationWindowIncreasePercentPerCstGesture}%，CST 落笔价格因而下降得更慢；ETH 落笔使窗口缩短约 ${protocolFacts.cstCalibrationWindowDecreasePercentPerEthGesture}%，价格下降得更快。`,
+        answer:
+          'V3 调整的是 CST 价格下降速率：ETH 落笔尝试加快速率，受最短窗口检查限制；CST 落笔减慢速率，并按不含溢价的基础花费、配置下限和最短窗口要求重设上限。窗口时长由当前上限与速率推算，不再按旧版固定百分比调整。',
       },
       {
         question: '我可以自由复用或改编吗？',

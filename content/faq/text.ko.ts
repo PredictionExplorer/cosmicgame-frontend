@@ -13,16 +13,6 @@ const cst = formatCount(protocolFacts.specialAllocationCst, 'ko');
 const outreachCst = formatCount(protocolFacts.outreachReserveCst, 'ko');
 
 /** protocolFacts stores the example gaps as English strings; render them in Korean. */
-const ELAPSED_KO: Record<
-  (typeof protocolFacts.dynamicCstRewardExamples)[number]['elapsed'],
-  string
-> = {
-  '0 seconds': '0초',
-  '1 second': '1초',
-  '60 seconds': '60초',
-  '1 hour': '1시간',
-  '1 day': '1일',
-};
 
 /** 한국어 자주 묻는 질문 copy, keyed by the skeleton in structure.ts. */
 export const faqTextKo = {
@@ -37,12 +27,13 @@ export const faqTextKo = {
       },
       'how-does-the-bidding-game-work': {
         question: '퍼포먼스 사이클은 어떻게 진행되나요?',
-        answer: `사이클은 첫 제스처를 위한 ETH 보정 구간으로 시작됩니다. 이 첫 제스처가 사이클 마감 시각을 설정하며, 현재 기본값은 약 24시간입니다. 이후의 ETH 또는 CST 제스처는 저장된 마감 시각에 현재 시간 증가량을 더합니다. 시간 증가량은 1시간에서 시작해 사이클이 마감될 때마다 ${protocolFacts.cycleTimeIncrementIncreasePercentPerCycle}% 늘어납니다. 사이클 마감 시각이 지나면 최종 제스처를 남긴 참여자가 ${protocolFacts.finalGestureExclusivityHours}시간 동안 단독으로 사이클을 마감하고 시그니처 배분을 회수할 수 있습니다. 사이클이 실제로 마감되기 전까지는 누구나 제스처를 남길 수 있습니다.`,
+        answer:
+          '사이클의 첫 제스처는 ETH여야 하며 마감 시계를 시작합니다. 이후 제스처는 시간이 지난 뒤에도 저장된 마감 시각에 현재 시간 증가량을 더합니다. 현재 시각에서 시계를 다시 시작하지 않습니다. 마감이 성공적으로 실행될 때까지 제스처가 가능합니다.',
       },
       'what-type-of-gestures-are-available': {
         question: '어떤 종류의 제스처가 있나요?',
         answer:
-          '제스처는 ETH 또는 CST 토큰(ERC-20)으로 남길 수 있습니다. 매 사이클의 첫 제스처는 ETH 제스처여야 하며, 그 뒤로는 ETH 제스처와 CST 제스처를 자유롭게 섞어 남길 수 있습니다. ETH 제스처에 Random Walk NFT를 첨부하면 ETH 제스처 비용이 50% 할인됩니다. Cosmic Signature NFT(ERC-721)는 배분과 앵커링에 쓰이는 자산이며, 제스처 비용으로는 쓸 수 없습니다. CST 제스처에는 별도의 보정 구간이 있습니다. 구간이 진행되는 동안 CST 제스처 비용은 내려가고, 구간의 길이 자체도 ETH 또는 CST 제스처마다 달라집니다.',
+          'ETH와 CST의 기본 비용은 별도 규칙을 따릅니다. 사이클이 열릴 때 ETH 비용은 보정 구간에서 내려가고, ETH 제스처마다 다음 기본 비용이 올라갑니다. CST 비용은 온체인에 저장된 속도로 내려갑니다. 마감이 가까우면 두 비용 모두 늦은 제스처 할증이 붙지만, 이 할증은 다음 기본 비용이나 별빛 선정 가중치를 높이지 않습니다. 사이클의 첫 제스처는 ETH여야 하며 마감 시계를 시작합니다. 이후 제스처는 시간이 지난 뒤에도 저장된 마감 시각에 현재 시간 증가량을 더합니다. 현재 시각에서 시계를 다시 시작하지 않습니다. 마감이 성공적으로 실행될 때까지 제스처가 가능합니다. ETH 비용 감소에는 각 Random Walk NFT를 단 한 번 사용할 수 있습니다. 컨트랙트는 소유권을 확인하고 사용 표시를 남기며 NFT 자체는 전송하지 않습니다. 앵커링과는 별도 권리입니다.',
       },
       'can-i-participate-without-nfts': {
         question: 'NFT가 하나도 없어도 참여할 수 있나요?',
@@ -56,12 +47,13 @@ export const faqTextKo = {
       },
       'how-long-does-each-round-last': {
         question: '퍼포먼스 사이클 하나는 얼마나 오래 이어지나요?',
-        answer: `사이클은 첫 ETH 제스처와 함께 시작되며, 이때 사이클 마감 시각은 현재 시간 증가량의 약 24배로 설정됩니다(출시 시점 기준 약 1일). 이후의 모든 제스처는 현재 시간 증가량을 더합니다. 시간 증가량은 정확히 1시간에서 시작했고, 사이클이 마감될 때마다 ${protocolFacts.cycleTimeIncrementIncreasePercentPerCycle}% 늘어납니다. 따라서 마감 전까지 제스처가 계속 이어지면 사이클은 하루보다 훨씬 오래 지속될 수 있습니다.`,
+        answer:
+          '사이클의 첫 제스처는 ETH여야 하며 마감 시계를 시작합니다. 이후 제스처는 시간이 지난 뒤에도 저장된 마감 시각에 현재 시간 증가량을 더합니다. 현재 시각에서 시계를 다시 시작하지 않습니다. 마감이 성공적으로 실행될 때까지 제스처가 가능합니다.',
       },
       'can-i-place-multiple-gestures': {
         question: '한 사이클에서 제스처를 여러 번 남길 수 있나요?',
         answer:
-          '네. 제스처마다 참여 CST가 지갑에 각인될 수 있고, 별빛 선정 자격이 한 건씩 늘어나며, 사이클의 시그니처가 조금씩 달라집니다. 참여 CST의 양은 동적입니다. 이전 제스처 이후 흐른 시간에 따라 정해지므로, 긴 공백 뒤에 남긴 제스처는 연달아 남긴 제스처보다 더 많은 CST를 각인합니다.',
+          'V3에서는 다음 제스처가 이전 제스처 참여자에게 참여 CST 전액을 각인합니다. 수량은 두 제스처 사이의 시간에 선형으로 비례합니다. 사이클의 첫 제스처는 이 규칙으로 CST를 각인하지 않으며, 마감도 최종 제스처 참여자의 마지막 구간에 추가 참여 CST를 지급하지 않습니다. 두 제스처의 주소가 같으면 해당 주소가 직접 받습니다.',
       },
     },
   },
@@ -71,24 +63,30 @@ export const faqTextKo = {
     items: {
       'what-is-the-main-allocation': {
         question: '시그니처 배분이란 무엇인가요?',
-        answer: `시그니처 배분은 사이클을 마감한 참여자가 받습니다. 사이클 마감 시각이 지난 뒤 ${protocolFacts.finalGestureExclusivityHours}시간 동안은 최종 제스처를 남긴 참여자만 마감할 수 있고, 그 뒤에는 누구나 마감할 수 있습니다. Cosmic Signature NFT 1개, 공로 CST ${cst}개, 사이클 준비금 ETH의 ${protocolFacts.mainEthPercentage}%, 그리고 사이클 동안 참여자 제스처에 첨부된 모든 토큰과 NFT가 포함됩니다.`,
+        answer: `마감을 성공적으로 실행한 주소는 사이클 준비금의 ${protocolFacts.mainEthPercentage}%, 총 ${formatCount(protocolFacts.specialAllocationCst, 'ko')} CST, 연속 ID의 Cosmic Signature NFT ${protocolFacts.mainPrizeNftsPerCycle}개를 받습니다. 마감 시각 이후 첫 ${protocolFacts.finalGestureExclusivityHours}시간에는 최종 제스처 참여자만 실행할 수 있고, 그 뒤에는 누구나 실행하여 자기 몫으로 받을 수 있습니다.`,
       },
       'what-rewards-per-bid': {
         question: '제스처마다 무엇을 받나요?',
-        answer: `모든 제스처는 사이클 마감 시 이루어지는 별빛 선정에 자격 한 건을 더하고, 수호 챔피언과 시간의 전사 경로에 반영되는 선두 유지 기록을 갱신하며, 참여 CST를 각인할 수 있습니다. 참여 CST는 제곱근 공식으로 계산합니다: ${protocolFacts.dynamicCstRewardFormula}. 쉽게 말해, 이전 제스처 이후 흐른 시간이 길수록 양이 늘어나지만 늘어나는 속도는 점점 느려집니다. 아주 빠르게 이어진 제스처는 0 CST를 받을 수 있고, 간격이 길면 훨씬 많은 CST가 각인됩니다.`,
+        answer:
+          'V3에서는 다음 제스처가 이전 제스처 참여자에게 참여 CST 전액을 각인합니다. 수량은 두 제스처 사이의 시간에 선형으로 비례합니다. 사이클의 첫 제스처는 이 규칙으로 CST를 각인하지 않으며, 마감도 최종 제스처 참여자의 마지막 구간에 추가 참여 CST를 지급하지 않습니다. 두 제스처의 주소가 같으면 해당 주소가 직접 받습니다.',
       },
       'how-does-the-stellarSelection-work': {
         question: '별빛 선정은 어떻게 이루어지나요?',
-        answer: `제스처마다 별빛 선정 자격이 한 건씩 기록됩니다. 사이클이 마감되면 스마트 컨트랙트가 풀에서 자격을 무작위로 선정합니다. 선정된 자격 ${protocolFacts.ethStellarSelectionRecipients}건이 사이클 준비금 ETH의 ${protocolFacts.stellarSelectionEthPercentage}%를 나누어 받고, 또 다른 ${protocolFacts.nftStellarSelectionRecipients}건은 각각 ${cst} CST와 Cosmic Signature NFT를 받으며, 앵커링된 Random Walk NFT 가운데 선정되는 ${protocolFacts.anchoredRwlkNftSelectionRecipients}건도 각각 ${cst} CST와 Cosmic Signature NFT를 받습니다. 선정은 복원 추출 방식으로 이루어지므로 같은 주소가 한 사이클에서 여러 번 선정될 수 있습니다. 제스처를 많이 남길수록 선정 빈도가 높아집니다.`,
+        answer:
+          '참여자 ETH 별빛 선정과 NFT 별빛 선정 모두 제스처별 가중치를 사용합니다. 가중치는 해당 시점의 ETH 기본 비용이며, Random Walk NFT 비용 감소와 늦은 제스처 할증은 제외합니다. CST 제스처에도 같은 시점의 ETH 기본 비용을 적용합니다. 복원 선정이므로 같은 주소가 여러 번 선정될 수 있습니다. 앵커링 NFT 별빛 선정은 활성 Random Walk NFT를 별도로 대상으로 합니다.',
       },
       'how-random-selection-works': {
         question: '무작위 선정은 어떻게 이루어지나요?',
         answer:
-          '별빛 선정은 사이클 마감 시점의 온체인 무작위성 소스를 사용하며, 여기에는 Arbitrum이 제공하는 블록 컨텍스트와 예비 엔트로피 소스가 포함됩니다. 참여자 별빛 선정은 자격 수에 비례합니다. 제스처마다 자격이 한 건 추가되므로 제스처가 많을수록 선정 빈도가 높아집니다. 앵커링 NFT 별빛 선정은 별개의 절차로, 참여자의 제스처 자격 풀이 아니라 앵커링된 Random Walk NFT의 자격을 기준으로 이루어집니다.',
+          '참여자 ETH 별빛 선정과 NFT 별빛 선정 모두 제스처별 가중치를 사용합니다. 가중치는 해당 시점의 ETH 기본 비용이며, Random Walk NFT 비용 감소와 늦은 제스처 할증은 제외합니다. CST 제스처에도 같은 시점의 ETH 기본 비용을 적용합니다. 복원 선정이므로 같은 주소가 여러 번 선정될 수 있습니다. 앵커링 NFT 별빛 선정은 활성 Random Walk NFT를 별도로 대상으로 합니다.',
       },
       'how-do-i-claim-my-allocation': {
         question: '수령자가 되면 배분을 어떻게 회수하나요?',
-        answer: `수령자는 앱과 프로토콜 컨트랙트를 통해 배분을 회수합니다. 최종 제스처 참여자는 사이클 마감 시각이 지난 뒤 ${protocolFacts.finalGestureExclusivityHours}시간 동안 단독으로 사이클을 마감하고 시그니처 배분을 회수할 수 있습니다.\n\n그 뒤에는 공개 마감 구간이 시작됩니다. 누구나 사이클을 마감할 수 있고, 스마트 컨트랙트는 마감을 실행한 사람을 사이클 수령자로 취급합니다. 즉 마감 실행자가 시그니처 배분 전체(ETH 몫, ${cst} CST 각인, Cosmic Signature NFT, 첨부 자산 우선권)를 받습니다.\n\n2차 ETH 배분과 첨부 토큰 또는 첨부 NFT 배분은 배분 지갑 에스크로에 보관되며, 별도의 회수 기한이 적용됩니다. 기본값은 ${protocolFacts.secondaryRetrievalTimeoutWeeks}주이며, 기한이 지나면 누구든 미회수 배분을 자기 몫으로 회수할 수 있습니다. 배분은 서둘러 회수해 주세요.`,
+        answer: `마감을 성공적으로 실행한 주소는 사이클 준비금의 ${protocolFacts.mainEthPercentage}%, 총 ${formatCount(protocolFacts.specialAllocationCst, 'ko')} CST, 연속 ID의 Cosmic Signature NFT ${protocolFacts.mainPrizeNftsPerCycle}개를 받습니다.
+
+마감 시각 이후 첫 ${protocolFacts.finalGestureExclusivityHours}시간에는 최종 제스처 참여자만 실행할 수 있고, 그 뒤에는 누구나 실행하여 자기 몫으로 받을 수 있습니다.
+
+2차 ETH 배분과 첨부 자산은 배분 지갑에서 별도로 회수합니다. 현재 기한인 ${protocolFacts.secondaryRetrievalTimeoutWeeks}주가 지나면 누구나 미회수 자산을 자기 몫으로 회수할 수 있습니다. 기한 만료만으로 자동 전송되지는 않습니다.`,
       },
       'how-does-anchoring-work': {
         question: '앵커링은 어떻게 작동하나요?',
@@ -100,12 +98,12 @@ export const faqTextKo = {
       },
       'how-many-nfts-minted': {
         question: '사이클마다 Cosmic Signature NFT가 몇 개 각인되나요?',
-        answer: `대부분의 사이클에서는 Cosmic Signature NFT ${protocolFacts.typicalNftsPerCycle}개가 각인됩니다. 시그니처 배분 수령자에게 1개, 최종 CST 제스처 수령자에게 1개, 수호 챔피언에게 1개, 시간의 전사에게 1개, NFT 별빛 선정 수령자에게 ${protocolFacts.nftStellarSelectionRecipients}개, 그리고 앵커링 NFT 별빛 선정으로 선정된 Random Walk NFT 앵커링 보유자에게 ${protocolFacts.anchoredRwlkNftSelectionRecipients}개입니다. 이 ${protocolFacts.typicalNftsPerCycle}개의 NFT 배분에는 각각 ${cst} CST도 함께 포함됩니다. 사이클에 CST 제스처가 없거나 앵커링된 Random Walk NFT가 없으면 해당 각인은 그 사이클에서 이루어지지 않습니다.`,
+        answer: `모든 경로가 있으면 한 사이클에서 Cosmic Signature NFT ${protocolFacts.typicalNftsPerCycle}개와 고정 배분 CST ${formatCount(protocolFacts.typicalCstImprintsPerCycle, 'ko')}개가 각인됩니다. 시그니처 배분은 NFT ${protocolFacts.mainPrizeNftsPerCycle}개에 대해 CST ${formatCount(protocolFacts.specialAllocationCst, 'ko')}개를 합계로 한 번 받습니다. 시간의 전사, 수호 챔피언, 최종 CST 제스처는 각각 NFT 1개와 해당 CST를 받으며, 두 NFT 선정 경로가 나머지를 더합니다. CST 제스처나 앵커링된 Random Walk NFT가 없으면 해당 경로는 생략합니다. 참여 CST는 별도입니다.`,
       },
       'what-happens-to-remaining-eth': {
         question: '사이클 준비금에 남은 ETH는 어떻게 되나요?',
         answer:
-          '사이클 준비금의 약 절반은 누적 준비금으로 다음 퍼포먼스 사이클에 이월되어 다음 사이클의 시작 잔액을 키웁니다. 프로토콜은 빼내지 않고 쌓아 갑니다.',
+          'ETH의 약 절반이 다음 사이클로 이어집니다. 정수 처리, 생략된 경로, 실패한 전송으로 더 많은 ETH가 남을 수 있습니다. 다음 사이클의 시작 준비금이 더 커진다는 보장은 없습니다.',
       },
       'what-happens-to-attached-assets': {
         question: '제스처에 첨부된 토큰이나 NFT는 어떻게 되나요?',
@@ -113,8 +111,7 @@ export const faqTextKo = {
       },
       'who-receives-10-percent': {
         question: '사이클 준비금의 공공재 배분은 누가 받나요?',
-        answer:
-          '마감 시 사이클 준비금의 7%가 공공재 금고로 전달되고, 그 뒤 누구나 금고 잔액을 설정된 공공재 수령처로 전달할 수 있습니다. 현재 수령처는 이더리움 핵심 기여자 170명 이상을 위한 공동 자금 지원 메커니즘인 Protocol Guild입니다. 지금은 프로토콜 소유자가 수령처 주소를 설정하지만, 소유권이 평의회 관리 아래로 넘어간 뒤에는 우주 평의회가 이를 정하도록 설계되어 있습니다.',
+        answer: `마감 시 프로토콜은 사이클 준비금의 ${protocolFacts.publicGoodsPercentage}%를 공공재 금고로 보내려고 시도합니다. 이후 누구나 별도 트랜잭션으로 금고 잔액을 현재 공공재 수령처인 Protocol Guild에 전달할 수 있습니다. 소유자는 수령처를 바꿀 수 있습니다. 프로토콜에서 금고로 보내는 작업이 실패하면 마감을 취소하지 않고 해당 몫이 준비금에 남을 수 있습니다.`,
       },
     },
   },
@@ -125,28 +122,32 @@ export const faqTextKo = {
       'how-does-price-increase': {
         question: '제스처 비용은 사이클 동안 어떻게 달라지나요?',
         answer:
-          'ETH 제스처 비용과 CST 제스처 비용은 온체인에서 각각 다른 경로를 따릅니다. ETH 제스처 비용은 ETH 보정 구간을 거친 뒤 ETH 제스처가 있을 때마다 한 단계씩 오릅니다. CST 제스처 비용은 현재 CST 보정 구간을 따라 내려갑니다. 이 CST 구간은 고정되어 있지 않습니다. ETH 제스처는 구간을 조금 줄이고 CST 제스처는 조금 늘리므로, 비용 경로는 ETH 참여와 CST 참여의 균형에 반응합니다.',
+          'ETH와 CST의 기본 비용은 별도 규칙을 따릅니다. 사이클이 열릴 때 ETH 비용은 보정 구간에서 내려가고, ETH 제스처마다 다음 기본 비용이 올라갑니다. CST 비용은 온체인에 저장된 속도로 내려갑니다. 마감이 가까우면 두 비용 모두 늦은 제스처 할증이 붙지만, 이 할증은 다음 기본 비용이나 별빛 선정 가중치를 높이지 않습니다.',
       },
       'what-is-dutch-auction': {
         question: '보정 구간이란 무엇인가요?',
-        answer: `보정 구간은 정해진 시간 동안 제스처 비용이 보정 상한에서 선형으로 내려가는 비용 탐색 구간입니다. ETH 제스처와 CST 제스처는 하한이 다른 별도의 구간을 사용합니다. ETH 제스처 비용은 상한의 약 1/${protocolFacts.ethCalibrationFloorDivisor}까지 내려가고, CST 제스처 비용은 ${protocolFacts.cstCalibrationFloorCst} CST까지 완전히 내려가므로 구간이 끝까지 지나면 비용 없이 CST 제스처를 남길 수도 있습니다. CST 보정 구간은 현재 ${protocolFacts.initialCstCalibrationWindowHours}시간을 기준으로 시작하지만, 그 길이는 온체인에 저장되어 제스처마다 달라집니다. CST 제스처는 구간을 약 ${protocolFacts.cstCalibrationWindowIncreasePercentPerCstGesture}% 늘리고, ETH 제스처는 약 ${protocolFacts.cstCalibrationWindowDecreasePercentPerEthGesture}% 줄입니다.`,
+        answer:
+          'V3는 CST 비용의 하락 속도를 저장하며 구간 길이는 속도와 상한에서 계산합니다. ETH 제스처는 rate + floor(rate / 100)으로 속도 증가를 시도하고, CST 제스처는 rate - floor(rate / 101)로 속도를 줄입니다. 최소 구간 조건을 어기면 ETH의 속도 증가는 적용하지 않습니다. CST 제스처는 할증 전 기본 비용의 두 배, 설정된 최소값, 새 속도에 180초를 곱한 값 가운데 가장 큰 값으로 상한을 다시 설정합니다. 다음 제스처를 즉시 남기는 것은 가능합니다.',
       },
       'how-is-participation-cst-calculated': {
         question: '참여 CST는 어떻게 계산되나요?',
-        answer: `참여 CST는 이전 제스처 이후 흐른 시간에 제곱근 공식을 적용해 계산합니다: ${protocolFacts.dynamicCstRewardFormula}. 제곱근을 쓰는 이유는 긴 공백을 더 크게 반영하되, 양이 끝없이 선형으로 늘어나지는 않게 하기 위해서입니다.\n\n출시 매개변수(시간 증가량 정확히 1시간) 기준의 예시는 대략 다음과 같습니다: ${protocolFacts.dynamicCstRewardExamples.map((example) => `${ELAPSED_KO[example.elapsed]}에 ${example.cst} CST`).join(', ')}. 시간 증가량은 사이클이 마감될 때마다 ${protocolFacts.cycleTimeIncrementIncreasePercentPerCycle}% 늘어나므로, 실제 양은 시간이 지날수록 이 예시보다 조금씩 낮아집니다. 제스처가 반영되는 순간의 정확한 양은 앱의 실시간 미리 보기와 컨트랙트가 기준입니다.`,
+        answer: `참여 CST의 최소 단위 수량은 ${protocolFacts.dynamicCstRewardFormula}입니다. 경과 시간은 초, 사이클 시간 증가량은 마이크로초 단위입니다. CST 수량으로 표시할 때는 결과를 10^18로 나눕니다.
+
+다음 제스처가 이전 참여자에게 전액을 각인합니다. 첫 제스처에는 참여 CST가 없으며 마감도 마지막 구간을 추가 지급하지 않습니다.`,
       },
       'why-minimum-cst-reward-protection': {
         question: '최소 참여 CST 보호란 무엇인가요?',
         answer:
-          '제스처를 제출하기 전에 앱은 예상 참여 CST 양을 미리 보여 주고, 받아들일 최소 CST 양을 함께 보냅니다. 다른 제스처가 먼저 반영되면 예상 양이 달라질 수 있습니다. 최소 참여 CST 보호는 실제 각인될 CST가 선택한 최소값보다 적을 경우 트랜잭션을 되돌릴 수 있습니다. 0 CST를 포함해 어떤 CST 양이든 받아들이도록 설정하면, 비용 검사만 통과해도 제스처가 그대로 진행됩니다.',
+          '최소 참여 CST는 다음 제스처가 이전 참여자에게 각인할 수량을 제한하며, 제출자에게 지급할 수량을 보장하지 않습니다. 두 주소가 같으면 제출자가 직접 받습니다. 0은 이 제한을 해제하며, 사이클의 첫 ETH 제스처는 이 검사를 건너뜁니다. 최대 비용과 네트워크 수수료는 별도 조건입니다.',
       },
       'how-cst-calibration-window-changes': {
         question: '제스처마다 CST 보정 구간은 어떻게 달라지나요?',
-        answer: `모든 ETH 또는 CST 제스처는 저장된 CST 보정 구간을 갱신합니다. CST 제스처는 구간을 현재 길이의 1/${protocolFacts.cstCalibrationWindowChangeDivisor}만큼 늘리며, 이는 정수 절삭 전 기준 약 +${protocolFacts.cstCalibrationWindowIncreasePercentPerCstGesture}%입니다. ETH 제스처는 구간을 약 1/${protocolFacts.cstCalibrationWindowChangeDivisor + 1}만큼, 즉 약 -${protocolFacts.cstCalibrationWindowDecreasePercentPerEthGesture}% 줄입니다. 구간이 짧아지면 CST 제스처 비용이 더 빨리 내려가고, 길어지면 더 천천히 내려갑니다.`,
+        answer:
+          'V3는 CST 비용의 하락 속도를 저장하며 구간 길이는 속도와 상한에서 계산합니다. ETH 제스처는 rate + floor(rate / 100)으로 속도 증가를 시도하고, CST 제스처는 rate - floor(rate / 101)로 속도를 줄입니다. 최소 구간 조건을 어기면 ETH의 속도 증가는 적용하지 않습니다. CST 제스처는 할증 전 기본 비용의 두 배, 설정된 최소값, 새 속도에 180초를 곱한 값 가운데 가장 큰 값으로 상한을 다시 설정합니다. 다음 제스처를 즉시 남기는 것은 가능합니다.',
       },
       'what-is-open-finalization-window': {
         question: '공개 마감 구간이란 무엇인가요?',
-        answer: `사이클 마감 시각이 지나면 최종 제스처 참여자는 ${protocolFacts.finalGestureExclusivityHours}시간 동안 단독으로 사이클을 마감할 수 있습니다. 이 우선 마감 구간 안에 마감하지 않으면 누구나 마감 트랜잭션을 호출할 수 있고, 스마트 컨트랙트는 마감을 실행한 사람을 사이클 수령자로 삼습니다. 마감 실행자가 시그니처 배분 전체(ETH 몫, ${cst} CST, Cosmic Signature NFT, 첨부 자산 우선권)를 받으므로, 최종 제스처 참여자는 구간이 끝나기 전에 마감해야 합니다. 공개 마감은 최종 제스처 참여자가 사라지더라도 프로토콜이 멈추지 않도록 합니다.`,
+        answer: `마감을 성공적으로 실행한 주소는 사이클 준비금의 ${protocolFacts.mainEthPercentage}%, 총 ${formatCount(protocolFacts.specialAllocationCst, 'ko')} CST, 연속 ID의 Cosmic Signature NFT ${protocolFacts.mainPrizeNftsPerCycle}개를 받습니다. 마감 시각 이후 첫 ${protocolFacts.finalGestureExclusivityHours}시간에는 최종 제스처 참여자만 실행할 수 있고, 그 뒤에는 누구나 실행하여 자기 몫으로 받을 수 있습니다.`,
       },
       'what-is-endurance-champion': {
         question: '수호 챔피언이란 무엇인가요?',
@@ -174,7 +175,7 @@ export const faqTextKo = {
       'how-time-increase-affects-game': {
         question: '제스처당 시간 증가는 프로토콜에 어떤 영향을 주나요?',
         answer:
-          '제스처마다 더해지는 시간이 늘어나면 사이클은 평균적으로 더 길어집니다. 변화는 점진적이어서 참여 경험은 매끄럽게 유지되고, 장기적으로 Cosmic Signature NFT의 총 공급량은 제한됩니다.',
+          '시간 증가량이 커지면 사이클 마감 빈도에 영향을 줄 수 있지만, NFT 공급량의 고정 상한이나 일정 기간의 새 작품 수를 보장하지는 않습니다.',
       },
       'what-if-two-gestures-same-time': {
         question: '두 제스처가 동시에 제출되면 어떻게 되나요?',
@@ -195,7 +196,7 @@ export const faqTextKo = {
       'what-are-cst-and-dao': {
         question: 'CST 토큰과 우주 평의회란 무엇인가요?',
         answer:
-          '모든 제스처는 CST 토큰을 각인할 수 있으며, CST는 우주 평의회에서 조율 가중치로 쓰입니다. 평의회는 프로토콜을 온체인에서 조율합니다. CST 보유자는 조율 제안을 올리고 찬성 또는 반대를 표명합니다(가중치를 활성화하려면 CST를 자신이나 다른 주소에 위임해야 합니다). 평의회는 컨트랙트 소유권이 평의회 관리 아래로 넘어간 뒤, 7% 배분을 받는 공공재 수령처를 비롯한 프로토콜 매개변수를 정하도록 설계되어 있습니다. 지금은 이 설정을 프로토콜 소유자가 관리합니다.',
+          'CST는 제스처에 사용하거나 위임 후 우주 평의회의 조율 가중치로 사용할 수 있습니다. 평의회는 실제로 보유한 자산과 권한만 관리합니다. 현재 핵심 프로토콜의 소유자는 평의회가 아니며, 권한 이전이나 포기에는 별도 온체인 조치가 필요합니다.',
       },
       'what-can-i-do-with-cst': {
         question: 'CST 토큰으로 무엇을 할 수 있나요?',
@@ -205,7 +206,7 @@ export const faqTextKo = {
       'what-makes-nfts-unique': {
         question: 'Cosmic Signature NFT는 무엇이 특별한가요?',
         answer:
-          'Cosmic Signature NFT는 온체인에 존재하며 스스로 지속됩니다. 각 NFT에는 스마트 컨트랙트에 저장된 무작위 생성 시드가 각인됩니다. 이미지와 영상은 오픈 소스 Rust 파이프라인으로 이 시드에서 렌더링됩니다. 시드가 세 천체의 초기 조건을 결정하므로 NFT마다 고유한 카오스 궤적이 만들어집니다.',
+          'NFT 시드는 온체인에 저장되고 이미지와 영상은 오프체인에서 생성됩니다. 재현하려면 같은 시드, 해당 렌더러 버전과 설정, 호환되는 도구가 필요합니다. 시드만 같다고 서로 다른 버전의 결과가 동일하다는 보장은 없습니다.',
       },
       'how-are-nft-images-created': {
         question: 'NFT 이미지는 어떻게 만들어지나요?',
@@ -215,16 +216,17 @@ export const faqTextKo = {
       'significance-of-random-seed': {
         question: 'NFT를 온체인 시드에서 생성하는 이유는 무엇인가요?',
         answer:
-          '시드 기반 파이프라인은 장기적인 재현 가능성을 보장합니다. 이미지를 중앙 서버에 두는 NFT 프로젝트와 달리, 모든 Cosmic Signature NFT의 시드는 Arbitrum에 저장됩니다. 누구나 언제든 오픈 소스 Rust 파이프라인으로 NFT 이미지와 영상을 독립적으로 다시 생성할 수 있으며, 결과는 원본과 픽셀 단위로 동일합니다.',
+          'NFT 시드는 온체인에 저장되고 이미지와 영상은 오프체인에서 생성됩니다. 재현하려면 같은 시드, 해당 렌더러 버전과 설정, 호환되는 도구가 필요합니다. 시드만 같다고 서로 다른 버전의 결과가 동일하다는 보장은 없습니다.',
       },
       'is-nft-supply-limited': {
         question: 'Cosmic Signature NFT의 수는 제한되어 있나요?',
-        answer: `컨트랙트에 고정된 공급 상한은 없습니다. 제스처마다 더해지는 시간은 사이클이 마감될 때마다 ${protocolFacts.cycleTimeIncrementIncreasePercentPerCycle}% 늘어납니다. 이 구조로 사이클이 길어지는 경향이 생기고 NFT 각인 속도가 억제됩니다. 실제 각인 속도는 참여 상황에 따라서도 달라집니다.`,
+        answer:
+          '시간 증가량이 커지면 사이클 마감 빈도에 영향을 줄 수 있지만, NFT 공급량의 고정 상한이나 일정 기간의 새 작품 수를 보장하지는 않습니다.',
       },
       'impact-of-limiting-nfts': {
         question: '사이클 길이는 새로 각인되는 NFT 수에 어떤 영향을 주나요?',
         answer:
-          '제스처마다 더해지는 시간이 늘어나면 사이클이 길어지는 경향이 있어, 같은 기간에 각인되는 NFT가 줄어듭니다. Cosmic Signature NFT 하나하나는 프로토콜 역사의 한 부분을 기록하며, 전체 수량에 고정된 상한은 없습니다.',
+          '시간 증가량이 커지면 사이클 마감 빈도에 영향을 줄 수 있지만, NFT 공급량의 고정 상한이나 일정 기간의 새 작품 수를 보장하지는 않습니다.',
       },
       'connection-with-randomwalknft': {
         question: 'Random Walk NFT와는 어떤 관계인가요?',
@@ -305,7 +307,7 @@ export const faqTextKo = {
       'game-security': {
         question: '프로토콜의 보안은 어떻게 확보되나요?',
         answer:
-          'Cosmic Signature는 커뮤니티가 동작을 독립적으로 살펴볼 수 있도록 컨트랙트 주소, 소스 코드 자료, 검증 맥락을 공개합니다. 스마트 컨트랙트는 독립 보안 기업 Hacken의 보안 감사를 받았으며, 전체 보고서는 보안 감사 페이지에 링크되어 있습니다.',
+          '공개 감사는 검토된 과거 컨트랙트 버전에 해당합니다. 이후 V2와 V3의 모든 변경을 독립적으로 검토했다는 뜻은 아닙니다. 공개 소스와 배포 코드가 일치한다는 검증도 보안 평가와 다릅니다. 현재 프로토콜 구현은 V3입니다. 구현 주소는 프록시의 EIP-1967 슬롯과 대조해야 합니다. V3의 공개 소스 검증은 아직 확인되지 않았으며, 과거 V2의 검증은 새 구현에 적용되지 않습니다.',
       },
       'fees-involved': {
         question: '수수료가 있나요?',
@@ -326,17 +328,17 @@ export const faqTextKo = {
       'team-controls': {
         question: '팀은 프로토콜에 어떤 권한을 갖고 있나요?',
         answer:
-          '초기에는 팀이 제스처당 시간 증가량이나 배분 경로 비율 같은 프로토콜의 일부 매개변수를 조정할 수 있습니다. 이 권한은 스마트 컨트랙트의 ‘Ownable’ 패턴으로 구현되며 사이클 사이의 구간으로 한정됩니다. 다음 사이클이 활성화되면(첫 제스처 전에 이루어집니다) 핵심 프로토콜 매개변수는 그 사이클이 마감될 때까지 잠깁니다.\n\n이 잠금과 별개로 몇 가지 제한된 권한은 남아 있습니다. 소유자는 첫 제스처가 오기 전까지 사이클 활성화를 미룰 수 있고, 다음 사이클 전의 지연 시간을 언제든 조정할 수 있으며, 주변 컨트랙트(공공재 금고 수령처, NFT 메타데이터 URI, 배분 지갑 회수 기한)를 언제든 관리할 수 있습니다.\n\n프로토콜 컨트랙트는 소유자가 업그레이드(UUPS)할 수도 있지만 사이클 사이에만 가능하며, 현재 배포된 구현은 공개 검증된 V2입니다.',
+          '소유자는 컨트랙트의 조건 아래 매개변수와 구현을 바꿀 권한을 유지합니다.\n\n핵심 변경은 사이클이 비활성일 때로 제한되지만 활성화 시각, 다음 지연 시간, 주변 컨트랙트에는 별도 권한이 있습니다.\n\nV3가 우주 평의회에 제어권을 자동 이전하거나 소유자 권한을 자동 해제하지는 않습니다.',
       },
       'will-team-always-have-control': {
         question: '팀이 프로토콜 매개변수 권한을 계속 갖게 되나요?',
         answer:
-          '아닙니다. 프로토콜이 안정되면 소유권은 우주 평의회로 이전됩니다. 그 뒤로 매개변수 변경은 조율 정족수를 충족한 프로토콜 조율 제안을 통해서만 이루어집니다.',
+          '소유자는 컨트랙트의 조건 아래 매개변수와 구현을 바꿀 권한을 유지합니다. 핵심 변경은 사이클이 비활성일 때로 제한되지만 활성화 시각, 다음 지연 시간, 주변 컨트랙트에는 별도 권한이 있습니다. V3가 우주 평의회에 제어권을 자동 이전하거나 소유자 권한을 자동 해제하지는 않습니다.',
       },
       'what-is-renounce-ownership': {
         question: '‘소유권 포기’란 무슨 뜻인가요?',
         answer:
-          '소유권 포기는 배포자 주소가 가진 제어 권한을 영구히 내려놓는 Ownable 컨트랙트 함수입니다. 한 번 호출되면 어떤 특권 역할도 컨트랙트 매개변수를 변경할 수 없습니다.',
+          '소유자는 컨트랙트의 조건 아래 매개변수와 구현을 바꿀 권한을 유지합니다. 핵심 변경은 사이클이 비활성일 때로 제한되지만 활성화 시각, 다음 지연 시간, 주변 컨트랙트에는 별도 권한이 있습니다. V3가 우주 평의회에 제어권을 자동 이전하거나 소유자 권한을 자동 해제하지는 않습니다.',
       },
       'why-renounce-ownership': {
         question: '팀은 왜 소유권을 포기하려 하나요?',

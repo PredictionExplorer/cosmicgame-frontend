@@ -1,12 +1,15 @@
 import { protocolFacts } from '@/content/protocol-facts';
 
+import { formatCount } from '@/utils/format/numbers';
+
 import type { LandingText } from './structure';
 
 /** Korean landing copy, keyed by the skeleton in structure.ts. */
 export const landingTextKo = {
   meta: {
     title: 'Cosmic Signature: Arbitrum 위의 절차적 온체인 아트 프로토콜',
-    description: `Cosmic Signature는 Arbitrum 위의 절차적 온체인 아트 프로토콜입니다. 참여자는 퍼포먼스 사이클마다 제스처를 남기고, 사이클이 마감되면 새 시그니처가 각인되며 사이클 준비금이 규칙에 따라 배분 경로별로 배분됩니다. 이더리움 핵심 기여자 몫은 ${protocolFacts.publicGoodsPercentage}%입니다.`,
+    description:
+      'V3는 이미 배포되었습니다. 참여 CST의 공식과 수령자, 참여자 ETH 및 NFT 별빛 선정의 가중치, CST 비용 하락 속도, ETH 비율, 시그니처 배분 NFT 수를 바꾸고 늦은 제스처 할증을 추가합니다.',
     keywords: [
       'Cosmic Signature',
       '절차적 아트 프로토콜',
@@ -24,7 +27,8 @@ export const landingTextKo = {
     eyebrow: '절차적 온체인 아트 프로토콜 · Arbitrum',
     headlineLead: '모든 제스처가',
     headlineAccent: '아트를 만듭니다.',
-    subhead: `ETH 또는 CST로 남기는 제스처마다 사이클 마감 시각이 늘어납니다. 시간이 다 되면 사이클이 마감되어 수령자에게 새 시그니처가 각인되고, 사이클 준비금이 배분 경로에 따라 배분됩니다. 이더리움 핵심 기여자 몫은 ${protocolFacts.publicGoodsPercentage}%입니다.`,
+    subhead:
+      '사이클의 첫 제스처는 ETH여야 하며 마감 시계를 시작합니다. 이후 제스처는 시간이 지난 뒤에도 저장된 마감 시각에 현재 시간 증가량을 더합니다. 현재 시각에서 시계를 다시 시작하지 않습니다. 마감이 성공적으로 실행될 때까지 제스처가 가능합니다. 해당 몫은 공공재 금고로 전달됩니다. 누구나 별도 트랜잭션으로 잔액을 현재 수령처인 Protocol Guild에 보낼 수 있습니다.',
     secondaryCtaLabel: '사이클 작동 원리',
     art: {
       viewAriaLabel: '앱에서 Cosmic Signature {tokenLabel} 보기',
@@ -58,7 +62,7 @@ export const landingTextKo = {
     eyebrow: '아트',
     heading: '온체인 시드로 그려 내는 삼체 문제.',
     description:
-      '모든 Cosmic Signature NFT는 뉴턴 중력 아래 서로를 도는 세 천체를 시각화합니다. 세 천체는 본질적으로 카오스적인 궤적을 그립니다. AI도 없고, 학습 데이터도 없습니다. 오직 결정론적 물리만 있습니다. 같은 시드 → 픽셀 하나까지 같은 결과물.',
+      'NFT 시드는 온체인에 저장되고 이미지와 영상은 오프체인에서 생성됩니다. 재현하려면 같은 시드, 해당 렌더러 버전과 설정, 호환되는 도구가 필요합니다. 시드만 같다고 서로 다른 버전의 결과가 동일하다는 보장은 없습니다.',
     showcase: {
       viewAriaLabel: 'Cosmic Signature {tokenLabel} 보기',
       artworkAlt: 'Cosmic Signature 작품 {tokenLabel}',
@@ -75,7 +79,7 @@ export const landingTextKo = {
       },
       selection: {
         title: '선별',
-        body: '보르다 집계(카오스 × 등변성)가 후보 풀에서 시각적으로 가장 흥미로운 궤도를 골라냅니다.',
+        body: '궤적의 성질을 바탕으로 Borda 순위를 매겨 후보를 좁히고, 이미지의 미적 특성을 확인하는 추가 단계로 결과를 정합니다.',
       },
       camera: {
         title: '카메라',
@@ -83,7 +87,7 @@ export const landingTextKo = {
       },
       color: {
         title: '색',
-        body: '색은 OKLab 지각 색 공간에서 천체마다 색상을 120°씩 벌려 혼합되며, 드리프트와 사인파로 변조됩니다.',
+        body: '팔레트는 OKLCh 지각 색 공간에서 색상과 색 간격을 조정합니다. 현재 렌더러는 세 천체의 색상을 일정한 각도 간격으로 고정하지 않습니다.',
       },
       'spectral-render': {
         title: '스펙트럼 렌더',
@@ -91,7 +95,7 @@ export const landingTextKo = {
       },
       signature: {
         title: '시그니처',
-        body: 'AgX 톤매핑, 블룸, OpenSimplex 성운 레이어, 컬러 그레이딩이 프레임을 완성합니다. 결과물은 16비트 PNG 한 장과 30초 길이의 H.265 영상입니다.',
+        body: '톤 매핑, 빛 번짐, 색 처리가 이미지를 완성합니다. 크기, 영상 길이, 파일 형식은 렌더러 버전과 설정에 따라 달라집니다.',
       },
     },
     facts: {
@@ -105,29 +109,28 @@ export const landingTextKo = {
   tracks: {
     eyebrow: '배분 경로',
     heading: '모든 사이클 준비금은 규칙에 따라 배분됩니다.',
-    description:
-      '사이클이 마감되면 프로토콜은 ETH와 CST 준비금을 끈기, 타이밍, 헌신, 참여를 인정하는 배분 경로로 배분합니다. ETH 준비금의 약 절반은 다음 사이클로 이월됩니다.',
+    description: `모든 경로가 있으면 한 사이클에서 Cosmic Signature NFT ${protocolFacts.typicalNftsPerCycle}개와 고정 배분 CST ${formatCount(protocolFacts.typicalCstImprintsPerCycle, 'ko')}개가 각인됩니다. 시그니처 배분은 NFT ${protocolFacts.mainPrizeNftsPerCycle}개에 대해 CST ${formatCount(protocolFacts.specialAllocationCst, 'ko')}개를 합계로 한 번 받습니다. 시간의 전사, 수호 챔피언, 최종 CST 제스처는 각각 NFT 1개와 해당 CST를 받으며, 두 NFT 선정 경로가 나머지를 더합니다. CST 제스처나 앵커링된 Random Walk NFT가 없으면 해당 경로는 생략합니다. 참여 CST는 별도입니다.`,
     ethLabel: '각 사이클 준비금의 ETH',
     fixedLabel: '사이클마다 배분되는 CST와 NFT',
-    fixedEach: `수령자마다 ${protocolFacts.specialAllocationCst.toLocaleString('ko-KR')} CST와 Cosmic Signature NFT 1개를 받습니다.`,
+    fixedEach: `수령자마다 ${formatCount(protocolFacts.specialAllocationCst, 'ko')} CST와 Cosmic Signature NFT 1개를 받습니다.`,
     recipients: { other: '수령자 {count}명' },
     items: {
       'signature-allocation': {
         title: '시그니처 배분',
-        body: '최종 제스처를 남긴 참여자에게. 1,000 CST와 Cosmic Signature NFT 1개가 포함됩니다.',
+        body: '마감 수령자는 연속 ID의 Cosmic Signature NFT 3개와 총 1,000 CST를 받습니다. 마감 권한에는 우선 마감 구간과 공개 마감 구간이 적용됩니다.',
       },
       'compounding-reserve': {
         percent: '약 50%',
         title: '누적 준비금',
-        body: '다음 퍼포먼스 사이클로 이월됩니다. 프로토콜은 빼내지 않고 쌓아 갑니다.',
+        body: 'ETH의 약 절반이 다음 사이클로 이어집니다. 정수 처리, 생략된 경로, 실패한 전송으로 더 많은 ETH가 남을 수 있습니다. 다음 사이클의 시작 준비금이 더 커진다는 보장은 없습니다.',
       },
       'chrono-warrior': {
         title: '시간의 전사 배분',
-        body: `수호 챔피언 자리를 가장 오랫동안 연속으로 지킨 참여자에게. ${protocolFacts.specialAllocationCst.toLocaleString('ko-KR')} CST와 Cosmic Signature NFT 1개가 포함됩니다.`,
+        body: `수호 챔피언 자리를 가장 오랫동안 연속으로 지킨 참여자에게. ${formatCount(protocolFacts.specialAllocationCst, 'ko')} CST와 Cosmic Signature NFT 1개가 포함됩니다.`,
       },
       'public-goods': {
         title: '공공재 배분',
-        body: '170명이 넘는 이더리움 핵심 기여자를 위한 자금 지원 메커니즘인 Protocol Guild로 전달됩니다.',
+        body: '해당 몫은 공공재 금고로 전달됩니다. 누구나 별도 트랜잭션으로 잔액을 현재 수령처인 Protocol Guild에 보낼 수 있습니다.',
       },
       'anchor-distribution': {
         title: '앵커링 지급',
@@ -135,11 +138,11 @@ export const landingTextKo = {
       },
       'eth-stellar-selection': {
         title: 'ETH 별빛 선정',
-        body: `무작위로 선정된 참여자 ${protocolFacts.ethStellarSelectionRecipients}명이 나누어 받습니다. 선정 빈도는 남긴 제스처 수에 따라 늘어납니다.`,
+        body: `가중치를 적용한 ${protocolFacts.ethStellarSelectionRecipients}건의 선정이 ETH 몫을 나눕니다. 제스처 당시의 ETH 기본 비용을 가중치로 선정하며, 비용 감소와 늦은 할증은 제외합니다. 같은 주소가 여러 번 선정될 수 있습니다.`,
       },
       'participant-nft-stellar-selection': {
         title: '참여자 대상 NFT 별빛 선정',
-        body: '사이클 참여자 가운데 무작위로 선정됩니다.',
+        body: '제스처 당시의 ETH 기본 비용을 가중치로 선정하며, 비용 감소와 늦은 할증은 제외합니다. 같은 주소가 여러 번 선정될 수 있습니다.',
       },
       'anchored-nft-stellar-selection': {
         title: '앵커링 NFT 별빛 선정',
@@ -164,7 +167,7 @@ export const landingTextKo = {
       '사이클마다 쌓인 ETH는 앵커링 해제 시 회수',
       '잠금 기간과 페널티 없음. 해제한 NFT는 다시 앵커링할 수 없음',
       '자매 컬렉션인 Random Walk NFT도 앵커링 가능',
-      `앵커링된 Random Walk NFT는 앵커링 NFT 별빛 선정 대상: ${protocolFacts.specialAllocationCst.toLocaleString('ko-KR')} CST와 Cosmic Signature NFT, ETH는 없음`,
+      `앵커링된 Random Walk NFT는 앵커링 NFT 별빛 선정 대상: ${formatCount(protocolFacts.specialAllocationCst, 'ko')} CST와 Cosmic Signature NFT, ETH는 없음`,
     ],
     ctaLabel: '앱에서 앵커링하기',
   },
@@ -172,7 +175,7 @@ export const landingTextKo = {
   publicGoods: {
     eyebrow: '공공재',
     heading: '모든 사이클이 이더리움 핵심 기여자를 지원합니다.',
-    body: '모든 퍼포먼스 사이클은 ETH 준비금의 일정 비율을 Protocol Guild로 전달합니다. Protocol Guild는 170명이 넘는 이더리움 핵심 기여자를 위한 공동 자금 지원 메커니즘입니다. 프로토콜이 많이 쓰일수록 이더리움 자체가 의존하는 인프라로 더 많이 흘러갑니다.',
+    body: '마감 시 프로토콜은 사이클 준비금의 설정된 몫을 공공재 금고로 보내려고 시도합니다. 이후 누구나 별도 트랜잭션으로 금고 잔액을 현재 공공재 수령처인 Protocol Guild에 전달할 수 있습니다. 소유자는 수령처를 바꿀 수 있습니다. 프로토콜에서 금고로 보내는 작업이 실패하면 마감을 취소하지 않고 해당 몫이 준비금에 남을 수 있습니다.',
     disclaimerHeading: '면책 고지',
     // lexicon-allow-start: explicit legal denial of charitable-tax-treatment framing.
     disclaimer:
@@ -180,7 +183,8 @@ export const landingTextKo = {
     // lexicon-allow-end
     card: {
       label: '사이클 배분',
-      description: '모든 퍼포먼스 사이클에서 이만큼이 Protocol Guild로 전달됩니다.',
+      description:
+        '해당 몫은 공공재 금고로 전달됩니다. 누구나 별도 트랜잭션으로 잔액을 현재 수령처인 Protocol Guild에 보낼 수 있습니다.',
       tableRows: {
         contributors: { label: 'Protocol Guild 기여자' },
         enforcement: { label: '집행', value: '온체인' },
@@ -213,7 +217,7 @@ export const landingTextKo = {
   verifiability: {
     eyebrow: '검증 가능성',
     heading: '열려 있고, 검증되었고, 재현 가능합니다.',
-    body: '누구나 시드로 시그니처를 다시 생성하고, 앱에 공개된 컨트랙트, 소스 코드, 보안 감사 현황과 대조해 확인할 수 있습니다.',
+    body: 'NFT 시드는 온체인에 저장되고 이미지와 영상은 오프체인에서 생성됩니다. 재현하려면 같은 시드, 해당 렌더러 버전과 설정, 호환되는 도구가 필요합니다. 시드만 같다고 서로 다른 버전의 결과가 동일하다는 보장은 없습니다.',
     pillars: {
       cc0: {
         title: 'CC0 1.0',
@@ -225,7 +229,7 @@ export const landingTextKo = {
       },
       reproducible: {
         title: '재현 가능한 아트',
-        body: '생성된 프레임의 SHA-256 해시를 지속적 통합에서 검증합니다. 같은 시드 → 같은 결과물.',
+        body: '저장소에는 수동으로 실행하는 이미지 재현 확인 절차가 있습니다. 현재 지속적 통합 과정은 생성된 프레임의 해시를 비교하지 않습니다.',
       },
     },
     evidenceLabel: '직접 확인하기',
@@ -238,12 +242,13 @@ export const landingTextKo = {
     items: [
       {
         question: '참여자로서 실제로 무엇을 하나요?',
-        answer: `제스처를 남깁니다. 각 제스처는 ETH 또는 CST 트랜잭션으로, 사이클 마감 시각을 연장하고, 별빛 선정 자격을 기록하고, 동적 참여 CST를 각인할 수 있으며, 사이클의 시그니처를 빚어냅니다. Cosmic Signature NFT를 앵커링하면 앵커링 지급의 몫을 받을 수 있습니다. ${protocolFacts.councilProposalThresholdCst} CST 이상을 보유하면 우주 평의회를 통해 조율 제안을 제출할 수 있습니다.`,
+        answer:
+          'V3에서는 다음 제스처가 이전 제스처 참여자에게 참여 CST 전액을 각인합니다. 수량은 두 제스처 사이의 시간에 선형으로 비례합니다. 사이클의 첫 제스처는 이 규칙으로 CST를 각인하지 않으며, 마감도 최종 제스처 참여자의 마지막 구간에 추가 참여 CST를 지급하지 않습니다. 두 제스처의 주소가 같으면 해당 주소가 직접 받습니다.',
       },
       {
         question: '작품은 어떤 기술로 만들어지나요?',
         answer:
-          '각 Cosmic Signature NFT는 뉴턴 중력 삼체 시뮬레이션의 결정론적 렌더입니다. 온체인 시드가 4차 요시다 심플렉틱 적분기로 시뮬레이션한 후보 궤도 100,000개 가운데 하나를 고르고, 그 궤도를 OKLab 색 혼합과 함께 64개의 파장 구간으로 스펙트럼 렌더링합니다. 파이프라인은 CC0로 완전히 오픈 소스이며, 누구나 시드로 시그니처를 재현할 수 있습니다.',
+          'NFT 시드는 온체인에 저장되고 이미지와 영상은 오프체인에서 생성됩니다. 재현하려면 같은 시드, 해당 렌더러 버전과 설정, 호환되는 도구가 필요합니다. 시드만 같다고 서로 다른 버전의 결과가 동일하다는 보장은 없습니다.',
       },
       {
         question: 'ETH 배분은 어디에서 나오나요?',
@@ -253,7 +258,7 @@ export const landingTextKo = {
       // lexicon-allow-start: explicit denial of charitable-tax-treatment framing.
       {
         question: '공공재란 정확히 무엇인가요?',
-        answer: `각 사이클 ETH 준비금의 ${protocolFacts.publicGoodsPercentage}%가 공공재 주소, 현재는 Protocol Guild로 전달됩니다. Protocol Guild는 170명이 넘는 이더리움 핵심 기여자를 위한 공동 자금 지원 메커니즘입니다. 이는 공공재 주소로 ETH를 전달하는 것으로, 미국 세법상의 자선 기부가 아니며, Cosmic Signature는 그 세무상 취급에 관해 어떤 진술도 하지 않습니다.`,
+        answer: `마감 시 프로토콜은 사이클 준비금의 ${protocolFacts.publicGoodsPercentage}%를 공공재 금고로 보내려고 시도합니다. 이후 누구나 별도 트랜잭션으로 금고 잔액을 현재 공공재 수령처인 Protocol Guild에 전달할 수 있습니다. 소유자는 수령처를 바꿀 수 있습니다. 프로토콜에서 금고로 보내는 작업이 실패하면 마감을 취소하지 않고 해당 몫이 준비금에 남을 수 있습니다.`,
       },
       // lexicon-allow-end
       // lexicon-allow-start: explicit denial of lottery, casino, gambling, house, dealer, and bet categories.
@@ -272,11 +277,13 @@ export const landingTextKo = {
       // lexicon-allow-end
       {
         question: '참여 CST의 양은 왜 달라지나요?',
-        answer: `참여 CST 각인은 이전 제스처 이후 흐른 시간을 바탕으로 한 제곱근 공식을 사용합니다. 공백이 길수록 더 많은 CST가 각인되지만, 제곱근 공식이므로 증가 폭은 선형보다 완만합니다. 매우 빠르게 이어지는 제스처는 0 CST를 각인할 수도 있습니다. 앱은 제출 전에 현재 수량을 미리 보여 줍니다.`,
+        answer:
+          'V3에서는 다음 제스처가 이전 제스처 참여자에게 참여 CST 전액을 각인합니다. 수량은 두 제스처 사이의 시간에 선형으로 비례합니다. 사이클의 첫 제스처는 이 규칙으로 CST를 각인하지 않으며, 마감도 최종 제스처 참여자의 마지막 구간에 추가 참여 CST를 지급하지 않습니다. 두 제스처의 주소가 같으면 해당 주소가 직접 받습니다.',
       },
       {
         question: 'ETH 제스처와 CST 제스처는 CST 보정 구간에 어떤 영향을 주나요?',
-        answer: `CST 보정 구간은 온체인에 저장되며 제스처마다 바뀝니다. CST 제스처는 구간을 약 ${protocolFacts.cstCalibrationWindowIncreasePercentPerCstGesture}% 늘려 CST 제스처 비용이 더 천천히 내려가게 하고, ETH 제스처는 약 ${protocolFacts.cstCalibrationWindowDecreasePercentPerEthGesture}% 줄여 CST 제스처 비용이 더 빨리 내려가게 합니다.`,
+        answer:
+          'V3는 CST 비용의 하락 속도를 저장하며 구간 길이는 속도와 상한에서 계산합니다. ETH 제스처는 rate + floor(rate / 100)으로 속도 증가를 시도하고, CST 제스처는 rate - floor(rate / 101)로 속도를 줄입니다. 최소 구간 조건을 어기면 ETH의 속도 증가는 적용하지 않습니다. CST 제스처는 할증 전 기본 비용의 두 배, 설정된 최소값, 새 속도에 180초를 곱한 값 가운데 가장 큰 값으로 상한을 다시 설정합니다. 다음 제스처를 즉시 남기는 것은 가능합니다.',
       },
       {
         question: '포크해도 되나요?',

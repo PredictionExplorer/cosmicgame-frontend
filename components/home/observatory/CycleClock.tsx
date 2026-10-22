@@ -4,6 +4,8 @@ import type { ReactNode } from 'react';
 import { ArrowRight, CalendarPlus } from 'lucide-react';
 import { useLocale, useTranslations } from 'next-intl';
 
+import { nftAllocationFacts } from '@/content/protocol-facts';
+
 import {
   SmoothCountdown,
   type LocalizedCountdownRenderProps,
@@ -51,6 +53,8 @@ export interface CycleClockProps {
   onFinalize: () => void;
   /** ETH price in USD for the allocation conversion; 0 hides the USD line. */
   ethUsdPrice?: number;
+  /** Current main-allocation NFT count, with the checked deployment as SSR fallback. */
+  signatureNftCount?: number;
   /**
    * NFTs and tokens attached to this cycle's Gestures, which travel with the
    * Signature Allocation; the line names them only when there are some.
@@ -123,6 +127,7 @@ export function CycleClock({
   claimWait,
   onFinalize,
   ethUsdPrice = 0,
+  signatureNftCount = nftAllocationFacts.mainPrizeNfts,
   attachedAssetCount = 0,
   attachedAssetsHref,
   headingAction = null,
@@ -340,7 +345,7 @@ export function CycleClock({
               <span>{t('observatory.clock.reserveExtraCst')}</span>
             </li>
             <li className={ITEM_SEPARATOR}>
-              <span>{t('observatory.clock.reserveExtraNft')}</span>
+              <span>{t('observatory.clock.reserveExtraNft', { count: signatureNftCount })}</span>
             </li>
             {attachedAssetCount > 0 && (
               <li className={ITEM_SEPARATOR} data-testid="clock-reserve-attached">

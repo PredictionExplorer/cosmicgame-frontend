@@ -1,9 +1,4 @@
-import {
-  ethDistributionFacts,
-  isV3Mechanics,
-  nftAllocationFacts,
-  protocolFacts,
-} from '@/content/protocol-facts';
+import { ethDistributionFacts, nftAllocationFacts, protocolFacts } from '@/content/protocol-facts';
 
 import type { LandingText } from './structure';
 
@@ -11,7 +6,7 @@ import type { LandingText } from './structure';
 export const landingTextEn = {
   meta: {
     title: 'Cosmic Signature: Procedural On-Chain Art Protocol on Arbitrum',
-    description: `Cosmic Signature is a procedural on-chain art protocol on Arbitrum. Participants make gestures in each Performance Cycle; when it finalizes, new Signatures are imprinted and the Cycle Reserve is allocated across its tracks, ${ethDistributionFacts.publicGoodsPercentage}% of it to Ethereum’s core contributors.`,
+    description: `Cosmic Signature is a procedural on-chain art protocol on Arbitrum. Gestures extend Performance Cycles; finalization creates Signatures and the reserve is allocated across its tracks, including ${ethDistributionFacts.publicGoodsPercentage}% to a Public Goods Vault.`,
     keywords: [
       'Cosmic Signature',
       'procedural art protocol',
@@ -29,7 +24,7 @@ export const landingTextEn = {
     eyebrow: 'Procedural on-chain art protocol · Arbitrum',
     headlineLead: 'Art, shaped by',
     headlineAccent: 'every gesture.',
-    subhead: `Each gesture, made with ETH or CST, extends the cycle’s clock. When it runs out, the cycle is finalized: new Signatures are imprinted for its recipients, and the Cycle Reserve is allocated across its tracks, ${ethDistributionFacts.publicGoodsPercentage}% of it to Ethereum’s core contributors.`,
+    subhead: `Each gesture, made with ETH or CST, extends the cycle’s clock. After the deadline, a transaction can finalize the cycle: new Signatures are imprinted, and the reserve is allocated across its tracks, including ${ethDistributionFacts.publicGoodsPercentage}% to the Public Goods Vault.`,
     secondaryCtaLabel: 'How a cycle works',
     art: {
       viewAriaLabel: 'View Cosmic Signature {tokenLabel} in the app',
@@ -63,7 +58,7 @@ export const landingTextEn = {
     eyebrow: 'The Art',
     heading: 'Three-body physics. Art from an on-chain seed.',
     description:
-      'Every Cosmic Signature NFT visualizes three celestial bodies orbiting under Newtonian gravity. Three bodies produce fundamentally chaotic trajectories. No AI. No training data. Just deterministic physics. Same seed → identical output, pixel for pixel.',
+      'Every Cosmic Signature NFT visualizes three celestial bodies orbiting under Newtonian gravity. Its seed is recorded on-chain; an open-source renderer creates the image off-chain. Reproduction uses that seed, the matching renderer revision and configuration, and a compatible toolchain.',
     showcase: {
       viewAriaLabel: 'View Cosmic Signature {tokenLabel}',
       artworkAlt: 'Cosmic Signature artwork {tokenLabel}',
@@ -80,7 +75,7 @@ export const landingTextEn = {
       },
       selection: {
         title: 'Selection',
-        body: 'A Borda rank aggregation (chaos × equilateralness) selects the most visually interesting orbit from the candidate pool.',
+        body: 'A Borda ranking of orbital measures creates a shortlist; an image-space aesthetic check guides the final selection.',
       },
       camera: {
         title: 'Camera',
@@ -88,7 +83,7 @@ export const landingTextEn = {
       },
       color: {
         title: 'Color',
-        body: 'Colors are mixed in the OKLab perceptual space with 120° hue separation per body, modulated by drift and a sine wave.',
+        body: 'A continuous perceptual palette varies hue and other color properties in OKLCh; the bodies do not have a fixed hue separation.',
       },
       'spectral-render': {
         title: 'Spectral render',
@@ -96,7 +91,7 @@ export const landingTextEn = {
       },
       signature: {
         title: 'Signature',
-        body: 'AgX tonemapping, bloom, OpenSimplex nebula layers, and color grading finish the frame. The result: a 16-bit PNG plus a 30-second H.265 video.',
+        body: 'Tonemapping, bloom, and color grading finish the image. The renderer can produce high-resolution images and animated views; output depends on its selected configuration.',
       },
     },
     facts: {
@@ -111,7 +106,7 @@ export const landingTextEn = {
     eyebrow: 'Allocation Tracks',
     heading: 'Every Cycle Reserve, allocated by rule.',
     description:
-      'When a cycle finalizes, the protocol distributes its ETH and CST reserves across allocation tracks that recognize endurance, timing, dedication, and participation. About half of the ETH reserve compounds into the next cycle.',
+      'At finalization, configured ETH shares are distributed and fixed CST allocations and NFTs are created. About half the ETH reserve carries forward, with rounding and omitted-track exceptions; reserve growth is not guaranteed.',
     ethLabel: 'ETH from each Cycle Reserve',
     fixedLabel: 'CST and NFTs, every cycle',
     fixedEach: `Each recipient receives ${protocolFacts.specialAllocationCst.toLocaleString('en-US')} CST and one Cosmic Signature NFT.`,
@@ -119,12 +114,12 @@ export const landingTextEn = {
     items: {
       'signature-allocation': {
         title: 'Signature Allocation',
-        body: `To the participant who made the Final Gesture. Includes ${protocolFacts.specialAllocationCst.toLocaleString('en-US')} CST and ${nftAllocationFacts.mainPrizeNftPhrase.en}.`,
+        body: `To the finalization caller: normally the Final Gesture participant, or any caller after the ${protocolFacts.finalGestureExclusivityHours}-hour exclusive window. Includes ${protocolFacts.specialAllocationCst.toLocaleString('en-US')} CST in total and ${nftAllocationFacts.mainPrizeNftPhrase.en}.`,
       },
       'compounding-reserve': {
         percent: '~50%',
         title: 'Compounding Cycle Reserve',
-        body: 'Rolls forward into the next Performance Cycle. The protocol compounds rather than extracts.',
+        body: 'Carries into the next Performance Cycle. The retained amount can vary; growth is not guaranteed.',
       },
       'chrono-warrior': {
         title: 'Chrono-Warrior Allocation',
@@ -132,7 +127,7 @@ export const landingTextEn = {
       },
       'public-goods': {
         title: 'Public Goods Allocation',
-        body: 'Forwarded to Protocol Guild, the funding mechanism for 170+ Ethereum core contributors.',
+        body: 'Sent to the Public Goods Vault; anyone can separately forward its balance to the current beneficiary, Protocol Guild.',
       },
       'anchor-distribution': {
         title: 'Anchor Distribution',
@@ -140,11 +135,11 @@ export const landingTextEn = {
       },
       'eth-stellar-selection': {
         title: 'ETH Stellar Selection',
-        body: `Split across ${protocolFacts.ethStellarSelectionRecipients} randomly selected participants. Selection frequency scales with gestures made.`,
+        body: `Shared across ${protocolFacts.ethStellarSelectionRecipients} selections. Weights use each gesture’s undiscounted, premium-free ETH base cost; repeats are possible.`,
       },
       'participant-nft-stellar-selection': {
         title: 'NFT Stellar Selection — Participants',
-        body: 'Selected at random from the cycle’s participants.',
+        body: 'Uses the same ETH base-cost weights as participant ETH selection. CST gestures use the concurrent ETH base cost; repeats are possible.',
       },
       'anchored-nft-stellar-selection': {
         title: 'Anchored-NFT Stellar Selection',
@@ -177,7 +172,7 @@ export const landingTextEn = {
   publicGoods: {
     eyebrow: 'Public Goods',
     heading: 'Every cycle funds Ethereum’s core contributors.',
-    body: 'Every Performance Cycle forwards a fixed share of its ETH reserve to Protocol Guild — the collective funding mechanism for 170+ Ethereum core contributors. The more the protocol is used, the more flows to the infrastructure Ethereum itself depends on.',
+    body: 'Each finalized cycle allocates a configured ETH share to the Public Goods Vault. A separate permissionless transaction forwards its balance to the current beneficiary, Protocol Guild. The vault owner can change that beneficiary.',
     disclaimerHeading: 'Disclaimer',
     // lexicon-allow-start: explicit legal denial of charitable-tax-treatment framing.
     disclaimer:
@@ -185,7 +180,8 @@ export const landingTextEn = {
     // lexicon-allow-end
     card: {
       label: 'Cycle allocation',
-      description: 'of every Performance Cycle’s ETH reserve is forwarded to Protocol Guild.',
+      description:
+        'of the reserve is allocated to the Public Goods Vault at finalization, for separate forwarding.',
       tableRows: {
         contributors: { label: 'Protocol Guild contributors' },
         enforcement: { label: 'Enforcement', value: 'on-chain' },
@@ -218,7 +214,7 @@ export const landingTextEn = {
   verifiability: {
     eyebrow: 'Verifiability',
     heading: 'Open, verified, reproducible.',
-    body: 'Anyone can regenerate a Signature from its seed and check the contracts, source code and audit status the app publishes.',
+    body: 'Inspect on-chain seeds, the matching renderer revision, contract addresses, and the published verification and audit status.',
     pillars: {
       cc0: {
         title: 'CC0 1.0',
@@ -230,7 +226,7 @@ export const landingTextEn = {
       },
       reproducible: {
         title: 'Reproducible art',
-        body: 'SHA-256 hashes of generated frames asserted in continuous integration. Same seed → identical output.',
+        body: 'The renderer provides manual reference-image checks. Reproduction uses the same seed, renderer revision, configuration and compatible toolchain.',
       },
     },
     evidenceLabel: 'Check it yourself',
@@ -243,12 +239,13 @@ export const landingTextEn = {
     items: [
       {
         question: 'What do I actually do as a participant?',
-        answer: `You make gestures. Each gesture is an ETH or CST transaction that extends the Cycle Finalization Time, records a Stellar Selection entry, may imprint dynamic Participation CST, and shapes the cycle’s Signature. You may anchor Cosmic Signature NFTs to receive a share of Anchor Distributions. You may submit Coordination Proposals through the Cosmic Council if you hold at least ${protocolFacts.councilProposalThresholdCst} CST.`,
+        answer:
+          'You make ETH or CST gestures that extend the stored deadline and record weighted Stellar Selection entries. A later gesture can credit Participation CST to the previous participant. You may anchor eligible NFTs or use delegated CST weight in the Cosmic Council. Participation does not guarantee an allocation.',
       },
       {
         question: 'What is the art, technically?',
         answer:
-          'Each Cosmic Signature NFT is a deterministic render of a three-body Newtonian simulation. The on-chain seed selects a candidate orbit (from 100,000 simulated via a 4th-order Yoshida symplectic integrator), which is then spectrally rendered across 64 wavelength bins with OKLab color mixing. The pipeline is fully open-source under CC0; anyone can reproduce a Signature from its seed.',
+          'Each Signature visualizes a three-body simulation from a seed recorded on-chain. The open-source renderer selects orbital candidates and produces images off-chain. Reproduction requires the matching renderer revision and configuration as well as the seed.',
       },
       {
         question: 'Where do the ETH allocations come from?',
@@ -258,7 +255,7 @@ export const landingTextEn = {
       // lexicon-allow-start: explicit denial of charitable-tax-treatment framing.
       {
         question: 'What exactly is Public Goods?',
-        answer: `${ethDistributionFacts.publicGoodsPercentage}% of each cycle’s ETH reserve is forwarded to a public-goods address, currently Protocol Guild. Protocol Guild is the collective funding mechanism for 170+ Ethereum core contributors. This is a forwarding of ETH to a public-goods address; it is not a charitable contribution in the U.S. tax sense, and Cosmic Signature makes no representation about its tax treatment.`,
+        answer: `${ethDistributionFacts.publicGoodsPercentage}% of the reserve is allocated to a Public Goods Vault. Anyone can separately forward its balance to the configured beneficiary, currently Protocol Guild; the owner can change that beneficiary. A failed transfer from the protocol can leave the share in the reserve.`,
       },
       // lexicon-allow-end
       // lexicon-allow-start: explicit denial of lottery, casino, gambling, house, dealer, and bet categories.
@@ -277,13 +274,12 @@ export const landingTextEn = {
       // lexicon-allow-end
       {
         question: 'Why does the Participation CST amount change?',
-        answer: isV3Mechanics
-          ? `The Participation CST imprint accrues linearly with how long it has been since the previous gesture — about ${protocolFacts.v3.dynamicCstRewardPerMinuteAtLaunch} CST per minute at the launch parameters. Longer quiet periods create proportionally larger CST imprints, and gestures made immediately after another imprint close to 0 CST. The app previews the current amount before you submit.`
-          : `The Participation CST imprint uses a square-root formula based on how long it has been since the previous gesture. Longer quiet periods create larger CST imprints, but the square root makes the increase sublinear. Very rapid gestures can imprint 0 CST. The app previews the current amount before you submit.`,
+        answer: `The amount grows linearly with elapsed time, at about ${protocolFacts.v3.dynamicCstRewardPerMinuteAtLaunch} CST per minute at the original increment. A later gesture credits it to the previous participant. The first gesture credits none, and finalization does not settle the final participant’s additional dynamic CST.`,
       },
       {
         question: 'How do ETH and CST gestures affect the CST Calibration Window?',
-        answer: `The CST Calibration Window is stored on-chain and changes after every gesture. A CST gesture lengthens it by about ${protocolFacts.cstCalibrationWindowIncreasePercentPerCstGesture}%, making CST Gesture Cost descend more slowly. An ETH gesture shortens it by about ${protocolFacts.cstCalibrationWindowDecreasePercentPerEthGesture}%, making CST Gesture Cost descend faster.`,
+        answer:
+          'V3 changes the CST decline rate. ETH gestures can increase it subject to a minimum-window safeguard; CST gestures reduce it and restart the ceiling using twice the premium-free base cost and on-chain minimums. Duration is derived from the ceiling and rate, rather than adjusted by a fixed percentage.',
       },
       {
         question: 'Can I fork this?',

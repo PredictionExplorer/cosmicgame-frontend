@@ -1,4 +1,4 @@
-import { protocolFacts } from '@/content/protocol-facts';
+import { historicalV2ProtocolFacts as protocolFacts } from '@/content/protocol-facts';
 
 import type { WhitePaperText } from './structure';
 import { WHITE_PAPER_VERSION } from './types';

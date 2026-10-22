@@ -1,6 +1,6 @@
 /**
- * Frontend-facing protocol facts verified against the deployed Arbitrum One
- * contract configuration and production Solidity defaults.
+ * Historical V2 facts retained for published whitepaper 1.0 editions.
+ * Current-facing content uses protocolFacts below.
  *
  * Source of truth:
  * - Proxy: 0x6a714Ae7B5b6eA520F6BCA23d2E609C4Fd5863F2
@@ -21,7 +21,7 @@
  * parameters are owner-configurable between cycles). UI surfaces should
  * prefer live contract/API reads and use these facts as verified defaults.
  */
-export const protocolFacts = {
+export const historicalV2ProtocolFacts = {
   contractAddresses: {
     proxy: '0x6a714Ae7B5b6eA520F6BCA23d2E609C4Fd5863F2',
     implementation: '0x50eB3d05d2C463949DE9238D419385594f7AdB97',
@@ -137,10 +137,8 @@ export const protocolFacts = {
   councilProposalThresholdCst: 100,
   councilQuorumPercent: 3,
   /**
-   * CosmicSignatureGameV3 — the upcoming proxy upgrade (not yet live on Arbitrum One).
-   * Version-aware UI (e.g. the Protocol Configuration page, which detects V3 via its
-   * new getters) should prefer these once the upgrade lands; the top-level facts above
-   * keep describing the live V2 deployment until then.
+   * CosmicSignatureGameV3 settings, installed on Arbitrum One on October 21, 2026.
+   * Live contract reads remain authoritative for owner-configurable values.
    *
    * Verified against the v3.1-2026-10-13 deployment branch Solidity defaults at
    * commit 9d1a6447 (`CosmicSignatureConstants.sol`). Values are unchanged from
@@ -152,7 +150,7 @@ export const protocolFacts = {
     dynamicCstRewardFormula:
       'elapsedSinceLastGesture * bidCstRewardAmountMultiplier / mainPrizeTimeIncrementInMicroSeconds',
     /** Reader notation of the linear rule, same symbols as `participationCstSymbols`. */
-    participationCstNotation: 'CST = Δt × m ÷ i',
+    participationCstNotation: 'CST units = floor(Δt × m ÷ i)',
     /**
      * Computed at the launch parameters (time increment = exactly 1 hour,
      * accrual ~1 CST per minute). The increment grows 1% per cycle, so live
@@ -194,7 +192,7 @@ export const protocolFacts = {
     cstCalibrationWindowMinMinutes: 3,
     /**
      * After a CST gesture the next Calibration Ceiling restarts at
-     * max(2 x the cost just paid, the 1 CST ceiling floor, decline speed x 3 minutes),
+     * max(2 x the premium-free CST base cost, the 1 CST ceiling floor, decline speed x 3 minutes),
      * so the window never opens shorter than the 3-minute floor.
      */
     cstCalibrationCeilingRestartMultiplier: 2,
@@ -212,22 +210,45 @@ export const protocolFacts = {
      * window closes.
      */
     lateGesturePremiumIsOneTimeToll: true,
-    /** ETH Stellar Selection odds are weighted by each gesture's undiscounted ETH cost at the moment it was made. */
+    /** Both participant Stellar Selections use each gesture's undiscounted, premium-free ETH base cost as weight. */
     weightedStellarSelection: true,
   },
 } as const;
 
 /**
- * Which contract mechanics version the static copy describes.
- *
- * Production runs V2 until the UUPS proxy upgrade lands, so this stays 2.
- * Flip it to 3 on upgrade day (or set NEXT_PUBLIC_CONTRACT_MECHANICS_VERSION=3
- * in an environment that points at a V3 node, e.g. local Hardhat testing).
- * V1 is history: the proxy was already upgraded to V2 and cannot roll back,
- * so only 2 and 3 are representable.
+ * Current V3 snapshot checked at Arbitrum One block 517046699 (October 21, 2026).
+ * The implementation runtime matches the reviewed production artifact. Public
+ * source verification is a separate status: V3 is not verified on Sourcify.
+ * Legacy duration fields are retained for V2 compatibility only; V3 uses a rate.
  */
+export const protocolFacts = {
+  ...historicalV2ProtocolFacts,
+  contractAddresses: {
+    ...historicalV2ProtocolFacts.contractAddresses,
+    implementation: '0xc1b97E1b0baC86248653B18706dbC5c8898c5c06',
+  },
+  mainEthPercentage: 20,
+  chronoWarriorEthPercentage: 15,
+  stellarSelectionEthPercentage: 5,
+  anchorDistributionPercentage: 5,
+  publicGoodsPercentage: 5,
+  mainPrizeNftsPerCycle: 3,
+  roleNftsPerCycle: 6,
+  typicalNftsPerCycle: 26,
+  nftBearingAllocations: 24,
+  participationCstRewardMultiplier: '60000000000000000000000000',
+  dynamicCstRewardFormula: historicalV2ProtocolFacts.v3.dynamicCstRewardFormula,
+  participationCstNotation: historicalV2ProtocolFacts.v3.participationCstNotation,
+  dynamicCstRewardExamples: historicalV2ProtocolFacts.v3.dynamicCstRewardExamples,
+  cstCalibrationCeilingMinCst: 1,
+  cstDeclineRateChangeDivisor: 100,
+  cstCalibrationRestartMinimumSeconds: 180,
+  currentNextCycleDelayDays: 7,
+} as const;
+
+/** V3 is deployed. Only an explicit V2 environment opts into historical copy. */
 export const contractMechanicsVersion: 2 | 3 =
-  Number(process.env.NEXT_PUBLIC_CONTRACT_MECHANICS_VERSION ?? '2') === 3 ? 3 : 2;
+  process.env.NEXT_PUBLIC_CONTRACT_MECHANICS_VERSION === '2' ? 2 : 3;
 
 /** True once the copy should describe V3 mechanics (linear CST accrual, reward split, multi-NFT allocation). */
 export const isV3Mechanics = contractMechanicsVersion === 3;
@@ -260,11 +281,11 @@ export const ethDistributionFacts: {
       publicGoodsPercentage: protocolFacts.v3.publicGoodsPercentage,
     }
   : {
-      mainEthPercentage: protocolFacts.mainEthPercentage,
-      chronoWarriorEthPercentage: protocolFacts.chronoWarriorEthPercentage,
-      stellarSelectionEthPercentage: protocolFacts.stellarSelectionEthPercentage,
-      anchorDistributionPercentage: protocolFacts.anchorDistributionPercentage,
-      publicGoodsPercentage: protocolFacts.publicGoodsPercentage,
+      mainEthPercentage: historicalV2ProtocolFacts.mainEthPercentage,
+      chronoWarriorEthPercentage: historicalV2ProtocolFacts.chronoWarriorEthPercentage,
+      stellarSelectionEthPercentage: historicalV2ProtocolFacts.stellarSelectionEthPercentage,
+      anchorDistributionPercentage: historicalV2ProtocolFacts.anchorDistributionPercentage,
+      publicGoodsPercentage: historicalV2ProtocolFacts.publicGoodsPercentage,
     };
 
 export const cstRewardFacts: {
@@ -273,7 +294,7 @@ export const cstRewardFacts: {
   notation: string;
   /** Keeps the literal elapsed labels so locale copy can index its translation map by them. */
   examples:
-    | typeof protocolFacts.dynamicCstRewardExamples
+    | typeof historicalV2ProtocolFacts.dynamicCstRewardExamples
     | typeof protocolFacts.v3.dynamicCstRewardExamples;
   /** 'sqrt' = V2 (sublinear, slowing growth); 'linear' = V3 (constant accrual rate). */
   curve: 'sqrt' | 'linear';
@@ -285,9 +306,9 @@ export const cstRewardFacts: {
       curve: 'linear',
     }
   : {
-      formula: protocolFacts.dynamicCstRewardFormula,
-      notation: protocolFacts.participationCstNotation,
-      examples: protocolFacts.dynamicCstRewardExamples,
+      formula: historicalV2ProtocolFacts.dynamicCstRewardFormula,
+      notation: historicalV2ProtocolFacts.participationCstNotation,
+      examples: historicalV2ProtocolFacts.dynamicCstRewardExamples,
       curve: 'sqrt',
     };
 
@@ -322,7 +343,7 @@ export const nftAllocationFacts: {
   ? {
       mainPrizeNfts: protocolFacts.v3.mainPrizeNftsPerCycleDefault,
       typicalNftsPerCycle: protocolFacts.v3.typicalNftsPerCycle,
-      nftBearingAllocations: protocolFacts.typicalNftsPerCycle,
+      nftBearingAllocations: historicalV2ProtocolFacts.typicalNftsPerCycle,
       mainPrizeNftPhrase: {
         en: 'three sequential Cosmic Signature NFTs',
         zh: '3 枚连续编号的 Cosmic Signature NFT',
@@ -332,9 +353,9 @@ export const nftAllocationFacts: {
       mainPrizeNftsWord: { en: 'three', zh: '3', zhHant: '3', uk: '3' },
     }
   : {
-      mainPrizeNfts: protocolFacts.mainPrizeNftsPerCycle,
-      typicalNftsPerCycle: protocolFacts.typicalNftsPerCycle,
-      nftBearingAllocations: protocolFacts.typicalNftsPerCycle,
+      mainPrizeNfts: historicalV2ProtocolFacts.mainPrizeNftsPerCycle,
+      typicalNftsPerCycle: historicalV2ProtocolFacts.typicalNftsPerCycle,
+      nftBearingAllocations: historicalV2ProtocolFacts.typicalNftsPerCycle,
       mainPrizeNftPhrase: {
         en: 'one Cosmic Signature NFT',
         zh: '1 枚 Cosmic Signature NFT',
@@ -343,3 +364,44 @@ export const nftAllocationFacts: {
       },
       mainPrizeNftsWord: { en: 'one', zh: '1', zhHant: '1', uk: '1' },
     };
+
+/**
+ * English edition 1.3 snapshot: Arbitrum One block 517046699,
+ * 2026-10-21 22:29:53 UTC. V3 source: CosmicSignatureGameV3,
+ * BiddingV3, MainPrizeV3 and CosmicSignatureConstants.
+ * Kept separate so the published translated 1.0 editions remain citable.
+ */
+export const whitePaperV13Facts = {
+  ...protocolFacts,
+  contractAddresses: {
+    ...protocolFacts.contractAddresses,
+    implementation: '0xc1b97E1b0baC86248653B18706dbC5c8898c5c06',
+  },
+  mainEthPercentage: 20,
+  chronoWarriorEthPercentage: 15,
+  stellarSelectionEthPercentage: 5,
+  anchorDistributionPercentage: 5,
+  publicGoodsPercentage: 5,
+  mainAllocationNfts: 3,
+  roleNftsPerCycle: 6,
+  typicalNftsPerCycle: 26,
+  cstCalibrationCeilingMinCst: 1,
+  cstDeclineRateChangeDivisor: 100,
+  cstRestartMinimumSeconds: 180,
+  nextCycleDelayDaysAtSnapshot: 7,
+  currentCycleIncrementMicroseconds: 3_709_083_600,
+  lateWindowSecondsAtSnapshot: 1_236,
+  lateWindowDurationDivisor: 3_000_000,
+  latePremiumBaseMultiplier: 29_228_998_656,
+  latePremiumExponent: 8,
+  dynamicCstRewardFormula: 'floor(elapsedSeconds * multiplier / incrementMicroseconds)',
+  participationCstNotation: 'CST units = floor(t * m / i)',
+  participationCstSymbols: ['t', 'm', 'i'],
+  dynamicCstRewardExamples: [
+    { elapsed: '0 seconds', cst: '0' },
+    { elapsed: '1 second', cst: '0.0167' },
+    { elapsed: '60 seconds', cst: '1' },
+    { elapsed: '1 hour', cst: '60' },
+    { elapsed: '1 day', cst: '1,440' },
+  ],
+} as const;

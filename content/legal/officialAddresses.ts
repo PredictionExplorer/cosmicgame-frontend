@@ -1,4 +1,4 @@
-import { protocolFacts } from '@/content/protocol-facts';
+import { historicalV2ProtocolFacts, protocolFacts } from '@/content/protocol-facts';
 
 import { OUTBOUND_HREFS } from './links';
 
@@ -24,9 +24,8 @@ export type OfficialCommunityId = (typeof OFFICIAL_COMMUNITY)[number]['id'];
 
 /**
  * The core contracts, named by their `contracts` catalog entry (the same
- * names as /contracts). Each was an exact match on Sourcify for Arbitrum One
- * (chain 42161) when checked on `SOURCIFY_CHECKED`
- * (sourcify.dev/server/v2/contract/42161/<address>: `"match":"exact_match"`).
+ * names as /contracts). Current on-chain identity and public source verification
+ * are separate: V3 is not part of the historical exact-match set below.
  */
 export const OFFICIAL_CONTRACTS = [
   { id: 'protocol', address: protocolFacts.contractAddresses.proxy },
@@ -47,7 +46,9 @@ export const SOURCIFY_CHECKED = '2026-09-24';
  * never labelled verified without a new check.
  */
 export const SOURCIFY_EXACT_MATCH: ReadonlySet<string> = new Set(
-  Object.values(protocolFacts.contractAddresses).map((address) => address.toLowerCase()),
+  Object.values(historicalV2ProtocolFacts.contractAddresses).map((address) =>
+    address.toLowerCase(),
+  ),
 );
 
 export const ARBITRUM_ONE_CHAIN_ID = 42161;

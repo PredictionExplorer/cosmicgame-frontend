@@ -1,370 +1,1487 @@
 # Cosmic Signature
 
-> Cosmic Signature is a procedural on-chain art protocol on Arbitrum. Every gesture shapes the cycle's final Signature, and the protocol redistributes its reserves across a fixed set of allocation tracks — including the infrastructure Ethereum itself depends on.
-
-## Overview
-
-Cosmic Signature is a procedural on-chain art protocol on Arbitrum. Participants make gestures during a Performance Cycle; when the cycle finalizes, the protocol distributes its reserves across a fixed set of allocation tracks — including Protocol Guild, the funding mechanism for 170+ Ethereum core contributors. The protocol runs on Arbitrum, a Layer 2 scaling solution for Ethereum, designed to process transactions at lower cost; fees vary with network conditions.
+Cosmic Signature is a procedural on-chain art protocol on Arbitrum. During each Performance Cycle, participants make gestures with ETH or CST, and every gesture helps shape the final Signature: deterministic NFT artwork generated from on-chain data and rendered through a three-body physics simulation.
 
 Cosmic Signature is not related to the COSMIC cancer mutation database or COSMIC mutational signatures in biology.
 
-## Key Pages
+## Current contract mechanics
 
-- [Protocol Home](https://cosmicsignature.com/): Overview of Cosmic Signature as a procedural on-chain art protocol
-- [About](https://cosmicsignature.com/about): Protocol overview and official resources
-- [White Paper](https://cosmicsignature.com/white-paper): The reference description of the protocol, with a downloadable PDF (v1.0, August 2026)
-- [What is Cosmic Signature?](https://cosmicsignature.com/learn/what-is-cosmic-signature): Plain-English overview
-- [Three-Body NFT Art](https://cosmicsignature.com/learn/three-body-nft-art): Technical explanation of deterministic art generation
-- [App](https://app.cosmicsignature.com/): Live gesture interface and active cycle status
-- [Gallery](https://app.cosmicsignature.com/gallery): Browse all imprinted Cosmic Signature NFTs
-- [How It Works](https://app.cosmicsignature.com/how-it-works): Complete guide to protocol mechanics
-- [FAQ](https://app.cosmicsignature.com/faq): Frequently asked questions
-- [Statistics](https://app.cosmicsignature.com/statistics): Protocol statistics and analytics
-- [Anchoring](https://app.cosmicsignature.com/anchoring): Anchor Cosmic Signature NFTs to receive ETH Anchor Distributions, or anchor Random Walk NFTs for Anchored-NFT Stellar Selection eligibility
-- [Allocation](https://app.cosmicsignature.com/allocation): Finalized cycle records and allocation tracks
-- [Contracts](https://app.cosmicsignature.com/contracts): Smart contract details and addresses
-- [Source Code](https://app.cosmicsignature.com/code): Source code and verification resources
-- [Security](https://app.cosmicsignature.com/security): Security model, verification resources, and participant safety notes
-- [Audits](https://app.cosmicsignature.com/audits): Hacken audit report, invariant fuzzing results, formal verification specifications in the contracts repository, and a verification checklist
-- [Risk Disclosures](https://app.cosmicsignature.com/risk-disclosures): Non-investment language, blockchain risks, and participant clarity
-- [Outreach](https://app.cosmicsignature.com/marketing): Outreach allocation program
-- [Imprint](https://app.cosmicsignature.com/imprint): Imprint Random Walk NFTs
+The checked Arbitrum One deployment uses V3 at 0xc1b97E1b0baC86248653B18706dbC5c8898c5c06, behind proxy 0x6a714Ae7B5b6eA520F6BCA23d2E609C4Fd5863F2. Parameters can change; read the contracts before acting.
 
-## Protocol Mechanics
+The Signature Allocation receives 20% of the ETH reserve, 1,000 CST in total and 3 sequential NFTs. Chrono-Warrior receives 15%; participant ETH Stellar Selection shares 5%; Anchor Distribution receives 5%; Public Goods receives 5%. Approximately half remains, with rounding and omitted-transfer exceptions.
 
-- Each cycle opens with ETH and CST Calibration Window mechanics; the CST window starts from a 12-hour reference and then changes on-chain
-- Every gesture adds the current time increment to Cycle Finalization Time; the increment starts at 1 hour and grows 1% per finalized cycle
-- When the Cycle Finalization Time expires, the Final Gesture participant may finalize the cycle and receive the Signature Allocation (25% of the Cycle Reserve, 1,000 CST, and 1 Cosmic Signature NFT); gestures remain possible until finalization executes
-- The Final Gesture participant has a 48-hour exclusive finalization window after the countdown reaches zero; afterwards anyone may finalize and the finalizer receives the Signature Allocation
-- Every gesture records a Stellar Selection entry and may imprint dynamic Participation CST
-- Participation CST uses a square-root formula based on elapsed time since the previous gesture; rapid gestures can imprint 0 CST, while longer quiet periods imprint more
-- CST gestures increase the CST Calibration Window by about 0.4%; ETH gestures decrease it by about 0.398%
-- In the vast majority of cycles, 24 Cosmic Signature NFTs are imprinted and paired with 24,000 CST
-- Three ETH Stellar Selection recipients share 4% of the Cycle Reserve
-- Ten NFT Stellar Selection recipients and ten Random Walk NFT anchor-holders each receive 1,000 CST and a Cosmic Signature NFT (selections are made with replacement)
-- The Chrono-Warrior receives 8% of the Cycle Reserve, 1,000 CST, and 1 Cosmic Signature NFT
-- The Endurance Champion and Final CST Gesture recipient each receive 1,000 CST and 1 Cosmic Signature NFT
-- Anchor Distributions route 6% of the Cycle Reserve to Cosmic Signature NFT anchor-holders; accumulated ETH is paid out when an anchor is released
-- Every NFT can be anchored only once, ever; releasing an anchor permanently ends that NFT's anchoring eligibility
-- 7% of each Cycle Reserve is forwarded to Protocol Guild (public goods)
-- Outreach Reserve imprints 3,000 CST per cycle, bringing typical fixed end-of-cycle/outreach CST imprints to 27,000 CST before dynamic per-gesture CST
-- Participants can make gestures with ETH or CST tokens (CST uses its own Calibration Window); the first gesture of each cycle must be an ETH gesture
-- Secondary ETH and attached-asset allocations use a 5-week retrieval timeout, after which anyone may retrieve unretrieved allocations for themselves
-- Random Walk NFT holders can attach an unused token to an ETH gesture for a 50% ETH Gesture Cost reduction; each Random Walk NFT can be used once for this discount
-- Random Walk NFTs can also be anchored for Anchored-NFT Stellar Selection eligibility (no ETH distributions)
+With every track present, finalization creates 26 Cosmic Signature NFTs and 27,000 fixed CST, including 3,000 CST for the Outreach Reserve. The Final CST Gesture and anchored Random Walk tracks are conditional. Three main NFTs do not create three separate CST allocations.
 
-## Tokens
+Participation CST is linear and credited to the previous participant when the next gesture executes. The first gesture creates no dynamic CST; finalization does not settle the last participant’s pending amount. Both participant ETH and NFT selections use the concurrent undiscounted, premium-free ETH base cost as weight, including CST gestures. Repeated recipients are possible.
 
-- **CST tokens**: ERC-20 coordination and utility tokens at the center of the protocol — CST gestures use their own Calibration Window, Cosmic Council coordination weight is denominated in CST, every gesture may imprint dynamic Participation CST, and 1,000 CST pairs with every imprinted Cosmic Signature NFT; trade on Uniswap on Arbitrum
-- **Cosmic Signature NFT**: ERC-721 generative art based on three-body problem physics; trades on Axiom Zero, the zero-fee marketplace
-- **Random Walk NFT**: Partner ERC-721 that can be attached to an ETH gesture for a one-time 50% ETH Gesture Cost reduction, or anchored for Anchored-NFT Stellar Selection eligibility
+V3 changes the CST price-decline rate, not a stored window duration. ETH attempts to increase the rate subject to a minimum-window guard; CST decreases the rate and resets its ceiling. Late prices can reach approximately five times the base cost; the premium does not increase selection weight or the following base price.
 
-## Artwork & Media
+The Final Gesture participant has a 48-hour exclusive finalization window after the deadline; afterwards anyone may finalize and the finalizer receives the Signature Allocation. Gestures remain possible until finalization. Each later gesture extends the stored deadline; the increment grows 1% per finalized cycle.
 
-- Every Cosmic Signature NFT is a deterministic render of a three-body-problem simulation seeded on-chain: the same seed always reproduces the same artwork, verifiable with the open-source Rust renderer
-- Artwork license: CC0 — no rights reserved
-- Each token has a canonical artwork page at https://app.cosmicsignature.com/detail/{tokenId} with the full-resolution PNG and an orbit video
-- Recent artwork pages and their image files are listed in the image sitemap: https://app.cosmicsignature.com/sitemap-nfts.xml
-- Both home pages (https://cosmicsignature.com/ and https://app.cosmicsignature.com/) feature a rotating, randomly chosen imprinted Signature from the collection
+Secondary ETH and attached assets have a 5-week retrieval timeout; afterwards anyone may retrieve unretrieved allocations for themselves. Each NFT can be anchored only once. For the ETH cost reduction, each Random Walk NFT can be used once.
 
-## Ecosystem
+Public Goods ETH first goes to the configured vault. A separate permissionless transaction forwards its balance to the current beneficiary, presently Protocol Guild. The owner can change that beneficiary. A failed transfer can leave the share in the reserve.
 
-- [Axiom Zero](https://www.axiomzero.market/cosmic-signature): The zero-fee NFT marketplace for Cosmic Signature and Random Walk NFTs on Arbitrum. Trades settle directly on-chain, and every token page labels the NFT's anchor status (never anchored vs anchored) read live from the anchoring contracts.
-- [Chaos Zero](https://chaoszero.com): The prediction market built specifically for Cosmic Signature. Each Performance Cycle opens one question — will this cycle finalize with more gestures than the previous one? Positions are denominated in CST and fully collateralized by construction, with no owner or admin keys.
-- [Uniswap CST trading](https://app.uniswap.org/swap?chain=arbitrum&inputCurrency=NATIVE&outputCurrency=0xAD91843e6A58Ba560F577E676986AFb1dba6FBA0): Swap ETH for CST on Arbitrum.
+Artwork reproduction requires its seed, renderer revision, configuration and compatible toolchain. Image-reference checks are currently manual. Historical audit reports describe their reviewed revisions; the V3 implementation is not currently verified on Sourcify. Ownership powers remain and have no automatic sunset.
 
-## Community
+## Ecosystem and media
 
-- Twitter/X: https://x.com/CosmicSignature
-- Discord: https://discord.gg/bGnPn96Qwt
+[Axiom Zero](https://www.axiomzero.market/cosmic-signature) is the zero-fee NFT marketplace for Cosmic Signature and Random Walk NFTs.
 
-## Technical
+[Chaos Zero](https://chaoszero.com) is the prediction market about whether a cycle has more gestures than the previous one.
 
-- Blockchain: Arbitrum (Ethereum Layer 2)
-- Smart contracts: Open-source Solidity contracts, exact-match verified on-chain; owner-controlled parameters until ownership moves under Cosmic Council control (independently audited by Hacken; report and formal verification specifications: https://app.cosmicsignature.com/audits)
-- NFT art: Generated from on-chain seeds using an open-source Rust program
-- Frontend: Next.js, React, TypeScript
+[CST on Uniswap](https://app.uniswap.org/swap?chain=arbitrum&inputCurrency=NATIVE&outputCurrency=0xAD91843e6A58Ba560F577E676986AFb1dba6FBA0)
 
-## Optional
+[Artwork pages](https://app.cosmicsignature.com/detail/{tokenId}) · [Image sitemap](https://app.cosmicsignature.com/sitemap-nfts.xml)
 
-- [Full documentation](https://cosmicsignature.com/llms-full.txt)
+[Source code](https://github.com/PredictionExplorer/Cosmic-Signature) · [Renderer](https://github.com/PredictionExplorer/CS-Image-Generation) · [X](https://x.com/CosmicSignature) · [Discord](https://discord.gg/bGnPn96Qwt)
+
+[Full documentation](https://cosmicsignature.com/llms-full.txt)
+
+## English
+
+Cosmic Signature is a procedural on-chain art protocol on Arbitrum. During each Performance Cycle, participants make gestures with ETH or CST, and every gesture helps shape the final Signature: deterministic NFT artwork generated from on-chain data and rendered through a three-body physics simulation.
+
+Cosmic Signature is not related to the COSMIC cancer mutation database or COSMIC mutational signatures in biology. It is an on-chain art protocol and app.
+
+- [/](https://cosmicsignature.com/)
+- [/about](https://cosmicsignature.com/about)
+- [/white-paper](https://cosmicsignature.com/white-paper)
+- [/learn](https://cosmicsignature.com/learn)
+- [/quiz](https://cosmicsignature.com/quiz)
+- [/](https://app.cosmicsignature.com/)
+- [/current-cycle](https://app.cosmicsignature.com/current-cycle)
+- [/how-it-works](https://app.cosmicsignature.com/how-it-works)
+- [/faq](https://app.cosmicsignature.com/faq)
+- [/gallery](https://app.cosmicsignature.com/gallery)
+- [/statistics](https://app.cosmicsignature.com/statistics)
+- [/anchoring](https://app.cosmicsignature.com/anchoring)
+- [/allocation](https://app.cosmicsignature.com/allocation)
+- [/contracts](https://app.cosmicsignature.com/contracts)
+- [/code](https://app.cosmicsignature.com/code)
+- [/security](https://app.cosmicsignature.com/security)
+- [/audits](https://app.cosmicsignature.com/audits)
+- [/risk-disclosures](https://app.cosmicsignature.com/risk-disclosures)
+- [/terms](https://app.cosmicsignature.com/terms)
+- [/privacy](https://app.cosmicsignature.com/privacy)
+- [/marketing](https://app.cosmicsignature.com/marketing)
+- [/imprint](https://app.cosmicsignature.com/imprint)
+- [/my-tokens](https://app.cosmicsignature.com/my-tokens)
+- [/my-anchors](https://app.cosmicsignature.com/my-anchors)
+- [/my-allocations](https://app.cosmicsignature.com/my-allocations)
+- [/my-statistics](https://app.cosmicsignature.com/my-statistics)
+
+[Version 1.3 — October 21, 2026](https://cosmicsignature.com/white-paper)
+
+Every Cosmic Signature NFT visualizes three celestial bodies orbiting under Newtonian gravity. Its seed is recorded on-chain; an open-source renderer creates the image off-chain. Reproduction uses that seed, the matching renderer revision and configuration, and a compatible toolchain.
+
+### Getting started
+
+#### What is Cosmic Signature?
+
+Cosmic Signature is a procedural on-chain art protocol on Arbitrum. Participants make gestures during a Performance Cycle; every gesture shapes the cycle’s final Signature. When the cycle finalizes, the protocol distributes its reserves across a fixed set of allocation tracks — including Protocol Guild, the funding mechanism for 170+ Ethereum core contributors.
+
+#### How does a Performance Cycle work?
+
+Each cycle opens with an ETH Calibration Window for the first gesture. That first gesture starts the Cycle Finalization Time, currently about 24 hours by default. Subsequent gestures with ETH or CST add the current time increment to the stored finalization time, with the increment starting at one hour and growing 1% per finalized cycle. When the Cycle Finalization Time expires, the participant who made the Final Gesture has an exclusive 48-hour window to finalize the cycle and retrieve the Signature Allocation; gestures remain possible until the cycle is actually finalized.
+
+#### What types of gestures are available?
+
+Gestures use ETH or CST. The first gesture of every cycle must be an ETH gesture. An unused Random Walk NFT owned by the sender can reduce one ETH Gesture Cost by 50%; it remains in its owner’s wallet. Cosmic Signature NFTs are allocation and anchoring assets, not gesture payment. CST base cost declines at an on-chain rate; both currencies can carry the late-gesture premium.
+
+#### Can I participate if I don’t own any NFTs?
+
+Yes. Anyone can participate in a Cosmic Signature Performance Cycle by making a gesture. An unused Random Walk NFT can be attached to an ETH gesture for a 50% Gesture Cost reduction.
+
+#### How can I get involved?
+
+You can participate by making gestures during a Performance Cycle, or by contributing an NFT from your project to be attached to a participant’s gesture. Join the Discord to meet other participants.
+
+#### How long does each Performance Cycle last?
+
+Each cycle begins when the first ETH gesture is made, which starts the Cycle Finalization Time at roughly 24 times the current time increment (about one day at launch). Every later gesture adds the current time increment, which started at exactly one hour and grows 1% with each finalized cycle. A cycle can therefore last much longer than a day if gestures keep arriving before finalization.
+
+#### Can I make multiple gestures in one cycle?
+
+Yes. Each gesture records a weighted Stellar Selection entry. In V3, a later gesture credits Participation CST to the previous participant for the elapsed interval. The first gesture credits none, and finalization does not settle additional Participation CST for the final participant. Repeated gestures by the same address can credit that address.
+
+### Allocations & distributions
+
+#### What is the Signature Allocation?
+
+The Signature Allocation goes to whoever finalizes the cycle. For the first 48 hours after the Cycle Finalization Time, only the participant who made the Final Gesture can finalize; after that, anyone can. It includes three sequential Cosmic Signature NFTs, a Recognition CST imprint of 1,000 CST, and 20% of the Cycle Reserve in ETH, plus any tokens or NFTs attached to participant gestures during the cycle.
+
+#### What do I receive for each gesture?
+
+Every gesture records a weighted Stellar Selection entry and updates the cycle’s timing records. V3 Participation CST grows linearly with the time since the previous gesture, but it is credited to that previous participant when the next gesture executes. The opening gesture credits none. Finalization does not settle additional Participation CST for the final participant.
+
+#### How does Stellar Selection work?
+
+At finalization, 3 participant selections share 5% of the reserve in ETH, and 10 participant selections each receive 1,000 CST and one NFT. Both tracks use each gesture’s undiscounted, premium-free ETH base cost as its weight. CST gestures use the concurrent ETH base cost. Selections are made with replacement, so repeats are possible. A separate track selects 10 active Random Walk NFT entries, each carrying 1,000 CST and one NFT, when any are anchored.
+
+#### How are random selections made?
+
+Both participant ETH and NFT Stellar Selections use the accumulated undiscounted, premium-free ETH base cost of the participant’s gestures as weight. CST gestures use the concurrent ETH base cost. Random Walk NFT selection instead uses active anchored NFT entries. All selections allow repeats. Entropy is derived from block context and fallback inputs at finalization; it is not an externally verified randomness service and can be influenced by transaction timing and block production.
+
+#### How do I retrieve my allocation if I’m a recipient?
+
+The Final Gesture participant has 48 hours after the deadline to finalize exclusively.
+
+After that, whoever finalizes receives the entire Signature Allocation: its ETH share, 1,000 CST in total, three sequential Cosmic Signature NFTs, and attached-asset beneficiary rights.
+
+Secondary ETH and attached assets sit in the Allocations Wallet with a separate retrieval deadline, currently 5 weeks. After that deadline, anyone may retrieve an unretrieved allocation for themselves. CST and NFTs already imprinted directly to a recipient are not subject to that retrieval timeout.
+
+#### How does Anchoring work?
+
+Cosmic Signature NFTs can be anchored to the protocol to receive ETH Anchor Distributions: each finalized cycle allocates 5% of the Cycle Reserve, split equally per anchored Cosmic Signature NFT, and the accumulated ETH is paid out when you release the anchor.
+
+Random Walk NFTs can also be anchored, but only for Anchored-NFT Stellar Selection eligibility — selected anchor-holders receive CST and Cosmic Signature NFTs, not ETH.
+
+Two rules to know: every NFT can be anchored only once, ever (after you release an anchor, that NFT can never be anchored again), and if no Cosmic Signature NFTs are anchored when a cycle finalizes, that cycle’s 5% simply stays in the Cycle Reserve. CST (ERC-20) cannot be anchored. Visit the My Anchors page (from your account menu) to manage anchors.
+
+#### What is the Outreach Reserve?
+
+You can receive CST tokens (ERC-20) for helping promote the protocol. The Outreach Reserve imprints 3,000 CST per cycle and distributes it to ecosystem contributors. Contact the Outreach Custodian via Discord for guidance.
+
+#### How many Cosmic Signature NFTs are imprinted each cycle?
+
+With every track present, a cycle imprints 26 Cosmic Signature NFTs: three for the Signature Allocation, one each for the Final CST Gesture, Endurance Champion and Chrono-Warrior, 10 for participant selection and 10 for anchored Random Walk NFT selection. The main allocation receives 1,000 CST once for all its NFTs; each other NFT allocation receives 1,000 CST. A cycle without CST gestures or active Random Walk anchors has the corresponding track skipped for that cycle.
+
+#### What happens to the remaining ETH in the Cycle Reserve?
+
+About half of the reserve carries into the next cycle. Integer rounding, a missing anchoring track, or a failed Public Goods transfer can retain more. Carryover does not guarantee that a later cycle begins with a larger balance.
+
+#### What happens to tokens or NFTs attached to gestures?
+
+ERC-20 tokens or ERC-721 NFTs attached to gestures are held in escrow by the Allocations Wallet contract; they do not join the ETH Cycle Reserve. After finalization, the cycle beneficiary (normally the Final Gesture participant) has exclusive priority to retrieve them. If attached assets remain unretrieved past the secondary retrieval timeout, currently 5 weeks by default, the contracts permit anyone to retrieve them for themselves.
+
+#### Who receives the public-goods allocation from the Cycle Reserve?
+
+Finalization attempts to transfer 5% of the reserve to the Public Goods Vault. Anyone can then send the vault’s balance to its configured beneficiary in a separate transaction. The current beneficiary is Protocol Guild; the vault owner can change it. A failed transfer from the protocol leaves that share in the reserve without necessarily reverting finalization. Ownership has not automatically moved to the Cosmic Council.
+
+### Cycle mechanics
+
+#### How does Gesture Cost change across a cycle?
+
+ETH opening cost descends through its Calibration Window. Each ETH gesture then increases the premium-free ETH base cost by the configured step plus one wei. CST base cost declines at an adaptive on-chain rate and resets after CST gestures. Both final prices carry a late premium near the deadline; this premium does not increase later base costs or selection weights.
+
+#### What is the Calibration Window?
+
+A Calibration Window describes a declining base cost. The opening ETH cost falls to about 1/200 of its ceiling: exactly floor(ceiling / 200) + 1 wei. CST base cost is max(ceiling − elapsed seconds × decline rate, 0). V3 changes that decline rate, not the old stored duration. A late premium can apply to either currency; a zero CST base remains zero, so a free CST gesture is possible; network gas still applies.
+
+#### How is Participation CST calculated?
+
+V3 computes floor(elapsed seconds × multiplier / increment in microseconds), in CST smallest units. Divide by 10^18 to express CST.
+
+At the original one-hour increment the rate is about 1 CST per minute; later increments change that rate. The next gesture credits the previous participant, the first gesture credits none, and finalization does not pay a final dynamic amount. Elapsed time alone is not a retrievable CST balance.
+
+#### What is Minimum CST Reward Protection?
+
+The minimum Participation CST argument constrains the amount credited to the previous participant. It does not promise CST to the sender unless the sender is also that participant. The app can apply this protection when your address holds the latest position; the opening ETH gesture skips the check. Cost caps are separate protections. Review the preview and recipient before confirming.
+
+#### How does each gesture change the CST Calibration Window?
+
+V3 adapts the decline rate. At divisor 100, an ETH gesture proposes rate + floor(rate / 100); it is accepted only if the resulting rate times 180 seconds does not exceed the current ceiling. A CST gesture uses rate − floor(rate / 101), then resets the ceiling to the largest of twice its premium-free CST base cost, 1 CST, and the new rate times 180 seconds. An ETH rate change applies to the full elapsed interval. The safeguard is not a waiting period between gestures.
+
+#### What is the Open-Finalization Window?
+
+Only the Final Gesture participant can finalize during the first 48 hours after the deadline. Thereafter any caller can finalize. The finalizer receives the full Signature Allocation, including 1,000 CST in total and three sequential Cosmic Signature NFTs. Gestures remain possible until finalization; they extend the stored deadline, which can still remain in the past.
+
+#### What is an Endurance Champion?
+
+The participant who remained the most recent gesture maker for the longest consecutive interval within a cycle (the longest gap before another gesture arrived). When the cycle finalizes, the Endurance Champion receives a Recognition CST imprint of 1,000 CST and one Cosmic Signature NFT.
+
+#### What is the Final CST Gesture?
+
+The Final CST Gesture is the last gesture made with CST tokens during a cycle. When the cycle finalizes, the participant who made it receives a Recognition CST imprint of 1,000 CST and one Cosmic Signature NFT.
+
+#### What is a Chrono-Warrior?
+
+The participant who held the Endurance Champion position for the longest consecutive interval. Analogous to the Endurance Champion being the longest-reigning recent gesture maker, the Chrono-Warrior is the longest-reigning Endurance Champion. When the cycle finalizes, the Chrono-Warrior receives 15% of the Cycle Reserve in ETH, 1,000 CST, and one Cosmic Signature NFT.
+
+#### Does the time added per gesture always stay the same?
+
+No. The time added after each gesture started at exactly one hour at launch and grows by 1% every time a cycle finalizes. Because a larger increment also makes each cycle last longer, the growth naturally slows down in calendar time.
+
+#### Why does the time added per gesture increase over time?
+
+It sets the long-term pace of imprinting. As cycles lengthen, fewer new Cosmic Signature NFTs are imprinted in the same span of time.
+
+#### How does the increase in time per gesture affect the protocol?
+
+As the time added per gesture increases, cycles run longer on average. The change is gradual, preserving a smooth participation experience while limiting total Cosmic Signature NFT supply over long time horizons.
+
+#### What happens if two gestures are submitted at the same time?
+
+The sequencer orders transactions on Arbitrum. Each gesture is checked against the protocol state when it executes. A later gesture can still succeed, but an earlier one may change its cost or Participation CST amount. If those changes exceed the protections set for your gesture, the transaction will revert.
+
+#### Is there a strategic element in Cosmic Signature?
+
+Yes. Participant timing, gesture frequency, and method (ETH vs CST vs Random Walk attachment) all shape how allocations distribute. The social dynamics and protocol design are designed so that multiple strategies can succeed across different allocation tracks.
 
 ## 中文概览
 
-Cosmic Signature 是运行于 Arbitrum 的程序化链上艺术协议。参与者在演绎周期中落笔；每一笔都会影响周期最终的签名作品。周期收官后，协议按公开规则将周期储备发往一组固定的分配轨道，其中包括支持以太坊核心贡献者的 Protocol Guild。
+Cosmic Signature 是 Arbitrum 上的程序化链上艺术协议。在每个演绎周期中，参与者以 ETH 或 CST 落笔；每一笔都在塑造最终的签名——一件从链上数据生成、经三体物理模拟渲染而成的确定性 NFT 艺术作品。
 
-Cosmic Signature 与 COSMIC 癌症突变数据库及生物学中的 COSMIC 突变特征没有关联。
+Cosmic Signature 与 COSMIC 癌症突变数据库及生物学中的 COSMIC 突变特征没有关联。本项目是链上艺术协议及应用。
 
-### 中文关键页面
+- [/zh/](https://cosmicsignature.com/zh/)
+- [/zh/about](https://cosmicsignature.com/zh/about)
+- [/zh/white-paper](https://cosmicsignature.com/zh/white-paper)
+- [/zh/learn](https://cosmicsignature.com/zh/learn)
+- [/zh/quiz](https://cosmicsignature.com/zh/quiz)
+- [/zh/](https://app.cosmicsignature.com/zh/)
+- [/zh/current-cycle](https://app.cosmicsignature.com/zh/current-cycle)
+- [/zh/how-it-works](https://app.cosmicsignature.com/zh/how-it-works)
+- [/zh/faq](https://app.cosmicsignature.com/zh/faq)
+- [/zh/gallery](https://app.cosmicsignature.com/zh/gallery)
+- [/zh/statistics](https://app.cosmicsignature.com/zh/statistics)
+- [/zh/anchoring](https://app.cosmicsignature.com/zh/anchoring)
+- [/zh/allocation](https://app.cosmicsignature.com/zh/allocation)
+- [/zh/contracts](https://app.cosmicsignature.com/zh/contracts)
+- [/zh/code](https://app.cosmicsignature.com/zh/code)
+- [/zh/security](https://app.cosmicsignature.com/zh/security)
+- [/zh/audits](https://app.cosmicsignature.com/zh/audits)
+- [/zh/risk-disclosures](https://app.cosmicsignature.com/zh/risk-disclosures)
+- [/zh/terms](https://app.cosmicsignature.com/zh/terms)
+- [/zh/privacy](https://app.cosmicsignature.com/zh/privacy)
+- [/zh/marketing](https://app.cosmicsignature.com/zh/marketing)
+- [/zh/imprint](https://app.cosmicsignature.com/zh/imprint)
+- [/zh/my-tokens](https://app.cosmicsignature.com/zh/my-tokens)
+- [/zh/my-anchors](https://app.cosmicsignature.com/zh/my-anchors)
+- [/zh/my-allocations](https://app.cosmicsignature.com/zh/my-allocations)
+- [/zh/my-statistics](https://app.cosmicsignature.com/zh/my-statistics)
 
-- [中文主页](https://cosmicsignature.com/zh)：协议与链上艺术概览
-- [关于](https://cosmicsignature.com/zh/about)：协议主体、官方链接与名称辨析
-- [白皮书](https://cosmicsignature.com/zh/white-paper)：协议机制与设计的完整说明（中英双语，附 PDF）
-- [学习](https://cosmicsignature.com/zh/learn)：演绎周期、三体艺术、锚定与公共物品说明
-- [中文应用](https://app.cosmicsignature.com/zh)：当前周期与落笔界面
-- [画廊](https://app.cosmicsignature.com/zh/gallery)：浏览已铭刻的 Cosmic Signature NFT
-- [运作原理](https://app.cosmicsignature.com/zh/how-it-works)：完整协议机制
-- [常见问题](https://app.cosmicsignature.com/zh/faq)：按主题整理的中文解答
-- [统计](https://app.cosmicsignature.com/zh/statistics)：公开协议数据
-- [锚定](https://app.cosmicsignature.com/zh/anchoring)：锚定规则与派发记录
-- [合约](https://app.cosmicsignature.com/zh/contracts)：已部署合约地址
-- [安全](https://app.cosmicsignature.com/zh/security)：验证资源与参与安全说明
-- [审计](https://app.cosmicsignature.com/zh/audits)：Hacken 审计报告与形式化验证背景
-- [风险披露](https://app.cosmicsignature.com/zh/risk-disclosures)：区块链、钱包与协议参与风险
+[版本 1.0 — 2026年8月](https://cosmicsignature.com/zh/white-paper)
 
-### 协议要点
+每枚 Cosmic Signature NFT 都呈现牛顿引力下的三体运动。种子记录在链上，图像与视频在链下渲染。使用对应的渲染器版本、配置与兼容工具链，才能核对复现结果。
 
-- 每个周期以 ETH 与 CST 校准窗口机制开启；CST 窗口从 12 小时基准出发，并随链上参与变化
-- 每次落笔都会按当前时间增量延长收官倒计时；该增量从 1 小时起步，每有一个周期收官便增长 1%
-- 倒计时归零后，写下收官之笔的参与者拥有 48 小时专属收官窗口；之后任何人均可收官，实际收官者获得签名分配
-- 每周期储备的 25% 进入签名分配，8% 发往时之勇士，4% 分为 3 份，经 ETH 星选发放，6% 用于锚定派发，7% 发往 Protocol Guild，约 50% 滚入下一周期
-- 绝大多数周期会铭刻 24 枚 Cosmic Signature NFT，并配套 24,000 CST；连同 3,000 CST 推广储备，典型固定铭刻总量为 27,000 CST，另有按落笔动态计算的参与 CST
-- 每枚 Cosmic Signature NFT 或 Random Walk NFT 一生只能锚定一次；解锚后不再具备锚定资格
-- 未使用的 Random Walk NFT 可附加至一笔 ETH 落笔，使该笔 ETH 落笔价格降低 50%；每枚 Random Walk NFT 仅可用于一次价格减免
-- 次级 ETH 与已附加资产设有 5 周取回期限；期限结束后，任何人都可为自己取回仍未取回的分配
+### 开始使用
 
-### 生态
+#### Cosmic Signature 是什么？
 
-- [Axiom Zero](https://www.axiomzero.market/cosmic-signature)：Arbitrum 上不收平台费的 NFT 市场
-- [Chaos Zero](https://chaoszero.com)：面向 Cosmic Signature 周期的预测市场；每周期的问题是本周期收官时的落笔数是否高于上一周期
-- [Uniswap CST 兑换](https://app.uniswap.org/swap?chain=arbitrum&inputCurrency=NATIVE&outputCurrency=0xAD91843e6A58Ba560F577E676986AFb1dba6FBA0)：在 Arbitrum 上兑换 CST
+Cosmic Signature 是 Arbitrum 上的程序化链上艺术协议。参与者在演绎周期中落笔，每一笔都会塑造这一周期最终的签名。周期收官后，协议将储备分配至一组固定的轨道，其中包括支持 170 多位以太坊核心贡献者的 Protocol Guild。
+
+#### 演绎周期如何运作？
+
+每个周期都以首笔落笔的 ETH 校准窗口开启。首笔落笔会启动周期收官倒计时，当前默认约为 24 小时。此后每笔 ETH 或 CST 落笔都会把当前时间增量加到链上收官时间；该增量初始为 1 小时，并在每个周期收官后增长 1%。倒计时结束后，收官之笔的参与者享有 48 小时的专属收官窗口，可完成周期收官并取回签名分配；在周期实际收官前，仍可继续落笔。
+
+#### 可以用哪些方式落笔？
+
+每个周期必须由 ETH 落笔开启，此后可使用 ETH 或 CST。拥有尚未用于减免的 Random Walk NFT 时，可将其用于 ETH 落笔减免；该 NFT 不会因此转出。Cosmic Signature NFT 用于分配与锚定，不能支付落笔。CST 基础价格随时间下降，下降速率会随落笔调整；临近收官时，两种落笔价格还可能包含溢价。
+
+#### 没有 NFT 也能参与吗？
+
+可以。任何人都能在 Cosmic Signature 的演绎周期中落笔。若拥有尚未使用的 Random Walk NFT，也可将其附加至一笔 ETH 落笔，使落笔价格降低 50%。每枚 Random Walk NFT 仅可用于这项减免一次。
+
+#### 有哪些参与方式？
+
+你可以在演绎周期中落笔，也可以将自己项目的 NFT 贡献给协议，供参与者随落笔附加。加入 Discord，即可认识其他参与者。
+
+#### 每个演绎周期会持续多久？
+
+首笔 ETH 落笔会开启周期，并将收官倒计时设为当前时间增量的约 24 倍（协议上线时约为 1 天）。此后每笔落笔都会加入当前时间增量；该增量初始恰为 1 小时，并在每个周期收官后增长 1%。因此，只要在收官前持续有人落笔，一个周期就可能远超 1 天。
+
+#### 一个周期内可以多次落笔吗？
+
+可以。每笔落笔都会增加星选权重，并更新坚守记录。下一笔落笔执行时，会按间隔时长向上一笔的参与者铭刻参与 CST；不是通常向本次提交者发放。首笔不铭刻参与 CST，收官也不会结算最后一笔之后的这项累计量。
+
+### 分配与派发
+
+#### 什么是签名分配？
+
+签名分配归实际收官者。倒计时归零后的 48 小时内，只有收官之笔参与者可以收官；此后任何人都可收官并成为受益方。分配包括周期储备的 20% ETH、合计 1,000 CST、3 枚连续编号的 Cosmic Signature NFT，以及对该周期附加资产的取回权。
+
+#### 每次落笔会带来什么？
+
+每笔落笔记录一份加权星选资格，更新坚守记录，并可能为上一笔参与者铭刻参与 CST。V3 按间隔秒数线性计算，合约以最小单位截断；等待本身不会形成可取回余额，必须有下一笔落笔执行。首笔不发放这项 CST，收官也不结算最后一笔之后的累计量。
+
+#### 星选如何运作？
+
+参与者 ETH 星选与 NFT 星选都采用加权、放回选择。每笔落笔的权重，是当时未减免、未加临近收官溢价的 ETH 基础价格；CST 落笔也使用同一时刻的 ETH 基础价格。3 次选择均分 5% ETH，另 10 次选择各获配 1,000 CST 与 1 枚 NFT。同一地址可多次获配。Random Walk NFT 锚定星选独立按已锚定 NFT 资格选择。
+
+#### 程序化随机选择是怎样完成的？
+
+参与者的 ETH 与 NFT 星选都按累计权重选择，而非简单按落笔次数计。权重取每笔发生时未减免、未含溢价的 ETH 基础价格，CST 落笔也一样。随机输入来自链上区块上下文，并非独立的可验证随机服务；不保证完全无偏。Random Walk NFT 锚定星选使用独立的已锚定 NFT 资格池。
+
+#### 成为获配者后，如何取回分配？
+
+获配者可通过应用与协议合约取回分配。周期收官倒计时结束后，收官之笔参与者享有 48 小时的专属时间，可完成周期收官并取回签名分配。
+
+此后进入公开收官窗口：任何人都可发起收官交易，智能合约会把实际完成收官的人视为周期受益方——收官者将获得整份签名分配，包括 ETH 份额、1,000 CST 铭刻、Cosmic Signature NFT，以及对已附加资产的优先权。
+
+次级 ETH、已附加代币与已附加 NFT 会由分配钱包托管，并采用另一项取回超时设置，当前默认为 5 周；超时后，合约允许任何人为自己取回仍未取回的分配。请及时处理。
+
+#### 锚定如何运作？
+
+Cosmic Signature NFT 可锚定至协议，以获得 ETH 锚定派发：每个已收官周期会划出周期储备的 5%，按当时已锚定的 Cosmic Signature NFT 数量平均分配；累积的 ETH 会在解锚时派发。
+
+Random Walk NFT 也可以锚定，但只用于取得锚定 NFT 星选资格——被选中的锚定者会获得 CST 与 Cosmic Signature NFT，而不是 ETH。
+
+还需注意两条规则：每枚 NFT 永远只能锚定一次（解锚后不可再次锚定）；若周期收官时没有任何 Cosmic Signature NFT 处于锚定状态，该周期的 5% 会留在周期储备中。CST（ERC-20）不能锚定。可从账户菜单进入"我的锚定"页面管理锚定。
+
+#### 什么是推广储备？
+
+帮助推广协议可获得 CST 代币（ERC-20）。推广储备每个周期铭刻 3,000 CST，并将其发放给生态贡献者。具体方式可在 Discord 联系推广托管人。
+
+#### 每个周期会铭刻多少枚 Cosmic Signature NFT？
+
+各轨道均满足条件时，收官会铭刻 26 枚 Cosmic Signature NFT：签名分配 3 枚，时之勇士、坚守冠军与 CST 收官之笔各 1 枚，参与者星选 10 枚，Random Walk NFT 锚定星选 10 枚。签名分配的 CST 合计仅为 1,000，不按其中的 NFT 枚数重复计算。没有 CST 落笔或没有已锚定 Random Walk NFT 时，相关轨道会跳过。
+
+#### 周期储备中剩余的 ETH 会怎样处理？
+
+未分配的 ETH 留在合约中，作为下一周期的起始储备。按当前配置通常约为一半，另可能留有取整余数或未成功转出的份额。这不保证下一周期的储备一定更大。
+
+#### 随落笔附加的代币或 NFT 会怎样处理？
+
+随落笔附加的 ERC-20 代币或 ERC-721 NFT 由分配钱包合约托管，不会进入 ETH 周期储备。周期收官后，周期受益方（通常为收官之笔参与者）享有优先取回权。若超出次级取回期限仍无人取回，目前默认期限为 5 周，合约将允许任何人为自己取回这些资产。
+
+#### 周期储备中的公共物品分配会发给谁？
+
+当前公共物品份额为周期储备的 5%。收官时，合约尝试将其转入公共物品金库；任何人随后都可另发一笔交易，将金库余额转给当前受益方 Protocol Guild。核心合约转入金库失败时，该份额可留在储备中而不阻止收官。受益方可由金库所有者更改；宇宙议会不会自动取得该权限。
+
+### 周期机制
+
+#### 一个周期内，落笔价格如何变化？
+
+ETH 开场基础价格在校准窗口中下降；开场后，每笔 ETH 落笔会提高下一笔基础价格。CST 基础价格按链上下降速率随时间减少，ETH 落笔尝试加快该速率，CST 落笔减慢该速率并重设上限。两种价格都可能在临近收官时加上溢价，所以最终价格不保证始终下降。
+
+#### 什么是校准窗口？
+
+校准窗口让基础价格随时间下降。ETH 开场基础价格降至上限的 1/200 向下取整再加 1 wei；CST 基础价格为上限减去经过秒数乘下降速率，最低为零。V3 的 CST 窗口是按速率推算的，并非固定初始时长。临近收官溢价另计；CST 基础价格为零时，加上溢价仍为零。
+
+#### 参与 CST 如何计算？
+
+V3 按经过秒数线性计算参与 CST：秒数乘以链上乘数，再除以以微秒计的周期增量，向下取整到 CST 最小单位。按原始一小时时间增量，约每分钟 1 CST；周期增量变大后，该速率会略降。下一笔落笔把计算出的全额铭刻给上一笔参与者；首笔不发放，收官也不结算最后一笔之后的累计量。
+
+原始一小时时间增量下的近似示例：0 秒后为 0 CST、1 秒后为 0.017 CST、60 秒后为 1 CST、1 小时后为 60 CST、1 天后为 1,440 CST。
+
+#### 什么是最低 CST 铭刻保护？
+
+这项下限约束的是本次交易向上一笔参与者铭刻的参与 CST，通常不是提交者自己收到的数量。若提交者也是上一笔参与者，下限才保护其自身的这次铭刻。其他落笔先执行时，收取对象和金额都可能改变。首笔 ETH 落笔跳过这项检查；价格上限与网络费用另行处理。
+
+#### 每笔落笔如何改变 CST 校准窗口？
+
+V3 在链上保存 CST 价格下降速率，窗口时长由上限与速率推算。按当前除数，ETH 落笔尝试将速率增加其百分之一，但必须满足最短窗口检查；CST 落笔将速率减去其 1/101。CST 落笔还会重设上限，取不含溢价的基础花费两倍、配置下限与新速率乘以 180 秒三者中的最大值。该检查不是落笔冷却期。
+
+#### 什么是公开收官窗口？
+
+周期收官倒计时结束后，收官之笔参与者享有 48 小时的专属收官时间。若未在该窗口内完成收官，任何人都可发起收官交易，智能合约会把实际收官者设为周期受益方。收官者将获得完整的签名分配，包括 ETH 份额、1,000 CST、Cosmic Signature NFT，以及对已附加资产的优先权。因此，收官之笔参与者应在专属窗口结束前完成收官。即使该参与者离开，公开收官机制也能让协议继续运行。
+
+#### 什么是坚守冠军？
+
+一个周期内，保持“最近一笔落笔者”身份时间最长的参与者，即下一笔落笔出现前拥有最长连续间隔的人，会成为坚守冠军。周期收官时，坚守冠军将获得 1,000 CST 的表彰铭刻与 1 枚 Cosmic Signature NFT。
+
+#### 什么是 CST 收官之笔？
+
+CST 收官之笔是一个周期中最后一笔使用 CST 完成的落笔。周期收官时，完成该笔落笔的参与者将获得 1,000 CST 的表彰铭刻与 1 枚 Cosmic Signature NFT。
+
+#### 什么是时之勇士？
+
+时之勇士是在坚守冠军位置上连续保持最久的参与者。坚守冠军对应保持"最近一笔落笔者"身份最久的人，时之勇士则对应保持坚守冠军身份最久的人。周期收官时，时之勇士将获得周期储备中 15% 的 ETH、1,000 CST 与 1 枚 Cosmic Signature NFT。
+
+#### 每笔落笔增加的时间始终相同吗？
+
+不会。协议上线时，每笔落笔增加的时间恰为 1 小时；此后每当一个周期收官，增量都会增长 1%。由于增量变大也会拉长每个周期，按日历时间看，这种增长会自然放缓。
+
+#### 为什么每笔落笔增加的时间会逐步增长？
+
+这一机制决定 Cosmic Signature NFT 的长期铭刻节奏：周期越长，同一段时间内铭刻的新 NFT 越少。
+
+#### 落笔时间增量上升会怎样影响协议？
+
+随着每笔落笔增加的时间变长，周期的平均持续时间也会延长。这一变化循序渐进，既保持平稳的参与体验，也限制长期范围内 Cosmic Signature NFT 的总供应增长。
+
+#### 两笔落笔同时提交会怎样？
+
+Arbitrum 的排序器会确定交易顺序。每笔落笔都按执行时的协议状态检查；后一笔仍可能成功，但前一笔可能改变落笔价格或参与 CST 铭刻量。若变化超出你设置的保护范围，交易就会回退。
+
+#### 参与 Cosmic Signature 是否需要策略？
+
+需要。落笔时机、频率和方式（ETH、CST 或附加 Random Walk NFT）都会影响各条分配轨道的结果。协议机制与参与者之间的互动允许多种策略在不同轨道上发挥作用。
 
 ## 繁體中文（台灣）概覽
 
-Cosmic Signature 是運作於 Arbitrum 的程序化鏈上藝術協議。參與者在演繹週期中落筆；每一筆都會影響週期最終的簽名作品。週期收官後，協議按公開規則將週期儲備發往一組固定的分配軌道，其中包括支持以太坊核心貢獻者的 Protocol Guild。
+Cosmic Signature 是 Arbitrum 上的程序化鏈上藝術協議。在每個演繹週期中，參與者以 ETH 或 CST 落筆；每一筆都在塑造最終的簽名——一件從鏈上資料生成、經三體物理模擬渲染而成的確定性 NFT 藝術作品。
 
-Cosmic Signature 與 COSMIC 癌症突變資料庫及生物學中的 COSMIC 突變特徵沒有關聯。
+Cosmic Signature 與 COSMIC 癌症突變資料庫及生物學中的 COSMIC 突變特徵沒有關聯。本專案是鏈上藝術協議及應用程式。
 
-### 台灣繁體中文關鍵頁面
+- [/zh-TW/](https://cosmicsignature.com/zh-TW/)
+- [/zh-TW/about](https://cosmicsignature.com/zh-TW/about)
+- [/zh-TW/white-paper](https://cosmicsignature.com/zh-TW/white-paper)
+- [/zh-TW/learn](https://cosmicsignature.com/zh-TW/learn)
+- [/zh-TW/quiz](https://cosmicsignature.com/zh-TW/quiz)
+- [/zh-TW/](https://app.cosmicsignature.com/zh-TW/)
+- [/zh-TW/current-cycle](https://app.cosmicsignature.com/zh-TW/current-cycle)
+- [/zh-TW/how-it-works](https://app.cosmicsignature.com/zh-TW/how-it-works)
+- [/zh-TW/faq](https://app.cosmicsignature.com/zh-TW/faq)
+- [/zh-TW/gallery](https://app.cosmicsignature.com/zh-TW/gallery)
+- [/zh-TW/statistics](https://app.cosmicsignature.com/zh-TW/statistics)
+- [/zh-TW/anchoring](https://app.cosmicsignature.com/zh-TW/anchoring)
+- [/zh-TW/allocation](https://app.cosmicsignature.com/zh-TW/allocation)
+- [/zh-TW/contracts](https://app.cosmicsignature.com/zh-TW/contracts)
+- [/zh-TW/code](https://app.cosmicsignature.com/zh-TW/code)
+- [/zh-TW/security](https://app.cosmicsignature.com/zh-TW/security)
+- [/zh-TW/audits](https://app.cosmicsignature.com/zh-TW/audits)
+- [/zh-TW/risk-disclosures](https://app.cosmicsignature.com/zh-TW/risk-disclosures)
+- [/zh-TW/terms](https://app.cosmicsignature.com/zh-TW/terms)
+- [/zh-TW/privacy](https://app.cosmicsignature.com/zh-TW/privacy)
+- [/zh-TW/marketing](https://app.cosmicsignature.com/zh-TW/marketing)
+- [/zh-TW/imprint](https://app.cosmicsignature.com/zh-TW/imprint)
+- [/zh-TW/my-tokens](https://app.cosmicsignature.com/zh-TW/my-tokens)
+- [/zh-TW/my-anchors](https://app.cosmicsignature.com/zh-TW/my-anchors)
+- [/zh-TW/my-allocations](https://app.cosmicsignature.com/zh-TW/my-allocations)
+- [/zh-TW/my-statistics](https://app.cosmicsignature.com/zh-TW/my-statistics)
 
-- [台灣繁體中文首頁](https://cosmicsignature.com/zh-TW)：協議與鏈上藝術概覽
-- [關於](https://cosmicsignature.com/zh-TW/about)：協議主體、官方連結與名稱辨析
-- [白皮書](https://cosmicsignature.com/zh-TW/white-paper)：協議機制與設計的完整說明（台灣繁體中文與英文雙語，附 PDF）
-- [學習](https://cosmicsignature.com/zh-TW/learn)：演繹週期、三體藝術、錨定與公共財說明
-- [台灣繁體中文應用程式](https://app.cosmicsignature.com/zh-TW)：目前週期與落筆介面
-- [畫廊](https://app.cosmicsignature.com/zh-TW/gallery)：瀏覽已銘刻的 Cosmic Signature NFT
-- [運作原理](https://app.cosmicsignature.com/zh-TW/how-it-works)：完整協議機制
-- [常見問題](https://app.cosmicsignature.com/zh-TW/faq)：按主題整理的台灣繁體中文解答
-- [統計](https://app.cosmicsignature.com/zh-TW/statistics)：公開協議資料
-- [錨定](https://app.cosmicsignature.com/zh-TW/anchoring)：錨定規則與配發紀錄
-- [合約](https://app.cosmicsignature.com/zh-TW/contracts)：已部署合約地址
-- [安全](https://app.cosmicsignature.com/zh-TW/security)：驗證資源與參與安全說明
-- [審計](https://app.cosmicsignature.com/zh-TW/audits)：Hacken 審計報告與形式化驗證背景
-- [風險揭露](https://app.cosmicsignature.com/zh-TW/risk-disclosures)：區塊鏈、錢包與協議參與風險
+[版本 1.0 — 2026年8月](https://cosmicsignature.com/zh-TW/white-paper)
 
-### 協議要點
+每枚 Cosmic Signature NFT 都呈現牛頓引力下的三體運動。種子記錄在鏈上，影像與影片在鏈下渲染。重現結果須搭配對應的渲染器版本、設定與相容工具鏈核對。
 
-- 每個週期以 ETH 與 CST 校準窗口機制開啟；CST 窗口從 12 小時基準出發，並隨鏈上參與變化
-- 每次落筆都會按目前時間增量延長收官倒數；該增量從 1 小時起步，每有一個週期收官便增長 1%
-- 倒數歸零後，寫下收官之筆的參與者擁有 48 小時專屬收官窗口；之後任何人均可收官，實際收官者獲得簽名分配
-- 每週期儲備的 25% 進入簽名分配，8% 發往時之勇士，4% 分為 3 份，經 ETH 星選發放，6% 用於錨定配發，7% 發往 Protocol Guild，約 50% 滾入下一週期
-- 絕大多數週期會銘刻 24 枚 Cosmic Signature NFT，並配套 24,000 CST；連同 3,000 CST 推廣儲備，典型固定銘刻總量為 27,000 CST，另有按落筆動態計算的參與 CST
-- 每枚 Cosmic Signature NFT 或 Random Walk NFT 一生只能錨定一次；解錨後不再具備錨定資格
-- 未使用的 Random Walk NFT 可附加至一筆 ETH 落筆，使該筆 ETH 落筆價格降低 50%；每枚 Random Walk NFT 僅可用於一次價格減免
-- 次級 ETH 與已附加資產設有 5 週取回期限；期限結束後，任何人都可為自己取回仍未取回的分配
+### 開始使用
 
-### 生態
+#### Cosmic Signature 是什麼？
 
-- [Axiom Zero](https://www.axiomzero.market/cosmic-signature)：Arbitrum 上不收平台費的 NFT 市場
-- [Chaos Zero](https://chaoszero.com)：面向 Cosmic Signature 週期的預測市場；每週期的問題是本週期收官時的落筆數是否高於上一週期
-- [Uniswap CST 兌換](https://app.uniswap.org/swap?chain=arbitrum&inputCurrency=NATIVE&outputCurrency=0xAD91843e6A58Ba560F577E676986AFb1dba6FBA0)：在 Arbitrum 上兌換 CST
+Cosmic Signature 是 Arbitrum 上的程序化鏈上藝術協議。參與者在演繹週期中落筆，每一筆都會塑造這一週期最終的簽名。週期收官後，協議將儲備分配至一組固定的軌道，其中包括支持 170 多位以太坊核心貢獻者的 Protocol Guild。
+
+#### 演繹週期如何運作？
+
+每個週期都以首筆落筆的 ETH 校準窗口開啟。首筆落筆會啟動週期收官倒數，目前預設約為 24 小時。此後每筆 ETH 或 CST 落筆都會把目前時間增量加到鏈上收官時間；該增量初始為 1 小時，並在每個週期收官後增長 1%。倒數結束後，收官之筆的參與者享有 48 小時的專屬收官窗口，可完成週期收官並取回簽名分配；在週期實際收官前，仍可繼續落筆。
+
+#### 可以用哪些方式落筆？
+
+每個週期須先以 ETH 落筆開啟，之後可使用 ETH 或 CST。尚未用於減免的 Random Walk NFT 可讓持有者減免 ETH 落筆價格，NFT 不會因此轉出。Cosmic Signature NFT 用於分配與錨定，不能支付落筆。CST 基礎價格隨時間下降，下降速率會隨落筆調整；接近收官時，兩種價格都可能加上溢價。
+
+#### 沒有 NFT 也能參與嗎？
+
+可以。任何人都能在 Cosmic Signature 的演繹週期中落筆。若擁有尚未使用的 Random Walk NFT，也可將其附加至一筆 ETH 落筆，使落筆價格降低 50%。每枚 Random Walk NFT 僅可用於這項減免一次。
+
+#### 有哪些參與方式？
+
+你可以在演繹週期中落筆，也可以將自己專案的 NFT 貢獻給協議，供參與者隨落筆附加。加入 Discord，即可認識其他參與者。
+
+#### 每個演繹週期會持續多久？
+
+首筆 ETH 落筆會開啟週期，並將收官倒數設為目前時間增量的約 24 倍（協議上線時約為 1 天）。此後每筆落筆都會加入目前時間增量；該增量初始恰為 1 小時，並在每個週期收官後增長 1%。因此，只要在收官前持續有人落筆，一個週期就可能遠超 1 天。
+
+#### 一個週期內可以多次落筆嗎？
+
+可以。每筆落筆都會增加星選權重，並更新堅守紀錄。下一筆執行時，會依間隔時長向上一筆的參與者銘刻參與 CST，通常不是發給這次提交者。首筆不銘刻參與 CST，收官也不會結算最後一筆之後的這項累積量。
+
+### 分配與配發
+
+#### 什麼是簽名分配？
+
+簽名分配歸實際收官者。倒數歸零後的 48 小時內，只有收官之筆參與者可以收官；之後任何人都能收官並成為受益方。分配包含週期儲備的 20% ETH、合計 1,000 CST、3 枚連續編號的 Cosmic Signature NFT，以及該週期附加資產的取回權。
+
+#### 每次落筆會帶來什麼？
+
+每筆落筆會記錄一份加權星選資格、更新堅守紀錄，並可能為上一筆參與者銘刻參與 CST。V3 依間隔秒數線性計算，再以合約最小單位截斷。等待本身不是可取回餘額，須有下一筆執行才會銘刻。首筆不發放這項 CST，收官也不結算最後一筆之後的累積量。
+
+#### 星選如何運作？
+
+參與者 ETH 星選與 NFT 星選都採加權、放回選取。每筆權重取當時未減免、未加臨近收官溢價的 ETH 基礎價格；CST 落筆也採用同一時間的 ETH 基礎價格。3 次選取均分 5% ETH，另 10 次選取各獲配 1,000 CST 與 1 枚 NFT。同一地址可多次獲配。Random Walk NFT 錨定星選另按已錨定 NFT 資格選取。
+
+#### 程序化隨機選擇是怎樣完成的？
+
+參與者的 ETH 與 NFT 星選都依累積權重選取，並非單純按落筆次數計算。權重取每筆發生時未減免、未含溢價的 ETH 基礎價格，CST 落筆也相同。隨機輸入來自鏈上區塊背景，並非獨立的可驗證隨機服務，不保證完全無偏。Random Walk NFT 錨定星選使用獨立的已錨定 NFT 資格池。
+
+#### 成為獲配者後，如何取回分配？
+
+獲配者可透過應用程式與協議合約取回分配。週期收官倒數結束後，收官之筆參與者享有 48 小時的專屬時間，可完成週期收官並取回簽名分配。
+
+此後進入公開收官窗口：任何人都可發起收官交易，智慧合約會把實際完成收官的人視為週期受益方——收官者將獲得整份簽名分配，包括 ETH 份額、1,000 CST 銘刻、Cosmic Signature NFT，以及對已附加資產的優先權。
+
+次級 ETH、已附加代幣與已附加 NFT 會由分配錢包託管，並採用另一項取回超時設定，目前預設為 5 週；超時後，合約允許任何人為自己取回仍未取回的分配。請及時處理。
+
+#### 錨定如何運作？
+
+Cosmic Signature NFT 可錨定至協議，以獲得 ETH 錨定配發：每個已收官週期會劃出週期儲備的 5%，按當時已錨定的 Cosmic Signature NFT 數量平均分配；累積的 ETH 會在解錨時配發。
+
+Random Walk NFT 也可以錨定，但只用於取得錨定 NFT 星選資格——被選中的錨定者會獲得 CST 與 Cosmic Signature NFT，而不是 ETH。
+
+還需注意兩條規則：每枚 NFT 永遠只能錨定一次（解錨後不可再次錨定）；若週期收官時沒有任何 Cosmic Signature NFT 處於錨定狀態，該週期的 5% 會留在週期儲備中。CST（ERC-20）不能錨定。可從帳戶選單進入「我的錨定」頁面管理錨定。
+
+#### 什麼是推廣儲備？
+
+幫助推廣協議可獲得 CST 代幣（ERC-20）。推廣儲備每個週期銘刻 3,000 CST，並將其發放給生態貢獻者。具體方式可在 Discord 聯絡推廣託管人。
+
+#### 每個週期會銘刻多少枚 Cosmic Signature NFT？
+
+各軌道條件都成立時，收官會銘刻 26 枚 Cosmic Signature NFT：簽名分配 3 枚，時之勇士、堅守冠軍與 CST 收官之筆各 1 枚，參與者星選 10 枚，Random Walk NFT 錨定星選 10 枚。簽名分配的 CST 合計只有 1,000，不會按其中的 NFT 枚數重複計算。沒有 CST 落筆或已錨定 Random Walk NFT 時，相關軌道會跳過。
+
+#### 週期儲備中剩餘的 ETH 會怎樣處理？
+
+未分配的 ETH 留在合約，成為下一週期的起始儲備。依目前設定通常約為一半，也可能包含取整餘數或未成功轉出的份額。這不保證下一週期的儲備一定更大。
+
+#### 隨落筆附加的代幣或 NFT 會怎樣處理？
+
+隨落筆附加的 ERC-20 代幣或 ERC-721 NFT 由分配錢包合約託管，不會進入 ETH 週期儲備。週期收官後，週期受益方（通常為收官之筆參與者）享有優先取回權。若超出次級取回期限仍無人取回，目前預設期限為 5 週，合約將允許任何人為自己取回這些資產。
+
+#### 週期儲備中的公共財分配會發給誰？
+
+目前公共財份額為週期儲備的 5%。收官時，合約會嘗試轉入公共財金庫；之後任何人都能另發一筆交易，將金庫餘額轉給目前受益方 Protocol Guild。核心合約轉入失敗時，該份額可留在儲備而不阻止收官。金庫所有者可更改受益方，宇宙議會不會自動取得這項權限。
+
+### 週期機制
+
+#### 一個週期內，落筆價格如何變化？
+
+ETH 開場基礎價格會在校準窗口下降；開場後，每筆 ETH 落筆會提高下一筆基礎價格。CST 基礎價格依鏈上下降速率隨時間減少，ETH 落筆嘗試加快速率，CST 落筆減慢速率並重設上限。兩種價格都可能在接近收官時加上溢價，因此最終價格不保證持續下降。
+
+#### 什麼是校準窗口？
+
+校準窗口讓基礎價格隨時間下降。ETH 開場基礎價格降至上限的 1/200 向下取整再加 1 wei；CST 基礎價格為上限減去經過秒數乘下降速率，最低為零。V3 的 CST 窗口依速率推算，並非固定初始時長。臨近收官溢價另計；CST 基礎價格為零時，加上溢價仍為零。
+
+#### 參與 CST 如何計算？
+
+V3 依經過秒數線性計算參與 CST：秒數乘上鏈上乘數，再除以微秒計的週期增量，向下取整到 CST 最小單位。以原始一小時增量計，約每分鐘 1 CST；週期增量變大後，速率會略降。下一筆會把全額銘刻給上一筆參與者；首筆不發放，收官也不結算最後一筆之後的累積量。
+
+原始一小時時間增量下的近似例子：0 秒後為 0 CST、1 秒後為 0.017 CST、60 秒後為 1 CST、1 小時後為 60 CST、1 天後為 1,440 CST。
+
+#### 什麼是最低 CST 銘刻保護？
+
+這項下限約束本次交易向上一筆參與者銘刻的參與 CST，通常不是提交者自己收到的數量。提交者也是上一筆參與者時，下限才會保護自身這次銘刻。若其他落筆先執行，收取對象與金額都可能改變。首筆 ETH 落筆會跳過這項檢查；價格上限與網路費用另行處理。
+
+#### 每筆落筆如何改變 CST 校準窗口？
+
+V3 在鏈上保存 CST 價格下降速率，再由上限與速率推算窗口時長。依目前除數，ETH 落筆會嘗試將速率增加百分之一，但須通過最短窗口檢查；CST 落筆則將速率減去其 1/101。CST 落筆也會重設上限，取不含溢價的基礎花費兩倍、設定下限與新速率乘以 180 秒三者最大值。這項檢查不是落筆冷卻期。
+
+#### 什麼是公開收官窗口？
+
+週期收官倒數結束後，收官之筆參與者享有 48 小時的專屬收官時間。若未在該窗口內完成收官，任何人都可發起收官交易，智慧合約會把實際收官者設為週期受益方。收官者將獲得完整的簽名分配，包括 ETH 份額、1,000 CST、Cosmic Signature NFT，以及對已附加資產的優先權。因此，收官之筆參與者應在專屬窗口結束前完成收官。即使該參與者離開，公開收官機制也能讓協議繼續執行。
+
+#### 什麼是堅守冠軍？
+
+一個週期內，保持「最近一筆落筆者」身份時間最長的參與者，即下一筆落筆出現前擁有最長連續間隔的人，會成為堅守冠軍。週期收官時，堅守冠軍將獲得 1,000 CST 的表彰銘刻與 1 枚 Cosmic Signature NFT。
+
+#### 什麼是 CST 收官之筆？
+
+CST 收官之筆是一個週期中最後一筆使用 CST 完成的落筆。週期收官時，完成該筆落筆的參與者將獲得 1,000 CST 的表彰銘刻與 1 枚 Cosmic Signature NFT。
+
+#### 什麼是時之勇士？
+
+時之勇士是在堅守冠軍位置上連續保持最久的參與者。堅守冠軍對應保持「最近一筆落筆者」身份最久的人，時之勇士則對應保持堅守冠軍身份最久的人。週期收官時，時之勇士將獲得週期儲備中 15% 的 ETH、1,000 CST 與 1 枚 Cosmic Signature NFT。
+
+#### 每筆落筆增加的時間始終相同嗎？
+
+不會。協議上線時，每筆落筆增加的時間恰為 1 小時；此後每當一個週期收官，增量都會增長 1%。由於增量變大也會拉長每個週期，按日曆時間看，這種增長會自然放緩。
+
+#### 為什麼每筆落筆增加的時間會逐步增長？
+
+這一機制決定 Cosmic Signature NFT 的長期銘刻節奏：週期越長，同一段時間內銘刻的新 NFT 越少。
+
+#### 落筆時間增量上升會怎樣影響協議？
+
+隨著每筆落筆增加的時間變長，週期的平均持續時間也會延長。這一變化循序漸進，既保持平穩的參與體驗，也限制長期範圍內 Cosmic Signature NFT 的總供應增長。
+
+#### 兩筆落筆同時提交會怎樣？
+
+Arbitrum 的排序器會決定交易順序。每筆落筆都按執行時的協議狀態檢查；後一筆仍可能成功，但前一筆可能改變落筆價格或參與 CST 銘刻量。若變化超出你設定的保護範圍，交易就會還原。
+
+#### 參與 Cosmic Signature 是否需要策略？
+
+需要。落筆時機、頻率和方式（ETH、CST 或附加 Random Walk NFT）都會影響各條分配軌道的結果。協議機制與參與者之間的互動允許多種策略在不同軌道上發揮作用。
 
 ## 繁體中文（香港）概覽
 
-Cosmic Signature 是運行於 Arbitrum 的程序化鏈上藝術協議。參與者在演繹週期中落筆；每一筆都會影響週期最終的簽名作品。週期收官後，協議按公開規則將週期儲備發往一組固定的分配軌道，其中包括支持以太坊核心貢獻者的 Protocol Guild。
+Cosmic Signature 是 Arbitrum 上的程序化鏈上藝術協議。在每個演繹週期中，參與者以 ETH 或 CST 落筆；每一筆都在塑造最終的簽名——一件從鏈上數據生成、經三體物理模擬渲染而成的確定性 NFT 藝術作品。
 
-Cosmic Signature 與 COSMIC 癌症突變數據庫及生物學中的 COSMIC 突變特徵沒有關聯。
+Cosmic Signature 與 COSMIC 癌症突變數據庫及生物學中的 COSMIC 突變特徵沒有關聯。本項目是鏈上藝術協議及應用程式。
 
-### 香港繁體中文關鍵頁面
+- [/zh-HK/](https://cosmicsignature.com/zh-HK/)
+- [/zh-HK/about](https://cosmicsignature.com/zh-HK/about)
+- [/zh-HK/white-paper](https://cosmicsignature.com/zh-HK/white-paper)
+- [/zh-HK/learn](https://cosmicsignature.com/zh-HK/learn)
+- [/zh-HK/quiz](https://cosmicsignature.com/zh-HK/quiz)
+- [/zh-HK/](https://app.cosmicsignature.com/zh-HK/)
+- [/zh-HK/current-cycle](https://app.cosmicsignature.com/zh-HK/current-cycle)
+- [/zh-HK/how-it-works](https://app.cosmicsignature.com/zh-HK/how-it-works)
+- [/zh-HK/faq](https://app.cosmicsignature.com/zh-HK/faq)
+- [/zh-HK/gallery](https://app.cosmicsignature.com/zh-HK/gallery)
+- [/zh-HK/statistics](https://app.cosmicsignature.com/zh-HK/statistics)
+- [/zh-HK/anchoring](https://app.cosmicsignature.com/zh-HK/anchoring)
+- [/zh-HK/allocation](https://app.cosmicsignature.com/zh-HK/allocation)
+- [/zh-HK/contracts](https://app.cosmicsignature.com/zh-HK/contracts)
+- [/zh-HK/code](https://app.cosmicsignature.com/zh-HK/code)
+- [/zh-HK/security](https://app.cosmicsignature.com/zh-HK/security)
+- [/zh-HK/audits](https://app.cosmicsignature.com/zh-HK/audits)
+- [/zh-HK/risk-disclosures](https://app.cosmicsignature.com/zh-HK/risk-disclosures)
+- [/zh-HK/terms](https://app.cosmicsignature.com/zh-HK/terms)
+- [/zh-HK/privacy](https://app.cosmicsignature.com/zh-HK/privacy)
+- [/zh-HK/marketing](https://app.cosmicsignature.com/zh-HK/marketing)
+- [/zh-HK/imprint](https://app.cosmicsignature.com/zh-HK/imprint)
+- [/zh-HK/my-tokens](https://app.cosmicsignature.com/zh-HK/my-tokens)
+- [/zh-HK/my-anchors](https://app.cosmicsignature.com/zh-HK/my-anchors)
+- [/zh-HK/my-allocations](https://app.cosmicsignature.com/zh-HK/my-allocations)
+- [/zh-HK/my-statistics](https://app.cosmicsignature.com/zh-HK/my-statistics)
 
-- [香港繁體中文主頁](https://cosmicsignature.com/zh-HK)：協議與鏈上藝術概覽
-- [關於](https://cosmicsignature.com/zh-HK/about)：協議主體、官方連結與名稱辨析
-- [白皮書](https://cosmicsignature.com/zh-HK/white-paper)：協議機制與設計的完整說明（香港繁體中文與英文雙語，附 PDF）
-- [學習](https://cosmicsignature.com/zh-HK/learn)：演繹週期、三體藝術、錨定與公共物品說明
-- [香港繁體中文應用程式](https://app.cosmicsignature.com/zh-HK)：目前週期與落筆介面
-- [畫廊](https://app.cosmicsignature.com/zh-HK/gallery)：瀏覽已銘刻的 Cosmic Signature NFT
-- [運作原理](https://app.cosmicsignature.com/zh-HK/how-it-works)：完整協議機制
-- [常見問題](https://app.cosmicsignature.com/zh-HK/faq)：按主題整理的香港繁體中文解答
-- [統計](https://app.cosmicsignature.com/zh-HK/statistics)：公開協議數據
-- [錨定](https://app.cosmicsignature.com/zh-HK/anchoring)：錨定規則與派發記錄
-- [合約](https://app.cosmicsignature.com/zh-HK/contracts)：已部署合約地址
-- [安全](https://app.cosmicsignature.com/zh-HK/security)：驗證資源與參與安全說明
-- [審計](https://app.cosmicsignature.com/zh-HK/audits)：Hacken 審計報告與形式化驗證背景
-- [風險披露](https://app.cosmicsignature.com/zh-HK/risk-disclosures)：區塊鏈、錢包與協議參與風險
+[版本 1.0 — 2026年8月](https://cosmicsignature.com/zh-HK/white-paper)
 
-### 協議要點
+每枚 Cosmic Signature NFT 都呈現牛頓引力下的三體運動。種子記錄在鏈上，圖像與影片在鏈下渲染。重現結果須配合對應的渲染器版本、設定與兼容工具鏈核對。
 
-- 每個週期以 ETH 與 CST 校準窗口機制開啟；CST 窗口從 12 小時基準出發，並隨鏈上參與變化
-- 每次落筆都會按目前時間增量延長收官倒數；該增量從 1 小時起步，每有一個週期收官便增長 1%
-- 倒數歸零後，寫下收官之筆的參與者擁有 48 小時專屬收官窗口；之後任何人均可收官，實際收官者獲得簽名分配
-- 每週期儲備的 25% 進入簽名分配，8% 發往時之勇士，4% 分為 3 份，經 ETH 星選發放，6% 用於錨定派發，7% 發往 Protocol Guild，約 50% 滾入下一週期
-- 絕大多數週期會銘刻 24 枚 Cosmic Signature NFT，並配套 24,000 CST；連同 3,000 CST 推廣儲備，典型固定銘刻總量為 27,000 CST，另有按落筆動態計算的參與 CST
-- 每枚 Cosmic Signature NFT 或 Random Walk NFT 一生只能錨定一次；解錨後不再具備錨定資格
-- 未使用的 Random Walk NFT 可附加至一筆 ETH 落筆，使該筆 ETH 落筆價格降低 50%；每枚 Random Walk NFT 僅可用於一次價格減免
-- 次級 ETH 與已附加資產設有 5 週取回期限；期限結束後，任何人都可為自己取回仍未取回的分配
+### 開始使用
 
-### 生態
+#### Cosmic Signature 是什麼？
 
-- [Axiom Zero](https://www.axiomzero.market/cosmic-signature)：Arbitrum 上不收平台費的 NFT 市場
-- [Chaos Zero](https://chaoszero.com)：面向 Cosmic Signature 週期的預測市場；每週期的問題是本週期收官時的落筆數是否高於上一週期
-- [Uniswap CST 兌換](https://app.uniswap.org/swap?chain=arbitrum&inputCurrency=NATIVE&outputCurrency=0xAD91843e6A58Ba560F577E676986AFb1dba6FBA0)：在 Arbitrum 上兌換 CST
+Cosmic Signature 是 Arbitrum 上的程序化鏈上藝術協議。參與者在演繹週期中落筆，每一筆都會塑造這一週期最終的簽名。週期收官後，協議將儲備分配至一組固定的軌道，其中包括支持 170 多位以太坊核心貢獻者的 Protocol Guild。
+
+#### 演繹週期如何運作？
+
+每個週期都以首筆落筆的 ETH 校準窗口開啟。首筆落筆會啟動週期收官倒數，目前預設約為 24 小時。此後每筆 ETH 或 CST 落筆都會把目前時間增量加到鏈上收官時間；該增量初始為 1 小時，並在每個週期收官後增長 1%。倒數結束後，收官之筆的參與者享有 48 小時的專屬收官窗口，可完成週期收官並取回簽名分配；在週期實際收官前，仍可繼續落筆。
+
+#### 可以用哪些方式落筆？
+
+每個週期須由 ETH 落筆開啟，其後可使用 ETH 或 CST。持有尚未用於減免的 Random Walk NFT，可用它減免 ETH 落筆價格；NFT 不會因此轉出。Cosmic Signature NFT 用於分配與錨定，不能支付落筆。CST 基礎價格隨時間下降，下降速率隨落筆調整；接近收官時，兩種價格亦可能包含溢價。
+
+#### 沒有 NFT 也能參與嗎？
+
+可以。任何人都能在 Cosmic Signature 的演繹週期中落筆。若擁有尚未使用的 Random Walk NFT，也可將其附加至一筆 ETH 落筆，使落筆價格降低 50%。每枚 Random Walk NFT 僅可用於這項減免一次。
+
+#### 有哪些參與方式？
+
+你可以在演繹週期中落筆，也可以將自己項目的 NFT 貢獻給協議，供參與者隨落筆附加。加入 Discord，即可認識其他參與者。
+
+#### 每個演繹週期會持續多久？
+
+首筆 ETH 落筆會開啟週期，並將收官倒數設為目前時間增量的約 24 倍（協議上線時約為 1 天）。此後每筆落筆都會加入目前時間增量；該增量初始恰為 1 小時，並在每個週期收官後增長 1%。因此，只要在收官前持續有人落筆，一個週期就可能遠超 1 天。
+
+#### 一個週期內可以多次落筆嗎？
+
+可以。每筆落筆都會增加星選權重，並更新堅守紀錄。下一筆執行時，會按間隔時長向上一筆的參與者銘刻參與 CST，通常並非發給本次提交者。首筆不銘刻參與 CST，收官亦不會結算最後一筆之後的這項累積量。
+
+### 分配與派發
+
+#### 什麼是簽名分配？
+
+簽名分配歸實際收官者。倒數歸零後的 48 小時內，只有收官之筆參與者可以收官；其後任何人均可收官並成為受益方。分配包括週期儲備的 20% ETH、合共 1,000 CST、3 枚連續編號的 Cosmic Signature NFT，以及該週期附加資產的取回權。
+
+#### 每次落筆會帶來什麼？
+
+每筆落筆會記錄一份加權星選資格、更新堅守紀錄，並可能為上一筆參與者銘刻參與 CST。V3 按間隔秒數線性計算，再以合約最小單位截斷。等待本身不構成可取回餘額，須有下一筆執行才會銘刻。首筆不發放這項 CST，收官亦不結算最後一筆之後的累積量。
+
+#### 星選如何運作？
+
+參與者 ETH 星選與 NFT 星選均採用加權、放回選取。每筆權重取當時未減免、未加臨近收官溢價的 ETH 基礎價格；CST 落筆亦使用同一時間的 ETH 基礎價格。3 次選取均分 5% ETH，另 10 次選取各獲配 1,000 CST 與 1 枚 NFT。同一地址可多次獲配。Random Walk NFT 錨定星選另按已錨定 NFT 資格選取。
+
+#### 程序化隨機選擇是怎樣完成的？
+
+參與者的 ETH 與 NFT 星選均按累積權重選取，並非單純按落筆次數計算。權重取每筆發生時未減免、未含溢價的 ETH 基礎價格，CST 落筆亦相同。隨機輸入來自鏈上區塊背景，並非獨立的可驗證隨機服務，不保證完全無偏。Random Walk NFT 錨定星選使用獨立的已錨定 NFT 資格池。
+
+#### 成為獲配者後，如何取回分配？
+
+獲配者可透過應用程式與協議合約取回分配。週期收官倒數結束後，收官之筆參與者享有 48 小時的專屬時間，可完成週期收官並取回簽名分配。
+
+此後進入公開收官窗口：任何人都可發起收官交易，智能合約會把實際完成收官的人視為週期受益方——收官者將獲得整份簽名分配，包括 ETH 份額、1,000 CST 銘刻、Cosmic Signature NFT，以及對已附加資產的優先權。
+
+次級 ETH、已附加代幣與已附加 NFT 會由分配錢包託管，並採用另一項取回超時設定，目前預設為 5 週；超時後，合約允許任何人為自己取回仍未取回的分配。請及時處理。
+
+#### 錨定如何運作？
+
+Cosmic Signature NFT 可錨定至協議，以獲得 ETH 錨定派發：每個已收官週期會劃出週期儲備的 5%，按當時已錨定的 Cosmic Signature NFT 數量平均分配；累積的 ETH 會在解錨時派發。
+
+Random Walk NFT 也可以錨定，但只用於取得錨定 NFT 星選資格——被選中的錨定者會獲得 CST 與 Cosmic Signature NFT，而不是 ETH。
+
+還需注意兩條規則：每枚 NFT 永遠只能錨定一次（解錨後不可再次錨定）；若週期收官時沒有任何 Cosmic Signature NFT 處於錨定狀態，該週期的 5% 會留在週期儲備中。CST（ERC-20）不能錨定。可從帳戶選單進入「我的錨定」頁面管理錨定。
+
+#### 什麼是推廣儲備？
+
+幫助推廣協議可獲得 CST 代幣（ERC-20）。推廣儲備每個週期銘刻 3,000 CST，並將其發放給生態貢獻者。具體方式可在 Discord 聯絡推廣託管人。
+
+#### 每個週期會銘刻多少枚 Cosmic Signature NFT？
+
+各軌道條件均成立時，收官會銘刻 26 枚 Cosmic Signature NFT：簽名分配 3 枚，時之勇士、堅守冠軍與 CST 收官之筆各 1 枚，參與者星選 10 枚，Random Walk NFT 錨定星選 10 枚。簽名分配的 CST 合共只有 1,000，不會按其中的 NFT 枚數重複計算。沒有 CST 落筆或已錨定 Random Walk NFT 時，相關軌道會略過。
+
+#### 週期儲備中剩餘的 ETH 會怎樣處理？
+
+未分配的 ETH 留在合約，成為下一週期的起始儲備。按目前設定通常約為一半，亦可能包括取整餘數或未成功轉出的份額。這不保證下一週期的儲備一定更大。
+
+#### 隨落筆附加的代幣或 NFT 會怎樣處理？
+
+隨落筆附加的 ERC-20 代幣或 ERC-721 NFT 由分配錢包合約託管，不會進入 ETH 週期儲備。週期收官後，週期受益方（通常為收官之筆參與者）享有優先取回權。若超出次級取回期限仍無人取回，目前預設期限為 5 週，合約將允許任何人為自己取回這些資產。
+
+#### 週期儲備中的公共物品分配會發給誰？
+
+目前公共物品份額為週期儲備的 5%。收官時，合約會嘗試轉入公共物品金庫；其後任何人均可另發一筆交易，將金庫餘額轉給目前受益方 Protocol Guild。核心合約轉入失敗時，該份額可留在儲備而不阻止收官。金庫所有者可更改受益方，宇宙議會不會自動取得這項權限。
+
+### 週期機制
+
+#### 一個週期內，落筆價格如何變化？
+
+ETH 開場基礎價格會在校準窗口下降；開場後，每筆 ETH 落筆會提高下一筆基礎價格。CST 基礎價格按鏈上下降速率隨時間減少，ETH 落筆嘗試加快速率，CST 落筆減慢速率並重設上限。兩種價格均可能在接近收官時加上溢價，因此最終價格不保證持續下降。
+
+#### 什麼是校準窗口？
+
+校準窗口讓基礎價格隨時間下降。ETH 開場基礎價格降至上限的 1/200 向下取整再加 1 wei；CST 基礎價格為上限減去經過秒數乘下降速率，最低為零。V3 的 CST 窗口按速率推算，並非固定初始時長。臨近收官溢價另計；CST 基礎價格為零時，加上溢價仍為零。
+
+#### 參與 CST 如何計算？
+
+V3 按經過秒數線性計算參與 CST：秒數乘以鏈上乘數，再除以微秒計的週期增量，向下取整至 CST 最小單位。以原始一小時增量計，約每分鐘 1 CST；週期增量變大後，速率會略降。下一筆會把全額銘刻給上一筆參與者；首筆不發放，收官亦不結算最後一筆之後的累積量。
+
+原始一小時時間增量下的近似例子：0 秒後為 0 CST、1 秒後為 0.017 CST、60 秒後為 1 CST、1 小時後為 60 CST、1 天後為 1,440 CST。
+
+#### 什麼是最低 CST 銘刻保護？
+
+這項下限約束本次交易向上一筆參與者銘刻的參與 CST，通常並非提交者自己收到的數量。提交者亦是上一筆參與者時，下限才會保護自身這次銘刻。若其他落筆先執行，收取對象與金額均可能改變。首筆 ETH 落筆會略過這項檢查；價格上限與網絡費用另行處理。
+
+#### 每筆落筆如何改變 CST 校準窗口？
+
+V3 在鏈上保存 CST 價格下降速率，再由上限與速率推算窗口時長。按目前除數，ETH 落筆會嘗試將速率增加百分之一，但須通過最短窗口檢查；CST 落筆則將速率減去其 1/101。CST 落筆亦會重設上限，取不含溢價的基礎花費兩倍、設定下限與新速率乘以 180 秒三者最大值。這項檢查並非落筆冷卻期。
+
+#### 什麼是公開收官窗口？
+
+週期收官倒數結束後，收官之筆參與者享有 48 小時的專屬收官時間。若未在該窗口內完成收官，任何人都可發起收官交易，智能合約會把實際收官者設為週期受益方。收官者將獲得完整的簽名分配，包括 ETH 份額、1,000 CST、Cosmic Signature NFT，以及對已附加資產的優先權。因此，收官之筆參與者應在專屬窗口結束前完成收官。即使該參與者離開，公開收官機制也能讓協議繼續運行。
+
+#### 什麼是堅守冠軍？
+
+一個週期內，保持「最近一筆落筆者」身份時間最長的參與者，即下一筆落筆出現前擁有最長連續間隔的人，會成為堅守冠軍。週期收官時，堅守冠軍將獲得 1,000 CST 的表彰銘刻與 1 枚 Cosmic Signature NFT。
+
+#### 什麼是 CST 收官之筆？
+
+CST 收官之筆是一個週期中最後一筆使用 CST 完成的落筆。週期收官時，完成該筆落筆的參與者將獲得 1,000 CST 的表彰銘刻與 1 枚 Cosmic Signature NFT。
+
+#### 什麼是時之勇士？
+
+時之勇士是在堅守冠軍位置上連續保持最久的參與者。堅守冠軍對應保持「最近一筆落筆者」身份最久的人，時之勇士則對應保持堅守冠軍身份最久的人。週期收官時，時之勇士將獲得週期儲備中 15% 的 ETH、1,000 CST 與 1 枚 Cosmic Signature NFT。
+
+#### 每筆落筆增加的時間始終相同嗎？
+
+不會。協議上線時，每筆落筆增加的時間恰為 1 小時；此後每當一個週期收官，增量都會增長 1%。由於增量變大也會拉長每個週期，按日曆時間看，這種增長會自然放緩。
+
+#### 為什麼每筆落筆增加的時間會逐步增長？
+
+這一機制決定 Cosmic Signature NFT 的長期銘刻節奏：週期越長，同一段時間內銘刻的新 NFT 越少。
+
+#### 落筆時間增量上升會怎樣影響協議？
+
+隨着每筆落筆增加的時間變長，週期的平均持續時間也會延長。這一變化循序漸進，既保持平穩的參與體驗，也限制長期範圍內 Cosmic Signature NFT 的總供應增長。
+
+#### 兩筆落筆同時提交會怎樣？
+
+Arbitrum 的排序器會確定交易順序。每筆落筆都按執行時的協議狀態檢查；後一筆仍可能成功，但前一筆可能改變落筆價格或參與 CST 銘刻量。若變化超出你設定的保護範圍，交易便會還原。
+
+#### 參與 Cosmic Signature 是否需要策略？
+
+需要。落筆時機、頻率和方式（ETH、CST 或附加 Random Walk NFT）都會影響各條分配軌道的結果。協議機制與參與者之間的互動允許多種策略在不同軌道上發揮作用。
 
 ## Українська: огляд
 
-Cosmic Signature — це процедурний протокол ончейн-мистецтва на Arbitrum. Учасники роблять жести протягом перформанс-циклу; кожен жест впливає на фінальну Сигнатуру циклу. Коли цикл завершується, протокол за відкритими правилами розподіляє резерв циклу за фіксованим набором напрямів розподілу, серед яких Protocol Guild — механізм підтримки основних розробників Ethereum.
+Cosmic Signature — процедурний протокол ончейн-мистецтва на Arbitrum. Під час кожного перформанс-циклу учасники роблять жести в ETH або CST, і кожен жест допомагає сформувати фінальну Сигнатуру: детермінований NFT-твір, згенерований з ончейн-даних за допомогою фізичної симуляції трьох тіл.
 
-Cosmic Signature не пов’язаний із базою даних мутацій раку COSMIC чи мутаційними сигнатурами COSMIC у біології.
+Cosmic Signature не має стосунку до бази даних онкологічних мутацій COSMIC чи мутаційних сигнатур COSMIC у біології. Це протокол ончейн-мистецтва та застосунок.
 
-### Ключові сторінки українською
+- [/uk/](https://cosmicsignature.com/uk/)
+- [/uk/about](https://cosmicsignature.com/uk/about)
+- [/uk/white-paper](https://cosmicsignature.com/uk/white-paper)
+- [/uk/learn](https://cosmicsignature.com/uk/learn)
+- [/uk/quiz](https://cosmicsignature.com/uk/quiz)
+- [/uk/](https://app.cosmicsignature.com/uk/)
+- [/uk/current-cycle](https://app.cosmicsignature.com/uk/current-cycle)
+- [/uk/how-it-works](https://app.cosmicsignature.com/uk/how-it-works)
+- [/uk/faq](https://app.cosmicsignature.com/uk/faq)
+- [/uk/gallery](https://app.cosmicsignature.com/uk/gallery)
+- [/uk/statistics](https://app.cosmicsignature.com/uk/statistics)
+- [/uk/anchoring](https://app.cosmicsignature.com/uk/anchoring)
+- [/uk/allocation](https://app.cosmicsignature.com/uk/allocation)
+- [/uk/contracts](https://app.cosmicsignature.com/uk/contracts)
+- [/uk/code](https://app.cosmicsignature.com/uk/code)
+- [/uk/security](https://app.cosmicsignature.com/uk/security)
+- [/uk/audits](https://app.cosmicsignature.com/uk/audits)
+- [/uk/risk-disclosures](https://app.cosmicsignature.com/uk/risk-disclosures)
+- [/uk/terms](https://app.cosmicsignature.com/uk/terms)
+- [/uk/privacy](https://app.cosmicsignature.com/uk/privacy)
+- [/uk/marketing](https://app.cosmicsignature.com/uk/marketing)
+- [/uk/imprint](https://app.cosmicsignature.com/uk/imprint)
+- [/uk/my-tokens](https://app.cosmicsignature.com/uk/my-tokens)
+- [/uk/my-anchors](https://app.cosmicsignature.com/uk/my-anchors)
+- [/uk/my-allocations](https://app.cosmicsignature.com/uk/my-allocations)
+- [/uk/my-statistics](https://app.cosmicsignature.com/uk/my-statistics)
 
-- [Головна сторінка](https://cosmicsignature.com/uk): огляд протоколу й ончейн-мистецтва
-- [Про проєкт](https://cosmicsignature.com/uk/about): опис протоколу, офіційні посилання та пояснення назви
-- [Біла книга](https://cosmicsignature.com/uk/white-paper): повний опис механіки та дизайну протоколу (з PDF)
-- [Навчання](https://cosmicsignature.com/uk/learn): перформанс-цикли, мистецтво трьох тіл, закріплення та суспільні блага
-- [Застосунок](https://app.cosmicsignature.com/uk): поточний цикл та інтерфейс жестів
-- [Галерея](https://app.cosmicsignature.com/uk/gallery): перегляд закарбованих Cosmic Signature NFT
-- [Як це працює](https://app.cosmicsignature.com/uk/how-it-works): повна механіка протоколу
-- [Поширені запитання](https://app.cosmicsignature.com/uk/faq): відповіді за темами
-- [Статистика](https://app.cosmicsignature.com/uk/statistics): відкриті дані протоколу
-- [Закріплення](https://app.cosmicsignature.com/uk/anchoring): правила закріплення та історія надходжень
-- [Контракти](https://app.cosmicsignature.com/uk/contracts): адреси розгорнутих контрактів
-- [Безпека](https://app.cosmicsignature.com/uk/security): ресурси для перевірки та безпечна участь
-- [Аудити](https://app.cosmicsignature.com/uk/audits): звіт аудиту Hacken і контекст формальної верифікації
-- [Розкриття ризиків](https://app.cosmicsignature.com/uk/risk-disclosures): ризики блокчейну, гаманців та участі в протоколі
+[Версія 1.0 — серпень 2026](https://cosmicsignature.com/uk/white-paper)
 
-### Основне про протокол
+Сід NFT зберігається ончейн, а зображення й відео створюються поза блокчейном. Для відтворення потрібні той самий сід, відповідна версія рендерера, налаштування та сумісні інструменти. Однаковий сід сам по собі не гарантує ідентичного результату між різними версіями.
 
-- Кожен цикл відкривається механізмом вікон калібрування ETH і CST; вікно CST стартує від базових 12 годин і змінюється разом з ончейн-участю
-- Кожен жест подовжує відлік до завершення на поточний часовий приріст; приріст починається з 1 години й зростає на 1% з кожним завершеним циклом
-- Після обнулення відліку учасник, який зробив завершальний жест, має ексклюзивне вікно завершення тривалістю 48 годин; після нього завершити цикл може будь-хто, і той, хто це зробить, отримує розподіл Сигнатури
-- З резерву кожного циклу 25% іде на розподіл Сигнатури, 8% — Воїну часу, 4% діляться на 3 рівні частки для зоряного відбору ETH, 6% — надходження за закріплення, 7% — Protocol Guild, а близько 50% переходить у наступний цикл
-- У більшості циклів закарбовується 24 Cosmic Signature NFT разом із 24 000 CST; разом із 3 000 CST для резерву просування типовий фіксований обсяг становить 27 000 CST, а CST участі закарбовуються динамічно за кожен жест
-- Кожен Cosmic Signature NFT або Random Walk NFT можна закріпити лише раз; після відкріплення він більше не може бути закріплений
-- Невикористаний Random Walk NFT можна долучити до ETH-жесту, і вартість цього ETH-жесту зменшиться на 50%; кожен Random Walk NFT дає таке зменшення лише один раз
-- Для вторинних ETH та долучених активів діє термін отримання 5 тижнів; після його завершення будь-хто може забрати собі незабрані розподіли
+### Початок роботи
 
-### Екосистема
+#### Що таке Cosmic Signature?
 
-- [Axiom Zero](https://www.axiomzero.market/cosmic-signature): NFT-маркетплейс на Arbitrum без комісії платформи
-- [Chaos Zero](https://chaoszero.com): ринок прогнозів для циклів Cosmic Signature; запитання кожного циклу — чи буде на момент завершення більше жестів, ніж у попередньому циклі
-- [Обмін CST на Uniswap](https://app.uniswap.org/swap?chain=arbitrum&inputCurrency=NATIVE&outputCurrency=0xAD91843e6A58Ba560F577E676986AFb1dba6FBA0): обмін CST на Arbitrum
+Cosmic Signature — це процедурний протокол ончейн-мистецтва на Arbitrum. Учасники роблять жести протягом перформанс-циклу; кожен жест формує фінальну Сигнатуру циклу. Коли цикл завершується, протокол розподіляє свої резерви за фіксованим набором напрямів розподілу — зокрема на Protocol Guild, механізм фінансування понад 170 розробників ядра Ethereum.
+
+#### Як працює перформанс-цикл?
+
+Перший жест циклу має бути з ETH і запускає час завершення циклу. Наступні жести додають поточний приріст до збереженого часу завершення, навіть після його спливу. Відлік не починається заново від поточного моменту. Жести можливі, доки завершення не виконається успішно.
+
+#### Які є типи жестів?
+
+ETH і CST мають окремі правила базової вартості. На початку циклу ETH-вартість знижується у вікні калібрування, а кожен ETH-жест підвищує наступну базову вартість. CST-вартість знижується зі збереженою ончейн-швидкістю. Наприкінці відліку до обох вартостей додається пізня надбавка; вона не збільшує наступну базову вартість або вагу зоряного відбору. Перший жест циклу має бути з ETH і запускає час завершення циклу. Наступні жести додають поточний приріст до збереженого часу завершення, навіть після його спливу. Відлік не починається заново від поточного моменту. Жести можливі, доки завершення не виконається успішно. Для зниження ETH-вартості кожен Random Walk NFT можна використати лише один раз. Контракт перевіряє право власності й позначає зниження використаним; сам NFT не передається. Це окреме право від закріплення.
+
+#### Чи можу я брати участь, якщо не маю жодного NFT?
+
+Так. Узяти участь у перформанс-циклі Cosmic Signature може будь-хто — достатньо зробити жест. Невикористаний Random Walk NFT можна долучити до ETH-жесту, щоб зменшити вартість жесту на 50%.
+
+#### Як долучитися до проєкту?
+
+Ви можете брати участь, роблячи жести протягом перформанс-циклу, або надати NFT зі свого проєкту, щоб його долучили до жесту учасника. Заходьте в Discord, щоб познайомитися з іншими учасниками.
+
+#### Скільки триває кожний перформанс-цикл?
+
+Перший жест циклу має бути з ETH і запускає час завершення циклу. Наступні жести додають поточний приріст до збереженого часу завершення, навіть після його спливу. Відлік не починається заново від поточного моменту. Жести можливі, доки завершення не виконається успішно.
+
+#### Чи можу я зробити кілька жестів за один цикл?
+
+У V3 наступний жест закарбовує всі CST участі для учасника попереднього жесту. Кількість лінійно залежить від часу між цими жестами. Перший жест циклу нічого не закарбовує за цим правилом, а завершення не виплачує додаткові CST участі учаснику із завершальним жестом. Якщо обидва жести належать одній адресі, вона отримує ці CST сама.
+
+### Розподіли та надходження
+
+#### Що таке розподіл Сигнатури?
+
+Розподіл Сигнатури отримує той, хто успішно завершує цикл: 20% резерву циклу, загалом 1 000 CST і 3 послідовні Cosmic Signature NFT. Протягом перших 48 годин після часу завершення це може зробити лише учасник із завершальним жестом; потім — будь-хто для себе.
+
+#### Що я отримую за кожний жест?
+
+У V3 наступний жест закарбовує всі CST участі для учасника попереднього жесту. Кількість лінійно залежить від часу між цими жестами. Перший жест циклу нічого не закарбовує за цим правилом, а завершення не виплачує додаткові CST участі учаснику із завершальним жестом. Якщо обидва жести належать одній адресі, вона отримує ці CST сама.
+
+#### Як працює зоряний відбір?
+
+І ETH-зоряний відбір, і NFT-зоряний відбір серед учасників використовують вагу кожного жесту. Вага — це базова вартість ETH-жесту на той момент, без зниження за Random Walk NFT і без надбавки за пізній жест. CST-жест отримує вагу за тією самою поточною базовою вартістю ETH. Відбір здійснюється з поверненням: одну адресу можна відібрати кілька разів. Зоряний відбір закріплених NFT окремо враховує активні Random Walk NFT.
+
+#### Як здійснюється випадковий відбір?
+
+І ETH-зоряний відбір, і NFT-зоряний відбір серед учасників використовують вагу кожного жесту. Вага — це базова вартість ETH-жесту на той момент, без зниження за Random Walk NFT і без надбавки за пізній жест. CST-жест отримує вагу за тією самою поточною базовою вартістю ETH. Відбір здійснюється з поверненням: одну адресу можна відібрати кілька разів. Зоряний відбір закріплених NFT окремо враховує активні Random Walk NFT.
+
+#### Як забрати розподіл, якщо я отримувач?
+
+Розподіл Сигнатури отримує той, хто успішно завершує цикл: 20% резерву циклу, загалом 1 000 CST і 3 послідовні Cosmic Signature NFT.
+
+Протягом перших 48 годин після часу завершення це може зробити лише учасник із завершальним жестом; потім — будь-хто для себе.
+
+Вторинні ETH-розподіли та долучені активи забирають окремо з гаманця розподілів. Після поточного строку 5 тижнів будь-хто може забрати ще не отримані активи для себе. Сплив строку не пересилає їх автоматично.
+
+#### Як працює закріплення?
+
+Cosmic Signature NFT можна закріпити в протоколі, щоб отримувати надходження за закріплення в ETH: кожен завершений цикл виділяє 5% резерву циклу, які діляться порівну між закріпленими Cosmic Signature NFT, а накопичений ETH надходить вам, коли ви відкріплюєте NFT.
+
+Random Walk NFT також можна закріпити, але лише для участі в зоряному відборі закріплених NFT — відібрані власники закріплень отримують CST і Cosmic Signature NFT, а не ETH.
+
+Варто знати два правила: кожен NFT можна закріпити лише один раз за все його існування (після відкріплення цей NFT уже ніколи не можна закріпити знову), а якщо на момент завершення циклу не закріплено жодного Cosmic Signature NFT, 5% цього циклу просто залишаються в резерві циклу. CST (ERC-20) закріпити не можна. Керувати закріпленнями можна на сторінці «Мої закріплення» (з меню облікового запису).
+
+#### Що таке резерв просування?
+
+Ви можете отримувати токени CST (ERC-20) за допомогу в просуванні протоколу. Резерв просування закарбовує 3 000 CST за цикл і передає їх тим, хто розвиває екосистему. Щоб дізнатися подробиці, зверніться до розпорядника резерву просування через Discord.
+
+#### Скільки Cosmic Signature NFT закарбовується за цикл?
+
+За наявності всіх напрямів цикл створює 26 Cosmic Signature NFT і 27 000 CST у фіксованих розподілах. Розподіл Сигнатури містить 3 NFT і лише один загальний розподіл 1 000 CST. Воїн часу, Чемпіон витривалості та завершальний CST-жест отримують по одному NFT і відповідний CST; два NFT-відбори додають свої записи. Без CST-жесту або закріплених Random Walk NFT відповідні напрями пропускаються. CST участі нараховуються окремо.
+
+#### Що відбувається з рештою ETH у резерві циклу?
+
+Приблизно половина ETH залишається для наступного циклу; округлення, відсутні напрями та невдалі передання можуть збільшити залишок. Це не гарантує, що наступний цикл почнеться з більшим резервом.
+
+#### Що відбувається з токенами чи NFT, долученими до жестів?
+
+Токени ERC-20 або NFT ERC-721, долучені до жестів, утримує в ескроу контракт гаманця розподілів; до резерву циклу в ETH вони не потрапляють. Після завершення бенефіціар циклу (зазвичай автор завершального жесту) має ексклюзивний пріоритет на їхнє забирання. Якщо долучені активи залишаються незабраними після спливу другорядного строку на забирання — нині за замовчуванням це 5 тижнів — контракти дозволяють будь-кому забрати їх собі.
+
+#### Хто отримує розподіл на суспільні блага з резерву циклу?
+
+Під час завершення протокол намагається передати 5% резерву циклу до сховища суспільних благ. Окрема транзакція, доступна будь-кому, пересилає баланс сховища поточному бенефіціару — нині Protocol Guild. Власник може змінити бенефіціара. Якщо передання зі протоколу не вдається, ця частка може залишитися в резерві, не скасовуючи завершення.
+
+### Механіка циклу
+
+#### Як змінюється вартість жесту протягом циклу?
+
+ETH і CST мають окремі правила базової вартості. На початку циклу ETH-вартість знижується у вікні калібрування, а кожен ETH-жест підвищує наступну базову вартість. CST-вартість знижується зі збереженою ончейн-швидкістю. Наприкінці відліку до обох вартостей додається пізня надбавка; вона не збільшує наступну базову вартість або вагу зоряного відбору.
+
+#### Що таке вікно калібрування?
+
+У V3 зберігається швидкість зниження вартості CST, а тривалість вікна обчислюється з неї та стелі. ETH-жест намагається збільшити швидкість за правилом rate + floor(rate / 100); CST-жест зменшує її за правилом rate - floor(rate / 101). Збільшення пропускають, якщо воно порушило б мінімальну тривалість. CST-жест перезапускає стелю як найбільше з подвоєної базової вартості CST без надбавки, налаштованого мінімуму та швидкості, помноженої на 180 секунд. Це не забороняє одразу зробити наступний жест.
+
+#### Як обчислюються CST участі?
+
+Кількість CST участі в найменших одиницях дорівнює elapsedSinceLastGesture * bidCstRewardAmountMultiplier / mainPrizeTimeIncrementInMicroSeconds. Час вимірюється в секундах, а приріст циклу — у мікросекундах. Для кількості CST результат ділять на 10^18.
+
+Наступний жест зараховує всю суму учаснику попереднього жесту. Перший жест не створює CST участі; завершення циклу також не нараховує останній незавершений інтервал.
+
+#### Що таке захист мінімального закарбування CST?
+
+Мінімум CST участі обмежує кількість, яку наступний жест зарахує попередньому учаснику, а не суму для відправника. Якщо обидві адреси збігаються, відправник отримує цю кількість сам. Значення 0 вимикає це обмеження; перший ETH-жест циклу пропускає перевірку. Максимальна вартість і мережеві комісії залишаються окремими умовами.
+
+#### Як кожен жест змінює вікно калібрування CST?
+
+У V3 зберігається швидкість зниження вартості CST, а тривалість вікна обчислюється з неї та стелі. ETH-жест намагається збільшити швидкість за правилом rate + floor(rate / 100); CST-жест зменшує її за правилом rate - floor(rate / 101). Збільшення пропускають, якщо воно порушило б мінімальну тривалість. CST-жест перезапускає стелю як найбільше з подвоєної базової вартості CST без надбавки, налаштованого мінімуму та швидкості, помноженої на 180 секунд. Це не забороняє одразу зробити наступний жест.
+
+#### Що таке вікно відкритого завершення?
+
+Розподіл Сигнатури отримує той, хто успішно завершує цикл: 20% резерву циклу, загалом 1 000 CST і 3 послідовні Cosmic Signature NFT. Протягом перших 48 годин після часу завершення це може зробити лише учасник із завершальним жестом; потім — будь-хто для себе.
+
+#### Хто такий Чемпіон витривалості?
+
+Учасник, який протягом циклу найдовше безперервно залишався автором останнього жесту (тобто мав найдовшу паузу до появи наступного жесту). Коли цикл завершується, Чемпіон витривалості отримує закарбування 1 000 CST визнання й один Cosmic Signature NFT.
+
+#### Що таке завершальний CST-жест?
+
+Завершальний CST-жест — це останній жест, зроблений токенами CST протягом циклу. Коли цикл завершується, учасник, який його зробив, отримує закарбування 1 000 CST визнання й один Cosmic Signature NFT.
+
+#### Хто такий Воїн часу?
+
+Учасник, який найдовше безперервно утримував позицію Чемпіона витривалості. Якщо Чемпіон витривалості — це автор останнього жесту з найдовшим безперервним лідерством, то Воїн часу — це Чемпіон витривалості з найдовшим безперервним лідерством. Коли цикл завершується, Воїн часу отримує 15% резерву циклу в ETH, 1 000 CST і один Cosmic Signature NFT.
+
+#### Чи час, який додає кожен жест, завжди однаковий?
+
+Ні. На старті час, що додається після кожного жесту, становив рівно одну годину, і він зростає на 1% щоразу, коли завершується цикл. Оскільки більший приріст також подовжує кожен цикл, у календарному часі це зростання природно сповільнюється.
+
+#### Чому час, який додає кожен жест, з часом збільшується?
+
+Цей механізм задає довгостроковий темп закарбування Cosmic Signature NFT: що довші цикли, то менше нових NFT закарбовується за той самий проміжок часу.
+
+#### Як збільшення часу за жест впливає на протокол?
+
+Збільшення часового приросту може впливати на частоту завершення циклів, але не встановлює фіксованої верхньої межі пропозиції NFT або гарантованої кількості нових творів за певний період.
+
+#### Що станеться, якщо два жести надіслано одночасно?
+
+Arbitrum виконує транзакції послідовно, у порядку, визначеному секвенсером. Перший жест оновлює стан протоколу. Наступний також може бути виконаний, якщо вкладається в задані межі вартості й мінімальної кількості CST участі. Інакше контракт відхиляє його.
+
+#### Чи є в Cosmic Signature стратегічний елемент?
+
+Так. Час, частота та спосіб жестів учасників (ETH, CST або долучення Random Walk NFT) впливають на те, як формуються розподіли. Соціальна динаміка й дизайн протоколу задумані так, щоб різні стратегії могли бути успішними в різних напрямах розподілу.
 
 ## 한국어 개요
 
-Cosmic Signature는 Arbitrum 위에서 작동하는 절차적 온체인 아트 프로토콜입니다. 참여자는 퍼포먼스 사이클 동안 제스처를 남기고, 모든 제스처는 사이클의 최종 시그니처에 영향을 줍니다. 사이클이 마감되면 프로토콜은 공개된 규칙에 따라 사이클 준비금을 정해진 배분 경로로 배분하며, 그 가운데에는 이더리움 핵심 기여자를 지원하는 Protocol Guild가 있습니다.
+Cosmic Signature는 Arbitrum 위의 절차적 온체인 아트 프로토콜입니다. 퍼포먼스 사이클마다 참여자는 ETH 또는 CST로 제스처를 남기고, 모든 제스처가 최종 시그니처를 함께 빚어냅니다. 시그니처는 온체인 데이터에서 생성되어 삼체 물리 시뮬레이션으로 렌더링되는 결정론적 NFT 작품입니다.
 
-Cosmic Signature는 COSMIC 암 돌연변이 데이터베이스나 생물학의 COSMIC 돌연변이 시그니처와 관련이 없습니다.
+Cosmic Signature는 COSMIC 암 돌연변이 데이터베이스나 생물학의 COSMIC 돌연변이 시그니처와 관련이 없습니다. 온체인 아트 프로토콜이자 앱입니다.
 
-### 한국어 주요 페이지
+- [/ko/](https://cosmicsignature.com/ko/)
+- [/ko/about](https://cosmicsignature.com/ko/about)
+- [/ko/white-paper](https://cosmicsignature.com/ko/white-paper)
+- [/ko/learn](https://cosmicsignature.com/ko/learn)
+- [/ko/quiz](https://cosmicsignature.com/ko/quiz)
+- [/ko/](https://app.cosmicsignature.com/ko/)
+- [/ko/current-cycle](https://app.cosmicsignature.com/ko/current-cycle)
+- [/ko/how-it-works](https://app.cosmicsignature.com/ko/how-it-works)
+- [/ko/faq](https://app.cosmicsignature.com/ko/faq)
+- [/ko/gallery](https://app.cosmicsignature.com/ko/gallery)
+- [/ko/statistics](https://app.cosmicsignature.com/ko/statistics)
+- [/ko/anchoring](https://app.cosmicsignature.com/ko/anchoring)
+- [/ko/allocation](https://app.cosmicsignature.com/ko/allocation)
+- [/ko/contracts](https://app.cosmicsignature.com/ko/contracts)
+- [/ko/code](https://app.cosmicsignature.com/ko/code)
+- [/ko/security](https://app.cosmicsignature.com/ko/security)
+- [/ko/audits](https://app.cosmicsignature.com/ko/audits)
+- [/ko/risk-disclosures](https://app.cosmicsignature.com/ko/risk-disclosures)
+- [/ko/terms](https://app.cosmicsignature.com/ko/terms)
+- [/ko/privacy](https://app.cosmicsignature.com/ko/privacy)
+- [/ko/marketing](https://app.cosmicsignature.com/ko/marketing)
+- [/ko/imprint](https://app.cosmicsignature.com/ko/imprint)
+- [/ko/my-tokens](https://app.cosmicsignature.com/ko/my-tokens)
+- [/ko/my-anchors](https://app.cosmicsignature.com/ko/my-anchors)
+- [/ko/my-allocations](https://app.cosmicsignature.com/ko/my-allocations)
+- [/ko/my-statistics](https://app.cosmicsignature.com/ko/my-statistics)
 
-- [한국어 홈](https://cosmicsignature.com/ko): 프로토콜과 온체인 아트 개요
-- [소개](https://cosmicsignature.com/ko/about): 프로토콜 소개, 공식 링크, 같은 이름의 다른 서비스와의 구분
-- [백서](https://cosmicsignature.com/ko/white-paper): 프로토콜 메커니즘과 설계의 전체 설명 (한국어와 영어, PDF 포함)
-- [학습](https://cosmicsignature.com/ko/learn): 퍼포먼스 사이클, 삼체 아트, 앵커링, 공공재 설명
-- [한국어 앱](https://app.cosmicsignature.com/ko): 현재 사이클과 제스처 인터페이스
-- [갤러리](https://app.cosmicsignature.com/ko/gallery): 각인된 Cosmic Signature NFT 둘러보기
-- [작동 원리](https://app.cosmicsignature.com/ko/how-it-works): 전체 프로토콜 메커니즘
-- [자주 묻는 질문](https://app.cosmicsignature.com/ko/faq): 주제별로 정리한 한국어 답변
-- [통계](https://app.cosmicsignature.com/ko/statistics): 공개 프로토콜 데이터
-- [앵커링](https://app.cosmicsignature.com/ko/anchoring): 앵커링 규칙과 지급 내역
-- [컨트랙트](https://app.cosmicsignature.com/ko/contracts): 배포된 컨트랙트 주소
-- [보안](https://app.cosmicsignature.com/ko/security): 검증 자료와 안전한 참여 안내
-- [보안 감사](https://app.cosmicsignature.com/ko/audits): Hacken 감사 보고서와 정형 검증 배경
-- [위험 고지](https://app.cosmicsignature.com/ko/risk-disclosures): 블록체인, 지갑, 프로토콜 참여의 위험
+[버전 1.0 — 2026년 8월](https://cosmicsignature.com/ko/white-paper)
 
-### 프로토콜 요점
+NFT 시드는 온체인에 저장되고 이미지와 영상은 오프체인에서 생성됩니다. 재현하려면 같은 시드, 해당 렌더러 버전과 설정, 호환되는 도구가 필요합니다. 시드만 같다고 서로 다른 버전의 결과가 동일하다는 보장은 없습니다.
 
-- 모든 사이클은 ETH 및 CST 보정 구간 메커니즘으로 시작합니다. CST 보정 구간은 12시간 기준에서 출발해 온체인 참여에 따라 달라집니다
-- 모든 제스처는 현재 시간 증가량만큼 마감 카운트다운을 연장합니다. 시간 증가량은 1시간에서 시작해 사이클이 마감될 때마다 1% 늘어납니다
-- 카운트다운이 0이 되면 최종 제스처를 남긴 참여자에게 48시간의 우선 마감 구간이 주어집니다. 그 뒤에는 누구나 사이클을 마감할 수 있으며, 실제로 마감한 사람이 시그니처 배분을 받습니다.
-- 각 사이클 준비금의 25%는 시그니처 배분으로, 8%는 시간의 전사에게, 4%는 ETH 별빛 선정으로 정해지는 3건에 균등 배분되고, 6%는 앵커링 지급에, 7%는 Protocol Guild에 전달되며, 약 50%는 다음 사이클로 이월됩니다.
-- 대부분의 사이클에서는 Cosmic Signature NFT 24개가 각인되고 여기에 24,000 CST가 함께 각인됩니다. 홍보 준비금 3,000 CST를 더하면 일반적인 사이클의 고정 각인 총량은 27,000 CST이며, 제스처마다 동적으로 계산되는 참여 CST는 별도입니다.
-- 각 Cosmic Signature NFT 또는 Random Walk NFT는 평생 한 번만 앵커링할 수 있으며, 앵커링을 해제하면 다시 앵커링할 수 없습니다.
-- 사용하지 않은 Random Walk NFT는 ETH 제스처 하나에 첨부해 그 ETH 제스처의 비용을 50% 할인받을 수 있습니다. 각 Random Walk NFT는 이 할인에 한 번만 쓸 수 있습니다.
-- 2차 ETH와 첨부 자산에는 5주의 회수 기한이 있으며, 기한이 지나면 누구나 미회수 배분을 자기 몫으로 회수할 수 있습니다.
+### 시작하기
 
-### 생태계
+#### Cosmic Signature란 무엇인가요?
 
-- [Axiom Zero](https://www.axiomzero.market/cosmic-signature): 플랫폼 수수료가 없는 Arbitrum NFT 마켓플레이스
-- [Chaos Zero](https://chaoszero.com): Cosmic Signature 사이클을 다루는 예측 시장. 사이클마다 "이번 사이클은 이전 사이클보다 더 많은 제스처로 마감될 것인가?"를 묻습니다.
-- [Uniswap CST 교환](https://app.uniswap.org/swap?chain=arbitrum&inputCurrency=NATIVE&outputCurrency=0xAD91843e6A58Ba560F577E676986AFb1dba6FBA0): Arbitrum에서 CST 교환
+Cosmic Signature는 Arbitrum 위의 절차적 온체인 아트 프로토콜입니다. 참여자는 퍼포먼스 사이클 동안 제스처를 남기고, 모든 제스처가 사이클의 최종 시그니처를 빚어냅니다. 사이클이 마감되면 프로토콜은 준비금을 정해진 배분 경로로 배분합니다. 이더리움 핵심 기여자 170명 이상을 위한 자금 지원 메커니즘인 Protocol Guild도 그중 하나입니다.
+
+#### 퍼포먼스 사이클은 어떻게 진행되나요?
+
+사이클의 첫 제스처는 ETH여야 하며 마감 시계를 시작합니다. 이후 제스처는 시간이 지난 뒤에도 저장된 마감 시각에 현재 시간 증가량을 더합니다. 현재 시각에서 시계를 다시 시작하지 않습니다. 마감이 성공적으로 실행될 때까지 제스처가 가능합니다.
+
+#### 어떤 종류의 제스처가 있나요?
+
+ETH와 CST의 기본 비용은 별도 규칙을 따릅니다. 사이클이 열릴 때 ETH 비용은 보정 구간에서 내려가고, ETH 제스처마다 다음 기본 비용이 올라갑니다. CST 비용은 온체인에 저장된 속도로 내려갑니다. 마감이 가까우면 두 비용 모두 늦은 제스처 할증이 붙지만, 이 할증은 다음 기본 비용이나 별빛 선정 가중치를 높이지 않습니다. 사이클의 첫 제스처는 ETH여야 하며 마감 시계를 시작합니다. 이후 제스처는 시간이 지난 뒤에도 저장된 마감 시각에 현재 시간 증가량을 더합니다. 현재 시각에서 시계를 다시 시작하지 않습니다. 마감이 성공적으로 실행될 때까지 제스처가 가능합니다. ETH 비용 감소에는 각 Random Walk NFT를 단 한 번 사용할 수 있습니다. 컨트랙트는 소유권을 확인하고 사용 표시를 남기며 NFT 자체는 전송하지 않습니다. 앵커링과는 별도 권리입니다.
+
+#### NFT가 하나도 없어도 참여할 수 있나요?
+
+네. 누구나 제스처를 남기는 것만으로 Cosmic Signature 퍼포먼스 사이클에 참여할 수 있습니다. 아직 사용하지 않은 Random Walk NFT가 있다면 ETH 제스처에 첨부해 제스처 비용을 50% 할인받을 수 있습니다.
+
+#### 어떻게 참여할 수 있나요?
+
+퍼포먼스 사이클 동안 제스처를 남기거나, 자신의 프로젝트 NFT를 참여자의 제스처에 첨부할 수 있도록 기여하는 방식으로 참여할 수 있습니다. 다른 참여자는 Discord에서 만날 수 있습니다.
+
+#### 퍼포먼스 사이클 하나는 얼마나 오래 이어지나요?
+
+사이클의 첫 제스처는 ETH여야 하며 마감 시계를 시작합니다. 이후 제스처는 시간이 지난 뒤에도 저장된 마감 시각에 현재 시간 증가량을 더합니다. 현재 시각에서 시계를 다시 시작하지 않습니다. 마감이 성공적으로 실행될 때까지 제스처가 가능합니다.
+
+#### 한 사이클에서 제스처를 여러 번 남길 수 있나요?
+
+V3에서는 다음 제스처가 이전 제스처 참여자에게 참여 CST 전액을 각인합니다. 수량은 두 제스처 사이의 시간에 선형으로 비례합니다. 사이클의 첫 제스처는 이 규칙으로 CST를 각인하지 않으며, 마감도 최종 제스처 참여자의 마지막 구간에 추가 참여 CST를 지급하지 않습니다. 두 제스처의 주소가 같으면 해당 주소가 직접 받습니다.
+
+### 배분과 앵커링 지급
+
+#### 시그니처 배분이란 무엇인가요?
+
+마감을 성공적으로 실행한 주소는 사이클 준비금의 20%, 총 1,000 CST, 연속 ID의 Cosmic Signature NFT 3개를 받습니다. 마감 시각 이후 첫 48시간에는 최종 제스처 참여자만 실행할 수 있고, 그 뒤에는 누구나 실행하여 자기 몫으로 받을 수 있습니다.
+
+#### 제스처마다 무엇을 받나요?
+
+V3에서는 다음 제스처가 이전 제스처 참여자에게 참여 CST 전액을 각인합니다. 수량은 두 제스처 사이의 시간에 선형으로 비례합니다. 사이클의 첫 제스처는 이 규칙으로 CST를 각인하지 않으며, 마감도 최종 제스처 참여자의 마지막 구간에 추가 참여 CST를 지급하지 않습니다. 두 제스처의 주소가 같으면 해당 주소가 직접 받습니다.
+
+#### 별빛 선정은 어떻게 이루어지나요?
+
+참여자 ETH 별빛 선정과 NFT 별빛 선정 모두 제스처별 가중치를 사용합니다. 가중치는 해당 시점의 ETH 기본 비용이며, Random Walk NFT 비용 감소와 늦은 제스처 할증은 제외합니다. CST 제스처에도 같은 시점의 ETH 기본 비용을 적용합니다. 복원 선정이므로 같은 주소가 여러 번 선정될 수 있습니다. 앵커링 NFT 별빛 선정은 활성 Random Walk NFT를 별도로 대상으로 합니다.
+
+#### 무작위 선정은 어떻게 이루어지나요?
+
+참여자 ETH 별빛 선정과 NFT 별빛 선정 모두 제스처별 가중치를 사용합니다. 가중치는 해당 시점의 ETH 기본 비용이며, Random Walk NFT 비용 감소와 늦은 제스처 할증은 제외합니다. CST 제스처에도 같은 시점의 ETH 기본 비용을 적용합니다. 복원 선정이므로 같은 주소가 여러 번 선정될 수 있습니다. 앵커링 NFT 별빛 선정은 활성 Random Walk NFT를 별도로 대상으로 합니다.
+
+#### 수령자가 되면 배분을 어떻게 회수하나요?
+
+마감을 성공적으로 실행한 주소는 사이클 준비금의 20%, 총 1,000 CST, 연속 ID의 Cosmic Signature NFT 3개를 받습니다.
+
+마감 시각 이후 첫 48시간에는 최종 제스처 참여자만 실행할 수 있고, 그 뒤에는 누구나 실행하여 자기 몫으로 받을 수 있습니다.
+
+2차 ETH 배분과 첨부 자산은 배분 지갑에서 별도로 회수합니다. 현재 기한인 5주가 지나면 누구나 미회수 자산을 자기 몫으로 회수할 수 있습니다. 기한 만료만으로 자동 전송되지는 않습니다.
+
+#### 앵커링은 어떻게 작동하나요?
+
+Cosmic Signature NFT를 프로토콜에 앵커링하면 ETH 앵커링 지급을 받을 수 있습니다. 마감되는 사이클마다 사이클 준비금의 5%가 앵커링된 Cosmic Signature NFT에 균등하게 나뉘고, 쌓인 ETH는 앵커링을 해제할 때 지급됩니다.
+
+Random Walk NFT도 앵커링할 수 있지만, 이는 앵커링 NFT 별빛 선정 자격을 얻기 위한 것입니다. 선정된 앵커링 보유자는 ETH가 아니라 CST와 Cosmic Signature NFT를 받습니다.
+
+알아 두어야 할 규칙이 두 가지 있습니다. 모든 NFT는 단 한 번만 앵커링할 수 있으며(앵커링을 해제한 NFT는 다시 앵커링할 수 없습니다), 사이클이 마감될 때 앵커링된 Cosmic Signature NFT가 하나도 없으면 그 사이클의 5%는 사이클 준비금에 그대로 남습니다. CST(ERC-20)는 앵커링할 수 없습니다. 앵커링 관리는 계정 메뉴의 내 앵커링 페이지에서 할 수 있습니다.
+
+#### 홍보 준비금이란 무엇인가요?
+
+프로토콜을 알리는 데 힘을 보태면 CST 토큰(ERC-20)을 받을 수 있습니다. 홍보 준비금은 사이클마다 3,000 CST를 각인해 생태계 기여자에게 전달합니다. 자세한 안내는 Discord에서 홍보 준비금 재무 담당자에게 문의해 주세요.
+
+#### 사이클마다 Cosmic Signature NFT가 몇 개 각인되나요?
+
+모든 경로가 있으면 한 사이클에서 Cosmic Signature NFT 26개와 고정 배분 CST 27,000개가 각인됩니다. 시그니처 배분은 NFT 3개에 대해 CST 1,000개를 합계로 한 번 받습니다. 시간의 전사, 수호 챔피언, 최종 CST 제스처는 각각 NFT 1개와 해당 CST를 받으며, 두 NFT 선정 경로가 나머지를 더합니다. CST 제스처나 앵커링된 Random Walk NFT가 없으면 해당 경로는 생략합니다. 참여 CST는 별도입니다.
+
+#### 사이클 준비금에 남은 ETH는 어떻게 되나요?
+
+ETH의 약 절반이 다음 사이클로 이어집니다. 정수 처리, 생략된 경로, 실패한 전송으로 더 많은 ETH가 남을 수 있습니다. 다음 사이클의 시작 준비금이 더 커진다는 보장은 없습니다.
+
+#### 제스처에 첨부된 토큰이나 NFT는 어떻게 되나요?
+
+제스처에 첨부된 ERC-20 토큰이나 ERC-721 NFT는 배분 지갑 컨트랙트가 에스크로로 보관하며, ETH 사이클 준비금에는 합쳐지지 않습니다. 마감 후에는 사이클 수령자(보통 최종 제스처 참여자)에게 이를 우선 회수할 권리가 있습니다. 첨부 자산이 2차 회수 기한(현재 기본값 5주)을 넘겨도 회수되지 않으면, 누구든 이를 자기 몫으로 회수할 수 있습니다.
+
+#### 사이클 준비금의 공공재 배분은 누가 받나요?
+
+마감 시 프로토콜은 사이클 준비금의 5%를 공공재 금고로 보내려고 시도합니다. 이후 누구나 별도 트랜잭션으로 금고 잔액을 현재 공공재 수령처인 Protocol Guild에 전달할 수 있습니다. 소유자는 수령처를 바꿀 수 있습니다. 프로토콜에서 금고로 보내는 작업이 실패하면 마감을 취소하지 않고 해당 몫이 준비금에 남을 수 있습니다.
+
+### 사이클 메커니즘
+
+#### 제스처 비용은 사이클 동안 어떻게 달라지나요?
+
+ETH와 CST의 기본 비용은 별도 규칙을 따릅니다. 사이클이 열릴 때 ETH 비용은 보정 구간에서 내려가고, ETH 제스처마다 다음 기본 비용이 올라갑니다. CST 비용은 온체인에 저장된 속도로 내려갑니다. 마감이 가까우면 두 비용 모두 늦은 제스처 할증이 붙지만, 이 할증은 다음 기본 비용이나 별빛 선정 가중치를 높이지 않습니다.
+
+#### 보정 구간이란 무엇인가요?
+
+V3는 CST 비용의 하락 속도를 저장하며 구간 길이는 속도와 상한에서 계산합니다. ETH 제스처는 rate + floor(rate / 100)으로 속도 증가를 시도하고, CST 제스처는 rate - floor(rate / 101)로 속도를 줄입니다. 최소 구간 조건을 어기면 ETH의 속도 증가는 적용하지 않습니다. CST 제스처는 할증 전 기본 비용의 두 배, 설정된 최소값, 새 속도에 180초를 곱한 값 가운데 가장 큰 값으로 상한을 다시 설정합니다. 다음 제스처를 즉시 남기는 것은 가능합니다.
+
+#### 참여 CST는 어떻게 계산되나요?
+
+참여 CST의 최소 단위 수량은 elapsedSinceLastGesture * bidCstRewardAmountMultiplier / mainPrizeTimeIncrementInMicroSeconds입니다. 경과 시간은 초, 사이클 시간 증가량은 마이크로초 단위입니다. CST 수량으로 표시할 때는 결과를 10^18로 나눕니다.
+
+다음 제스처가 이전 참여자에게 전액을 각인합니다. 첫 제스처에는 참여 CST가 없으며 마감도 마지막 구간을 추가 지급하지 않습니다.
+
+#### 최소 참여 CST 보호란 무엇인가요?
+
+최소 참여 CST는 다음 제스처가 이전 참여자에게 각인할 수량을 제한하며, 제출자에게 지급할 수량을 보장하지 않습니다. 두 주소가 같으면 제출자가 직접 받습니다. 0은 이 제한을 해제하며, 사이클의 첫 ETH 제스처는 이 검사를 건너뜁니다. 최대 비용과 네트워크 수수료는 별도 조건입니다.
+
+#### 제스처마다 CST 보정 구간은 어떻게 달라지나요?
+
+V3는 CST 비용의 하락 속도를 저장하며 구간 길이는 속도와 상한에서 계산합니다. ETH 제스처는 rate + floor(rate / 100)으로 속도 증가를 시도하고, CST 제스처는 rate - floor(rate / 101)로 속도를 줄입니다. 최소 구간 조건을 어기면 ETH의 속도 증가는 적용하지 않습니다. CST 제스처는 할증 전 기본 비용의 두 배, 설정된 최소값, 새 속도에 180초를 곱한 값 가운데 가장 큰 값으로 상한을 다시 설정합니다. 다음 제스처를 즉시 남기는 것은 가능합니다.
+
+#### 공개 마감 구간이란 무엇인가요?
+
+마감을 성공적으로 실행한 주소는 사이클 준비금의 20%, 총 1,000 CST, 연속 ID의 Cosmic Signature NFT 3개를 받습니다. 마감 시각 이후 첫 48시간에는 최종 제스처 참여자만 실행할 수 있고, 그 뒤에는 누구나 실행하여 자기 몫으로 받을 수 있습니다.
+
+#### 수호 챔피언이란 무엇인가요?
+
+한 사이클 안에서 최근 제스처 참여자 자리를 끊기지 않고 가장 오래 지킨 참여자입니다(다음 제스처가 오기까지의 공백이 가장 길었던 참여자). 사이클이 마감되면 수호 챔피언은 공로 CST 1,000개와 Cosmic Signature NFT 1개를 받습니다.
+
+#### 최종 CST 제스처란 무엇인가요?
+
+최종 CST 제스처는 한 사이클에서 CST 토큰으로 남긴 제스처 가운데 가장 나중의 것입니다. 사이클이 마감되면 이를 남긴 참여자가 공로 CST 1,000개와 Cosmic Signature NFT 1개를 받습니다.
+
+#### 시간의 전사란 무엇인가요?
+
+수호 챔피언 자리를 끊기지 않고 가장 오래 지킨 참여자입니다. 수호 챔피언이 최근 제스처 참여자 자리를 가장 오래 지킨 사람이라면, 시간의 전사는 수호 챔피언 자리를 가장 오래 지킨 사람입니다. 사이클이 마감되면 시간의 전사는 사이클 준비금 ETH의 15%, 1,000 CST, Cosmic Signature NFT 1개를 받습니다.
+
+#### 제스처마다 더해지는 시간은 늘 같나요?
+
+아닙니다. 제스처마다 더해지는 시간은 출시 시점에 정확히 1시간이었고, 사이클이 마감될 때마다 1%씩 늘어납니다. 증가량이 커지면 사이클 하나도 더 오래 이어지므로, 실제 달력 시간으로 보면 증가 속도는 자연스럽게 느려집니다.
+
+#### 제스처마다 더해지는 시간이 왜 점점 늘어나나요?
+
+이 메커니즘은 Cosmic Signature NFT의 장기적인 각인 속도를 정합니다. 사이클이 길어질수록 같은 기간에 각인되는 새 NFT가 줄어듭니다.
+
+#### 제스처당 시간 증가는 프로토콜에 어떤 영향을 주나요?
+
+시간 증가량이 커지면 사이클 마감 빈도에 영향을 줄 수 있지만, NFT 공급량의 고정 상한이나 일정 기간의 새 작품 수를 보장하지는 않습니다.
+
+#### 두 제스처가 동시에 제출되면 어떻게 되나요?
+
+Arbitrum 트랜잭션은 시퀀서가 포함한 순서대로 처리됩니다. 뒤의 제스처는 앞의 제스처가 반영된 상태에서 실행됩니다. 최대 비용과 최소 참여 CST 조건을 충족하면 뒤의 제스처도 실행되고, 충족하지 못하면 취소됩니다. 취소된 경우 미리 보기를 갱신한 뒤 다시 시도해 주세요.
+
+#### Cosmic Signature에 전략적 요소가 있나요?
+
+네. 참여자의 타이밍, 제스처 빈도, 제스처 수단(ETH, CST, Random Walk NFT 첨부)이 모두 배분이 이루어지는 방식에 영향을 줍니다. 사회적 역학과 프로토콜 설계는 서로 다른 배분 경로에서 여러 전략이 함께 결실을 맺을 수 있도록 짜여 있습니다.
 
 ## 日本語の概要
 
-Cosmic SignatureはArbitrum上で動くプロシージャル・オンチェーンアート・プロトコルです。参加者はパフォーマンス・サイクルの間に一筆を入れ、すべての一筆がサイクルの最終シグネチャーに影響します。サイクルが確定すると、プロトコルは公開されたルールに従ってサイクル準備金を定められた配分トラックへ配り、その中にはEthereumのコア貢献者を支えるProtocol Guildも含まれます。
+Cosmic SignatureはArbitrum上のプロシージャル・オンチェーンアート・プロトコルです。参加者がETHまたはCSTで一筆を入れるたびに、そのサイクルのシグネチャーが形づくられます。シグネチャーは、オンチェーンのデータと三体問題の物理シミュレーションから生まれる決定論的なNFT作品です。
 
-Cosmic Signatureは、COSMICがん変異データベースや生物学のCOSMIC変異シグネチャーとは関係がありません。
+Cosmic Signatureは、生物学におけるCOSMICがん変異データベースやCOSMIC変異シグネチャーとは関係がありません。オンチェーンアートのプロトコルとアプリです。
 
-### 日本語の主要ページ
+- [/ja/](https://cosmicsignature.com/ja/)
+- [/ja/about](https://cosmicsignature.com/ja/about)
+- [/ja/white-paper](https://cosmicsignature.com/ja/white-paper)
+- [/ja/learn](https://cosmicsignature.com/ja/learn)
+- [/ja/quiz](https://cosmicsignature.com/ja/quiz)
+- [/ja/](https://app.cosmicsignature.com/ja/)
+- [/ja/current-cycle](https://app.cosmicsignature.com/ja/current-cycle)
+- [/ja/how-it-works](https://app.cosmicsignature.com/ja/how-it-works)
+- [/ja/faq](https://app.cosmicsignature.com/ja/faq)
+- [/ja/gallery](https://app.cosmicsignature.com/ja/gallery)
+- [/ja/statistics](https://app.cosmicsignature.com/ja/statistics)
+- [/ja/anchoring](https://app.cosmicsignature.com/ja/anchoring)
+- [/ja/allocation](https://app.cosmicsignature.com/ja/allocation)
+- [/ja/contracts](https://app.cosmicsignature.com/ja/contracts)
+- [/ja/code](https://app.cosmicsignature.com/ja/code)
+- [/ja/security](https://app.cosmicsignature.com/ja/security)
+- [/ja/audits](https://app.cosmicsignature.com/ja/audits)
+- [/ja/risk-disclosures](https://app.cosmicsignature.com/ja/risk-disclosures)
+- [/ja/terms](https://app.cosmicsignature.com/ja/terms)
+- [/ja/privacy](https://app.cosmicsignature.com/ja/privacy)
+- [/ja/marketing](https://app.cosmicsignature.com/ja/marketing)
+- [/ja/imprint](https://app.cosmicsignature.com/ja/imprint)
+- [/ja/my-tokens](https://app.cosmicsignature.com/ja/my-tokens)
+- [/ja/my-anchors](https://app.cosmicsignature.com/ja/my-anchors)
+- [/ja/my-allocations](https://app.cosmicsignature.com/ja/my-allocations)
+- [/ja/my-statistics](https://app.cosmicsignature.com/ja/my-statistics)
 
-- [日本語ホーム](https://cosmicsignature.com/ja): プロトコルとオンチェーンアートの概要
-- [概要](https://cosmicsignature.com/ja/about): プロトコルの概要、公式リンク、同名のサービスとの区別
-- [ホワイトペーパー](https://cosmicsignature.com/ja/white-paper): プロトコルの仕組みと設計の完全な説明（日本語と英語、PDFあり）
-- [学ぶ](https://cosmicsignature.com/ja/learn): パフォーマンス・サイクル、三体アート、係留、公共財の解説
-- [日本語アプリ](https://app.cosmicsignature.com/ja): 現在のサイクルと一筆のインターフェース
-- [ギャラリー](https://app.cosmicsignature.com/ja/gallery): 刻印されたCosmic Signature NFTを見る
-- [仕組み](https://app.cosmicsignature.com/ja/how-it-works): プロトコルの仕組みの全体
-- [よくある質問](https://app.cosmicsignature.com/ja/faq): 話題ごとに整理した日本語の回答
-- [統計](https://app.cosmicsignature.com/ja/statistics): 公開のプロトコルデータ
-- [係留](https://app.cosmicsignature.com/ja/anchoring): 係留のルールと配分の履歴
-- [コントラクト](https://app.cosmicsignature.com/ja/contracts): デプロイ済みのコントラクトアドレス
-- [セキュリティ](https://app.cosmicsignature.com/ja/security): 検証のリソースと安全な参加の案内
-- [監査](https://app.cosmicsignature.com/ja/audits): Hackenの監査報告書と形式検証の背景
-- [リスク開示](https://app.cosmicsignature.com/ja/risk-disclosures): ブロックチェーン、ウォレット、プロトコル参加のリスク
+[バージョン1.0 — 2026年8月](https://cosmicsignature.com/ja/white-paper)
 
-### プロトコルの要点
+NFTのシードはオンチェーンに保存され、画像と動画はオフチェーンで生成されます。再現には同じシード、適切なレンダラーの版と設定、互換性のあるツールが必要です。シードだけで異なる版の出力まで一致するとは限りません。
 
-- すべてのサイクルはETHとCSTの調律期間の仕組みで始まります。CST調律期間は初期値は12時間で、オンチェーンの参加に応じて変わります。
-- すべての一筆は現在の時間増分だけ確定までのカウントダウンを延ばします。時間増分は1時間から始まり、サイクルが確定するごとに1%ずつ増えます。
-- カウントダウンがゼロになると、最後の一筆を入れた参加者に48時間の優先確定期間が与えられます。その後は誰でもサイクルを確定でき、実際に確定した人がシグネチャー配分を受け取ります。
-- 各サイクル準備金の25%はシグネチャー配分に、8%は時の戦士に、4%はETH星選で選ばれた3件に均等配分され、6%は係留配分に、7%はProtocol Guildへ送られ、約50%は次のサイクルへ持ち越されます。
-- 大多数のサイクルでは24枚のCosmic Signature NFTが刻印され、それとともに24,000 CSTが刻印されます。広報準備金の3,000 CSTを加えると、標準的なサイクルの固定の刻印の合計は27,000 CSTで、一筆ごとに動的に計算される参加CSTは別です。
-- 各Cosmic Signature NFTまたは各Random Walk NFTを係留できるのは一度だけで、解除後は再係留できません。
-- 未使用のRandom Walk NFTはETH一筆に添付でき、その一筆の費用が50%割引されます。各Random Walk NFTはこの割引に一度しか使えません。
-- 二次的なETHと添付されたアセットには5週間の受け取り期限があり、期限が過ぎると誰でも未受け取りの配分を自分のものとして受け取れます。
+### はじめに
 
-### エコシステム
+#### Cosmic Signatureとは何ですか？
 
-- [Axiom Zero](https://www.axiomzero.market/cosmic-signature): プラットフォーム手数料のないArbitrumのNFTマーケットプレイス
-- [Chaos Zero](https://chaoszero.com): Cosmic Signatureのサイクルを扱う予測市場。サイクルごとに「このサイクルは前のサイクルより多い筆数で確定するか？」を問います。
-- [UniswapでのCSTスワップ](https://app.uniswap.org/swap?chain=arbitrum&inputCurrency=NATIVE&outputCurrency=0xAD91843e6A58Ba560F577E676986AFb1dba6FBA0): Arbitrum上でのCSTのスワップ
+Cosmic SignatureはArbitrum上のプロシージャル・オンチェーンアート・プロトコルです。参加者はパフォーマンス・サイクルの間に一筆を入れ、その一つひとつがサイクルの最終シグネチャーを形づくります。サイクルが確定すると、プロトコルは準備金を定められた配分トラックへ配ります。その中には、170人以上のEthereumコア貢献者の資金支援メカニズムであるProtocol Guildも含まれます。
+
+#### パフォーマンス・サイクルはどのように進みますか？
+
+サイクル最初の一筆はETHで入れ、確定時計を始めます。以降の一筆は、時刻を過ぎた後も保存済みの確定時刻に現在の加算時間を足します。現在時刻から時計を再開するわけではありません。確定処理が成功するまでは一筆を入れられます。
+
+#### どんな種類の一筆がありますか？
+
+ETHとCSTの基本費用は別々のルールに従います。開始時のETH費用は調律期間中に下がり、ETH一筆ごとに次の基本費用が上がります。CST費用は保存された下降速度で下がります。確定時刻が近づくと両方に終盤の加算が付きますが、次の基本費用や星選のウェイトは増やしません。サイクル最初の一筆はETHで入れ、確定時計を始めます。以降の一筆は、時刻を過ぎた後も保存済みの確定時刻に現在の加算時間を足します。現在時刻から時計を再開するわけではありません。確定処理が成功するまでは一筆を入れられます。各Random Walk NFTはETH費用の割引に一度だけ使えます。コントラクトは所有権を確認して使用済みと記録し、NFT自体は移しません。係留とは別の権利です。
+
+#### NFTを一つも持っていなくても参加できますか？
+
+はい。一筆を入れれば、誰でもCosmic Signatureのパフォーマンス・サイクルに参加できます。未使用のRandom Walk NFTをETH一筆に添付すると、一筆の費用が50%引き下げられます。
+
+#### どのように参加できますか？
+
+パフォーマンス・サイクルの間に一筆を入れることで参加できます。あるいは、自分のプロジェクトのNFTを、参加者の一筆に添付されるものとして提供することもできます。Discordに参加して、他の参加者と交流できます。
+
+#### 各パフォーマンス・サイクルはどれくらい続きますか？
+
+サイクル最初の一筆はETHで入れ、確定時計を始めます。以降の一筆は、時刻を過ぎた後も保存済みの確定時刻に現在の加算時間を足します。現在時刻から時計を再開するわけではありません。確定処理が成功するまでは一筆を入れられます。
+
+#### 一つのサイクルで複数の一筆を入れられますか？
+
+V3では、次の一筆が直前の一筆を入れた参加者に参加CSTの全額を刻印します。数量は二つの一筆の間の時間に比例します。サイクル最初の一筆ではこのCSTは発生せず、確定時にも最後の参加者の未精算区間へ追加の参加CSTは支払われません。両方の一筆が同じアドレスなら、そのアドレス自身が受け取ります。
+
+### 配分
+
+#### シグネチャー配分とは何ですか？
+
+確定処理を成功させたアドレスが、サイクル準備金の20%、合計1,000 CST、連続したIDのCosmic Signature NFT3点を受け取ります。確定時刻後の最初の48時間は最後の一筆の参加者だけが実行でき、その後は誰でも実行して自分で受け取れます。
+
+#### 一筆ごとに何を受け取れますか？
+
+V3では、次の一筆が直前の一筆を入れた参加者に参加CSTの全額を刻印します。数量は二つの一筆の間の時間に比例します。サイクル最初の一筆ではこのCSTは発生せず、確定時にも最後の参加者の未精算区間へ追加の参加CSTは支払われません。両方の一筆が同じアドレスなら、そのアドレス自身が受け取ります。
+
+#### 星選はどのような仕組みですか？
+
+参加者向けのETH星選とNFT星選は、どちらも一筆ごとのウェイトを使います。ウェイトは、その時点のETH基本費用からRandom Walk NFTによる割引と終盤の加算を除いた値です。CST一筆にも同時点のETH基本費用を使います。復元を伴う選定なので、同じアドレスが複数回選ばれることがあります。係留NFT星選は、係留中のRandom Walk NFTを別に対象とします。
+
+#### 無作為な選定はどのように行われますか？
+
+参加者向けのETH星選とNFT星選は、どちらも一筆ごとのウェイトを使います。ウェイトは、その時点のETH基本費用からRandom Walk NFTによる割引と終盤の加算を除いた値です。CST一筆にも同時点のETH基本費用を使います。復元を伴う選定なので、同じアドレスが複数回選ばれることがあります。係留NFT星選は、係留中のRandom Walk NFTを別に対象とします。
+
+#### 受領者になったら、配分はどう受け取りますか？
+
+確定処理を成功させたアドレスが、サイクル準備金の20%、合計1,000 CST、連続したIDのCosmic Signature NFT3点を受け取ります。
+
+確定時刻後の最初の48時間は最後の一筆の参加者だけが実行でき、その後は誰でも実行して自分で受け取れます。
+
+二次ETH配分と添付資産は配分ウォレットから別に受け取ります。現在の期限である5週間を過ぎると、未受領の資産を誰でも自分のために受け取れます。期限だけで自動送付されるわけではありません。
+
+#### 係留はどのような仕組みですか？
+
+Cosmic Signature NFTはプロトコルに係留してETHの係留配分を受け取れます。確定したサイクルごとにサイクル準備金の5%が配分され、係留中のCosmic Signature NFT 1点ごとに等分され、累積したETHは係留を解除したときに支払われます。
+
+Random Walk NFTも係留できますが、係留NFT星選の対象になるためだけです。選ばれた係留者はETHではなく、CSTとCosmic Signature NFTを受け取ります。
+
+知っておきたい二つのルール：すべてのNFTを係留できるのは生涯で一度だけ（係留を解除すると、そのNFTは二度と係留できません）、そしてサイクルが確定した時点でCosmic Signature NFTが一つも係留されていなければ、そのサイクルの5%はサイクル準備金に残ります。CST（ERC-20）は係留できません。係留の管理は、アカウントメニューの「自分の係留」ページで行います。
+
+#### 広報準備金とは何ですか？
+
+プロトコルを広める手助けをすると、CSTトークン（ERC-20）を受け取れます。広報準備金はサイクルごとに3,000 CSTを刻印し、エコシステムの貢献者へ配ります。案内が必要な場合は、Discordで広報の管理者に連絡してください。
+
+#### 各サイクルで刻印されるCosmic Signature NFTはいくつですか？
+
+すべてのトラックがある場合、サイクルは26枚のCosmic Signature NFTと固定配分の27,000 CSTを刻印します。シグネチャー配分はNFT3点に対して、合計1,000 CSTを一度だけ受け取ります。時の戦士、持久チャンピオン、最後のCST一筆には各1点と対応するCSTがあり、二つのNFT星選が残りを加えます。CST一筆や係留中のRandom Walk NFTがなければ該当トラックは省略されます。参加CSTは別です。
+
+#### サイクル準備金に残ったETHはどうなりますか？
+
+ETHのおよそ半分が次のサイクルへ持ち越されます。整数の丸め、省略されたトラック、送付失敗により残高が増える場合があります。次の開始準備金が前より大きくなる保証はありません。
+
+#### 一筆に添付されたトークンやNFTはどうなりますか？
+
+一筆に添付されたERC-20トークンやERC-721 NFTは配分ウォレットコントラクトがエスクローで保管し、ETHのサイクル準備金には加わりません。確定後、サイクル受領者（通常は最後の一筆の参加者）がそれらを受け取る優先権を持ちます。添付されたアセットが二次的な受け取りタイムアウト（現在の既定は5週間）を過ぎても受け取られなければ、コントラクトは誰でもそれらを自分のものとして受け取ることを許します。
+
+#### サイクル準備金からの公共財配分は誰が受け取りますか？
+
+確定時に、プロトコルはサイクル準備金の5%を公共財金庫へ送ろうとします。その後、誰でも別のトランザクションで残高を現在の受け手であるProtocol Guildへ送れます。所有者は受け手を変更できます。プロトコルから金庫への送付が失敗しても、確定を取り消さずにその分を準備金へ残す場合があります。
+
+### サイクルの仕組み
+
+#### 一筆の費用はサイクルの中でどう変わりますか？
+
+ETHとCSTの基本費用は別々のルールに従います。開始時のETH費用は調律期間中に下がり、ETH一筆ごとに次の基本費用が上がります。CST費用は保存された下降速度で下がります。確定時刻が近づくと両方に終盤の加算が付きますが、次の基本費用や星選のウェイトは増やしません。
+
+#### 調律期間とは何ですか？
+
+V3が保存するのはCST費用の下降速度で、期間の長さは速度と上限から求めます。ETH一筆はrate + floor(rate / 100)への増加を試み、CST一筆はrate - floor(rate / 101)へ減少させます。最短期間の条件に反する増加は行いません。CST一筆の後の上限は、加算前のCST基本費用の2倍、設定された最小値、新しい速度と180秒の積のうち最大の値です。次の一筆をすぐに入れることはできます。
+
+#### 参加CSTはどのように計算されますか？
+
+参加CSTの最小単位での数量はelapsedSinceLastGesture * bidCstRewardAmountMultiplier / mainPrizeTimeIncrementInMicroSecondsです。経過時間は秒、サイクルの加算時間はマイクロ秒で扱います。CST数量で表示するには結果を10^18で割ります。
+
+次の一筆が直前の参加者へ全額を刻印します。最初の一筆では発生せず、確定時にも最後の区間は追加精算されません。
+
+#### 最低参加CST保護とは何ですか？
+
+参加CSTの最小値は、次の一筆が直前の参加者へ刻印する数量を制限します。送信者への支払いを保証する値ではありません。両者が同じアドレスなら送信者自身が受け取ります。0はこの制限を無効にし、サイクル最初のETH一筆はこの確認を省略します。最大費用とネットワーク手数料は別の条件です。
+
+#### 各一筆はCST調律期間をどう変えますか？
+
+V3が保存するのはCST費用の下降速度で、期間の長さは速度と上限から求めます。ETH一筆はrate + floor(rate / 100)への増加を試み、CST一筆はrate - floor(rate / 101)へ減少させます。最短期間の条件に反する増加は行いません。CST一筆の後の上限は、加算前のCST基本費用の2倍、設定された最小値、新しい速度と180秒の積のうち最大の値です。次の一筆をすぐに入れることはできます。
+
+#### 公開確定期間とは何ですか？
+
+確定処理を成功させたアドレスが、サイクル準備金の20%、合計1,000 CST、連続したIDのCosmic Signature NFT3点を受け取ります。確定時刻後の最初の48時間は最後の一筆の参加者だけが実行でき、その後は誰でも実行して自分で受け取れます。
+
+#### 持久チャンピオンとは何ですか？
+
+サイクルの中で、最新の一筆を入れた参加者として、次の一筆が入るまで最も長く先頭を保持した参加者です。サイクルが確定すると、持久チャンピオンは1,000 CSTの功労CSTとCosmic Signature NFT 1点を受け取ります。
+
+#### 最後のCST一筆とは何ですか？
+
+最後のCST一筆とは、サイクル中にCSTトークンで入れられた最後の一筆です。サイクルが確定すると、それを入れた参加者は1,000 CSTの功労CSTとCosmic Signature NFT 1点を受け取ります。
+
+#### 時の戦士とは何ですか？
+
+持久チャンピオンの称号を最も長く連続して保持した参加者です。持久チャンピオンが一筆を入れた後の先頭保持時間で決まるのに対し、時の戦士はその称号の保持時間で決まります。サイクルが確定すると、時の戦士はサイクル準備金の15%のETH、1,000 CST、Cosmic Signature NFT 1点を受け取ります。
+
+#### 一筆ごとに加わる時間は常に同じですか？
+
+いいえ。各一筆の後に加わる時間は、開始時にはちょうど一時間でしたが、サイクルが確定するごとに1%ずつ大きくなります。増分が大きくなると各サイクルも長く続くので、暦の上での成長は自然に緩やかになります。
+
+#### 一筆ごとに加わる時間はなぜ増えていくのですか？
+
+この仕組みは、Cosmic Signature NFTが刻印される長期的なペースを決めます。サイクルが長くなるほど、同じ期間に刻印される新しいNFTは少なくなります。
+
+#### 一筆ごとの時間の増加はプロトコルにどう影響しますか？
+
+加算時間が増えると確定頻度に影響しますが、NFT供給の固定上限や一定期間の新作数を保証するものではありません。
+
+#### 二つの一筆が同時に送信されたらどうなりますか？
+
+Arbitrumのトランザクションは、シーケンサーが取り込んだ順に処理されます。後の一筆は、先の一筆が反映された状態で実行されます。費用の上限と最低参加CSTの条件を満たせば、後の一筆も成立します。条件を満たさなければ取り消されるため、プレビューを更新してから再度お試しください。
+
+#### Cosmic Signatureに戦略的な要素はありますか？
+
+はい。参加者のタイミング、一筆の頻度、方法（ETHか、CSTか、Random Walkの添付か）のすべてが、配分がどう配られるかを形づくります。社会的な力学とプロトコルの設計は、異なる配分トラックで複数の戦略が成り立つように作られています。
 
 ## Tiếng Việt: tổng quan
 
-Cosmic Signature là giao thức nghệ thuật tạo sinh trên chuỗi Arbitrum. Người tham gia đặt nét bút trong một chu kỳ trình diễn, và mỗi nét bút đều định hình Signature cuối cùng của chu kỳ. Khi chu kỳ hoàn tất, giao thức phân phối Dự trữ chu kỳ qua một nhóm luồng phân bổ cố định theo các quy tắc đã công bố, bao gồm Protocol Guild, cơ chế tài trợ cho những người đóng góp cốt lõi cho Ethereum.
+Cosmic Signature là giao thức nghệ thuật tạo sinh trên chuỗi Arbitrum. Trong mỗi chu kỳ trình diễn, người tham gia đặt nét bút bằng ETH hoặc CST, mỗi nét bút góp phần định hình Signature cuối cùng: tác phẩm NFT được tạo từ dữ liệu trên chuỗi bằng mô phỏng vật lý ba vật thể. Quy trình tất định cho phép tái tạo cùng một tác phẩm từ cùng dữ liệu ban đầu.
 
-Cosmic Signature không liên quan đến cơ sở dữ liệu đột biến ung thư COSMIC hay các chữ ký đột biến COSMIC trong sinh học.
+Cosmic Signature không liên quan đến cơ sở dữ liệu đột biến ung thư COSMIC hay các chữ ký đột biến COSMIC trong sinh học. Đây là một giao thức và ứng dụng nghệ thuật trên chuỗi.
 
-### Các trang chính bằng tiếng Việt
+- [/vi/](https://cosmicsignature.com/vi/)
+- [/vi/about](https://cosmicsignature.com/vi/about)
+- [/vi/white-paper](https://cosmicsignature.com/vi/white-paper)
+- [/vi/learn](https://cosmicsignature.com/vi/learn)
+- [/vi/quiz](https://cosmicsignature.com/vi/quiz)
+- [/vi/](https://app.cosmicsignature.com/vi/)
+- [/vi/current-cycle](https://app.cosmicsignature.com/vi/current-cycle)
+- [/vi/how-it-works](https://app.cosmicsignature.com/vi/how-it-works)
+- [/vi/faq](https://app.cosmicsignature.com/vi/faq)
+- [/vi/gallery](https://app.cosmicsignature.com/vi/gallery)
+- [/vi/statistics](https://app.cosmicsignature.com/vi/statistics)
+- [/vi/anchoring](https://app.cosmicsignature.com/vi/anchoring)
+- [/vi/allocation](https://app.cosmicsignature.com/vi/allocation)
+- [/vi/contracts](https://app.cosmicsignature.com/vi/contracts)
+- [/vi/code](https://app.cosmicsignature.com/vi/code)
+- [/vi/security](https://app.cosmicsignature.com/vi/security)
+- [/vi/audits](https://app.cosmicsignature.com/vi/audits)
+- [/vi/risk-disclosures](https://app.cosmicsignature.com/vi/risk-disclosures)
+- [/vi/terms](https://app.cosmicsignature.com/vi/terms)
+- [/vi/privacy](https://app.cosmicsignature.com/vi/privacy)
+- [/vi/marketing](https://app.cosmicsignature.com/vi/marketing)
+- [/vi/imprint](https://app.cosmicsignature.com/vi/imprint)
+- [/vi/my-tokens](https://app.cosmicsignature.com/vi/my-tokens)
+- [/vi/my-anchors](https://app.cosmicsignature.com/vi/my-anchors)
+- [/vi/my-allocations](https://app.cosmicsignature.com/vi/my-allocations)
+- [/vi/my-statistics](https://app.cosmicsignature.com/vi/my-statistics)
 
-- [Trang chủ tiếng Việt](https://cosmicsignature.com/vi): Tổng quan về giao thức và nghệ thuật trên chuỗi
-- [Về Cosmic Signature](https://cosmicsignature.com/vi/about): Giới thiệu giao thức, liên kết chính thức và phân biệt với các dịch vụ trùng tên
-- [Sách trắng](https://cosmicsignature.com/vi/white-paper): Mô tả đầy đủ về cơ chế và thiết kế của giao thức (tiếng Việt và tiếng Anh, có bản PDF)
-- [Tìm hiểu](https://cosmicsignature.com/vi/learn): Giải thích về chu kỳ trình diễn, nghệ thuật ba vật thể, neo giữ và Hàng hóa công
-- [Ứng dụng tiếng Việt](https://app.cosmicsignature.com/vi): Giao diện chu kỳ hiện tại và nét bút
-- [Phòng trưng bày](https://app.cosmicsignature.com/vi/gallery): Xem các Cosmic Signature NFT đã khắc
-- [Cách hoạt động](https://app.cosmicsignature.com/vi/how-it-works): Toàn bộ cơ chế của giao thức
-- [Câu hỏi thường gặp](https://app.cosmicsignature.com/vi/faq): Giải đáp bằng tiếng Việt, sắp theo chủ đề
-- [Thống kê](https://app.cosmicsignature.com/vi/statistics): Dữ liệu giao thức công khai
-- [Neo giữ](https://app.cosmicsignature.com/vi/anchoring): Quy tắc neo giữ và lịch sử phân phối
-- [Hợp đồng](https://app.cosmicsignature.com/vi/contracts): Địa chỉ các hợp đồng đã triển khai
-- [Bảo mật](https://app.cosmicsignature.com/vi/security): Tài nguyên xác minh và hướng dẫn tham gia an toàn
-- [Kiểm toán](https://app.cosmicsignature.com/vi/audits): Báo cáo kiểm toán của Hacken và bối cảnh kiểm chứng hình thức
-- [Công bố rủi ro](https://app.cosmicsignature.com/vi/risk-disclosures): Rủi ro về blockchain, ví và việc tham gia giao thức
+[Phiên bản 1.0 — tháng 8 năm 2026](https://cosmicsignature.com/vi/white-paper)
 
-### Những điểm chính của giao thức
+Seed của NFT được lưu trên chuỗi, còn hình ảnh và video được tạo ngoài chuỗi. Tái tạo cần cùng seed, đúng phiên bản và cấu hình bộ kết xuất, cùng công cụ tương thích. Chỉ có cùng seed không bảo đảm kết quả giống nhau giữa các phiên bản.
 
-- Mỗi chu kỳ bắt đầu với cơ chế cửa sổ hiệu chỉnh ETH và CST. Cửa sổ hiệu chỉnh CST khởi đầu từ mốc tham chiếu 12 giờ và thay đổi theo mức tham gia trên chuỗi
-- Mỗi nét bút kéo dài đếm ngược hoàn tất thêm mức tăng thời gian hiện tại. Mức tăng khởi đầu ở 1 giờ và lớn thêm 1% sau mỗi chu kỳ hoàn tất
-- Khi đếm ngược về không, người đặt nét bút cuối cùng có cửa sổ hoàn tất ưu tiên 48 giờ. Sau đó bất kỳ ai cũng có thể hoàn tất chu kỳ, và người thực sự hoàn tất nhận phân bổ Signature
-- Trong Dự trữ chu kỳ, 25% dành cho phân bổ Signature, 8% cho Chiến binh Thời gian, 4% chia cho 3 lượt ETH Tinh tuyển, 6% cho phân phối neo giữ, 7% chuyển đến Protocol Guild, và khoảng 50% chuyển sang chu kỳ tiếp theo
-- Trong phần lớn các chu kỳ, 24 Cosmic Signature NFT được khắc cùng với 24.000 CST. Cộng 3.000 CST của Dự trữ truyền thông, tổng lượng khắc cố định của một chu kỳ điển hình là 27.000 CST, chưa kể CST tham gia được tính động theo từng nét bút
-- Mỗi Cosmic Signature NFT hoặc mỗi Random Walk NFT chỉ có thể được neo giữ đúng một lần trong đời; sau khi gỡ neo, nó không thể neo giữ lại
-- Một Random Walk NFT chưa sử dụng có thể được đính kèm vào một nét bút ETH để giảm 50% chi phí nét bút ETH đó. Mỗi Random Walk NFT chỉ dùng được một lần cho mức giảm này
-- ETH phụ và tài sản đính kèm có thời hạn nhận về 5 tuần; sau thời hạn đó, bất kỳ ai cũng có thể nhận về phân bổ chưa được nhận cho chính họ
+### Bắt đầu
 
-### Hệ sinh thái
+#### Cosmic Signature là gì?
 
-- [Axiom Zero](https://www.axiomzero.market/cosmic-signature): Sàn NFT trên Arbitrum không thu phí nền tảng
-- [Chaos Zero](https://chaoszero.com): Thị trường dự đoán về các chu kỳ của Cosmic Signature. Mỗi chu kỳ đặt câu hỏi: Chu kỳ này có hoàn tất với nhiều nét bút hơn chu kỳ trước không?
-- [Hoán đổi CST trên Uniswap](https://app.uniswap.org/swap?chain=arbitrum&inputCurrency=NATIVE&outputCurrency=0xAD91843e6A58Ba560F577E676986AFb1dba6FBA0): Hoán đổi CST trên Arbitrum
+Cosmic Signature là giao thức nghệ thuật tạo sinh trên chuỗi Arbitrum. Người tham gia đặt nét bút trong một chu kỳ trình diễn; mỗi nét bút đều định hình Signature cuối cùng của chu kỳ. Khi chu kỳ hoàn tất, giao thức phân phối dự trữ của mình qua một nhóm luồng phân bổ cố định — bao gồm Protocol Guild, cơ chế tài trợ cho hơn 170 người đóng góp cốt lõi cho Ethereum.
+
+#### Một chu kỳ trình diễn hoạt động như thế nào?
+
+Nét bút đầu tiên của chu kỳ phải dùng ETH và bắt đầu đồng hồ hoàn tất. Các nét bút sau cộng mức tăng hiện tại vào thời điểm hoàn tất đã lưu, kể cả sau khi hết giờ. Đồng hồ không bắt đầu lại từ thời điểm hiện tại. Bạn vẫn có thể đặt nét bút cho tới khi giao dịch hoàn tất thành công.
+
+#### Có những loại nét bút nào?
+
+ETH và CST có quy tắc chi phí cơ sở riêng. Khi chu kỳ mở, chi phí ETH giảm trong cửa sổ hiệu chỉnh; mỗi nét bút ETH nâng chi phí cơ sở tiếp theo. Chi phí CST giảm theo tốc độ lưu trên chuỗi. Gần hạn hoàn tất, cả hai chi phí có phụ phí cuối chu kỳ, nhưng phụ phí không nâng chi phí cơ sở tiếp theo hay trọng số Tinh tuyển. Nét bút đầu tiên của chu kỳ phải dùng ETH và bắt đầu đồng hồ hoàn tất. Các nét bút sau cộng mức tăng hiện tại vào thời điểm hoàn tất đã lưu, kể cả sau khi hết giờ. Đồng hồ không bắt đầu lại từ thời điểm hiện tại. Bạn vẫn có thể đặt nét bút cho tới khi giao dịch hoàn tất thành công. Để giảm chi phí ETH, mỗi Random Walk NFT chỉ được dùng một lần. Hợp đồng kiểm tra quyền sở hữu và đánh dấu đã dùng; bản thân NFT không được chuyển đi. Quyền này tách biệt với neo giữ.
+
+#### Tôi có thể tham gia nếu không sở hữu NFT nào không?
+
+Có. Bất kỳ ai cũng có thể tham gia một chu kỳ trình diễn Cosmic Signature bằng cách đặt nét bút. Một Random Walk NFT chưa sử dụng có thể được đính kèm vào nét bút ETH để giảm 50% chi phí nét bút.
+
+#### Tôi có thể tham gia bằng cách nào?
+
+Bạn có thể tham gia bằng cách đặt nét bút trong một chu kỳ trình diễn, hoặc đóng góp một NFT từ dự án của bạn để đính kèm vào nét bút của người tham gia. Hãy tham gia Discord để gặp những người tham gia khác.
+
+#### Mỗi chu kỳ trình diễn kéo dài bao lâu?
+
+Nét bút đầu tiên của chu kỳ phải dùng ETH và bắt đầu đồng hồ hoàn tất. Các nét bút sau cộng mức tăng hiện tại vào thời điểm hoàn tất đã lưu, kể cả sau khi hết giờ. Đồng hồ không bắt đầu lại từ thời điểm hiện tại. Bạn vẫn có thể đặt nét bút cho tới khi giao dịch hoàn tất thành công.
+
+#### Tôi có thể đặt nhiều nét bút trong một chu kỳ không?
+
+Trong V3, nét bút tiếp theo khắc toàn bộ CST tham gia cho người đặt nét bút trước. Số lượng tăng tuyến tính theo thời gian giữa hai nét bút. Nét bút đầu tiên của chu kỳ không khắc CST theo quy tắc này, và hoàn tất không thanh toán thêm khoảng thời gian cuối cho người đặt nét bút cuối cùng. Nếu cả hai nét bút thuộc cùng một địa chỉ, địa chỉ đó nhận CST.
+
+### Phân bổ và phân phối
+
+#### Phân bổ Signature là gì?
+
+Địa chỉ hoàn tất chu kỳ thành công nhận 20% Dự trữ chu kỳ, tổng cộng 1.000 CST và 3 Cosmic Signature NFT có ID liên tiếp. Trong 48 giờ đầu sau thời điểm hoàn tất, chỉ người đặt nét bút cuối cùng được thực hiện; sau đó bất kỳ ai cũng có thể hoàn tất và tự nhận phân bổ.
+
+#### Tôi nhận được gì cho mỗi nét bút?
+
+Trong V3, nét bút tiếp theo khắc toàn bộ CST tham gia cho người đặt nét bút trước. Số lượng tăng tuyến tính theo thời gian giữa hai nét bút. Nét bút đầu tiên của chu kỳ không khắc CST theo quy tắc này, và hoàn tất không thanh toán thêm khoảng thời gian cuối cho người đặt nét bút cuối cùng. Nếu cả hai nét bút thuộc cùng một địa chỉ, địa chỉ đó nhận CST.
+
+#### Tinh tuyển hoạt động như thế nào?
+
+Cả ETH Tinh tuyển và NFT Tinh tuyển dành cho người tham gia đều dùng trọng số từng nét bút. Trọng số là chi phí ETH cơ sở tại thời điểm đó, chưa giảm bằng Random Walk NFT và chưa cộng phụ phí cuối chu kỳ. Nét bút CST dùng cùng chi phí ETH cơ sở đương thời. Các lượt chọn có hoàn lại, nên một địa chỉ có thể được chọn nhiều lần. Tinh tuyển NFT neo giữ xét riêng các Random Walk NFT đang neo giữ.
+
+#### Việc chọn ngẫu nhiên được thực hiện thế nào?
+
+Cả ETH Tinh tuyển và NFT Tinh tuyển dành cho người tham gia đều dùng trọng số từng nét bút. Trọng số là chi phí ETH cơ sở tại thời điểm đó, chưa giảm bằng Random Walk NFT và chưa cộng phụ phí cuối chu kỳ. Nét bút CST dùng cùng chi phí ETH cơ sở đương thời. Các lượt chọn có hoàn lại, nên một địa chỉ có thể được chọn nhiều lần. Tinh tuyển NFT neo giữ xét riêng các Random Walk NFT đang neo giữ.
+
+#### Tôi nhận về phân bổ bằng cách nào nếu là người nhận?
+
+Địa chỉ hoàn tất chu kỳ thành công nhận 20% Dự trữ chu kỳ, tổng cộng 1.000 CST và 3 Cosmic Signature NFT có ID liên tiếp.
+
+Trong 48 giờ đầu sau thời điểm hoàn tất, chỉ người đặt nét bút cuối cùng được thực hiện; sau đó bất kỳ ai cũng có thể hoàn tất và tự nhận phân bổ.
+
+Phân bổ ETH thứ cấp và tài sản đính kèm được nhận về riêng từ Ví Phân bổ. Sau thời hạn hiện tại là 5 tuần, bất kỳ ai cũng có thể nhận về tài sản chưa được nhận cho chính mình. Hết hạn không tự động chuyển tài sản.
+
+#### Neo giữ hoạt động như thế nào?
+
+Cosmic Signature NFT có thể được neo giữ với giao thức để nhận phân phối neo giữ bằng ETH: mỗi chu kỳ hoàn tất phân bổ 5% Dự trữ chu kỳ, chia đều cho mỗi Cosmic Signature NFT đang neo giữ, và ETH tích lũy được chi trả khi bạn gỡ neo.
+
+Random Walk NFT cũng có thể được neo giữ, nhưng chỉ để thuộc diện Tinh tuyển NFT neo giữ — những người neo giữ được chọn nhận CST và Cosmic Signature NFT, không nhận ETH.
+
+Hai quy tắc cần biết: mỗi NFT chỉ được neo giữ đúng một lần (sau khi bạn gỡ neo, NFT đó không bao giờ có thể neo giữ lại), và nếu không có Cosmic Signature NFT nào đang neo giữ khi một chu kỳ hoàn tất, 5% của chu kỳ đó chỉ đơn giản ở lại trong Dự trữ chu kỳ. CST (ERC-20) không thể neo giữ. Hãy vào trang Neo giữ của tôi (từ menu tài khoản) để quản lý neo giữ.
+
+#### Dự trữ truyền thông là gì?
+
+Bạn có thể nhận token CST (ERC-20) khi giúp giới thiệu giao thức. Dự trữ truyền thông khắc 3.000 CST mỗi chu kỳ và phân phối cho những người đóng góp cho hệ sinh thái. Hãy liên hệ người phụ trách truyền thông qua Discord để được hướng dẫn.
+
+#### Mỗi chu kỳ có bao nhiêu Cosmic Signature NFT được khắc?
+
+Khi có đủ các luồng, một chu kỳ khắc 26 Cosmic Signature NFT và 27.000 CST trong các phân bổ cố định. Phân bổ Signature gồm 3 NFT nhưng chỉ một khoản tổng cộng 1.000 CST. Chiến binh Thời gian, Quán quân Bền bỉ và nét bút CST cuối cùng mỗi luồng có một NFT cùng CST tương ứng; hai luồng NFT Tinh tuyển bổ sung phần còn lại. Nếu không có nét bút CST hoặc Random Walk NFT neo giữ thì luồng tương ứng bị bỏ qua. CST tham gia được tính riêng.
+
+#### ETH còn lại trong Dự trữ chu kỳ sẽ đi đâu?
+
+Khoảng một nửa ETH được giữ lại cho chu kỳ sau. Làm tròn số nguyên, luồng bị bỏ qua và chuyển không thành công có thể làm phần còn lại lớn hơn. Điều đó không bảo đảm dự trữ đầu chu kỳ sau sẽ lớn hơn.
+
+#### Điều gì xảy ra với token hoặc NFT đính kèm vào nét bút?
+
+Token ERC-20 hoặc NFT ERC-721 đính kèm vào nét bút được hợp đồng ví phân bổ giữ trong ký quỹ; chúng không nhập vào Dự trữ chu kỳ bằng ETH. Sau khi hoàn tất, người nhận của chu kỳ (thường là người đặt nét bút cuối cùng) có quyền ưu tiên độc quyền để nhận về chúng. Nếu tài sản đính kèm vẫn chưa được nhận về sau thời hạn nhận về phụ, hiện mặc định là 5 tuần, các hợp đồng cho phép bất kỳ ai nhận về chúng cho chính họ.
+
+#### Ai nhận phần phân bổ hàng hóa công từ Dự trữ chu kỳ?
+
+Khi hoàn tất, giao thức thử chuyển 5% Dự trữ chu kỳ vào Kho Hàng hóa công. Sau đó bất kỳ ai cũng có thể dùng một giao dịch riêng để chuyển số dư kho tới đơn vị thụ hưởng hiện tại là Protocol Guild. Chủ sở hữu có thể thay đổi đơn vị thụ hưởng. Nếu chuyển từ giao thức vào kho thất bại, phần này có thể ở lại dự trữ mà không hủy hoàn tất.
+
+### Cơ chế chu kỳ
+
+#### Chi phí nét bút thay đổi thế nào trong một chu kỳ?
+
+ETH và CST có quy tắc chi phí cơ sở riêng. Khi chu kỳ mở, chi phí ETH giảm trong cửa sổ hiệu chỉnh; mỗi nét bút ETH nâng chi phí cơ sở tiếp theo. Chi phí CST giảm theo tốc độ lưu trên chuỗi. Gần hạn hoàn tất, cả hai chi phí có phụ phí cuối chu kỳ, nhưng phụ phí không nâng chi phí cơ sở tiếp theo hay trọng số Tinh tuyển.
+
+#### Cửa sổ hiệu chỉnh là gì?
+
+V3 lưu tốc độ giảm chi phí CST; độ dài cửa sổ được tính từ tốc độ và mức trần. Nét bút ETH thử tăng tốc độ theo rate + floor(rate / 100), còn nét bút CST giảm theo rate - floor(rate / 101). Nếu mức tăng vi phạm điều kiện thời lượng tối thiểu, nó không được áp dụng. Nét bút CST đặt lại mức trần bằng giá trị lớn nhất giữa hai lần chi phí CST cơ sở chưa có phụ phí, mức tối thiểu đã cấu hình, và tốc độ mới nhân 180 giây. Bạn vẫn có thể đặt nét bút tiếp theo ngay lập tức.
+
+#### CST tham gia được tính như thế nào?
+
+Số đơn vị nhỏ nhất của CST tham gia bằng elapsedSinceLastGesture * bidCstRewardAmountMultiplier / mainPrizeTimeIncrementInMicroSeconds. Thời gian đã trôi qua tính bằng giây, còn mức tăng thời gian của chu kỳ tính bằng micro giây. Chia kết quả cho 10^18 để biểu diễn bằng CST.
+
+Nét bút tiếp theo khắc toàn bộ cho người tham gia trước. Nét bút đầu tiên không tạo CST tham gia; hoàn tất cũng không thanh toán thêm khoảng thời gian cuối.
+
+#### Bảo đảm CST tham gia tối thiểu là gì?
+
+Mức CST tham gia tối thiểu giới hạn số lượng mà nét bút tiếp theo khắc cho người tham gia trước, không bảo đảm một khoản cho người gửi. Nếu hai địa chỉ giống nhau, người gửi tự nhận số lượng đó. Giá trị 0 tắt giới hạn này; nét bút ETH đầu tiên của chu kỳ bỏ qua kiểm tra. Chi phí tối đa và phí mạng là các điều kiện riêng.
+
+#### Mỗi nét bút làm thay đổi cửa sổ hiệu chỉnh CST như thế nào?
+
+V3 lưu tốc độ giảm chi phí CST; độ dài cửa sổ được tính từ tốc độ và mức trần. Nét bút ETH thử tăng tốc độ theo rate + floor(rate / 100), còn nét bút CST giảm theo rate - floor(rate / 101). Nếu mức tăng vi phạm điều kiện thời lượng tối thiểu, nó không được áp dụng. Nét bút CST đặt lại mức trần bằng giá trị lớn nhất giữa hai lần chi phí CST cơ sở chưa có phụ phí, mức tối thiểu đã cấu hình, và tốc độ mới nhân 180 giây. Bạn vẫn có thể đặt nét bút tiếp theo ngay lập tức.
+
+#### Cửa sổ hoàn tất mở là gì?
+
+Địa chỉ hoàn tất chu kỳ thành công nhận 20% Dự trữ chu kỳ, tổng cộng 1.000 CST và 3 Cosmic Signature NFT có ID liên tiếp. Trong 48 giờ đầu sau thời điểm hoàn tất, chỉ người đặt nét bút cuối cùng được thực hiện; sau đó bất kỳ ai cũng có thể hoàn tất và tự nhận phân bổ.
+
+#### Quán quân Bền bỉ là gì?
+
+Người tham gia giữ vị trí người đặt nét bút gần nhất trong khoảng liên tục dài nhất của một chu kỳ (khoảng cách dài nhất trước khi một nét bút khác xuất hiện). Khi chu kỳ hoàn tất, Quán quân Bền bỉ nhận 1.000 CST ghi nhận và một Cosmic Signature NFT.
+
+#### Nét bút CST cuối cùng là gì?
+
+Nét bút CST cuối cùng là nét bút sau cùng được đặt bằng token CST trong một chu kỳ. Khi chu kỳ hoàn tất, người tham gia đặt nét bút đó nhận 1.000 CST ghi nhận và một Cosmic Signature NFT.
+
+#### Chiến binh Thời gian là gì?
+
+Người tham gia giữ vị trí Quán quân Bền bỉ trong khoảng liên tục dài nhất. Tương tự như Quán quân Bền bỉ là người đặt nét bút gần nhất giữ vị trí lâu nhất, Chiến binh Thời gian là Quán quân Bền bỉ giữ vị trí lâu nhất. Khi chu kỳ hoàn tất, Chiến binh Thời gian nhận 15% Dự trữ chu kỳ bằng ETH, 1.000 CST và một Cosmic Signature NFT.
+
+#### Thời gian cộng thêm cho mỗi nét bút có luôn giữ nguyên không?
+
+Không. Thời gian cộng thêm sau mỗi nét bút khởi đầu ở đúng một giờ khi ra mắt và lớn thêm 1% mỗi lần một chu kỳ hoàn tất. Vì mức tăng lớn hơn cũng khiến mỗi chu kỳ kéo dài hơn, nên đà tăng tự nhiên chậm lại theo thời gian lịch.
+
+#### Vì sao thời gian cộng thêm cho mỗi nét bút tăng dần theo thời gian?
+
+Cơ chế này điều tiết tốc độ khắc Cosmic Signature NFT về dài hạn: chu kỳ càng dài thì càng ít NFT mới được khắc trong cùng một khoảng thời gian.
+
+#### Việc tăng thời gian mỗi nét bút ảnh hưởng thế nào đến giao thức?
+
+Mức tăng thời gian lớn hơn có thể ảnh hưởng tần suất hoàn tất chu kỳ, nhưng không đặt trần cố định cho nguồn cung NFT hay bảo đảm số tác phẩm mới trong một khoảng thời gian.
+
+#### Điều gì xảy ra nếu hai nét bút được gửi cùng lúc?
+
+Arbitrum xử lý giao dịch tuần tự theo thứ tự do sequencer sắp xếp. Nét bút được xử lý trước sẽ cập nhật trạng thái giao thức. Nét bút sau vẫn có thể thành công nếu đáp ứng giới hạn chi phí tối đa và CST tham gia tối thiểu; nếu không, hợp đồng sẽ hoàn nguyên giao dịch.
+
+#### Cosmic Signature có yếu tố chiến thuật không?
+
+Có. Thời điểm của người tham gia, tần suất nét bút và phương thức (ETH so với CST so với đính kèm Random Walk) đều định hình cách các phân bổ được phân phối. Động lực xã hội và thiết kế giao thức được xây dựng để nhiều chiến thuật khác nhau đều có thể thành công trên các luồng phân bổ khác nhau.

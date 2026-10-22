@@ -1,5 +1,7 @@
 import { protocolFacts } from '@/content/protocol-facts';
 
+import { formatCount } from '@/utils/format/numbers';
+
 import type { QuizTierQuestionsText } from './structure';
 
 /**
@@ -125,13 +127,13 @@ export const basicQuestionsTextJa = {
     prompt:
       'トークン #42のためにオンチェーンに保存されている正確なシードで、オープンソースのアートパイプラインを再実行します。何が出てきますか？',
     options: {
-      a: 'どのマシンでも、ピクセル単位で同一の画像。',
+      a: 'NFTのシードはオンチェーンに保存され、画像と動画はオフチェーンで生成されます。再現には同じシード、適切なレンダラーの版と設定、互換性のあるツールが必要です。シードだけで異なる版の出力まで一致するとは限りません。',
       b: '小さなランダムな違いを持つ似た画像。',
       c: 'ハードウェアが違えば違う画像。',
       d: '低解像度のプレビューだけ。完全なアートにはプロジェクトのサーバーが必要。',
     },
     explanation:
-      '作品の再現性は自動検証で確認されています。同じシードは、どのマシンでもビット単位で同じ画像を生みます。レンダリングされたフレームのSHA-256ハッシュは継続的インテグレーションで検証されるので、出力のずれはビルドを失敗させます。',
+      'NFTのシードはオンチェーンに保存され、画像と動画はオフチェーンで生成されます。再現には同じシード、適切なレンダラーの版と設定、互換性のあるツールが必要です。シードだけで異なる版の出力まで一致するとは限りません。 リポジトリには手動で実行する画像の再現性確認があります。現在の継続的インテグレーションは、生成フレームのハッシュを比較していません。',
     referenceLabel: 'ホワイトペーパー §6.2——再現性とライセンス',
   },
   'cst-supply-origin': {
@@ -159,15 +161,14 @@ export const basicQuestionsTextJa = {
     referenceLabel: 'ホワイトペーパー §7.2——焼却と供給量の動態',
   },
   'public-goods-beneficiary': {
-    prompt: `すべてのサイクルは準備金の${protocolFacts.publicGoodsPercentage}%を公共財配分として送ります。現在それを受け取っているのは誰ですか？`,
+    prompt: '現在の公共財金庫の受け手は誰ですか？',
     options: {
       a: 'Protocol Guild——170人以上のEthereumコア貢献者の資金支援メカニズム。',
       b: 'プロトコルチームの運営ウォレット。',
       c: 'Arbitrumのバリデーター。',
       d: '無作為に選ばれたNFT保有者。',
     },
-    explanation:
-      '公共財金庫はその分をProtocol Guildへ送り、送付は確定の一部としてオンチェーンで強制されます。それを守るかどうかをサイクルごとに誰かが決めることはありません。理由はこうです：公開のインフラの上で生きるプロトコルは、それを機械的に、予定どおりに、公開の場で支えるべきだからです。',
+    explanation: `確定時に、プロトコルはサイクル準備金の${protocolFacts.publicGoodsPercentage}%を公共財金庫へ送ろうとします。その後、誰でも別のトランザクションで残高を現在の受け手であるProtocol Guildへ送れます。所有者は受け手を変更できます。プロトコルから金庫への送付が失敗しても、確定を取り消さずにその分を準備金へ残す場合があります。`,
     referenceLabel: 'ホワイトペーパー §10——公共財',
   },
   'anchoring-basic': {
@@ -240,7 +241,7 @@ export const basicQuestionsTextJa = {
       d: 'アプリのバックエンドサーバーが送金を発行する。',
     },
     explanation:
-      '機械的な分配は、プロトコルを支える三つの性質の一つです。参加者と分配のルールの間に裁量を持つアカウントは存在せず、一筆からETHを受け取るチームのウォレットもありません。アプリとサーバーは、コントラクトがすでに行ったことを表示するだけです。',
+      '所有者は、コントラクトの条件に従ってパラメーターと実装を変更する権限を保持します。主要な変更はサイクル非稼働時に制限されますが、開始時刻、次の待機時間、周辺コントラクトには別の権限があります。V3は宇宙評議会への移管や権限放棄を自動実行しません。',
     referenceLabel: 'ホワイトペーパー §1——はじめに',
   },
   'nft-count-typical': {
@@ -251,7 +252,7 @@ export const basicQuestionsTextJa = {
       c: `${protocolFacts.nftStellarSelectionRecipients}`,
       d: '100',
     },
-    explanation: `標準的なサイクルは${protocolFacts.typicalNftsPerCycle}点のNFTを刻印します。${protocolFacts.roleNftsPerCycle}点の役割NFT（受領者、時の戦士、持久チャンピオン、最後のCST一筆）、${protocolFacts.nftStellarSelectionRecipients}点の参加者星選NFT、${protocolFacts.anchoredRwlkNftSelectionRecipients}点の係留Random Walk星選NFTです。トラックを一つ飛ばすサイクルは、それより少なく刻印します。`,
+    explanation: `すべてのトラックがある場合、サイクルはCosmic Signature NFT${protocolFacts.typicalNftsPerCycle}点と固定配分の${formatCount(protocolFacts.typicalCstImprintsPerCycle, 'ja')} CSTを刻印します。シグネチャー配分はNFT${protocolFacts.mainPrizeNftsPerCycle}点に対して、合計${formatCount(protocolFacts.specialAllocationCst, 'ja')} CSTを一度だけ受け取ります。時の戦士、持久チャンピオン、最後のCST一筆には各1点と対応するCSTがあり、二つのNFT星選が残りを加えます。CST一筆や係留中のRandom Walk NFTがなければ該当トラックは省略されます。参加CSTは別です。`,
     referenceLabel: 'ホワイトペーパー §5.1——確定時の分配',
   },
   'chrono-endurance-exist': {
@@ -269,13 +270,13 @@ export const basicQuestionsTextJa = {
   'stellar-selection-what': {
     prompt: '星選とは何ですか？',
     options: {
-      a: 'サイクル中に一筆ごとに記録される対象で、確定時にコントラクトがそこから受領者を選ぶ。',
+      a: '一筆の時点における、割引も終盤の加算もないETH基本費用をウェイトとして選びます。同じアドレスを複数回選ぶことがあります。',
       b: '参加者を活動量で並べる順位表。',
       c: 'NFTのアートワークに付けられる希少度の階級。',
       d: 'アートの中の星座に名前を付ける仕組み。',
     },
     explanation:
-      '各一筆は、サイクルの選定プールに1件の対象を記録します。確定時、コントラクトはETHとNFTの星選のために対象を選ぶので、選ばれる頻度は参加に比例します。これは分配の仕組みであり、順位付けではありません。',
+      '参加者向けのETH星選とNFT星選は、どちらも一筆ごとのウェイトを使います。ウェイトは、その時点のETH基本費用からRandom Walk NFTによる割引と終盤の加算を除いた値です。CST一筆にも同時点のETH基本費用を使います。復元を伴う選定なので、同じアドレスが複数回選ばれることがあります。係留NFT星選は、係留中のRandom Walk NFTを別に対象とします。',
     referenceLabel: 'ホワイトペーパー §5.3——星選',
   },
   'ecosystem-optionality': {

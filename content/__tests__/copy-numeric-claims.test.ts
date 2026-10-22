@@ -13,9 +13,10 @@ import {
   getSecurityCopy,
   getTermsCopy,
 } from '@/content/legal';
-import { protocolFacts } from '@/content/protocol-facts';
+import { historicalV2ProtocolFacts, protocolFacts } from '@/content/protocol-facts';
 import { getQuizContent } from '@/content/quiz';
 import { getWhitePaperContent } from '@/content/white-paper';
+import { whitePaperV13Facts } from '@/content/protocol-facts';
 import { DURATION_NOUNS, type DurationNouns } from '@/test-utils/locale-expectations';
 
 import { getLocaleConfig } from '@/i18n/localeConfig';
@@ -155,6 +156,7 @@ const allowedWeekFigures = new Set<number>([
 
 const allowedDayFigures = new Set<number>([
   protocolFacts.councilVotingDelayDays,
+  protocolFacts.currentNextCycleDelayDays,
   // "1 day" appears as a dynamic-CST elapsed-time example and as the
   // approximate initial Cycle Finalization Time at launch.
   1,
@@ -165,7 +167,7 @@ const allowedCstAmounts = new Set<number>([
   protocolFacts.outreachReserveCst,
   protocolFacts.typicalCstImprintsPerCycle,
   // NFT-paired CST subtotal quoted in the llms docs (24 x 1,000).
-  protocolFacts.typicalNftsPerCycle * protocolFacts.specialAllocationCst,
+  protocolFacts.nftBearingAllocations * protocolFacts.specialAllocationCst,
   protocolFacts.cstCalibrationCeilingMinCst,
   protocolFacts.cstCalibrationFloorCst,
   protocolFacts.councilProposalThresholdCst,
@@ -177,6 +179,48 @@ const allowedCstAmounts = new Set<number>([
   // V3 linear accrual rate ("about 1 CST per minute at launch").
   protocolFacts.v3.dynamicCstRewardPerMinuteAtLaunch,
 ]);
+
+/** English 1.3 has a dated V3 snapshot; older editions retain their V2 facts. */
+function editionAllowlist(source: CopySource, allowed: ReadonlySet<number>, kind: string) {
+  if (source.name.startsWith('white-paper-') && source.name !== 'white-paper-en') {
+    const legacy =
+      {
+        percentage: [
+          historicalV2ProtocolFacts.mainEthPercentage,
+          historicalV2ProtocolFacts.chronoWarriorEthPercentage,
+          historicalV2ProtocolFacts.stellarSelectionEthPercentage,
+          historicalV2ProtocolFacts.anchorDistributionPercentage,
+          historicalV2ProtocolFacts.publicGoodsPercentage,
+        ],
+        cst: [
+          historicalV2ProtocolFacts.cstCalibrationCeilingMinCst,
+          ...historicalV2ProtocolFacts.dynamicCstRewardExamples.map((example) =>
+            Number(example.cst),
+          ),
+        ],
+      }[kind] ?? [];
+    return new Set([...allowed, ...legacy]);
+  }
+  if (source.name !== 'white-paper-en') return allowed;
+  const extra =
+    {
+      percentage: [
+        whitePaperV13Facts.mainEthPercentage,
+        whitePaperV13Facts.chronoWarriorEthPercentage,
+        whitePaperV13Facts.stellarSelectionEthPercentage,
+        whitePaperV13Facts.anchorDistributionPercentage,
+        whitePaperV13Facts.publicGoodsPercentage,
+      ],
+      days: [whitePaperV13Facts.nextCycleDelayDaysAtSnapshot],
+      cst: [
+        whitePaperV13Facts.cstCalibrationCeilingMinCst,
+        ...whitePaperV13Facts.dynamicCstRewardExamples.map((example) =>
+          Number(example.cst.replaceAll(',', '')),
+        ),
+      ],
+    }[kind] ?? [];
+  return new Set([...allowed, ...extra]);
+}
 
 /**
  * How a source writes numbers: the character class of its digit-grouping
@@ -224,7 +268,8 @@ function parseNumber(raw: string, grammar: NumberGrammar, grouped: boolean): num
     // "1,5" in a comma-decimal language stays a fraction.
     text = text.replace(new RegExp(`${grammar.groupClass}(?=\\d{3}(?!\\d))`, 'g'), '');
     // "1.000" / "24.000": dots that each precede exactly three digits are groups.
-    if (grammar.dotGroups && /^\d{1,3}(?:\.\d{3})+$/.test(text)) text = text.replace(/\./g, '');
+    if (grammar.dotGroups && /^[1-9]\d{0,2}(?:\.\d{3})+$/.test(text))
+      text = text.replace(/\./g, '');
   }
   return Number(text.replace(new RegExp(grammar.decimalClass), '.'));
 }
@@ -286,7 +331,7 @@ describe('copy numeric claims stay pinned to protocolFacts', () => {
     assertAllowed(
       source.name,
       collect(source, new RegExp(`(\\d+(?:${decimalClass}\\d+)?)%`, 'g')),
-      allowedPercents,
+      editionAllowlist(source, allowedPercents, 'percentage'),
       'percentage',
     );
   });
@@ -313,7 +358,7 @@ describe('copy numeric claims stay pinned to protocolFacts', () => {
     assertAllowed(
       source.name,
       collect(source, durationPatterns('days')),
-      allowedDayFigures,
+      editionAllowlist(source, allowedDayFigures, 'days'),
       'day figure',
     );
   });
@@ -323,10 +368,13 @@ describe('copy numeric claims stay pinned to protocolFacts', () => {
       source.name,
       collect(
         source,
-        new RegExp(`(${numberPattern(numberGrammar(source.locale))})\\s+CST\\b`, 'g'),
+        new RegExp(
+          `(?<![A-Za-z0-9.,])(${numberPattern(numberGrammar(source.locale))})\\s+CST\\b`,
+          'gu',
+        ),
         { grouped: true },
       ),
-      allowedCstAmounts,
+      editionAllowlist(source, allowedCstAmounts, 'cst'),
       'CST amount',
     );
   });

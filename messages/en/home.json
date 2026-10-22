@@ -379,7 +379,8 @@
     "reachesFloorIn": "0 CST in {duration}",
     "windowEndsIn": "Window ends in {duration}",
     "windowDetails": "Window length: {duration}. Elapsed: {elapsed}.",
-    "floorIn": "in {duration}"
+    "floorIn": "in {duration}",
+    "cstSubtitleV3": "CST base cost declines at the live rate. ETH gestures can increase that rate; CST gestures reduce it and restart the ceiling. A late-gesture premium is added separately."
   },
   "allocation": {
     "title": "Allocation breakdown",
@@ -400,7 +401,7 @@
       },
       "publicGoods": {
         "name": "Public Goods",
-        "tooltip": "{percent}% of every Cycle Reserve is forwarded to Protocol Guild, the funding mechanism for 170+ Ethereum core contributors.",
+        "tooltip": "{percent}% is allocated to the Public Goods Vault. Anyone can separately forward its balance to the configured beneficiary, currently Protocol Guild.",
         "recipientLabel": "Protocol Guild"
       },
       "ethStellar": {
@@ -514,10 +515,10 @@
     "monument": {
       "reserveLabel": "Signature Allocation",
       "extras": {
-        "base": "+ 1,000 CST · 1 Cosmic Signature NFT",
-        "withNft": "+ 1,000 CST · 1 Cosmic Signature NFT · {nftCount, plural, one {# attached NFT} other {# attached NFTs}}",
-        "withErc20": "+ 1,000 CST · 1 Cosmic Signature NFT · {erc20Count, plural, one {# attached token deposit} other {# attached token deposits}}",
-        "withBoth": "+ 1,000 CST · 1 Cosmic Signature NFT · {nftCount, plural, one {# attached NFT} other {# attached NFTs}} · {erc20Count, plural, one {# attached token deposit} other {# attached token deposits}}"
+        "base": "+ 1,000 CST · {cscNftCount, plural, one {# Cosmic Signature NFT} other {# Cosmic Signature NFTs}}",
+        "withNft": "+ 1,000 CST · {cscNftCount, plural, one {# Cosmic Signature NFT} other {# Cosmic Signature NFTs}} · {nftCount, plural, one {# attached NFT} other {# attached NFTs}}",
+        "withErc20": "+ 1,000 CST · {cscNftCount, plural, one {# Cosmic Signature NFT} other {# Cosmic Signature NFTs}} · {erc20Count, plural, one {# attached token deposit} other {# attached token deposits}}",
+        "withBoth": "+ 1,000 CST · {cscNftCount, plural, one {# Cosmic Signature NFT} other {# Cosmic Signature NFTs}} · {nftCount, plural, one {# attached NFT} other {# attached NFTs}} · {erc20Count, plural, one {# attached token deposit} other {# attached token deposits}}"
       },
       "calendarTitle": "Cosmic Signature Cycle {number} opens",
       "calendarBody": "The next Performance Cycle opens for gestures. The first gesture starts the finalization clock.",
@@ -528,7 +529,7 @@
       "subtitle": "Everything this cycle distributes at finalization",
       "cstPlusNft": "1,000 CST + NFT",
       "cstPlusNftEach": "1,000 CST + NFT each",
-      "stellarStatus": "every gesture is an entry",
+      "stellarStatus": "weighted entries in V3",
       "ethGroup": "ETH from the Cycle Reserve",
       "fixedGroup": "CST and NFT allocations"
     },
@@ -538,7 +539,7 @@
       "galleryCta": "Gallery",
       "viewAria": "View Cosmic Signature {id}",
       "alt": "Cosmic Signature artwork {id} — deterministic three-body generative art",
-      "pairingNote": "Deterministic three-body art, imprinted on-chain. Every Signature is paired with 1,000 CST.",
+      "pairingNote": "Recognition allocations include CST. The main allocation pairs its full NFT set with one fixed CST amount.",
       "watchDrawing": "Watch it take shape",
       "showFinished": "Show the finished work"
     },
@@ -583,7 +584,7 @@
     "clock": {
       "reserveLabel": "Signature Allocation",
       "reserveExtraCst": "+ 1,000 CST",
-      "reserveExtraNft": "1 Cosmic Signature NFT",
+      "reserveExtraNft": "{count, plural, one {# Cosmic Signature NFT} other {# Cosmic Signature NFTs}}",
       "reserveAttached": "{count, plural, one {# attached asset} other {# attached assets}}",
       "reserveUsd": "≈ {amount} USD",
       "calendarTitle": "Cosmic Signature Cycle {number} opens",

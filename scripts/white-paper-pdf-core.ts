@@ -9,7 +9,8 @@
 
 import { createHash } from 'node:crypto';
 
-import { protocolFacts } from '../content/protocol-facts';
+import { historicalV2ProtocolFacts as protocolFacts } from '../content/protocol-facts';
+import { whitePaperV13Facts } from '../content/protocol-facts';
 import type {
   WhitePaperBlock,
   WhitePaperContent,
@@ -116,11 +117,13 @@ function rawLatex(value: string): string {
  * code faces have no ⌊ ⌋ √ Δ.
  */
 const NOTATION_LATEX: Readonly<Record<string, string>> = {
+  [whitePaperV13Facts.participationCstNotation]: String.raw`\mathrm{CST\ units} = \left\lfloor t \times m \div i \right\rfloor`,
   [protocolFacts.participationCstNotation]: String.raw`\mathrm{CST} = \left\lfloor \sqrt{\Delta t \times m \div i} \right\rfloor`,
 };
 
 /** The notation's symbols, as they appear in its legend. */
 const SYMBOL_LATEX: Readonly<Record<string, string>> = {
+  t: 't',
   [protocolFacts.participationCstSymbols[0]]: String.raw`\Delta t`,
   [protocolFacts.participationCstSymbols[1]]: 'm',
   [protocolFacts.participationCstSymbols[2]]: 'i',

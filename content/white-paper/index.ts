@@ -16,6 +16,7 @@ import { whitePaperTextZhHk } from './text.zh-HK';
 import { whitePaperTextZhTw } from './text.zh-TW';
 import {
   WHITE_PAPER_PATH,
+  getWhitePaperEdition,
   whitePaperPdfPath,
   type WhitePaperBlock,
   type WhitePaperContent,
@@ -89,7 +90,7 @@ function buildWhitePaperContent(locale: AppLocale, text: WhitePaperText): WhiteP
       heading: text.references.heading,
       items: text.references.items,
     },
-    citation: WHITE_PAPER_SHARED.citation,
+    citation: `Bobrovytsky, T. (2026). Cosmic Signature: A Procedural On-Chain Art Protocol. Version ${getWhitePaperEdition(locale).version}.`,
     licenseNote: text.licenseNote,
     reading: text.reading,
     figures: text.figures,

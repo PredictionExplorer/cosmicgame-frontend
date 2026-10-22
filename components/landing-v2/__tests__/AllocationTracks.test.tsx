@@ -59,8 +59,11 @@ describe('<AllocationTracks />', () => {
       within(legend).getByText(`${ethDistributionFacts.mainEthPercentage}%`),
     ).toBeInTheDocument();
     expect(
-      within(legend).getByText(`${ethDistributionFacts.publicGoodsPercentage}%`),
-    ).toBeInTheDocument();
+      within(legend).getAllByText(`${ethDistributionFacts.publicGoodsPercentage}%`),
+    ).toHaveLength(
+      tracks.eth.filter((track) => track.share === ethDistributionFacts.publicGoodsPercentage)
+        .length,
+    );
     expect(within(legend).getByText('~50%')).toBeInTheDocument();
   });
 

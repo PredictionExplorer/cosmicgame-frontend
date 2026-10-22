@@ -1,5 +1,7 @@
 import { protocolFacts } from '@/content/protocol-facts';
 
+import { formatCount } from '@/utils/format/numbers';
+
 import type { QuizTierQuestionsText } from './structure';
 
 const cst = (amount: number): string => amount.toLocaleString('vi-VN');
@@ -60,8 +62,7 @@ export const hardQuestionsTextVi = {
       c: 'Phần đó bị đốt.',
       d: 'Phần đó lặng lẽ được cộng vào phân bổ của người nhận chu kỳ.',
     },
-    explanation:
-      'Chuyển tiếp chịu lỗi là một lựa chọn thiết kế có chủ đích: một sự cố ở Kho Hàng hóa công không bao giờ được làm kẹt một chu kỳ. Hoàn tất hoàn thành, sự cố được ghi trên chuỗi, và việc chuyển tiếp được xử lý sau. Khác với khoản chuyển trực tiếp cho người nhận chu kỳ, giao dịch có thể bị hoàn nguyên \u2014 nhưng chỉ chính giao dịch của người gọi.',
+    explanation: `Khi hoàn tất, giao thức thử chuyển ${protocolFacts.publicGoodsPercentage}% Dự trữ chu kỳ vào Kho Hàng hóa công. Sau đó bất kỳ ai cũng có thể dùng một giao dịch riêng để chuyển số dư kho tới đơn vị thụ hưởng hiện tại là Protocol Guild. Chủ sở hữu có thể thay đổi đơn vị thụ hưởng. Nếu chuyển từ giao thức vào kho thất bại, phần này có thể ở lại dự trữ mà không hủy hoàn tất.`,
     referenceLabel: 'Sách trắng \u00a711.2 \u2014 Thiết kế phòng vệ',
   },
   'no-anchored-nfts': {
@@ -176,42 +177,41 @@ export const hardQuestionsTextVi = {
     referenceLabel: 'Sách trắng \u00a712.2 \u2014 Nâng cấp V2',
   },
   'v3-what-changes': {
-    prompt: 'Nâng cấp V3 dự kiến thay đổi đúng một điều. Điều gì?',
+    prompt: 'Mô tả nào đúng với V3 đã triển khai?',
     options: {
-      a: 'Giá của việc hành động muộn: trong 20 phút cuối, mọi chi phí nét bút được nhân với một hệ số cộng thêm tăng dần từ 1 lần lên 10 lần.',
+      a: 'V3 đã được triển khai. Bản này thay đổi công thức và người nhận CST tham gia, trọng số của cả ETH Tinh tuyển và NFT Tinh tuyển dành cho người tham gia, tốc độ giảm chi phí CST, tỷ lệ ETH, số NFT của Phân bổ Signature và bổ sung phụ phí cuối chu kỳ.',
       b: 'Quy trình nghệ thuật chuyển sang bộ kết xuất mới.',
       c: 'Nét bút CST bị loại bỏ.',
-      d: 'Các tỷ lệ phân bổ được cân đối lại.',
+      d: 'V3 chỉ đổi tên NFT, còn mọi quy tắc kinh tế đều không đổi.',
     },
     explanation:
-      'V3 không chạm vào gì ngoài giai đoạn cuối: trong 20 phút cuối trước thời điểm hoàn tất chu kỳ, mọi chi phí nét bút \u2014 ETH, ETH kèm Random Walk NFT hay CST \u2014 được nhân với một hệ số cộng thêm tăng theo đa thức từ 1 lần lên 10 lần. Mọi thứ khác trong giao thức giữ nguyên như V2 định nghĩa.',
-    referenceLabel: 'Sách trắng \u00a712.3 \u2014 Nâng cấp V3 dự kiến',
+      'V3 đã được triển khai. Bản này thay đổi công thức và người nhận CST tham gia, trọng số của cả ETH Tinh tuyển và NFT Tinh tuyển dành cho người tham gia, tốc độ giảm chi phí CST, tỷ lệ ETH, số NFT của Phân bổ Signature và bổ sung phụ phí cuối chu kỳ.',
+    referenceLabel: 'Sách trắng \u00a712.3 \u2014 V3 đã triển khai',
   },
   'v3-shape': {
-    prompt:
-      'Hệ số cộng thêm của V3 là m(t) = 1 + 9\u00b7(t/T)\u2078. Vì sao số mũ bậc tám quan trọng?',
+    prompt: 'Phụ phí cuối chu kỳ của V3 tăng như thế nào?',
     options: {
-      a: 'Hệ số gần như vô hình trong phần lớn cửa sổ và chỉ dốc lên ở những phút cuối \u2014 khoảng 1,04 lần khi còn mười phút, 1,9 lần khi còn năm, 7 lần khi còn một, và 10 lần tại thời điểm đếm ngược về 0.',
+      a: 'Trong một phần ba cuối của mức tăng thời gian hiện tại, chi phí ETH và CST có phụ phí theo lũy thừa bậc tám. Tổng chi phí tiến tới khoảng năm lần chi phí cơ sở gần hạn chót và giữ mức trần sau khi hết giờ. Chi phí CST cơ sở bằng 0 vẫn bằng 0. Công thức số nguyên của hợp đồng quyết định kết quả chính xác.',
       b: 'Nó khiến hệ số tăng tuyến tính xuyên cửa sổ.',
       c: 'Nó áp trọn 10 lần cho toàn bộ cửa sổ cuối.',
       d: 'Nó chỉ ảnh hưởng đến nét bút CST.',
     },
     explanation:
-      'Đường tăng bậc tám tập trung phần lớn mức tăng chi phí vào những phút cuối. Nét bút ở đầu cửa sổ chịu mức tăng nhỏ, còn nét bút gần thời hạn chịu mức tăng lớn. Đường tuyến tính hoặc hệ số cố định 10 lần sẽ phân bố mức tăng theo cách khác.',
-    referenceLabel: 'Sách trắng \u00a712.3 \u2014 Nâng cấp V3 dự kiến',
+      'Trong một phần ba cuối của mức tăng thời gian hiện tại, chi phí ETH và CST có phụ phí theo lũy thừa bậc tám. Tổng chi phí tiến tới khoảng năm lần chi phí cơ sở gần hạn chót và giữ mức trần sau khi hết giờ. Chi phí CST cơ sở bằng 0 vẫn bằng 0. Công thức số nguyên của hợp đồng quyết định kết quả chính xác.',
+    referenceLabel: 'Sách trắng \u00a712.3 \u2014 V3 đã triển khai',
   },
   'v3-overtime': {
     prompt:
       'Dưới V3, Zed chờ đến sau khi thời hạn trôi qua và đặt nét bút sau thời hạn. Hệ số nào được áp?',
     options: {
-      a: 'Trọn 10 lần \u2014 hệ số chạm 10 lần tại thời hạn và giữ ở đó cho mọi nét bút sau thời hạn.',
+      a: 'Trong một phần ba cuối của mức tăng thời gian hiện tại, chi phí ETH và CST có phụ phí theo lũy thừa bậc tám. Tổng chi phí tiến tới khoảng năm lần chi phí cơ sở gần hạn chót và giữ mức trần sau khi hết giờ. Chi phí CST cơ sở bằng 0 vẫn bằng 0. Công thức số nguyên của hợp đồng quyết định kết quả chính xác.',
       b: 'Không có \u2014 nét bút sau thời hạn trở về 1 lần.',
-      c: 'Một nửa mức tối đa, 5 lần.',
+      c: 'Chỉ khoảng 2,5 lần chi phí cơ sở.',
       d: 'Nét bút sau thời hạn bị chặn hoàn toàn dưới V3.',
     },
     explanation:
-      'Hệ số tăng lên 10 lần tại thời hạn và giữ ở 10 lần cho bất kỳ nét bút nào đặt sau thời hạn. Việc giành vị trí sau hết hạn vẫn khả thi \u2014 quy tắc thời gian đã lưu của V2 vẫn điều khiển đồng hồ \u2014 nhưng dưới V3 những nét bút này phải chịu hệ số chi phí cao hơn.',
-    referenceLabel: 'Sách trắng \u00a712.3 \u2014 Nâng cấp V3 dự kiến',
+      'Trong một phần ba cuối của mức tăng thời gian hiện tại, chi phí ETH và CST có phụ phí theo lũy thừa bậc tám. Tổng chi phí tiến tới khoảng năm lần chi phí cơ sở gần hạn chót và giữ mức trần sau khi hết giờ. Chi phí CST cơ sở bằng 0 vẫn bằng 0. Công thức số nguyên của hợp đồng quyết định kết quả chính xác.',
+    referenceLabel: 'Sách trắng \u00a712.3 \u2014 V3 đã triển khai',
   },
   'owner-mid-cycle': {
     prompt:
@@ -239,15 +239,15 @@ export const hardQuestionsTextVi = {
     referenceLabel: 'Sách trắng \u00a713 \u2014 Con đường đến phi tập trung hoàn toàn',
   },
   'owner-endgame': {
-    prompt: 'Vai trò chủ sở hữu kết thúc như thế nào, theo cam kết của sách trắng?',
+    prompt: 'Mã V3 đã triển khai bảo đảm điều gì về việc kết thúc quyền chủ sở hữu?',
     options: {
-      a: 'Khi các nâng cấp còn lại hoàn thành, quyền kiểm soát đặc quyền rời khỏi địa chỉ triển khai vĩnh viễn \u2014 bằng cách chuyển cho Hội đồng Vũ trụ hoặc từ bỏ hoàn toàn, được thông báo trước.',
+      a: 'Chủ sở hữu vẫn có quyền đổi tham số và bản triển khai theo điều kiện của hợp đồng. Các thay đổi chính bị giới hạn khi chu kỳ chưa hoạt động, nhưng thời điểm kích hoạt, thời gian chờ chu kỳ sau và các hợp đồng phụ có quyền riêng. V3 không tự động chuyển quyền cho Hội đồng Vũ trụ hoặc tự động từ bỏ quyền chủ sở hữu.',
       b: 'Nó không bao giờ kết thúc; đội ngũ giữ vai trò bảo trì vô thời hạn.',
       c: 'Nó được bán cho người được ủy quyền có trọng số cao nhất trong Hội đồng.',
       d: 'Nó chuyển sang một multisig của công ty vĩnh viễn.',
     },
     explanation:
-      'Cam kết là rõ ràng: sau khi các nâng cấp còn lại được triển khai, bắt đầu từ V3, vai trò chủ sở hữu rời khỏi người triển khai vĩnh viễn, với cơ chế chính xác được thông báo trước. Từ đó không bên tư nhân nào có thể nâng cấp giao thức hay thay đổi tham số của nó \u2014 và mỗi bước của quá trình đều hiển thị trên chuỗi, kể cả bước cuối.',
+      'Chủ sở hữu vẫn có quyền đổi tham số và bản triển khai theo điều kiện của hợp đồng. Các thay đổi chính bị giới hạn khi chu kỳ chưa hoạt động, nhưng thời điểm kích hoạt, thời gian chờ chu kỳ sau và các hợp đồng phụ có quyền riêng. V3 không tự động chuyển quyền cho Hội đồng Vũ trụ hoặc tự động từ bỏ quyền chủ sở hữu.',
     referenceLabel: 'Sách trắng \u00a713 \u2014 Con đường đến phi tập trung hoàn toàn',
   },
   'postpone-activation-limit': {
@@ -267,12 +267,13 @@ export const hardQuestionsTextVi = {
     prompt:
       'Dòng chảy định kỳ duy nhất mà đội ngũ điều hướng là gì, và đội ngũ nhận ETH nào từ nét bút?',
     options: {
-      a: `${cst(protocolFacts.outreachReserveCst)} CST mỗi chu kỳ cho Dự trữ truyền thông \u2014 và không ví nào của đội ngũ nhận ETH từ nét bút, bao giờ.`,
+      a: 'Phân bổ ETH hiện tại không có tỷ lệ riêng cho đội ngũ. Người phụ trách được chỉ định phân phối CST của Dự trữ truyền thông. Địa chỉ liên quan đến đội ngũ có thể tham gia theo cùng quy tắc; quyền chủ sở hữu vẫn tồn tại.',
       b: 'Một tỷ lệ ETH nhỏ của mỗi nét bút.',
       c: 'Phân bổ Signature của mỗi chu kỳ thứ mười.',
       d: 'Hoàn toàn không gì, kể cả CST.',
     },
-    explanation: `Dự trữ truyền thông nhận ${cst(protocolFacts.outreachReserveCst)} CST mỗi chu kỳ cho truyền thông cộng đồng \u2014 dòng chảy định kỳ duy nhất mà đội ngũ điều hướng, và nó không mang quyền đặc biệt nào. Về phía ETH, sách trắng tuyệt đối: không ví nào của đội ngũ nhận ETH từ nét bút.`,
+    explanation:
+      'Phân bổ ETH hiện tại không có tỷ lệ riêng cho đội ngũ. Người phụ trách được chỉ định phân phối CST của Dự trữ truyền thông. Địa chỉ liên quan đến đội ngũ có thể tham gia theo cùng quy tắc; quyền chủ sở hữu vẫn tồn tại.',
     referenceLabel: 'Sách trắng \u00a77.1 \u2014 Quy tắc khắc',
   },
   'art-integrator': {
@@ -290,25 +291,25 @@ export const hardQuestionsTextVi = {
   'art-candidates': {
     prompt: 'Quy trình chọn quỹ đạo trở thành một Signature như thế nào?',
     options: {
-      a: 'Một trăm nghìn cấu hình ứng viên được mô phỏng một triệu bước mỗi cấu hình, rồi một phép tổng hợp xếp hạng Borda chấm điểm hỗn độn và độ đều cạnh của tam giác để chọn quỹ đạo thú vị nhất về thị giác.',
+      a: 'Xếp hạng Borda theo đặc tính quỹ đạo tạo danh sách ngắn, sau đó một bước đánh giá tính thẩm mỹ của hình ảnh chọn kết quả.',
       b: 'Quỹ đạo ngẫu nhiên đầu tiên được dùng nguyên trạng.',
       c: 'Đội ngũ tuyển chọn quỹ đạo của mỗi chu kỳ bằng tay.',
       d: 'Chủ sở hữu NFT biểu quyết chọn quỹ đạo ứng viên sau khi khắc.',
     },
     explanation:
-      'Seed sinh ra một trăm nghìn ứng viên; mỗi ứng viên được tích phân một triệu bước vật lý; một phép tổng hợp xếp hạng Borda trên các chỉ số hỗn độn và độ đều cạnh chọn ra ứng viên nổi bật. Mọi giai đoạn đều là hàm thuần của seed \u2014 việc tuyển chọn diễn ra bằng thuật toán, bất kỳ ai cũng tái tạo được y hệt.',
+      'Xếp hạng Borda theo đặc tính quỹ đạo tạo danh sách ngắn, sau đó một bước đánh giá tính thẩm mỹ của hình ảnh chọn kết quả. Seed của NFT được lưu trên chuỗi, còn hình ảnh và video được tạo ngoài chuỗi. Tái tạo cần cùng seed, đúng phiên bản và cấu hình bộ kết xuất, cùng công cụ tương thích. Chỉ có cùng seed không bảo đảm kết quả giống nhau giữa các phiên bản.',
     referenceLabel: 'Sách trắng \u00a76.1 \u2014 Quy trình',
   },
   'art-color': {
     prompt: 'Màu của ba vật thể được chọn như thế nào?',
     options: {
-      a: 'Pha trong không gian màu cảm nhận OKLab với độ tách sắc 120 độ cho mỗi vật thể, điều biến bởi độ trôi và một sóng sin.',
+      a: 'Bảng màu dùng không gian cảm nhận OKLCh với sắc độ và khoảng cách màu biến đổi. Bộ kết xuất hiện tại không cố định góc cách đều giữa màu của ba vật thể.',
       b: 'Đỏ, lục và lam cố định cho mọi Signature.',
       c: 'Lấy mẫu từ ảnh chụp tinh vân thật.',
       d: 'Do chủ sở hữu đầu tiên của NFT chọn lúc khắc.',
     },
     explanation:
-      'Màu được pha trong OKLab \u2014 một không gian cảm nhận nơi các khoảng cách số bằng nhau tạo ra mức chênh lệch màu gần tương đương trong cảm nhận của mắt người \u2014 với độ tách sắc 120 độ giữ ba vật thể phân biệt rõ về thị giác. Như mọi thứ phía sau seed, bảng màu là tất định.',
+      'Bảng màu dùng không gian cảm nhận OKLCh với sắc độ và khoảng cách màu biến đổi. Bộ kết xuất hiện tại không cố định góc cách đều giữa màu của ba vật thể.',
     referenceLabel: 'Sách trắng \u00a76.1 \u2014 Quy trình',
   },
   'art-spectral': {
@@ -320,11 +321,11 @@ export const hardQuestionsTextVi = {
       d: 'Các đường spline tinh chỉnh bằng tay vẽ theo mô phỏng.',
     },
     explanation:
-      'Bộ kết xuất coi ánh sáng là một quang phổ, không phải ba kênh màu: sáu mươi tư dải bước sóng trải khắp vùng khả kiến, những vệt có độ dày phản ứng theo vận tốc, và độ sâu trường ảnh cho chiều sâu. Ánh xạ tông AgX, hiệu ứng bloom, các lớp tinh vân OpenSimplex và cân màu hoàn thiện khung hình.',
+      'Ánh xạ tông màu, hiệu ứng phát sáng và xử lý màu hoàn thiện hình ảnh. Kích thước, thời lượng và định dạng phụ thuộc vào phiên bản và cấu hình bộ kết xuất.',
     referenceLabel: 'Sách trắng \u00a76.1 \u2014 Quy trình',
   },
   'art-output': {
-    prompt: 'Quy trình xuất ra những tệp gì cho mỗi NFT?',
+    prompt: 'Cấu hình mặc định của bộ kết xuất được mô tả tạo ra những tệp nào?',
     options: {
       a: 'Một ảnh PNG 16 bit và một video H.265 dài 30 giây.',
       b: 'Chỉ một ảnh thu nhỏ JPEG.',
@@ -332,33 +333,33 @@ export const hardQuestionsTextVi = {
       d: 'Một tệp vector SVG.',
     },
     explanation:
-      'Mỗi Signature được xuất dưới dạng ảnh PNG 16 bit \u2014 gấp đôi độ sâu màu thông thường trên mỗi kênh \u2014 cộng một video H.265 dài 30 giây của quỹ đạo đang chuyển động. Cả hai đều có thể tái tạo từ seed trên chuỗi bởi bất kỳ ai chạy quy trình mã nguồn mở.',
+      'Ánh xạ tông màu, hiệu ứng phát sáng và xử lý màu hoàn thiện hình ảnh. Kích thước, thời lượng và định dạng phụ thuộc vào phiên bản và cấu hình bộ kết xuất. Seed của NFT được lưu trên chuỗi, còn hình ảnh và video được tạo ngoài chuỗi. Tái tạo cần cùng seed, đúng phiên bản và cấu hình bộ kết xuất, cùng công cụ tương thích. Chỉ có cùng seed không bảo đảm kết quả giống nhau giữa các phiên bản.',
     referenceLabel: 'Sách trắng \u00a76.1 \u2014 Quy trình',
   },
   'art-server-death': {
     prompt: 'Mọi máy chủ gắn với dự án biến mất vào ngày mai. Điều gì xảy ra với tác phẩm?',
     options: {
-      a: 'Mọi Signature có thể được tái tạo từ seed trên chuỗi bằng quy trình kết xuất mã nguồn mở.',
+      a: 'Seed của NFT được lưu trên chuỗi, còn hình ảnh và video được tạo ngoài chuỗi. Tái tạo cần cùng seed, đúng phiên bản và cấu hình bộ kết xuất, cùng công cụ tương thích. Chỉ có cùng seed không bảo đảm kết quả giống nhau giữa các phiên bản.',
       b: 'Nghệ thuật mất; chỉ siêu dữ liệu còn lại.',
       c: 'Chỉ ảnh thu nhỏ còn lại trong ví.',
       d: 'Tùy vào việc các bản ghim IPFS có được duy trì không.',
     },
     explanation:
-      'Seed được lưu trên chuỗi, còn quy trình kết xuất mã nguồn mở là tất định. Khi có seed và mã nguồn, bạn có thể tái tạo Signature đến từng điểm ảnh mà không cần máy chủ của dự án.',
+      'Seed của NFT được lưu trên chuỗi, còn hình ảnh và video được tạo ngoài chuỗi. Tái tạo cần cùng seed, đúng phiên bản và cấu hình bộ kết xuất, cùng công cụ tương thích. Chỉ có cùng seed không bảo đảm kết quả giống nhau giữa các phiên bản. Kho mã có các bước kiểm tra hình ảnh tham chiếu chạy thủ công. Quy trình tích hợp liên tục hiện tại không so sánh mã băm của các khung hình được tạo.',
     funFact:
-      'Tích hợp liên tục kiểm định mã băm SHA-256 của các khung hình đã kết xuất, nên ngay cả một sai lệch vô tình một điểm ảnh trong quy trình cũng làm bản dựng thất bại.',
+      'Kho mã có các bước kiểm tra hình ảnh tham chiếu chạy thủ công. Quy trình tích hợp liên tục hiện tại không so sánh mã băm của các khung hình được tạo.',
     referenceLabel: 'Sách trắng \u00a76.2 \u2014 Khả năng tái tạo và giấy phép',
   },
   'art-naming': {
     prompt: 'Chủ sở hữu có quyền tùy chỉnh gì với Cosmic Signature NFT của mình?',
     options: {
-      a: 'Họ có thể đặt tên cho nó trên chuỗi, tối đa 32 byte \u2014 chính tác phẩm không bao giờ thay đổi.',
+      a: 'Chủ NFT có thể ghi tên dài tối đa 32 byte mà không đổi seed trên chuỗi. Vị trí siêu dữ liệu chịu quyền quản lý riêng của chủ hợp đồng NFT.',
       b: 'Họ có thể đổi seed một lần.',
       c: 'Họ có thể điều chỉnh bảng màu.',
       d: 'Họ có thể kéo dài thời lượng video.',
     },
     explanation:
-      'Chủ sở hữu có thể ghi một tên tối đa 32 byte trên chuỗi. Đó là toàn bộ bề mặt tùy chỉnh: seed, quỹ đạo, bảng màu và video được cố định vĩnh viễn lúc khắc \u2014 tính tất định là lời hứa cốt lõi của bộ sưu tập, và đổi seed sẽ phá vỡ nó.',
+      'Chủ NFT có thể ghi tên dài tối đa 32 byte mà không đổi seed trên chuỗi. Vị trí siêu dữ liệu chịu quyền quản lý riêng của chủ hợp đồng NFT.',
     referenceLabel: 'Sách trắng \u00a76.2 \u2014 Khả năng tái tạo và giấy phép',
   },
   'art-license': {
@@ -376,13 +377,13 @@ export const hardQuestionsTextVi = {
   'seed-derivation': {
     prompt: 'Seed nghệ thuật của một NFT được tạo khi nào và như thế nào?',
     options: {
-      a: 'Lúc khắc, hợp đồng suy ra một seed 32 byte từ dữ liệu trên chuỗi và lưu nó cùng NFT; một bộ tạo SHA3-256 khiến mọi thứ phía sau là hàm thuần của nó.',
+      a: 'Hợp đồng ghi seed 32 byte khi khắc. Bộ kết xuất dùng seed cùng phiên bản, cấu hình và công cụ.',
       b: 'Nghệ sĩ tải lên một seed cho mỗi NFT trước khi hoàn tất.',
       c: 'Seed là địa chỉ ví của chủ sở hữu.',
       d: 'Một seed mới được rút mỗi lần tác phẩm được kết xuất.',
     },
     explanation:
-      'Seed được suy ra trên chuỗi lúc khắc và lưu vĩnh viễn cùng NFT. Nó khởi tạo một bộ tạo số ngẫu nhiên SHA3-256, và mọi lựa chọn phía sau \u2014 quỹ đạo ứng viên, máy quay, màu sắc \u2014 đều là hàm thuần của nó. Kết xuất hôm nay hay một thập kỷ sau: cùng seed, cùng Signature.',
+      'Hợp đồng ghi seed 32 byte khi khắc. Bộ kết xuất dùng seed cùng phiên bản, cấu hình và công cụ. Seed của NFT được lưu trên chuỗi, còn hình ảnh và video được tạo ngoài chuỗi. Tái tạo cần cùng seed, đúng phiên bản và cấu hình bộ kết xuất, cùng công cụ tương thích. Chỉ có cùng seed không bảo đảm kết quả giống nhau giữa các phiên bản.',
     referenceLabel: 'Sách trắng \u00a76.1 \u2014 Quy trình',
   },
   'hacken-findings': {
@@ -422,15 +423,15 @@ export const hardQuestionsTextVi = {
     referenceLabel: 'Sách trắng \u00a711.1 \u2014 Rà soát độc lập',
   },
   'sourcify-status': {
-    prompt: 'Tình trạng xác minh mã nguồn của các hợp đồng đã triển khai là gì?',
+    prompt: 'Làm sao kiểm tra bản triển khai hiện tại và trạng thái xác minh công khai?',
     options: {
-      a: 'Xác minh khớp chính xác trên Sourcify cho Arbitrum One (chuỗi 42161), tại các địa chỉ cố định trong phụ lục của sách trắng.',
-      b: 'Chưa xác minh \u2014 bạn phải tin vào bytecode.',
-      c: 'Chỉ proxy được xác minh, không phải bản triển khai.',
+      a: 'Bản triển khai hiện tại của giao thức là V3. Hãy đối chiếu địa chỉ triển khai với ô EIP-1967 của proxy. Việc xác minh công khai mã nguồn V3 chưa được xác nhận; xác minh V2 trước đây không áp dụng cho bản triển khai mới.',
+      b: 'Xác minh mã nguồn bảo đảm mọi bản triển khai đều an toàn.',
+      c: 'Mã nguồn V2 trùng khớp tự động xác minh V3.',
       d: 'Được xác minh trên testnet, nhưng không trên mainnet.',
     },
     explanation:
-      'Mọi hợp đồng đều được xác minh khớp chính xác trên Sourcify cho chuỗi 42161 \u2014 bậc xác minh nghiêm ngặt nhất, nơi bytecode trên chuỗi khớp với mã nguồn đã công bố đến từng byte, kể cả siêu dữ liệu. Địa chỉ proxy là địa chỉ vĩnh viễn của giao thức; các bản triển khai chỉ thay đổi qua quy trình nâng cấp công khai.',
+      'Bản triển khai hiện tại của giao thức là V3. Hãy đối chiếu địa chỉ triển khai với ô EIP-1967 của proxy. Việc xác minh công khai mã nguồn V3 chưa được xác nhận; xác minh V2 trước đây không áp dụng cho bản triển khai mới.',
     referenceLabel: 'Sách trắng \u00a711.4 \u2014 Xác minh mở',
   },
   reentrancy: {
@@ -500,7 +501,7 @@ export const hardQuestionsTextVi = {
     prompt:
       'Trong cửa sổ hoàn tất mở, Quill (người chưa từng đặt một nét bút nào) hoàn tất chu kỳ. Chính xác cô nhận gì?',
     options: {
-      a: 'Mọi thứ vai trò người nhận mang theo: phần ETH của phân bổ Signature, lần khắc CST của nó, NFT của nó và quyền ưu tiên với các tài sản đính kèm.',
+      a: `Địa chỉ hoàn tất chu kỳ thành công nhận ${protocolFacts.mainEthPercentage}% Dự trữ chu kỳ, tổng cộng ${formatCount(protocolFacts.specialAllocationCst, 'vi')} CST và ${protocolFacts.mainPrizeNftsPerCycle} Cosmic Signature NFT có ID liên tiếp. Trong ${protocolFacts.finalGestureExclusivityHours} giờ đầu sau thời điểm hoàn tất, chỉ người đặt nét bút cuối cùng được thực hiện; sau đó bất kỳ ai cũng có thể hoàn tất và tự nhận phân bổ.`,
       b: 'Một khoản phí hoàn tất cố định, còn các phân bổ vẫn thuộc về người đặt nét bút cuối cùng.',
       c: 'Chỉ NFT; ETH tích lũy sang chu kỳ sau.',
       d: 'Không gì cả \u2014 hoàn tất là một dịch vụ công.',
@@ -546,13 +547,13 @@ export const hardQuestionsTextVi = {
     prompt:
       'Bea đặt 30 nét bút trong chu kỳ này; Cal đặt 3. Điều gì đúng về các lượt chọn ETH Tinh tuyển?',
     options: {
-      a: 'Lượt của Bea xuất hiện trong quỹ nhiều gấp mười lần, và với việc có hoàn lại cô thậm chí có thể được chọn nhiều lần \u2014 nhưng Cal hoàn toàn vẫn có thể được chọn.',
+      a: 'Trọng số là chi phí ETH cơ sở lúc đặt nét bút, không gồm mức giảm hay phụ phí cuối chu kỳ. Một địa chỉ có thể được chọn nhiều lần.',
       b: 'Bea được bảo đảm ít nhất một lượt chọn.',
       c: 'Cal bị loại; chỉ những người tham gia hàng đầu mới đủ điều kiện.',
       d: 'Cả hai có cơ hội y hệt \u2014 một lượt cho mỗi địa chỉ.',
     },
     explanation:
-      'Lượt tăng theo số nét bút đã đặt \u2014 tần suất được chọn tỷ lệ với mức tham gia \u2014 và các lượt chọn có hoàn lại. Không gì được bảo đảm cho ai, và không ai đã đặt nét bút bị loại: quỹ cân theo hoạt động mà không chia định mức hay đặt ngưỡng.',
+      'Cả ETH Tinh tuyển và NFT Tinh tuyển dành cho người tham gia đều dùng trọng số từng nét bút. Trọng số là chi phí ETH cơ sở tại thời điểm đó, chưa giảm bằng Random Walk NFT và chưa cộng phụ phí cuối chu kỳ. Nét bút CST dùng cùng chi phí ETH cơ sở đương thời. Các lượt chọn có hoàn lại, nên một địa chỉ có thể được chọn nhiều lần. Tinh tuyển NFT neo giữ xét riêng các Random Walk NFT đang neo giữ.',
     referenceLabel: 'Sách trắng \u00a75.3 \u2014 Tinh tuyển',
   },
   'recognition-vs-participation': {
@@ -563,7 +564,7 @@ export const hardQuestionsTextVi = {
       c: 'CST tham gia, mà đội ngũ có thể điều chỉnh theo từng nét bút.',
       d: 'Cả ba dòng đều do đội ngũ điều hướng.',
     },
-    explanation: `Ba dòng là: CST tham gia (khắc lúc đặt nét bút theo công thức), CST ghi nhận (${cst(protocolFacts.specialAllocationCst)} CST đi cùng mỗi lần phân phối NFT khi hoàn tất) và Dự trữ truyền thông (${cst(protocolFacts.outreachReserveCst)} CST mỗi chu kỳ). Chỉ dòng cuối do đội ngũ điều hướng \u2014 và đó là CST thông thường không có quyền đặc biệt, được chi cho truyền thông cộng đồng.`,
+    explanation: `Khi có đủ các luồng, một chu kỳ khắc ${protocolFacts.typicalNftsPerCycle} Cosmic Signature NFT và ${formatCount(protocolFacts.typicalCstImprintsPerCycle, 'vi')} CST trong các phân bổ cố định. Phân bổ Signature gồm ${protocolFacts.mainPrizeNftsPerCycle} NFT nhưng chỉ một khoản tổng cộng ${formatCount(protocolFacts.specialAllocationCst, 'vi')} CST. Chiến binh Thời gian, Quán quân Bền bỉ và nét bút CST cuối cùng mỗi luồng có một NFT cùng CST tương ứng; hai luồng NFT Tinh tuyển bổ sung phần còn lại. Nếu không có nét bút CST hoặc Random Walk NFT neo giữ thì luồng tương ứng bị bỏ qua. CST tham gia được tính riêng. Trong V3, nét bút tiếp theo khắc toàn bộ CST tham gia cho người đặt nét bút trước. Số lượng tăng tuyến tính theo thời gian giữa hai nét bút. Nét bút đầu tiên của chu kỳ không khắc CST theo quy tắc này, và hoàn tất không thanh toán thêm khoảng thời gian cuối cho người đặt nét bút cuối cùng. Nếu cả hai nét bút thuộc cùng một địa chỉ, địa chỉ đó nhận CST.`,
     referenceLabel: 'Sách trắng \u00a77.1 \u2014 Quy tắc khắc',
   },
   'finalization-actions': {
@@ -611,7 +612,7 @@ export const hardQuestionsTextVi = {
       c: 'Chỉ chủ sở hữu mới có thể bổ sung cho kho.',
       d: 'Chỉ CST mới có thể được đóng góp tự nguyện.',
     },
-    explanation: `Kho nhận các khoản đóng góp ETH tự nguyện trực tiếp, bên trên ${protocolFacts.publicGoodsPercentage}% được thực thi mỗi chu kỳ. Việc chuyển tiếp cơ học đặt ra mức sàn; bất kỳ ai muốn thêm vào đều có thể làm vậy mà không cần chờ một lần hoàn tất.`,
+    explanation: `Khi hoàn tất, giao thức thử chuyển ${protocolFacts.publicGoodsPercentage}% Dự trữ chu kỳ vào Kho Hàng hóa công. Sau đó bất kỳ ai cũng có thể dùng một giao dịch riêng để chuyển số dư kho tới đơn vị thụ hưởng hiện tại là Protocol Guild. Chủ sở hữu có thể thay đổi đơn vị thụ hưởng. Nếu chuyển từ giao thức vào kho thất bại, phần này có thể ở lại dự trữ mà không hủy hoàn tất.`,
     referenceLabel: 'Sách trắng \u00a710 \u2014 Hàng hóa công',
   },
   'risk-honesty': {

@@ -9,7 +9,7 @@ const findItemById = (id: string) => findFaqItemById(faqContentEn, id);
  * Contract-accuracy regression guard for FAQ copy.
  *
  * Every assertion here traces to behavior in the verified Arbitrum contracts
- * (CosmicSignatureGameV2 + periphery, exact-match verified on Sourcify).
+ * (CosmicSignatureGameV3 + periphery, checked against the deployed runtime).
  * The "banned claims" list captures misstatements that previously shipped and
  * were corrected during the 2026-07 contract audit; they must never return.
  */
@@ -108,7 +108,7 @@ describe('FAQ contract accuracy', () => {
     });
   });
 
-  describe('gesture rules (BiddingV2)', () => {
+  describe('gesture rules (BiddingV3)', () => {
     it('states that the first gesture of a cycle must be ETH', () => {
       expect(answerOf('what-type-of-gestures-are-available')).toMatch(
         /first gesture of every cycle must be an ETH gesture/i,
@@ -155,7 +155,7 @@ describe('FAQ contract accuracy', () => {
   describe('public goods beneficiary (CharityWallet owner-configured today)', () => {
     it('does not present Council beneficiary selection as a current fact', () => {
       const answer = answerOf('who-receives-10-percent');
-      expect(answer).toMatch(/set by the protocol owner/i);
+      expect(answer).toMatch(/vault owner can change/i);
       expect(answer).toMatch(/Protocol Guild/);
     });
 

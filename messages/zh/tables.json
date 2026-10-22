@@ -283,7 +283,7 @@
   },
   "stellarSelection": {
     "draws": "周期收官时，协议会从本池中选取 {eth} 次 ETH 星选与 {nft} 次 NFT 星选。",
-    "weightedNote": "份额按每笔落笔当时的 ETH 价格加权。"
+    "weightedNote": "权重采用每笔当时未减免、未含溢价的 ETH 基础价格。"
   },
   "recipientHistory": {
     "sources": {

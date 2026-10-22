@@ -283,7 +283,7 @@
   },
   "stellarSelection": {
     "draws": "週期收官時，協議會從本池中選取 {eth} 次 ETH 星選與 {nft} 次 NFT 星選。",
-    "weightedNote": "份額按每筆落筆當時的 ETH 價格加權。"
+    "weightedNote": "權重取每筆當時未減免、未含溢價的 ETH 基礎價格。"
   },
   "recipientHistory": {
     "sources": {

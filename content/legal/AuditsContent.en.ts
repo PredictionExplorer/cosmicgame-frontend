@@ -4,7 +4,7 @@ import type { AuditsCopy } from './AuditsContent';
 export const auditsCopyEn: AuditsCopy = {
   title: 'Audits',
   intro:
-    'An independent audit of the Cosmic Signature contracts by Hacken, the formal verification and analysis kept in the contracts repository, and how to check a contract yourself.',
+    'Hacken’s historical contract review, repository verification tools, and how to inspect the current deployment. The historical audit is not an independent review of every later V2 or V3 change.',
   summary: {
     label: 'Audit at a glance',
     auditor: 'Auditor',
@@ -28,7 +28,7 @@ export const auditsCopyEn: AuditsCopy = {
   audit: {
     heading: 'Independent audit by Hacken',
     paragraphs: [
-      'In late 2025, Hacken carried out an independent security review of the Cosmic Signature smart contracts. The engagement covered the production contracts in the public repository: the core protocol that runs each cycle, the CST token, both NFT collections, the anchoring wallets, and the wallet and system management contracts that support them. Hacken published the final report in January 2026.',
+      'Hacken reviewed the Cosmic Signature contracts in late 2025 at revision 9385ddb and published its final report in January 2026. Its scope included the core protocol, token and NFT integrations, anchoring wallets and supporting contracts at that revision. V3 was installed later and is not automatically covered by that review.',
       'The report lists each finding with its severity and its status; the summary above counts them. None is critical or high severity, and most describe design tradeoffs the team reviewed and accepted.',
       'Alongside the manual review, Hacken fuzz-tested the system’s invariants, properties such as the rule that the ETH the protocol holds always equals what came in minus what went out. Every invariant held.',
     ],
@@ -67,8 +67,8 @@ export const auditsCopyEn: AuditsCopy = {
     intro: 'Before you interact with a contract, you can confirm each of these yourself:',
     steps: [
       'Find the contract’s address on the <contracts>contracts page</contracts>, the one list of official addresses.',
-      'Open the address on <explorer>Arbiscan</explorer> and confirm it is on Arbitrum One with verified source code.',
-      'Compare that source with the <contractsRepository>public repository</contractsRepository>, or check the exact match on <sourcify>Sourcify</sourcify>.',
+      'Open the address on <explorer>Arbiscan</explorer>, confirm Arbitrum One, and inspect the current implementation and its actual source-verification status.',
+      'Compare published source with the <contractsRepository>repository</contractsRepository> and inspect <sourcify>Sourcify</sourcify>. V3 currently has no Sourcify verification; historical implementation matches do not transfer to it.',
       'Read the <hacken>Hacken report</hacken> for every finding and its status.',
       'Confirm that what the app shows matches the contract’s behavior on-chain.',
     ],

@@ -142,7 +142,7 @@ describe('CstCalibrationWindowView', () => {
     render(
       <CstCalibrationWindowView gestures={legacyGestures} isLive nowTs={NOW_SEC} label="Window" />,
     );
-    expect(screen.getByText(/No per-gesture Calibration Window data/)).toBeInTheDocument();
+    expect(screen.getByText(/No compatible per-gesture duration data/)).toBeInTheDocument();
     expect(screen.queryByTestId('composed-chart')).not.toBeInTheDocument();
   });
 
@@ -189,7 +189,7 @@ describe('CstCalibrationWindowChart', () => {
     expect(
       screen.queryByText('Failed to load Calibration Window timeline'),
     ).not.toBeInTheDocument();
-    expect(screen.getByText(/No per-gesture Calibration Window data/)).toBeInTheDocument();
+    expect(screen.getByText(/No compatible per-gesture duration data/)).toBeInTheDocument();
   });
 
   it('waits for a finalized cycle’s end, and offers a retry when it cannot be read', async () => {

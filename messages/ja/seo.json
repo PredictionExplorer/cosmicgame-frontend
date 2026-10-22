@@ -213,7 +213,7 @@
       },
       "public-goods-contributions-cg": {
         "heading": "プロトコルの公共財拠出",
-        "description": "確定した各サイクルのサイクル準備金の7%が公共財金庫に入り、その受け手のために保管されます。現在の受け手は、Ethereumのコア貢献者を支援するProtocol Guildです。",
+        "description": "確定した各サイクルのサイクル準備金の5%が公共財金庫に入り、その受け手のために保管されます。現在の受け手は、Ethereumのコア貢献者を支援するProtocol Guildです。",
         "links": {
           "learn": "公共財について学ぶ",
           "contracts": "金庫のコントラクトを確認する"
@@ -335,7 +335,7 @@
       "alt": "Cosmic Signature——すべての一筆がシグネチャーを形づくる。",
       "title": "すべての一筆がシグネチャーを形づくる。",
       "subhead": "Arbitrum上のプロシージャル・オンチェーンアート・プロトコル。",
-      "fact": "CC0・オープンソース・Protocol Guildへ7%"
+      "fact": "CC0・オープンソース・Protocol Guildへ5%"
     },
     "gallery": {
       "alt": "Cosmic Signature——ギャラリー",
@@ -363,7 +363,7 @@
       "eyebrow": "よくある質問",
       "title": "率直に答えておきたい質問。",
       "subhead": "パフォーマンス・サイクル、一筆、配分、係留、プロトコルの調整。",
-      "fact": "CC0・オープンソース・Protocol Guildへ7%"
+      "fact": "CC0・オープンソース・Protocol Guildへ5%"
     },
     "howItWorks": {
       "alt": "Cosmic Signature——仕組み",

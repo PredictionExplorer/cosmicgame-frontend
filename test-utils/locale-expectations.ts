@@ -138,7 +138,7 @@ export const LLMS_SECTIONS: Record<TranslatedLocale, LlmsSectionExpectation> = {
       '48 годин',
       `${protocolFacts.typicalNftsPerCycle} Cosmic Signature NFT`,
       'кожен Random Walk NFT',
-      'базою даних мутацій раку COSMIC',
+      'бази даних онкологічних мутацій COSMIC',
     ],
     // Ukrainian thousands never use the English comma grouping, which a
     // Ukrainian reader parses as a decimal point.

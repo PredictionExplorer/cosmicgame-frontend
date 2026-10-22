@@ -3,11 +3,6 @@ import { protocolFacts } from '@/content/protocol-facts';
 
 import type { LearnText } from './structure';
 
-const cstWindowDecrease =
-  protocolFacts.cstCalibrationWindowDecreasePercentPerEthGesture.toLocaleString('vi-VN');
-const cstWindowIncrease =
-  protocolFacts.cstCalibrationWindowIncreasePercentPerCstGesture.toLocaleString('vi-VN');
-
 /** Vietnamese learn copy, keyed by the skeleton in structure.ts. */
 export const learnTextVi = {
   hub: {
@@ -126,8 +121,8 @@ export const learnTextVi = {
         {
           heading: 'Mở chu kỳ',
           body: [
-            `Một chu kỳ bắt đầu với một cửa sổ hiệu chỉnh ETH cho nét bút đầu tiên. Cửa sổ hiệu chỉnh CST khởi đầu từ mốc tham chiếu ${protocolFacts.initialCstCalibrationWindowHours} giờ rồi thay đổi trên chuỗi khi các nét bút xuất hiện.`,
-            `Nét bút đầu tiên khởi động thời điểm hoàn tất chu kỳ. Các nét bút tiếp theo cộng mức tăng thời gian hiện tại và cập nhật trạng thái chu kỳ hiện tại. Nét bút ETH rút ngắn cửa sổ hiệu chỉnh CST khoảng ${cstWindowDecrease}%; nét bút CST kéo dài nó khoảng ${cstWindowIncrease}%.`,
+            'Nét bút đầu tiên của chu kỳ phải dùng ETH và bắt đầu đồng hồ hoàn tất. Các nét bút sau cộng mức tăng hiện tại vào thời điểm hoàn tất đã lưu, kể cả sau khi hết giờ. Đồng hồ không bắt đầu lại từ thời điểm hiện tại. Bạn vẫn có thể đặt nét bút cho tới khi giao dịch hoàn tất thành công.',
+            'V3 lưu tốc độ giảm chi phí CST; độ dài cửa sổ được tính từ tốc độ và mức trần. Nét bút ETH thử tăng tốc độ theo rate + floor(rate / 100), còn nét bút CST giảm theo rate - floor(rate / 101). Nếu mức tăng vi phạm điều kiện thời lượng tối thiểu, nó không được áp dụng. Nét bút CST đặt lại mức trần bằng giá trị lớn nhất giữa hai lần chi phí CST cơ sở chưa có phụ phí, mức tối thiểu đã cấu hình, và tốc độ mới nhân 180 giây. Bạn vẫn có thể đặt nét bút tiếp theo ngay lập tức.',
           ],
         },
         {
@@ -167,15 +162,15 @@ export const learnTextVi = {
         {
           heading: 'Một nét bút làm gì',
           body: [
-            `Mỗi nét bút ghi nhận sự tham gia vào chu kỳ đang diễn ra, có thể khắc CST tham gia động, kéo dài thời điểm hoàn tất chu kỳ và góp vào bối cảnh lịch sử xoay quanh Signature cuối cùng. CST tham gia dùng công thức căn bậc hai: ${protocolFacts.participationCstNotation}, trong đó ${protocolFacts.participationCstSymbols[0]} là số giây kể từ nét bút trước, m là hệ số nhân CST tham gia và i là mức tăng thời gian của chu kỳ.`,
-            `Chi phí nét bút thay đổi trong suốt chu kỳ. Nét bút ETH và nét bút CST dùng các cơ chế liên quan nhưng riêng biệt, bao gồm các cửa sổ hiệu chỉnh giúp người tham gia thấy rõ đường đi của chi phí. Mỗi nét bút CST kéo dài cửa sổ hiệu chỉnh CST khoảng ${cstWindowIncrease}%; mỗi nét bút ETH rút ngắn nó khoảng ${cstWindowDecrease}%.`,
+            'Trong V3, nét bút tiếp theo khắc toàn bộ CST tham gia cho người đặt nét bút trước. Số lượng tăng tuyến tính theo thời gian giữa hai nét bút. Nét bút đầu tiên của chu kỳ không khắc CST theo quy tắc này, và hoàn tất không thanh toán thêm khoảng thời gian cuối cho người đặt nét bút cuối cùng. Nếu cả hai nét bút thuộc cùng một địa chỉ, địa chỉ đó nhận CST.',
+            'ETH và CST có quy tắc chi phí cơ sở riêng. Khi chu kỳ mở, chi phí ETH giảm trong cửa sổ hiệu chỉnh; mỗi nét bút ETH nâng chi phí cơ sở tiếp theo. Chi phí CST giảm theo tốc độ lưu trên chuỗi. Gần hạn hoàn tất, cả hai chi phí có phụ phí cuối chu kỳ, nhưng phụ phí không nâng chi phí cơ sở tiếp theo hay trọng số Tinh tuyển.',
           ],
         },
         {
           heading: 'Đính kèm Random Walk NFT',
           body: [
-            'Người tham gia có thể đính kèm một Random Walk NFT chưa sử dụng vào nét bút ETH để giảm chi phí nét bút một lần. Random Walk NFT cũng có thể được neo giữ để thuộc diện Tinh tuyển NFT neo giữ.',
-            'Kết nối ví để thực hiện các thao tác này trong ứng dụng. Bạn có thể đọc hướng dẫn và xem dữ liệu công khai trước khi kết nối.',
+            'ETH và CST có quy tắc chi phí cơ sở riêng. Khi chu kỳ mở, chi phí ETH giảm trong cửa sổ hiệu chỉnh; mỗi nét bút ETH nâng chi phí cơ sở tiếp theo. Chi phí CST giảm theo tốc độ lưu trên chuỗi. Gần hạn hoàn tất, cả hai chi phí có phụ phí cuối chu kỳ, nhưng phụ phí không nâng chi phí cơ sở tiếp theo hay trọng số Tinh tuyển.',
+            'V3 lưu tốc độ giảm chi phí CST; độ dài cửa sổ được tính từ tốc độ và mức trần. Nét bút ETH thử tăng tốc độ theo rate + floor(rate / 100), còn nét bút CST giảm theo rate - floor(rate / 101). Nếu mức tăng vi phạm điều kiện thời lượng tối thiểu, nó không được áp dụng. Nét bút CST đặt lại mức trần bằng giá trị lớn nhất giữa hai lần chi phí CST cơ sở chưa có phụ phí, mức tối thiểu đã cấu hình, và tốc độ mới nhân 180 giây. Bạn vẫn có thể đặt nét bút tiếp theo ngay lập tức.',
           ],
         },
         {
@@ -207,21 +202,21 @@ export const learnTextVi = {
         {
           heading: 'Từ seed trên chuỗi đến bản kết xuất tất định',
           body: [
-            'Mỗi Cosmic Signature NFT lưu một seed có thể tái tạo tác phẩm. Quy trình kết xuất dùng các đầu vào tất định, nên cùng một seed tạo ra cùng một Signature.',
+            'Seed của NFT được lưu trên chuỗi, còn hình ảnh và video được tạo ngoài chuỗi. Tái tạo cần cùng seed, đúng phiên bản và cấu hình bộ kết xuất, cùng công cụ tương thích. Chỉ có cùng seed không bảo đảm kết quả giống nhau giữa các phiên bản.',
             'Quy trình nghệ thuật mô phỏng ba thiên thể dưới lực hấp dẫn Newton. Các quỹ đạo hỗn độn trở thành những vệt quỹ đạo quang phổ, tạo nên một bản sắc thị giác dễ nhận ra cho giao thức.',
           ],
         },
         {
           heading: 'Mở và có thể tái tạo',
           body: [
-            'Giao thức đề cao khả năng tái tạo. Mã nguồn và quy trình kết xuất được thiết kế để mỗi Signature có thể được xác minh độc lập từ seed của nó.',
+            'Seed của NFT được lưu trên chuỗi, còn hình ảnh và video được tạo ngoài chuỗi. Tái tạo cần cùng seed, đúng phiên bản và cấu hình bộ kết xuất, cùng công cụ tương thích. Chỉ có cùng seed không bảo đảm kết quả giống nhau giữa các phiên bản.',
             'Tác phẩm được công bố theo CC0, đưa cả phần hình ảnh và kỹ thuật đến gần với phạm vi công cộng.',
           ],
         },
         {
           heading: 'Vì sao tính tất định quan trọng với nghệ thuật',
           body: [
-            'Hệ ba vật thể cho Cosmic Signature một ngôn ngữ thị giác dựa trên chuyển động, lực hấp dẫn và những quỹ đạo bất ổn. Tính tất định quan trọng vì tác phẩm phải có thể tái tạo từ các đầu vào công khai thay vì phụ thuộc vào một bộ kết xuất lưu trữ mờ đục.',
+            'Seed của NFT được lưu trên chuỗi, còn hình ảnh và video được tạo ngoài chuỗi. Tái tạo cần cùng seed, đúng phiên bản và cấu hình bộ kết xuất, cùng công cụ tương thích. Chỉ có cùng seed không bảo đảm kết quả giống nhau giữa các phiên bản.',
             'Một quy trình tất định cho phép nhà sưu tầm, lập trình viên và nhà nghiên cứu xác minh rằng hình ảnh Signature tương ứng với seed và mã kết xuất. Đó là lý do trang mã nguồn, phòng trưng bày, trang chi tiết token và trang hợp đồng cùng kể một câu chuyện tin cậy.',
           ],
         },
@@ -289,7 +284,7 @@ export const learnTextVi = {
           body: ['Không bước nào cần đến ví.'],
           steps: [
             'Mở địa chỉ từ [trang hợp đồng](contracts) trên [Arbiscan](explorer) và xác nhận mạng là Arbitrum One, không phải mạng thử nghiệm.',
-            'Trên thẻ Contract, xác nhận mã nguồn đã được xác minh. So sánh mã đó với [kho mã hợp đồng công khai](contractsRepository), hoặc kiểm tra kết quả khớp chính xác trên [Sourcify](sourcify).',
+            'Bản triển khai hiện tại của giao thức là V3. Hãy đối chiếu địa chỉ triển khai với ô EIP-1967 của proxy. Việc xác minh công khai mã nguồn V3 chưa được xác nhận; xác minh V2 trước đây không áp dụng cho bản triển khai mới. [kho mã hợp đồng công khai](contractsRepository), [Sourcify](sourcify).',
             'Với hợp đồng giao thức, mở Read as Proxy: hợp đồng triển khai được nêu ở đó phải trùng với địa chỉ hợp đồng triển khai trên trang hợp đồng.',
             'Chọn một bản ghi trong ứng dụng, chẳng hạn một nét bút hay một khoản phân bổ, rồi tìm đúng giao dịch đó trong các giao dịch của hợp đồng trên trình khám phá khối.',
           ],
@@ -299,7 +294,7 @@ export const learnTextVi = {
           body: [
             `Cuối năm 2025, Hacken đã rà soát các hợp đồng đang vận hành: giao thức cốt lõi điều hành mỗi chu kỳ, token CST, cả hai bộ sưu tập NFT, các ví neo giữ, cùng các hợp đồng quản lý ví và hệ thống. [Báo cáo](hackenReport) công bố vào tháng 1 năm 2026 liệt kê ${AUDIT_FINDINGS_TOTAL} phát hiện, không có phát hiện nào ở mức nghiêm trọng hay cao, và ${HACKEN_AUDIT.invariants.held} trên ${HACKEN_AUDIT.invariants.tested} bất biến mà Hacken kiểm thử fuzz đã giữ vững.`,
             'Kho mã hợp đồng còn có đặc tả Certora Prover, cấu hình Solidity SMTChecker, phân tích tĩnh Slither và bộ kiểm thử, mỗi mục đều có liên kết từ [trang kiểm toán](audits). Chúng chỉ chứng minh hoặc kiểm thử các thuộc tính mà chúng nêu, không hơn.',
-            'Phạm vi kiểm toán là các hợp đồng thông minh: trang web này, dịch vụ dữ liệu phía sau ứng dụng và quy trình kết xuất tác phẩm không nằm trong đó. Như mọi hình thức kiểm tra, kiểm toán giảm rủi ro chứ không loại bỏ được rủi ro; hãy đọc [công bố rủi ro](riskDisclosures) trước khi tham gia.',
+            'Bản kiểm toán công khai áp dụng cho phiên bản hợp đồng lịch sử đã được xem xét. Nó không phải kiểm toán độc lập mọi thay đổi V2 hoặc V3 sau đó. Xác minh mã nguồn trùng với mã triển khai cũng không phải đánh giá bảo mật. Nguồn tham khảo: [công bố rủi ro](riskDisclosures).',
           ],
         },
       ],
@@ -318,7 +313,7 @@ export const learnTextVi = {
           heading: 'CST trong giao thức',
           body: [
             'Nét bút có thể khắc CST tham gia, và CST cũng có thể dùng làm phương thức thanh toán thay thế cho nét bút thông qua cửa sổ hiệu chỉnh riêng của nó. CST chi cho một nét bút được đốt \u2014 loại bỏ vĩnh viễn khỏi nguồn cung \u2014 thay vì gom vào quỹ.',
-            'Lượng CST tham gia là động: nó phụ thuộc vào thời gian kể từ nét bút trước và dùng công thức căn bậc hai, nên những khoảng lặng dài tạo ra lần khắc lớn hơn trong khi nét bút dồn dập có thể tạo ra 0 CST.',
+            'Trong V3, nét bút tiếp theo khắc toàn bộ CST tham gia cho người đặt nét bút trước. Số lượng tăng tuyến tính theo thời gian giữa hai nét bút. Nét bút đầu tiên của chu kỳ không khắc CST theo quy tắc này, và hoàn tất không thanh toán thêm khoảng thời gian cuối cho người đặt nét bút cuối cùng. Nếu cả hai nét bút thuộc cùng một địa chỉ, địa chỉ đó nhận CST.',
             'CST biểu thị trọng số điều phối trong Hội đồng Vũ trụ sau khi được ủy quyền (người nắm giữ có thể ủy quyền cho chính mình), nơi những người tham gia điều phối các thay đổi của giao thức theo quy tắc trên chuỗi.',
           ],
         },
@@ -333,7 +328,7 @@ export const learnTextVi = {
           heading: 'Bản ghi điều phối',
           body: [
             'Hội đồng Vũ trụ cho người nắm giữ CST một cách để điều phối các thay đổi của giao thức theo quy tắc trên chuỗi. Trang Thay đổi điều phối và các trang ứng dụng liên quan hiển thị lịch sử thay đổi tham số để người đọc hiểu giao thức tiến hóa ra sao.',
-            'Hội đồng Vũ trụ là cơ chế điều phối của Cosmic Signature. Để hiểu phạm vi quyền hạn hiện tại và các giới hạn liên quan, hãy đọc thêm thông tin hợp đồng, điều khoản và công bố rủi ro.',
+            'CST có thể dùng để đặt nét bút hoặc, sau khi ủy quyền, làm Trọng số Điều phối trong Hội đồng Vũ trụ. Hội đồng chỉ quản lý tài sản và quyền mà mình thực sự nắm giữ. Hiện Hội đồng không sở hữu giao thức chính; chuyển giao hoặc từ bỏ quyền cần các thao tác riêng trên chuỗi.',
           ],
         },
       ],
@@ -382,19 +377,19 @@ export const learnTextVi = {
         'Cách Cosmic Signature chuyển một phần phân bổ hàng hóa công đến Protocol Guild, cơ chế tài trợ cho những người đóng góp cốt lõi cho Ethereum.',
       h1: 'Cosmic Signature và hàng hóa công của Ethereum',
       summary:
-        'Cosmic Signature có một luồng phân bổ hàng hóa công, hiện chuyển một phần của mỗi Dự trữ chu kỳ đến Protocol Guild.',
+        'Phần này vào Kho Hàng hóa công. Bất kỳ ai cũng có thể dùng một giao dịch riêng để chuyển số dư kho tới đơn vị thụ hưởng hiện tại là Protocol Guild.',
       sections: [
         {
           heading: 'Phân bổ cho Protocol Guild',
           body: [
-            'Protocol Guild là cơ chế tài trợ cho hơn 170 người đóng góp cốt lõi cho Ethereum. Cosmic Signature hiện chuyển phần phân bổ hàng hóa công đến Protocol Guild.',
+            `Khi hoàn tất, giao thức thử chuyển ${protocolFacts.publicGoodsPercentage}% Dự trữ chu kỳ vào Kho Hàng hóa công. Sau đó bất kỳ ai cũng có thể dùng một giao dịch riêng để chuyển số dư kho tới đơn vị thụ hưởng hiện tại là Protocol Guild. Chủ sở hữu có thể thay đổi đơn vị thụ hưởng. Nếu chuyển từ giao thức vào kho thất bại, phần này có thể ở lại dự trữ mà không hủy hoàn tất.`,
             'Phân bổ Hàng hóa công là một phần trong cơ chế của giao thức. Lịch sử đóng góp và chuyển khoản giúp bạn kiểm tra phần dự trữ được dành cho mục đích này.',
           ],
         },
         {
           heading: 'Vì sao hàng hóa công là một phần của giao thức',
           body: [
-            'Việc chuyển tiếp hàng hóa công là một luồng phân bổ ở cấp giao thức chứ không phải một tuyên bố truyền thông thi thoảng. Một phần Dự trữ chu kỳ được chuyển đến một đơn vị thụ hưởng hàng hóa công, hiện là Protocol Guild, theo các quy tắc hiển thị trong ứng dụng.',
+            'Phần này vào Kho Hàng hóa công. Bất kỳ ai cũng có thể dùng một giao dịch riêng để chuyển số dư kho tới đơn vị thụ hưởng hiện tại là Protocol Guild.',
             'Điều này cho các trang hàng hóa công một nhiệm vụ cụ thể: hiển thị bản ghi đóng góp, bản ghi nhận về, bối cảnh đơn vị thụ hưởng và mối quan hệ giữa việc tham gia chu kỳ và sự hỗ trợ hệ sinh thái Ethereum.',
           ],
         },

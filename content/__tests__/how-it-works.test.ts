@@ -144,7 +144,7 @@ describe('how-it-works content', () => {
     const [notReturned, stepsUp, gas] = howItWorksContentEn.costs.items;
     expect(notReturned.body).toMatch(/joins the Cycle Reserve, and CST paid is burned/);
     expect(stepsUp.body).toContain(
-      `raises the next ETH Gesture Cost by ${protocolFacts.ethGestureCostStepUpPercent}%`,
+      `increases the next premium-free ETH base cost by ${protocolFacts.ethGestureCostStepUpPercent}% plus one wei`,
     );
     expect(gas.body).toMatch(/network fee in ETH/);
   });
@@ -234,19 +234,17 @@ describe('how-it-works content', () => {
 });
 
 describe('how-it-works protocol-fact interpolation', () => {
-  it('derives the calibration-window figures from protocolFacts', () => {
+  it('describes V3 rate-based calibration and interpolates its safeguards', () => {
     expect(howItWorksContentEn.gameCycle.phases[0].description).toContain(
-      `${protocolFacts.initialCstCalibrationWindowHours}-hour`,
+      'carried CST ceiling and decline rate',
     );
-    expect(howItWorksContentEn.gameCycle.phases[1].description).toContain(
-      `shortens the CST Calibration Window by about ${protocolFacts.cstCalibrationWindowDecreasePercentPerEthGesture}%`,
-    );
-    expect(howItWorksContentEn.gameCycle.phases[1].description).toContain(
-      `lengthens it by about ${protocolFacts.cstCalibrationWindowIncreasePercentPerCstGesture}%`,
-    );
-    expect(howItWorksContentEn.proTips.tips[0].body).toContain(
-      `at least ${protocolFacts.cstCalibrationCeilingMinCst} CST`,
-    );
+    expect(howItWorksContentEn.gameCycle.phases[1].description).toContain('CST decline rate');
+    expect(howItWorksContentEn.gameCycle.phases[1].description).toContain('premium-free base cost');
+    const calibration = howItWorksContentEn.proTips.tips[0].body;
+    expect(calibration).toContain(`${protocolFacts.cstCalibrationCeilingMinCst} CST`);
+    expect(calibration).toContain(`${protocolFacts.cstCalibrationRestartMinimumSeconds} seconds`);
+    expect(calibration).toContain('not a cooldown');
+    expect(JSON.stringify(howItWorksContentEn)).not.toMatch(/12-hour reference|0[.,]4%|0[.,]398%/);
   });
 
   it('derives the allocation percentages and CST amounts from protocolFacts', () => {
@@ -285,7 +283,10 @@ describe('how-it-works protocol-fact interpolation', () => {
 
   it('explains Participation CST without the contract identifiers', () => {
     const { description } = howItWorksContentEn.rewardBreakdown.items[0];
-    expect(description).toMatch(/square root of the time since the previous gesture/);
+    expect(description).toMatch(/previous participant/);
+    expect(description).toMatch(/linearly with elapsed time/);
+    expect(description).toMatch(/opening gesture credits none/);
+    expect(description).toMatch(/finalization does not settle/);
     expect(description).not.toContain('bidCstRewardAmountMultiplier');
   });
 
@@ -293,12 +294,11 @@ describe('how-it-works protocol-fact interpolation', () => {
     expect(howItWorksContentZh.gameCycle.phases[3].description).toContain(
       `${protocolFacts.mainEthPercentage}%`,
     );
-    expect(howItWorksContentZh.gameCycle.phases[0].description).toContain(
-      `${protocolFacts.initialCstCalibrationWindowHours} 小时`,
+    expect(howItWorksContentZh.gameCycle.phases[0].description).toContain('首笔 ETH');
+    expect(howItWorksContentZh.proTips.tips[0].body).toContain(
+      String(protocolFacts.cstCalibrationRestartMinimumSeconds),
     );
-    expect(howItWorksContentZh.gameCycle.phases[1].description).toContain(
-      `${protocolFacts.cstCalibrationWindowDecreasePercentPerEthGesture}%`,
-    );
+    expect(JSON.stringify(howItWorksContentZh)).not.toMatch(/12 小时|0[.,]4%|0[.,]398%/);
     expect(howItWorksContentZh.gameCycle.phases[2].description).toContain(
       `${protocolFacts.finalGestureExclusivityHours} 小时`,
     );

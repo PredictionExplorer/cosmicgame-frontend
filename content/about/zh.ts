@@ -36,7 +36,7 @@ export const aboutContentZh = {
     heading: '缘起',
     paragraphs: [
       `Cosmic Signature 由 ${WHITE_PAPER_SHARED.authorName} 设计，白皮书也出自他手。它源于两个信念：其一，生成艺术最有意思的时候，是其中没有任何随意之处——每一幅图像都是一个物理过程的产物，任何人都能用同一颗种子重新运行它；其二，一个替参与者持有 ETH 的协议，应当清楚地回答每一个 wei 的去向。`,
-      '因此，这里的艺术来自物理，而非模型：牛顿引力下的三个天体，由链上记录的种子经开源渲染管线生成，并以 CC0 发布。分配是机械的：合约执行每一项分配，没有任何团队钱包从落笔中收取 ETH。团队的角色也是有限的：所有者权限在周期运行期间处于锁定状态，并将在剩余升级完成后彻底移除。',
+      '艺术由公开种子和链下物理渲染产生，复现需要对应的软件版本与配置。合约按配置执行分配。所有者仍可在合约规定的条件下升级与调整参数，部分外围权限可随时使用；V3 没有自动移交或移除这些权限的机制。',
     ],
   },
   milestones: {
@@ -49,18 +49,18 @@ export const aboutContentZh = {
       },
       v2: {
         label: 'V2',
-        status: '当前版本',
+        status: '历史版本',
         text: '依据协议的实际使用做出的五项调整，包括随两次落笔间隔而增长的参与 CST，以及收官之笔参与者更长的专属收官窗口。',
       },
       v3: {
         label: 'V3',
-        status: '规划中',
-        text: '对截止前最后几分钟内的落笔加收溢价，让持续参与比最后一刻的时机更有分量。它正在公开仓库中开发。',
+        status: '当前版本',
+        text: 'V3 已部署：参与 CST 改为下一笔向上一笔参与者线性发放；参与者星选采用基础价格权重，并引入下降速率调整、临近收官溢价及新的分配配置。',
       },
       handover: {
         label: '此后',
-        status: '已承诺',
-        text: '设计定稿后，所有者控制权将永久离开部署地址：移交给宇宙议会或直接放弃，具体方式会提前公布。',
+        status: '尚未执行',
+        text: '所有者权限目前仍保留。移交宇宙议会或放弃所有权都必须分别通过链上交易完成；合约没有自动执行的时间表。',
       },
     },
   },
@@ -71,7 +71,7 @@ export const aboutContentZh = {
       { id: 'app', label: 'Cosmic Signature 应用', href: ABOUT_RESOURCE_HREFS.app },
       {
         id: 'contracts',
-        label: '已验证的 Arbitrum 合约',
+        label: 'Arbitrum 合约与验证状态',
         href: ABOUT_RESOURCE_HREFS.contracts,
       },
       { id: 'code', label: '源代码', href: ABOUT_RESOURCE_HREFS.code },

@@ -158,14 +158,12 @@ describe('Contracts', () => {
     ).not.toBeNull();
     expect(token?.querySelector('a[href*="repo.sourcify.dev"]')).not.toBeNull();
     const implementation = document.querySelector('[data-contract="implementation"]');
-    expect(implementation?.querySelector('a[href*="repo.sourcify.dev"]')).not.toBeNull();
+    expect(implementation?.querySelector('a[href*="repo.sourcify.dev"]')).toBeNull();
     // What that link vouches for is said once for the list, not as a badge on every row.
     expect(screen.queryByText('Exact match')).toBeNull();
     const notes = document.querySelectorAll('[data-sourcify-note]');
     expect(notes).toHaveLength(1);
-    expect(notes[0]).toHaveTextContent(
-      'Every address with a Sourcify link is an exact match there, checked September 24, 2026.',
-    );
+    expect(notes[0]).toHaveTextContent(/V3.*not.*verified.*Sourcify/i);
   });
 
   it('shows every whole address, so it can be checked character by character on a phone', () => {
@@ -212,12 +210,12 @@ describe('Contracts', () => {
     const token = document.querySelector('[data-contract="cst"]');
     expect(token?.textContent).toContain(checksumAddress(protocolFacts.contractAddresses.cstToken));
     expect(token?.querySelector('[data-slot="contract-drift"]')).toHaveTextContent(
-      `The indexer reports ${addr('2')}, which has not been verified.`,
+      `The indexer reports ${addr('2')}, which differs from the checked address shown here.`,
     );
-    // The dashboard lags an upgrade: a different implementation is not drift.
+    // A stale implementation is reported as drift, independently of public verification.
     expect(
       document.querySelector('[data-contract="implementation"] [data-slot="contract-drift"]'),
-    ).toBeNull();
+    ).toHaveTextContent(addr('b'));
   });
 
   it('shows the verified implementation address over a stale dashboard value', () => {

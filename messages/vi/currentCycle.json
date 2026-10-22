@@ -57,12 +57,13 @@
       "fixedCstEach": "1.000 CST mỗi người",
       "nft": "1 Cosmic Signature NFT",
       "nftEach": "1 Cosmic Signature NFT mỗi người",
-      "attachedTokens": "Token đính kèm (nếu có)"
+      "attachedTokens": "Token đính kèm (nếu có)",
+      "nftCount": "{count, plural, other {# Cosmic Signature NFT}}"
     },
     "cards": {
       "signature": {
         "name": "Phân bổ Signature",
-        "tooltip": "Người tham gia đặt nét bút cuối cùng khi đếm ngược về không có thể hoàn tất chu kỳ và nhận về phân bổ này: ETH, 1.000 CST, một Cosmic Signature NFT và các token đính kèm. Nếu người đó không hoàn tất trong cửa sổ ưu tiên, người hoàn tất chu kỳ sẽ nhận phân bổ."
+        "tooltip": "Người hoàn tất nhận 3 Cosmic Signature NFT có ID liên tiếp và tổng cộng 1.000 CST. Quyền hoàn tất tuân theo thời gian độc quyền và thời gian mở."
       },
       "chronoWarrior": {
         "name": "Phân bổ Chiến binh Thời gian",
@@ -79,7 +80,7 @@
       },
       "publicGoods": {
         "name": "Hàng hóa công",
-        "tooltip": "{percent}% của mỗi Dự trữ chu kỳ được chuyển đến Protocol Guild, cơ chế tài trợ cho hơn 170 người đóng góp cốt lõi cho Ethereum.",
+        "tooltip": "{percent}% được phân bổ vào Kho Hàng hóa công. Bất kỳ ai cũng có thể chuyển riêng số dư tới đơn vị thụ hưởng đã cấu hình, hiện là Protocol Guild.",
         "recipientLabel": "Protocol Guild"
       },
       "nftStellar": {
@@ -136,10 +137,10 @@
   "rules": {
     "howItWorks": "Cách hoạt động",
     "participation": "Khi đặt nét bút, bạn có thể khắc <em>CST tham gia động</em>. Số lượng tính theo công thức căn bậc hai dựa trên khoảng thời gian kể từ nét bút trước.",
-    "participationV3": "Khi đặt nét bút, bạn có thể khắc <em>CST tham gia động</em>. Số lượng tích lũy với tốc độ đều đặn dựa trên khoảng thời gian kể từ nét bút trước.",
+    "participationV3": "Nét bút tiếp theo khắc <em>CST tham gia động</em> cho người tham gia trước, tăng tuyến tính theo thời gian đã trôi qua. Nét bút đầu tiên và hoàn tất không thanh toán thêm.",
     "calibration": "Nét bút ETH rút ngắn cửa sổ hiệu chỉnh CST khoảng {decreasePercent}%; nét bút CST kéo dài cửa sổ này khoảng {increasePercent}%.",
     "stellarSelection": "Mỗi nét bút ghi nhận một lượt Tinh tuyển. {ethEntries} lượt nhận {rafflePercent}% Dự trữ chu kỳ. {nftEntries} người nhận Tinh tuyển khác và {anchorHolders} người neo giữ Random Walk NFT nhận một Cosmic Signature NFT.",
-    "stellarSelectionV3": "Mỗi nét bút ghi nhận một lượt Tinh tuyển với trọng số bằng chi phí ETH tại thời điểm thực hiện. {ethEntries} lượt nhận {rafflePercent}% Dự trữ chu kỳ. {nftEntries} người nhận Tinh tuyển khác và {anchorHolders} người neo giữ Random Walk NFT nhận một Cosmic Signature NFT.",
+    "stellarSelectionV3": "Cả hai luồng người tham gia dùng trọng số chi phí ETH cơ sở chưa giảm và chưa có phụ phí; nét bút CST dùng cơ sở ETH cùng thời điểm. {ethEntries} lượt chia {rafflePercent}% ETH. {nftEntries} lượt NFT của người tham gia và tối đa {anchorHolders} lượt Random Walk NFT đang neo giữ nhận NFT cùng CST. Một địa chỉ có thể lặp lại.",
     "publicGoods": "Protocol Guild nhận {percent}% Dự trữ chu kỳ (ít nhất {amount} ETH) mỗi chu kỳ.",
     "learnMore": "Cách một chu kỳ vận hành"
   },

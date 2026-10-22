@@ -15,7 +15,7 @@ export const mediumQuestionsTextZh = {
   'eth-opening-price-discovery': {
     prompt: '新周期如何找到自己的开场 ETH 落笔价格？',
     options: {
-      a: `ETH 校准窗口从上一周期开场实付价格的 ${protocolFacts.ethCalibrationCeilingMultiplier} 倍起步，线性下行至其两百分之一加 1 wei 的底价。`,
+      a: '从上一周期开场时未减免、未含溢价的 ETH 基础价格的两倍起步，线性下降到上限除以 200 后取整再加 1 wei。',
       b: `每个周期都固定以 ${protocolFacts.initialGestureCostEth} ETH 开场。`,
       c: '每个周期的开场价格由宇宙议会表决决定。',
       d: '价格每小时翻倍，直到有人落笔。',
@@ -24,14 +24,15 @@ export const mediumQuestionsTextZh = {
     referenceLabel: '白皮书 §3.1 · 开场与 ETH 校准窗口',
   },
   'eth-step-up': {
-    prompt: 'Pax 落下一笔 ETH 落笔。下一笔 ETH 落笔的价格会怎样？',
+    prompt: 'Pax 以 ETH 落笔后，下一笔不含溢价的 ETH 基础价格如何变化？',
     options: {
       a: `上调 ${protocolFacts.ethGestureCostStepUpPercent}%，再加 1 wei——这条序列公开而精确。`,
       b: '翻倍。',
       c: '在周期收官前保持不变。',
       d: `下调 ${protocolFacts.ethGestureCostStepUpPercent}%，以吸引更多落笔。`,
     },
-    explanation: `开场之后，每笔 ETH 落笔都会把下一笔的价格抬高 ${protocolFacts.ethGestureCostStepUpPercent}%，再加 1 wei，价格永远向上。落笔前随时可以从合约读到当前价格——没有意外，只有一段不断上行的阶梯。`,
+    explanation:
+      '每笔 ETH 落笔将下一笔基础价格设为当前基础价格加其百分之一的整数部分，再加 1 wei。临近收官溢价单独计算，不计入这条基础价格序列，因此最终报价不一定只会上升。',
     funFact: '那 1 wei 并非可有可无：当价格小到百分比部分四舍五入为零时，它保证价格仍严格增长。',
     referenceLabel: '白皮书 §4.1 · ETH 落笔',
   },
@@ -50,12 +51,13 @@ export const mediumQuestionsTextZh = {
   'cst-window-restart': {
     prompt: 'Lyra 落下一笔 CST 落笔。这对 CST 校准窗口意味着什么？',
     options: {
-      a: `窗口以她刚付价格的 ${protocolFacts.cstCalibrationCeilingMultiplier} 倍重启——起始价不低于 ${cst(protocolFacts.cstCalibrationCeilingMinCst)} CST——随后再次线性降至零。`,
+      a: '以不含溢价的基础花费两倍、配置下限与新下降速率乘以 180 秒三者最大值，重设窗口上限。',
       b: '没有影响——窗口继续原来的下行。',
       c: `价格锁定在 ${cst(protocolFacts.cstCalibrationCeilingMinCst)} CST，直到周期结束。`,
       d: '窗口关闭，CST 落笔暂停到下一周期。',
     },
-    explanation: `每笔 CST 落笔都会以新的起始价重启窗口：上一笔实付价格的 ${protocolFacts.cstCalibrationCeilingMultiplier} 倍，且起始价不低于 ${cst(protocolFacts.cstCalibrationCeilingMinCst)} CST。此后价格在窗口时长内线性降至零。沿途支付的 CST 全数销毁。`,
+    explanation:
+      'CST 基础价格随时间下降。CST 落笔后，上限重设为不含溢价的基础花费两倍、配置下限及新下降速率乘以 180 秒三者中的最大值。临近收官溢价另计，并可能使最终价格上升。',
     referenceLabel: '白皮书 §4.3 · CST 落笔',
   },
   'cst-free-quiet': {
@@ -71,28 +73,30 @@ export const mediumQuestionsTextZh = {
     referenceLabel: '白皮书 §4.3 · CST 落笔',
   },
   'window-feedback-loop': {
-    prompt: '一阵密集的 ETH 落笔扫过周期。这对 CST 校准窗口的时长意味着什么？',
+    prompt: '连续的 ETH 落笔如何影响 CST 的下降速率？',
     options: {
-      a: `每笔 ETH 落笔使其缩短约 ${protocolFacts.cstCalibrationWindowDecreasePercentPerEthGesture}%，CST 价格降得更快，CST 落笔更早变得划算。`,
-      b: `每笔 ETH 落笔使其延长约 ${protocolFacts.cstCalibrationWindowIncreasePercentPerCstGesture}%，CST 下行随之放慢。`,
+      a: '每笔尝试把下降速率提高百分之一，但仅在最短窗口检查通过时采用。',
+      b: '每笔都把下降速率降低百分之一。',
       c: '毫无影响——两种货币互不相干。',
       d: '窗口重置回初始时长。',
     },
-    explanation: `窗口时长是链上的活参数，也是协议里一条安静的反馈回路：每笔 ETH 落笔使其缩短约 ${protocolFacts.cstCalibrationWindowDecreasePercentPerEthGesture}%，每笔 CST 落笔使其延长约 ${protocolFacts.cstCalibrationWindowIncreasePercentPerCstGesture}%。ETH 越密集，CST 降得越快；CST 多了，下行又放慢——回路把每个周期推向两种货币的均衡组合。`,
+    explanation:
+      'V3 在链上保存 CST 价格下降速率，窗口时长由上限与速率推算。按当前除数，ETH 落笔尝试将速率增加其百分之一，但必须满足最短窗口检查；CST 落笔将速率减去其 1/101。CST 落笔还会重设上限，取不含溢价的基础花费两倍、配置下限与新速率乘以 180 秒三者中的最大值。该检查不是落笔冷却期。',
     referenceLabel: '白皮书 §4.3 · CST 落笔',
   },
   'participation-cst-timing': {
     prompt:
       '按上线参数，两笔落笔分别铭刻参与 CST：一笔落在上一笔之后 1 秒，另一笔终结了一整天的沉默。两者大约各铭刻多少？',
     options: {
-      a: `约 ${oneSecondExample.cst} CST 与约 ${oneDayExample.cst} CST——数量随经过时间的平方根增长。`,
+      a: `约 ${oneSecondExample.cst} CST 与 ${oneDayExample.cst} CST，按间隔线性计算，并发给上一笔参与者。`,
       b: `每笔固定 ${cst(100)} CST，与时机无关。`,
       c: '两笔相同——时机从不重要。',
       d: '都是零——只有收官才铭刻 CST。',
     },
-    explanation: `参与 CST 随距上一笔时间的平方根增长：一秒后跟进的一笔几乎什么也铭刻不到（约 ${oneSecondExample.cst} CST），终结一整天沉默的一笔能铭刻数百（约 ${oneDayExample.cst} CST）。每笔固定 ${cst(100)} CST 正是最初的 V1 规则——它让机器速度的连续落笔凭空生成 CST，V2 因此将其替换。`,
+    explanation:
+      'V3 按经过秒数线性计算参与 CST：秒数乘以链上乘数，再除以以微秒计的周期增量，向下取整到 CST 最小单位。按原始一小时时间增量，约每分钟 1 CST；周期增量变大后，该速率会略降。下一笔落笔把计算出的全额铭刻给上一笔参与者；首笔不发放，收官也不结算最后一笔之后的累计量。',
     funFact:
-      '落笔间隔越长，每笔铭刻的参与 CST 越多；连续快速落笔则可能只铭刻少量 CST，甚至为零。表彰 CST 与推广储备另有各自的铭刻机制。',
+      '可以。每笔落笔都会增加星选权重，并更新坚守记录。下一笔落笔执行时，会按间隔时长向上一笔的参与者铭刻参与 CST；不是通常向本次提交者发放。首笔不铭刻参与 CST，收官也不会结算最后一笔之后的这项累计量。',
     referenceLabel: '白皮书 §7.1 · 铭刻规则',
   },
   'cst-max-cost-protection': {
@@ -152,7 +156,8 @@ export const mediumQuestionsTextZh = {
       c: `${cst(protocolFacts.outreachReserveCst)} CST，只选出一次。`,
       d: `只有 NFT，共选出 ${protocolFacts.typicalNftsPerCycle} 次。`,
     },
-    explanation: `参与者 NFT 星选选出 ${protocolFacts.nftStellarSelectionRecipients} 次，每次携带 ${cst(protocolFacts.specialAllocationCst)} CST 与 1 枚 NFT。表彰 CST 总是与 NFT 同行——收官时的每份 NFT 发放都是这样成对出现的。`,
+    explanation:
+      '参与者 NFT 星选每次分配一枚 NFT 与一次表彰 CST，采用基础 ETH 价格权重并允许重复选择。签名分配另有不同规则：三枚 NFT 合计对应一次 1,000 CST，不是每枚都配 1,000 CST。',
     referenceLabel: '白皮书 §5.1 · 收官时的发放',
   },
   'draws-with-replacement': {
@@ -164,7 +169,7 @@ export const mediumQuestionsTextZh = {
       d: '需经宇宙议会批准方可重复。',
     },
     explanation:
-      '选择采用放回方式，同一参与者可能被选中多次。每笔落笔计入一次资格，入选频次与参与程度成正比——机制随活跃度伸缩，而不是每个地址限选一次。',
+      '参与者的 ETH 与 NFT 星选都按累计权重选择，而非简单按落笔次数计。权重取每笔发生时未减免、未含溢价的 ETH 基础价格，CST 落笔也一样。随机输入来自链上区块上下文，并非独立的可验证随机服务；不保证完全无偏。Random Walk NFT 锚定星选使用独立的已锚定 NFT 资格池。',
     referenceLabel: '白皮书 §5.3 · 星选',
   },
   'anchored-rwlk-track': {
@@ -204,13 +209,13 @@ export const mediumQuestionsTextZh = {
   'push-vs-pull': {
     prompt: '收官时哪些 ETH 直接送达，哪些进入托管？',
     options: {
-      a: '签名分配与公共物品转拨直接送达；时之勇士的 ETH 与 ETH 星选份额存入分配钱包托管。',
+      a: '签名分配的 ETH 直接送达收官者，公共物品份额先进入金库；次级 ETH 进入分配钱包。',
       b: '全部直接发送给每位获配者。',
       c: '全部进入托管，包括受益方的份额。',
       d: '只有 CST 进入托管；ETH 全部直接送达。',
     },
     explanation:
-      '发放刻意分成主动送达与自行取回两类：受益方的 ETH 与公共物品转拨在收官时送达，次级 ETH 分配存入分配钱包由获配者自行取回。CST 与 NFT 则直接铭刻到各自获配者名下。',
+      '主 ETH 份额直接转给收官者，次级 ETH 留在分配钱包等待取回。公共物品份额先转入金库，转给最终受益方还需另一次交易。CST 与 NFT 按各轨道直接铭刻，相关失败条件由合约规定。',
     referenceLabel: '白皮书 §5.4 · 发放、托管与期限',
   },
   'council-proposal-threshold': {
@@ -221,7 +226,7 @@ export const mediumQuestionsTextZh = {
       c: `至少 ${cst(protocolFacts.outreachReserveCst)} CST。`,
       d: '任意数量——没有门槛。',
     },
-    explanation: `提案门槛是 ${protocolFacts.councilProposalThresholdCst} CST 的委托权重——刻意设得不高，让提案保持人人可及。${cst(protocolFacts.specialAllocationCst)} CST 是随每份 NFT 发放的表彰 CST，是一个容易混淆的另一常量。`,
+    explanation: `门槛为 ${protocolFacts.councilProposalThresholdCst} CST 的历史委托权重。${cst(protocolFacts.specialAllocationCst)} CST 则是固定表彰分配，不能混作提案门槛；签名分配的多枚 NFT 合计只对应一次该 CST 数额。`,
     referenceLabel: '白皮书 §9 · 宇宙议会',
   },
   'council-timeline': {
@@ -272,12 +277,12 @@ export const mediumQuestionsTextZh = {
   'typical-cst-fixed': {
     prompt: '典型周期铭刻多少固定 CST？如何构成？',
     options: {
-      a: `${cst(protocolFacts.typicalCstImprintsPerCycle)} CST——${protocolFacts.typicalNftsPerCycle} 份 NFT 发放各伴随 ${cst(protocolFacts.specialAllocationCst)} CST，另有 ${cst(protocolFacts.outreachReserveCst)} CST 进入推广储备。`,
+      a: `${cst(protocolFacts.typicalCstImprintsPerCycle)} CST：固定表彰分配加上推广储备；签名分配的多枚 NFT 只对应一次 CST 数额。`,
       b: `${cst(protocolFacts.specialAllocationCst)} CST，全部归周期受益方。`,
       c: `${cst(protocolFacts.outreachReserveCst)} CST，全部用于社区推广。`,
       d: '每个周期都无法预测。',
     },
-    explanation: `固定流精确可数：${protocolFacts.typicalNftsPerCycle} 份与 NFT 成对的 ${cst(protocolFacts.specialAllocationCst)} CST 铭刻，加上 ${cst(protocolFacts.outreachReserveCst)} CST 推广储备，典型周期合计 ${cst(protocolFacts.typicalCstImprintsPerCycle)} CST。各笔落笔沿途铭刻的动态参与 CST 另计，取决于时机。`,
+    explanation: `完整轨道合计铭刻 ${protocolFacts.typicalNftsPerCycle} 枚 NFT 和 ${cst(protocolFacts.typicalCstImprintsPerCycle)} CST 固定分配。签名分配有 ${protocolFacts.mainPrizeNftsPerCycle} 枚 NFT，但只发放一次 ${cst(protocolFacts.specialAllocationCst)} CST；动态参与 CST 另计。条件轨道缺席时，总额会减少。`,
     referenceLabel: '白皮书 §7.1 · 铭刻规则',
   },
   'attached-assets-destination': {
@@ -295,12 +300,12 @@ export const mediumQuestionsTextZh = {
   'next-cycle-delay': {
     prompt: '一个周期刚刚完成收官。下一个周期何时启用？',
     options: {
-      a: `经过一段短暂延迟——默认 ${protocolFacts.defaultNextCycleDelayMinutes} 分钟，但以链上实时数值为准，且该数值可调整。`,
+      a: `经过链上配置的延迟后开启，目前为 ${protocolFacts.currentNextCycleDelayDays} 天；所有者可以调整。`,
       b: '同一笔交易内立即启用。',
       c: `正好 ${protocolFacts.finalGestureExclusivityHours} 小时之后。`,
       d: '只有所有者手动开启后才启用。',
     },
-    explanation: `收官之后，下一周期经过一段短暂延迟启用，默认 ${protocolFacts.defaultNextCycleDelayMinutes} 分钟。实时延迟存储在链上、可由所有者调整，因此最终依据是合约而非默认值。周期一旦启用，新的校准窗口随之开启。`,
+    explanation: `下一周期的启用时间由成功收官的时间加上配置延迟决定。当前为 ${protocolFacts.currentNextCycleDelayDays} 天；${protocolFacts.defaultNextCycleDelayMinutes} 分钟是历史 Solidity 默认值，不是当前延迟。`,
     referenceLabel: '白皮书 §3.3 · 收官与公开收官窗口',
   },
 } as const satisfies QuizTierQuestionsText<'medium'>;

@@ -1,33 +1,13 @@
 import { protocolFacts } from '@/content/protocol-facts';
 
-import { formatCount, formatNumber } from '@/utils/format/numbers';
+import { formatCount } from '@/utils/format/numbers';
 
 import type { FAQText } from './structure';
 
-const ELAPSED_VI: Record<
-  (typeof protocolFacts.dynamicCstRewardExamples)[number]['elapsed'],
-  string
-> = {
-  '0 seconds': '0 giây',
-  '1 second': '1 giây',
-  '60 seconds': '60 giây',
-  '1 hour': '1 giờ',
-  '1 day': '1 ngày',
-};
-
 /** Vietnamese decimal mark for a protocol figure quoted in English notation ("1.73"). */
-const viDecimal = (value: string): string => value.replace('.', ',');
 
 const cstAmount = formatCount(protocolFacts.specialAllocationCst, 'vi');
 const outreachCst = formatCount(protocolFacts.outreachReserveCst, 'vi');
-const cstWindowDecrease = formatNumber(
-  protocolFacts.cstCalibrationWindowDecreasePercentPerEthGesture,
-  'vi',
-);
-const cstWindowIncrease = formatNumber(
-  protocolFacts.cstCalibrationWindowIncreasePercentPerCstGesture,
-  'vi',
-);
 
 /** Vietnamese FAQ copy, keyed by the skeleton in structure.ts. */
 export const faqTextVi = {
@@ -42,12 +22,13 @@ export const faqTextVi = {
       },
       'how-does-the-bidding-game-work': {
         question: 'Một chu kỳ trình diễn hoạt động như thế nào?',
-        answer: `Mỗi chu kỳ mở ra với một cửa sổ hiệu chỉnh ETH cho nét bút đầu tiên. Nét bút đầu tiên đó khởi động thời điểm hoàn tất chu kỳ, hiện mặc định khoảng 24 giờ. Các nét bút tiếp theo bằng ETH hoặc CST cộng mức tăng thời gian hiện tại vào thời điểm hoàn tất đã lưu, với mức tăng khởi đầu là một giờ và lớn thêm ${protocolFacts.cycleTimeIncrementIncreasePercentPerCycle}% sau mỗi chu kỳ hoàn tất. Khi đếm ngược hoàn tất về 0, người tham gia đặt nét bút cuối cùng có một cửa sổ ưu tiên ${protocolFacts.finalGestureExclusivityHours} giờ để hoàn tất chu kỳ và nhận về phân bổ Signature; vẫn có thể đặt nét bút cho đến khi chu kỳ thực sự được hoàn tất.`,
+        answer:
+          'Nét bút đầu tiên của chu kỳ phải dùng ETH và bắt đầu đồng hồ hoàn tất. Các nét bút sau cộng mức tăng hiện tại vào thời điểm hoàn tất đã lưu, kể cả sau khi hết giờ. Đồng hồ không bắt đầu lại từ thời điểm hiện tại. Bạn vẫn có thể đặt nét bút cho tới khi giao dịch hoàn tất thành công.',
       },
       'what-type-of-gestures-are-available': {
         question: 'Có những loại nét bút nào?',
         answer:
-          'Nét bút có thể đặt bằng ETH hoặc token CST (ERC-20). Nét bút đầu tiên của mỗi chu kỳ phải là nét bút ETH; sau đó, nét bút ETH và CST có thể xen kẽ tự do. Bạn cũng có thể đính kèm một Random Walk NFT vào nét bút ETH để được giảm 50% chi phí nét bút ETH. Cosmic Signature NFT (ERC-721) là tài sản phân bổ và neo giữ; chúng không được chấp nhận làm phương thức thanh toán cho nét bút. Nét bút CST dùng cửa sổ hiệu chỉnh riêng: chi phí nét bút CST giảm dần khi cửa sổ chạy, và độ dài cửa sổ tự thay đổi sau mỗi nét bút ETH hoặc CST.',
+          'ETH và CST có quy tắc chi phí cơ sở riêng. Khi chu kỳ mở, chi phí ETH giảm trong cửa sổ hiệu chỉnh; mỗi nét bút ETH nâng chi phí cơ sở tiếp theo. Chi phí CST giảm theo tốc độ lưu trên chuỗi. Gần hạn hoàn tất, cả hai chi phí có phụ phí cuối chu kỳ, nhưng phụ phí không nâng chi phí cơ sở tiếp theo hay trọng số Tinh tuyển. Nét bút đầu tiên của chu kỳ phải dùng ETH và bắt đầu đồng hồ hoàn tất. Các nét bút sau cộng mức tăng hiện tại vào thời điểm hoàn tất đã lưu, kể cả sau khi hết giờ. Đồng hồ không bắt đầu lại từ thời điểm hiện tại. Bạn vẫn có thể đặt nét bút cho tới khi giao dịch hoàn tất thành công. Để giảm chi phí ETH, mỗi Random Walk NFT chỉ được dùng một lần. Hợp đồng kiểm tra quyền sở hữu và đánh dấu đã dùng; bản thân NFT không được chuyển đi. Quyền này tách biệt với neo giữ.',
       },
       'can-i-participate-without-nfts': {
         question: 'Tôi có thể tham gia nếu không sở hữu NFT nào không?',
@@ -61,12 +42,13 @@ export const faqTextVi = {
       },
       'how-long-does-each-round-last': {
         question: 'Mỗi chu kỳ trình diễn kéo dài bao lâu?',
-        answer: `Mỗi chu kỳ bắt đầu khi nét bút ETH đầu tiên được đặt, khởi động thời điểm hoàn tất chu kỳ ở khoảng 24 lần mức tăng thời gian hiện tại (khoảng một ngày khi ra mắt). Mỗi nét bút sau đó cộng thêm mức tăng thời gian hiện tại, vốn khởi đầu ở đúng một giờ và lớn thêm ${protocolFacts.cycleTimeIncrementIncreasePercentPerCycle}% sau mỗi chu kỳ hoàn tất. Vì vậy một chu kỳ có thể kéo dài hơn một ngày rất nhiều nếu nét bút liên tục xuất hiện trước khi hoàn tất.`,
+        answer:
+          'Nét bút đầu tiên của chu kỳ phải dùng ETH và bắt đầu đồng hồ hoàn tất. Các nét bút sau cộng mức tăng hiện tại vào thời điểm hoàn tất đã lưu, kể cả sau khi hết giờ. Đồng hồ không bắt đầu lại từ thời điểm hiện tại. Bạn vẫn có thể đặt nét bút cho tới khi giao dịch hoàn tất thành công.',
       },
       'can-i-place-multiple-gestures': {
         question: 'Tôi có thể đặt nhiều nét bút trong một chu kỳ không?',
         answer:
-          'Có. Mỗi nét bút có thể khắc CST tham gia vào ví của bạn, tăng số lượt của bạn trong Tinh tuyển và định hình Signature đang biến chuyển của chu kỳ. Lượng CST tham gia thay đổi theo thời gian kể từ nét bút trước. Khoảng cách dài hơn cho lượng CST được khắc lớn hơn so với hai nét bút nối tiếp sát nhau.',
+          'Trong V3, nét bút tiếp theo khắc toàn bộ CST tham gia cho người đặt nét bút trước. Số lượng tăng tuyến tính theo thời gian giữa hai nét bút. Nét bút đầu tiên của chu kỳ không khắc CST theo quy tắc này, và hoàn tất không thanh toán thêm khoảng thời gian cuối cho người đặt nét bút cuối cùng. Nếu cả hai nét bút thuộc cùng một địa chỉ, địa chỉ đó nhận CST.',
       },
     },
   },
@@ -76,24 +58,30 @@ export const faqTextVi = {
     items: {
       'what-is-the-main-allocation': {
         question: 'Phân bổ Signature là gì?',
-        answer: `Phân bổ Signature thuộc về người hoàn tất chu kỳ. Trong ${protocolFacts.finalGestureExclusivityHours} giờ đầu sau thời điểm hoàn tất chu kỳ, chỉ người đặt nét bút cuối cùng được hoàn tất; sau đó bất kỳ ai cũng có thể hoàn tất. Phân bổ bao gồm một Cosmic Signature NFT, ${cstAmount} CST ghi nhận và ${protocolFacts.mainEthPercentage}% Dự trữ chu kỳ bằng ETH, cộng với mọi token hoặc NFT được đính kèm vào nét bút của người tham gia trong chu kỳ.`,
+        answer: `Địa chỉ hoàn tất chu kỳ thành công nhận ${protocolFacts.mainEthPercentage}% Dự trữ chu kỳ, tổng cộng ${formatCount(protocolFacts.specialAllocationCst, 'vi')} CST và ${protocolFacts.mainPrizeNftsPerCycle} Cosmic Signature NFT có ID liên tiếp. Trong ${protocolFacts.finalGestureExclusivityHours} giờ đầu sau thời điểm hoàn tất, chỉ người đặt nét bút cuối cùng được thực hiện; sau đó bất kỳ ai cũng có thể hoàn tất và tự nhận phân bổ.`,
       },
       'what-rewards-per-bid': {
         question: 'Tôi nhận được gì cho mỗi nét bút?',
-        answer: `Mỗi nét bút ghi nhận một lượt trong Tinh tuyển cuối chu kỳ, cập nhật thời gian dẫn đầu liên quan đến Quán quân Bền bỉ và Chiến binh Thời gian, và có thể khắc CST tham gia. CST tham gia được tính theo công thức căn bậc hai: ${protocolFacts.dynamicCstRewardFormula}. Nói đơn giản, lượng này tăng theo thời gian kể từ nét bút trước, nhưng với tốc độ chậm dần. Nét bút quá dồn dập có thể nhận 0 CST; một khoảng cách dài hơn có thể tạo ra lần khắc CST lớn hơn nhiều.`,
+        answer:
+          'Trong V3, nét bút tiếp theo khắc toàn bộ CST tham gia cho người đặt nét bút trước. Số lượng tăng tuyến tính theo thời gian giữa hai nét bút. Nét bút đầu tiên của chu kỳ không khắc CST theo quy tắc này, và hoàn tất không thanh toán thêm khoảng thời gian cuối cho người đặt nét bút cuối cùng. Nếu cả hai nét bút thuộc cùng một địa chỉ, địa chỉ đó nhận CST.',
       },
       'how-does-the-stellarSelection-work': {
         question: 'Tinh tuyển hoạt động như thế nào?',
-        answer: `Mỗi nét bút ghi nhận một lượt Tinh tuyển. Cuối mỗi chu kỳ, hợp đồng thông minh chọn ngẫu nhiên các lượt từ quỹ: ${protocolFacts.ethStellarSelectionRecipients} lượt chia ${protocolFacts.stellarSelectionEthPercentage}% Dự trữ chu kỳ bằng ETH, ${protocolFacts.nftStellarSelectionRecipients} lượt mỗi lượt nhận ${cstAmount} CST và một Cosmic Signature NFT, và ${protocolFacts.anchoredRwlkNftSelectionRecipients} lượt trong số các Random Walk NFT đang neo giữ cũng nhận ${cstAmount} CST và Cosmic Signature NFT. Các lượt chọn có hoàn lại, nên cùng một địa chỉ có thể được chọn nhiều lần trong một chu kỳ. Tần suất được chọn tăng theo số nét bút bạn đặt.`,
+        answer:
+          'Cả ETH Tinh tuyển và NFT Tinh tuyển dành cho người tham gia đều dùng trọng số từng nét bút. Trọng số là chi phí ETH cơ sở tại thời điểm đó, chưa giảm bằng Random Walk NFT và chưa cộng phụ phí cuối chu kỳ. Nét bút CST dùng cùng chi phí ETH cơ sở đương thời. Các lượt chọn có hoàn lại, nên một địa chỉ có thể được chọn nhiều lần. Tinh tuyển NFT neo giữ xét riêng các Random Walk NFT đang neo giữ.',
       },
       'how-random-selection-works': {
         question: 'Việc chọn ngẫu nhiên được thực hiện thế nào?',
         answer:
-          'Tinh tuyển dùng các nguồn ngẫu nhiên trên chuỗi tại thời điểm hoàn tất chu kỳ, gồm bối cảnh khối do Arbitrum cung cấp và các nguồn entropy dự phòng. Tinh tuyển dành cho người tham gia tính theo lượt: mỗi nét bút thêm một lượt, nên càng nhiều nét bút thì tần suất được chọn càng cao. Tinh tuyển NFT neo giữ là một cơ chế riêng, dựa trên diện Random Walk NFT đang neo giữ thay vì quỹ lượt nét bút của người tham gia.',
+          'Cả ETH Tinh tuyển và NFT Tinh tuyển dành cho người tham gia đều dùng trọng số từng nét bút. Trọng số là chi phí ETH cơ sở tại thời điểm đó, chưa giảm bằng Random Walk NFT và chưa cộng phụ phí cuối chu kỳ. Nét bút CST dùng cùng chi phí ETH cơ sở đương thời. Các lượt chọn có hoàn lại, nên một địa chỉ có thể được chọn nhiều lần. Tinh tuyển NFT neo giữ xét riêng các Random Walk NFT đang neo giữ.',
       },
       'how-do-i-claim-my-allocation': {
         question: 'Tôi nhận về phân bổ bằng cách nào nếu là người nhận?',
-        answer: `Người nhận nhận về phân bổ thông qua ứng dụng và các hợp đồng giao thức. Người đặt nét bút cuối cùng có ${protocolFacts.finalGestureExclusivityHours} giờ ưu tiên sau thời điểm hoàn tất chu kỳ để hoàn tất chu kỳ và nhận về phân bổ Signature.\n\nSau đó, cửa sổ hoàn tất mở bắt đầu: bất kỳ ai cũng có thể hoàn tất chu kỳ, và hợp đồng thông minh coi người hoàn tất là người nhận của chu kỳ — người hoàn tất nhận toàn bộ phân bổ Signature (phần ETH, ${cstAmount} CST được khắc, Cosmic Signature NFT và quyền ưu tiên với các tài sản đính kèm).\n\nCác phân bổ ETH phụ cùng phân bổ token hoặc NFT đính kèm nằm trong ký quỹ của ví phân bổ với một thời hạn nhận về riêng, mặc định là ${protocolFacts.secondaryRetrievalTimeoutWeeks} tuần; khi hết hạn, các hợp đồng cho phép bất kỳ ai nhận về một phân bổ chưa được nhận cho chính họ. Hãy nhận về kịp thời.`,
+        answer: `Địa chỉ hoàn tất chu kỳ thành công nhận ${protocolFacts.mainEthPercentage}% Dự trữ chu kỳ, tổng cộng ${formatCount(protocolFacts.specialAllocationCst, 'vi')} CST và ${protocolFacts.mainPrizeNftsPerCycle} Cosmic Signature NFT có ID liên tiếp.
+
+Trong ${protocolFacts.finalGestureExclusivityHours} giờ đầu sau thời điểm hoàn tất, chỉ người đặt nét bút cuối cùng được thực hiện; sau đó bất kỳ ai cũng có thể hoàn tất và tự nhận phân bổ.
+
+Phân bổ ETH thứ cấp và tài sản đính kèm được nhận về riêng từ Ví Phân bổ. Sau thời hạn hiện tại là ${protocolFacts.secondaryRetrievalTimeoutWeeks} tuần, bất kỳ ai cũng có thể nhận về tài sản chưa được nhận cho chính mình. Hết hạn không tự động chuyển tài sản.`,
       },
       'how-does-anchoring-work': {
         question: 'Neo giữ hoạt động như thế nào?',
@@ -105,12 +93,12 @@ export const faqTextVi = {
       },
       'how-many-nfts-minted': {
         question: 'Mỗi chu kỳ có bao nhiêu Cosmic Signature NFT được khắc?',
-        answer: `Trong phần lớn các chu kỳ, ${protocolFacts.typicalNftsPerCycle} Cosmic Signature NFT được khắc: một cho người nhận phân bổ Signature, một cho người nhận nét bút CST cuối cùng, một cho Quán quân Bền bỉ, một cho Chiến binh Thời gian, ${protocolFacts.nftStellarSelectionRecipients} cho người nhận NFT Tinh tuyển, và ${protocolFacts.anchoredRwlkNftSelectionRecipients} cho những người neo giữ Random Walk NFT được chọn qua Tinh tuyển NFT neo giữ. Mỗi phân bổ NFT trong ${protocolFacts.typicalNftsPerCycle} phân bổ đó cũng đi kèm ${cstAmount} CST. Nếu một chu kỳ không có nét bút CST hoặc không có Random Walk NFT đang neo giữ, những lần khắc tương ứng sẽ được bỏ qua trong chu kỳ đó.`,
+        answer: `Khi có đủ các luồng, một chu kỳ khắc ${protocolFacts.typicalNftsPerCycle} Cosmic Signature NFT và ${formatCount(protocolFacts.typicalCstImprintsPerCycle, 'vi')} CST trong các phân bổ cố định. Phân bổ Signature gồm ${protocolFacts.mainPrizeNftsPerCycle} NFT nhưng chỉ một khoản tổng cộng ${formatCount(protocolFacts.specialAllocationCst, 'vi')} CST. Chiến binh Thời gian, Quán quân Bền bỉ và nét bút CST cuối cùng mỗi luồng có một NFT cùng CST tương ứng; hai luồng NFT Tinh tuyển bổ sung phần còn lại. Nếu không có nét bút CST hoặc Random Walk NFT neo giữ thì luồng tương ứng bị bỏ qua. CST tham gia được tính riêng.`,
       },
       'what-happens-to-remaining-eth': {
         question: 'ETH còn lại trong Dự trữ chu kỳ sẽ đi đâu?',
         answer:
-          'Khoảng một nửa Dự trữ chu kỳ chuyển tiếp vào chu kỳ trình diễn tiếp theo dưới dạng Dự trữ tích lũy, nâng số dư khởi điểm của chu kỳ sau. Phần ETH này tiếp tục được tích lũy trong giao thức.',
+          'Khoảng một nửa ETH được giữ lại cho chu kỳ sau. Làm tròn số nguyên, luồng bị bỏ qua và chuyển không thành công có thể làm phần còn lại lớn hơn. Điều đó không bảo đảm dự trữ đầu chu kỳ sau sẽ lớn hơn.',
       },
       'what-happens-to-attached-assets': {
         question: 'Điều gì xảy ra với token hoặc NFT đính kèm vào nét bút?',
@@ -118,8 +106,7 @@ export const faqTextVi = {
       },
       'who-receives-10-percent': {
         question: 'Ai nhận phần phân bổ hàng hóa công từ Dự trữ chu kỳ?',
-        answer:
-          'Bảy phần trăm Dự trữ chu kỳ được chuyển đến Kho Hàng hóa công khi hoàn tất, và sau đó bất kỳ ai cũng có thể chuyển số dư của kho đến đơn vị thụ hưởng Hàng hóa công đã cấu hình. Đơn vị thụ hưởng hiện tại là Protocol Guild — cơ chế tài trợ tập thể cho hơn 170 người đóng góp cốt lõi cho Ethereum. Hiện nay địa chỉ thụ hưởng do chủ sở hữu giao thức thiết lập; dự định là Hội đồng Vũ trụ sẽ điều hướng nó khi quyền sở hữu chuyển sang Hội đồng kiểm soát.',
+        answer: `Khi hoàn tất, giao thức thử chuyển ${protocolFacts.publicGoodsPercentage}% Dự trữ chu kỳ vào Kho Hàng hóa công. Sau đó bất kỳ ai cũng có thể dùng một giao dịch riêng để chuyển số dư kho tới đơn vị thụ hưởng hiện tại là Protocol Guild. Chủ sở hữu có thể thay đổi đơn vị thụ hưởng. Nếu chuyển từ giao thức vào kho thất bại, phần này có thể ở lại dự trữ mà không hủy hoàn tất.`,
       },
     },
   },
@@ -130,28 +117,32 @@ export const faqTextVi = {
       'how-does-price-increase': {
         question: 'Chi phí nét bút thay đổi thế nào trong một chu kỳ?',
         answer:
-          'Chi phí nét bút ETH và CST đi theo hai đường riêng trên chuỗi. Chi phí nét bút ETH dùng cửa sổ hiệu chỉnh ETH rồi tăng theo bậc sau các nét bút ETH. Chi phí nét bút CST giảm dần qua cửa sổ hiệu chỉnh CST hiện tại. Cửa sổ CST đó không tĩnh: nét bút ETH rút ngắn nó một chút, còn nét bút CST kéo dài nó một chút, nên đường chi phí phản ứng theo cán cân giữa tham gia bằng ETH và CST.',
+          'ETH và CST có quy tắc chi phí cơ sở riêng. Khi chu kỳ mở, chi phí ETH giảm trong cửa sổ hiệu chỉnh; mỗi nét bút ETH nâng chi phí cơ sở tiếp theo. Chi phí CST giảm theo tốc độ lưu trên chuỗi. Gần hạn hoàn tất, cả hai chi phí có phụ phí cuối chu kỳ, nhưng phụ phí không nâng chi phí cơ sở tiếp theo hay trọng số Tinh tuyển.',
       },
       'what-is-dutch-auction': {
         question: 'Cửa sổ hiệu chỉnh là gì?',
-        answer: `Cửa sổ hiệu chỉnh là một cửa sổ khám phá chi phí, trong đó chi phí nét bút giảm tuyến tính từ trần hiệu chỉnh trong một thời lượng đã biết. Nét bút ETH và nét bút CST dùng hai cửa sổ riêng với hai sàn khác nhau: chi phí nét bút ETH giảm đến sàn khoảng 1/${protocolFacts.ethCalibrationFloorDivisor} trần của nó, còn chi phí nét bút CST giảm hẳn về ${protocolFacts.cstCalibrationFloorCst} — một nét bút CST không tốn chi phí là khả thi nếu cửa sổ trôi qua hoàn toàn. Cửa sổ hiệu chỉnh CST hiện khởi đầu từ mốc tham chiếu ${protocolFacts.initialCstCalibrationWindowHours} giờ, nhưng nó được lưu trên chuỗi và thay đổi sau mỗi nét bút: mỗi nét bút CST tăng cửa sổ khoảng ${cstWindowIncrease}%, và mỗi nét bút ETH giảm nó khoảng ${cstWindowDecrease}%.`,
+        answer:
+          'V3 lưu tốc độ giảm chi phí CST; độ dài cửa sổ được tính từ tốc độ và mức trần. Nét bút ETH thử tăng tốc độ theo rate + floor(rate / 100), còn nét bút CST giảm theo rate - floor(rate / 101). Nếu mức tăng vi phạm điều kiện thời lượng tối thiểu, nó không được áp dụng. Nét bút CST đặt lại mức trần bằng giá trị lớn nhất giữa hai lần chi phí CST cơ sở chưa có phụ phí, mức tối thiểu đã cấu hình, và tốc độ mới nhân 180 giây. Bạn vẫn có thể đặt nét bút tiếp theo ngay lập tức.',
       },
       'how-is-participation-cst-calculated': {
         question: 'CST tham gia được tính như thế nào?',
-        answer: `CST tham gia dùng công thức căn bậc hai dựa trên thời gian đã trôi qua kể từ nét bút trước: ${protocolFacts.dynamicCstRewardFormula}. Công thức căn bậc hai cho lượng CST lớn hơn khi khoảng cách giữa hai nét bút dài hơn, nhưng mức tăng chậm hơn thời gian chờ.\n\nVới các tham số lúc ra mắt (mức tăng thời gian đúng một giờ), các ví dụ xấp xỉ là ${protocolFacts.dynamicCstRewardExamples.map((example) => `${viDecimal(example.cst)} CST sau ${ELAPSED_VI[example.elapsed]}`).join(', ')}. Mức tăng lớn thêm ${protocolFacts.cycleTimeIncrementIncreasePercentPerCycle}% sau mỗi chu kỳ hoàn tất, nên lượng thực tế theo thời gian trôi thấp hơn một chút so với các con số này. Ứng dụng hiển thị lượng CST ước tính hiện tại. Hợp đồng xác định lượng thực tế khi nét bút được xử lý.`,
+        answer: `Số đơn vị nhỏ nhất của CST tham gia bằng ${protocolFacts.dynamicCstRewardFormula}. Thời gian đã trôi qua tính bằng giây, còn mức tăng thời gian của chu kỳ tính bằng micro giây. Chia kết quả cho 10^18 để biểu diễn bằng CST.
+
+Nét bút tiếp theo khắc toàn bộ cho người tham gia trước. Nét bút đầu tiên không tạo CST tham gia; hoàn tất cũng không thanh toán thêm khoảng thời gian cuối.`,
       },
       'why-minimum-cst-reward-protection': {
         question: 'Bảo đảm CST tham gia tối thiểu là gì?',
         answer:
-          'Trước khi bạn gửi nét bút, ứng dụng xem trước lượng CST tham gia dự kiến và gửi kèm mức CST tối thiểu bạn sẵn lòng chấp nhận. Nếu một nét bút khác đến trước, lượng dự kiến của bạn có thể thay đổi. Bảo đảm CST tham gia tối thiểu có thể dừng giao dịch nếu lần khắc CST kết quả thấp hơn mức tối thiểu bạn đã chọn. Bạn cũng có thể chọn chấp nhận mọi lượng CST, kể cả 0 CST, nếu muốn nét bút được tiến hành miễn là các kiểm tra chi phí đạt.',
+          'Mức CST tham gia tối thiểu giới hạn số lượng mà nét bút tiếp theo khắc cho người tham gia trước, không bảo đảm một khoản cho người gửi. Nếu hai địa chỉ giống nhau, người gửi tự nhận số lượng đó. Giá trị 0 tắt giới hạn này; nét bút ETH đầu tiên của chu kỳ bỏ qua kiểm tra. Chi phí tối đa và phí mạng là các điều kiện riêng.',
       },
       'how-cst-calibration-window-changes': {
         question: 'Mỗi nét bút làm thay đổi cửa sổ hiệu chỉnh CST như thế nào?',
-        answer: `Mỗi nét bút ETH hoặc CST đều cập nhật cửa sổ hiệu chỉnh CST đã lưu. Một nét bút CST kéo dài cửa sổ thêm thời lượng / ${protocolFacts.cstCalibrationWindowChangeDivisor}, tức khoảng +${cstWindowIncrease}% trước khi làm tròn xuống số nguyên. Một nét bút ETH rút ngắn nó khoảng thời lượng / ${protocolFacts.cstCalibrationWindowChangeDivisor + 1}, tức khoảng -${cstWindowDecrease}%. Cửa sổ ngắn hơn khiến chi phí nét bút CST giảm nhanh hơn; cửa sổ dài hơn khiến nó giảm chậm hơn.`,
+        answer:
+          'V3 lưu tốc độ giảm chi phí CST; độ dài cửa sổ được tính từ tốc độ và mức trần. Nét bút ETH thử tăng tốc độ theo rate + floor(rate / 100), còn nét bút CST giảm theo rate - floor(rate / 101). Nếu mức tăng vi phạm điều kiện thời lượng tối thiểu, nó không được áp dụng. Nét bút CST đặt lại mức trần bằng giá trị lớn nhất giữa hai lần chi phí CST cơ sở chưa có phụ phí, mức tối thiểu đã cấu hình, và tốc độ mới nhân 180 giây. Bạn vẫn có thể đặt nét bút tiếp theo ngay lập tức.',
       },
       'what-is-open-finalization-window': {
         question: 'Cửa sổ hoàn tất mở là gì?',
-        answer: `Khi đếm ngược hoàn tất về 0, người đặt nét bút cuối cùng có ${protocolFacts.finalGestureExclusivityHours} giờ ưu tiên để hoàn tất chu kỳ. Nếu họ không hoàn tất trong cửa sổ ưu tiên đó, bất kỳ ai cũng có thể gọi giao dịch hoàn tất — và hợp đồng thông minh coi người hoàn tất là người nhận của chu kỳ. Người hoàn tất nhận toàn bộ phân bổ Signature (phần ETH, ${cstAmount} CST, Cosmic Signature NFT và quyền ưu tiên với các tài sản đính kèm), nên người đặt nét bút cuối cùng nên hoàn tất trước khi cửa sổ kết thúc. Hoàn tất mở giữ cho giao thức tiếp tục vận hành ngay cả khi người đặt nét bút cuối cùng biến mất.`,
+        answer: `Địa chỉ hoàn tất chu kỳ thành công nhận ${protocolFacts.mainEthPercentage}% Dự trữ chu kỳ, tổng cộng ${formatCount(protocolFacts.specialAllocationCst, 'vi')} CST và ${protocolFacts.mainPrizeNftsPerCycle} Cosmic Signature NFT có ID liên tiếp. Trong ${protocolFacts.finalGestureExclusivityHours} giờ đầu sau thời điểm hoàn tất, chỉ người đặt nét bút cuối cùng được thực hiện; sau đó bất kỳ ai cũng có thể hoàn tất và tự nhận phân bổ.`,
       },
       'what-is-endurance-champion': {
         question: 'Quán quân Bền bỉ là gì?',
@@ -179,7 +170,7 @@ export const faqTextVi = {
       'how-time-increase-affects-game': {
         question: 'Việc tăng thời gian mỗi nét bút ảnh hưởng thế nào đến giao thức?',
         answer:
-          'Khi thời gian cộng thêm cho mỗi nét bút tăng, các chu kỳ trung bình kéo dài hơn. Sự thay đổi diễn ra từ từ, giữ trải nghiệm tham gia mượt mà và có xu hướng làm chậm tốc độ khắc NFT trong dài hạn, tùy theo hoạt động của người tham gia.',
+          'Mức tăng thời gian lớn hơn có thể ảnh hưởng tần suất hoàn tất chu kỳ, nhưng không đặt trần cố định cho nguồn cung NFT hay bảo đảm số tác phẩm mới trong một khoảng thời gian.',
       },
       'what-if-two-gestures-same-time': {
         question: 'Điều gì xảy ra nếu hai nét bút được gửi cùng lúc?',
@@ -200,7 +191,7 @@ export const faqTextVi = {
       'what-are-cst-and-dao': {
         question: 'Token CST và Hội đồng Vũ trụ là gì?',
         answer:
-          'Mỗi nét bút có thể khắc token CST, thứ biểu thị trọng số điều phối trong Hội đồng Vũ trụ. Hội đồng điều phối giao thức trên chuỗi: người nắm giữ CST gửi các đề xuất điều phối và bày tỏ tán thành hoặc phản đối (ủy quyền CST của bạn — cho chính bạn hoặc một địa chỉ khác — để kích hoạt trọng số đó). Hội đồng được thiết kế để điều hướng các tham số giao thức, bao gồm đơn vị thụ hưởng Hàng hóa công nào nhận phần phân bổ 7%, khi quyền sở hữu hợp đồng chuyển sang Hội đồng kiểm soát; hiện nay các thiết lập đó vẫn do chủ sở hữu giao thức quản lý.',
+          'CST có thể dùng để đặt nét bút hoặc, sau khi ủy quyền, làm Trọng số Điều phối trong Hội đồng Vũ trụ. Hội đồng chỉ quản lý tài sản và quyền mà mình thực sự nắm giữ. Hiện Hội đồng không sở hữu giao thức chính; chuyển giao hoặc từ bỏ quyền cần các thao tác riêng trên chuỗi.',
       },
       'what-can-i-do-with-cst': {
         question: 'Tôi có thể làm gì với token CST?',
@@ -210,7 +201,7 @@ export const faqTextVi = {
       'what-makes-nfts-unique': {
         question: 'Điều gì làm Cosmic Signature NFT trở nên độc nhất?',
         answer:
-          'Cosmic Signature NFT nằm trên chuỗi và tự duy trì. Mỗi NFT được khắc với một seed sinh ngẫu nhiên lưu trong hợp đồng thông minh. Hình ảnh và video được kết xuất từ seed này bằng một quy trình Rust mã nguồn mở. Seed quyết định điều kiện khởi đầu của ba thiên thể, tạo ra một quỹ đạo hỗn độn độc nhất cho mỗi NFT.',
+          'Seed của NFT được lưu trên chuỗi, còn hình ảnh và video được tạo ngoài chuỗi. Tái tạo cần cùng seed, đúng phiên bản và cấu hình bộ kết xuất, cùng công cụ tương thích. Chỉ có cùng seed không bảo đảm kết quả giống nhau giữa các phiên bản.',
       },
       'how-are-nft-images-created': {
         question: 'Hình ảnh NFT được tạo ra như thế nào?',
@@ -220,16 +211,17 @@ export const faqTextVi = {
       'significance-of-random-seed': {
         question: 'Vì sao mỗi NFT được tạo từ một seed trên chuỗi?',
         answer:
-          'Quy trình dựa trên seed bảo đảm khả năng tái tạo lâu dài. Khác với các dự án NFT mà hình ảnh phụ thuộc vào máy chủ tập trung, seed của mỗi Cosmic Signature NFT được lưu trên Arbitrum. Bất kỳ ai cũng có thể độc lập tạo lại hình ảnh và video NFT vào bất cứ lúc nào bằng quy trình Rust mã nguồn mở — giống bản gốc đến từng điểm ảnh.',
+          'Seed của NFT được lưu trên chuỗi, còn hình ảnh và video được tạo ngoài chuỗi. Tái tạo cần cùng seed, đúng phiên bản và cấu hình bộ kết xuất, cùng công cụ tương thích. Chỉ có cùng seed không bảo đảm kết quả giống nhau giữa các phiên bản.',
       },
       'is-nft-supply-limited': {
         question: 'Số lượng Cosmic Signature NFT có giới hạn không?',
-        answer: `Hợp đồng không đặt giới hạn tối đa cho tổng số NFT. Thời gian cộng thêm cho mỗi nét bút tăng ${protocolFacts.cycleTimeIncrementIncreasePercentPerCycle}% sau mỗi chu kỳ hoàn tất. Điều này có xu hướng kéo dài chu kỳ và làm chậm tốc độ khắc NFT, nhưng tốc độ thực tế còn phụ thuộc vào hoạt động của người tham gia.`,
+        answer:
+          'Mức tăng thời gian lớn hơn có thể ảnh hưởng tần suất hoàn tất chu kỳ, nhưng không đặt trần cố định cho nguồn cung NFT hay bảo đảm số tác phẩm mới trong một khoảng thời gian.',
       },
       'impact-of-limiting-nfts': {
         question: 'Nhịp chu kỳ ảnh hưởng thế nào đến số NFT mới?',
         answer:
-          'Thời gian cộng thêm tăng dần có xu hướng kéo dài chu kỳ và giảm số NFT được khắc trong cùng một khoảng thời gian. Mỗi Cosmic Signature NFT ghi lại một phần lịch sử của giao thức; tổng cung không có giới hạn cố định.',
+          'Mức tăng thời gian lớn hơn có thể ảnh hưởng tần suất hoàn tất chu kỳ, nhưng không đặt trần cố định cho nguồn cung NFT hay bảo đảm số tác phẩm mới trong một khoảng thời gian.',
       },
       'connection-with-randomwalknft': {
         question: 'Mối liên hệ với Random Walk NFT là gì?',
@@ -310,7 +302,7 @@ export const faqTextVi = {
       'game-security': {
         question: 'Tính bảo mật của giao thức được bảo đảm như thế nào?',
         answer:
-          'Cosmic Signature công khai địa chỉ hợp đồng, tài nguyên mã nguồn và bối cảnh xác minh để cộng đồng có thể độc lập kiểm tra hành vi. Các hợp đồng thông minh đã được Hacken, một công ty bảo mật độc lập, kiểm toán, và báo cáo đầy đủ được liên kết từ trang Kiểm toán.',
+          'Bản kiểm toán công khai áp dụng cho phiên bản hợp đồng lịch sử đã được xem xét. Nó không phải kiểm toán độc lập mọi thay đổi V2 hoặc V3 sau đó. Xác minh mã nguồn trùng với mã triển khai cũng không phải đánh giá bảo mật. Bản triển khai hiện tại của giao thức là V3. Hãy đối chiếu địa chỉ triển khai với ô EIP-1967 của proxy. Việc xác minh công khai mã nguồn V3 chưa được xác nhận; xác minh V2 trước đây không áp dụng cho bản triển khai mới.',
       },
       'fees-involved': {
         question: 'Có khoản phí nào không?',
@@ -331,17 +323,17 @@ export const faqTextVi = {
       'team-controls': {
         question: 'Đội ngũ có những quyền kiểm soát nào đối với giao thức?',
         answer:
-          'Ban đầu, đội ngũ có khả năng điều chỉnh một số tham số của giao thức, như mức tăng thời gian nét bút hay tỷ lệ các luồng phân bổ. Quyền kiểm soát này được triển khai qua mẫu “Ownable” của hợp đồng thông minh và giới hạn trong cửa sổ giữa các chu kỳ: một khi chu kỳ tiếp theo kích hoạt — điều xảy ra trước nét bút đầu tiên của nó — các tham số cốt lõi của giao thức bị khóa cho đến khi chu kỳ đó hoàn tất.\n\nMột vài quyền kiểm soát hẹp hơn vẫn khả dụng ngoài khóa đó: chủ sở hữu có thể lùi thời điểm kích hoạt một chu kỳ cho đến khi nét bút đầu tiên xuất hiện, điều chỉnh độ trễ trước chu kỳ tiếp theo bất cứ lúc nào, và quản lý các hợp đồng ngoại vi (đơn vị thụ hưởng của Kho Hàng hóa công, URI siêu dữ liệu NFT và thời hạn nhận về của ví phân bổ) bất cứ lúc nào.\n\nHợp đồng giao thức cũng có thể được chủ sở hữu nâng cấp (UUPS), nhưng chỉ giữa các chu kỳ; bản triển khai hiện tại là V2 đã được xác minh công khai.',
+          'Chủ sở hữu vẫn có quyền đổi tham số và bản triển khai theo điều kiện của hợp đồng.\n\nCác thay đổi chính bị giới hạn khi chu kỳ chưa hoạt động, nhưng thời điểm kích hoạt, thời gian chờ chu kỳ sau và các hợp đồng phụ có quyền riêng.\n\nV3 không tự động chuyển quyền cho Hội đồng Vũ trụ hoặc tự động từ bỏ quyền chủ sở hữu.',
       },
       'will-team-always-have-control': {
         question: 'Đội ngũ có luôn nắm quyền kiểm soát các tham số của giao thức không?',
         answer:
-          'Không. Khi giao thức ổn định, quyền sở hữu được chuyển giao cho Hội đồng Vũ trụ. Sau đó các thay đổi tham số chỉ diễn ra thông qua các đề xuất điều phối giao thức đạt túc số điều phối.',
+          'Chủ sở hữu vẫn có quyền đổi tham số và bản triển khai theo điều kiện của hợp đồng. Các thay đổi chính bị giới hạn khi chu kỳ chưa hoạt động, nhưng thời điểm kích hoạt, thời gian chờ chu kỳ sau và các hợp đồng phụ có quyền riêng. V3 không tự động chuyển quyền cho Hội đồng Vũ trụ hoặc tự động từ bỏ quyền chủ sở hữu.',
       },
       'what-is-renounce-ownership': {
         question: '“Từ bỏ quyền sở hữu” nghĩa là gì?',
         answer:
-          'Từ bỏ quyền sở hữu là một hàm của hợp đồng Ownable, chuyển giao vĩnh viễn quyền kiểm soát khỏi địa chỉ triển khai. Sau khi được gọi, không vai trò đặc quyền nào có thể sửa đổi tham số của hợp đồng.',
+          'Chủ sở hữu vẫn có quyền đổi tham số và bản triển khai theo điều kiện của hợp đồng. Các thay đổi chính bị giới hạn khi chu kỳ chưa hoạt động, nhưng thời điểm kích hoạt, thời gian chờ chu kỳ sau và các hợp đồng phụ có quyền riêng. V3 không tự động chuyển quyền cho Hội đồng Vũ trụ hoặc tự động từ bỏ quyền chủ sở hữu.',
       },
       'why-renounce-ownership': {
         question: 'Vì sao đội ngũ lại từ bỏ quyền sở hữu?',

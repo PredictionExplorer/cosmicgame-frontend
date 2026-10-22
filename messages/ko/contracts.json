@@ -21,7 +21,7 @@
     },
     "cst": {
       "name": "Cosmic Signature CST 토큰",
-      "description": "제스처마다 각인되며 우주 평의회에서 조율 가중치를 행사하는 데 쓰이는 ERC-20 토큰(CST)"
+      "description": "V3에서는 다음 제스처가 이전 제스처 참여자에게 참여 CST 전액을 각인합니다. 수량은 두 제스처 사이의 시간에 선형으로 비례합니다. 사이클의 첫 제스처는 이 규칙으로 CST를 각인하지 않으며, 마감도 최종 제스처 참여자의 마지막 구간에 추가 참여 CST를 지급하지 않습니다. 두 제스처의 주소가 같으면 해당 주소가 직접 받습니다."
     },
     "nft": {
       "name": "Cosmic Signature NFT",
@@ -64,9 +64,9 @@
   "addresses": {
     "title": "컨트랙트 주소",
     "description": "Arbitrum One의 모든 Cosmic Signature 컨트랙트입니다. 주소를 복사하거나 Arbiscan에서 주소를, Sourcify에서 소스 코드를 확인할 수 있습니다.",
-    "verified": "Sourcify 링크가 있는 주소는 모두 Sourcify에서 완전 일치합니다. 확인일: {date}.",
+    "verified": "주소 확인일: {date}. 각 구현의 현재 공개 검증 상태는 Sourcify에서 별도로 확인해 주세요.",
     "markets": "마켓",
-    "reported": "인덱서가 보고한 다음 주소는 검증되지 않았습니다: {address}"
+    "reported": "인덱서가 다른 주소를 보고합니다: {address}. 현재 온체인 상태와 대조해 주세요."
   },
   "funds": {
     "title": "배분 경로",
@@ -75,7 +75,7 @@
     "segments": {
       "signature": {
         "label": "시그니처 배분",
-        "tooltip": "최종 제스처를 남긴 참여자가 회수하는 ETH 비율입니다. 이 참여자는 1,000 CST와 Cosmic Signature NFT도 함께 받습니다."
+        "tooltip": "마감 수령자는 연속 ID의 Cosmic Signature NFT 3개와 총 1,000 CST를 받습니다. 마감 권한에는 우선 마감 구간과 공개 마감 구간이 적용됩니다."
       },
       "chrono": {
         "label": "시간의 전사",
@@ -83,7 +83,7 @@
       },
       "stellar": {
         "label": "별빛 선정",
-        "tooltip": "사이클이 마감될 때 무작위로 선정된 참여자에게 배분되는 몫입니다."
+        "tooltip": "제스처 당시의 ETH 기본 비용을 가중치로 선정하며, 비용 감소와 늦은 할증은 제외합니다. 같은 주소가 여러 번 선정될 수 있습니다."
       },
       "anchor": {
         "label": "앵커링 지급",
@@ -91,7 +91,7 @@
       },
       "publicGoods": {
         "label": "공공재",
-        "tooltip": "매 사이클 공공재 수령처(Protocol Guild)로 전달됩니다."
+        "tooltip": "해당 몫은 공공재 금고로 전달됩니다. 누구나 별도 트랜잭션으로 잔액을 현재 수령처인 Protocol Guild에 보낼 수 있습니다."
       },
       "next": {
         "label": "누적 준비금",
@@ -113,7 +113,7 @@
       },
       "cstPreview": {
         "label": "현재 참여 CST 미리 보기",
-        "tooltip": "지금 제스처를 남길 때 예상되는 참여 CST입니다. 이 값은 동적으로 변하며 {formula} 공식을 따릅니다."
+        "tooltip": "V3에서는 다음 제스처가 이전 참여자에게 CST 최소 단위로 {formula}에 따른 수량을 각인합니다. 첫 제스처는 각인하지 않으며 마감에도 추가 지급은 없습니다."
       },
       "finalization": {
         "label": "마감 제한 시간",
@@ -125,12 +125,12 @@
       },
       "message": {
         "label": "메시지 최대 길이",
-        "tooltip": "제스처 메시지에 허용되는 최대 글자 수입니다."
+        "tooltip": "제스처 메시지의 최대 UTF-8 바이트 길이"
       },
       "v3CstDecline": {
         "label": "CST 가격 하락 속도",
         "value": "{amount} CST/분",
-        "tooltip": "CST 보정 구간 동안 CST 제스처 비용이 낮아지는 속도입니다. 각인되는 참여 CST는 추월당한 참여자에게 전액 지급됩니다."
+        "tooltip": "현재 CST 상한과 하락 속도에서 계산한 길이입니다. V3는 속도를 바꾸고 CST 제스처 후 상한을 다시 설정하며, 저장된 길이를 고정 비율로 바꾸지 않습니다."
       },
       "v3SignatureNfts": {
         "label": "시그니처 배분 NFT 수",
@@ -164,7 +164,7 @@
     },
     "ceiling": "시작 비용",
     "cstDurationTooltip": "현재 저장된 CST 보정 구간의 지속 시간입니다. CST 제스처는 이를 약 {increase}% 늘리고, ETH 제스처는 약 {decrease}% 줄입니다.",
-    "cstCeilingTooltip": "현재 표시된 CST 보정 구간의 시작 제스처 비용입니다. 비용은 저장된 지속 시간에 걸쳐 선형으로 내려갑니다.",
+    "cstCeilingTooltip": "현재 CST 상한과 하락 속도에서 계산한 길이입니다. V3는 속도를 바꾸고 CST 제스처 후 상한을 다시 설정하며, 저장된 길이를 고정 비율로 바꾸지 않습니다.",
     "publicGoodsAddress": "공공재 수령처",
     "publicGoodsAddressTooltip": "공공재 금고 컨트랙트에서 공공재 배분을 현재 받고 있는 온체인 주소입니다.",
     "selection": {
@@ -177,7 +177,8 @@
     },
     "cstComplete": "구간이 끝까지 지나 다음 CST 제스처로 다시 시작될 때까지 CST 제스처 비용은 최저가에 머뭅니다.",
     "ethClosed": "이번 사이클의 첫 제스처로 이 구간은 닫혔습니다. 이제 ETH 제스처 비용은 제스처마다 오릅니다.",
-    "ethComplete": "구간이 끝까지 지나 이번 사이클의 첫 제스처가 있을 때까지 ETH 제스처 비용은 최저가에 머뭅니다."
+    "ethComplete": "구간이 끝까지 지나 이번 사이클의 첫 제스처가 있을 때까지 ETH 제스처 비용은 최저가에 머뭅니다.",
+    "cstDurationTooltipV3": "현재 CST 상한과 하락 속도에서 계산한 길이입니다. V3는 속도를 바꾸고 CST 제스처 후 상한을 다시 설정하며, 저장된 길이를 고정 비율로 바꾸지 않습니다."
   },
   "vault": {
     "title": "공공재",

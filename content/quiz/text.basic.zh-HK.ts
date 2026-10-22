@@ -116,15 +116,15 @@ export const basicQuestionsTextZhHk = {
     referenceLabel: '白皮書 §6 · 藝術',
   },
   'same-seed': {
-    prompt: '你用編號 42 的 NFT 在鏈上儲存的種子，重跑一遍開源渲染管線。會得到什麼？',
+    prompt: '重現編號 42 的 NFT 已發佈作品，需要哪些條件？',
     options: {
-      a: '在任何機器上都逐像素一致的同一幅圖像。',
+      a: '配合對應渲染器版本、設定與兼容工具鏈，可核對生成的作品。',
       b: '相似但帶有少量隨機差異的圖像。',
       c: '不同硬件上會得到不同的圖像。',
       d: '只有低分辨率預覽；完整作品需要項目伺服器。',
     },
     explanation:
-      '確定性靠機制保證，而非口頭承諾：同一種子在任何機器上都產出逐比特一致的圖像。生成幀的 SHA-256 哈希在持續集成中逐一斷言，輸出一旦漂移，構建立即失敗。',
+      '倉庫提供手動執行的參考圖像檢查。重現作品須固定種子、渲染器版本、設定與兼容工具鏈；目前持續整合不會比較生成畫面的雜湊。',
     referenceLabel: '白皮書 §6.2 · 可復現性與許可',
   },
   'cst-supply-origin': {
@@ -136,7 +136,7 @@ export const basicQuestionsTextZhHk = {
       d: '任何人調用代幣合約都能銘刻 CST。',
     },
     explanation:
-      'CST 供應量從零起步，代幣合約只接受協議合約的銘刻與銷毀指令。新的 CST 來自既定機制：落筆時的參與 CST、週期收官時的表彰 CST，以及推廣儲備。合約沒有硬性供應上限。',
+      'CST 由協議按參與機制與固定分配銘刻。V3 的動態參與 CST 在下一筆執行時發給上一筆參與者；表彰 CST 和推廣儲備在收官時銘刻。落筆使用的 CST 會銷毀，持有人及獲授權的支出者亦可銷毀代幣；供應量受代幣表示範圍限制。',
     referenceLabel: '白皮書 §7 · CST 代幣',
   },
   'cst-on-spend': {
@@ -160,7 +160,7 @@ export const basicQuestionsTextZhHk = {
       d: '隨機選出的一位 NFT 持有者。',
     },
     explanation:
-      '公共物品金庫把這一份額轉撥給 Protocol Guild，轉撥作為收官的一部分在鏈上強制執行——沒有人逐週期決定是否兌現。道理很簡單：活在公共基礎設施之上的協議，就該機械地、按節奏地、公開地資助這層設施。',
+      '收官時，公共物品份額先進入金庫。任何人均可另發一筆交易，將金庫餘額轉給目前受益方 Protocol Guild；金庫所有者可更改受益方。轉入失敗的份額可留在儲備，不保證每次收官均完成最終轉撥。',
     referenceLabel: '白皮書 §10 · 公共物品',
   },
   'anchoring-basic': {
@@ -242,7 +242,7 @@ export const basicQuestionsTextZhHk = {
       c: `${protocolFacts.nftStellarSelectionRecipients} 枚`,
       d: '100 枚',
     },
-    explanation: `典型週期銘刻 ${protocolFacts.typicalNftsPerCycle} 枚 NFT：${protocolFacts.roleNftsPerCycle} 枚角色 NFT（受益方、時之勇士、堅守冠軍、CST 收官之筆）、${protocolFacts.nftStellarSelectionRecipients} 枚參與者 NFT 星選、${protocolFacts.anchoredRwlkNftSelectionRecipients} 枚錨定 NFT 星選。跳過某條軌道的週期會少銘刻幾枚。`,
+    explanation: `全部軌道均存在時，共 ${protocolFacts.typicalNftsPerCycle} 枚 NFT：簽名分配 ${protocolFacts.mainPrizeNftsPerCycle} 枚，其餘角色各一枚，另有參與者與 Random Walk NFT 錨定星選。簽名分配的 CST 只發放一次，不按其中的 NFT 枚數重複計算；缺少相關參與或錨定時，條件軌道會略過。`,
     referenceLabel: '白皮書 §5.1 · 收官時的發放',
   },
   'chrono-endurance-exist': {
@@ -260,13 +260,13 @@ export const basicQuestionsTextZhHk = {
   'stellar-selection-what': {
     prompt: '星選是什麼？',
     options: {
-      a: '週期進行中按筆計入的資格記錄，收官時由合約從中選出獲配者。',
+      a: '週期中記錄的加權參與資格，用於收官時的分配選取。',
       b: '按活躍度排名參與者的榜單。',
       c: '賦予 NFT 作品的稀有度等級。',
       d: '為作品中的星座命名的方案。',
     },
     explanation:
-      '每筆落筆都在本週期星選池中計入一次資格。收官時，合約為 ETH 星選與 NFT 星選選出資格，入選頻次與參與程度成正比。它是一種發放機制，不是排名。',
+      '參與者 ETH 與 NFT 星選均按每筆當時未減免、未含溢價的 ETH 基礎價格加權。CST 落筆亦使用同一時間的 ETH 基礎價格，可以重複獲配，但不保證任何地址獲配。',
     referenceLabel: '白皮書 §5.3 · 星選',
   },
   'ecosystem-optionality': {
@@ -284,13 +284,13 @@ export const basicQuestionsTextZhHk = {
   'what-it-is-not': {
     prompt: '關於協議的本質，哪種說法與白皮書一致？',
     options: {
-      a: '參與者以價值換取參與本身，協議不留任何運營方抽成。',
+      a: '參與不保證獲得分配、資產價值、流動性，或未來移除所有者權限。',
       b: '取得 CST 是一條憑他人努力獲取金錢的可靠途徑。',
       c: '有一個運營方從每個週期中留下一定比例。',
       d: '協議承諾 NFT 的價值會隨時間上漲。',
     },
     explanation:
-      '每條分配軌道流向的都是參與者、已錨定的 NFT、滾動儲備或公共物品——不存在運營方抽成。白皮書不對價格、流動性或未來價值作任何承諾，並直言任何人都不應帶着「憑他人努力獲取金錢」的預期取得 CST 或 NFT。',
+      '目前 ETH 分配沒有獨立團隊份額。推廣儲備的 CST 由任命的託管人發放，團隊相關地址仍可按相同規則參與。沒有獨立 ETH 份額不代表沒有管理權限，亦不保證任何財務結果。',
     referenceLabel: '白皮書 §14.1 · Cosmic Signature 不是什麼',
   },
   'where-recorded': {

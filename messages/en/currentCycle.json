@@ -57,12 +57,13 @@
       "fixedCstEach": "1,000 CST each",
       "nft": "1 Cosmic Signature NFT",
       "nftEach": "1 Cosmic Signature NFT each",
-      "attachedTokens": "Attached tokens (if any)"
+      "attachedTokens": "Attached tokens (if any)",
+      "nftCount": "{count, plural, one {# Cosmic Signature NFT} other {# Cosmic Signature NFTs}}"
     },
     "cards": {
       "signature": {
         "name": "Signature Allocation",
-        "tooltip": "When the countdown reaches zero, the participant who made the Final Gesture may finalize the cycle and retrieve this allocation: ETH, 1,000 CST, a Cosmic Signature NFT, and attached tokens. If they do not finalize within their exclusive window, whoever finalizes receives it."
+        "tooltip": "The finalization caller receives the ETH share, 1,000 CST in total, the configured Signature NFT allocation and attached-asset rights. The Final Gesture participant has exclusive priority for 48 hours after the deadline; afterwards any caller can finalize."
       },
       "chronoWarrior": {
         "name": "Chrono-Warrior Allocation",
@@ -79,7 +80,7 @@
       },
       "publicGoods": {
         "name": "Public Goods",
-        "tooltip": "{percent}% of every Cycle Reserve is forwarded to Protocol Guild, the funding mechanism for 170+ Ethereum core contributors.",
+        "tooltip": "{percent}% is allocated to the Public Goods Vault. Anyone can separately forward its balance to the configured beneficiary, currently Protocol Guild.",
         "recipientLabel": "Protocol Guild"
       },
       "nftStellar": {
@@ -136,11 +137,11 @@
   "rules": {
     "howItWorks": "How it works",
     "participation": "When you gesture, you may imprint <em>dynamic Participation CST</em>. The amount uses a square-root formula based on how long it has been since the previous gesture.",
-    "participationV3": "When you gesture, you may imprint <em>dynamic Participation CST</em>. The amount accrues at a steady rate based on how long it has been since the previous gesture.",
+    "participationV3": "A later gesture credits the previous participant with <em>dynamic Participation CST</em>, linear in elapsed time. The first gesture credits none, and finalization does not settle an additional amount.",
     "calibration": "ETH gestures shorten the CST Calibration Window by about {decreasePercent}%; CST gestures lengthen it by about {increasePercent}%.",
     "stellarSelection": "Each gesture records one Stellar Selection entry. {ethEntries} entries receive {rafflePercent}% of the Cycle Reserve. {nftEntries} additional Selection recipients and {anchorHolders} Random Walk NFT anchor-holders receive a Cosmic Signature NFT.",
-    "stellarSelectionV3": "Each gesture records a Stellar Selection entry weighted by its ETH cost at the moment it is made. {ethEntries} entries receive {rafflePercent}% of the Cycle Reserve. {nftEntries} additional Selection recipients and {anchorHolders} Random Walk NFT anchor-holders receive a Cosmic Signature NFT.",
-    "publicGoods": "Protocol Guild receives {percent}% of the Cycle Reserve (at least {amount} ETH) each cycle.",
+    "stellarSelectionV3": "Both participant tracks use undiscounted, premium-free ETH base-cost weights; CST gestures use the concurrent ETH base cost. {ethEntries} selections share {rafflePercent}% ETH. {nftEntries} participant NFT selections and up to {anchorHolders} active Random Walk NFT selections receive NFTs and CST. Repeats are possible.",
+    "publicGoods": "The current Public Goods allocation is {percent}% (about {amount}\u00a0ETH). It is allocated to the vault for a separate transfer to its configured beneficiary, currently Protocol Guild.",
     "learnMore": "How a cycle works"
   },
   "attachedTokens": {

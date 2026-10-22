@@ -1,8 +1,10 @@
 import { protocolFacts } from '@/content/protocol-facts';
 
+import { formatCount } from '@/utils/format/numbers';
+
 import type { TermsCopy } from './TermsContent';
 
-const cst = protocolFacts.specialAllocationCst.toLocaleString('ja-JP');
+const cst = formatCount(protocolFacts.specialAllocationCst, 'ja');
 
 export const termsCopyJa = {
   title: '利用規約',
@@ -56,12 +58,12 @@ export const termsCopyJa = {
         {
           id: 'dynamic-cst',
           subtitle: '動的なCSTの刻印',
-          text: '一筆が刻印する参加CSTは固定ではありません。その量は前の一筆からの経過時間に依存し、平方根の式で計算されます。ごく短い間隔の一筆は0 CSTを刻印することがあります。',
+          text: 'V3では、次の一筆が直前の一筆を入れた参加者に参加CSTの全額を刻印します。数量は二つの一筆の間の時間に比例します。サイクル最初の一筆ではこのCSTは発生せず、確定時にも最後の参加者の未精算区間へ追加の参加CSTは支払われません。両方の一筆が同じアドレスなら、そのアドレス自身が受け取ります。',
         },
         {
           id: 'cst-window',
           subtitle: 'CST調律期間',
-          text: `CST一筆の費用は、オンチェーンに保存された調律期間を通じて下がります。CST一筆はそれぞれその期間を約${protocolFacts.cstCalibrationWindowIncreasePercentPerCstGesture}%増やし、ETH一筆はそれぞれ約${protocolFacts.cstCalibrationWindowDecreasePercentPerEthGesture}%減らします。`,
+          text: 'V3が保存するのはCST費用の下降速度で、期間の長さは速度と上限から求めます。ETH一筆はrate + floor(rate / 100)への増加を試み、CST一筆はrate - floor(rate / 101)へ減少させます。最短期間の条件に反する増加は行いません。CST一筆の後の上限は、加算前のCST基本費用の2倍、設定された最小値、新しい速度と180秒の積のうち最大の値です。次の一筆をすぐに入れることはできます。',
         },
         {
           id: 'smart-contract',
@@ -87,12 +89,12 @@ export const termsCopyJa = {
         {
           id: 'distribution',
           subtitle: '配分の実行',
-          text: `配分はスマートコントラクトのルールに従って自動的に配られます。標準的なサイクルでは、以下の配分トラック全体で${protocolFacts.typicalNftsPerCycle}点のCosmic Signature NFTと${protocolFacts.typicalCstImprintsPerCycle.toLocaleString('ja-JP')} CSTが刻印されます。`,
+          text: `すべてのトラックがある場合、サイクルはCosmic Signature NFT${protocolFacts.typicalNftsPerCycle}点と固定配分の${formatCount(protocolFacts.typicalCstImprintsPerCycle, 'ja')} CSTを刻印します。シグネチャー配分はNFT${protocolFacts.mainPrizeNftsPerCycle}点に対して、合計${formatCount(protocolFacts.specialAllocationCst, 'ja')} CSTを一度だけ受け取ります。時の戦士、持久チャンピオン、最後のCST一筆には各1点と対応するCSTがあり、二つのNFT星選が残りを加えます。CST一筆や係留中のRandom Walk NFTがなければ該当トラックは省略されます。参加CSTは別です。`,
         },
         {
           id: 'signature',
           subtitle: 'シグネチャー配分',
-          text: `最後の一筆を入れた参加者は、${protocolFacts.mainEthPercentage}%のETH、${cst} CSTの功労CST、Cosmic Signature NFT 1点、そしてサイクルで添付されたトークン（あれば）を受け取れます。`,
+          text: `確定処理を成功させたアドレスが、サイクル準備金の${protocolFacts.mainEthPercentage}%、合計${formatCount(protocolFacts.specialAllocationCst, 'ja')} CST、連続したIDのCosmic Signature NFT${protocolFacts.mainPrizeNftsPerCycle}点を受け取ります。確定時刻後の最初の${protocolFacts.finalGestureExclusivityHours}時間は最後の一筆の参加者だけが実行でき、その後は誰でも実行して自分で受け取れます。`,
         },
         {
           id: 'chrono',
@@ -112,7 +114,7 @@ export const termsCopyJa = {
         {
           id: 'eth-selection',
           subtitle: 'ETH星選',
-          text: `選ばれた${protocolFacts.ethStellarSelectionRecipients}人の参加者が、サイクル準備金から${protocolFacts.stellarSelectionEthPercentage}%のETHを分け合います。`,
+          text: `確定時に、プロトコルはサイクル準備金の${protocolFacts.publicGoodsPercentage}%を公共財金庫へ送ろうとします。その後、誰でも別のトランザクションで残高を現在の受け手であるProtocol Guildへ送れます。所有者は受け手を変更できます。プロトコルから金庫への送付が失敗しても、確定を取り消さずにその分を準備金へ残す場合があります。`,
         },
         {
           id: 'nft-selection',
@@ -132,7 +134,7 @@ export const termsCopyJa = {
         {
           id: 'public-goods',
           subtitle: '公共財',
-          text: `${protocolFacts.publicGoodsPercentage}%のETHが、現在の公共財の受け手であるProtocol Guildへ送られます。`,
+          text: '参加者向けのETH星選とNFT星選は、どちらも一筆ごとのウェイトを使います。ウェイトは、その時点のETH基本費用からRandom Walk NFTによる割引と終盤の加算を除いた値です。CST一筆にも同時点のETH基本費用を使います。復元を伴う選定なので、同じアドレスが複数回選ばれることがあります。係留NFT星選は、係留中のRandom Walk NFTを別に対象とします。',
         },
         {
           id: 'compounding',

@@ -82,6 +82,7 @@ The app serves two hosts from one codebase: the marketing site (`cosmicsignature
 | `npm run terminology:check`  | Glossary drift gate for every translated locale                          |
 | `npm run i18n:check`         | `i18n:strict` + `terminology:check` + `lexicon:scan` (pre-push runs it)  |
 | `npm run white-paper:pdf`    | Regenerate the per-locale white-paper PDFs (pandoc + tectonic)           |
+| `npm run llms:build`         | Regenerate AI-facing docs from current localized site content            |
 
 ## Environment Variables
 

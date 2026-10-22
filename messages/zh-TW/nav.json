@@ -159,7 +159,7 @@
     },
     "contracts": {
       "label": "合約",
-      "description": "Arbitrum 上已驗證的合約地址"
+      "description": "Arbitrum 合約地址與驗證狀態"
     },
     "sourceCode": {
       "label": "原始碼",

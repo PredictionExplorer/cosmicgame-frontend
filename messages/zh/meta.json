@@ -151,7 +151,7 @@
     "description": "解答 Cosmic Signature、演绎周期、落笔、CST、三体 NFT 艺术、Arbitrum、锚定、合约与协议安全等常见问题。"
   },
   "contracts": {
-    "title": "合约：已验证的 Arbitrum 智能合约",
+    "title": "合约：Arbitrum 地址与验证状态",
     "description": "Cosmic Signature 在 Arbitrum One 上的全部智能合约地址，附区块浏览器与 Sourcify 链接，以及分配比例、协议配置与校准窗口。"
   },
   "terms": {
@@ -317,7 +317,7 @@
       "title": "收藏与交易 Cosmic Signature NFT 和 CST",
       "description": "了解 Cosmic Signature 资产可在哪里交易：Axiom Zero NFT 市场不收平台费，可在 Arbitrum 上通过 Uniswap 兑换 CST，Chaos Zero 则提供周期预测市场。"
     },
-    "not-a-\u006cottery-not-an-\u0069nvestment": {
+    "not-a-lottery-not-an-investment": {
       "title": "Cosmic Signature 是彩\u7968、赌\u573a或投\u8d44产品吗？",
       "description": "Cosmic Signature 是程序化链上艺术协议，不是彩\u7968、赌\u573a、赌\u535a产品或投\u8d44产品。"
     }

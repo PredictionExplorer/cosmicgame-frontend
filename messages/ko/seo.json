@@ -213,7 +213,7 @@
       },
       "public-goods-contributions-cg": {
         "heading": "프로토콜 공공재 기여",
-        "description": "마감된 사이클마다 사이클 준비금의 7%가 공공재 금고로 들어가 공공재 수령처 앞으로 보관됩니다. 현재 수령처는 이더리움 핵심 기여자를 지원하는 Protocol Guild입니다.",
+        "description": "마감된 사이클마다 사이클 준비금의 5%가 공공재 금고로 들어가 공공재 수령처 앞으로 보관됩니다. 현재 수령처는 이더리움 핵심 기여자를 지원하는 Protocol Guild입니다.",
         "links": {
           "learn": "공공재 알아보기",
           "contracts": "금고 컨트랙트 확인"
@@ -335,7 +335,7 @@
       "alt": "Cosmic Signature — 모든 제스처가 시그니처를 빚어냅니다.",
       "title": "모든 제스처가 시그니처를 빚어냅니다.",
       "subhead": "Arbitrum 위의 절차적 온체인 아트 프로토콜입니다.",
-      "fact": "CC0 · 오픈 소스 · 7%는 Protocol Guild로"
+      "fact": "CC0 · 오픈 소스 · 5%는 Protocol Guild로"
     },
     "gallery": {
       "alt": "Cosmic Signature — 갤러리",
@@ -363,7 +363,7 @@
       "eyebrow": "자주 묻는 질문",
       "title": "궁금한 점에 분명하게 답합니다.",
       "subhead": "퍼포먼스 사이클, 제스처, 배분, 앵커링, 프로토콜 조율을 다룹니다.",
-      "fact": "CC0 · 오픈 소스 · 7%는 Protocol Guild로"
+      "fact": "CC0 · 오픈 소스 · 5%는 Protocol Guild로"
     },
     "howItWorks": {
       "alt": "Cosmic Signature — 작동 원리",

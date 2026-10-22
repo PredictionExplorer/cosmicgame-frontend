@@ -21,7 +21,7 @@
     },
     "cst": {
       "name": "Token CST của Cosmic Signature",
-      "description": "Token ERC-20 (CST) có thể được khắc khi đặt nét bút và dùng để xác định trọng số điều phối trong Hội đồng Vũ trụ"
+      "description": "Trong V3, nét bút tiếp theo khắc toàn bộ CST tham gia cho người đặt nét bút trước. Số lượng tăng tuyến tính theo thời gian giữa hai nét bút. Nét bút đầu tiên của chu kỳ không khắc CST theo quy tắc này, và hoàn tất không thanh toán thêm khoảng thời gian cuối cho người đặt nét bút cuối cùng. Nếu cả hai nét bút thuộc cùng một địa chỉ, địa chỉ đó nhận CST."
     },
     "nft": {
       "name": "Cosmic Signature NFT",
@@ -64,9 +64,9 @@
   "addresses": {
     "title": "Địa chỉ hợp đồng",
     "description": "Mọi hợp đồng Cosmic Signature trên Arbitrum One. Sao chép địa chỉ, hoặc kiểm tra địa chỉ trên Arbiscan và mã nguồn trên Sourcify.",
-    "verified": "Mọi địa chỉ có liên kết Sourcify đều khớp chính xác trên đó, kiểm tra ngày {date}.",
+    "verified": "Địa chỉ được kiểm tra ngày {date}. Hãy xem riêng trạng thái xác minh công khai hiện tại của từng bản triển khai trên Sourcify.",
     "markets": "Thị trường",
-    "reported": "Bộ lập chỉ mục báo cáo địa chỉ {address}, địa chỉ này chưa được xác minh."
+    "reported": "Bộ lập chỉ mục báo một địa chỉ khác: {address}. Hãy đối chiếu với trạng thái hiện tại trên chuỗi."
   },
   "funds": {
     "title": "Các luồng phân bổ",
@@ -75,7 +75,7 @@
     "segments": {
       "signature": {
         "label": "Phân bổ Signature",
-        "tooltip": "Tỷ lệ ETH được nhận về bởi người tham gia đặt nét bút cuối cùng; người này cũng nhận 1.000 CST và một Cosmic Signature NFT"
+        "tooltip": "Người hoàn tất nhận 3 Cosmic Signature NFT có ID liên tiếp và tổng cộng 1.000 CST. Quyền hoàn tất tuân theo thời gian độc quyền và thời gian mở."
       },
       "chrono": {
         "label": "Chiến binh Thời gian",
@@ -83,7 +83,7 @@
       },
       "stellar": {
         "label": "Tinh tuyển",
-        "tooltip": "Phần được phân phối cho những người tham gia được chọn ngẫu nhiên khi chu kỳ hoàn tất"
+        "tooltip": "Trọng số là chi phí ETH cơ sở lúc đặt nét bút, không gồm mức giảm hay phụ phí cuối chu kỳ. Một địa chỉ có thể được chọn nhiều lần."
       },
       "anchor": {
         "label": "Phân phối neo giữ",
@@ -91,7 +91,7 @@
       },
       "publicGoods": {
         "label": "Hàng hóa công",
-        "tooltip": "Được chuyển đến đơn vị thụ hưởng Hàng hóa công (Protocol Guild) mỗi chu kỳ"
+        "tooltip": "Phần này vào Kho Hàng hóa công. Bất kỳ ai cũng có thể dùng một giao dịch riêng để chuyển số dư kho tới đơn vị thụ hưởng hiện tại là Protocol Guild."
       },
       "next": {
         "label": "Dự trữ tích lũy",
@@ -113,7 +113,7 @@
       },
       "cstPreview": {
         "label": "Xem trước CST tham gia hiện tại",
-        "tooltip": "CST tham gia ước tính nếu một nét bút được đặt ngay lúc này. Con số này thay đổi liên tục và dùng {formula}."
+        "tooltip": "Trong V3, nét bút tiếp theo khắc cho người tham gia trước số lượng theo {formula}, tính bằng đơn vị CST nhỏ nhất. Nét bút đầu tiên không khắc và hoàn tất không thanh toán thêm."
       },
       "finalization": {
         "label": "Thời hạn hoàn tất",
@@ -125,12 +125,12 @@
       },
       "message": {
         "label": "Độ dài lời nhắn tối đa",
-        "tooltip": "Số ký tự tối đa được phép trong lời nhắn của nét bút"
+        "tooltip": "Độ dài tối đa của thông điệp nét bút tính bằng byte UTF-8"
       },
       "v3CstDecline": {
         "label": "Tốc độ giảm giá CST",
         "value": "{amount} CST/phút",
-        "tooltip": "Tốc độ giảm của chi phí nét bút CST trong cửa sổ hiệu chỉnh CST. Mỗi lượt khắc CST tham gia được ghi trọn cho người tham gia bị vượt."
+        "tooltip": "Độ dài được tính từ mức trần CST và tốc độ giảm hiện tại. V3 điều chỉnh tốc độ và đặt lại mức trần sau nét bút CST, không thay đổi một thời lượng lưu sẵn theo tỷ lệ cố định."
       },
       "v3SignatureNfts": {
         "label": "NFT phân bổ Signature",
@@ -164,7 +164,7 @@
     },
     "ceiling": "Chi phí khởi điểm",
     "cstDurationTooltip": "Thời lượng hiện tại của cửa sổ hiệu chỉnh CST. Nét bút CST kéo dài cửa sổ khoảng {increase}%; nét bút ETH rút ngắn khoảng {decrease}%.",
-    "cstCeilingTooltip": "Chi phí nét bút khởi điểm của cửa sổ hiệu chỉnh CST đang hiển thị. Chi phí giảm tuyến tính trong suốt thời lượng đang được lưu.",
+    "cstCeilingTooltip": "Độ dài được tính từ mức trần CST và tốc độ giảm hiện tại. V3 điều chỉnh tốc độ và đặt lại mức trần sau nét bút CST, không thay đổi một thời lượng lưu sẵn theo tỷ lệ cố định.",
     "publicGoodsAddress": "Đơn vị thụ hưởng Hàng hóa công",
     "publicGoodsAddressTooltip": "Địa chỉ trên chuỗi hiện đang nhận phần phân bổ Hàng hóa công từ hợp đồng Kho Hàng hóa công",
     "selection": {
@@ -177,7 +177,8 @@
     },
     "cstComplete": "Cửa sổ đã chạy hết thời lượng, nên chi phí nét bút CST giữ ở mức sàn cho đến khi nét bút CST tiếp theo bắt đầu lại cửa sổ.",
     "ethClosed": "Nét bút đầu tiên của chu kỳ đã đóng cửa sổ này; giờ chi phí nét bút ETH tăng theo từng nét bút.",
-    "ethComplete": "Cửa sổ đã chạy hết thời lượng, nên chi phí nét bút ETH giữ ở mức sàn cho đến nét bút đầu tiên của chu kỳ."
+    "ethComplete": "Cửa sổ đã chạy hết thời lượng, nên chi phí nét bút ETH giữ ở mức sàn cho đến nét bút đầu tiên của chu kỳ.",
+    "cstDurationTooltipV3": "Độ dài được tính từ mức trần CST và tốc độ giảm hiện tại. V3 điều chỉnh tốc độ và đặt lại mức trần sau nét bút CST, không thay đổi một thời lượng lưu sẵn theo tỷ lệ cố định."
   },
   "vault": {
     "title": "Hàng hóa công",

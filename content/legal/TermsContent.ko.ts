@@ -1,5 +1,7 @@
 import { protocolFacts } from '@/content/protocol-facts';
 
+import { formatCount } from '@/utils/format/numbers';
+
 import type { TermsCopy } from './TermsContent';
 
 export const termsCopyKo = {
@@ -54,12 +56,12 @@ export const termsCopyKo = {
         {
           id: 'dynamic-cst',
           subtitle: '동적 CST 각인',
-          text: '제스처로 각인되는 참여 CST의 양은 고정되어 있지 않습니다. 이전 제스처 이후 경과한 시간에 따라 달라지며, 제곱근 공식으로 계산됩니다. 매우 짧은 간격으로 이어지는 제스처는 각인되는 CST가 0이 될 수도 있습니다.',
+          text: 'V3에서는 다음 제스처가 이전 제스처 참여자에게 참여 CST 전액을 각인합니다. 수량은 두 제스처 사이의 시간에 선형으로 비례합니다. 사이클의 첫 제스처는 이 규칙으로 CST를 각인하지 않으며, 마감도 최종 제스처 참여자의 마지막 구간에 추가 참여 CST를 지급하지 않습니다. 두 제스처의 주소가 같으면 해당 주소가 직접 받습니다.',
         },
         {
           id: 'cst-window',
           subtitle: 'CST 보정 구간',
-          text: `CST 제스처 비용은 온체인에 저장된 보정 구간을 따라 하락합니다. CST 제스처 1회마다 이 구간은 약 ${protocolFacts.cstCalibrationWindowIncreasePercentPerCstGesture}% 늘어나고, ETH 제스처 1회마다 약 ${protocolFacts.cstCalibrationWindowDecreasePercentPerEthGesture}% 줄어듭니다.`,
+          text: 'V3는 CST 비용의 하락 속도를 저장하며 구간 길이는 속도와 상한에서 계산합니다. ETH 제스처는 rate + floor(rate / 100)으로 속도 증가를 시도하고, CST 제스처는 rate - floor(rate / 101)로 속도를 줄입니다. 최소 구간 조건을 어기면 ETH의 속도 증가는 적용하지 않습니다. CST 제스처는 할증 전 기본 비용의 두 배, 설정된 최소값, 새 속도에 180초를 곱한 값 가운데 가장 큰 값으로 상한을 다시 설정합니다. 다음 제스처를 즉시 남기는 것은 가능합니다.',
         },
         {
           id: 'smart-contract',
@@ -85,42 +87,42 @@ export const termsCopyKo = {
         {
           id: 'distribution',
           subtitle: '배분 실행',
-          text: `배분은 스마트 컨트랙트 규칙에 따라 자동으로 실행됩니다. 일반적인 사이클에서는 아래 배분 경로에 걸쳐 Cosmic Signature NFT ${protocolFacts.typicalNftsPerCycle}개와 ${protocolFacts.typicalCstImprintsPerCycle.toLocaleString('ko-KR')} CST가 각인됩니다.`,
+          text: `모든 경로가 있으면 한 사이클에서 Cosmic Signature NFT ${protocolFacts.typicalNftsPerCycle}개와 고정 배분 CST ${formatCount(protocolFacts.typicalCstImprintsPerCycle, 'ko')}개가 각인됩니다. 시그니처 배분은 NFT ${protocolFacts.mainPrizeNftsPerCycle}개에 대해 CST ${formatCount(protocolFacts.specialAllocationCst, 'ko')}개를 합계로 한 번 받습니다. 시간의 전사, 수호 챔피언, 최종 CST 제스처는 각각 NFT 1개와 해당 CST를 받으며, 두 NFT 선정 경로가 나머지를 더합니다. CST 제스처나 앵커링된 Random Walk NFT가 없으면 해당 경로는 생략합니다. 참여 CST는 별도입니다.`,
         },
         {
           id: 'signature',
           subtitle: '시그니처 배분',
-          text: `최종 제스처를 남긴 참여자는 ETH의 ${protocolFacts.mainEthPercentage}%, 공로 CST ${protocolFacts.specialAllocationCst.toLocaleString('ko-KR')}개, Cosmic Signature NFT 1개, 그리고 해당 사이클에 첨부된 토큰이 있다면 그 토큰을 회수할 수 있습니다.`,
+          text: `마감을 성공적으로 실행한 주소는 사이클 준비금의 ${protocolFacts.mainEthPercentage}%, 총 ${formatCount(protocolFacts.specialAllocationCst, 'ko')} CST, 연속 ID의 Cosmic Signature NFT ${protocolFacts.mainPrizeNftsPerCycle}개를 받습니다. 마감 시각 이후 첫 ${protocolFacts.finalGestureExclusivityHours}시간에는 최종 제스처 참여자만 실행할 수 있고, 그 뒤에는 누구나 실행하여 자기 몫으로 받을 수 있습니다.`,
         },
         {
           id: 'chrono',
           subtitle: '시간의 전사',
-          text: `수호 챔피언 자리를 가장 오랫동안 연속으로 지킨 참여자는 ETH의 ${protocolFacts.chronoWarriorEthPercentage}%, 공로 CST ${protocolFacts.specialAllocationCst.toLocaleString('ko-KR')}개, Cosmic Signature NFT 1개를 받습니다.`,
+          text: `수호 챔피언 자리를 가장 오랫동안 연속으로 지킨 참여자는 ETH의 ${protocolFacts.chronoWarriorEthPercentage}%, 공로 CST ${formatCount(protocolFacts.specialAllocationCst, 'ko')}개, Cosmic Signature NFT 1개를 받습니다.`,
         },
         {
           id: 'endurance',
           subtitle: '수호 챔피언',
-          text: `최근 제스처 자리를 중단 없이 가장 오랫동안 지킨 참여자는 공로 CST ${protocolFacts.specialAllocationCst.toLocaleString('ko-KR')}개와 Cosmic Signature NFT 1개를 받습니다.`,
+          text: `최근 제스처 자리를 중단 없이 가장 오랫동안 지킨 참여자는 공로 CST ${formatCount(protocolFacts.specialAllocationCst, 'ko')}개와 Cosmic Signature NFT 1개를 받습니다.`,
         },
         {
           id: 'final-cst',
           subtitle: '최종 CST 제스처',
-          text: `사이클에서 마지막으로 CST 제스처를 남긴 참여자는 공로 CST ${protocolFacts.specialAllocationCst.toLocaleString('ko-KR')}개와 Cosmic Signature NFT 1개를 받습니다.`,
+          text: `사이클에서 마지막으로 CST 제스처를 남긴 참여자는 공로 CST ${formatCount(protocolFacts.specialAllocationCst, 'ko')}개와 Cosmic Signature NFT 1개를 받습니다.`,
         },
         {
           id: 'eth-selection',
           subtitle: 'ETH 별빛 선정',
-          text: `별빛 선정으로 정해진 참여자 ${protocolFacts.ethStellarSelectionRecipients}명이 사이클 준비금 ETH의 ${protocolFacts.stellarSelectionEthPercentage}%를 나누어 받습니다.`,
+          text: `마감 시 프로토콜은 사이클 준비금의 ${protocolFacts.publicGoodsPercentage}%를 공공재 금고로 보내려고 시도합니다. 이후 누구나 별도 트랜잭션으로 금고 잔액을 현재 공공재 수령처인 Protocol Guild에 전달할 수 있습니다. 소유자는 수령처를 바꿀 수 있습니다. 프로토콜에서 금고로 보내는 작업이 실패하면 마감을 취소하지 않고 해당 몫이 준비금에 남을 수 있습니다.`,
         },
         {
           id: 'nft-selection',
           subtitle: 'NFT 별빛 선정',
-          text: `별빛 선정으로 정해진 참여자 ${protocolFacts.nftStellarSelectionRecipients}명이 각각 공로 CST ${protocolFacts.specialAllocationCst.toLocaleString('ko-KR')}개와 Cosmic Signature NFT 1개를 받습니다.`,
+          text: `별빛 선정으로 정해진 참여자 ${protocolFacts.nftStellarSelectionRecipients}명이 각각 공로 CST ${formatCount(protocolFacts.specialAllocationCst, 'ko')}개와 Cosmic Signature NFT 1개를 받습니다.`,
         },
         {
           id: 'anchored-selection',
           subtitle: '앵커링 NFT 별빛 선정',
-          text: `별빛 선정으로 정해진 Random Walk NFT 앵커링 보유자 ${protocolFacts.anchoredRwlkNftSelectionRecipients}명이 각각 공로 CST ${protocolFacts.specialAllocationCst.toLocaleString('ko-KR')}개와 Cosmic Signature NFT 1개를 받습니다.`,
+          text: `별빛 선정으로 정해진 Random Walk NFT 앵커링 보유자 ${protocolFacts.anchoredRwlkNftSelectionRecipients}명이 각각 공로 CST ${formatCount(protocolFacts.specialAllocationCst, 'ko')}개와 Cosmic Signature NFT 1개를 받습니다.`,
         },
         {
           id: 'anchor-distribution',
@@ -130,7 +132,7 @@ export const termsCopyKo = {
         {
           id: 'public-goods',
           subtitle: '공공재',
-          text: `ETH의 ${protocolFacts.publicGoodsPercentage}%는 현재 공공재 수령처인 Protocol Guild로 전달됩니다.`,
+          text: '참여자 ETH 별빛 선정과 NFT 별빛 선정 모두 제스처별 가중치를 사용합니다. 가중치는 해당 시점의 ETH 기본 비용이며, Random Walk NFT 비용 감소와 늦은 제스처 할증은 제외합니다. CST 제스처에도 같은 시점의 ETH 기본 비용을 적용합니다. 복원 선정이므로 같은 주소가 여러 번 선정될 수 있습니다. 앵커링 NFT 별빛 선정은 활성 Random Walk NFT를 별도로 대상으로 합니다.',
         },
         {
           id: 'compounding',

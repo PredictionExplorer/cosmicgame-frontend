@@ -1,3 +1,5 @@
+import { protocolFacts } from '@/content/protocol-facts';
+
 import { checkA11y, render, screen } from '@/test-utils';
 
 import { AnchoringFlow, type AnchoringFlowProps } from '../AnchoringFlow';
@@ -24,7 +26,9 @@ describe('AnchoringFlow', () => {
     expect(screen.getByText('anchoring.flow.equals')).toBeInTheDocument();
     // The pool's share of the Cycle Reserve comes from protocol-facts.
     expect(
-      screen.getByText('anchoring.flow.cosmicSignature.pool.caption(percentage=6)'),
+      screen.getByText(
+        `anchoring.flow.cosmicSignature.pool.caption(percentage=${protocolFacts.anchorDistributionPercentage})`,
+      ),
     ).toBeInTheDocument();
   });
 

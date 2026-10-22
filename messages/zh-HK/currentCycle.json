@@ -57,12 +57,13 @@
       "fixedCstEach": "每位 1,000 CST",
       "nft": "1 枚 Cosmic Signature NFT",
       "nftEach": "每位 1 枚 Cosmic Signature NFT",
-      "attachedTokens": "已附加代幣（如有）"
+      "attachedTokens": "已附加代幣（如有）",
+      "nftCount": "{count, plural, other {# 枚 Cosmic Signature NFT}}"
     },
     "cards": {
       "signature": {
         "name": "簽名分配",
-        "tooltip": "倒數歸零後，寫下收官之筆的參與者可收官並取回這份分配：ETH、1,000 CST、一枚 Cosmic Signature NFT，以及已附加的代幣。若其未在專屬收官窗口內收官，這份分配歸實際收官者。"
+        "tooltip": "實際收官者取回 ETH、合共 1,000 CST、三枚編號連續的 Cosmic Signature NFT 及附加資產。收官之筆參與者享有專屬收官窗口，其後任何人均可收官並成為受益方。"
       },
       "chronoWarrior": {
         "name": "時之勇士分配",
@@ -79,7 +80,7 @@
       },
       "publicGoods": {
         "name": "公共物品",
-        "tooltip": "每個週期，週期儲備的 {percent}% 都會轉撥給 Protocol Guild——為 170 多位以太坊核心貢獻者提供資助的機制。",
+        "tooltip": "{percent}% 分配至公共物品金庫；任何人均可另發一筆交易，將餘額轉給設定的受益方，目前為 Protocol Guild。",
         "recipientLabel": "Protocol Guild"
       },
       "nftStellar": {
@@ -136,10 +137,10 @@
   "rules": {
     "howItWorks": "運作原理",
     "participation": "落筆時，你可能銘刻<em>動態的參與 CST</em>，具體數量取決於距上一筆經過的時間，並按其平方根計算。",
-    "participationV3": "落筆時，你可能銘刻<em>動態的參與 CST</em>，具體數量隨距上一筆經過的時間以恆定速率累積。",
+    "participationV3": "下一筆落筆會向上一筆參與者銘刻<em>動態參與 CST</em>，按間隔線性計算。首筆不發放，收官亦不結算最後一筆之後的累積量。",
     "calibration": "ETH 落筆會使 CST 校準窗口縮短約 {decreasePercent}%；CST 落筆則使其延長約 {increasePercent}%。",
     "stellarSelection": "每一筆都計入一次星選資格。週期收官時，週期儲備的 {rafflePercent}% 將由程序化隨機選出的 {ethEntries} 位 ETH 星選獲配者均分；另有 {nftEntries} 位星選獲配者與 {anchorHolders} 位 Random Walk NFT 錨定者，各獲配一枚 Cosmic Signature NFT。",
-    "stellarSelectionV3": "每一筆都計入一次星選資格，其權重為落筆當時的 ETH 費用。週期收官時，週期儲備的 {rafflePercent}% 將由程序化隨機選出的 {ethEntries} 位 ETH 星選獲配者均分；另有 {nftEntries} 位星選獲配者與 {anchorHolders} 位 Random Walk NFT 錨定者，各獲配一枚 Cosmic Signature NFT。",
+    "stellarSelectionV3": "參與者 ETH 與 NFT 星選均按每筆當時未減免、未含溢價的 ETH 基礎價格加權，CST 落筆亦採用該價格。{ethEntries} 次選取均分儲備的 {rafflePercent}%，另有 {nftEntries} 次參與者 NFT 選取；錨定軌道另按 Random Walk NFT 資格選取 {anchorHolders} 次。容許重複獲配。",
     "publicGoods": "每個週期，Protocol Guild 都會收到週期儲備的 {percent}%（至少 {amount} ETH）。",
     "learnMore": "了解週期如何運作"
   },

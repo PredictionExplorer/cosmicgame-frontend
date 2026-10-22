@@ -10,6 +10,7 @@ import {
 } from '@/scripts/build-og-fonts-core';
 import { ogCoverageProblems, uncoveredBy } from '@/scripts/og-font-coverage';
 import { SCRIPT_PATTERNS } from '@/test-utils/locale-expectations';
+import { protocolFacts } from '@/content/protocol-facts';
 
 import { getLocaleConfig } from '@/i18n/localeConfig';
 import { routing, TRANSLATED_LOCALES } from '@/i18n/routing';
@@ -94,8 +95,11 @@ describe('localized share-card copy', () => {
     expect(drawn).not.toMatch(/Receive a share each cycle|Per-Cycle ETH|No Lockup/i);
   });
 
-  it('states the public-goods share as the tested marquee does', () => {
-    expect(getOgCopy('en', 'default').fact).toContain('7% to Protocol Guild');
+  it('states the current public-goods share as an allocation, not automatic forwarding', () => {
+    expect(getOgCopy('en', 'default').fact).toContain(
+      `${protocolFacts.publicGoodsPercentage}% Public Goods allocation`,
+    );
+    expect(getOgCopy('en', 'default').fact).not.toContain('7% to Protocol Guild');
   });
 
   it('fills templates and cycles per locale', () => {

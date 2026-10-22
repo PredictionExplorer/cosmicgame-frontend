@@ -1,9 +1,4 @@
-import {
-  ethDistributionFacts,
-  isV3Mechanics,
-  nftAllocationFacts,
-  protocolFacts,
-} from '@/content/protocol-facts';
+import { ethDistributionFacts, nftAllocationFacts, protocolFacts } from '@/content/protocol-facts';
 
 import type { TermsCopy } from './TermsContent';
 
@@ -59,16 +54,12 @@ export const termsCopyEn = {
         {
           id: 'dynamic-cst',
           subtitle: 'Dynamic CST imprints',
-          text: isV3Mechanics
-            ? 'Participation CST imprinted by a gesture is not fixed. The amount accrues linearly with how much time has elapsed since the previous gesture, and part of each imprint is credited to the participant being outbid. Very rapid gestures may imprint 0 CST.'
-            : 'Participation CST imprinted by a gesture is not fixed. The amount depends on how much time has elapsed since the previous gesture and is calculated with a square-root formula. Very rapid gestures may imprint 0 CST.',
+          text: 'V3 Participation CST grows linearly with elapsed time and is credited entirely to the previous participant when the next gesture executes. The opening gesture credits none. Finalization does not settle additional dynamic CST for the final participant. This amount is separate from fixed recognition allocations.',
         },
         {
           id: 'cst-window',
           subtitle: 'CST Calibration Window',
-          text: isV3Mechanics
-            ? 'The CST Gesture Cost descends through a Calibration Window. Each CST gesture restarts the window at twice the price it paid (subject to an on-chain minimum), and the cost then declines at a steady on-chain rate until it reaches zero or another CST gesture lands.'
-            : `The CST Gesture Cost descends through a Calibration Window stored on-chain. Each CST gesture increases that window by about ${protocolFacts.cstCalibrationWindowIncreasePercentPerCstGesture}%, and each ETH gesture decreases it by about ${protocolFacts.cstCalibrationWindowDecreasePercentPerEthGesture}%.`,
+          text: 'V3 CST base cost declines using an adaptive rate. ETH gestures can increase that rate subject to the minimum-window safeguard. CST gestures reduce it, then reset the ceiling using twice the premium-free base cost, the configured minimum and the updated rate times the safeguard interval. A late premium can apply to both ETH and CST; it does not enter the next base cost or selection weight.',
         },
         {
           id: 'smart-contract',
@@ -94,12 +85,12 @@ export const termsCopyEn = {
         {
           id: 'distribution',
           subtitle: 'Allocation distribution',
-          text: `Allocations are distributed automatically according to the smart contract rules. In a typical cycle, ${nftAllocationFacts.typicalNftsPerCycle} Cosmic Signature NFTs and ${protocolFacts.typicalCstImprintsPerCycle.toLocaleString('en-US')} CST are imprinted across the allocation tracks below.`,
+          text: `A successful finalization distributes allocations according to the contracts. With every track present, it creates ${nftAllocationFacts.typicalNftsPerCycle} Cosmic Signature NFTs and ${protocolFacts.typicalCstImprintsPerCycle.toLocaleString('en-US')} fixed CST. A cycle without CST gestures or active Random Walk anchors omits the relevant track. Dynamic Participation CST is separate.`,
         },
         {
           id: 'signature',
           subtitle: 'Signature Allocation',
-          text: `The participant who made the Final Gesture may retrieve ${ethDistributionFacts.mainEthPercentage}% ETH, ${protocolFacts.specialAllocationCst.toLocaleString('en-US')} Recognition CST, ${nftAllocationFacts.mainPrizeNftPhrase.en}, and attached tokens from the cycle, if any.`,
+          text: `The finalization caller receives ${ethDistributionFacts.mainEthPercentage}% ETH, ${protocolFacts.specialAllocationCst.toLocaleString('en-US')} Recognition CST in total, ${nftAllocationFacts.mainPrizeNftPhrase.en}, and attached-asset beneficiary rights. Only the Final Gesture participant can finalize during the exclusive window; afterwards any caller can.`,
         },
         {
           id: 'chrono',
@@ -119,7 +110,7 @@ export const termsCopyEn = {
         {
           id: 'eth-selection',
           subtitle: 'ETH Stellar Selection',
-          text: `${protocolFacts.ethStellarSelectionRecipients} selected participants share ${ethDistributionFacts.stellarSelectionEthPercentage}% ETH from the Cycle Reserve.`,
+          text: `${protocolFacts.ethStellarSelectionRecipients} selections share ${ethDistributionFacts.stellarSelectionEthPercentage}% ETH. Both participant ETH and NFT tracks use undiscounted, premium-free ETH base-cost weights, including the concurrent ETH base cost for CST gestures. Repeated selection is possible.`,
         },
         {
           id: 'nft-selection',
@@ -139,7 +130,7 @@ export const termsCopyEn = {
         {
           id: 'public-goods',
           subtitle: 'Public Goods',
-          text: `${ethDistributionFacts.publicGoodsPercentage}% ETH is forwarded to Protocol Guild, the current Public Goods Beneficiary.`,
+          text: `Finalization attempts to send ${ethDistributionFacts.publicGoodsPercentage}% ETH to the Public Goods Vault. Anyone may separately forward its balance to the configured beneficiary, currently Protocol Guild. The owner can change the beneficiary. A failed core-to-vault transfer can retain that share in the reserve without failing finalization.`,
         },
         {
           id: 'compounding',

@@ -4,7 +4,7 @@ import type { AuditsCopy } from './AuditsContent';
 export const auditsCopyVi: AuditsCopy = {
   title: 'Kiểm toán',
   intro:
-    'Kiểm toán độc lập của Hacken đối với các hợp đồng Cosmic Signature, phần kiểm chứng hình thức và phân tích trong kho mã hợp đồng, và cách tự kiểm tra một hợp đồng.',
+    'Bản kiểm toán công khai áp dụng cho phiên bản hợp đồng lịch sử đã được xem xét. Nó không phải kiểm toán độc lập mọi thay đổi V2 hoặc V3 sau đó. Xác minh mã nguồn trùng với mã triển khai cũng không phải đánh giá bảo mật.',
   summary: {
     label: 'Tóm tắt kiểm toán',
     auditor: 'Đơn vị kiểm toán',
@@ -28,7 +28,7 @@ export const auditsCopyVi: AuditsCopy = {
   audit: {
     heading: 'Kiểm toán độc lập bởi Hacken',
     paragraphs: [
-      `Cuối năm 2025, Hacken đã thực hiện một cuộc rà soát bảo mật độc lập các hợp đồng thông minh của Cosmic Signature. Phạm vi bao gồm các hợp đồng đang vận hành trong kho mã công khai, từ giao thức cốt lõi điều hành mỗi chu kỳ đến token CST, cả hai bộ sưu tập NFT, các ví neo giữ, cùng các hợp đồng quản lý ví và hệ thống hỗ trợ chúng. Hacken công bố báo cáo cuối cùng vào tháng 1 năm 2026.`,
+      'Bản kiểm toán công khai áp dụng cho phiên bản hợp đồng lịch sử đã được xem xét. Nó không phải kiểm toán độc lập mọi thay đổi V2 hoặc V3 sau đó. Xác minh mã nguồn trùng với mã triển khai cũng không phải đánh giá bảo mật.',
       'Báo cáo nêu từng phát hiện cùng mức độ nghiêm trọng và trạng thái của nó; phần tóm tắt phía trên thống kê số lượng. Không có phát hiện nào ở mức nghiêm trọng hay cao, và phần lớn mô tả những cân nhắc thiết kế mà đội ngũ đã xem xét và chấp nhận.',
       'Bên cạnh rà soát thủ công, Hacken đã chạy kiểm thử fuzz với các bất biến của hệ thống, chẳng hạn yêu cầu rằng lượng ETH giao thức nắm giữ luôn bằng số đã nạp trừ số đã nhận về. Mọi bất biến đều giữ vững.',
     ],
@@ -68,8 +68,8 @@ export const auditsCopyVi: AuditsCopy = {
     intro: 'Trước khi tương tác với một hợp đồng, bạn có thể tự xác nhận từng điều sau:',
     steps: [
       'Tìm địa chỉ hợp đồng trên <contracts>trang hợp đồng</contracts>, danh sách địa chỉ chính thức duy nhất.',
-      'Mở địa chỉ đó trên <explorer>Arbiscan</explorer> và xác nhận nó nằm trên Arbitrum One với mã nguồn đã xác minh.',
-      'So sánh mã nguồn đó với <contractsRepository>kho mã công khai</contractsRepository>, hoặc kiểm tra kết quả khớp chính xác trên <sourcify>Sourcify</sourcify>.',
+      'Bản triển khai hiện tại của giao thức là V3. Hãy đối chiếu địa chỉ triển khai với ô EIP-1967 của proxy. Việc xác minh công khai mã nguồn V3 chưa được xác nhận; xác minh V2 trước đây không áp dụng cho bản triển khai mới. Chi tiết: <explorer>Arbiscan</explorer>.',
+      'Bản kiểm toán công khai áp dụng cho phiên bản hợp đồng lịch sử đã được xem xét. Nó không phải kiểm toán độc lập mọi thay đổi V2 hoặc V3 sau đó. Xác minh mã nguồn trùng với mã triển khai cũng không phải đánh giá bảo mật. Chi tiết: <contractsRepository>kho mã công khai</contractsRepository>, <sourcify>Sourcify</sourcify>.',
       'Đọc <hacken>báo cáo của Hacken</hacken> để xem từng phát hiện và trạng thái của nó.',
       'Xác nhận rằng những gì ứng dụng hiển thị khớp với hành vi của hợp đồng trên chuỗi.',
     ],

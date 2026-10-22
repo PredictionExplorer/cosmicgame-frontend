@@ -66,5 +66,9 @@
     "resumeAnimation": "애니메이션 이어서 재생",
     "replayAnimation": "다시 재생",
     "unavailable": "작품을 불러올 수 없습니다"
+  },
+  "whitePaperHistorical": {
+    "body": "과거 {version}판은 이전 규칙을 설명합니다. 현재 영어 {currentVersion}판은 배포된 V3를 반영합니다.",
+    "link": "현재 영어판 읽기"
   }
 }

@@ -66,5 +66,9 @@
     "resumeAnimation": "繼續播放動畫",
     "replayAnimation": "重新播放",
     "unavailable": "作品暫不可用"
+  },
+  "whitePaperHistorical": {
+    "body": "這是歷史版本 {version}，說明較早的機制。目前英文版 {currentVersion} 反映已部署的 V3。",
+    "link": "閱讀目前英文版"
   }
 }

@@ -1,6 +1,7 @@
 import { render, screen } from '@testing-library/react';
 
 import { landingContentEn } from '@/content/landing';
+import { ethDistributionFacts } from '@/content/protocol-facts';
 
 import { Hero } from '@/components/landing-v2/Hero';
 
@@ -30,8 +31,11 @@ describe('<Hero />', () => {
     expect(screen.getByText(hero.subhead)).toBeInTheDocument();
     // It says what a gesture is before it asks for one (V168).
     expect(hero.subhead).toMatch(/^Each gesture, made with ETH or CST, extends the cycle’s clock/);
-    expect(hero.subhead).toMatch(/new Signatures are imprinted for its recipients/);
-    expect(hero.subhead).toMatch(/7% of it to Ethereum’s core contributors/);
+    expect(hero.subhead).toMatch(/new Signatures are imprinted/);
+    expect(hero.subhead).toContain(
+      `${ethDistributionFacts.publicGoodsPercentage}% to the Public Goods Vault`,
+    );
+    expect(hero.subhead).toContain('a transaction can finalize');
   });
 
   it('opens the app home as its primary action in the same tab', () => {

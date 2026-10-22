@@ -59,7 +59,7 @@ export const hardQuestionsTextEn = {
       d: 'The share is silently added to the beneficiary\u2019s allocation.',
     },
     explanation:
-      'Failure-tolerant forwarding is a deliberate design choice: a problem at the Public Goods Vault must never strand a cycle. Finalization completes, the failure is recorded on-chain, and the forwarding is handled afterward. Compare that with the beneficiary push, which does revert \u2014 but only the caller\u2019s own transaction.',
+      'A failed core-to-vault ETH transfer is recorded and can leave that share in the reserve without reverting finalization. There is no automatic retry. Funds already in the vault are separately forwarded by a permissionless transaction. Other required transfers can still revert finalization.',
     referenceLabel: 'White paper \u00a711.2 \u2014 Defensive design',
   },
   'no-anchored-nfts': {
@@ -174,42 +174,41 @@ export const hardQuestionsTextEn = {
     referenceLabel: 'White paper \u00a712.2 \u2014 The V2 upgrade',
   },
   'v3-what-changes': {
-    prompt: 'The planned V3 upgrade changes exactly one thing. What?',
+    prompt: 'Which description matches deployed V3?',
     options: {
-      a: 'The cost of acting late: during the final 20 minutes, every Gesture Cost is multiplied by a premium ramping from 1x to 10x.',
+      a: 'Linear CST credited to the previous participant, weighted participant selections, adaptive CST decline, revised allocations and a late-cost premium.',
       b: 'The art pipeline switches to a new renderer.',
       c: 'CST gestures are removed.',
-      d: 'The allocation percentages are rebalanced.',
+      d: 'Only the allocation percentages change.',
     },
     explanation:
-      'V3 touches nothing but the endgame: in the final 20 minutes before the Cycle Finalization Time, every Gesture Cost \u2014 ETH, ETH with a Random Walk NFT, or CST \u2014 is multiplied by a premium that ramps polynomially from 1x to 10x. Everything else in the protocol stays as V2 defined it.',
-    referenceLabel: 'White paper \u00a712.3 \u2014 The planned V3 upgrade',
+      'V3 changes the reward recipient and formula, both participant selection tracks, CST pricing, ETH shares and main NFT count. Its late premium applies to ETH and CST and reaches approximately 5x total cost; it does not enter future base costs or selection weights.',
+    referenceLabel: 'White paper §12.3 — Deployed V3',
   },
   'v3-shape': {
-    prompt:
-      'V3\u2019s premium is m(t) = 1 + 9\u00b7(t/T)\u2078. Why does the eighth-order exponent matter?',
+    prompt: 'V3’s late premium follows an eighth-power curve. What does that imply?',
     options: {
-      a: 'The premium stays nearly invisible for most of the window and turns steep only at the very end \u2014 about 1.04x at ten minutes out, 1.9x at five, 7x at one, and 10x at zero.',
+      a: 'The increase is small early in the late window and becomes steep near expiry, approaching approximately 5x total base cost.',
       b: 'It makes the premium rise linearly across the window.',
-      c: 'It applies the full 10x for the entire final window.',
+      c: 'The maximum applies throughout the entire late window.',
       d: 'It only affects CST gestures.',
     },
     explanation:
-      'The eighth-power curve concentrates most of the increase near the deadline. Earlier in the window, the multiplier remains close to 1; near the end, it rises sharply toward 10. A linear curve would spread the increase evenly, while a fixed multiplier would apply the same cost throughout.',
-    referenceLabel: 'White paper \u00a712.3 \u2014 The planned V3 upgrade',
+      'The integer formula approximates an eighth-power rise to about 4x premium plus the original base cost. The window scales with the cycle increment; current settings give approximately 5x total at expiry. Integer arithmetic and the exact parameters determine the quote.',
+    referenceLabel: 'White paper §12.3 — Deployed V3',
   },
   'v3-overtime': {
     prompt:
       'Under V3, Zed waits until after the deadline has passed and gestures during overtime. What premium applies?',
     options: {
-      a: 'The full 10x \u2014 the premium reaches 10x at the deadline and stays there for any overtime gesture.',
+      a: 'The premium stays capped at its deadline value, approximately 5x total base cost at the current parameters.',
       b: 'None \u2014 overtime gestures are back to 1x.',
-      c: 'Half the maximum, 5x.',
+      c: 'Half the maximum premium.',
       d: 'Overtime gestures are blocked entirely under V3.',
     },
     explanation:
-      'Under the planned V3 rules, the multiplier reaches 10 at the deadline and stays there during overtime. Post-expiry gestures remain possible, and V2’s rule of extending the stored finalization time still applies.',
-    referenceLabel: 'White paper \u00a712.3 \u2014 The planned V3 upgrade',
+      'The elapsed late-window input is capped at the deadline value during overtime. Both ETH and CST use the premium formula; a zero CST base remains zero. Further gestures remain possible until finalization and extend the stored deadline.',
+    referenceLabel: 'White paper §12.3 — Deployed V3',
   },
   'owner-mid-cycle': {
     prompt:
@@ -237,15 +236,15 @@ export const hardQuestionsTextEn = {
     referenceLabel: 'White paper \u00a713 \u2014 The path to full decentralization',
   },
   'owner-endgame': {
-    prompt: 'How does the owner role end, according to the white paper\u2019s commitment?',
+    prompt: 'What does deployed V3 require to happen to owner powers?',
     options: {
-      a: 'Once the remaining upgrades are complete, privileged control leaves the deploying address permanently \u2014 by transfer to the Cosmic Council or outright renouncement, announced in advance.',
-      b: 'It never ends; the team keeps a maintenance role indefinitely.',
+      a: 'There is no automatic handover or expiry; an authorized transaction must transfer or renounce each relevant owner role.',
+      b: 'All powers disappear automatically after the first V3 cycle.',
       c: 'It is sold to the highest-weighted Council delegate.',
       d: 'It transfers to a company multisig permanently.',
     },
     explanation:
-      'The commitment is explicit: after the remaining upgrades land, beginning with V3, the owner role leaves the deployer permanently, with the exact mechanism announced in advance. From then on no private party can upgrade the protocol or change its parameters \u2014 and every step of the process is visible on-chain, including the last one.',
+      'Owner powers remain. Council ownership would preserve them under collective control, while renunciation disables the relevant owner-only operations. Each contract has separate roles; a stated intention is not an executed transfer.',
     referenceLabel: 'White paper \u00a713 \u2014 The path to full decentralization',
   },
   'postpone-activation-limit': {
@@ -265,12 +264,13 @@ export const hardQuestionsTextEn = {
     prompt:
       'What is the only recurring flow the team directs, and what ETH does the team receive from gestures?',
     options: {
-      a: `The ${cst(protocolFacts.outreachReserveCst)} CST per cycle to the Outreach Reserve \u2014 and no team wallet receives ETH from gestures, ever.`,
+      a: `The Outreach Reserve receives ${cst(protocolFacts.outreachReserveCst)} CST; the current ETH split has no separate team percentage.`,
       b: 'A small ETH percentage of each gesture.',
       c: 'The Signature Allocation of every tenth cycle.',
       d: 'Nothing at all, including CST.',
     },
-    explanation: `The Outreach Reserve receives ${cst(protocolFacts.outreachReserveCst)} CST per cycle for community outreach \u2014 the only recurring flow the team directs, and it carries no special powers. On the ETH side the paper is absolute: no team wallet receives ETH from gestures.`,
+    explanation:
+      'The appointed treasurer distributes Outreach CST. The current ETH tracks have no separate team percentage, but team-associated addresses can participate under the same rules. This does not remove owner powers or guarantee future configuration.',
     referenceLabel: 'White paper \u00a77.1 \u2014 Imprint rules',
   },
   'art-integrator': {
@@ -289,25 +289,25 @@ export const hardQuestionsTextEn = {
   'art-candidates': {
     prompt: 'How does the pipeline pick the orbit that becomes a Signature?',
     options: {
-      a: 'One hundred thousand candidate configurations are simulated for a million steps each, then a Borda rank aggregation scores chaos and triangle equilateralness to pick the most visually interesting orbit.',
+      a: 'A configured pool of orbital candidates is scored, shortlisted by Borda ranking, then checked with an image-space aesthetic criterion.',
       b: 'The first randomly generated orbit is used as-is.',
       c: 'The team curates each cycle\u2019s orbits by hand.',
       d: 'NFT owners vote on candidate orbits after imprinting.',
     },
     explanation:
-      'The seed spawns one hundred thousand candidates; each is integrated for a million physics steps; a Borda rank aggregation across chaos and equilateralness metrics picks the standout. Every stage is a pure function of the seed \u2014 curation happens by algorithm, identically reproducible by anyone.',
+      'The current defaults simulate one hundred thousand candidates for one million steps each. Ranking and an image-space aesthetic check guide selection. Reproduction needs the same renderer revision and configuration; defaults are not immutable contract parameters.',
     referenceLabel: 'White paper \u00a76.1 \u2014 The pipeline',
   },
   'art-color': {
     prompt: 'How are the colors of the three bodies chosen?',
     options: {
-      a: 'Mixed in the OKLab perceptual color space with 120-degree hue separation per body, modulated by drift and a sine wave.',
+      a: 'A continuous perceptual palette varies hue and related properties in OKLCh, rather than fixing equal hue separation.',
       b: 'Fixed red, green, and blue for every Signature.',
       c: 'Sampled from photographs of real nebulae.',
       d: 'Chosen by the NFT\u2019s first owner at imprint time.',
     },
     explanation:
-      'Colors are mixed in OKLab \u2014 a perceptual space where equal numeric distances look equally different to human eyes \u2014 with 120-degree hue separation keeping the three bodies visually distinct. Like everything downstream of the seed, the palette is deterministic.',
+      'The current renderer uses a palette genome with variable hue dispersion and a perceptual check. The old fixed 120-degree description does not describe this version. Reproduction requires its revision and configuration.',
     referenceLabel: 'White paper \u00a76.1 \u2014 The pipeline',
   },
   'art-spectral': {
@@ -319,46 +319,46 @@ export const hardQuestionsTextEn = {
       d: 'Hand-tuned splines traced over the simulation.',
     },
     explanation:
-      'The renderer treats light as a spectrum, not three color channels: sixty-four wavelength bins across the visible range, trails whose thickness responds to velocity, and depth of field for dimensionality. AgX tonemapping, bloom, OpenSimplex nebula layers, and grading finish the frame.',
+      'The renderer uses spectral wavelength bins, motion-dependent trails and depth of field, with tonemapping, bloom and grading. These are renderer settings; the chain records the seed, not finished pixels.',
     referenceLabel: 'White paper \u00a76.1 \u2014 The pipeline',
   },
   'art-output': {
-    prompt: 'What files does the pipeline output for every NFT?',
+    prompt: 'What does the renderer create off-chain?',
     options: {
-      a: 'A 16-bit PNG and a 30-second H.265 video.',
+      a: 'High-resolution images and animated views, according to its output configuration.',
       b: 'A JPEG thumbnail only.',
       c: 'An animated GIF.',
       d: 'An SVG vector file.',
     },
     explanation:
-      'Each Signature ships as a 16-bit PNG \u2014 double the usual color depth per channel \u2014 plus a 30-second H.265 video of the orbit in motion. Both are regenerable from the on-chain seed by anyone running the open-source pipeline.',
+      'Image and video formats, resolution and duration depend on the renderer configuration. Reproduction uses the stored seed with the matching revision, configuration and compatible toolchain.',
     referenceLabel: 'White paper \u00a76.1 \u2014 The pipeline',
   },
   'art-server-death': {
     prompt:
       'Every server associated with the project disappears tomorrow. What happens to the artwork?',
     options: {
-      a: 'Every Signature can be regenerated from the chain \u2014 the seeds are on-chain and the pipeline is public.',
+      a: 'The on-chain seeds remain available; artwork can be regenerated with the matching renderer revision, configuration and compatible toolchain.',
       b: 'The art is lost; only metadata survives.',
       c: 'Only thumbnails survive in wallets.',
       d: 'It depends on whether IPFS pins are maintained.',
     },
     explanation:
-      'NFT seeds remain on-chain, and the rendering pipeline is open source and deterministic. Anyone with the seed and the pipeline can regenerate the artwork without relying on the project’s image servers.',
+      'Seeds do not depend on the project’s image server. Finished media and metadata are hosted separately, and regeneration requires software, configuration and a compatible environment.',
     funFact:
-      'Continuous integration asserts SHA-256 hashes of rendered frames, so even an accidental one-pixel drift in the pipeline would fail the build.',
+      'Reference-image checks are provided for manual execution. The current CI workflow does not compare generated frame hashes.',
     referenceLabel: 'White paper \u00a76.2 \u2014 Reproducibility and license',
   },
   'art-naming': {
     prompt: 'What customization does an owner have over their Cosmic Signature NFT?',
     options: {
-      a: 'They may name it on-chain, up to 32 bytes \u2014 the artwork itself never changes.',
+      a: 'They can record a name of up to 32 bytes. That does not change the on-chain seed.',
       b: 'They may regenerate the seed once.',
       c: 'They may adjust the color palette.',
       d: 'They may extend the video\u2019s duration.',
     },
     explanation:
-      'Owners may record a name of up to 32 bytes on-chain. That is the entire customization surface: the seed, the orbit, the palette, and the video are fixed forever at imprint time — determinism is the collection’s core promise, and regenerating would break it.',
+      'Naming records text without changing the seed. The token’s metadata location remains subject to the NFT contract’s owner controls; displayed media and a stored seed are different things.',
     referenceLabel: 'White paper \u00a76.2 \u2014 Reproducibility and license',
   },
   'art-license': {
@@ -377,13 +377,13 @@ export const hardQuestionsTextEn = {
   'seed-derivation': {
     prompt: 'When and how is an NFT\u2019s art seed created?',
     options: {
-      a: 'At imprint time, the contract derives a 32-byte seed from on-chain data and stores it with the NFT; a SHA3-256 generator makes everything downstream a pure function of it.',
+      a: 'The contract derives and records a 32-byte seed at imprint time; the renderer uses it with its revision and configuration.',
       b: 'The artist uploads a seed for each NFT before finalization.',
       c: 'The seed is the owner\u2019s wallet address.',
       d: 'A fresh seed is selected every time the art is rendered.',
     },
     explanation:
-      'The seed is derived on-chain at imprint time and stored with the NFT permanently. It initializes a SHA3-256 random number generator, and every downstream choice \u2014 candidate orbits, camera, colors \u2014 is a pure function of it. Render it today or in a decade: same seed, same Signature.',
+      'The seed is recorded on-chain and initializes the renderer’s random stream. It does not alone fix every possible future renderer version, output option or toolchain.',
     referenceLabel: 'White paper \u00a76.1 \u2014 The pipeline',
   },
   'hacken-findings': {
@@ -425,13 +425,13 @@ export const hardQuestionsTextEn = {
   'sourcify-status': {
     prompt: 'What is the source-verification status of the deployed contracts?',
     options: {
-      a: 'Exact-match verified on Sourcify for Arbitrum One (chain 42161), at the addresses fixed in the white paper\u2019s appendix.',
-      b: 'Unverified \u2014 you have to trust the bytecode.',
-      c: 'Only the proxy is verified, not the implementation.',
+      a: 'Historical contracts have published matches; the current V3 implementation is not yet verified on Sourcify, despite matching the reviewed local production artifact.',
+      b: 'Source verification guarantees that every implementation is secure.',
+      c: 'V2’s source match automatically verifies V3.',
       d: 'Verified on a testnet, but not on mainnet.',
     },
     explanation:
-      'All contracts are exact-match verified on Sourcify for chain 42161 \u2014 the strictest verification tier, where the on-chain bytecode matches the published source byte for byte, metadata included. The proxy address is the protocol\u2019s permanent address; implementations change only through the public upgrade process.',
+      'Check the current implementation address and its own verification record. A local bytecode comparison, a public source match and an independent security audit establish different evidence. None transfers automatically from an earlier revision.',
     referenceLabel: 'White paper \u00a711.4 \u2014 Open verification',
   },
   reentrancy: {
@@ -500,7 +500,7 @@ export const hardQuestionsTextEn = {
     prompt:
       'During the Open-Finalization Window, Quill (who never gestured once) finalizes the cycle. What exactly does she receive?',
     options: {
-      a: 'Everything the beneficiary role carries: the Signature Allocation\u2019s ETH share, its CST imprint, its NFT, and priority over attached assets.',
+      a: 'The entire main allocation: its ETH share, one fixed CST amount, three sequential NFTs and attached-asset beneficiary rights at current V3 settings.',
       b: 'A fixed finalization fee, with the allocations still going to the Final Gesture participant.',
       c: 'Only the NFT; the ETH compounds.',
       d: 'Nothing \u2014 finalizing is a public service.',
@@ -546,13 +546,13 @@ export const hardQuestionsTextEn = {
     prompt:
       'Bea made 30 gestures this cycle; Cal made 3. What is true about the ETH Stellar Selection?',
     options: {
-      a: 'Bea’s entries appear ten times as often in the pool, and with replacement she could even be selected more than once — but Cal can absolutely still be selected.',
+      a: 'Their accumulated premium-free ETH base-cost weights determine relative proportions; the gesture counts alone do not establish a ten-to-one ratio.',
       b: 'Bea is guaranteed at least one selection.',
       c: 'Cal is excluded; only the top participants qualify.',
       d: 'Both have identical chances \u2014 one entry per address.',
     },
     explanation:
-      'Entries scale with gestures made — selection frequency is proportional to participation — and selections are made with replacement. Nothing is guaranteed to anyone, and no one who gestured is excluded: the pool weights activity without rationing or thresholds.',
+      'Both participant ETH and NFT tracks use undiscounted, premium-free ETH base cost for each gesture. CST gestures use the concurrent ETH base. Repeats are possible and no address is guaranteed a selection.',
     referenceLabel: 'White paper \u00a75.3 \u2014 Stellar Selections',
   },
   'recognition-vs-participation': {
@@ -564,7 +564,7 @@ export const hardQuestionsTextEn = {
       c: 'Participation CST, which the team can adjust per gesture.',
       d: 'All three flows are team-directed.',
     },
-    explanation: `The three flows are: Participation CST (imprinted at gesture time by formula), Recognition CST (${cst(protocolFacts.specialAllocationCst)} CST paired with each NFT distribution at finalization), and the Outreach Reserve (${cst(protocolFacts.outreachReserveCst)} CST per cycle). Only the last is team-directed \u2014 and it is ordinary CST with no special powers, spent on community outreach.`,
+    explanation: `Participation CST is credited to the previous participant on a later gesture. Recognition allocations receive ${cst(protocolFacts.specialAllocationCst)} CST each; the main allocation receives it once for all its NFTs. The appointed treasurer distributes the Outreach Reserve’s ${cst(protocolFacts.outreachReserveCst)} CST. CST still carries ordinary delegated coordination weight.`,
     referenceLabel: 'White paper \u00a77.1 \u2014 Imprint rules',
   },
   'finalization-actions': {

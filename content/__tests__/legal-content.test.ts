@@ -169,9 +169,9 @@ describe('localized legal content', () => {
   it('preserves Terms protocol facts in every locale', () => {
     for (const locale of routing.locales) {
       const terms = JSON.stringify(getTermsCopy(locale));
-      // The decimal separator follows the locale (vi: 0,4).
-      const increase = String(protocolFacts.cstCalibrationWindowIncreasePercentPerCstGesture);
-      expect(terms).toMatch(new RegExp(increase.replace('.', '[.,]')));
+      // V3 uses a decline rate, not V2's 0.4% duration update.
+      expect(terms).not.toMatch(/0[.,]4%|0[.,]398%/);
+      expect(terms).toContain(`${protocolFacts.publicGoodsPercentage}%`);
       expect(terms).toContain(String(protocolFacts.finalGestureExclusivityHours));
       expect(terms).toContain(String(protocolFacts.secondaryRetrievalTimeoutWeeks));
       expect(terms).toContain(`${protocolFacts.randomWalkDiscountPercentage}%`);

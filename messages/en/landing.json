@@ -66,5 +66,9 @@
     "resumeAnimation": "Resume the animation",
     "replayAnimation": "Play again",
     "unavailable": "Artwork unavailable"
+  },
+  "whitePaperHistorical": {
+    "body": "This is archived version {version}. Current protocol mechanics are documented in English version {currentVersion}.",
+    "link": "Read the current English edition"
   }
 }

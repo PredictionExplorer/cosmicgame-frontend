@@ -3,6 +3,7 @@ import { join } from 'path';
 
 import { protocolFacts } from '@/content/protocol-facts';
 import { LLMS_SECTIONS } from '@/test-utils/locale-expectations';
+import { buildLlmsDocs } from '@/scripts/llms-docs-core';
 
 import { TRANSLATED_LOCALES } from '@/i18n/routing';
 import { COSMIC_SIGNATURE_MARKETPLACE_URL } from '@/config/marketplace';
@@ -16,6 +17,13 @@ describe('LLM-facing protocol docs', () => {
     ['llms.txt', readPublicFile('llms.txt')],
     ['llms-full.txt', readPublicFile('llms-full.txt')],
   ] as const;
+
+  it.each(docs)(
+    '%s stays synchronized with current localized site content',
+    (fileName, content) => {
+      expect(content).toBe(buildLlmsDocs(fileName === 'llms-full.txt'));
+    },
+  );
 
   it.each(docs)('%s reflects the typical per-cycle NFT count', (_fileName, content) => {
     expect(content).toContain(`${protocolFacts.typicalNftsPerCycle} Cosmic Signature NFTs`);

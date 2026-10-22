@@ -30,23 +30,23 @@ export interface CycleReserveSplit {
 }
 
 /**
- * A finalized cycle's split of its Cycle Reserve, on the same base as the protocol split
- * /allocation draws (25% Signature Allocation, 8% Chrono-Warrior, …, ~50% next cycle), so a
- * reader who follows a cycle from the list sees the same percentages.
- *
- * The API reports what each track carried, not the reserve itself. Every track is a fixed
- * percentage of the same reserve, so the reserve follows from the Signature Allocation's ETH
- * and its percentage (`signaturePercent`, protocol-facts' `mainEthPercentage`); each track's
- * share is its ETH over that reserve, and what the tracks did not take carried into the next
- * cycle.
+ * Reconstructs the reserve from reported ETH amounts and the historical main
+ * allocation percentage. An absent historical percentage leaves proportions
+ * and carryover unknown while preserving reported distributed amounts.
+ * Integer contract rounding means the reconstructed reserve is approximate.
  */
 export function cycleReserveSplit(
   amounts: Readonly<Record<DistributedTrackId, number | null>>,
-  signaturePercent: number,
+  signaturePercent: number | null,
 ): CycleReserveSplit {
   const signature = amounts.signature;
   const reserve =
-    signature !== null && signature > 0 && signaturePercent > 0
+    signature !== null &&
+    signature > 0 &&
+    signaturePercent !== null &&
+    Number.isFinite(signaturePercent) &&
+    signaturePercent > 0 &&
+    signaturePercent <= 100
       ? signature / (signaturePercent / 100)
       : null;
   const known = DISTRIBUTED_TRACKS.every((id) => amounts[id] !== null);

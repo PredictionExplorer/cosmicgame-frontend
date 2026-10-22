@@ -1,5 +1,5 @@
 import { AUDIT_FINDINGS_TOTAL, HACKEN_AUDIT } from '@/content/legal/audit';
-import { cstRewardFacts, isV3Mechanics, protocolFacts } from '@/content/protocol-facts';
+import { protocolFacts } from '@/content/protocol-facts';
 
 import type { LearnText } from './structure';
 
@@ -116,8 +116,8 @@ export const learnTextZhTw = {
         {
           heading: '週期開啟',
           body: [
-            `週期以首個 ETH 校準窗口為起點。CST 校準窗口的初始時長為 ${protocolFacts.initialCstCalibrationWindowHours} 小時，之後會隨每次落筆在鏈上動態調整。`,
-            `首筆落筆會啟動收官倒數。此後每一筆都會按目前增量延長倒數，並更新週期狀態。ETH 落筆會使 CST 校準窗口縮短約 ${protocolFacts.cstCalibrationWindowDecreasePercentPerEthGesture}%；CST 落筆則會使其延長約 ${protocolFacts.cstCalibrationWindowIncreasePercentPerCstGesture}%。`,
+            '到達啟用時間後，週期等待首筆 ETH 落筆。ETH 開場基礎價格在校準窗口下降；首筆才啟動收官倒數與首個 CST 窗口。起始儲備包含上一週期的留存。',
+            '後續落筆會把目前增量加到已儲存的收官時間，即使時間已過，也不會從現在重新計時。ETH 落筆嘗試加快 CST 價格下降速率，CST 落筆減慢速率並重設窗口上限。',
           ],
         },
         {
@@ -156,8 +156,8 @@ export const learnTextZhTw = {
         {
           heading: '落筆會帶來什麼',
           body: [
-            `每一筆都會寫入目前週期，可能銘刻參與 CST，延長收官倒數，併成為最終簽名歷史的一部分。參與 CST 的數量按${isV3Mechanics ? '線性' : '平方根'}公式計算：${cstRewardFacts.notation}，其中 ${protocolFacts.participationCstSymbols[0]} 為距上一筆的秒數，m 為參與 CST 乘數，i 為週期時間增量。`,
-            `落筆價格會在週期中持續變化。ETH 落筆與 CST 落筆彼此關聯，但各有機制；校準窗口會清楚顯示價格如何變化。每筆 CST 落筆會使 CST 校準窗口延長約 ${protocolFacts.cstCalibrationWindowIncreasePercentPerCstGesture}%；每筆 ETH 落筆則會使其縮短約 ${protocolFacts.cstCalibrationWindowDecreasePercentPerEthGesture}%。`,
+            '每筆落筆會記錄一份加權星選資格、更新堅守紀錄，並可能為上一筆參與者銘刻參與 CST。V3 依間隔秒數線性計算，再以合約最小單位截斷。等待本身不是可取回餘額，須有下一筆執行才會銘刻。首筆不發放這項 CST，收官也不結算最後一筆之後的累積量。',
+            'V3 在鏈上保存 CST 價格下降速率，再由上限與速率推算窗口時長。依目前除數，ETH 落筆會嘗試將速率增加百分之一，但須通過最短窗口檢查；CST 落筆則將速率減去其 1/101。CST 落筆也會重設上限，取不含溢價的基礎花費兩倍、設定下限與新速率乘以 180 秒三者最大值。這項檢查不是落筆冷卻期。',
           ],
         },
         {
@@ -196,14 +196,14 @@ export const learnTextZhTw = {
         {
           heading: '從鏈上種子到確定性渲染',
           body: [
-            '每枚 Cosmic Signature NFT 都儲存著可復現作品的種子。渲染管線採用確定性輸入，因此同一種子始終生成相同的簽名作品。',
+            '每枚 Cosmic Signature NFT 的種子與所有權紀錄保存在鏈上。影像和影片由鏈下開源渲染器生成，呈現牛頓引力下的三體運動。重現作品需要種子、對應渲染器版本、設定與相容工具鏈；媒體檔案並非全部存放在合約中。',
             '創作過程模擬 3 個天體在牛頓引力下的運動。混沌軌跡化作光譜般的軌道痕跡，由此形成協議鮮明的視覺語言。',
           ],
         },
         {
           heading: '開放且可復現',
           body: [
-            '可復現性是這套協議的重要原則。藉助原始碼和渲染管線，任何人都能從種子出發，獨立驗證每件簽名作品。',
+            '鏈上種子提供可查證的生成起點。搭配對應渲染器版本、設定與相容工具鏈，任何人都能嘗試重新生成作品。種子本身不保證跨版本、跨機器逐像素一致，也不保證託管影像與影片的服務隨時可用。',
             '作品與相關技術均以 CC0 發布，任何人都可自由使用和改編。',
           ],
         },
@@ -278,7 +278,7 @@ export const learnTextZhTw = {
           body: ['以下步驟都無需連接錢包。'],
           steps: [
             '從[合約頁面](contracts)在 [Arbiscan](explorer) 上開啟地址，確認網路是 Arbitrum One，而不是測試網。',
-            '在 Contract 分頁確認原始碼已驗證，再與[公開的合約儲存庫](contractsRepository)比對，或在 [Sourcify](sourcify) 上核對完全相符。',
+            '將目前實作與[公開原始碼](contractsRepository)比對，再到 [Sourcify](sourcify) 查詢該實作的驗證紀錄。V3 尚未在 Sourcify 驗證，舊版本的匹配紀錄不能證明新實作。',
             '對於協議合約，開啟 Read as Proxy：其中列出的實現合約，應與合約頁面上的實現合約地址一致。',
             '在應用程式中選一筆紀錄，例如一次落筆或一筆分配，再在區塊瀏覽器上該合約的交易中找到同一筆交易。',
           ],
@@ -288,7 +288,7 @@ export const learnTextZhTw = {
           body: [
             `2025年末，Hacken 審查了生產合約：驅動每個週期的核心協議、CST 代幣、兩個 NFT 系列、錨定錢包，以及錢包與系統管理合約。[審計報告](hackenReport)於2026年1月發布，共列出 ${AUDIT_FINDINGS_TOTAL} 項發現，其中沒有嚴重或高危級別問題；在 Hacken 模糊測試的 ${HACKEN_AUDIT.invariants.tested} 項不變量中，${HACKEN_AUDIT.invariants.held} 項保持成立。`,
             '合約儲存庫還包含 Certora Prover 規格、Solidity SMTChecker 設定、Slither 靜態分析和自動化測試套件，[審計頁面](audits)逐一附有連結。這些檢查只證明或測試它們所聲明的屬性，僅此而已。',
-            '審計的範圍是智慧合約：本網站、應用程式背後的資料服務和藝術渲染流程都不在其中。與所有檢查一樣，審計只能降低風險，無法消除風險；參與之前，請閱讀[風險揭露](riskDisclosures)。',
+            '歷史審計針對報告列出的程式碼版本，不會自動涵蓋後續全部 V2 或 V3 改動。網站、資料服務與藝術渲染器不在該合約審計範圍，不能把過去的審查當作目前整套系統的安全保證。另請閱讀[風險揭露](riskDisclosures)。',
           ],
         },
       ],
@@ -306,9 +306,7 @@ export const learnTextZhTw = {
           heading: 'CST 在協議中的作用',
           body: [
             '落筆時可能銘刻參與 CST；CST 也可用於落筆，其價格由專屬校準窗口決定。用於落筆的 CST 會直接銷燬，永久從供應量中移除，不會匯入資金池。',
-            isV3Mechanics
-              ? '參與 CST 的數量會動態變化：它隨距上一筆的時間線性累積。間隔越久，銘刻量按比例越大；連續快速落筆則銘刻量接近 0 CST。'
-              : '參與 CST 的數量會動態變化：它取決於距上一筆的時間，並採用平方根公式。間隔越久，銘刻量通常越大；連續快速落筆則可能銘刻 0 CST。',
+            'V3 依經過秒數線性計算參與 CST：秒數乘上鏈上乘數，再除以微秒計的週期增量，向下取整到 CST 最小單位。以原始一小時增量計，約每分鐘 1 CST；週期增量變大後，速率會略降。下一筆會把全額銘刻給上一筆參與者；首筆不發放，收官也不結算最後一筆之後的累積量。',
             '完成委託後，CST 可在宇宙議會中用作協調權重；持有者也可將權重委託給自己。參與者依照鏈上規則協調協議變更。',
           ],
         },
@@ -323,7 +321,7 @@ export const learnTextZhTw = {
           heading: '協調紀錄',
           body: [
             '宇宙議會讓 CST 持有者依照鏈上規則協調協議變更。協調變更及相關應用程式頁面會公開參數變更歷史，幫助讀者理解協議如何演進。',
-            '為避免相關措辭引發歧義，Cosmic Signature 將這套協調機制稱為「宇宙議會」，並將法律說明與風險揭露單獨呈現。',
+            '宇宙議會只能行使實際授予的權限，目前不擁有核心協議。V3 不會自動移交或放棄所有權，每個所有者角色都須分別執行鏈上操作。',
           ],
         },
       ],
@@ -370,19 +368,19 @@ export const learnTextZhTw = {
         '了解 Cosmic Signature 如何將公共財分配轉撥至 Protocol Guild，為以太坊核心貢獻者提供資助。',
       h1: 'Cosmic Signature 與以太坊公共財',
       summary:
-        'Cosmic Signature 設有公共財分配軌道，目前會將每個週期的一部分儲備轉撥給 Protocol Guild。',
+        'Cosmic Signature：收官時，協議會嘗試將固定 ETH 份額轉入公共財金庫。之後任何人都能另發一筆交易，將餘額轉給目前受益方 Protocol Guild，支持以太坊核心貢獻者。金庫所有者可更改受益方。',
       sections: [
         {
           heading: 'Protocol Guild 分配',
           body: [
-            'Protocol Guild 為 170 多位以太坊核心貢獻者提供資助。Cosmic Signature 目前將公共財分配轉撥至 Protocol Guild。',
+            '收官時，協議會嘗試將固定 ETH 份額轉入公共財金庫。之後任何人都能另發一筆交易，將餘額轉給目前受益方 Protocol Guild，支持以太坊核心貢獻者。金庫所有者可更改受益方。',
             '這說明公共財分配是協議設計的一部分，而不是應用程式介面中的附帶說明。',
           ],
         },
         {
           heading: '公共財為何屬於協議本身',
           body: [
-            '公共財轉撥是協議內的一條固定分配軌道。按現行規則，週期儲備的一部分會轉至公共財受益方，目前為 Protocol Guild。',
+            `目前公共財份額為週期儲備的 ${protocolFacts.publicGoodsPercentage}%。收官時，合約會嘗試轉入公共財金庫；之後任何人都能另發一筆交易，將金庫餘額轉給目前受益方 Protocol Guild。核心合約轉入失敗時，該份額可留在儲備而不阻止收官。金庫所有者可更改受益方，宇宙議會不會自動取得這項權限。`,
             '公共財頁面會列出資助、取回和受益方紀錄，方便驗證資金流向及其與週期參與的關係。',
           ],
         },

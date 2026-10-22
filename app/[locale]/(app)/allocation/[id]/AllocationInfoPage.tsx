@@ -4,7 +4,6 @@ import { useMemo, type ReactNode } from 'react';
 import { useLocale, useTranslations } from 'next-intl';
 
 import { getEnduranceChampions } from '@/utils';
-import { protocolFacts } from '@/content/protocol-facts';
 
 import { ALLOCATION_TRACK_COPY_KEYS, type AllocationTrackId } from '@/config/allocationTracks';
 import { Link } from '@/i18n/navigation';
@@ -44,6 +43,7 @@ import {
   cycleReserveSplit,
   type DistributedTrackId,
 } from '@/components/winnings/cycleReserveSplit';
+import { useHistoricalAllocationPercentage } from '@/components/winnings/useHistoricalAllocationPercentage';
 import { cycleRoles, type CycleRole } from '@/components/winnings/cycleRoles';
 import { useLiveCycle, useMissingCycle } from '@/components/winnings/missingCycle';
 import { ShareCycleButton } from '@/components/winnings/ShareCycleButton';
@@ -600,8 +600,8 @@ function CycleRecord({
   const locale = useLocale();
   const format = useFormat();
 
-  // Shares of the Cycle Reserve, as /allocation draws the protocol split (25%, 8%, …, ~50%).
-  const split = cycleReserveSplit(distributedEth(cycle), protocolFacts.mainEthPercentage);
+  const historicalPercentage = useHistoricalAllocationPercentage(cycle.BlockNum);
+  const split = cycleReserveSplit(distributedEth(cycle), historicalPercentage);
   const knownTotal = split.distributed;
   const segments: AllocationSplitSegment[] = split.shares.map((share) => ({
     ...share,

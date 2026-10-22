@@ -66,5 +66,9 @@
     "resumeAnimation": "Tiếp tục hoạt ảnh",
     "replayAnimation": "Phát lại",
     "unavailable": "Tác phẩm không khả dụng"
+  },
+  "whitePaperHistorical": {
+    "body": "Ấn bản lịch sử {version} mô tả cơ chế trước đây. Ấn bản tiếng Anh hiện tại {currentVersion} phản ánh V3 đã triển khai.",
+    "link": "Đọc ấn bản tiếng Anh hiện tại"
   }
 }

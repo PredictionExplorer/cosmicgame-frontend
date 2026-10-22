@@ -57,12 +57,13 @@
       "fixedCstEach": "各1,000 CST",
       "nft": "Cosmic Signature NFT 1点",
       "nftEach": "各Cosmic Signature NFT 1点",
-      "attachedTokens": "添付されたトークン（あれば）"
+      "attachedTokens": "添付されたトークン（あれば）",
+      "nftCount": "{count, plural, other {Cosmic Signature NFT#点}}"
     },
     "cards": {
       "signature": {
         "name": "シグネチャー配分",
-        "tooltip": "確定時刻を過ぎると、最後に一筆を入れた参加者がサイクルを確定できます。シグネチャー配分にはETH、1,000 CST、Cosmic Signature NFT、添付されたトークンが含まれます。その参加者が優先期間内に確定しなければ、確定実行者が受け取ります。"
+        "tooltip": "確定の受領者に連続IDのCosmic Signature NFT3点と合計1,000 CSTを配分します。確定権には優先期間と公開期間があります。"
       },
       "chronoWarrior": {
         "name": "時の戦士配分",
@@ -79,7 +80,7 @@
       },
       "publicGoods": {
         "name": "公共財",
-        "tooltip": "すべてのサイクル準備金の{percent}%が、170人以上のEthereumコア貢献者の資金支援メカニズムであるProtocol Guildへ送られます。",
+        "tooltip": "{percent}%を公共財金庫へ配分します。誰でも別途、その残高を設定された受け手であるProtocol Guildへ送れます。",
         "recipientLabel": "Protocol Guild"
       },
       "nftStellar": {
@@ -136,10 +137,10 @@
   "rules": {
     "howItWorks": "仕組み",
     "participation": "一筆を入れると、<em>動的な参加CST</em>を刻印できます。その量は、前の一筆からの経過時間に基づく平方根の式で決まります。",
-    "participationV3": "一筆を入れると、<em>動的な参加CST</em>を刻印できます。その量は、前の一筆からの経過時間に応じて一定の速さで積み上がります。",
+    "participationV3": "次の一筆が直前の参加者に、経過時間に比例する<em>動的な参加CST</em>を刻印します。最初の一筆と確定時には追加精算しません。",
     "calibration": "ETH一筆はCST調律期間を約{decreasePercent}%短くし、CST一筆は約{increasePercent}%長くします。",
     "stellarSelection": "一筆ごとに星選の対象が1件記録されます。{ethEntries}件の対象がサイクル準備金の{rafflePercent}%を受け取ります。さらに{nftEntries}人の星選受領者と{anchorHolders}人のRandom Walk NFT係留者がCosmic Signature NFTを受け取ります。",
-    "stellarSelectionV3": "一筆ごとに星選の対象が1件記録され、各対象の重みはその時点の一筆の費用（ETH）です。{ethEntries}件の対象がサイクル準備金の{rafflePercent}%を受け取ります。さらに{nftEntries}人の星選受領者と{anchorHolders}人のRandom Walk NFT係留者がCosmic Signature NFTを受け取ります。",
+    "stellarSelectionV3": "両方の参加者トラックは割引も加算もないETH基本費用をウェイトにし、CST一筆にも同時点のETH基本費用を使います。{ethEntries}回の選定でETHの{rafflePercent}%を分けます。参加者NFTの{nftEntries}回と係留中のRandom Walk NFTの最大{anchorHolders}回の選定にNFTとCSTを配ります。重複選定があります。",
     "publicGoods": "Protocol Guildはサイクルごとにサイクル準備金の{percent}%（少なくとも{amount} ETH）を受け取ります。",
     "learnMore": "サイクルの仕組み"
   },

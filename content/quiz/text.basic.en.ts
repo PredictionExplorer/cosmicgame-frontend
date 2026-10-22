@@ -122,16 +122,15 @@ export const basicQuestionsTextEn = {
     referenceLabel: 'White paper \u00a76 \u2014 The art',
   },
   'same-seed': {
-    prompt:
-      'You re-run the open-source art pipeline with the exact seed stored on-chain for token #42. What comes out?',
+    prompt: 'What is needed to reproduce the published artwork for token #42?',
     options: {
-      a: 'The identical image, pixel for pixel, on any machine.',
-      b: 'A similar image with small random variations.',
-      c: 'A different image on different hardware.',
+      a: 'Its on-chain seed, the matching renderer revision and configuration, and a compatible toolchain.',
+      b: 'Only the seed, regardless of renderer version or configuration.',
+      c: 'Only the current owner’s address.',
       d: 'Only a low-resolution preview; the full art needs the project servers.',
     },
     explanation:
-      'Determinism is enforced, not assumed: the same seed produces the same image, bit for bit, on any machine. SHA-256 hashes of rendered frames are asserted in continuous integration, so a drift in output would fail the build.',
+      'The seed is a public input, but renderer revisions and options can change the output. Reference-image checks are available to run manually; current CI does not compare generated frame hashes. Arbitrary machines or future versions are not promised identical pixels.',
     referenceLabel: 'White paper \u00a76.2 \u2014 Reproducibility and license',
   },
   'cst-supply-origin': {
@@ -240,7 +239,7 @@ export const basicQuestionsTextEn = {
       d: 'The app\u2019s backend servers issue the transfers.',
     },
     explanation:
-      'Mechanical distribution is one of the protocol\u2019s three anchoring properties: no discretionary account sits between participants and the distribution rules, and no team wallet receives ETH from gestures. The app and servers only display what the contracts already did.',
+      'Contracts execute configured allocation rules. Administrative powers remain under their documented restrictions; the app and indexer display records and do not authorize the on-chain transfers.',
     referenceLabel: 'White paper \u00a71 \u2014 Introduction',
   },
   'nft-count-typical': {
@@ -251,7 +250,7 @@ export const basicQuestionsTextEn = {
       c: `${protocolFacts.nftStellarSelectionRecipients}`,
       d: '100',
     },
-    explanation: `A typical cycle imprints ${protocolFacts.typicalNftsPerCycle} NFTs: ${protocolFacts.roleNftsPerCycle} role NFTs (beneficiary, Chrono-Warrior, Endurance Champion, Final CST Gesture), ${protocolFacts.nftStellarSelectionRecipients} participant Stellar Selection NFTs, and ${protocolFacts.anchoredRwlkNftSelectionRecipients} anchored-Random-Walk Selection NFTs. Cycles that skip a track imprint fewer.`,
+    explanation: `A full-track cycle creates ${protocolFacts.typicalNftsPerCycle} NFTs: ${protocolFacts.mainPrizeNftsPerCycle} for the main allocation, one each for Chrono-Warrior, Endurance Champion and Final CST Gesture, and ${protocolFacts.nftStellarSelectionRecipients} participant plus ${protocolFacts.anchoredRwlkNftSelectionRecipients} anchored Random Walk selections. Missing CST or active anchors omit the relevant track.`,
     referenceLabel: 'White paper \u00a75.1 \u2014 Distribution at finalization',
   },
   'chrono-endurance-exist': {
@@ -269,13 +268,13 @@ export const basicQuestionsTextEn = {
   'stellar-selection-what': {
     prompt: 'What are Stellar Selections?',
     options: {
-      a: 'Per-gesture entries recorded during the cycle, from which the contract selects recipients at finalization.',
+      a: 'Weighted participant entries recorded during the cycle, used to select allocations at finalization.',
       b: 'A leaderboard ranking participants by activity.',
       c: 'Rarity tiers assigned to the NFT artwork.',
       d: 'A scheme for naming constellations in the art.',
     },
     explanation:
-      'Each gesture records one entry in the cycle\u2019s Selection pool. At finalization the contract selects entries for the ETH and NFT Stellar Selections, so selection frequency is proportional to participation. It is a distribution mechanism, not a ranking.',
+      'Both participant ETH and NFT selections use the undiscounted, premium-free ETH base cost at each gesture as weight. CST gestures use the concurrent ETH base cost. Selections allow repeats, and no participant is guaranteed an allocation.',
     referenceLabel: 'White paper \u00a75.3 \u2014 Stellar Selections',
   },
   'ecosystem-optionality': {
@@ -294,13 +293,13 @@ export const basicQuestionsTextEn = {
   'what-it-is-not': {
     prompt: 'Which statement matches how the white paper describes the protocol\u2019s nature?',
     options: {
-      a: 'Participants exchange value for participation itself, and the protocol retains no operator\u2019s margin of any kind.',
+      a: 'Participation does not guarantee an allocation, token value, liquidity or future removal of owner powers.',
       b: 'Acquiring CST is a reliable path to financial gain from the efforts of others.',
       c: 'An operator keeps a percentage of every cycle for itself.',
       d: 'The protocol promises that NFT values will rise over time.',
     },
     explanation:
-      'Every allocation track flows to participants, to anchored NFTs, to the compounding reserve, or to public goods \u2014 there is no operator\u2019s margin. The paper makes no promises about price, liquidity, or future value, and says plainly that no one should acquire CST or the NFTs expecting financial gain from the efforts of others.',
+      'The current ETH split has no separate operator percentage. An appointed treasurer distributes the Outreach Reserve’s CST. Participation and holding assets do not guarantee financial outcomes, and owner powers remain separately disclosed.',
     referenceLabel: 'White paper \u00a714.1 \u2014 What Cosmic Signature is not',
   },
   'where-recorded': {

@@ -19,8 +19,8 @@
  * this avoids system CID fonts that some PDF readers cannot resolve.
  * Rerun after any change to a content module (each run records the digest
  * of its source in content/white-paper/pdf-manifest.json, and a test fails
- * while a PDF lags its content), and bump WHITE_PAPER_VERSION in
- * content/white-paper/types.ts for substantive revisions so older copies
+ * while a PDF lags its content), and update the locale's WHITE_PAPER_EDITIONS
+ * entry in content/white-paper/types.ts for substantive revisions so older copies
  * stay citable. The markdown itself is built in white-paper-pdf-core.ts.
  */
 
@@ -49,11 +49,7 @@ import {
   whitePaperContentZhHk,
   whitePaperContentZhTw,
 } from '../content/white-paper';
-import {
-  WHITE_PAPER_DATE_DISPLAY,
-  whitePaperPdfPath,
-  type WhitePaperContent,
-} from '../content/white-paper/types';
+import { whitePaperPdfPath, type WhitePaperContent } from '../content/white-paper/types';
 import { isAppLocale, type AppLocale, type LocaleRecord } from '../i18n/locale';
 import { routing } from '../i18n/routing';
 
@@ -98,7 +94,7 @@ const BASE_HEADER_INCLUDES = [
 const BUILDS: LocaleRecord<LocaleBuild> = {
   en: {
     content: whitePaperContentEn,
-    dateDisplay: WHITE_PAPER_DATE_DISPLAY,
+    dateDisplay: whitePaperContentEn.hero.dateLabel,
     tocTitle: 'Contents',
     headerIncludes: BASE_HEADER_INCLUDES,
   },

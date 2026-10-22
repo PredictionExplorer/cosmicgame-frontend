@@ -1,5 +1,7 @@
 import userEvent from '@testing-library/user-event';
 
+import { protocolFacts } from '@/content/protocol-facts';
+
 import { checkA11y, render, screen } from '@/test-utils';
 
 import { AnchoringQuestions } from '../AnchoringQuestions';
@@ -38,7 +40,7 @@ describe('AnchoringQuestions', () => {
     expect(questions).toHaveLength(5);
     // The answers quote the protocol's constants rather than hard-coding them.
     const answer = screen.getByText(
-      'anchoring.questions.items.anchorOnce.answer(percentage=6,selections=10,cst=1000)',
+      `anchoring.questions.items.anchorOnce.answer(percentage=${protocolFacts.anchorDistributionPercentage},selections=${protocolFacts.anchoredRwlkNftSelectionRecipients},cst=${protocolFacts.specialAllocationCst})`,
     );
     const disclosure = answer.closest('details');
     expect(disclosure).not.toHaveAttribute('open');

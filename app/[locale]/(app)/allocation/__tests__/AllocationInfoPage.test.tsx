@@ -7,6 +7,11 @@ import { checkA11y, render, screen, within } from '@/test-utils';
 
 import AllocationInfoPage from '../[id]/AllocationInfoPage';
 
+const mockHistoricalPercentage = jest.fn<number | null, [number | undefined]>();
+jest.mock('@/components/winnings/useHistoricalAllocationPercentage', () => ({
+  useHistoricalAllocationPercentage: (block: number | undefined) => mockHistoricalPercentage(block),
+}));
+
 const mockUseRoundInfo = jest.fn();
 const mockUseGestureListByCycle = jest.fn();
 const mockUseDonationsNFTByRound = jest.fn();
@@ -88,6 +93,7 @@ const LAST_CST = '0x4444444444444444444444444444444444444444';
 
 const baseAllocationInfo = {
   TimeStamp: 1700000000,
+  BlockNum: 500000000,
   TxHash: '0xabc',
   AmountEth: 1.5,
   TokenId: 42,
@@ -130,6 +136,7 @@ const baseAllocationInfo = {
 const defaultRoundList = [{ RoundNum: 0 }, { RoundNum: 1 }, { RoundNum: 2 }, { RoundNum: 3 }];
 
 beforeEach(() => {
+  mockHistoricalPercentage.mockReturnValue(25);
   jest.clearAllMocks();
   mockCopy.mockResolvedValue(true);
   mockUseDashboardInfo.mockReturnValue({ data: undefined, isLoading: false });
@@ -505,6 +512,32 @@ describe('AllocationInfoPage', () => {
       const next = split.querySelector('div[data-track="nextCycle"]');
       expect(next).toHaveTextContent(/~3\.5000.ETH/);
       expect(next).toHaveTextContent(/~58\.3/);
+    });
+
+    it('uses the recorded block configuration instead of current V3 defaults', () => {
+      renderCycle();
+      expect(mockHistoricalPercentage).toHaveBeenCalledWith(500000000);
+      expect(
+        screen.getByTestId('allocation-split').querySelector('div[data-track="signature"]'),
+      ).toHaveTextContent('25%');
+    });
+
+    it('uses a V3 percentage only when read for that record', () => {
+      mockHistoricalPercentage.mockReturnValue(20);
+      renderCycle(3, { BlockNum: 517100000 });
+      const split = screen.getByTestId('allocation-split');
+      expect(split.querySelector('div[data-track="signature"]')).toHaveTextContent('20%');
+      expect(split.querySelector('div[data-track="nextCycle"]')).toHaveTextContent(/~5\.0000.ETH/);
+    });
+
+    it('keeps the historical carryover unknown when its configuration cannot be read', () => {
+      mockHistoricalPercentage.mockReturnValue(null);
+      renderCycle();
+      const split = screen.getByTestId('allocation-split');
+      expect(split.querySelector('div[data-track="nextCycle"]')).toHaveTextContent(
+        'common.status.unavailable',
+      );
+      expect(split.querySelector('div[data-track="signature"]')).not.toHaveTextContent('20%');
     });
 
     it('keeps the cycle’s other facts with the split, one heading fewer', () => {

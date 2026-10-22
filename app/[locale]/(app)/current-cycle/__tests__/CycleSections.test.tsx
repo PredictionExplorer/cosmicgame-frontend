@@ -204,7 +204,7 @@ describe('CycleRules', () => {
   it('reads the rules from the live parameters and links to the full explanation', () => {
     render(<CycleRules data={data} headingId="rules" />);
     expect(
-      screen.getByText(/currentCycle\.rules\.stellarSelection\(ethEntries=3,rafflePercent=4/),
+      screen.getByText(/currentCycle\.rules\.stellarSelectionV3\(ethEntries=3,rafflePercent=4/),
     ).toBeInTheDocument();
     expect(
       screen.getByText(/currentCycle\.rules\.publicGoods\(percent=7,amount=2\.2606\)/),

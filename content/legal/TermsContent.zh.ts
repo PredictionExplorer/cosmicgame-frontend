@@ -1,9 +1,4 @@
-import {
-  ethDistributionFacts,
-  isV3Mechanics,
-  nftAllocationFacts,
-  protocolFacts,
-} from '@/content/protocol-facts';
+import { ethDistributionFacts, nftAllocationFacts, protocolFacts } from '@/content/protocol-facts';
 
 import type { TermsCopy } from './TermsContent';
 
@@ -58,16 +53,12 @@ export const termsCopyZh = {
         {
           id: 'dynamic-cst',
           subtitle: '动态 CST 铭刻',
-          text: isV3Mechanics
-            ? '每笔落笔铭刻的参与 CST 并非固定数量，而是随距上一笔落笔经过的时间线性累积，且每次铭刻的一部分会记入被超越的参与者。极短间隔的落笔可能铭刻 0 CST。'
-            : '每笔落笔铭刻的参与 CST 并非固定数量，而是取决于距上一笔落笔经过的时间，并按平方根公式计算。极短间隔的落笔可能铭刻 0 CST。',
+          text: '每笔落笔记录一份加权星选资格，更新坚守记录，并可能为上一笔参与者铭刻参与 CST。V3 按间隔秒数线性计算，合约以最小单位截断；等待本身不会形成可取回余额，必须有下一笔落笔执行。首笔不发放这项 CST，收官也不结算最后一笔之后的累计量。',
         },
         {
           id: 'cst-window',
           subtitle: 'CST 校准窗口',
-          text: isV3Mechanics
-            ? 'CST 落笔价格会在校准窗口中逐步下降。每笔 CST 落笔会以其成交价的两倍（受链上最低值约束）重启该窗口，之后价格按链上恒定速率下降，直至归零或另一笔 CST 落笔成交。'
-            : `CST 落笔价格会在链上存储的校准窗口中逐步下降。每笔 CST 落笔会使该窗口增加约 ${protocolFacts.cstCalibrationWindowIncreasePercentPerCstGesture}%，每笔 ETH 落笔会使其减少约 ${protocolFacts.cstCalibrationWindowDecreasePercentPerEthGesture}%。`,
+          text: 'V3 在链上保存 CST 价格下降速率，窗口时长由上限与速率推算。按当前除数，ETH 落笔尝试将速率增加其百分之一，但必须满足最短窗口检查；CST 落笔将速率减去其 1/101。CST 落笔还会重设上限，取不含溢价的基础花费两倍、配置下限与新速率乘以 180 秒三者中的最大值。该检查不是落笔冷却期。',
         },
         {
           id: 'smart-contract',
@@ -98,7 +89,7 @@ export const termsCopyZh = {
         {
           id: 'signature',
           subtitle: '签名分配',
-          text: `完成收官之笔的参与者可以取回 ${ethDistributionFacts.mainEthPercentage}% 的 ETH、${protocolFacts.specialAllocationCst.toLocaleString('zh-CN')} CST 表彰铭刻、${nftAllocationFacts.mainPrizeNftPhrase.zh}，以及该周期中可能存在的已附加代币。`,
+          text: `签名分配归实际收官者。倒计时归零后的 ${protocolFacts.finalGestureExclusivityHours} 小时内，只有收官之笔参与者可以收官；此后任何人都可收官并成为受益方。分配包括周期储备的 ${protocolFacts.mainEthPercentage}% ETH、合计 ${protocolFacts.specialAllocationCst.toLocaleString('zh')} CST、${nftAllocationFacts.mainPrizeNftPhrase.zh}，以及对该周期附加资产的取回权。`,
         },
         {
           id: 'chrono',
@@ -118,12 +109,12 @@ export const termsCopyZh = {
         {
           id: 'eth-selection',
           subtitle: 'ETH 星选',
-          text: `${protocolFacts.ethStellarSelectionRecipients} 位获配者共同分得周期储备中 ${ethDistributionFacts.stellarSelectionEthPercentage}% 的 ETH。`,
+          text: '参与者 ETH 星选按每笔未减免、未含溢价的 ETH 基础价格加权，并采用放回选择；CST 落笔使用同一时刻的 ETH 基础价格。所选资格共同分得这条轨道的 ETH，同一地址可以多次获配。',
         },
         {
           id: 'nft-selection',
           subtitle: 'NFT 星选',
-          text: `${protocolFacts.nftStellarSelectionRecipients} 位获配者各获得 ${protocolFacts.specialAllocationCst.toLocaleString('zh-CN')} CST 表彰铭刻与 1 枚 Cosmic Signature NFT。`,
+          text: '参与者 NFT 星选使用与 ETH 星选相同的权重，进行放回选择，每次分配 CST 与一枚 Cosmic Signature NFT；同一地址可多次获配。',
         },
         {
           id: 'anchored-selection',
@@ -138,7 +129,7 @@ export const termsCopyZh = {
         {
           id: 'public-goods',
           subtitle: '公共物品',
-          text: `${ethDistributionFacts.publicGoodsPercentage}% 的 ETH 会转拨给当前公共物品受益方 Protocol Guild。`,
+          text: `当前公共物品份额为周期储备的 ${protocolFacts.publicGoodsPercentage}%。收官时，合约尝试将其转入公共物品金库；任何人随后都可另发一笔交易，将金库余额转给当前受益方 Protocol Guild。核心合约转入金库失败时，该份额可留在储备中而不阻止收官。受益方可由金库所有者更改；宇宙议会不会自动取得该权限。`,
         },
         {
           id: 'compounding',

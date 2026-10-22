@@ -3,7 +3,7 @@
 import type { ReactNode } from 'react';
 import { useLocale, useTranslations } from 'next-intl';
 
-import { protocolFacts } from '@/content/protocol-facts';
+import { historicalV2ProtocolFacts, isV3Mechanics, protocolFacts } from '@/content/protocol-facts';
 
 import { formatAmount, formatCount, formatPercent } from '@/utils/format';
 import { Amount } from '@/components/ui/amount';
@@ -106,7 +106,10 @@ export function ProtocolConfiguration({
         id: 'cstPreview',
         label: t('configuration.cards.cstPreview.label'),
         definition: t('configuration.cards.cstPreview.tooltip', {
-          formula: protocolFacts.dynamicCstRewardFormula,
+          formula:
+            v3Config || isV3Mechanics
+              ? protocolFacts.dynamicCstRewardFormula
+              : historicalV2ProtocolFacts.dynamicCstRewardFormula,
         }),
         value: show(cstRewardPerBid, (ready) => <Amount value={ready} unit="CST" />),
       },

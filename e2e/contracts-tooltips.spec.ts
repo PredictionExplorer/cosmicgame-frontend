@@ -21,7 +21,7 @@ const TOOLTIP_LABELS_AND_COPY: Array<{ label: string; expected: RegExp }> = [
   },
   {
     label: 'Participation CST now',
-    expected: /Estimated Participation CST if a gesture lands now/,
+    expected: /Estimated amount credited to the previous participant/,
   },
   {
     label: 'Finalization timeout',
@@ -33,7 +33,7 @@ const TOOLTIP_LABELS_AND_COPY: Array<{ label: string; expected: RegExp }> = [
   },
   {
     label: 'Message length limit',
-    expected: /Maximum character length allowed in gesture messages/,
+    expected: /Maximum UTF-8 byte length of a gesture message/,
   },
   {
     label: 'ETH Stellar Selection recipients',
@@ -48,18 +48,18 @@ const TOOLTIP_LABELS_AND_COPY: Array<{ label: string; expected: RegExp }> = [
     expected: /Number of Random Walk NFT anchor-holders randomly selected/,
   },
   // Allocation tracks
-  { label: 'Signature Allocation', expected: /participant who made the Final Gesture/ },
+  { label: 'Signature Allocation', expected: /ETH share received by the finalization caller/ },
   { label: 'Chrono-Warrior', expected: /ETH allocation to the Chrono-Warrior/ },
-  { label: 'Stellar Selection', expected: /Portion distributed to randomly selected participants/ },
+  { label: 'Stellar Selection', expected: /undiscounted, premium-free ETH base-cost weights/ },
   {
     label: 'Anchor Distribution',
     expected: /ETH Anchor Distributions to Cosmic Signature NFT anchor-holders/,
   },
-  { label: 'Public Goods', expected: /Forwarded to the Public Goods Beneficiary/ },
+  { label: 'Public Goods', expected: /Allocated to the Public Goods Vault/ },
   // Calibration Windows
   {
     label: 'Starting cost',
-    expected: /Starting Gesture Cost of the CST Calibration Window/,
+    expected: /current beginning base cost/,
   },
   // Public Goods
   {

@@ -21,7 +21,7 @@ export const securityCopyZhTw: SecurityCopy = {
     },
     contractsHeading: 'Arbitrum One 上的核心合約',
     contractsIntro:
-      '每個合約公開的原始碼在 Sourcify 上皆為完全相符（核對日期：{date}），因此鏈上的位元組碼就是你能讀到的程式碼。<contracts>合約頁面</contracts>列出了所有地址。',
+      '周邊合約與歷史 V2 實作的公開匹配紀錄於 {date} 核對。目前 V3 尚未在 Sourcify 驗證，舊版本紀錄不能代替目前實作的證據。<contracts>合約頁面</contracts>列出各地址及狀態。',
     explorerLink: 'Arbiscan',
     sourcifyLink: 'Sourcify',
     copyLabel: '複製 {value}',
@@ -45,7 +45,8 @@ export const securityCopyZhTw: SecurityCopy = {
       },
       {
         term: '週期進行中',
-        detail: '從週期啟用（發生在首筆落筆之前）到該週期收官，核心參數都處於鎖定狀態。',
+        detail:
+          '核心設定與升級要求目前時間早於週期啟用時間。只要首筆尚未執行，所有者仍可延後啟用時間，重新進入可維護窗口。周邊權限另有各自規則。',
       },
       {
         term: '任何時候',
@@ -55,12 +56,12 @@ export const securityCopyZhTw: SecurityCopy = {
       {
         term: '升級',
         detail:
-          '協議運行在 UUPS 代理之後，因此地址始終不變。所有者只能在週期之間將其指向新程式碼；目前使用的是上方列出、已公開驗證的 V2 實作。',
+          '協議使用 UUPS 代理，升級會更換實作並保留代理地址。目前實作為 V3；升級須由所有者在合約允許的未啟用狀態下執行。原始碼驗證與安全審計是不同事項，須分別核對。',
       },
       {
         term: '宇宙議會',
         detail:
-          '計畫在協議穩定後將所有權移交宇宙議會。此後，參數只能透過達到協調法定權重的協議協調提案變更。',
+          '宇宙議會只能行使實際授予的權限，目前不擁有核心協議。V3 不會自動移交或放棄所有權，每個所有者角色都須分別執行鏈上操作。',
       },
     ],
   },
@@ -104,7 +105,7 @@ export const securityCopyZhTw: SecurityCopy = {
   verify: {
     heading: '自行驗證',
     paragraph:
-      '最有力的安全訊號，是應用程式顯示的內容、已驗證合約、原始碼與 Arbitrum 即時資料彼此一致。這些都可以在不依賴本網站的情況下自行核對。',
+      '請將應用程式顯示與 Arbitrum 即時狀態、目前安裝的實作、原始碼及驗證範圍交叉核對。歷史版本的匹配或審計紀錄不會自動涵蓋升級後的實作。',
     resources: [
       {
         link: 'contracts',

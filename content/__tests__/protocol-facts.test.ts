@@ -1,14 +1,15 @@
 import {
   contractMechanicsVersion,
   cstRewardFacts,
+  historicalV2ProtocolFacts,
   isV3Mechanics,
   nftAllocationFacts,
   protocolFacts,
 } from '@/content/protocol-facts';
 
 /**
- * Deployed Solidity constants these facts are derived from
- * (contracts verified exact-match on Sourcify, chain 42161):
+ * Current V3 facts and the separately preserved V2 history are checked against
+ * production Solidity. Local runtime matching is distinct from public verification:
  * - INITIAL_MAIN_PRIZE_TIME_INCREMENT = 1 hours
  * - DEFAULT_BID_CST_REWARD_AMOUNT_MULTIPLIER =
  *     3 * (1 ether)^2 * INITIAL_MAIN_PRIZE_TIME_INCREMENT * MICROSECONDS_PER_SECOND
@@ -51,22 +52,31 @@ describe('protocolFacts', () => {
       protocolFacts.nftStellarSelectionRecipients +
         protocolFacts.anchoredRwlkNftSelectionRecipients,
     );
+    expect(protocolFacts.nftBearingAllocations).toBe(
+      protocolFacts.roleNftsPerCycle -
+        protocolFacts.mainPrizeNftsPerCycle +
+        1 +
+        protocolFacts.stellarNftsPerCycle,
+    );
     expect(protocolFacts.typicalCstImprintsPerCycle).toBe(
-      protocolFacts.typicalNftsPerCycle * protocolFacts.specialAllocationCst +
+      protocolFacts.nftBearingAllocations * protocolFacts.specialAllocationCst +
         protocolFacts.outreachReserveCst,
     );
   });
 
   it('V3 adds NFTs only to the Signature Allocation, and adds no CST', () => {
     const extraNfts =
-      protocolFacts.v3.mainPrizeNftsPerCycleDefault - protocolFacts.mainPrizeNftsPerCycle;
-    expect(protocolFacts.v3.typicalNftsPerCycle).toBe(
-      protocolFacts.typicalNftsPerCycle + extraNfts,
+      protocolFacts.mainPrizeNftsPerCycle - historicalV2ProtocolFacts.mainPrizeNftsPerCycle;
+    expect(extraNfts).toBe(2);
+    expect(protocolFacts.typicalNftsPerCycle).toBe(
+      historicalV2ProtocolFacts.typicalNftsPerCycle + extraNfts,
     );
 
     // The extra NFTs ride along with the existing Signature Allocation, so the
     // number of NFT-bearing allocations - and therefore the CST total - is unchanged.
-    expect(nftAllocationFacts.nftBearingAllocations).toBe(protocolFacts.typicalNftsPerCycle);
+    expect(nftAllocationFacts.nftBearingAllocations).toBe(
+      historicalV2ProtocolFacts.typicalNftsPerCycle,
+    );
     expect(protocolFacts.typicalCstImprintsPerCycle).toBe(
       nftAllocationFacts.nftBearingAllocations * protocolFacts.specialAllocationCst +
         protocolFacts.outreachReserveCst,
@@ -80,8 +90,8 @@ describe('protocolFacts', () => {
           typicalNftsPerCycle: protocolFacts.v3.typicalNftsPerCycle,
         }
       : {
-          mainPrizeNfts: protocolFacts.mainPrizeNftsPerCycle,
-          typicalNftsPerCycle: protocolFacts.typicalNftsPerCycle,
+          mainPrizeNfts: historicalV2ProtocolFacts.mainPrizeNftsPerCycle,
+          typicalNftsPerCycle: historicalV2ProtocolFacts.typicalNftsPerCycle,
         };
 
     expect(nftAllocationFacts.mainPrizeNfts).toBe(expected.mainPrizeNfts);
@@ -107,22 +117,26 @@ describe('protocolFacts', () => {
     expect(distributed + protocolFacts.compoundingReservePercentage).toBe(100);
   });
 
-  it('CST Calibration Window change percentages derive from the on-chain divisor', () => {
-    const divisor = protocolFacts.cstCalibrationWindowChangeDivisor;
+  it('historical V2 CST Calibration Window change percentages derive from the on-chain divisor', () => {
+    const divisor = historicalV2ProtocolFacts.cstCalibrationWindowChangeDivisor;
     // Lengthen per CST gesture: duration += duration / divisor  ->  +100/divisor %.
-    expect(protocolFacts.cstCalibrationWindowIncreasePercentPerCstGesture).toBe(100 / divisor);
+    expect(historicalV2ProtocolFacts.cstCalibrationWindowIncreasePercentPerCstGesture).toBe(
+      100 / divisor,
+    );
     // Shorten per ETH gesture: duration = (duration + 1) * divisor / (divisor + 1)
     //   ->  about -100/(divisor + 1) %, quoted to 3 decimals.
     const expectedDecrease = Number((100 / (divisor + 1)).toFixed(3));
-    expect(protocolFacts.cstCalibrationWindowDecreasePercentPerEthGesture).toBe(expectedDecrease);
+    expect(historicalV2ProtocolFacts.cstCalibrationWindowDecreasePercentPerEthGesture).toBe(
+      expectedDecrease,
+    );
   });
 
-  it('dynamic CST examples match the contract formula at the stated launch parameters', () => {
+  it('historical V2 dynamic CST examples match the contract formula at the stated launch parameters', () => {
     // radicand = elapsedSeconds * bidCstRewardAmountMultiplier / mainPrizeTimeIncrementInMicroSeconds
     // At launch, multiplier = 3 * (1e18)^2 * incrementMicroseconds, so the
     // increment cancels and radicand = elapsedSeconds * 3 * 1e36 exactly.
-    expect(protocolFacts.dynamicCstRewardExamplesAssumeIncrementHours).toBe(
-      protocolFacts.initialCycleTimeIncrementHours,
+    expect(historicalV2ProtocolFacts.dynamicCstRewardExamplesAssumeIncrementHours).toBe(
+      historicalV2ProtocolFacts.initialCycleTimeIncrementHours,
     );
 
     const WEI_PER_CST = 10n ** 18n;
@@ -135,7 +149,7 @@ describe('protocolFacts', () => {
       '1 day': 86400n,
     };
 
-    for (const example of protocolFacts.dynamicCstRewardExamples) {
+    for (const example of historicalV2ProtocolFacts.dynamicCstRewardExamples) {
       const elapsed = elapsedSeconds[example.elapsed];
       expect(elapsed).toBeDefined();
       const rewardWei = bigintSqrt(elapsed! * THREE_E36);
@@ -150,7 +164,7 @@ describe('protocolFacts', () => {
     }
   });
 
-  it('V3 dynamic CST examples match the linear accrual at the stated launch parameters', () => {
+  it('current V3 examples match integer linear accrual at the stated launch parameters', () => {
     // V3 accrues linearly: INITIAL_BID_CST_REWARD_AMOUNT_PER_MINUTE = 1 ether
     // (exactly 1 CST per minute at launch; CosmicSignatureConstants.sol).
     const elapsedSeconds: Record<string, number> = {
@@ -160,12 +174,17 @@ describe('protocolFacts', () => {
       '1 hour': 3600,
       '1 day': 86400,
     };
-    const cstPerSecond = protocolFacts.v3.dynamicCstRewardPerMinuteAtLaunch / 60;
+    const unit = 10n ** 18n;
+    const incrementMicroseconds =
+      BigInt(protocolFacts.initialCycleTimeIncrementHours) * 3600n * 1_000_000n;
+    const multiplier = BigInt(protocolFacts.participationCstRewardMultiplier);
+    expect(multiplier).toBe((unit * incrementMicroseconds) / 60n);
 
-    for (const example of protocolFacts.v3.dynamicCstRewardExamples) {
+    for (const example of protocolFacts.dynamicCstRewardExamples) {
       const elapsed = elapsedSeconds[example.elapsed];
       expect(elapsed).toBeDefined();
-      const rewardCst = elapsed! * cstPerSecond;
+      const rewardUnits = (BigInt(elapsed!) * multiplier) / incrementMicroseconds;
+      const rewardCst = Number(rewardUnits) / Number(unit);
       const quoted = Number(example.cst.replace(/,/g, ''));
       expect(Number.isNaN(quoted)).toBe(false);
       if (quoted === 0) {
@@ -178,8 +197,7 @@ describe('protocolFacts', () => {
   });
 
   it('cstRewardFacts follows the configured contract mechanics version', () => {
-    // Production copy describes V2 until the proxy upgrade lands
-    // (flip contractMechanicsVersion / NEXT_PUBLIC_CONTRACT_MECHANICS_VERSION on upgrade day).
+    // V3 is the default; an explicit V2 test environment uses the historical snapshot.
     if (contractMechanicsVersion === 3) {
       expect(cstRewardFacts.curve).toBe('linear');
       expect(cstRewardFacts.formula).toBe(protocolFacts.v3.dynamicCstRewardFormula);
@@ -187,12 +205,12 @@ describe('protocolFacts', () => {
     } else {
       expect(contractMechanicsVersion).toBe(2);
       expect(cstRewardFacts.curve).toBe('sqrt');
-      expect(cstRewardFacts.formula).toBe(protocolFacts.dynamicCstRewardFormula);
-      expect(cstRewardFacts.examples).toBe(protocolFacts.dynamicCstRewardExamples);
+      expect(cstRewardFacts.formula).toBe(historicalV2ProtocolFacts.dynamicCstRewardFormula);
+      expect(cstRewardFacts.examples).toBe(historicalV2ProtocolFacts.dynamicCstRewardExamples);
     }
   });
 
-  it('timeouts match the deployed V2 configuration', () => {
+  it('timeouts retain the deployed configuration', () => {
     // timeoutDurationToClaimMainPrize (V2) = 2 days = 48 hours.
     expect(protocolFacts.finalGestureExclusivityHours).toBe(2 * HOURS_PER_DAY);
     // PrizesWallet.timeoutDurationToWithdrawPrizes = 5 weeks = 3,024,000 seconds.
@@ -209,7 +227,10 @@ describe('protocolFacts', () => {
     expect(protocolFacts.ethCalibrationFloorDivisor).toBe(200);
     expect(protocolFacts.ethCalibrationCeilingMultiplier).toBe(2);
     expect(protocolFacts.cstCalibrationCeilingMultiplier).toBe(2);
-    expect(protocolFacts.cstCalibrationCeilingMinCst).toBe(200);
+    expect(protocolFacts.cstCalibrationCeilingMinCst).toBe(1);
+    expect(protocolFacts.cstDeclineRateChangeDivisor).toBe(100);
+    expect(protocolFacts.cstCalibrationRestartMinimumSeconds).toBe(180);
+    expect(historicalV2ProtocolFacts.cstCalibrationCeilingMinCst).toBe(200);
     expect(protocolFacts.cstCalibrationFloorCst).toBe(0);
     expect(protocolFacts.initialGestureCostEth).toBe(0.0001);
     expect(protocolFacts.gestureMessageMaxLength).toBe(280);

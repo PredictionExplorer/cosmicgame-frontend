@@ -1,5 +1,4 @@
 import { AUDIT_FINDINGS_TOTAL, HACKEN_AUDIT } from '@/content/legal/audit';
-import { cstRewardFacts, isV3Mechanics, protocolFacts } from '@/content/protocol-facts';
 
 import type { LearnText } from './structure';
 
@@ -120,8 +119,8 @@ export const learnTextEn = {
         {
           heading: 'Cycle opening',
           body: [
-            `A cycle begins with an ETH Calibration Window for the first gesture. The CST Calibration Window starts from a ${protocolFacts.initialCstCalibrationWindowHours}-hour reference and then changes on-chain as gestures arrive.`,
-            `The first gesture starts the Cycle Finalization Time. Subsequent gestures add the current time increment and update the current cycle state. ETH gestures shorten the CST Calibration Window by about ${protocolFacts.cstCalibrationWindowDecreasePercentPerEthGesture}%; CST gestures lengthen it by about ${protocolFacts.cstCalibrationWindowIncreasePercentPerCstGesture}%.`,
+            'A cycle opens at its on-chain activation time. The first gesture must use ETH and ends its opening ETH Calibration Window. The carried CST ceiling and decline rate determine the first CST window; V3 has no fixed reference duration for it.',
+            'The first gesture starts the deadline. Later gestures extend the stored deadline, including after expiry. ETH gestures can increase the CST decline rate subject to a minimum-window safeguard; CST gestures reduce that rate and restart the ceiling using the premium-free base cost and on-chain minimums.',
           ],
         },
         {
@@ -161,8 +160,8 @@ export const learnTextEn = {
         {
           heading: 'What a gesture does',
           body: [
-            `Every gesture records participation in the active cycle, may imprint dynamic Participation CST, extends Cycle Finalization Time, and contributes to the historical context around the final Signature. Participation CST uses a ${isV3Mechanics ? 'linear' : 'square-root'} formula: ${cstRewardFacts.notation}, where ${protocolFacts.participationCstSymbols[0]} is the seconds since the previous gesture, m the Participation CST multiplier and i the cycle time increment.`,
-            `Gesture Cost changes across the cycle. ETH gestures and CST gestures use related but distinct mechanics, including Calibration Windows that make the cost path visible to participants. Each CST gesture lengthens the CST Calibration Window by about ${protocolFacts.cstCalibrationWindowIncreasePercentPerCstGesture}%; each ETH gesture shortens it by about ${protocolFacts.cstCalibrationWindowDecreasePercentPerEthGesture}%.`,
+            'A gesture records weighted selection participation and updates the stored deadline. V3 Participation CST is linear in elapsed time and is credited to the previous participant when the next gesture arrives. The opening gesture credits none; finalization does not settle an additional dynamic amount for the final participant.',
+            'ETH and CST base costs follow different paths. CST base cost declines using an on-chain rate; ETH and CST gestures adjust that rate. A CST gesture resets its ceiling from the largest of twice the premium-free base cost, the configured minimum, and the updated rate times the safeguard interval. Both currencies can carry a late premium, which does not increase later base costs or selection weights.',
           ],
         },
         {
@@ -191,7 +190,7 @@ export const learnTextEn = {
     'three-body-nft-art': {
       cardTitle: 'Three-body art',
       cardDescription:
-        'How an on-chain seed and three-body physics give the same artwork every time.',
+        'How an on-chain seed, renderer revision and configuration produce three-body artwork.',
       title: 'How Cosmic Signature Generates Three-Body NFT Art | Cosmic Signature',
       description:
         'A technical explanation of deterministic Cosmic Signature NFT artwork generated from on-chain seeds and three-body physics.',
@@ -202,14 +201,14 @@ export const learnTextEn = {
         {
           heading: 'On-chain seed to deterministic render',
           body: [
-            'Each Cosmic Signature NFT stores a seed that can reproduce the artwork. The rendering pipeline uses deterministic inputs, so the same seed produces the same Signature output.',
+            'Each NFT records a seed on-chain. The renderer creates images and videos off-chain using that seed, its software revision and configuration. Reproducing a published output requires the matching inputs and a compatible toolchain.',
             'The art process simulates three celestial bodies under Newtonian gravity. Chaotic trajectories become spectral orbital trails, creating a recognizable visual identity for the protocol.',
           ],
         },
         {
           heading: 'Open and reproducible',
           body: [
-            'The protocol emphasizes reproducibility. The source code and rendering pipeline are intended to make each Signature independently verifiable from its seed.',
+            'The source includes manual reference-image checks. The current continuous-integration workflow does not compare generated frame hashes, and a seed alone does not identify every output-changing renderer option.',
             'The artwork is dedicated to the public domain under CC0.',
           ],
         },
@@ -285,7 +284,7 @@ export const learnTextEn = {
           body: ['None of these steps needs a wallet.'],
           steps: [
             'Open the address from the [contracts page](contracts) on [Arbiscan](explorer), and confirm the network is Arbitrum One, not a test network.',
-            'On the Contract tab, confirm the source code is verified. Compare it with the [public contracts repository](contractsRepository), or check the exact match on [Sourcify](sourcify).',
+            'Compare the current implementation with the [public repository](contractsRepository) and check its own [Sourcify record](sourcify). The October 21 V3 runtime matches the reviewed local production artifact, but Sourcify currently reports it as unverified; historical V2 verification is not evidence for V3.',
             'For the protocol contract, open Read as Proxy: the implementation it names should be the implementation address on the contracts page.',
             'Pick a record in the app, such as a gesture or an allocation, and find the same transaction among the contract’s transactions on the explorer.',
           ],
@@ -295,7 +294,7 @@ export const learnTextEn = {
           body: [
             `In late 2025, Hacken reviewed the production contracts: the core protocol that runs each cycle, the CST token, both NFT collections, the anchoring wallets, and the wallet and system management contracts. [The report](hackenReport), published in January 2026, lists ${AUDIT_FINDINGS_TOTAL} findings, none of them critical or high, and ${HACKEN_AUDIT.invariants.held} of the ${HACKEN_AUDIT.invariants.tested} invariants Hacken fuzz-tested held.`,
             'The contracts repository also carries Certora Prover specifications, a Solidity SMTChecker configuration, Slither static analysis and a test suite, each linked from the [audits page](audits). They prove or test the properties they state, and no more.',
-            'The audit’s scope was the smart contracts: this website, the data service behind the app and the art pipeline were not part of it. Like every check, it lowers risk without removing it; read the [risk disclosures](riskDisclosures) before taking part.',
+            'The report covers its historical reviewed revision, not every later V2 or V3 change. The website, data service and art renderer were outside that audit scope. Source verification and test results establish specific properties; they do not remove risk. Read the [risk disclosures](riskDisclosures) before taking part.',
           ],
         },
       ],
@@ -314,9 +313,7 @@ export const learnTextEn = {
           heading: 'CST in the protocol',
           body: [
             'Gestures can imprint Participation CST, and CST can also be used as an alternative gesture currency through its own Calibration Window. CST spent on a gesture is burned \u2014 permanently removed from supply \u2014 rather than pooled.',
-            isV3Mechanics
-              ? 'The Participation CST amount is dynamic: it accrues linearly with time since the previous gesture, so long quiet periods produce proportionally larger imprints while rapid gestures imprint close to 0 CST.'
-              : 'The Participation CST amount is dynamic: it depends on time since the previous gesture and uses a square-root formula, so long quiet periods produce larger imprints while rapid gestures can produce 0 CST.',
+            'V3 credits the full dynamic Participation CST amount to the previous participant when a later gesture arrives. It grows linearly with elapsed time. The first gesture creates none, and finalization does not pay a final dynamic amount. Fixed recognition and outreach allocations are separate.',
             'CST expresses coordination weight in the Cosmic Council once delegated (holders can delegate to themselves), where participants coordinate protocol changes according to on-chain rules.',
           ],
         },
@@ -331,7 +328,7 @@ export const learnTextEn = {
           heading: 'Coordination records',
           body: [
             'The Cosmic Council gives CST holders a way to coordinate protocol changes according to on-chain rules. Coordination Changes and related app pages make the history of parameter changes visible so readers can understand how the protocol evolves.',
-            'The Cosmic Council coordinates protocol changes through proposals and delegated CST weight. The terms and risk disclosures explain the limits and responsibilities that apply to participation.',
+            'The Council acts through proposals and delegated historical CST weight, but can control only assets and permissions assigned to it. It does not currently own the core protocol. V3 does not automatically transfer or remove owner powers.',
           ],
         },
       ],
@@ -379,12 +376,12 @@ export const learnTextEn = {
         'How Cosmic Signature routes a public-goods allocation to Protocol Guild, the funding mechanism for Ethereum core contributors.',
       h1: 'Cosmic Signature and Ethereum Public Goods',
       summary:
-        'Cosmic Signature includes a public-goods allocation track that currently forwards a portion of each Cycle Reserve to Protocol Guild.',
+        'Cosmic Signature allocates part of the reserve to a Public Goods Vault. Anyone can separately forward its balance to the configured beneficiary, currently Protocol Guild.',
       sections: [
         {
           heading: 'Protocol Guild allocation',
           body: [
-            'Protocol Guild is the funding mechanism for 170+ Ethereum core contributors. Cosmic Signature currently forwards the public-goods allocation to Protocol Guild.',
+            'Protocol Guild supports Ethereum core contributors and is the current vault beneficiary. Finalization attempts the transfer to the vault; a separate permissionless transaction forwards the vault balance. The owner can change the beneficiary, and failed core-to-vault transfers can leave that share in the reserve.',
             'Public Goods Allocation is one of the protocol’s allocation tracks. Its contribution and forwarding records are available in the app.',
           ],
         },

@@ -213,7 +213,7 @@
       },
       "public-goods-contributions-cg": {
         "heading": "Protocol Public Goods contributions",
-        "description": "7% of every finalized cycle’s Cycle Reserve goes to the Public Goods Vault for its beneficiary: currently Protocol Guild, which funds Ethereum core contributors.",
+        "description": "5% of the reserve is allocated to the Public Goods Vault. Anyone can separately forward its balance to the current beneficiary, Protocol Guild.",
         "links": {
           "learn": "Learn about Public Goods",
           "contracts": "Review the vault contract"
@@ -335,7 +335,7 @@
       "alt": "Cosmic Signature — Every Gesture Shapes the Signature.",
       "title": "Every Gesture Shapes the Signature.",
       "subhead": "A procedural on-chain art protocol on Arbitrum.",
-      "fact": "CC0 · Open source · 7% to Protocol Guild"
+      "fact": "CC0 · Open source · 5% Public Goods allocation"
     },
     "gallery": {
       "alt": "Cosmic Signature — Gallery",
@@ -363,7 +363,7 @@
       "eyebrow": "FAQ",
       "title": "Questions worth answering plainly.",
       "subhead": "Performance Cycles, gestures, allocations, anchoring, Protocol Coordination.",
-      "fact": "CC0 · Open source · 7% to Protocol Guild"
+      "fact": "CC0 · Open source · 5% Public Goods allocation"
     },
     "howItWorks": {
       "alt": "Cosmic Signature — How it works",

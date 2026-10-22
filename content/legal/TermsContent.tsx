@@ -70,7 +70,7 @@ export function clauseAnchor(sectionId: string, clauseId: string): string {
 /**
  * The allocation tracks as one list, each track once: its name (the clause's
  * anchor, so the risk disclosures can cite it), its figures on one line
- * ("ETH 25% · CST 1,000 · NFT 1", from `protocolFacts`), and the sentence
+ * ("ETH 20% · CST 1,000 · NFT 3", from `protocolFacts`), and the sentence
  * that binds it. It replaces a table followed by the same eleven tracks
  * again as clauses, which stated every figure twice.
  */

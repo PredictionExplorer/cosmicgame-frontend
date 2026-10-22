@@ -1,14 +1,17 @@
 import { protocolFacts } from '@/content/protocol-facts';
 
+import { formatCount } from '@/utils/format/numbers';
+
 import type { LandingText } from './structure';
 
-const cst = protocolFacts.specialAllocationCst.toLocaleString('en-US');
+const cst = formatCount(protocolFacts.specialAllocationCst, 'ja');
 
 /** Japanese landing copy, keyed by the skeleton in structure.ts. */
 export const landingTextJa = {
   meta: {
     title: 'Cosmic Signature：Arbitrum上のプロシージャル・オンチェーンアート・プロトコル',
-    description: `Cosmic SignatureはArbitrum上のプロシージャル・オンチェーンアート・プロトコルです。参加者はパフォーマンス・サイクルごとに一筆を入れ、サイクルが確定すると新しいシグネチャーが刻印され、サイクル準備金がルールどおり各配分トラックへ配られます。そのうち${protocolFacts.publicGoodsPercentage}%はEthereumのコア貢献者へ送られます。`,
+    description:
+      'V3はデプロイ済みです。参加CSTの式と受領者、参加者向けETH星選とNFT星選のウェイト、CST費用の下降速度、ETHの割合、シグネチャー配分のNFT数を変更し、終盤の費用加算も導入しています。',
     keywords: [
       'Cosmic Signature',
       'プロシージャルアート・プロトコル',
@@ -26,7 +29,8 @@ export const landingTextJa = {
     eyebrow: 'プロシージャル・オンチェーンアート・プロトコル · Arbitrum',
     headlineLead: '一筆ごとに、',
     headlineAccent: 'アートが生まれます。',
-    subhead: `ETHまたはCSTで入れる一筆ごとに、サイクルの確定時刻が延びます。時間が尽きるとサイクルが確定し、受領者に新しいシグネチャーが刻印され、サイクル準備金が各トラックへ配分されます。そのうち${protocolFacts.publicGoodsPercentage}%はEthereumのコア貢献者へ送られます。`,
+    subhead:
+      'サイクル最初の一筆はETHで入れ、確定時計を始めます。以降の一筆は、時刻を過ぎた後も保存済みの確定時刻に現在の加算時間を足します。現在時刻から時計を再開するわけではありません。確定処理が成功するまでは一筆を入れられます。 該当額は公共財金庫に入ります。誰でも別のトランザクションで、現在の受け手であるProtocol Guildへ金庫の残高を送れます。',
     secondaryCtaLabel: 'サイクルの仕組み',
     art: {
       viewAriaLabel: 'Cosmic Signature {tokenLabel}をアプリで見る',
@@ -60,7 +64,7 @@ export const landingTextJa = {
     eyebrow: 'アート',
     heading: 'オンチェーンのシードから描く、三体問題。',
     description:
-      'Cosmic Signature NFTは、ニュートン重力のもとで動く三つの天体の軌跡を描きます。その複雑な模様は、AIや学習データを使わず、決定論的な物理計算から生まれます。同じシードからは、ピクセル単位で同じ作品を再現できます。',
+      'NFTのシードはオンチェーンに保存され、画像と動画はオフチェーンで生成されます。再現には同じシード、適切なレンダラーの版と設定、互換性のあるツールが必要です。シードだけで異なる版の出力まで一致するとは限りません。',
     showcase: {
       viewAriaLabel: 'Cosmic Signature {tokenLabel}を見る',
       artworkAlt: 'Cosmic Signatureのアートワーク{tokenLabel}',
@@ -77,7 +81,7 @@ export const landingTextJa = {
       },
       selection: {
         title: '選抜',
-        body: 'ボルダ集計（カオス × 正三角形度）が、候補の中から最も視覚的に興味深い軌道を選びます。',
+        body: '軌道の性質を使ったボルダ順位で候補を絞り、その後に画像の美的な性質を確認する段階を通じて結果を選びます。',
       },
       camera: {
         title: 'カメラ',
@@ -85,7 +89,7 @@ export const landingTextJa = {
       },
       color: {
         title: '色',
-        body: '人の色の知覚に合わせたOKLab空間で色を混ぜます。天体ごとに色相を120°ずつずらし、緩やかな変化と正弦波で色を変調します。',
+        body: 'パレットは知覚色空間OKLChで色相や色の間隔を変化させます。現在のレンダラーは三つの天体の色相を等間隔の角度に固定していません。',
       },
       'spectral-render': {
         title: 'スペクトルレンダリング',
@@ -93,7 +97,7 @@ export const landingTextJa = {
       },
       signature: {
         title: 'シグネチャー',
-        body: 'AgXトーンマッピング、ブルーム、OpenSimplexの星雲レイヤー、カラーグレーディングがフレームを仕上げます。その結果が、16ビットPNGと30秒のH.265動画です。',
+        body: 'トーンマッピング、ブルーム、色処理で画像を仕上げます。解像度、動画の長さ、形式はレンダラーの版と設定によって変わります。',
       },
     },
     facts: {
@@ -107,8 +111,7 @@ export const landingTextJa = {
   tracks: {
     eyebrow: '配分トラック',
     heading: 'サイクル準備金は、すべてルールどおりに配分されます。',
-    description:
-      'サイクルが確定すると、プロトコルはETHとCSTの準備金を、継続の長さ、タイミング、関わり方、参加を反映する配分トラックへ配ります。ETH準備金のおよそ半分は次のサイクルへ累積します。',
+    description: `すべてのトラックがある場合、サイクルはCosmic Signature NFT${protocolFacts.typicalNftsPerCycle}点と固定配分の${formatCount(protocolFacts.typicalCstImprintsPerCycle, 'ja')} CSTを刻印します。シグネチャー配分はNFT${protocolFacts.mainPrizeNftsPerCycle}点に対して、合計${formatCount(protocolFacts.specialAllocationCst, 'ja')} CSTを一度だけ受け取ります。時の戦士、持久チャンピオン、最後のCST一筆には各1点と対応するCSTがあり、二つのNFT星選が残りを加えます。CST一筆や係留中のRandom Walk NFTがなければ該当トラックは省略されます。参加CSTは別です。`,
     ethLabel: '各サイクル準備金のETH',
     fixedLabel: 'サイクルごとのCSTとNFT',
     fixedEach: `受領者はそれぞれ${cst} CSTとCosmic Signature NFT 1点を受け取ります。`,
@@ -116,12 +119,12 @@ export const landingTextJa = {
     items: {
       'signature-allocation': {
         title: 'シグネチャー配分',
-        body: '最後の一筆を入れた参加者へ。1,000 CSTとCosmic Signature NFT 1点を含みます。',
+        body: '確定の受領者に連続IDのCosmic Signature NFT3点と合計1,000 CSTを配分します。確定権には優先期間と公開期間があります。',
       },
       'compounding-reserve': {
         percent: '約50%',
         title: '累積準備金',
-        body: '次のパフォーマンス・サイクルへ持ち越されます。プロトコルは引き出すのではなく、蓄えていきます。',
+        body: 'ETHのおよそ半分が次のサイクルへ持ち越されます。整数の丸め、省略されたトラック、送付失敗により残高が増える場合があります。次の開始準備金が前より大きくなる保証はありません。',
       },
       'chrono-warrior': {
         title: '時の戦士配分',
@@ -129,7 +132,7 @@ export const landingTextJa = {
       },
       'public-goods': {
         title: '公共財配分',
-        body: '170人以上のEthereumコア貢献者の資金支援メカニズムであるProtocol Guildへ送られます。',
+        body: '該当額は公共財金庫に入ります。誰でも別のトランザクションで、現在の受け手であるProtocol Guildへ金庫の残高を送れます。',
       },
       'anchor-distribution': {
         title: '係留配分',
@@ -137,11 +140,11 @@ export const landingTextJa = {
       },
       'eth-stellar-selection': {
         title: 'ETH星選',
-        body: `無作為に選ばれた${protocolFacts.ethStellarSelectionRecipients}人の参加者で分け合います。選ばれる頻度は入れた一筆の数に応じて高まります。`,
+        body: `ウェイト付きの${protocolFacts.ethStellarSelectionRecipients}回の選定でETHの該当額を分けます。一筆の時点における、割引も終盤の加算もないETH基本費用をウェイトとして選びます。同じアドレスを複数回選ぶことがあります。`,
       },
       'participant-nft-stellar-selection': {
         title: 'NFT星選——参加者',
-        body: 'サイクルの参加者から無作為に選ばれます。',
+        body: '一筆の時点における、割引も終盤の加算もないETH基本費用をウェイトとして選びます。同じアドレスを複数回選ぶことがあります。',
       },
       'anchored-nft-stellar-selection': {
         title: '係留NFT星選',
@@ -174,7 +177,7 @@ export const landingTextJa = {
   publicGoods: {
     eyebrow: '公共財',
     heading: 'すべてのサイクルが、Ethereumのコア貢献者を支えます。',
-    body: 'すべてのパフォーマンス・サイクルは、ETH準備金の一定割合を、170人以上のEthereumコア貢献者の共同資金支援メカニズムであるProtocol Guildへ送ります。プロトコルの利用が増えるほど、Ethereumを支えるインフラへ届く資金も増えます。',
+    body: '確定時に、プロトコルはサイクル準備金の設定された割合を公共財金庫へ送ろうとします。その後、誰でも別のトランザクションで残高を現在の受け手であるProtocol Guildへ送れます。所有者は受け手を変更できます。プロトコルから金庫への送付が失敗しても、確定を取り消さずにその分を準備金へ残す場合があります。',
     disclaimerHeading: '免責事項',
     // lexicon-allow-start: explicit legal denial of charitable-tax-treatment framing.
     disclaimer:
@@ -182,7 +185,8 @@ export const landingTextJa = {
     // lexicon-allow-end
     card: {
       label: 'サイクル配分',
-      description: '各サイクルのETH準備金からProtocol Guildへ送られる割合です。',
+      description:
+        '該当額は公共財金庫に入ります。誰でも別のトランザクションで、現在の受け手であるProtocol Guildへ金庫の残高を送れます。',
       tableRows: {
         contributors: { label: 'Protocol Guildの貢献者' },
         enforcement: { label: '執行', value: 'オンチェーン' },
@@ -215,7 +219,7 @@ export const landingTextJa = {
   verifiability: {
     eyebrow: '検証可能性',
     heading: 'オープンで、検証済みで、再現可能。',
-    body: 'シグネチャーは誰でもシードから再生成でき、アプリで公開しているコントラクト、ソースコード、監査の状況と照らし合わせて確認できます。',
+    body: 'NFTのシードはオンチェーンに保存され、画像と動画はオフチェーンで生成されます。再現には同じシード、適切なレンダラーの版と設定、互換性のあるツールが必要です。シードだけで異なる版の出力まで一致するとは限りません。',
     pillars: {
       cc0: {
         title: 'CC0 1.0',
@@ -227,7 +231,7 @@ export const landingTextJa = {
       },
       reproducible: {
         title: '再現可能なアート',
-        body: '生成されたフレームのSHA-256ハッシュを継続的インテグレーションで検証します。同じシード → 同一の出力。',
+        body: 'リポジトリには手動で実行する画像の再現性確認があります。現在の継続的インテグレーションは、生成フレームのハッシュを比較していません。',
       },
     },
     evidenceLabel: '自分で確かめる',
@@ -240,12 +244,13 @@ export const landingTextJa = {
     items: [
       {
         question: '参加者として、実際には何をするのですか？',
-        answer: `一筆を入れます。各一筆はETHまたはCSTのトランザクションで、サイクル確定時刻を延ばし、星選の対象を記録し、動的な参加CSTを刻印することがあり、サイクルのシグネチャーを形づくります。Cosmic Signature NFTを係留すると、係留配分の対象にもなります。${protocolFacts.councilProposalThresholdCst} CST以上を保有していれば、宇宙評議会を通じて調整提案を提出することもできます。`,
+        answer:
+          'V3では、次の一筆が直前の一筆を入れた参加者に参加CSTの全額を刻印します。数量は二つの一筆の間の時間に比例します。サイクル最初の一筆ではこのCSTは発生せず、確定時にも最後の参加者の未精算区間へ追加の参加CSTは支払われません。両方の一筆が同じアドレスなら、そのアドレス自身が受け取ります。',
       },
       {
         question: '作品はどのような技術で作られていますか？',
         answer:
-          '各Cosmic Signature NFTは、ニュートン力学による三体シミュレーションの決定論的なレンダリングです。オンチェーンのシードが候補軌道（4次ヨシダ・シンプレクティック積分器でシミュレーションした10万通りの中から）を選び、それがOKLabの色の混合とともに64の波長ビンでスペクトルレンダリングされます。パイプラインはCC0のもとで完全にオープンソースで、誰でもシードからシグネチャーを再現できます。',
+          'NFTのシードはオンチェーンに保存され、画像と動画はオフチェーンで生成されます。再現には同じシード、適切なレンダラーの版と設定、互換性のあるツールが必要です。シードだけで異なる版の出力まで一致するとは限りません。',
       },
       {
         question: 'ETHの配分はどこから来るのですか？',
@@ -255,7 +260,7 @@ export const landingTextJa = {
       // lexicon-allow-start: explicit denial of charitable-tax-treatment framing.
       {
         question: '公共財とは、正確には何ですか？',
-        answer: `各サイクルのETH準備金の${protocolFacts.publicGoodsPercentage}%が、公共財のアドレス——現在はProtocol Guild——へ送られます。Protocol Guildは170人以上のEthereumコア貢献者の共同資金支援メカニズムです。これは公共財のアドレスへのETHの送付であり、米国の税法上の慈善寄付ではなく、Cosmic Signatureはその税務上の扱いについて何も表明しません。`,
+        answer: `確定時に、プロトコルはサイクル準備金の${protocolFacts.publicGoodsPercentage}%を公共財金庫へ送ろうとします。その後、誰でも別のトランザクションで残高を現在の受け手であるProtocol Guildへ送れます。所有者は受け手を変更できます。プロトコルから金庫への送付が失敗しても、確定を取り消さずにその分を準備金へ残す場合があります。`,
       },
       // lexicon-allow-end
       // lexicon-allow-start: explicit denial of lottery, casino, gambling, house, dealer, and bet categories.
@@ -275,11 +280,12 @@ export const landingTextJa = {
       {
         question: '参加CSTの量はなぜ変わるのですか？',
         answer:
-          '参加CSTの刻印は、前の一筆からの経過時間に基づく平方根の式を使います。前の一筆から時間が空くほど刻印されるCSTは増えますが、平方根を使うため、増加のペースは次第に緩やかになります。ごく短い間隔の一筆は0 CSTを刻印することがあります。送信前にアプリが現在の量をプレビューします。',
+          'V3では、次の一筆が直前の一筆を入れた参加者に参加CSTの全額を刻印します。数量は二つの一筆の間の時間に比例します。サイクル最初の一筆ではこのCSTは発生せず、確定時にも最後の参加者の未精算区間へ追加の参加CSTは支払われません。両方の一筆が同じアドレスなら、そのアドレス自身が受け取ります。',
       },
       {
         question: 'ETH一筆とCST一筆はCST調律期間にどう影響しますか？',
-        answer: `CST調律期間はオンチェーンに保存され、一筆ごとに変わります。CST一筆は期間を約${protocolFacts.cstCalibrationWindowIncreasePercentPerCstGesture}%長くし、CST一筆の費用がより緩やかに下がるようにします。ETH一筆は期間を約${protocolFacts.cstCalibrationWindowDecreasePercentPerEthGesture}%短くし、CST一筆の費用がより速く下がるようにします。`,
+        answer:
+          'V3が保存するのはCST費用の下降速度で、期間の長さは速度と上限から求めます。ETH一筆はrate + floor(rate / 100)への増加を試み、CST一筆はrate - floor(rate / 101)へ減少させます。最短期間の条件に反する増加は行いません。CST一筆の後の上限は、加算前のCST基本費用の2倍、設定された最小値、新しい速度と180秒の積のうち最大の値です。次の一筆をすぐに入れることはできます。',
       },
       {
         question: 'フォークしてもいいですか？',

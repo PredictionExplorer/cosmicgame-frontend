@@ -289,9 +289,9 @@
       "netPositive": "이 제스처가 반영되면 각인되는 CST가 비용보다 많습니다.",
       "netNegative": "대부분의 CST 제스처는 받는 CST보다 더 많은 CST를 씁니다.",
       "durationMismatch": "API 보고값({apiDuration})과 달라 온체인 지속 시간({contractDuration})을 사용합니다.",
-      "economicsDescriptionV3": "CST 비용은 내 잔액에서 차감됩니다. 이 제스처로 생성되는 동적 CST는 내가 추월한 참여자에게 전액 각인되며, 나의 CST는 내가 최신 참여자로 있는 동안 쌓여 다음 제스처가 처리될 때 각인됩니다.",
-      "previewDescriptionV3": "이 제스처로 생성될 동적 CST의 예상 수량입니다. 전액이 내가 추월한 참여자에게 지급되며, 누군가 나를 추월하면 다음 제스처의 CST 전액을 내가 받습니다.",
-      "goesToOutbid": "추월당한 참여자에게 전액 지급됩니다. 내가 추월당하면 다음 제스처의 CST를 받습니다."
+      "economicsDescriptionV3": "V3에서는 다음 제스처가 이전 제스처 참여자에게 참여 CST 전액을 각인합니다. 수량은 두 제스처 사이의 시간에 선형으로 비례합니다. 사이클의 첫 제스처는 이 규칙으로 CST를 각인하지 않으며, 마감도 최종 제스처 참여자의 마지막 구간에 추가 참여 CST를 지급하지 않습니다. 두 제스처의 주소가 같으면 해당 주소가 직접 받습니다.",
+      "previewDescriptionV3": "V3에서는 다음 제스처가 이전 제스처 참여자에게 참여 CST 전액을 각인합니다. 수량은 두 제스처 사이의 시간에 선형으로 비례합니다. 사이클의 첫 제스처는 이 규칙으로 CST를 각인하지 않으며, 마감도 최종 제스처 참여자의 마지막 구간에 추가 참여 CST를 지급하지 않습니다. 두 제스처의 주소가 같으면 해당 주소가 직접 받습니다.",
+      "goesToOutbid": "V3에서는 다음 제스처가 이전 제스처 참여자에게 참여 CST 전액을 각인합니다. 수량은 두 제스처 사이의 시간에 선형으로 비례합니다. 사이클의 첫 제스처는 이 규칙으로 CST를 각인하지 않으며, 마감도 최종 제스처 참여자의 마지막 구간에 추가 참여 CST를 지급하지 않습니다. 두 제스처의 주소가 같으면 해당 주소가 직접 받습니다."
     },
     "preview": "실시간 제스처 옵션을 여기에서 미리 볼 수 있습니다. 지갑을 연결하면 메시지를 쓰고, 자산을 첨부하고, Arbitrum에 제스처를 제출할 수 있습니다.",
     "advanced": {
@@ -322,7 +322,7 @@
         "guarded": "표시된 금액에서 허용 오차를 뺀 값 이상을 요구",
         "toleranceLabel": "허용 오차",
         "toleranceHint": "이 견적과 트랜잭션 확정 사이의 변동을 허용합니다.",
-        "note": "제스처의 참여 CST는 추월당한 참여자에게 새겨지므로, 그 참여자가 본인일 때만 하한이 의미가 있습니다. 다른 제스처가 먼저 확정되면 하한 때문에 내 제스처가 되돌려질 수 있습니다.",
+        "note": "최소 참여 CST는 다음 제스처가 이전 참여자에게 각인할 수량을 제한하며, 제출자에게 지급할 수량을 보장하지 않습니다. 두 주소가 같으면 제출자가 직접 받습니다. 0은 이 제한을 해제하며, 사이클의 첫 ETH 제스처는 이 검사를 건너뜁니다. 최대 비용과 네트워크 수수료는 별도 조건입니다.",
         "autoNote": "자동 선택됨: 현재 내가 이 사이클의 최신 참여자이므로, 이 제스처의 참여 CST는 내 지갑으로 돌아옵니다."
       }
     },
@@ -379,7 +379,8 @@
     "reachesFloorIn": "{duration} 후 0 CST",
     "windowEndsIn": "{duration} 후 구간 종료",
     "windowDetails": "구간 길이: {duration}. 경과: {elapsed}.",
-    "floorIn": "{duration} 후"
+    "floorIn": "{duration} 후",
+    "cstSubtitleV3": "CST 기본 비용은 현재 온체인 속도로 내려갑니다. ETH 제스처는 속도를 높일 수 있고, CST 제스처는 속도를 낮추며 상한을 다시 설정합니다. 늦은 제스처 할증은 별도로 더합니다."
   },
   "allocation": {
     "title": "배분 내역",
@@ -400,7 +401,7 @@
       },
       "publicGoods": {
         "name": "공공재",
-        "tooltip": "모든 사이클 준비금의 {percent}%는 170명 이상의 이더리움 핵심 기여자를 위한 자금 지원 메커니즘인 Protocol Guild로 전달됩니다.",
+        "tooltip": "{percent}%는 공공재 금고에 배분됩니다. 누구나 별도로 잔액을 설정된 수령처인 Protocol Guild에 전달할 수 있습니다.",
         "recipientLabel": "Protocol Guild"
       },
       "ethStellar": {
@@ -514,10 +515,10 @@
     "monument": {
       "reserveLabel": "시그니처 배분",
       "extras": {
-        "base": "+ 1,000 CST · Cosmic Signature NFT 1개",
-        "withNft": "+ 1,000 CST · Cosmic Signature NFT 1개 · {nftCount, plural, other {첨부된 NFT #개}}",
-        "withErc20": "+ 1,000 CST · Cosmic Signature NFT 1개 · {erc20Count, plural, other {첨부된 토큰 적립 #건}}",
-        "withBoth": "+ 1,000 CST · Cosmic Signature NFT 1개 · {nftCount, plural, other {첨부된 NFT #개}} · {erc20Count, plural, other {첨부된 토큰 적립 #건}}"
+        "base": "+ 1,000 CST · {cscNftCount, plural, other {Cosmic Signature NFT #개}}",
+        "withNft": "+ 1,000 CST · {cscNftCount, plural, other {Cosmic Signature NFT #개}} · {nftCount, plural, other {첨부된 NFT #개}}",
+        "withErc20": "+ 1,000 CST · {cscNftCount, plural, other {Cosmic Signature NFT #개}} · {erc20Count, plural, other {첨부된 토큰 적립 #건}}",
+        "withBoth": "+ 1,000 CST · {cscNftCount, plural, other {Cosmic Signature NFT #개}} · {nftCount, plural, other {첨부된 NFT #개}} · {erc20Count, plural, other {첨부된 토큰 적립 #건}}"
       },
       "calendarTitle": "Cosmic Signature 사이클 {number} 시작",
       "calendarBody": "다음 퍼포먼스 사이클이 제스처를 받기 시작합니다. 첫 제스처가 마감 카운트다운을 시작합니다.",
@@ -528,7 +529,7 @@
       "subtitle": "이 사이클의 마감 시 배분 내역",
       "cstPlusNft": "1,000 CST + NFT",
       "cstPlusNftEach": "각 1,000 CST + NFT",
-      "stellarStatus": "제스처 하나가 자격 하나",
+      "stellarStatus": "V3 가중치 적용 기록",
       "ethGroup": "사이클 준비금의 ETH",
       "fixedGroup": "CST 및 NFT 배분"
     },
@@ -538,7 +539,7 @@
       "galleryCta": "갤러리",
       "viewAria": "Cosmic Signature {id} 보기",
       "alt": "Cosmic Signature 작품 {id}: 결정론적 삼체 제너러티브 아트",
-      "pairingNote": "온체인에 각인된 결정론적 삼체 아트. 모든 시그니처에는 1,000 CST가 함께합니다.",
+      "pairingNote": "고정 배분에는 CST가 포함됩니다. 기본 배분의 NFT 전체에 대해 하나의 고정 CST 수량을 받습니다.",
       "watchDrawing": "그려지는 과정 보기",
       "showFinished": "완성된 작품 보기"
     },
@@ -583,7 +584,7 @@
     "clock": {
       "reserveLabel": "시그니처 배분",
       "reserveExtraCst": "+ 1,000 CST",
-      "reserveExtraNft": "Cosmic Signature NFT 1개",
+      "reserveExtraNft": "{count, plural, other {Cosmic Signature NFT #개}}",
       "reserveAttached": "{count, plural, other {첨부 자산 #개}}",
       "reserveUsd": "≈ {amount} USD",
       "calendarTitle": "Cosmic Signature 사이클 {number} 시작",

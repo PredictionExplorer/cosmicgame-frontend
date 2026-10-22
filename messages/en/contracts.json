@@ -21,7 +21,7 @@
     },
     "cst": {
       "name": "Cosmic Signature CST Token",
-      "description": "ERC-20 token (CST) imprinted with every gesture and used to express Coordination Weight on the Cosmic Council"
+      "description": "ERC-20 token (CST) created through Participation CST and fixed allocations, and used for delegated Coordination Weight"
     },
     "nft": {
       "name": "Cosmic Signature NFT",
@@ -64,9 +64,9 @@
   "addresses": {
     "title": "Contract addresses",
     "description": "Every Cosmic Signature contract on Arbitrum One. Copy an address, or check it on Arbiscan and its source code on Sourcify.",
-    "verified": "Every address with a Sourcify link is an exact match there, checked {date}.",
+    "verified": "Companion contracts and the historical V2 implementation have published matches checked {date}. The current V3 implementation is not yet verified on Sourcify; inspect its own lookup.",
     "markets": "Markets",
-    "reported": "The indexer reports {address}, which has not been verified."
+    "reported": "The indexer reports {address}, which differs from the checked address shown here."
   },
   "funds": {
     "title": "Allocation tracks",
@@ -75,7 +75,7 @@
     "segments": {
       "signature": {
         "label": "Signature Allocation",
-        "tooltip": "ETH percentage retrieved by the participant who made the Final Gesture; they also receive 1,000 CST and a Cosmic Signature NFT"
+        "tooltip": "ETH share received by the finalization caller, together with 1,000 CST in total and the configured Signature NFT allocation"
       },
       "chrono": {
         "label": "Chrono-Warrior",
@@ -83,7 +83,7 @@
       },
       "stellar": {
         "label": "Stellar Selection",
-        "tooltip": "Portion distributed to randomly selected participants when the cycle finalizes"
+        "tooltip": "Participant ETH selections use undiscounted, premium-free ETH base-cost weights in V3, including the concurrent ETH base cost for CST gestures"
       },
       "anchor": {
         "label": "Anchor Distribution",
@@ -91,7 +91,7 @@
       },
       "publicGoods": {
         "label": "Public Goods",
-        "tooltip": "Forwarded to the Public Goods Beneficiary (Protocol Guild) each cycle"
+        "tooltip": "Allocated to the Public Goods Vault for a separate permissionless transfer to its configured beneficiary"
       },
       "next": {
         "label": "Compounding Cycle Reserve",
@@ -113,7 +113,7 @@
       },
       "cstPreview": {
         "label": "Participation CST now",
-        "tooltip": "Estimated Participation CST if a gesture lands now. The amount is dynamic and uses {formula}."
+        "tooltip": "Estimated amount credited to the previous participant by a later gesture in V3. Formula: {formula}, in CST smallest units. The first gesture credits none; finalization does not settle an additional amount."
       },
       "finalization": {
         "label": "Finalization timeout",
@@ -125,12 +125,12 @@
       },
       "message": {
         "label": "Message length limit",
-        "tooltip": "Maximum character length allowed in gesture messages"
+        "tooltip": "Maximum UTF-8 byte length of a gesture message"
       },
       "v3CstDecline": {
         "label": "CST Price Decline Rate",
         "value": "{amount} CST/min",
-        "tooltip": "How fast the CST Gesture Cost declines during the CST Calibration Window. Each Participation CST imprint is credited in full to the participant being outbid."
+        "tooltip": "The live CST base-cost decline rate. ETH can increase it subject to a safeguard; CST reduces it and resets the ceiling. Participation CST is a separate calculation."
       },
       "v3SignatureNfts": {
         "label": "Signature Allocation NFTs",
@@ -164,7 +164,7 @@
     },
     "ceiling": "Starting cost",
     "cstDurationTooltip": "Live stored duration of the CST Calibration Window. CST gestures lengthen it by about {increase}%; ETH gestures shorten it by about {decrease}%.",
-    "cstCeilingTooltip": "Starting Gesture Cost of the CST Calibration Window currently displayed. The cost descends linearly across the live stored duration.",
+    "cstCeilingTooltip": "The current beginning base cost. It declines at the on-chain rate; the late-gesture premium is calculated separately.",
     "publicGoodsAddress": "Public Goods Beneficiary",
     "publicGoodsAddressTooltip": "The on-chain address currently receiving the Public Goods Allocation from the Public Goods Vault contract",
     "selection": {
@@ -177,7 +177,8 @@
     },
     "cstComplete": "The window has run its full length, so the CST Gesture Cost stays at its floor until the next CST gesture restarts it.",
     "ethClosed": "The cycle’s first gesture closed this window; the ETH Gesture Cost now steps up with each gesture.",
-    "ethComplete": "The window has run its full length, so the ETH Gesture Cost stays at its floor until the cycle’s first gesture."
+    "ethComplete": "The window has run its full length, so the ETH Gesture Cost stays at its floor until the cycle’s first gesture.",
+    "cstDurationTooltipV3": "Derived from the current CST ceiling and decline rate. V3 adjusts the rate and resets the ceiling after CST gestures; it does not adjust a stored duration by fixed percentages."
   },
   "vault": {
     "title": "Public Goods",

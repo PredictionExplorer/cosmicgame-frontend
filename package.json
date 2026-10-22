@@ -36,6 +36,7 @@
     "terminology:check": "tsx scripts/terminology-consistency.ts",
     "lexicon:scan": "tsx scripts/lexicon-scan.ts",
     "white-paper:pdf": "tsx scripts/generate-white-paper-pdf.ts",
+    "llms:build": "tsx scripts/generate-llms-docs.ts",
     "og:fonts": "tsx scripts/build-og-fonts.ts",
     "seo:share-check": "tsx scripts/share-metadata-check.ts",
     "brand:icons": "tsx scripts/build-brand-icons.ts",

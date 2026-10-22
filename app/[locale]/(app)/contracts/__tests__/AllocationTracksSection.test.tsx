@@ -102,17 +102,20 @@ describe('AllocationTracksSection', () => {
 
 describe('AllocationTracksSection definitions', () => {
   const SEGMENT_DEFINITIONS: Array<{ label: string; definition: RegExp }> = [
-    { label: 'Signature Allocation', definition: /participant who made the Final Gesture/ },
+    { label: 'Signature Allocation', definition: /finalization caller/ },
     { label: 'Chrono-Warrior', definition: /ETH allocation to the Chrono-Warrior/ },
     {
       label: 'Stellar Selection',
-      definition: /Portion distributed to randomly selected participants/,
+      definition: /undiscounted, premium-free ETH base-cost weights/,
     },
     {
       label: 'Anchor Distribution',
       definition: /ETH Anchor Distributions to Cosmic Signature NFT anchor-holders/,
     },
-    { label: 'Public Goods', definition: /Forwarded to the Public Goods Beneficiary/ },
+    {
+      label: 'Public Goods',
+      definition: /Public Goods Vault for a separate permissionless transfer/,
+    },
     { label: 'Compounding Cycle Reserve', definition: /roll forward into the next cycle/ },
   ];
 

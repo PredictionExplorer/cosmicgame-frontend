@@ -3,7 +3,8 @@ import {
   CONTRACT_ENTRY_IDS,
   contractEntryCopy,
 } from '@/content/legal/contractRegistry';
-import { protocolFacts } from '@/content/protocol-facts';
+import { historicalV2ProtocolFacts, protocolFacts } from '@/content/protocol-facts';
+import { isSourcifyVerified } from '@/content/legal/officialAddresses';
 
 const copy = contractEntryCopy((key) => key);
 const API = {
@@ -21,7 +22,13 @@ const API = {
 };
 
 describe('buildContracts', () => {
-  it('lists the eleven verified contracts on Arbitrum One, whatever the indexer answers', () => {
+  it('does not inherit a public verification status when the implementation changes', () => {
+    expect(isSourcifyVerified(historicalV2ProtocolFacts.contractAddresses.implementation)).toBe(
+      true,
+    );
+    expect(isSourcifyVerified(protocolFacts.contractAddresses.implementation)).toBe(false);
+  });
+  it('lists the eleven checked contracts on Arbitrum One, whatever the indexer answers', () => {
     for (const api of [API, null]) {
       const contracts = buildContracts(api, copy, { verified: true });
       expect(contracts.map((contract) => contract.id)).toEqual(CONTRACT_ENTRY_IDS);
@@ -31,15 +38,16 @@ describe('buildContracts', () => {
     }
   });
 
-  it('keeps a differing indexer address as drift, except the lagging implementation', () => {
+  it('reports implementation drift while preserving the checked address', () => {
     const contracts = buildContracts(API, copy, { verified: true });
     const byId = Object.fromEntries(contracts.map((contract) => [contract.id, contract]));
     expect(byId.cst?.address).toBe(protocolFacts.contractAddresses.cstToken);
     expect(byId.cst?.reported).toBe(API.CosmicTokenAddr);
     expect(byId.protocol?.reported).toBeUndefined();
-    // An empty field is not drift, and the dashboard's pre-upgrade implementation is not either.
+    // Missing indexer data is distinct from a conflicting implementation.
     expect(byId.rwalkAnchor?.reported).toBeUndefined();
-    expect(byId.implementation?.reported).toBeUndefined();
+    expect(byId.implementation?.reported).toBe(API.ImplementationAddr);
+    expect(byId.implementation?.address).toBe(protocolFacts.contractAddresses.implementation);
   });
 
   it('lists what the indexer reports on another network, leaving out what it does not', () => {

@@ -18,7 +18,7 @@
     "calibrationWindow": {
       "term": "Cửa sổ hiệu chỉnh",
       "short": "Khoảng thời gian chi phí nét bút giảm dần từ trần hiệu chỉnh xuống sàn hiệu chỉnh: bạn càng chờ lâu, chi phí càng thấp.",
-      "long": "Nét bút ETH và nét bút CST theo các cửa sổ riêng. Cửa sổ CST được lưu trên chuỗi và thay đổi sau mỗi nét bút: nét bút CST kéo dài cửa sổ một chút, còn nét bút ETH rút ngắn nó."
+      "long": "V3 lưu tốc độ giảm chi phí CST; độ dài cửa sổ được tính từ tốc độ và mức trần. Nét bút ETH thử tăng tốc độ theo rate + floor(rate / 100), còn nét bút CST giảm theo rate - floor(rate / 101). Nếu mức tăng vi phạm điều kiện thời lượng tối thiểu, nó không được áp dụng. Nét bút CST đặt lại mức trần bằng giá trị lớn nhất giữa hai lần chi phí CST cơ sở chưa có phụ phí, mức tối thiểu đã cấu hình, và tốc độ mới nhân 180 giây. Bạn vẫn có thể đặt nét bút tiếp theo ngay lập tức."
     },
     "cycleReserve": {
       "term": "Dự trữ chu kỳ",
@@ -27,7 +27,7 @@
     },
     "signatureAllocation": {
       "term": "Phân bổ Signature",
-      "short": "Phân bổ dành cho người hoàn tất chu kỳ: một phần Dự trữ chu kỳ bằng ETH, CST ghi nhận và một Cosmic Signature NFT.",
+      "short": "Người hoàn tất nhận 3 Cosmic Signature NFT có ID liên tiếp và tổng cộng 1.000 CST. Quyền hoàn tất tuân theo thời gian độc quyền và thời gian mở.",
       "long": "Người đang giữ Nét bút gần nhất có thể hoàn tất chu kỳ và nhận về phân bổ này, kèm quyền ưu tiên với các token và NFT đính kèm nét bút. Nếu người đó không hoàn tất trong khoảng thời gian dành riêng, người thực hiện hoàn tất sẽ nhận phân bổ."
     },
     "finalCstGesture": {
@@ -48,7 +48,7 @@
     "stellarSelection": {
       "term": "Tinh tuyển",
       "short": "Việc chọn ngẫu nhiên của giao thức khi hoàn tất, để xác định người nhận phân bổ trong số các lượt đã ghi nhận.",
-      "long": "Mỗi nét bút ghi nhận một lượt; từ phiên bản giao thức 3, trọng số của mỗi lượt bằng chi phí ETH của nét bút tại thời điểm thực hiện, còn ở các chu kỳ trước đó mọi lượt có trọng số như nhau. Khi hoàn tất, hợp đồng dùng nguồn ngẫu nhiên trên chuỗi để chọn các lượt nhận phân bổ ETH và Cosmic Signature NFT; các Random Walk NFT đang neo giữ tham gia một đợt Tinh tuyển riêng. Cùng một địa chỉ có thể được chọn nhiều lần."
+      "long": "Cả ETH Tinh tuyển và NFT Tinh tuyển dành cho người tham gia đều dùng trọng số từng nét bút. Trọng số là chi phí ETH cơ sở tại thời điểm đó, chưa giảm bằng Random Walk NFT và chưa cộng phụ phí cuối chu kỳ. Nét bút CST dùng cùng chi phí ETH cơ sở đương thời. Các lượt chọn có hoàn lại, nên một địa chỉ có thể được chọn nhiều lần. Tinh tuyển NFT neo giữ xét riêng các Random Walk NFT đang neo giữ."
     },
     "anchoring": {
       "term": "Neo giữ",
@@ -88,7 +88,7 @@
     "cst": {
       "term": "CST",
       "short": "Cosmic Signature Token, token ERC-20 của giao thức.",
-      "long": "Nét bút có thể khắc CST, và CST dùng để trả chi phí cho nét bút CST, khi đó số CST này bị đốt. CST đã ủy quyền tạo nên trọng số điều phối trong Hội đồng Vũ trụ."
+      "long": "Trong V3, nét bút tiếp theo khắc toàn bộ CST tham gia cho người đặt nét bút trước. Số lượng tăng tuyến tính theo thời gian giữa hai nét bút. Nét bút đầu tiên của chu kỳ không khắc CST theo quy tắc này, và hoàn tất không thanh toán thêm khoảng thời gian cuối cho người đặt nét bút cuối cùng. Nếu cả hai nét bút thuộc cùng một địa chỉ, địa chỉ đó nhận CST."
     }
   }
 }

@@ -1,5 +1,7 @@
 import { protocolFacts } from '@/content/protocol-facts';
 
+import { formatCount, formatNumber } from '@/utils/format/numbers';
+
 import type { QuizTierQuestionsText } from './structure';
 
 const cst = (amount: number): string => amount.toLocaleString('vi-VN');
@@ -19,7 +21,7 @@ export const mediumQuestionsTextVi = {
   'eth-opening-price-discovery': {
     prompt: 'Một chu kỳ mới khám phá chi phí nét bút ETH mở đầu của mình như thế nào?',
     options: {
-      a: `Cửa sổ hiệu chỉnh ETH bắt đầu ở ${protocolFacts.ethCalibrationCeilingMultiplier} lần chi phí mở đầu đã trả của chu kỳ trước và giảm tuyến tính về sàn bằng một phần hai trăm của mức đó, cộng một wei.`,
+      a: 'ETH và CST có quy tắc chi phí cơ sở riêng. Khi chu kỳ mở, chi phí ETH giảm trong cửa sổ hiệu chỉnh; mỗi nét bút ETH nâng chi phí cơ sở tiếp theo. Chi phí CST giảm theo tốc độ lưu trên chuỗi. Gần hạn hoàn tất, cả hai chi phí có phụ phí cuối chu kỳ, nhưng phụ phí không nâng chi phí cơ sở tiếp theo hay trọng số Tinh tuyển.',
       b: `Mỗi chu kỳ mở ở mức cố định ${viDecimal(String(protocolFacts.initialGestureCostEth))} ETH.`,
       c: 'Hội đồng Vũ trụ biểu quyết chi phí mở đầu của mỗi chu kỳ.',
       d: 'Chi phí gấp đôi mỗi giờ cho đến khi có người đặt nét bút.',
@@ -35,7 +37,8 @@ export const mediumQuestionsTextVi = {
       c: 'Nó giữ nguyên cho đến khi chu kỳ hoàn tất.',
       d: `Nó giảm ${protocolFacts.ethGestureCostStepUpPercent}% để mời gọi thêm hoạt động.`,
     },
-    explanation: `Sau nét bút mở, mỗi nét bút ETH nâng chi phí nét bút ETH tiếp theo lên ${protocolFacts.ethGestureCostStepUpPercent}%, cộng một wei, nên chi phí luôn tăng. Bất kỳ ai cũng có thể đọc chi phí hiện tại từ hợp đồng trước khi hành động \u2014 không có bất ngờ, chỉ có một bậc thang đi lên.`,
+    explanation:
+      'ETH và CST có quy tắc chi phí cơ sở riêng. Khi chu kỳ mở, chi phí ETH giảm trong cửa sổ hiệu chỉnh; mỗi nét bút ETH nâng chi phí cơ sở tiếp theo. Chi phí CST giảm theo tốc độ lưu trên chuỗi. Gần hạn hoàn tất, cả hai chi phí có phụ phí cuối chu kỳ, nhưng phụ phí không nâng chi phí cơ sở tiếp theo hay trọng số Tinh tuyển.',
     funFact:
       'Một wei thêm vào rất quan trọng: nó bảo đảm tăng trưởng nghiêm ngặt ngay cả khi chi phí nhỏ đến mức phần trăm của nó làm tròn về không.',
     referenceLabel: 'Sách trắng \u00a74.1 \u2014 Nét bút ETH',
@@ -55,12 +58,13 @@ export const mediumQuestionsTextVi = {
   'cst-window-restart': {
     prompt: 'Lyra đặt một nét bút CST. Điều đó làm gì với cửa sổ hiệu chỉnh CST?',
     options: {
-      a: `Nó khởi động lại cửa sổ từ ${protocolFacts.cstCalibrationCeilingMultiplier} lần chi phí cô vừa trả \u2014 không bao giờ dưới ${cst(protocolFacts.cstCalibrationCeilingMinCst)} CST \u2014 rồi lại giảm tuyến tính về không.`,
+      a: 'V3 lưu tốc độ giảm chi phí CST; độ dài cửa sổ được tính từ tốc độ và mức trần. Nét bút ETH thử tăng tốc độ theo rate + floor(rate / 100), còn nét bút CST giảm theo rate - floor(rate / 101). Nếu mức tăng vi phạm điều kiện thời lượng tối thiểu, nó không được áp dụng. Nét bút CST đặt lại mức trần bằng giá trị lớn nhất giữa hai lần chi phí CST cơ sở chưa có phụ phí, mức tối thiểu đã cấu hình, và tốc độ mới nhân 180 giây. Bạn vẫn có thể đặt nét bút tiếp theo ngay lập tức.',
       b: 'Không gì cả \u2014 cửa sổ tiếp tục giảm từ chỗ đang đứng.',
       c: `Chi phí khóa ở ${cst(protocolFacts.cstCalibrationCeilingMinCst)} CST cho phần còn lại của chu kỳ.`,
       d: 'Cửa sổ đóng và nét bút CST tạm dừng đến chu kỳ sau.',
     },
-    explanation: `Mỗi nét bút CST khởi động lại cửa sổ từ giá trị khởi điểm mới: ${protocolFacts.cstCalibrationCeilingMultiplier} lần chi phí trả gần nhất, với sàn ${cst(protocolFacts.cstCalibrationCeilingMinCst)} CST cho điểm khởi đầu. Từ đó chi phí giảm tuyến tính về không trong thời lượng của cửa sổ. Số CST đã chi bị đốt trên đường đi.`,
+    explanation:
+      'V3 lưu tốc độ giảm chi phí CST; độ dài cửa sổ được tính từ tốc độ và mức trần. Nét bút ETH thử tăng tốc độ theo rate + floor(rate / 100), còn nét bút CST giảm theo rate - floor(rate / 101). Nếu mức tăng vi phạm điều kiện thời lượng tối thiểu, nó không được áp dụng. Nét bút CST đặt lại mức trần bằng giá trị lớn nhất giữa hai lần chi phí CST cơ sở chưa có phụ phí, mức tối thiểu đã cấu hình, và tốc độ mới nhân 180 giây. Bạn vẫn có thể đặt nét bút tiếp theo ngay lập tức.',
     referenceLabel: 'Sách trắng \u00a74.3 \u2014 Nét bút CST',
   },
   'cst-free-quiet': {
@@ -80,26 +84,27 @@ export const mediumQuestionsTextVi = {
     prompt:
       'Một loạt nét bút ETH quét qua chu kỳ. Điều đó làm gì với thời lượng của cửa sổ hiệu chỉnh CST?',
     options: {
-      a: `Mỗi nét bút ETH rút ngắn nó khoảng ${percent(protocolFacts.cstCalibrationWindowDecreasePercentPerEthGesture)}%, nên chi phí CST giảm nhanh hơn và nét bút CST sớm trở nên hấp dẫn.`,
+      a: 'V3 lưu tốc độ giảm chi phí CST; độ dài cửa sổ được tính từ tốc độ và mức trần. Nét bút ETH thử tăng tốc độ theo rate + floor(rate / 100), còn nét bút CST giảm theo rate - floor(rate / 101). Nếu mức tăng vi phạm điều kiện thời lượng tối thiểu, nó không được áp dụng. Nét bút CST đặt lại mức trần bằng giá trị lớn nhất giữa hai lần chi phí CST cơ sở chưa có phụ phí, mức tối thiểu đã cấu hình, và tốc độ mới nhân 180 giây. Bạn vẫn có thể đặt nét bút tiếp theo ngay lập tức.',
       b: `Mỗi nét bút ETH kéo dài nó khoảng ${percent(protocolFacts.cstCalibrationWindowIncreasePercentPerCstGesture)}%, làm chậm đường giảm của CST.`,
       c: 'Không gì cả \u2014 hai loại tiền độc lập với nhau.',
       d: 'Cửa sổ đặt lại về thời lượng ban đầu.',
     },
-    explanation: `Thời lượng cửa sổ thay đổi theo hoạt động, tạo cơ chế phản hồi giữa hai loại nét bút: mỗi nét bút ETH rút ngắn nó khoảng ${percent(protocolFacts.cstCalibrationWindowDecreasePercentPerEthGesture)}%, mỗi nét bút CST kéo dài nó khoảng ${percent(protocolFacts.cstCalibrationWindowIncreasePercentPerCstGesture)}%. Hoạt động ETH sôi động đẩy nhanh đường giảm của CST, và hoạt động CST sôi động lại làm chậm nó \u2014 đẩy mỗi chu kỳ về một cán cân hài hòa.`,
+    explanation:
+      'V3 lưu tốc độ giảm chi phí CST; độ dài cửa sổ được tính từ tốc độ và mức trần. Nét bút ETH thử tăng tốc độ theo rate + floor(rate / 100), còn nét bút CST giảm theo rate - floor(rate / 101). Nếu mức tăng vi phạm điều kiện thời lượng tối thiểu, nó không được áp dụng. Nét bút CST đặt lại mức trần bằng giá trị lớn nhất giữa hai lần chi phí CST cơ sở chưa có phụ phí, mức tối thiểu đã cấu hình, và tốc độ mới nhân 180 giây. Bạn vẫn có thể đặt nét bút tiếp theo ngay lập tức.',
     referenceLabel: 'Sách trắng \u00a74.3 \u2014 Nét bút CST',
   },
   'participation-cst-timing': {
     prompt:
       'Hai nét bút khắc CST tham gia với các tham số lúc ra mắt: một nét đến 1 giây sau nét bút trước, nét kia kết thúc trọn một ngày yên lặng. Mỗi nét khắc khoảng bao nhiêu?',
     options: {
-      a: `Khoảng ${viDecimal(oneSecondExample.cst)} CST và khoảng ${viDecimal(oneDayExample.cst)} CST \u2014 lượng này tăng theo căn bậc hai của thời gian đã trôi qua.`,
+      a: `Khoảng ${formatNumber(Number(oneSecondExample.cst.replaceAll(',', '')), 'vi', { maximumFractionDigits: 6 })} CST và ${formatNumber(Number(oneDayExample.cst.replaceAll(',', '')), 'vi', { maximumFractionDigits: 6 })} CST cho người tham gia trước; lượng tăng tuyến tính.`,
       b: `Mỗi nét một mức cố định ${cst(100)} CST, bất kể thời điểm.`,
       c: 'Bằng nhau \u2014 thời điểm không bao giờ quan trọng.',
       d: 'Không cho cả hai \u2014 chỉ hoàn tất mới khắc CST.',
     },
-    explanation: `CST tham gia tăng theo căn bậc hai của thời gian kể từ nét bút trước: một nét bút đến sau một giây khắc gần như không có gì (khoảng ${viDecimal(oneSecondExample.cst)} CST), trong khi nét kết thúc một ngày yên lặng khắc hàng trăm (khoảng ${viDecimal(oneDayExample.cst)} CST). Mức cố định ${cst(100)} CST mỗi nét bút là quy tắc V1 ban đầu \u2014 nó biến những chuỗi tốc độ máy thành CST không tốn chi phí, chính là lý do V2 thay thế nó.`,
+    explanation: `Số đơn vị nhỏ nhất của CST tham gia bằng ${protocolFacts.dynamicCstRewardFormula}. Thời gian đã trôi qua tính bằng giây, còn mức tăng thời gian của chu kỳ tính bằng micro giây. Chia kết quả cho 10^18 để biểu diễn bằng CST. Nét bút tiếp theo khắc toàn bộ cho người tham gia trước. Nét bút đầu tiên không tạo CST tham gia; hoàn tất cũng không thanh toán thêm khoảng thời gian cuối.`,
     funFact:
-      'Khoảng cách giữa hai nét bút quyết định lượng CST tham gia. Nét bút liên tiếp quá gần nhau có thể khắc gần 0 CST tham gia; CST ghi nhận và Dự trữ truyền thông được khắc theo quy tắc riêng.',
+      'Trong V3, nét bút tiếp theo khắc toàn bộ CST tham gia cho người đặt nét bút trước. Số lượng tăng tuyến tính theo thời gian giữa hai nét bút. Nét bút đầu tiên của chu kỳ không khắc CST theo quy tắc này, và hoàn tất không thanh toán thêm khoảng thời gian cuối cho người đặt nét bút cuối cùng. Nếu cả hai nét bút thuộc cùng một địa chỉ, địa chỉ đó nhận CST.',
     referenceLabel: 'Sách trắng \u00a77.1 \u2014 Quy tắc khắc',
   },
   'cst-max-cost-protection': {
@@ -160,20 +165,20 @@ export const mediumQuestionsTextVi = {
       c: `${cst(protocolFacts.outreachReserveCst)} CST, chọn một lần.`,
       d: `Chỉ một NFT, chọn ${protocolFacts.typicalNftsPerCycle} lần.`,
     },
-    explanation: `NFT Tinh tuyển chọn ${protocolFacts.nftStellarSelectionRecipients} lượt; mỗi lượt mang ${cst(protocolFacts.specialAllocationCst)} CST và một NFT. CST ghi nhận luôn đi cùng NFT của nó \u2014 mọi lần phân phối NFT khi hoàn tất đều ghép đôi hai thứ này.`,
+    explanation: `Khi có đủ các luồng, một chu kỳ khắc ${protocolFacts.typicalNftsPerCycle} Cosmic Signature NFT và ${formatCount(protocolFacts.typicalCstImprintsPerCycle, 'vi')} CST trong các phân bổ cố định. Phân bổ Signature gồm ${protocolFacts.mainPrizeNftsPerCycle} NFT nhưng chỉ một khoản tổng cộng ${formatCount(protocolFacts.specialAllocationCst, 'vi')} CST. Chiến binh Thời gian, Quán quân Bền bỉ và nét bút CST cuối cùng mỗi luồng có một NFT cùng CST tương ứng; hai luồng NFT Tinh tuyển bổ sung phần còn lại. Nếu không có nét bút CST hoặc Random Walk NFT neo giữ thì luồng tương ứng bị bỏ qua. CST tham gia được tính riêng.`,
     referenceLabel: 'Sách trắng \u00a75.1 \u2014 Phân phối khi hoàn tất',
   },
   'draws-with-replacement': {
     prompt:
       'Cùng một người tham gia có thể được chọn nhiều lần trong Tinh tuyển của một chu kỳ không?',
     options: {
-      a: 'Có \u2014 các lượt chọn có hoàn lại, và số lượt tăng theo số nét bút đã đặt.',
+      a: 'Trọng số là chi phí ETH cơ sở lúc đặt nét bút, không gồm mức giảm hay phụ phí cuối chu kỳ. Một địa chỉ có thể được chọn nhiều lần.',
       b: 'Không \u2014 mỗi người tham gia chỉ được chọn tối đa một lần.',
       c: 'Chỉ người tham gia có từ mười nét bút trở lên mới có thể lặp lại.',
       d: 'Chỉ khi Hội đồng Vũ trụ phê duyệt việc lặp lại.',
     },
     explanation:
-      'Các lượt chọn có hoàn lại, nên cùng một người tham gia có thể được chọn nhiều lần. Mỗi nét bút ghi nhận một lượt, khiến tần suất được chọn tỷ lệ với mức tham gia \u2014 cơ chế tăng theo hoạt động thay vì chia định mức một lượt cho mỗi địa chỉ.',
+      'Cả ETH Tinh tuyển và NFT Tinh tuyển dành cho người tham gia đều dùng trọng số từng nét bút. Trọng số là chi phí ETH cơ sở tại thời điểm đó, chưa giảm bằng Random Walk NFT và chưa cộng phụ phí cuối chu kỳ. Nét bút CST dùng cùng chi phí ETH cơ sở đương thời. Các lượt chọn có hoàn lại, nên một địa chỉ có thể được chọn nhiều lần. Tinh tuyển NFT neo giữ xét riêng các Random Walk NFT đang neo giữ.',
     referenceLabel: 'Sách trắng \u00a75.3 \u2014 Tinh tuyển',
   },
   'anchored-rwlk-track': {
@@ -219,8 +224,7 @@ export const mediumQuestionsTextVi = {
       c: 'Mọi thứ chờ trong ký quỹ, kể cả phần của người nhận chu kỳ.',
       d: 'Chỉ CST được ký quỹ; toàn bộ ETH đi trực tiếp.',
     },
-    explanation:
-      'Phân bổ được gửi trực tiếp hoặc giữ lại để người nhận tự nhận về. ETH của người nhận chu kỳ và khoản chuyển Hàng hóa công được đẩy đi trong lúc hoàn tất; các phân bổ ETH phụ được đặt vào ví phân bổ để từng người nhận nhận về. CST và NFT được khắc trực tiếp cho người nhận.',
+    explanation: `Khi hoàn tất, giao thức thử chuyển ${protocolFacts.publicGoodsPercentage}% Dự trữ chu kỳ vào Kho Hàng hóa công. Sau đó bất kỳ ai cũng có thể dùng một giao dịch riêng để chuyển số dư kho tới đơn vị thụ hưởng hiện tại là Protocol Guild. Chủ sở hữu có thể thay đổi đơn vị thụ hưởng. Nếu chuyển từ giao thức vào kho thất bại, phần này có thể ở lại dự trữ mà không hủy hoàn tất.`,
     referenceLabel: 'Sách trắng \u00a75.4 \u2014 Giao nhận, ký quỹ và thời hạn',
   },
   'council-proposal-threshold': {
@@ -231,7 +235,8 @@ export const mediumQuestionsTextVi = {
       c: `Ít nhất ${cst(protocolFacts.outreachReserveCst)} CST.`,
       d: 'Bất kỳ lượng nào \u2014 không có ngưỡng.',
     },
-    explanation: `Ngưỡng đề xuất là ${protocolFacts.councilProposalThresholdCst} CST trọng số được ủy quyền \u2014 khiêm tốn một cách có chủ đích, để việc đề xuất luôn dễ tiếp cận. Con số ${cst(protocolFacts.specialAllocationCst)} CST là CST ghi nhận đi cùng mỗi lần phân phối NFT, một hằng số khác dễ bị nhầm với nó.`,
+    explanation:
+      'CST có thể dùng để đặt nét bút hoặc, sau khi ủy quyền, làm Trọng số Điều phối trong Hội đồng Vũ trụ. Hội đồng chỉ quản lý tài sản và quyền mà mình thực sự nắm giữ. Hiện Hội đồng không sở hữu giao thức chính; chuyển giao hoặc từ bỏ quyền cần các thao tác riêng trên chuỗi.',
     referenceLabel: 'Sách trắng \u00a79 \u2014 Hội đồng Vũ trụ',
   },
   'council-timeline': {
@@ -284,12 +289,12 @@ export const mediumQuestionsTextVi = {
   'typical-cst-fixed': {
     prompt: 'Một chu kỳ điển hình khắc bao nhiêu CST cố định, và cơ cấu ra sao?',
     options: {
-      a: `${cst(protocolFacts.typicalCstImprintsPerCycle)} CST \u2014 ${cst(protocolFacts.specialAllocationCst)} CST đi cùng mỗi lần trong ${protocolFacts.typicalNftsPerCycle} lần phân phối NFT, cộng ${cst(protocolFacts.outreachReserveCst)} CST cho Dự trữ truyền thông.`,
+      a: `Khi có đủ các luồng, một chu kỳ khắc ${protocolFacts.typicalNftsPerCycle} Cosmic Signature NFT và ${formatCount(protocolFacts.typicalCstImprintsPerCycle, 'vi')} CST trong các phân bổ cố định. Phân bổ Signature gồm ${protocolFacts.mainPrizeNftsPerCycle} NFT nhưng chỉ một khoản tổng cộng ${formatCount(protocolFacts.specialAllocationCst, 'vi')} CST. Chiến binh Thời gian, Quán quân Bền bỉ và nét bút CST cuối cùng mỗi luồng có một NFT cùng CST tương ứng; hai luồng NFT Tinh tuyển bổ sung phần còn lại. Nếu không có nét bút CST hoặc Random Walk NFT neo giữ thì luồng tương ứng bị bỏ qua. CST tham gia được tính riêng.`,
       b: `${cst(protocolFacts.specialAllocationCst)} CST, toàn bộ cho người nhận chu kỳ.`,
       c: `${cst(protocolFacts.outreachReserveCst)} CST, toàn bộ cho truyền thông cộng đồng.`,
       d: 'Nó thay đổi khó lường từ chu kỳ này sang chu kỳ khác.',
     },
-    explanation: `Các dòng cố định là chính xác: ${protocolFacts.typicalNftsPerCycle} lần khắc đi cùng NFT, mỗi lần ${cst(protocolFacts.specialAllocationCst)} CST, cộng ${cst(protocolFacts.outreachReserveCst)} CST truyền thông, tổng cộng ${cst(protocolFacts.typicalCstImprintsPerCycle)} CST trong một chu kỳ điển hình. CST tham gia động từ các nét bút riêng lẻ là phần cộng thêm và phụ thuộc vào thời điểm.`,
+    explanation: `Khi có đủ các luồng, một chu kỳ khắc ${protocolFacts.typicalNftsPerCycle} Cosmic Signature NFT và ${formatCount(protocolFacts.typicalCstImprintsPerCycle, 'vi')} CST trong các phân bổ cố định. Phân bổ Signature gồm ${protocolFacts.mainPrizeNftsPerCycle} NFT nhưng chỉ một khoản tổng cộng ${formatCount(protocolFacts.specialAllocationCst, 'vi')} CST. Chiến binh Thời gian, Quán quân Bền bỉ và nét bút CST cuối cùng mỗi luồng có một NFT cùng CST tương ứng; hai luồng NFT Tinh tuyển bổ sung phần còn lại. Nếu không có nét bút CST hoặc Random Walk NFT neo giữ thì luồng tương ứng bị bỏ qua. CST tham gia được tính riêng.`,
     referenceLabel: 'Sách trắng \u00a77.1 \u2014 Quy tắc khắc',
   },
   'attached-assets-destination': {
@@ -307,12 +312,12 @@ export const mediumQuestionsTextVi = {
   'next-cycle-delay': {
     prompt: 'Một chu kỳ vừa được hoàn tất. Khi nào chu kỳ tiếp theo kích hoạt?',
     options: {
-      a: `Sau một độ trễ ngắn \u2014 mặc định ${protocolFacts.defaultNextCycleDelayMinutes} phút, dù giá trị trực tiếp trên chuỗi có thể điều chỉnh và là giá trị quyết định.`,
+      a: `Chu kỳ tiếp theo mở sau thời gian chờ được cấu hình trên chuỗi tính từ hoàn tất thành công, hiện là ${protocolFacts.currentNextCycleDelayDays} ngày. Chủ sở hữu có thể đổi thời gian này; mặc định ban đầu ${protocolFacts.defaultNextCycleDelayMinutes} phút không phải cấu hình hiện tại.`,
       b: 'Ngay lập tức, trong cùng giao dịch.',
       c: `Đúng ${protocolFacts.finalGestureExclusivityHours} giờ sau.`,
       d: 'Chỉ khi chủ sở hữu khởi động thủ công.',
     },
-    explanation: `Sau khi hoàn tất, chu kỳ tiếp theo kích hoạt sau một độ trễ ngắn, mặc định ${protocolFacts.defaultNextCycleDelayMinutes} phút. Độ trễ trực tiếp được lưu trên chuỗi và chủ sở hữu có thể cấu hình, nên hợp đồng \u2014 không phải giá trị mặc định \u2014 là nguồn chính xác. Khi đã kích hoạt, các cửa sổ hiệu chỉnh của chu kỳ mới mở ra.`,
+    explanation: `Chu kỳ tiếp theo mở sau thời gian chờ được cấu hình trên chuỗi tính từ hoàn tất thành công, hiện là ${protocolFacts.currentNextCycleDelayDays} ngày. Chủ sở hữu có thể đổi thời gian này; mặc định ban đầu ${protocolFacts.defaultNextCycleDelayMinutes} phút không phải cấu hình hiện tại.`,
     referenceLabel: 'Sách trắng \u00a73.3 \u2014 Hoàn tất',
   },
 } as const satisfies QuizTierQuestionsText<'medium'>;
