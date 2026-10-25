@@ -82,7 +82,6 @@ export function useEndgameChainSync({
   const [isClaimedOnChain, setIsClaimedOnChain] = useState(false);
 
   const baselineRoundRef = useRef<number | null>(null);
-  const zeroCrossAtMsRef = useRef<number | null>(null);
   const failureReportedRef = useRef(false);
 
   const hasTarget = Number.isFinite(targetMs) && targetMs > 0;
@@ -94,11 +93,15 @@ export function useEndgameChainSync({
   // state, with no Finalize button, for the whole grace period.
   const crossedLive = crossed && now - targetMs <= ENDGAME_TAIL_MS;
 
-  if (crossedLive && zeroCrossAtMsRef.current == null) {
-    zeroCrossAtMsRef.current = now;
-  } else if (!crossed && zeroCrossAtMsRef.current != null) {
+  // The zero-cross is latched during render (the sanctioned adjustment
+  // pattern): state, not a ref, so concurrent renders cannot observe a
+  // half-written latch.
+  const [zeroCrossAtMs, setZeroCrossAtMs] = useState<number | null>(null);
+  if (crossedLive && zeroCrossAtMs == null) {
+    setZeroCrossAtMs(now);
+  } else if (!crossed && zeroCrossAtMs != null) {
     // Deadline moved into the future (extension) or a new round started.
-    zeroCrossAtMsRef.current = null;
+    setZeroCrossAtMs(null);
   }
 
   const active =
@@ -190,15 +193,19 @@ export function useEndgameChainSync({
   }, [active, cosmicGame, queryClient, sampleIntervalMs]);
 
   // A new cycle (or a target far in the future) resets the claim latch so the
-  // hook can arm again for the next endgame.
+  // hook can arm again for the next endgame: a render-phase adjustment, with
+  // the round baseline cleared in the latch effect's cleanup so the pair
+  // always resets together.
+  if (!crossed && isClaimedOnChain) {
+    setIsClaimedOnChain(false);
+  }
   useEffect(() => {
-    if (!crossed && isClaimedOnChain) {
-      setIsClaimedOnChain(false);
+    if (!isClaimedOnChain) return undefined;
+    return () => {
       baselineRoundRef.current = null;
-    }
-  }, [crossed, isClaimedOnChain]);
+    };
+  }, [isClaimedOnChain]);
 
-  const zeroCrossAtMs = zeroCrossAtMsRef.current;
   const withinGrace = zeroCrossAtMs != null && now - zeroCrossAtMs < CONFIRMATION_GRACE_MS;
   // `active` covers the tail window, a readable contract and an unclaimed
   // cycle: without it there is no sample to wait for, so the clock decides.

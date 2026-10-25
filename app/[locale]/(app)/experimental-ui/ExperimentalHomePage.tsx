@@ -261,7 +261,10 @@ const ExperimentalHomePage = ({
   useEffect(() => {
     if (!coherentInitialTimingSample || currentTimeUpdatedAt > 0) return;
     // Re-anchor once after hydration, so a failed timing refetch leaves no
-    // persistent server/browser clock skew.
+    // persistent server/browser clock skew. A one-shot read of the real
+    // clock after mount has to set state from the effect body, so the rule
+    // is waived rather than worked around.
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setClientClockAnchorMs((current) =>
       current === coherentInitialTimingSample.sampledAtMs ? Date.now() : current,
     );
@@ -386,11 +389,12 @@ const ExperimentalHomePage = ({
     setMessage,
     setRwlkId,
   } = gestureForm;
-  const cstDisplayNow =
-    now > 0 && (!cstGestureData.updatedAtMs || now > cstGestureData.updatedAtMs) ? now : Date.now();
+  // `deriveLiveCstGestureData` returns the sample unchanged until `now`
+  // passes its `updatedAtMs`, so the ticking clock state is enough here —
+  // the same call HomePage makes — and the render never reads Date.now().
   const liveCstGestureData = useMemo(
-    () => deriveLiveCstGestureData(cstGestureData, { nowMs: cstDisplayNow }),
-    [cstDisplayNow, cstGestureData],
+    () => deriveLiveCstGestureData(cstGestureData, { nowMs: now }),
+    [now, cstGestureData],
   );
   const {
     fetchActivationTime,

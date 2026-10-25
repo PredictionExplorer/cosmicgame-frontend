@@ -1,8 +1,8 @@
 [
   {
-    "id": "GHSA-vfj7-8cjw-p6xm",
-    "package": "braces",
-    "reason": "Tooling only: glob matching in lint/test commands uses repository-controlled patterns; braces is absent from the production dependency tree. As of 2026-10-11 no patched braces release exists, and even @next/eslint-plugin-next 16.4.0 still depends on fast-glob -> micromatch -> braces 3.0.3. Updating lint-staged to 16.4.0 removes one consumer but cannot remove that chain. Remove this exception as soon as braces is patched or the remaining consumers migrate. Advisory: https://github.com/advisories/GHSA-vfj7-8cjw-p6xm",
-    "expires": "2026-10-25"
+    "id": "GHSA-mrhx-c7xc-m3w5",
+    "package": "zod",
+    "reason": "Wallet stack only: the flagged copies are zod 3.x pinned by @reown/appkit-wallet and @reown/appkit-utils (via @base-org/account -> @coinbase/cdp-sdk); they validate the wallet SDK's own config and RPC payloads in the user's browser session, so the memory-exhaustion DoS has no server exposure and no patched zod 3.x exists (the fix landed in 4.6.6). As of 2026-10-25 even @reown/appkit-wallet 1.8.24 (latest) still pins zod 3.22.4, and overriding to zod 4 would break those zod-3 consumers. Our direct zod is 4.6.7 (patched). Remove this exception as soon as the reown stack declares zod >=4.6.6 or a patched 3.x release appears. Advisory: https://github.com/advisories/GHSA-mrhx-c7xc-m3w5",
+    "expires": "2026-11-24"
   }
 ]

@@ -235,13 +235,21 @@ export function useGestureForm({
     'auto',
   );
   /**
+   * The contract (by identity) whose V3 probe succeeded; see the detection
+   * effect below. Keyed by the contract rather than a bare boolean, so a
+   * scenario or deployment switch needs no reset: another contract's
+   * detection simply stops matching.
+   */
+  const [v3DetectedContract, setV3DetectedContract] = useState<unknown>(null);
+  /**
    * True on V3 contracts, where the entire per-gesture Participation CST is
    * imprinted to the outbid (previous) participant; the participant placing
    * the gesture receives nothing at gesture time and instead accrues CST
    * while they remain the latest participant. False on V1/V2 (whole reward
    * to the gesturer).
    */
-  const [cstRewardToOutbidBidder, setCstRewardToOutbidBidder] = useState<boolean>(false);
+  const cstRewardToPreviousGesturer =
+    !uxScenario && !!cosmicGameContract && v3DetectedContract === cosmicGameContract;
 
   /** The wallet's unused Random Walk NFTs: not read without a wallet, then loading, ready or failed. */
   const rwlkListStatus: RwlkListStatus = !account
@@ -307,10 +315,8 @@ export function useGestureForm({
   // the state stays false and the UI keeps V2 semantics (whole reward to the
   // gesturer).
   useEffect(() => {
-    if (uxScenario || !cosmicGameContract) {
-      setCstRewardToOutbidBidder(false);
-      return;
-    }
+    // `cstRewardToPreviousGesturer` already derives to false here; nothing to probe.
+    if (uxScenario || !cosmicGameContract) return undefined;
     let cancelled = false;
     (async () => {
       try {
@@ -318,16 +324,16 @@ export function useGestureForm({
           | bigint
           | undefined;
         if (!cancelled && value !== undefined) {
-          setCstRewardToOutbidBidder(true);
+          setV3DetectedContract(cosmicGameContract);
         }
       } catch (err) {
         // Expected on V2 deployments (selector absent; behind the proxy this
         // surfaces as a reasonless revert rather than "unrecognized
-        // selector"). Anything else is worth reporting.
+        // selector"). Anything else is worth reporting. The detection state
+        // stays unset for this contract, so the derived flag reads false.
         if (!cancelled && !isMissingFunctionReadError(err)) {
           reportError(err, 'cstBidPriceDeclineMultiplier');
         }
-        if (!cancelled) setCstRewardToOutbidBidder(false);
       }
     })();
     return () => {
@@ -339,14 +345,29 @@ export function useGestureForm({
     return mapCTPriceInfo(ctPriceData, contractCstDurations, contractCstPriceWei);
   }, [contractCstDurations, contractCstPriceWei, ctPriceData]);
 
+  // A contract quote is only live for a few seconds. A timer retires it the
+  // moment it lapses, so the render below never consults the wall clock
+  // (render stays pure) and the fallback to the API price happens exactly at
+  // the staleness boundary instead of at the next unrelated render.
+  useEffect(() => {
+    if (!contractEthQuote) return undefined;
+    const expiresInMs = contractEthQuote.readAtMs + CONTRACT_ETH_QUOTE_FRESH_MS - Date.now();
+    const timeoutId = window.setTimeout(
+      () => {
+        setContractEthQuote((current) => (current === contractEthQuote ? null : current));
+      },
+      Math.max(0, expiresInMs),
+    );
+    return () => window.clearTimeout(timeoutId);
+  }, [contractEthQuote]);
+
   const ethGestureInfo = useMemo<EthGestureInfo | null>(() => {
     // Inside the late-gesture window the contract is re-quoted every refresh
     // tick, and that figure (base plus live premium) beats the API's slower
-    // poll. Never derived from the last paid price in either branch.
-    const liveQuote =
-      contractEthQuote && Date.now() - contractEthQuote.readAtMs < CONTRACT_ETH_QUOTE_FRESH_MS
-        ? contractEthQuote
-        : null;
+    // poll. Never derived from the last paid price in either branch. A stale
+    // quote cannot appear here: the timer above retires it at the freshness
+    // boundary.
+    const liveQuote = contractEthQuote;
     if (!bidEthPriceData && !liveQuote) return null;
     const priceWei = liveQuote ? liveQuote.priceWei : BigInt(bidEthPriceData!.ETHPrice);
     return {
@@ -381,8 +402,13 @@ export function useGestureForm({
     (cstRewardGuardChoice === 'guarded' ||
       (cstRewardGuardChoice === 'auto' && connectedIsLatestGesturer));
 
+  // A new reader or deployment must not inherit the previous window's rate.
+  // The resets below run synchronously when the effect's inputs change, on
+  // purpose: a render-phase adjustment cannot stand in for them, because the
+  // client and contract identities this effect keys on are not stable across
+  // server render passes (a render-phase version looped SSR into a 500).
+  /* eslint-disable react-hooks/set-state-in-effect */
   useEffect(() => {
-    // A new reader or deployment must not inherit the previous window's rate.
     setContractCstDurations(null);
     if (uxScenario) {
       setContractCstPriceWei(null);
@@ -400,11 +426,8 @@ export function useGestureForm({
     // The window exists on V3 only, and only once the cycle has a gesture:
     // before it there is no premium and `nextEthBidPrice` is stale
     // (Comment-202501022), so the difference must not be computed.
-    const canReadLateWindow = !!cosmicGameContract && cstRewardToOutbidBidder && !firstGesture;
+    const canReadLateWindow = !!cosmicGameContract && cstRewardToPreviousGesturer && !firstGesture;
 
-    if (!canReadDurations) {
-      setContractCstDurations(null);
-    }
     if (!canReadPrice) {
       setContractCstPriceWei(null);
     }
@@ -637,9 +660,10 @@ export function useGestureForm({
     cosmicGameContract,
     publicClient,
     uxScenario,
-    cstRewardToOutbidBidder,
+    cstRewardToPreviousGesturer,
     firstGesture,
   ]);
+  /* eslint-enable react-hooks/set-state-in-effect */
 
   // Amounts in validation and success messages follow the one precision
   // policy the form itself uses (`exact`: up to six places, the locale's
@@ -845,7 +869,7 @@ export function useGestureForm({
     quotedPrice: bigint,
     track: 'eth' | 'cst',
   ): Promise<bigint | null> => {
-    if (!cstRewardToOutbidBidder) return null; // V1/V2: no late-gesture premium exists.
+    if (!cstRewardToPreviousGesturer) return null; // V1/V2: no late-gesture premium exists.
     try {
       const read = cosmicGameContract!.read;
       // The premium only applies when the cycle has a last gesturer.
@@ -1501,7 +1525,7 @@ export function useGestureForm({
     isCstRewardLoading,
     cstRewardReadFailed,
     /** V3: the gesture's Participation CST goes to the outbid previous participant. */
-    cstRewardToOutbidBidder,
+    cstRewardToPreviousGesturer,
     cstRewardTolerancePercent,
     setCstRewardTolerancePercent: updateCstRewardTolerancePercent,
     /** True when the next gesture sends a nonzero Participation CST floor. */

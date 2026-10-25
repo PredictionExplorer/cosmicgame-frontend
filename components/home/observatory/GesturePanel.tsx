@@ -92,7 +92,7 @@ export interface GesturePanelFormState {
   /** The last read of the Participation CST preview failed; it retries on its own poll. */
   cstRewardReadFailed?: boolean;
   /** True on V3 contracts: the whole per-gesture CST imprint goes to the outbid participant. */
-  cstRewardToOutbidBidder?: boolean;
+  cstRewardToPreviousGesturer?: boolean;
   /** The V3 late-gesture window per the contract; null on V1/V2 or before the first gesture. */
   lateGestureWindow?: LateGestureWindowInfo | null;
   /** The person's Participation CST floor choice ('auto' preselects by wallet). */
@@ -234,7 +234,7 @@ export function GesturePanel({
     gestureCstRewardAmount = null,
     isCstRewardLoading = false,
     cstRewardReadFailed = false,
-    cstRewardToOutbidBidder = false,
+    cstRewardToPreviousGesturer = false,
     lateGestureWindow = null,
   } = form;
 
@@ -496,7 +496,7 @@ export function GesturePanel({
                 label={
                   <ExplainedTerm
                     definition={t(
-                      cstRewardToOutbidBidder
+                      cstRewardToPreviousGesturer
                         ? 'form.reward.economicsDescriptionV3'
                         : 'form.reward.economicsDescription',
                     )}
@@ -514,7 +514,7 @@ export function GesturePanel({
               {/* Net CST only makes sense on V1/V2, where the reward is the
                   gesturer's own. On V3 the imprint goes to the outbid
                   participant, so "reward minus cost" mixes two wallets. */}
-              {!cstRewardToOutbidBidder && (
+              {!cstRewardToPreviousGesturer && (
                 <SpecRow
                   testId="panel-cst-metric-net"
                   label={t('form.reward.netLabel')}
@@ -534,7 +534,7 @@ export function GesturePanel({
               label={
                 <ExplainedTerm
                   definition={t(
-                    cstRewardToOutbidBidder
+                    cstRewardToPreviousGesturer
                       ? 'form.reward.previewDescriptionV3'
                       : 'form.reward.previewDescription',
                   )}
@@ -547,7 +547,7 @@ export function GesturePanel({
           )}
         </dl>
       )}
-      {!isFirstGesture && cstRewardToOutbidBidder && !isCstRewardLoading && hasCstReward && (
+      {!isFirstGesture && cstRewardToPreviousGesturer && !isCstRewardLoading && hasCstReward && (
         <p
           data-testid="panel-cst-goes-to-outbid"
           className="type-caption min-w-0 text-muted-foreground [overflow-wrap:anywhere]"

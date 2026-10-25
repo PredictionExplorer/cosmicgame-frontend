@@ -138,8 +138,11 @@ export function QuizRunner({
   const total = tier.questions.length;
 
   // Saved runs are read after mount: the server render has no storage, and
-  // reading it during render would not match the HTML it sent.
+  // reading it during render would not match the HTML it sent. A one-shot
+  // post-hydration read of an external store has to set state from the
+  // effect body, so the rule is waived rather than worked around.
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setSaved(readSavedAttempt(browserStorage('session'), storageKey, tier));
   }, [storageKey, tier]);
 

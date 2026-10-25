@@ -162,15 +162,16 @@ export default function HarnessPanel() {
           ? `Ready: ${transition.target ?? status?.scenario ?? 'quiet'}`
           : 'Idle';
 
-  useEffect(() => {
-    if (
-      pendingScenario &&
-      status?.scenario === pendingScenario &&
-      status.transition?.state === 'running'
-    ) {
-      setPendingScenario(null);
-    }
-  }, [pendingScenario, status?.scenario, status?.transition?.state]);
+  // The optimistic pick retires the moment the harness reports it running:
+  // a render-phase adjustment, so the panel never paints a stale pending
+  // label over the settled scenario.
+  if (
+    pendingScenario &&
+    status?.scenario === pendingScenario &&
+    status.transition?.state === 'running'
+  ) {
+    setPendingScenario(null);
+  }
 
   useEffect(() => {
     if (transition?.state !== 'running' || transition.kind === 'command') return;

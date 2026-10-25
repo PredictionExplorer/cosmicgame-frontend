@@ -244,10 +244,8 @@ export function useAllocationFinalize({
   };
 
   const fetchActivationTime = useCallback(async () => {
-    if (uxScenario) {
-      if (mountedRef.current) setActivationTime(0);
-      return;
-    }
+    // Scenario activation time is derived at the hook's return; nothing to read.
+    if (uxScenario) return;
     if (!cosmicGameContract) return;
     try {
       const time = await cosmicGameContract.read.roundActivationTime?.();
@@ -270,11 +268,10 @@ export function useAllocationFinalize({
   }, [cosmicGameContract, currentTimeRaw, currentTimeUpdatedAt, offset, uxScenario]);
 
   useEffect(() => {
-    if (uxScenario) {
-      setTimeoutClaimPrize(300);
-      setActivationTime(0);
-      return;
-    }
+    // Scenario values are not synced into state: the return below derives
+    // them, so a scenario never inherits (or leaks) a real deployment's
+    // figures.
+    if (uxScenario) return;
     const fetchTimeoutFinalize = async () => {
       if (!cosmicGameContract) return;
       try {
@@ -294,7 +291,10 @@ export function useAllocationFinalize({
       // Setting activation time state from a one-shot async contract read.
       // Migrating to React Query would be cleaner long-term but is a larger
       // refactor (the gesture flow couples to fetchActivationTime via the
-      // returned callback).
+      // returned callback). Every setState inside lands from the read's
+      // await continuation, never synchronously, so the warning is the
+      // tracer being conservative about the shared callback.
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       void fetchActivationTime();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -302,10 +302,10 @@ export function useAllocationFinalize({
 
   return {
     allocationTime,
-    timeoutFinalize,
+    timeoutFinalize: uxScenario ? 300 : timeoutFinalize,
     isClaiming,
     claimHistory,
-    activationTime,
+    activationTime: uxScenario ? 0 : activationTime,
     onFinalize,
     fetchActivationTime,
   } as const;

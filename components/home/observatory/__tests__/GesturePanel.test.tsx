@@ -64,7 +64,7 @@ const makeForm = (overrides: Partial<GesturePanelFormState> = {}): GesturePanelF
   ethGestureInfo: { AuctionDuration: 3600, ETHPrice: 0.01, SecondsElapsed: 1800 },
   gestureCstRewardAmount: 100,
   isCstRewardLoading: false,
-  cstRewardToOutbidBidder: false,
+  cstRewardToPreviousGesturer: false,
   ...overrides,
 });
 
@@ -389,7 +389,7 @@ describe('GesturePanel', () => {
     render(
       <GesturePanel
         {...baseProps}
-        form={makeForm({ gestureType: 'CST', cstRewardToOutbidBidder: true })}
+        form={makeForm({ gestureType: 'CST', cstRewardToPreviousGesturer: true })}
       />,
     );
     // Net CST mixes two wallets on V3 (the imprint goes to the outbid
