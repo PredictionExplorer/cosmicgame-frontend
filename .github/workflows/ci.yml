@@ -10,7 +10,7 @@ jobs:
   lint-test-build:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
@@ -85,7 +85,7 @@ jobs:
       HARNESS_E2E: '0'
       NEXT_PUBLIC_PLAYWRIGHT_UX_SCENARIOS: '1'
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
