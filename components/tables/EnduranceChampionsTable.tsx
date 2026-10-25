@@ -71,6 +71,9 @@ const EnduranceChampionsTable = ({
       {
         id: 'championTime',
         kind: 'duration',
+        // Zero-padded clock fields ("1d 11:30:32", "00:44:15"), so the
+        // hours, minutes and seconds line up down the column.
+        durationStyle: 'clock',
         header: t('endurance.championTime'),
         value: (row) => row.championTime,
         sortable: true,
@@ -78,6 +81,7 @@ const EnduranceChampionsTable = ({
       {
         id: 'chronoWarrior',
         kind: 'duration',
+        durationStyle: 'clock',
         header: t('endurance.chronoWarrior'),
         value: (row) => row.chronoWarrior ?? 0,
         sortable: true,
@@ -91,9 +95,10 @@ const EnduranceChampionsTable = ({
       data={championList ?? []}
       columns={columns}
       ariaLabel={t('names.enduranceChampions')}
-      // One entry per participant: the address is the row's stable identity
-      // (a key with the row's position remounted every row on each sort).
-      getRowKey={(row) => row.participant.toLowerCase()}
+      // The list is a record progression: the same participant appears once
+      // per record-setting hold, so the address is not a row identity (as a
+      // key, its duplicates broke re-rendering on sort). Rows keep the
+      // default index key.
       initialSort={{ id: 'championTime', direction: 'desc' }}
       // Two durations ("9d 1h 36m 4s") beside an address do not fit a phone
       // row: each participant reads as a record.

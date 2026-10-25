@@ -24,6 +24,8 @@ export interface KindOptions {
   unit?: AmountUnit;
   showUnit?: boolean;
   percentScale?: 'percent' | 'ratio';
+  /** `duration`: `clock` zero-pads the fields ("1d 11:30:32") so a column lines up. */
+  durationStyle?: 'compact' | 'clock';
   seconds?: boolean;
   year?: 'auto' | 'always' | 'never';
   copy?: boolean;
@@ -86,6 +88,7 @@ export function KindValue({
   unit = 'ETH',
   showUnit = true,
   percentScale = 'percent',
+  durationStyle = 'compact',
   seconds = false,
   year,
   copy = false,
@@ -127,7 +130,7 @@ export function KindValue({
         maximumFractionDigits: 1,
       });
     case 'duration':
-      return <Duration seconds={toNumber(value)} />;
+      return <Duration seconds={toNumber(value)} variant={durationStyle} />;
     case 'datetime': {
       const time = <DateTime timestamp={toNumber(value)} seconds={seconds} year={year} />;
       if (href) return <TableLink href={href}>{time}</TableLink>;

@@ -37,17 +37,17 @@ describe('EnduranceChampionsTable', () => {
         championList={[createChampion({ championTime: 3600, chronoWarrior: 1800 })]}
       />,
     );
-    expect(screen.getAllByText(/1h/).length).toBeGreaterThanOrEqual(1);
-    expect(screen.getAllByText(/30m/).length).toBeGreaterThanOrEqual(1);
+    expect(screen.getAllByText('01:00:00').length).toBeGreaterThanOrEqual(1);
+    expect(screen.getAllByText('00:30:00').length).toBeGreaterThanOrEqual(1);
     // Durations render as machine-readable <time> elements, end-aligned.
-    const [duration] = screen.getAllByText(/1h/);
+    const [duration] = screen.getAllByText('01:00:00');
     expect(duration?.closest('time')).toHaveAttribute('datetime', 'PT1H');
     expect(duration?.closest('td')).toHaveAttribute('data-align', 'end');
   });
 
   it('renders 0 chrono warrior time as formatted seconds', () => {
     render(<EnduranceChampionsTable championList={[createChampion({ chronoWarrior: 0 })]} />);
-    expect(screen.getAllByText(/0s/).length).toBeGreaterThanOrEqual(1);
+    expect(screen.getAllByText('00:00:00').length).toBeGreaterThanOrEqual(1);
   });
 
   it('sorts by championTime desc by default (largest first)', () => {
@@ -59,7 +59,7 @@ describe('EnduranceChampionsTable', () => {
     const rows = screen.getAllByRole('row');
     const dataRows = rows.filter((r) => r.querySelector('td'));
     const firstRowText = dataRows[0]?.textContent ?? '';
-    expect(firstRowText).toContain('5m');
+    expect(firstRowText).toContain('00:05:00');
   });
 
   it('toggles sort direction on same column click', () => {
@@ -74,7 +74,7 @@ describe('EnduranceChampionsTable', () => {
     const rows = screen.getAllByRole('row');
     const dataRows = rows.filter((r) => r.querySelector('td'));
     const firstRowText = dataRows[0]?.textContent ?? '';
-    expect(firstRowText).toContain('1m');
+    expect(firstRowText).toContain('00:01:00');
   });
 
   it('switches sort field to chronoWarrior', () => {
@@ -86,7 +86,7 @@ describe('EnduranceChampionsTable', () => {
     const sortButtons = screen.getAllByText('tables.endurance.chronoWarrior');
     const headerButton = sortButtons.find((el) => el.tagName === 'BUTTON') ?? sortButtons[0]!;
     fireEvent.click(headerButton);
-    const timeCells = screen.getAllByText('8m 20s');
+    const timeCells = screen.getAllByText('00:08:20');
     expect(timeCells.length).toBeGreaterThanOrEqual(1);
   });
 
@@ -198,7 +198,7 @@ describe('EnduranceChampionsTable', () => {
     const rows = screen.getAllByRole('row');
     const dataRows = rows.filter((r) => r.querySelector('td'));
     const firstRowText = dataRows[0]?.textContent ?? '';
-    expect(firstRowText).toContain('5m');
+    expect(firstRowText).toContain('00:05:00');
   });
 
   it('has no accessibility violations', async () => {

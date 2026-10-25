@@ -101,6 +101,12 @@ export interface DataTableColumn<T> {
   showUnit?: boolean;
   /** `percent`: `percent` (default) reads 12.5 as 12.5%, `ratio` reads 0.125 as 12.5%. */
   percentScale?: 'percent' | 'ratio';
+  /**
+   * `duration`: `compact` (default) reads "1d 2h 30m 45s"; `clock` reads
+   * "1d 11:30:32" with zero-padded fields, so a column of durations lines
+   * up digit for digit.
+   */
+  durationStyle?: 'compact' | 'clock';
   /** `datetime`: show seconds. */
   seconds?: boolean;
   /** `datetime`: the year rule. Default `auto` (only when it is not this year). */
@@ -1104,6 +1110,7 @@ function renderCell<T>(
       unit={column.unit}
       showUnit={column.showUnit}
       percentScale={column.percentScale}
+      durationStyle={column.durationStyle}
       seconds={column.seconds}
       year={column.year}
       copy={column.copy}
