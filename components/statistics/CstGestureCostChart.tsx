@@ -1,6 +1,6 @@
 'use client';
 
-import { memo, useMemo, type FC } from 'react';
+import { memo, useMemo, useState, type FC } from 'react';
 import { Area, ComposedChart, Line, XAxis, YAxis, CartesianGrid, Tooltip } from 'recharts';
 import { useLocale, useTranslations } from 'next-intl';
 
@@ -24,6 +24,7 @@ import { useFormat } from '@/hooks/useFormat';
 import { GESTURE_METHOD_COLOR } from '@/lib/theme/dataColors';
 import { useMediaQuery } from '@/hooks/useMediaQuery';
 import { DataTable, type DataTableColumn } from '@/components/ui/data-table';
+import { SegmentedControl } from '@/components/ui/segmented-control';
 import { EmptyState } from '@/components/ui/empty-state';
 import { ErrorState } from '@/components/ui/error-state';
 import { SkeletonChart } from '@/components/ui/skeleton';
@@ -46,6 +47,10 @@ import {
   Y_AXIS_PROPS,
 } from './charts/theme';
 import { useCoarsePointer } from './charts/timeline';
+import { linearScale } from './charts/ticks';
+
+/** How the cost axis spreads the paid amounts. */
+export type CostScale = 'log' | 'linear';
 
 /** CST actually paid, in the CST method's colour on every chart. */
 const PRICE_COLOR = GESTURE_METHOD_COLOR.cst;
@@ -153,22 +158,32 @@ function openGestureTx(payload: unknown) {
   }
 }
 
-const CostChartView = memo(function CostChartView({ series }: { series: CstGestureCostSeries }) {
+const CostChartView = memo(function CostChartView({
+  series,
+  scale,
+}: {
+  series: CstGestureCostSeries;
+  scale: CostScale;
+}) {
   const locale = useLocale();
   const wide = useMediaQuery('(min-width: 640px)');
   const dense = series.points.length > DENSE_POINTS || !wide;
   const dot = useMemo(() => priceDot(dense), [dense]);
-  const priceTicks = useMemo(
-    () => decadeTicks(series.minPaid, series.maxPaid),
-    [series.minPaid, series.maxPaid],
-  );
+  // Log: decade ticks enclosing the paid range. Linear: 1-2-5 steps from zero.
+  const priceAxis = useMemo(() => {
+    if (scale === 'log') {
+      const ticks = decadeTicks(series.minPaid, series.maxPaid);
+      return { ticks, domain: [ticks[0]!, ticks[ticks.length - 1]!] as [number, number] };
+    }
+    return linearScale(0, series.maxPaid);
+  }, [scale, series.minPaid, series.maxPaid]);
   const priceTick = (value: number) =>
     formatAmount(value, { unit: 'CST', context: 'hero', withUnit: false, locale });
   const maxClock = series.points.reduce((max, p) => Math.max(max, p.clockRemainingSeconds ?? 0), 0);
   const xAxis = useElapsedHoursAxis(series.points[series.points.length - 1]?.hoursIntoRound ?? 0);
   const clockAxis = useDurationAxis(0, maxClock, 2);
   // One label column for both panels, so their plots start at the same x.
-  const labelWidth = Math.max(yAxisWidth(priceTicks.map(priceTick)), clockAxis.width);
+  const labelWidth = Math.max(yAxisWidth(priceAxis.ticks.map(priceTick)), clockAxis.width);
   const xAxisProps = {
     ...X_AXIS_PROPS,
     dataKey: 'hoursIntoRound',
@@ -187,17 +202,18 @@ const CostChartView = memo(function CostChartView({ series }: { series: CstGestu
           <XAxis {...xAxisProps} tick={false} height={1} />
           <YAxis
             {...Y_AXIS_PROPS}
-            scale="log"
-            domain={[priceTicks[0]!, priceTicks[priceTicks.length - 1]!]}
-            ticks={priceTicks}
+            scale={scale}
+            domain={priceAxis.domain}
+            ticks={priceAxis.ticks}
             tickFormatter={(v) => priceTick(Number(v))}
             width={labelWidth}
-            allowDataOverflow
+            // The log floor clamps free gestures up into the domain; linear plots them at 0.
+            allowDataOverflow={scale === 'log'}
           />
           <Tooltip {...TOOLTIP_PROPS} content={<CostTooltip />} />
           <Line
             type="linear"
-            dataKey="cstPlotted"
+            dataKey={scale === 'log' ? 'cstPlotted' : 'cstPaid'}
             stroke={PRICE_COLOR}
             // A dense cloud reads as points; a joining line would fuse it into a band.
             strokeOpacity={dense ? 0 : 0.35}
@@ -254,16 +270,19 @@ type CstGestureCostViewProps = {
 
 /**
  * What each CST gesture cost over one cycle, above the allocation clock that
- * was left before it, on one shared time axis: the cost on a log scale (paid
- * amounts span fractions to thousands), free gestures as open rings, and the
- * clock as its own panel instead of a second scale on the same plot.
- * Together they show why prices rise when the clock runs low: the cost has
- * no time to descend between gestures.
+ * was left before it, on one shared time axis: the cost on a log scale by
+ * default (paid amounts span fractions to thousands) with a linear option in
+ * the toolbar, free gestures as open rings, and the clock as its own panel
+ * instead of a second scale on the same plot. Together they show why prices
+ * rise when the clock runs low: the cost has no time to descend between
+ * gestures.
  */
 export const CstGestureCostView: FC<CstGestureCostViewProps> = ({ gestures, label }) => {
   const t = useTranslations('statistics');
   const locale = useLocale();
   const format = useFormat();
+  // Log by default: most cycles span fractions to thousands of CST.
+  const [scale, setScale] = useState<CostScale>('log');
   const series = useMemo(() => getCstGestureCostSeries(gestures), [gestures]);
 
   const columns = useMemo<DataTableColumn<CostRow>[]>(
@@ -333,6 +352,17 @@ export const CstGestureCostView: FC<CstGestureCostViewProps> = ({ gestures, labe
     <ChartFigure
       label={label}
       readout={readout}
+      controls={
+        <SegmentedControl
+          label={t('charts.cstCost.scale')}
+          value={scale}
+          onValueChange={setScale}
+          options={[
+            { value: 'log', label: t('charts.cstCost.scaleLog') },
+            { value: 'linear', label: t('charts.cstCost.scaleLinear') },
+          ]}
+        />
+      }
       legend={
         <ChartLegend
           items={[
@@ -364,7 +394,7 @@ export const CstGestureCostView: FC<CstGestureCostViewProps> = ({ gestures, labe
       }
     >
       <div data-testid="cst-gesture-cost-chart">
-        <CostChartView series={series} />
+        <CostChartView series={series} scale={scale} />
       </div>
     </ChartFigure>
   );

@@ -120,6 +120,21 @@ describe('CstGestureCostView', () => {
     }
   });
 
+  it('switches the cost axis from decades to linear steps on request', async () => {
+    const user = userEvent.setup();
+    render(<CstGestureCostView gestures={gestures} label="CST cost" />);
+    // Log by default: decades enclosing the 150–3,500 CST paid range.
+    const [logPrice] = screen.getAllByTestId('y-axis');
+    expect(within(logPrice!).getByText('10,000')).toBeInTheDocument();
+    expect(within(logPrice!).queryByText('2,000')).not.toBeInTheDocument();
+    await user.click(screen.getByRole('radio', { name: 'Linear' }));
+    // Linear: 1-2-5 steps from zero; no decade padding above the data.
+    const [linearPrice] = screen.getAllByTestId('y-axis');
+    expect(within(linearPrice!).getByText('2,000')).toBeInTheDocument();
+    expect(within(linearPrice!).queryByText('10,000')).not.toBeInTheDocument();
+    expect(screen.getByRole('radio', { name: 'Linear' })).toBeChecked();
+  });
+
   it('keys the paid dots, the free rings and the clock in the legend', () => {
     render(<CstGestureCostView gestures={gestures} label="CST cost" />);
     expect(screen.getByText('CST paid per gesture')).toBeInTheDocument();
