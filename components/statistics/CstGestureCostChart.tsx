@@ -1,7 +1,16 @@
 'use client';
 
 import { memo, useMemo, useState, type FC } from 'react';
-import { Area, ComposedChart, Line, XAxis, YAxis, CartesianGrid, Tooltip } from 'recharts';
+import {
+  Area,
+  ComposedChart,
+  Line,
+  ReferenceLine,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+} from 'recharts';
 import { useLocale, useTranslations } from 'next-intl';
 
 import {
@@ -211,6 +220,10 @@ const CostChartView = memo(function CostChartView({
             allowDataOverflow={scale === 'log'}
           />
           <Tooltip {...TOOLTIP_PROPS} content={<CostTooltip />} />
+          {/* The cost floor, so the panel's base does not merge into the clock
+              below: zero on the linear scale; on the log scale (where zero has
+              no position) the clamp level that free gestures are drawn at. */}
+          <ReferenceLine y={priceAxis.domain[0]} stroke="hsl(32 95% 55%)" strokeWidth={1.5} />
           <Line
             type="linear"
             dataKey={scale === 'log' ? 'cstPlotted' : 'cstPaid'}

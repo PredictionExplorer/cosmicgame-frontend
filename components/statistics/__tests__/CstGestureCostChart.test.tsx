@@ -135,6 +135,18 @@ describe('CstGestureCostView', () => {
     expect(screen.getByRole('radio', { name: 'Linear' })).toBeChecked();
   });
 
+  it('draws the cost floor as a baseline on both scales', async () => {
+    const user = userEvent.setup();
+    render(<CstGestureCostView gestures={gestures} label="CST cost" />);
+    // Log: zero has no position, so the line sits on the clamp level free gestures draw at.
+    const logLines = screen.getAllByTestId('reference-line');
+    expect(logLines).toHaveLength(1);
+    expect(logLines[0]).toHaveAttribute('data-y', '100');
+    await user.click(screen.getByRole('radio', { name: 'Linear' }));
+    // Linear: the baseline is true zero.
+    expect(screen.getByTestId('reference-line')).toHaveAttribute('data-y', '0');
+  });
+
   it('keys the paid dots, the free rings and the clock in the legend', () => {
     render(<CstGestureCostView gestures={gestures} label="CST cost" />);
     expect(screen.getByText('CST paid per gesture')).toBeInTheDocument();
