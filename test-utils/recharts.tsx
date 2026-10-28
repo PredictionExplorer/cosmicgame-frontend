@@ -89,7 +89,8 @@ export function rechartsStub() {
     Area: series('area'),
     Scatter: series('scatter'),
     CartesianGrid: Nothing,
-    ReferenceLine: Nothing,
+    // A reference line prints its level, so a chart's baselines are testable.
+    ReferenceLine: ({ y }: Props) => <svg data-testid="reference-line" data-y={String(y)} />,
     ReferenceArea: Nothing,
     Legend: Nothing,
     Cell: Nothing,

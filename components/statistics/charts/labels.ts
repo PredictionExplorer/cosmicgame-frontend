@@ -28,13 +28,25 @@ const EN_MONTHS = [
 
 const utcDate = (ts: number) => new Date(ts * 1000);
 
+/**
+ * Intl output varies by ICU build in its choice of space characters: Node 22
+ * writes "May 8 – Oct 27, 2026" with thin spaces (U+2009) around the range
+ * dash where browsers write plain spaces, and other builds use no-break
+ * (U+00A0) or narrow no-break (U+202F) spaces. These labels render during
+ * SSR, so any such difference between the server's and the reader's ICU is
+ * a hydration mismatch; collapse them all to plain spaces.
+ */
+const unifyIntlSpaces = (text: string) => text.replace(/[\u00A0\u2009\u202F]/g, ' ');
+
 /** Intl's own short month-and-day, in UTC: 8月12日, 8월 12일, 12 серп. */
 const intlMonthDay = (locale: string) => (date: Date) =>
-  new Intl.DateTimeFormat(getLocaleConfig(locale).intlLocale, {
-    month: 'short',
-    day: 'numeric',
-    timeZone: 'UTC',
-  }).format(date);
+  unifyIntlSpaces(
+    new Intl.DateTimeFormat(getLocaleConfig(locale).intlLocale, {
+      month: 'short',
+      day: 'numeric',
+      timeZone: 'UTC',
+    }).format(date),
+  );
 
 /** A Vietnamese day and month, zero-padded: 12/08, as in 12/08/2026. */
 const viDayMonth = (date: Date) =>
@@ -55,11 +67,13 @@ const MONTH_DAY: LocaleRecord<(date: Date) => string> = {
 
 /** The month ("Aug", 8月, трав.), or with its year ("Aug 2026", 2026年8月). */
 function monthLabel(date: Date, locale: string, withYear: boolean): string {
-  return new Intl.DateTimeFormat(getLocaleConfig(locale).intlLocale, {
-    month: 'short',
-    ...(withYear ? { year: 'numeric' } : {}),
-    timeZone: 'UTC',
-  }).format(date);
+  return unifyIntlSpaces(
+    new Intl.DateTimeFormat(getLocaleConfig(locale).intlLocale, {
+      month: 'short',
+      ...(withYear ? { year: 'numeric' } : {}),
+      timeZone: 'UTC',
+    }).format(date),
+  );
 }
 
 /** A calendar date's short label: "Aug 12", 8月12日, 12/08. */
@@ -99,12 +113,14 @@ export function formatTimeTick(
 
 /** Intl's own date range, which writes the year once when both ends share it. */
 const intlRange = (locale: string) => (from: Date, to: Date) =>
-  new Intl.DateTimeFormat(getLocaleConfig(locale).intlLocale, {
-    month: 'short',
-    day: 'numeric',
-    year: 'numeric',
-    timeZone: 'UTC',
-  }).formatRange(from, to);
+  unifyIntlSpaces(
+    new Intl.DateTimeFormat(getLocaleConfig(locale).intlLocale, {
+      month: 'short',
+      day: 'numeric',
+      year: 'numeric',
+      timeZone: 'UTC',
+    }).formatRange(from, to),
+  );
 
 const DATE_RANGE: LocaleRecord<(from: Date, to: Date) => string> = {
   en: intlRange('en'),
