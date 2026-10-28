@@ -4,5 +4,11 @@
     "package": "zod",
     "reason": "Wallet stack only: the flagged copies are zod 3.x pinned by @reown/appkit-wallet and @reown/appkit-utils (via @base-org/account -> @coinbase/cdp-sdk); they validate the wallet SDK's own config and RPC payloads in the user's browser session, so the memory-exhaustion DoS has no server exposure and no patched zod 3.x exists (the fix landed in 4.6.6). As of 2026-10-25 even @reown/appkit-wallet 1.8.24 (latest) still pins zod 3.22.4, and overriding to zod 4 would break those zod-3 consumers. Our direct zod is 4.6.7 (patched). Remove this exception as soon as the reown stack declares zod >=4.6.6 or a patched 3.x release appears. Advisory: https://github.com/advisories/GHSA-mrhx-c7xc-m3w5",
     "expires": "2026-11-24"
+  },
+  {
+    "id": "GHSA-gcqx-w48m-w2h4",
+    "package": "deepmerge",
+    "reason": "No patched release exists: the advisory covers >=4.2.0 <=4.3.1 and 4.3.1 is the latest deepmerge as of 2026-10-27, so npm update, consumer bumps and overrides all have no patched target (npm audit's only suggestion is a major downgrade of @rainbow-me/rainbowkit to 0.1.0). Low severity, integrity-only (CVSS 5.3): mergeObject() can poison the prototype of the object it returns, not Object.prototype. Our two consumers never feed it attacker-controlled input: @vanilla-extract/css (via rainbowkit) merges its own style objects at module init, and jest-config merges local test configs in tooling. Remove this exception when deepmerge publishes a release above 4.3.1 that leaves the advisory range. Advisory: https://github.com/advisories/GHSA-gcqx-w48m-w2h4",
+    "expires": "2026-11-26"
   }
 ]
