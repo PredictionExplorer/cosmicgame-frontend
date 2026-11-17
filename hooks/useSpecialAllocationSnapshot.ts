@@ -186,11 +186,46 @@ export async function fetchChainSpecialAllocationSnapshot({
 
   const sourceBlockNumber = bigintToSafeNumber(block.number);
   const sourceBlockTimeStamp = bigintToSafeNumber(block.timestamp);
+
+  // Live endurance-champion anchor, derived the same way the Go API does
+  // (internal/api/cosmicgame/contractstate/specialwinners.go): when the
+  // current last bidder has out-held the stored endurance record,
+  // tryGetCurrentChampions() recomputes the champion in memory, but the
+  // enduranceChampionStartTimeStamp() / prevEnduranceChampionDuration()
+  // storage getters still return the OLD anchor until the next bid commits
+  // the update. Mixing the live champion with that stale anchor made the
+  // Chrono-Warrior segment and its "is live" flag wrong after a live
+  // overtake, freezing the displayed run until the next bid.
+  const storedEnduranceStart = bigintToSafeNumber(enduranceChampionStartTimeStamp);
+  const storedPrevDuration = bigintToSafeNumber(prevEnduranceChampionDuration);
+  const storedEnduranceDurationNumber = bigintToSafeNumber(storedEnduranceChampionDuration);
+  const storedEnduranceAddress = cleanAddress(storedEnduranceChampionAddress);
+  const lastGestureTime = latestParticipantLastGestureTimeValue;
+  let liveEnduranceStart = storedEnduranceStart;
+  let livePrevDuration = storedPrevDuration;
+  if (
+    latestParticipant &&
+    latestParticipant !== ZERO_ADDRESS &&
+    lastGestureTime !== undefined &&
+    sourceBlockTimeStamp !== undefined
+  ) {
+    if (!storedEnduranceAddress || storedEnduranceAddress === ZERO_ADDRESS) {
+      // No champion recorded yet: the last bidder is the (live) champion.
+      liveEnduranceStart = lastGestureTime;
+    } else if (
+      storedEnduranceDurationNumber !== undefined &&
+      sourceBlockTimeStamp - lastGestureTime > storedEnduranceDurationNumber
+    ) {
+      // Last bidder out-held the stored record: champion start/prev are
+      // recomputed live, exactly as tryGetCurrentChampions() does.
+      livePrevDuration = storedEnduranceDurationNumber;
+      liveEnduranceStart = lastGestureTime;
+    }
+  }
+
   const currentChronoSegmentDuration =
     sourceBlockTimeStamp !== undefined
-      ? sourceBlockTimeStamp -
-        ((bigintToSafeNumber(enduranceChampionStartTimeStamp) ?? 0) +
-          (bigintToSafeNumber(prevEnduranceChampionDuration) ?? 0))
+      ? sourceBlockTimeStamp - ((liveEnduranceStart ?? 0) + (livePrevDuration ?? 0))
       : undefined;
   const storedChronoDuration = bigintToSafeNumber(storedChronoWarriorDuration);
   const returnedChronoDuration = bigintToSafeNumber(chronoDuration);
@@ -201,8 +236,8 @@ export async function fetchChainSpecialAllocationSnapshot({
       EnduranceChampionDuration: bigintToSafeNumber(enduranceChampionDuration),
       StoredEnduranceChampionAddress: cleanAddress(storedEnduranceChampionAddress),
       StoredEnduranceChampionDuration: bigintToSafeNumber(storedEnduranceChampionDuration),
-      EnduranceChampionStartTimeStamp: bigintToSafeNumber(enduranceChampionStartTimeStamp),
-      PrevEnduranceChampionDuration: bigintToSafeNumber(prevEnduranceChampionDuration),
+      EnduranceChampionStartTimeStamp: liveEnduranceStart,
+      PrevEnduranceChampionDuration: livePrevDuration,
       ChronoWarriorAddress: chronoWarriorAddress,
       ChronoWarriorDuration: bigintToSafeNumber(chronoDuration),
       ChronoWarriorIsLive:

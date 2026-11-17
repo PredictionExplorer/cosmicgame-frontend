@@ -52,7 +52,14 @@ describe('harness role-source selection', () => {
   });
 });
 
-function mockPublicClient(returnedChronoDuration: bigint) {
+/**
+ * Chain state at block timestamp 1000: stored endurance champion 0x1111
+ * (start 700, duration 100, prev 0), stored chrono record 50. With the
+ * default lastBidTimeStamp of 800 the last bidder 0x3333 has held for 200s,
+ * out-holding the stored record of 100 — a live overtake, during which the
+ * storage anchor getters are stale until the next bid commits.
+ */
+function mockPublicClient(returnedChronoDuration: bigint, lastBidTimeStamp: bigint = 800n) {
   return {
     getBlock: jest.fn().mockResolvedValue({ number: 12_345n, timestamp: 1_000n }),
     readContract: jest.fn(({ functionName }: { functionName: string }) => {
@@ -76,7 +83,7 @@ function mockPublicClient(returnedChronoDuration: bigint) {
         case 'roundNum':
           return Promise.resolve(1n);
         case 'biddersInfo':
-          return Promise.resolve([0n, 0n, 800n]);
+          return Promise.resolve([0n, 0n, lastBidTimeStamp]);
         default:
           throw new Error(`Unexpected read: ${functionName}`);
       }
@@ -206,9 +213,28 @@ describe('fetchChainSpecialAllocationSnapshot', () => {
     }
   });
 
-  it('marks chain chrono live only when the source segment matches the returned duration', async () => {
-    const coherentClient = mockPublicClient(300n);
-    const mismatchedClient = mockPublicClient(250n);
+  it('rebases the endurance anchor during a live overtake, as the contract and the Go API do', async () => {
+    // Last bid at 800, block at 1000: the 200s hold out-held the stored
+    // record of 100, so the live chrono segment starts at the crossover
+    // (800 + 100 = 900) and is 100s long. The exported anchor must be the
+    // rebased one, not the stale storage getters (start 700, prev 0).
+    const snapshot = await fetchChainSpecialAllocationSnapshot({
+      publicClient: mockPublicClient(100n) as never,
+      cosmicGameAddress: gameAddress,
+    });
+
+    expect(snapshot?.data.EnduranceChampionStartTimeStamp).toBe(800);
+    expect(snapshot?.data.PrevEnduranceChampionDuration).toBe(100);
+    expect(snapshot?.data.ChronoWarriorIsLive).toBe(true);
+  });
+
+  it('marks chain chrono live only when the rebased segment matches the returned duration', async () => {
+    // Overtake in progress (see mockPublicClient): correct live segment is
+    // 1000 - (800 + 100) = 100.
+    const coherentClient = mockPublicClient(100n);
+    // 300 is what the STALE storage anchor would derive (1000 - 700): the
+    // pre-fix code treated it as live. It must not match anymore.
+    const staleAnchorClient = mockPublicClient(300n);
 
     await expect(
       fetchChainSpecialAllocationSnapshot({
@@ -217,21 +243,35 @@ describe('fetchChainSpecialAllocationSnapshot', () => {
       }),
     ).resolves.toMatchObject({
       data: {
-        ChronoWarriorDuration: 300,
+        ChronoWarriorDuration: 100,
         ChronoWarriorIsLive: true,
       },
     });
 
     await expect(
       fetchChainSpecialAllocationSnapshot({
-        publicClient: mismatchedClient as never,
+        publicClient: staleAnchorClient as never,
         cosmicGameAddress: gameAddress,
       }),
     ).resolves.toMatchObject({
       data: {
-        ChronoWarriorDuration: 250,
+        ChronoWarriorDuration: 300,
         ChronoWarriorIsLive: false,
       },
     });
+  });
+
+  it('keeps the stored anchor when no overtake is in progress', async () => {
+    // Last bid at 950: a 50s hold does not beat the stored record of 100,
+    // so the storage anchor (start 700, prev 0) is current and the open
+    // segment is 1000 - 700 = 300.
+    const snapshot = await fetchChainSpecialAllocationSnapshot({
+      publicClient: mockPublicClient(300n, 950n) as never,
+      cosmicGameAddress: gameAddress,
+    });
+
+    expect(snapshot?.data.EnduranceChampionStartTimeStamp).toBe(700);
+    expect(snapshot?.data.PrevEnduranceChampionDuration).toBe(0);
+    expect(snapshot?.data.ChronoWarriorIsLive).toBe(true);
   });
 });
