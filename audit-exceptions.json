@@ -6,9 +6,9 @@
     "expires": "2026-11-24"
   },
   {
-    "id": "GHSA-gcqx-w48m-w2h4",
-    "package": "deepmerge",
-    "reason": "No patched release exists: the advisory covers >=4.2.0 <=4.3.1 and 4.3.1 is the latest deepmerge as of 2026-10-27, so npm update, consumer bumps and overrides all have no patched target (npm audit's only suggestion is a major downgrade of @rainbow-me/rainbowkit to 0.1.0). Low severity, integrity-only (CVSS 5.3): mergeObject() can poison the prototype of the object it returns, not Object.prototype. Our two consumers never feed it attacker-controlled input: @vanilla-extract/css (via rainbowkit) merges its own style objects at module init, and jest-config merges local test configs in tooling. Remove this exception when deepmerge publishes a release above 4.3.1 that leaves the advisory range. Advisory: https://github.com/advisories/GHSA-gcqx-w48m-w2h4",
-    "expires": "2026-11-26"
+    "id": "GHSA-fc5q-39xc-vjpf",
+    "package": "picomatch",
+    "reason": "ReDoS through crafted extglob patterns. Every copy sits in build/test tooling (@sentry/bundler-plugins, jest, @wagmi/cli, tinyglobby under eslint tooling) and only ever receives developer-authored glob patterns from this repo's configs, never untrusted input. No patched release exists: the advisory covers <=4.0.7 and 4.0.7 is the latest published version as of 2026-11-17. Remove as soon as picomatch publishes a fixed release. Advisory: https://github.com/advisories/GHSA-fc5q-39xc-vjpf",
+    "expires": "2026-12-15"
   }
 ]
