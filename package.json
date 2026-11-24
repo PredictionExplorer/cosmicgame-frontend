@@ -125,6 +125,9 @@
     "@coinbase/cdp-sdk": "1.49.1",
     "@rainbow-me/rainbowkit": {
       "wagmi": "^3.6.15"
+    },
+    "@sentry/bundler-plugins": {
+      "glob": "^14.0.6"
     }
   },
   "lint-staged": {

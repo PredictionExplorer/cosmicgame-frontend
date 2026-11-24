@@ -2,7 +2,7 @@
   {
     "id": "GHSA-mrhx-c7xc-m3w5",
     "package": "zod",
-    "reason": "Wallet stack only: the flagged copies are zod 3.x pinned by @reown/appkit-wallet and @reown/appkit-utils (via @base-org/account -> @coinbase/cdp-sdk); they validate the wallet SDK's own config and RPC payloads in the user's browser session, so the memory-exhaustion DoS has no server exposure and no patched zod 3.x exists (the fix landed in 4.6.6). As of 2026-10-25 even @reown/appkit-wallet 1.8.24 (latest) still pins zod 3.22.4, and overriding to zod 4 would break those zod-3 consumers. Our direct zod is 4.6.7 (patched). Remove this exception as soon as the reown stack declares zod >=4.6.6 or a patched 3.x release appears. Advisory: https://github.com/advisories/GHSA-mrhx-c7xc-m3w5",
-    "expires": "2026-11-24"
+    "reason": "Wallet stack only: the flagged copies are zod 3.x pinned by @reown/appkit-wallet and @reown/appkit-utils (via @base-org/account -> @coinbase/cdp-sdk); they validate the wallet SDK's own config and RPC payloads in the user's browser session, so the memory-exhaustion DoS has no server exposure and no patched zod 3.x exists (the fix landed in 4.6.6). As of 2026-11-24 even @reown/appkit-wallet 2.0.0 (latest) still pins zod 3.22.4, and overriding to zod 4 would break those zod-3 consumers. Our direct zod is 4.6.7 (patched). Remove this exception as soon as the reown stack declares zod >=4.6.6 or a patched 3.x release appears. Advisory: https://github.com/advisories/GHSA-mrhx-c7xc-m3w5",
+    "expires": "2026-12-24"
   }
 ]
