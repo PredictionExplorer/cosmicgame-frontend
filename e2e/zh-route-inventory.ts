@@ -529,6 +529,15 @@ export const ZH_ROUTE_INVENTORY: readonly ZhRouteInventoryEntry[] = [
     expectedText: '铭刻 Random Walk NFT',
   },
   {
+    id: 'salon',
+    pageFile: '(app)/salon/page.tsx',
+    publicPath: '/salon',
+    fixturePath: '/salon',
+    host: 'app',
+    cluster: 'long-tail',
+    expectedText: '沙龙',
+  },
+  {
     id: 'contracts',
     pageFile: '(app)/contracts/page.tsx',
     publicPath: '/contracts',

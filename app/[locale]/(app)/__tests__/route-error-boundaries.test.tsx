@@ -13,6 +13,7 @@ import MyAllocationsError from '../my-allocations/error';
 import MyAnchorsError from '../my-anchors/error';
 import MyStatisticsError from '../my-statistics/error';
 import MyTokensError from '../my-tokens/error';
+import SalonError from '../salon/error';
 import StatisticsError from '../statistics/error';
 
 jest.mock('../../../../utils/errors', () => ({ reportError: jest.fn() }));
@@ -40,6 +41,7 @@ const BOUNDARIES: ReadonlyArray<
   ['my-anchors', MyAnchorsError, 'my-anchors-route', 'errors.route.titles.myAnchors'],
   ['my-statistics', MyStatisticsError, 'my-statistics-route', 'errors.route.titles.myStatistics'],
   ['my-tokens', MyTokensError, 'my-tokens-route', 'errors.route.titles.myTokens'],
+  ['salon', SalonError, 'salon-route', 'errors.route.titles.salon'],
 ];
 
 beforeEach(() => {

@@ -1,0 +1,54 @@
+{
+  "title": "サロン",
+  "subtitle": "パフォーマンス・サイクルの締めくくり時に、追加のシグネチャーが刻印され、ここで公開のオファーを受け付けます。締切時点で先頭のオファーがその作品を受け取り、代金は次のサイクルの配分に加わります。",
+  "terms": "各サイクルで{lots}点のシグネチャーがサロンに並びます。締めくくりの{openingDelay}後にオファーが開きます。最初のオファーで{offerWindow}の受付が始まり、各オファーは先頭のオファーを少なくとも{raise}上回る必要があります。締切間際のオファーは、締切まで少なくとも{extension}残るよう延長します。",
+  "connect": {
+    "title": "ウォレットを接続してオファーする",
+    "description": "作品と締切は誰でも見られます。オファー、確定、作品の受け取りにはウォレットの接続が必要です。"
+  },
+  "credit": {
+    "notice": "上回られたオファーの返金が保管されています：",
+    "retrieve": "返されたオファーを受け取る"
+  },
+  "absent": {
+    "title": "このネットワークではサロンは未開設です",
+    "description": "このネットワークのコントラクトにはまだサロンが含まれていません。V4リリースで開設されます。"
+  },
+  "empty": {
+    "title": "オファー受付中のシグネチャーはまだありません",
+    "description": "次のサイクルの締めくくりで、最初の作品がサロンに並びます。"
+  },
+  "readFailed": {
+    "title": "サロンを読み込めませんでした",
+    "message": "チェーンからの読み取りに失敗しました。再読み込みしてください。"
+  },
+  "exhibit": {
+    "title": "サイクル{cycle}の展示",
+    "description": "このサイクルの締めくくりで刻印されたシグネチャー。1点ずつオファーを受け付けます。"
+  },
+  "status": {
+    "upcoming": "まもなく開始",
+    "awaitingFirstOffer": "最初のオファー待ち",
+    "open": "オファー受付中",
+    "concludable": "締切済み・確定待ち",
+    "awaitingRetrieval": "確定済み",
+    "retrieved": "受け取り済み"
+  },
+  "lot": {
+    "opensIn": "オファー開始まで",
+    "closesIn": "締切まで",
+    "leadingOffer": "先頭のオファー：",
+    "minimumNextOffer": "次のオファーの最低額：",
+    "youLead": "オファーが先頭です",
+    "offerAmountLabel": "オファー額（ETH）",
+    "placeOffer": "オファーする",
+    "raiseOffer": "オファーを上げる",
+    "connectToOffer": "オファーにはウォレットを接続してください。",
+    "invalidAmount": "オファーは0.25のようなETH額で入力してください。",
+    "offerTooLow": "オファーは少なくとも{minimum}が必要です。",
+    "conclude": "確定する",
+    "retrievePiece": "シグネチャーを受け取る",
+    "awaitingRecipient": "受領者の受け取り待ち：",
+    "retrievedBy": "受け取り済み："
+  }
+}

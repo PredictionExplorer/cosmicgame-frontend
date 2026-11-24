@@ -193,5 +193,18 @@
     "detailsCopied": "错误详情已复制。",
     "connectWallet": "连接钱包",
     "busy": "请先完成正在进行的交易。"
+  },
+  "salon": {
+    "walletNotReady": "钱包尚未连接完成，或当前处于其他网络。请切换至 {network} 后重试。",
+    "offerPlaced": "您以 {amount} 的报价领先签名作品 #{nftId}。",
+    "offerFailed": "报价未能完成。请检查钱包后重试。",
+    "offersMoved": "该作品的报价刚刚发生变化。请查看最新领先报价后重试。",
+    "lotClosed": "该件的报价已截止。",
+    "lotNotOpen": "该件尚未开放报价。",
+    "lotConcluded": "签名作品 #{nftId} 已完结，等待接收者取回。",
+    "concludeFailed": "完结未能完成。请检查钱包后重试。",
+    "pieceRetrieved": "签名作品 #{nftId} 已进入您的钱包。",
+    "returnedOffersRetrieved": "已退回的报价 {amount} 已回到您的钱包。",
+    "retrieveFailed": "取回未能完成。请检查钱包后重试。"
   }
 }

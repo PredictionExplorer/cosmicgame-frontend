@@ -36,6 +36,10 @@
       "label": "Закарбувати Random Walk NFT",
       "description": "Закарбуйте Random Walk NFT, щоб знизити вартість жесту"
     },
+    "salon": {
+      "label": "Салон",
+      "description": "Додаткові Сигнатури щоциклу на відкритих пропозиціях"
+    },
     "gallery": {
       "label": "Галерея",
       "description": "Усі Сигнатури, закарбовані дотепер"

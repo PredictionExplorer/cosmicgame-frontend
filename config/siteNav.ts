@@ -62,6 +62,8 @@ const ROUTE_DEFINITIONS = {
   // Participate: where a visitor acts.
   observatory: { host: 'app', path: '/', section: 'participate', footer: true },
   imprint: { host: 'app', path: '/imprint', section: 'participate', footer: true },
+  // V4 (in development): the extra Signatures each cycle places on open offer.
+  salon: { host: 'app', path: '/salon', section: 'participate', footer: true },
 
   // Collection: the art.
   gallery: {

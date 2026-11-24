@@ -321,5 +321,9 @@
       "title": "Cosmic Signature 是彩\u7968、賭\u5834或投\u8cc7產品嗎？",
       "description": "Cosmic Signature 是程序化鏈上藝術協議，不是彩\u7968、賭\u5834、賭\u535a產品或投\u8cc7產品。"
     }
+  },
+  "salon": {
+    "title": "沙龍",
+    "description": "每個演繹週期額外銘刻的簽名作品在此公開接受報價：批件、倒數計時與領先報價均即時讀取自鏈上。"
   }
 }

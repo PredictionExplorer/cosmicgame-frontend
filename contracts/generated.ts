@@ -3341,6 +3341,135 @@ export const cosmicGameAbi = [
 ] as const;
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// CosmicGameV4
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+export const cosmicGameV4Abi = [
+  {
+    type: 'event',
+    anonymous: false,
+    inputs: [
+      {
+        name: 'artAuctionAddress',
+        internalType: 'address',
+        type: 'address',
+        indexed: true,
+      },
+    ],
+    name: 'ArtAuctionConfigured',
+  },
+  {
+    type: 'event',
+    anonymous: false,
+    inputs: [
+      {
+        name: 'roundNum',
+        internalType: 'uint256',
+        type: 'uint256',
+        indexed: true,
+      },
+      {
+        name: 'artAuctionAddress',
+        internalType: 'address',
+        type: 'address',
+        indexed: true,
+      },
+      {
+        name: 'firstNftId',
+        internalType: 'uint256',
+        type: 'uint256',
+        indexed: true,
+      },
+      {
+        name: 'numNfts',
+        internalType: 'uint256',
+        type: 'uint256',
+        indexed: false,
+      },
+    ],
+    name: 'ArtAuctionNftsMinted',
+  },
+  {
+    type: 'event',
+    anonymous: false,
+    inputs: [
+      {
+        name: 'openingBid',
+        internalType: 'uint256',
+        type: 'uint256',
+        indexed: false,
+      },
+    ],
+    name: 'ArtAuctionOpeningBidChanged',
+  },
+  {
+    type: 'event',
+    anonymous: false,
+    inputs: [
+      {
+        name: 'market',
+        internalType: 'address',
+        type: 'address',
+        indexed: true,
+      },
+      {
+        name: 'cycle',
+        internalType: 'uint256',
+        type: 'uint256',
+        indexed: true,
+      },
+      {
+        name: 'amount',
+        internalType: 'uint256',
+        type: 'uint256',
+        indexed: false,
+      },
+      {
+        name: 'cumulativeAmount',
+        internalType: 'uint256',
+        type: 'uint256',
+        indexed: false,
+      },
+    ],
+    name: 'ChaosZeroCycleFunded',
+  },
+  {
+    type: 'function',
+    inputs: [],
+    name: 'artAuction',
+    outputs: [
+      {
+        name: '',
+        internalType: 'contract ICosmicSignatureArtAuction',
+        type: 'address',
+      },
+    ],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    inputs: [],
+    name: 'artAuctionOpeningBid',
+    outputs: [{ name: '', internalType: 'uint256', type: 'uint256' }],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    inputs: [],
+    name: 'chaosZeroMarket',
+    outputs: [{ name: '', internalType: 'contract IChaosZeroMarket', type: 'address' }],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    inputs: [{ name: 'openingBid_', internalType: 'uint256', type: 'uint256' }],
+    name: 'setArtAuctionOpeningBid',
+    outputs: [],
+    stateMutability: 'nonpayable',
+  },
+] as const;
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // CosmicSignature
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -3856,6 +3985,590 @@ export const cosmicSignatureAbi = [
     type: 'function',
     inputs: [{ name: 'newOwner', internalType: 'address', type: 'address' }],
     name: 'transferOwnership',
+    outputs: [],
+    stateMutability: 'nonpayable',
+  },
+] as const;
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// CosmicSignatureArtAuction
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+export const cosmicSignatureArtAuctionAbi = [
+  {
+    type: 'constructor',
+    inputs: [
+      { name: 'game_', internalType: 'address', type: 'address' },
+      { name: 'nft_', internalType: 'address', type: 'address' },
+    ],
+    stateMutability: 'nonpayable',
+  },
+  {
+    type: 'error',
+    inputs: [{ name: 'nftId', internalType: 'uint256', type: 'uint256' }],
+    name: 'AuctionAlreadySettled',
+  },
+  {
+    type: 'error',
+    inputs: [
+      { name: 'nftId', internalType: 'uint256', type: 'uint256' },
+      { name: 'endAt', internalType: 'uint256', type: 'uint256' },
+    ],
+    name: 'AuctionEnded',
+  },
+  {
+    type: 'error',
+    inputs: [
+      { name: 'nftId', internalType: 'uint256', type: 'uint256' },
+      { name: 'eligibleAt', internalType: 'uint256', type: 'uint256' },
+    ],
+    name: 'AuctionNotEligible',
+  },
+  {
+    type: 'error',
+    inputs: [
+      { name: 'nftId', internalType: 'uint256', type: 'uint256' },
+      { name: 'endAt', internalType: 'uint256', type: 'uint256' },
+    ],
+    name: 'AuctionNotEnded',
+  },
+  {
+    type: 'error',
+    inputs: [{ name: 'nftId', internalType: 'uint256', type: 'uint256' }],
+    name: 'AuctionNotSettled',
+  },
+  {
+    type: 'error',
+    inputs: [{ name: 'nftId', internalType: 'uint256', type: 'uint256' }],
+    name: 'AuctionNotStarted',
+  },
+  {
+    type: 'error',
+    inputs: [
+      { name: 'minimumBid', internalType: 'uint256', type: 'uint256' },
+      { name: 'proposedBid', internalType: 'uint256', type: 'uint256' },
+    ],
+    name: 'BidTooLow',
+  },
+  {
+    type: 'error',
+    inputs: [
+      { name: 'expectedGame', internalType: 'address', type: 'address' },
+      { name: 'actualGame', internalType: 'address', type: 'address' },
+    ],
+    name: 'CollectionGameMismatch',
+  },
+  {
+    type: 'error',
+    inputs: [
+      { name: 'requiredValue', internalType: 'uint256', type: 'uint256' },
+      { name: 'suppliedValue', internalType: 'uint256', type: 'uint256' },
+    ],
+    name: 'IncorrectBidFunding',
+  },
+  { type: 'error', inputs: [], name: 'InvalidArtAuctionOpeningBid' },
+  {
+    type: 'error',
+    inputs: [
+      { name: 'firstNftId', internalType: 'uint256', type: 'uint256' },
+      { name: 'totalSupply', internalType: 'uint256', type: 'uint256' },
+    ],
+    name: 'InvalidBatchRange',
+  },
+  {
+    type: 'error',
+    inputs: [{ name: 'account', internalType: 'address', type: 'address' }],
+    name: 'InvalidContractAddress',
+  },
+  {
+    type: 'error',
+    inputs: [{ name: 'recipient', internalType: 'address', type: 'address' }],
+    name: 'InvalidRecipient',
+  },
+  {
+    type: 'error',
+    inputs: [{ name: 'nftId', internalType: 'uint256', type: 'uint256' }],
+    name: 'NftAlreadyDelivered',
+  },
+  {
+    type: 'error',
+    inputs: [{ name: 'nftId', internalType: 'uint256', type: 'uint256' }],
+    name: 'NftAlreadyRegistered',
+  },
+  {
+    type: 'error',
+    inputs: [
+      { name: 'nftId', internalType: 'uint256', type: 'uint256' },
+      { name: 'owner', internalType: 'address', type: 'address' },
+    ],
+    name: 'NftNotInCustody',
+  },
+  {
+    type: 'error',
+    inputs: [{ name: 'account', internalType: 'address', type: 'address' }],
+    name: 'NoRefundCredit',
+  },
+  { type: 'error', inputs: [], name: 'NoSurplus' },
+  {
+    type: 'error',
+    inputs: [{ name: 'caller', internalType: 'address', type: 'address' }],
+    name: 'OnlyGame',
+  },
+  {
+    type: 'error',
+    inputs: [
+      { name: 'nftId', internalType: 'uint256', type: 'uint256' },
+      { name: 'caller', internalType: 'address', type: 'address' },
+    ],
+    name: 'OnlyWinner',
+  },
+  {
+    type: 'error',
+    inputs: [{ name: 'nftId', internalType: 'uint256', type: 'uint256' }],
+    name: 'ProceedsAlreadyForwarded',
+  },
+  { type: 'error', inputs: [], name: 'ReentrancyGuardReentrantCall' },
+  {
+    type: 'error',
+    inputs: [
+      { name: 'recipient', internalType: 'address', type: 'address' },
+      { name: 'amount', internalType: 'uint256', type: 'uint256' },
+    ],
+    name: 'RefundTransferFailed',
+  },
+  {
+    type: 'error',
+    inputs: [{ name: 'roundNum', internalType: 'uint256', type: 'uint256' }],
+    name: 'RoundAlreadyRegistered',
+  },
+  {
+    type: 'error',
+    inputs: [{ name: 'nftId', internalType: 'uint256', type: 'uint256' }],
+    name: 'UnknownAuction',
+  },
+  {
+    type: 'event',
+    anonymous: false,
+    inputs: [
+      {
+        name: 'roundNum',
+        internalType: 'uint256',
+        type: 'uint256',
+        indexed: true,
+      },
+      {
+        name: 'firstNftId',
+        internalType: 'uint256',
+        type: 'uint256',
+        indexed: true,
+      },
+      {
+        name: 'count',
+        internalType: 'uint256',
+        type: 'uint256',
+        indexed: false,
+      },
+      {
+        name: 'eligibleAt',
+        internalType: 'uint256',
+        type: 'uint256',
+        indexed: false,
+      },
+      {
+        name: 'openingBid',
+        internalType: 'uint256',
+        type: 'uint256',
+        indexed: false,
+      },
+    ],
+    name: 'AuctionBatchRegistered',
+  },
+  {
+    type: 'event',
+    anonymous: false,
+    inputs: [
+      {
+        name: 'nftId',
+        internalType: 'uint256',
+        type: 'uint256',
+        indexed: true,
+      },
+      {
+        name: 'roundNum',
+        internalType: 'uint256',
+        type: 'uint256',
+        indexed: true,
+      },
+      {
+        name: 'bidder',
+        internalType: 'address',
+        type: 'address',
+        indexed: true,
+      },
+      {
+        name: 'amount',
+        internalType: 'uint256',
+        type: 'uint256',
+        indexed: false,
+      },
+      {
+        name: 'ethPaid',
+        internalType: 'uint256',
+        type: 'uint256',
+        indexed: false,
+      },
+      {
+        name: 'endAt',
+        internalType: 'uint256',
+        type: 'uint256',
+        indexed: false,
+      },
+    ],
+    name: 'AuctionBidPlaced',
+  },
+  {
+    type: 'event',
+    anonymous: false,
+    inputs: [
+      {
+        name: 'nftId',
+        internalType: 'uint256',
+        type: 'uint256',
+        indexed: true,
+      },
+      {
+        name: 'winner',
+        internalType: 'address',
+        type: 'address',
+        indexed: true,
+      },
+      {
+        name: 'recipient',
+        internalType: 'address',
+        type: 'address',
+        indexed: true,
+      },
+    ],
+    name: 'AuctionNftDelivered',
+  },
+  {
+    type: 'event',
+    anonymous: false,
+    inputs: [
+      {
+        name: 'nftId',
+        internalType: 'uint256',
+        type: 'uint256',
+        indexed: true,
+      },
+      {
+        name: 'roundNum',
+        internalType: 'uint256',
+        type: 'uint256',
+        indexed: true,
+      },
+      {
+        name: 'amount',
+        internalType: 'uint256',
+        type: 'uint256',
+        indexed: false,
+      },
+    ],
+    name: 'AuctionProceedsForwarded',
+  },
+  {
+    type: 'event',
+    anonymous: false,
+    inputs: [
+      {
+        name: 'bidder',
+        internalType: 'address',
+        type: 'address',
+        indexed: true,
+      },
+      {
+        name: 'nftId',
+        internalType: 'uint256',
+        type: 'uint256',
+        indexed: true,
+      },
+      {
+        name: 'amount',
+        internalType: 'uint256',
+        type: 'uint256',
+        indexed: false,
+      },
+    ],
+    name: 'AuctionRefundCredited',
+  },
+  {
+    type: 'event',
+    anonymous: false,
+    inputs: [
+      {
+        name: 'bidder',
+        internalType: 'address',
+        type: 'address',
+        indexed: true,
+      },
+      {
+        name: 'recipient',
+        internalType: 'address',
+        type: 'address',
+        indexed: true,
+      },
+      {
+        name: 'amount',
+        internalType: 'uint256',
+        type: 'uint256',
+        indexed: false,
+      },
+    ],
+    name: 'AuctionRefundWithdrawn',
+  },
+  {
+    type: 'event',
+    anonymous: false,
+    inputs: [
+      {
+        name: 'nftId',
+        internalType: 'uint256',
+        type: 'uint256',
+        indexed: true,
+      },
+      {
+        name: 'roundNum',
+        internalType: 'uint256',
+        type: 'uint256',
+        indexed: true,
+      },
+      {
+        name: 'winner',
+        internalType: 'address',
+        type: 'address',
+        indexed: true,
+      },
+      {
+        name: 'amount',
+        internalType: 'uint256',
+        type: 'uint256',
+        indexed: false,
+      },
+    ],
+    name: 'AuctionSettled',
+  },
+  {
+    type: 'event',
+    anonymous: false,
+    inputs: [
+      {
+        name: 'amount',
+        internalType: 'uint256',
+        type: 'uint256',
+        indexed: false,
+      },
+    ],
+    name: 'AuctionSurplusForwarded',
+  },
+  {
+    type: 'function',
+    inputs: [],
+    name: 'AUCTION_DURATION',
+    outputs: [{ name: '', internalType: 'uint256', type: 'uint256' }],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    inputs: [],
+    name: 'ELIGIBILITY_DELAY',
+    outputs: [{ name: '', internalType: 'uint256', type: 'uint256' }],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    inputs: [],
+    name: 'EXTENSION_DURATION',
+    outputs: [{ name: '', internalType: 'uint256', type: 'uint256' }],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    inputs: [],
+    name: 'MINIMUM_INCREASE_DIVISOR',
+    outputs: [{ name: '', internalType: 'uint256', type: 'uint256' }],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    inputs: [],
+    name: 'NFTS_PER_BATCH',
+    outputs: [{ name: '', internalType: 'uint256', type: 'uint256' }],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    inputs: [
+      { name: 'nftId_', internalType: 'uint256', type: 'uint256' },
+      { name: 'totalBidAmount_', internalType: 'uint256', type: 'uint256' },
+    ],
+    name: 'bid',
+    outputs: [],
+    stateMutability: 'payable',
+  },
+  {
+    type: 'function',
+    inputs: [
+      { name: 'nftId_', internalType: 'uint256', type: 'uint256' },
+      { name: 'recipient_', internalType: 'address', type: 'address' },
+    ],
+    name: 'claimNft',
+    outputs: [],
+    stateMutability: 'nonpayable',
+  },
+  {
+    type: 'function',
+    inputs: [{ name: 'batchIndex_', internalType: 'uint256', type: 'uint256' }],
+    name: 'firstNftIdByBatchIndex',
+    outputs: [{ name: '', internalType: 'uint256', type: 'uint256' }],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    inputs: [{ name: 'nftId_', internalType: 'uint256', type: 'uint256' }],
+    name: 'forwardProceeds',
+    outputs: [],
+    stateMutability: 'nonpayable',
+  },
+  {
+    type: 'function',
+    inputs: [],
+    name: 'forwardSurplus',
+    outputs: [],
+    stateMutability: 'nonpayable',
+  },
+  {
+    type: 'function',
+    inputs: [],
+    name: 'game',
+    outputs: [{ name: '', internalType: 'address', type: 'address' }],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    inputs: [{ name: 'nftId_', internalType: 'uint256', type: 'uint256' }],
+    name: 'getAuction',
+    outputs: [
+      {
+        name: '',
+        internalType: 'struct ICosmicSignatureArtAuction.Auction',
+        type: 'tuple',
+        components: [
+          { name: 'roundNum', internalType: 'uint256', type: 'uint256' },
+          { name: 'eligibleAt', internalType: 'uint256', type: 'uint256' },
+          { name: 'endAt', internalType: 'uint256', type: 'uint256' },
+          { name: 'highestBidder', internalType: 'address', type: 'address' },
+          { name: 'highestBid', internalType: 'uint256', type: 'uint256' },
+          { name: 'registered', internalType: 'bool', type: 'bool' },
+          { name: 'settled', internalType: 'bool', type: 'bool' },
+          { name: 'delivered', internalType: 'bool', type: 'bool' },
+          { name: 'proceedsForwarded', internalType: 'bool', type: 'bool' },
+        ],
+      },
+    ],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    inputs: [{ name: 'nftId_', internalType: 'uint256', type: 'uint256' }],
+    name: 'minimumNextBid',
+    outputs: [{ name: '', internalType: 'uint256', type: 'uint256' }],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    inputs: [],
+    name: 'nft',
+    outputs: [{ name: '', internalType: 'address', type: 'address' }],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    inputs: [{ name: '', internalType: 'uint256', type: 'uint256' }],
+    name: 'openingBidByRound',
+    outputs: [{ name: '', internalType: 'uint256', type: 'uint256' }],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    inputs: [{ name: '', internalType: 'address', type: 'address' }],
+    name: 'refundCredits',
+    outputs: [{ name: '', internalType: 'uint256', type: 'uint256' }],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    inputs: [
+      { name: 'roundNum_', internalType: 'uint256', type: 'uint256' },
+      { name: 'firstNftId_', internalType: 'uint256', type: 'uint256' },
+      { name: 'openingBid_', internalType: 'uint256', type: 'uint256' },
+    ],
+    name: 'registerAuctionBatch',
+    outputs: [],
+    stateMutability: 'nonpayable',
+  },
+  {
+    type: 'function',
+    inputs: [],
+    name: 'registeredBatchCount',
+    outputs: [{ name: '', internalType: 'uint256', type: 'uint256' }],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    inputs: [{ name: 'roundNum_', internalType: 'uint256', type: 'uint256' }],
+    name: 'registeredRounds',
+    outputs: [{ name: '', internalType: 'bool', type: 'bool' }],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    inputs: [{ name: 'nftId_', internalType: 'uint256', type: 'uint256' }],
+    name: 'settle',
+    outputs: [],
+    stateMutability: 'nonpayable',
+  },
+  {
+    type: 'function',
+    inputs: [],
+    name: 'totalBidEscrow',
+    outputs: [{ name: '', internalType: 'uint256', type: 'uint256' }],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    inputs: [],
+    name: 'totalLiabilities',
+    outputs: [{ name: '', internalType: 'uint256', type: 'uint256' }],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    inputs: [],
+    name: 'totalPendingProceeds',
+    outputs: [{ name: '', internalType: 'uint256', type: 'uint256' }],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    inputs: [],
+    name: 'totalRefundCredits',
+    outputs: [{ name: '', internalType: 'uint256', type: 'uint256' }],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    inputs: [{ name: 'recipient_', internalType: 'address payable', type: 'address' }],
+    name: 'withdrawRefund',
     outputs: [],
     stateMutability: 'nonpayable',
   },

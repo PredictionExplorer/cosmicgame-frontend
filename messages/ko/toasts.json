@@ -193,5 +193,18 @@
     "detailsCopied": "오류 세부 정보를 복사했습니다.",
     "connectWallet": "지갑 연결",
     "busy": "진행 중인 트랜잭션을 먼저 마무리해 주세요."
+  },
+  "salon": {
+    "walletNotReady": "지갑이 아직 연결 중이거나 다른 네트워크에 있습니다. {network} 네트워크로 전환한 뒤 다시 시도해 주세요.",
+    "offerPlaced": "{amount} 오퍼로 시그니처 #{nftId}의 선두에 섰습니다.",
+    "offerFailed": "오퍼가 완료되지 않았습니다. 지갑을 확인하고 다시 시도하세요.",
+    "offersMoved": "이 작품의 오퍼가 방금 바뀌었습니다. 선두 오퍼를 확인하고 다시 시도하세요.",
+    "lotClosed": "이 작품의 오퍼가 마감되었습니다.",
+    "lotNotOpen": "이 작품은 아직 오퍼를 받지 않습니다.",
+    "lotConcluded": "시그니처 #{nftId} 작품이 확정되었습니다. 수령인의 회수를 기다립니다.",
+    "concludeFailed": "확정이 완료되지 않았습니다. 지갑을 확인하고 다시 시도하세요.",
+    "pieceRetrieved": "시그니처 #{nftId} 작품이 지갑에 들어왔습니다.",
+    "returnedOffersRetrieved": "반환된 오퍼가 지갑으로 돌아왔습니다: {amount}.",
+    "retrieveFailed": "회수가 완료되지 않았습니다. 지갑을 확인하고 다시 시도하세요."
   }
 }

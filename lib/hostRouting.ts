@@ -102,6 +102,7 @@ export const APP_ONLY_PATH_PREFIXES: readonly string[] = [
   '/privacy',
   '/risk-disclosures',
   '/audits',
+  '/salon',
   '/security',
   '/site-map',
   '/source-code',

@@ -21,7 +21,8 @@
       "myAllocations": "Không tải được phân bổ của bạn",
       "myAnchors": "Không tải được neo giữ của bạn",
       "myTokens": "Không tải được token của bạn",
-      "myStatistics": "Không tải được thống kê của bạn"
+      "myStatistics": "Không tải được thống kê của bạn",
+      "salon": "Không tải được Salon"
     }
   },
   "global": {

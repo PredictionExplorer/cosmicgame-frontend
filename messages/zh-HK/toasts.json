@@ -193,5 +193,18 @@
     "detailsCopied": "錯誤詳情已複製。",
     "connectWallet": "連接錢包",
     "busy": "請先完成進行中的交易。"
+  },
+  "salon": {
+    "walletNotReady": "錢包尚未連接完成，或目前處於其他網絡。請切換至 {network} 後重試。",
+    "offerPlaced": "您以 {amount} 的報價領先簽名作品 #{nftId}。",
+    "offerFailed": "報價未能完成。請檢查錢包後重試。",
+    "offersMoved": "該作品的報價剛剛發生變化。請查看最新領先報價後重試。",
+    "lotClosed": "該件的報價已截止。",
+    "lotNotOpen": "該件尚未開放報價。",
+    "lotConcluded": "簽名作品 #{nftId} 已完結，等待接收者取回。",
+    "concludeFailed": "完結未能完成。請檢查錢包後重試。",
+    "pieceRetrieved": "簽名作品 #{nftId} 已進入您的錢包。",
+    "returnedOffersRetrieved": "已退回的報價 {amount} 已回到您的錢包。",
+    "retrieveFailed": "取回未能完成。請檢查錢包後重試。"
   }
 }

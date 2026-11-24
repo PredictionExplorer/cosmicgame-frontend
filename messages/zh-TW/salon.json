@@ -1,0 +1,54 @@
+{
+  "title": "沙龍",
+  "subtitle": "演繹週期收官時，會額外銘刻若干簽名作品並在此公開接受報價。截止時領先的報價獲得該作品，所得將匯入下一週期的分配。",
+  "terms": "每個週期向沙龍送入 {lots} 件簽名作品。收官後 {openingDelay} 開放報價。首筆報價啟動 {offerWindow} 的報價窗口；每筆報價須比領先報價至少高出 {raise}；臨近截止的報價會把截止時間延長至至少 {extension}。",
+  "connect": {
+    "title": "連接錢包以提交報價",
+    "description": "作品與倒數計時對所有人公開。提交報價、完結批件或取回作品需要連接錢包。"
+  },
+  "credit": {
+    "notice": "您被超越的報價已為您保留：",
+    "retrieve": "取回已退回的報價"
+  },
+  "absent": {
+    "title": "沙龍尚未在此網路開放",
+    "description": "此網路的合約尚不包含沙龍，將隨 V4 版本一同上線。"
+  },
+  "empty": {
+    "title": "暫無簽名作品接受報價",
+    "description": "下一個週期收官時，首批作品將進入沙龍。"
+  },
+  "readFailed": {
+    "title": "無法讀取沙龍",
+    "message": "從鏈上讀取作品失敗，請重新整理後再試。"
+  },
+  "exhibit": {
+    "title": "第 {cycle} 個週期展品",
+    "description": "本週期收官時銘刻的簽名作品，逐件接受報價。"
+  },
+  "status": {
+    "upcoming": "即將開放",
+    "awaitingFirstOffer": "等待首筆報價",
+    "open": "報價進行中",
+    "concludable": "已截止，可完結",
+    "awaitingRetrieval": "已完結",
+    "retrieved": "已取回"
+  },
+  "lot": {
+    "opensIn": "報價開放還有",
+    "closesIn": "距截止還有",
+    "leadingOffer": "領先報價：",
+    "minimumNextOffer": "最低下一筆報價：",
+    "youLead": "您的報價領先",
+    "offerAmountLabel": "報價金額（ETH）",
+    "placeOffer": "提交報價",
+    "raiseOffer": "提高報價",
+    "connectToOffer": "連接錢包後即可提交報價。",
+    "invalidAmount": "請以 ETH 金額填寫報價，例如 0.25。",
+    "offerTooLow": "報價不得低於 {minimum}。",
+    "conclude": "完結此件",
+    "retrievePiece": "取回簽名作品",
+    "awaitingRecipient": "等待其取回：",
+    "retrievedBy": "已取回至："
+  }
+}

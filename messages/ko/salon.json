@@ -1,0 +1,54 @@
+{
+  "title": "살롱",
+  "subtitle": "퍼포먼스 사이클이 마무리될 때 추가 시그니처가 각인되어 이곳에서 공개 오퍼를 받습니다. 마감 시점의 선두 오퍼가 작품을 받고, 대금은 다음 사이클의 배분에 더해집니다.",
+  "terms": "사이클마다 {lots}점의 시그니처가 살롱에 오릅니다. 마무리 후 {openingDelay} 뒤에 오퍼가 열립니다. 첫 오퍼로 {offerWindow} 창이 시작되며, 각 오퍼는 선두 오퍼보다 최소 {raise} 높아야 합니다. 마감 직전의 오퍼는 마감까지 {extension} 이상 남도록 연장합니다.",
+  "connect": {
+    "title": "지갑을 연결하고 오퍼를 제시하세요",
+    "description": "작품과 마감 시각은 누구나 볼 수 있습니다. 오퍼 제시, 확정, 작품 회수에는 지갑 연결이 필요합니다."
+  },
+  "credit": {
+    "notice": "추월된 오퍼 금액이 보관되어 있습니다:",
+    "retrieve": "반환된 오퍼 회수"
+  },
+  "absent": {
+    "title": "이 네트워크에는 아직 살롱이 없습니다",
+    "description": "이 네트워크의 컨트랙트에는 아직 살롱이 포함되어 있지 않습니다. V4 릴리스와 함께 열립니다."
+  },
+  "empty": {
+    "title": "아직 오퍼를 받는 시그니처가 없습니다",
+    "description": "다음 사이클이 마무리되면 첫 작품들이 살롱에 오릅니다."
+  },
+  "readFailed": {
+    "title": "살롱을 읽을 수 없습니다",
+    "message": "체인에서 작품을 읽지 못했습니다. 새로고침 후 다시 시도하세요."
+  },
+  "exhibit": {
+    "title": "사이클 {cycle} 전시",
+    "description": "이 사이클 마무리 때 각인된 시그니처로, 한 점씩 오퍼를 받습니다."
+  },
+  "status": {
+    "upcoming": "곧 열림",
+    "awaitingFirstOffer": "첫 오퍼 대기",
+    "open": "오퍼 진행 중",
+    "concludable": "마감됨 · 확정 대기",
+    "awaitingRetrieval": "확정됨",
+    "retrieved": "회수됨"
+  },
+  "lot": {
+    "opensIn": "오퍼 시작까지",
+    "closesIn": "마감까지",
+    "leadingOffer": "선두 오퍼:",
+    "minimumNextOffer": "다음 오퍼 최소액:",
+    "youLead": "오퍼가 선두입니다",
+    "offerAmountLabel": "오퍼 금액(ETH)",
+    "placeOffer": "오퍼 제시",
+    "raiseOffer": "오퍼 올리기",
+    "connectToOffer": "오퍼를 제시하려면 지갑을 연결하세요.",
+    "invalidAmount": "오퍼는 0.25 같은 ETH 금액으로 입력하세요.",
+    "offerTooLow": "오퍼는 최소 {minimum} 이상이어야 합니다.",
+    "conclude": "확정하기",
+    "retrievePiece": "시그니처 회수",
+    "awaitingRecipient": "수령인의 회수 대기:",
+    "retrievedBy": "회수한 주소:"
+  }
+}

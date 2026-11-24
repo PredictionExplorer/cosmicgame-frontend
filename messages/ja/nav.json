@@ -36,6 +36,10 @@
       "label": "Random Walk NFTの刻印",
       "description": "Random Walk NFTを刻印して一筆の費用を下げる"
     },
+    "salon": {
+      "label": "サロン",
+      "description": "各サイクルの追加シグネチャーへの公開オファー"
+    },
     "gallery": {
       "label": "ギャラリー",
       "description": "これまでに刻印されたすべてのシグネチャー"

@@ -71,9 +71,9 @@ describe('site-wide localized page metadata', () => {
     return !INHERITED_OR_NON_DOCUMENT_ROUTES.has(repoPath);
   });
 
-  it('audits all 64 locale pages and all 63 metadata-producing routes', () => {
-    expect(pageFiles).toHaveLength(64);
-    expect(metadataRoutes).toHaveLength(63);
+  it('audits all 65 locale pages and all 64 metadata-producing routes', () => {
+    expect(pageFiles).toHaveLength(65);
+    expect(metadataRoutes).toHaveLength(64);
   });
 
   it.each(metadataRoutes)('%s reads locale-aware metadata from the meta namespace', (path) => {

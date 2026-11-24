@@ -36,6 +36,10 @@
       "label": "銘刻 Random Walk NFT",
       "description": "銘刻 Random Walk NFT，降低落筆價格"
     },
+    "salon": {
+      "label": "沙龍",
+      "description": "每個週期額外的簽名作品公開接受報價"
+    },
     "gallery": {
       "label": "畫廊",
       "description": "瀏覽所有已銘刻的簽名作品"

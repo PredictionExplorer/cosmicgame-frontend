@@ -36,6 +36,10 @@
       "label": "Random Walk NFT 각인",
       "description": "Random Walk NFT 각인으로 제스처 비용 낮추기"
     },
+    "salon": {
+      "label": "살롱",
+      "description": "사이클마다 추가 시그니처에 공개 오퍼"
+    },
     "gallery": {
       "label": "갤러리",
       "description": "지금까지 각인된 모든 시그니처"

@@ -25,8 +25,15 @@
  */
 import type { Abi } from 'viem';
 
-import { cosmicGameAbi, prizesWalletAbi } from '@/contracts/abis';
+import { cosmicGameAbi, cosmicGameV4Abi, prizesWalletAbi } from '@/contracts/abis';
 import { protocolFacts } from '@/content/protocol-facts';
+
+/**
+ * The game ABI the getters are read with: the V3 surface plus the V4
+ * additions (`artAuction`). On a chain still running V3 the V4 getters
+ * return no data and are skipped by {@link readTrustedAddresses}.
+ */
+const GAME_GETTERS_ABI: Abi = [...cosmicGameAbi, ...cosmicGameV4Abi];
 
 /** The game proxy, pinned per chain id. Where one is set, the API's game address is ignored. */
 export const PINNED_GAME_PROXY: Readonly<Partial<Record<number, string>>> = {
@@ -43,6 +50,8 @@ export const PROTOCOL_ADDRESS_GETTERS = [
   'randomWalkNft',
   'charityAddress',
   'marketingWallet',
+  // V4 only: the Signature salon contract (skipped on a V3 chain).
+  'artAuction', // lexicon-allow-abi
 ] as const;
 
 /** Functions whose first argument receives a right over the caller's assets. */
@@ -159,7 +168,7 @@ export function readTrustedAddresses(
   const addresses: Promise<ReadonlySet<string>> = Promise.all(
     PROTOCOL_ADDRESS_GETTERS.map((functionName) =>
       client
-        .readContract({ address: game as `0x${string}`, abi: cosmicGameAbi, functionName })
+        .readContract({ address: game as `0x${string}`, abi: GAME_GETTERS_ABI, functionName })
         .then(normalize, (err: unknown) => {
           if (isMissingGetter(err)) return null;
           throw err;

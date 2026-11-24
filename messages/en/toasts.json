@@ -193,5 +193,18 @@
     "detailsCopied": "Error details copied.",
     "connectWallet": "Connect wallet",
     "busy": "Finish the transaction in progress first."
+  },
+  "salon": {
+    "walletNotReady": "Your wallet is still connecting or is on another network. Switch to {network} and try again.",
+    "offerPlaced": "Your offer of {amount} leads Signature #{nftId}.",
+    "offerFailed": "The offer didn’t go through. Check your wallet and try again.",
+    "offersMoved": "The offers on this piece moved while you decided. Review the leading offer and try again.",
+    "lotClosed": "This lot’s offers have closed.",
+    "lotNotOpen": "This lot is not taking offers yet.",
+    "lotConcluded": "Signature #{nftId} was concluded: the piece now awaits its recipient.",
+    "concludeFailed": "Concluding didn’t go through. Check your wallet and try again.",
+    "pieceRetrieved": "Signature #{nftId} is in your wallet.",
+    "returnedOffersRetrieved": "{amount} in returned offers is back in your wallet.",
+    "retrieveFailed": "The retrieval didn’t go through. Check your wallet and try again."
   }
 }

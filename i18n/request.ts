@@ -36,6 +36,7 @@ export const NAMESPACES = [
   'myPages',
   'nav',
   'publicGoods',
+  'salon',
   'search',
   'seo',
   'siteMap',

@@ -321,5 +321,9 @@
       "title": "Is Cosmic Signature a \u004cottery, \u0043asino, or \u0049nvestment?",
       "description": "Cosmic Signature is a procedural on-chain art protocol, not a \u006cottery, \u0063asino, \u0067ambling product, or \u0069nvestment product."
     }
+  },
+  "salon": {
+    "title": "Salon",
+    "description": "The extra Signatures each Performance Cycle places on open offer: the lots, their clocks and leading offers, read live from the chain."
   }
 }

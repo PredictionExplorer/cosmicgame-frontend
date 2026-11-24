@@ -21,7 +21,8 @@
       "myAllocations": "Your allocations failed to load",
       "myAnchors": "Your anchors failed to load",
       "myTokens": "Your tokens failed to load",
-      "myStatistics": "Your statistics failed to load"
+      "myStatistics": "Your statistics failed to load",
+      "salon": "The Salon failed to load"
     }
   },
   "global": {

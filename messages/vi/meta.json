@@ -321,5 +321,9 @@
       "title": "Cosmic Signature có phải là x\u1ed5 s\u1ed1, s\u00f2ng b\u1ea1c hay \u0111\u1ea7u t\u01b0?",
       "description": "Cosmic Signature là giao thức nghệ thuật tạo sinh trên chuỗi, không phải x\u1ed5 s\u1ed1, s\u00f2ng b\u1ea1c, sản phẩm c\u1edd b\u1ea1c hay sản phẩm \u0111\u1ea7u t\u01b0."
     }
+  },
+  "salon": {
+    "title": "Salon",
+    "description": "Các Signature bổ sung mà mỗi chu kỳ trưng bày để nhận chào giá công khai: lô, đồng hồ và chào giá dẫn đầu đọc trực tiếp từ chuỗi."
   }
 }

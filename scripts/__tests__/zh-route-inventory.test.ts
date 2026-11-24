@@ -40,8 +40,8 @@ describe('canonical localized route inventory', () => {
       .map((route) => route.pageFile)
       .sort();
 
-    expect(actual).toHaveLength(65);
-    expect(inventoried).toHaveLength(65);
+    expect(actual).toHaveLength(66);
+    expect(inventoried).toHaveLength(66);
     expect(inventoried).toEqual(actual);
   });
 

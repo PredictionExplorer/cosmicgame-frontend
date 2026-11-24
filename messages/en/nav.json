@@ -36,6 +36,10 @@
       "label": "Imprint Random Walk NFT",
       "description": "Imprint a Random Walk NFT for a lower Gesture Cost"
     },
+    "salon": {
+      "label": "Salon",
+      "description": "Extra Signatures on open offer each cycle"
+    },
     "gallery": {
       "label": "Gallery",
       "description": "Every Signature imprinted so far"

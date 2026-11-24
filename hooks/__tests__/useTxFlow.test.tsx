@@ -587,8 +587,9 @@ describe('useTxFlow — write targets', () => {
     expect(mockReadContract).toHaveBeenCalledWith(
       expect.objectContaining({ address: GAME, functionName: 'prizesWallet' }),
     );
-    // Eight getters, read once although the run wrote twice.
-    expect(mockReadContract).toHaveBeenCalledTimes(8);
+    // Nine getters (the V4 salon getter included), read once although the
+    // run wrote twice.
+    expect(mockReadContract).toHaveBeenCalledTimes(9);
   });
 
   it('refuses a write to a contract the game does not name, before any prompt', async () => {

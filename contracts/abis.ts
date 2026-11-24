@@ -14,6 +14,8 @@ import * as generated from './generated';
 export const charityWalletAbi: Abi = generated.charityWalletAbi;
 export const cosmicDaoAbi: Abi = generated.cosmicDaoAbi;
 export const cosmicGameAbi: Abi = generated.cosmicGameAbi;
+export const cosmicGameV4Abi: Abi = generated.cosmicGameV4Abi;
+export const cosmicSignatureArtAuctionAbi: Abi = generated.cosmicSignatureArtAuctionAbi;
 export const cosmicSignatureAbi: Abi = generated.cosmicSignatureAbi;
 export const cosmicTokenAbi: Abi = generated.cosmicTokenAbi;
 export const ethDonationsAbi: Abi = generated.ethDonationsAbi;

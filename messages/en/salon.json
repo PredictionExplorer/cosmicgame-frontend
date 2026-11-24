@@ -1,0 +1,54 @@
+{
+  "title": "The Salon",
+  "subtitle": "When a Performance Cycle finalizes, extra Signatures are imprinted and placed here on open offer. The leading offer when a lot closes receives the piece, and the proceeds strengthen the next cycle’s allocation.",
+  "terms": "Each cycle places {lots} Signatures in the salon. Offers open {openingDelay} after finalization. The first offer on a piece starts a {offerWindow} window; each offer must raise the leading one by at least {raise}, and an offer near the close extends it to leave at least {extension}.",
+  "connect": {
+    "title": "Connect a wallet to place offers",
+    "description": "The lots and their clocks are public. Placing an offer, concluding a lot, or retrieving a piece needs a connected wallet."
+  },
+  "credit": {
+    "notice": "Offers of yours that were outdone are held for you:",
+    "retrieve": "Retrieve returned offers"
+  },
+  "absent": {
+    "title": "The salon has not opened on this network",
+    "description": "This network’s contracts do not include the salon yet. It opens with the V4 release."
+  },
+  "empty": {
+    "title": "No Signatures on offer yet",
+    "description": "The next cycle’s finalization places the first pieces in the salon."
+  },
+  "readFailed": {
+    "title": "The salon could not be read",
+    "message": "Reading the lots from the chain failed. Refresh to try again."
+  },
+  "exhibit": {
+    "title": "Cycle {cycle} exhibit",
+    "description": "Signatures imprinted at this cycle’s finalization, each on offer separately."
+  },
+  "status": {
+    "upcoming": "Opens soon",
+    "awaitingFirstOffer": "Awaiting the first offer",
+    "open": "Offers open",
+    "concludable": "Closed — ready to conclude",
+    "awaitingRetrieval": "Concluded",
+    "retrieved": "Retrieved"
+  },
+  "lot": {
+    "opensIn": "Offers open in",
+    "closesIn": "Closes in",
+    "leadingOffer": "Leading offer:",
+    "minimumNextOffer": "Minimum next offer:",
+    "youLead": "your offer leads",
+    "offerAmountLabel": "Offer amount in ETH",
+    "placeOffer": "Place offer",
+    "raiseOffer": "Raise offer",
+    "connectToOffer": "Connect a wallet to place an offer.",
+    "invalidAmount": "Enter the offer as an ETH amount, like 0.25.",
+    "offerTooLow": "An offer must reach at least {minimum}.",
+    "conclude": "Conclude lot",
+    "retrievePiece": "Retrieve the Signature",
+    "awaitingRecipient": "Awaiting retrieval by",
+    "retrievedBy": "Retrieved by"
+  }
+}

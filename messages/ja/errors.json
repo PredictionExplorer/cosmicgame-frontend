@@ -21,7 +21,8 @@
       "myAllocations": "配分を読み込めませんでした",
       "myAnchors": "係留を読み込めませんでした",
       "myTokens": "トークンを読み込めませんでした",
-      "myStatistics": "統計を読み込めませんでした"
+      "myStatistics": "統計を読み込めませんでした",
+      "salon": "サロンを読み込めませんでした"
     }
   },
   "global": {

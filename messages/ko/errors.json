@@ -21,7 +21,8 @@
       "myAllocations": "내 배분을 불러오지 못했습니다",
       "myAnchors": "내 앵커링을 불러오지 못했습니다",
       "myTokens": "내 토큰을 불러오지 못했습니다",
-      "myStatistics": "내 통계를 불러오지 못했습니다"
+      "myStatistics": "내 통계를 불러오지 못했습니다",
+      "salon": "살롱을 불러오지 못했습니다"
     }
   },
   "global": {

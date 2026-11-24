@@ -36,6 +36,10 @@
       "label": "Khắc Random Walk NFT",
       "description": "Khắc Random Walk NFT để giảm chi phí nét bút"
     },
+    "salon": {
+      "label": "Salon",
+      "description": "Signature bổ sung mỗi chu kỳ, nhận chào giá công khai"
+    },
     "gallery": {
       "label": "Phòng trưng bày",
       "description": "Mọi Signature đã được khắc đến nay"

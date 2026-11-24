@@ -164,12 +164,14 @@ export const noindexAppRoutes: SeoRoute[] = [
   '/my-allocations',
   '/my-statistics',
   '/recipient-history',
+  // Noindex while the Salon ships with the V4 contracts (not live in production).
+  '/salon',
   '/transfer-cst',
 ].map((path) => ({
   path,
   host: 'app',
   kind:
-    path === '/experimental-ui'
+    path === '/experimental-ui' || path === '/salon'
       ? 'tool'
       : path.startsWith('/admin') || path.startsWith('/internal')
         ? 'admin'

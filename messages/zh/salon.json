@@ -1,0 +1,54 @@
+{
+  "title": "沙龙",
+  "subtitle": "演绎周期收官时，会额外铭刻若干签名作品并在此公开接受报价。截止时领先的报价获得该作品，所得将汇入下一周期的分配。",
+  "terms": "每个周期向沙龙送入 {lots} 件签名作品。收官后 {openingDelay} 开放报价。首笔报价启动 {offerWindow} 的报价窗口；每笔报价须比领先报价至少高出 {raise}；临近截止的报价会把截止时间延长至至少 {extension}。",
+  "connect": {
+    "title": "连接钱包以提交报价",
+    "description": "作品与倒计时对所有人公开。提交报价、完结批件或取回作品需要连接钱包。"
+  },
+  "credit": {
+    "notice": "您被超越的报价已为您保留：",
+    "retrieve": "取回已退回的报价"
+  },
+  "absent": {
+    "title": "沙龙尚未在此网络开放",
+    "description": "此网络的合约尚不包含沙龙，将随 V4 版本一同上线。"
+  },
+  "empty": {
+    "title": "暂无签名作品接受报价",
+    "description": "下一个周期收官时，首批作品将进入沙龙。"
+  },
+  "readFailed": {
+    "title": "无法读取沙龙",
+    "message": "从链上读取作品失败，请刷新重试。"
+  },
+  "exhibit": {
+    "title": "第 {cycle} 个周期展品",
+    "description": "本周期收官时铭刻的签名作品，逐件接受报价。"
+  },
+  "status": {
+    "upcoming": "即将开放",
+    "awaitingFirstOffer": "等待首笔报价",
+    "open": "报价进行中",
+    "concludable": "已截止，可完结",
+    "awaitingRetrieval": "已完结",
+    "retrieved": "已取回"
+  },
+  "lot": {
+    "opensIn": "报价开放还有",
+    "closesIn": "距截止还有",
+    "leadingOffer": "领先报价：",
+    "minimumNextOffer": "最低下一笔报价：",
+    "youLead": "您的报价领先",
+    "offerAmountLabel": "报价金额（ETH）",
+    "placeOffer": "提交报价",
+    "raiseOffer": "提高报价",
+    "connectToOffer": "连接钱包后即可提交报价。",
+    "invalidAmount": "请以 ETH 金额填写报价，例如 0.25。",
+    "offerTooLow": "报价不得低于 {minimum}。",
+    "conclude": "完结此件",
+    "retrievePiece": "取回签名作品",
+    "awaitingRecipient": "等待其取回：",
+    "retrievedBy": "已取回至："
+  }
+}

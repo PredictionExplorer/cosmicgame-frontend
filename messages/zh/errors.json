@@ -21,7 +21,8 @@
       "myAllocations": "未能加载我的分配",
       "myAnchors": "未能加载我的锚定",
       "myTokens": "未能加载我的代币",
-      "myStatistics": "未能加载我的统计"
+      "myStatistics": "未能加载我的统计",
+      "salon": "沙龙加载失败"
     }
   },
   "global": {

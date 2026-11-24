@@ -1,0 +1,54 @@
+{
+  "title": "Salon",
+  "subtitle": "Khi một chu kỳ khép lại, các Signature bổ sung được khắc và trưng bày tại đây để nhận chào giá công khai. Chào giá dẫn đầu lúc đóng sẽ nhận tác phẩm, số tiền thu được bổ sung cho phần phân bổ của chu kỳ kế tiếp.",
+  "terms": "Mỗi chu kỳ đưa {lots} Signature vào salon. Chào giá mở sau khi chu kỳ khép lại {openingDelay}. Chào giá đầu tiên khởi động khung {offerWindow}; mỗi chào giá phải cao hơn mức dẫn đầu ít nhất {raise}; chào giá sát giờ đóng sẽ kéo dài thời hạn để còn ít nhất {extension}.",
+  "connect": {
+    "title": "Kết nối ví để chào giá",
+    "description": "Tác phẩm và đồng hồ đếm ngược là công khai. Chào giá, chốt lô hoặc nhận về tác phẩm cần ví đã kết nối."
+  },
+  "credit": {
+    "notice": "Các chào giá của bạn đã bị vượt đang được giữ lại:",
+    "retrieve": "Nhận về chào giá được hoàn"
+  },
+  "absent": {
+    "title": "Salon chưa mở trên mạng này",
+    "description": "Hợp đồng trên mạng này chưa bao gồm salon. Salon sẽ mở cùng bản phát hành V4."
+  },
+  "empty": {
+    "title": "Chưa có Signature nào nhận chào giá",
+    "description": "Khi chu kỳ kế tiếp khép lại, những tác phẩm đầu tiên sẽ vào salon."
+  },
+  "readFailed": {
+    "title": "Không đọc được salon",
+    "message": "Không đọc được tác phẩm từ chuỗi. Hãy tải lại và thử lại."
+  },
+  "exhibit": {
+    "title": "Trưng bày chu kỳ {cycle}",
+    "description": "Các Signature được khắc khi chu kỳ này khép lại, nhận chào giá riêng từng tác phẩm."
+  },
+  "status": {
+    "upcoming": "Sắp mở",
+    "awaitingFirstOffer": "Chờ chào giá đầu tiên",
+    "open": "Đang nhận chào giá",
+    "concludable": "Đã đóng — chờ chốt",
+    "awaitingRetrieval": "Đã chốt",
+    "retrieved": "Đã nhận về"
+  },
+  "lot": {
+    "opensIn": "Mở nhận chào giá sau",
+    "closesIn": "Đóng sau",
+    "leadingOffer": "Chào giá dẫn đầu:",
+    "minimumNextOffer": "Chào giá tối thiểu kế tiếp:",
+    "youLead": "chào giá của bạn đang dẫn đầu",
+    "offerAmountLabel": "Số ETH chào giá",
+    "placeOffer": "Chào giá",
+    "raiseOffer": "Nâng chào giá",
+    "connectToOffer": "Kết nối ví để chào giá.",
+    "invalidAmount": "Nhập chào giá bằng số ETH, ví dụ 0.25.",
+    "offerTooLow": "Chào giá phải đạt ít nhất {minimum}.",
+    "conclude": "Chốt lô",
+    "retrievePiece": "Nhận về Signature",
+    "awaitingRecipient": "Chờ người nhận nhận về:",
+    "retrievedBy": "Đã nhận về bởi:"
+  }
+}

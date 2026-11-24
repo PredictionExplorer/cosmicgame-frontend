@@ -193,5 +193,18 @@
     "detailsCopied": "Đã sao chép chi tiết lỗi.",
     "connectWallet": "Kết nối ví",
     "busy": "Hãy hoàn tất giao dịch đang diễn ra trước."
+  },
+  "salon": {
+    "walletNotReady": "Ví vẫn đang kết nối hoặc đang ở mạng khác. Hãy chuyển sang {network} và thử lại.",
+    "offerPlaced": "Chào giá {amount} của bạn đang dẫn đầu Signature #{nftId}.",
+    "offerFailed": "Chào giá không thành công. Kiểm tra ví và thử lại.",
+    "offersMoved": "Chào giá cho tác phẩm này vừa thay đổi. Xem lại mức dẫn đầu và thử lại.",
+    "lotClosed": "Lô này đã đóng nhận chào giá.",
+    "lotNotOpen": "Lô này chưa mở nhận chào giá.",
+    "lotConcluded": "Signature #{nftId} đã được chốt, đang chờ người nhận nhận về.",
+    "concludeFailed": "Chốt không thành công. Kiểm tra ví và thử lại.",
+    "pieceRetrieved": "Signature #{nftId} đã vào ví của bạn.",
+    "returnedOffersRetrieved": "{amount} chào giá được hoàn đã trở lại ví của bạn.",
+    "retrieveFailed": "Nhận về không thành công. Kiểm tra ví và thử lại."
   }
 }
