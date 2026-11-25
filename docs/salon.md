@@ -10,18 +10,18 @@ exercise every flow on a local chain.
 > is written entirely in coined terms. This table is the translation layer
 > between the UI/code and the Solidity:
 >
-> | Site term            | Contract term                      |
-> | -------------------- | ---------------------------------- |
-> | Salon                | `CosmicSignatureArtAuction`        |
-> | lot                  | one auctioned NFT (`nftId`)        |
-> | exhibit              | per-round batch (`NFTS_PER_BATCH`) |
-> | offer                | bid                                |
-> | patron (leading)     | bidder (`highestBidder`)           |
-> | minimum next offer   | `minimumNextBid(nftId)`            |
-> | conclude             | `settle(nftId)`                    |
-> | retrieve (the piece) | `claimNft(nftId, recipient)`       |
-> | returned offers      | refund credits (`refundCredits`)   |
-> | cycle                | round                              |
+> | Site term            | Contract term                                                                                                         |
+> | -------------------- | --------------------------------------------------------------------------------------------------------------------- |
+> | Salon                | `CosmicSignatureArtAuction`                                                                                           |
+> | lot                  | one auctioned NFT (`nftId`)                                                                                           |
+> | exhibit              | one round's batch of registered NFTs (`NFTS_PER_BATCH`); a UI grouping only — every NFT in it is auctioned separately |
+> | offer                | bid                                                                                                                   |
+> | patron (leading)     | bidder (`highestBidder`)                                                                                              |
+> | minimum next offer   | `minimumNextBid(nftId)`                                                                                               |
+> | conclude             | `settle(nftId)`                                                                                                       |
+> | retrieve (the piece) | `claimNft(nftId, recipient)`                                                                                          |
+> | returned offers      | refund credits (`refundCredits`)                                                                                      |
+> | cycle                | round                                                                                                                 |
 >
 > The same renaming exists per locale (zh 沙龙/报价, ja サロン/オファー,
 > ko 살롱/오퍼, uk Салон/пропозиція, vi salon/chào giá); each locale's banned
