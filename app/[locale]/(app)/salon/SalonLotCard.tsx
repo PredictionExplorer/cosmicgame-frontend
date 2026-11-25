@@ -9,6 +9,7 @@ import type { TxResult } from '@/hooks/useTxFlow';
 import { SignatureCard } from '@/components/nft/SignatureCard';
 import { AddressChip } from '@/components/ui/address-chip';
 import { Amount } from '@/components/ui/amount';
+import { Badge, type BadgeProps } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Duration } from '@/components/ui/duration';
 import { Input } from '@/components/ui/input';
@@ -35,6 +36,19 @@ export function salonLotPhase(lot: SalonLot, nowSeconds: number): SalonLotPhase 
   if (nowSeconds < lot.closesAt) return 'open';
   return 'concludable';
 }
+
+/**
+ * The status badge's tone per phase: a lot with live offers breathes, one
+ * needing a hand (conclude, retrieve) asks for it, the rest stay quiet.
+ */
+const PHASE_TONE: Record<SalonLotPhase, NonNullable<BadgeProps['tone']>> = {
+  upcoming: 'neutral',
+  awaitingFirstOffer: 'neutral',
+  open: 'live',
+  concludable: 'attention',
+  awaitingRetrieval: 'positive',
+  retrieved: 'neutral',
+};
 
 interface SalonLotCardProps {
   lot: SalonLot;
@@ -149,15 +163,24 @@ export function SalonLotCard({
       imprintedAt={imprintedAt}
       sizes={CARD_SIZES}
       priority={priority}
-      extraMeta={[t(`status.${phase}`), ...facts]}
+      extraMeta={facts}
       after={
         <div className="mt-2 space-y-2">
+          <div className="flex flex-wrap gap-1.5">
+            <Badge tone={PHASE_TONE[phase]} size="sm" dot={phase === 'open'}>
+              {t(`status.${phase}`)}
+            </Badge>
+            {isLeadingPatron && phase === 'open' && (
+              <Badge tone="accent" size="sm">
+                {t('lot.youLead')}
+              </Badge>
+            )}
+          </div>
           {(phase === 'awaitingFirstOffer' || phase === 'open') && (
             <>
               <p className="type-caption text-muted-foreground">
                 {t('lot.minimumNextOffer')}{' '}
                 <Amount value={lot.minimumNextOffer} unit="ETH" context="exact" />
-                {isLeadingPatron && <> · {t('lot.youLead')}</>}
               </p>
               {account ? (
                 <form onSubmit={(event) => void submitOffer(event)} className="flex gap-2">
