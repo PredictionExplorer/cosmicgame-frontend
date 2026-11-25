@@ -78,8 +78,21 @@ export function SalonLotCard({
   const t = useTranslations('salon');
   const phase = salonLotPhase(lot, nowSeconds);
 
-  const [offerText, setOfferText] = useState('');
+  // The field starts at — and, until the patron edits it, follows — the
+  // lot's live minimum, so the form is submittable exactly as rendered;
+  // typing is only needed to offer more than the minimum.
+  const minimumText = formatEther(lot.minimumNextOffer);
+  const [offerText, setOfferText] = useState(minimumText);
+  const [edited, setEdited] = useState(false);
   const [offerError, setOfferError] = useState<string | null>(null);
+
+  // Guarded reset during render (not an effect): when the chain minimum
+  // moves and the patron hasn't typed, the prefill follows it.
+  const [lastMinimum, setLastMinimum] = useState(minimumText);
+  if (lastMinimum !== minimumText) {
+    setLastMinimum(minimumText);
+    if (!edited) setOfferText(minimumText);
+  }
 
   const isLeadingPatron = !!account && lot.leadingPatron.toLowerCase() === account.toLowerCase();
 
@@ -93,12 +106,14 @@ export function SalonLotCard({
       return;
     }
     if (total < lot.minimumNextOffer) {
-      setOfferError(t('lot.offerTooLow', { minimum: `${formatEther(lot.minimumNextOffer)} ETH` }));
+      setOfferError(t('lot.offerTooLow', { minimum: `${minimumText} ETH` }));
       return;
     }
     setOfferError(null);
     const result = await onOffer(lot.nftId, total);
-    if (result.status === 'confirmed') setOfferText('');
+    // Hand the field back to the live minimum, which the confirmed offer
+    // just raised.
+    if (result.status === 'confirmed') setEdited(false);
   };
 
   const facts: React.ReactNode[] = [];
@@ -148,13 +163,16 @@ export function SalonLotCard({
                 <form onSubmit={(event) => void submitOffer(event)} className="flex gap-2">
                   <Input
                     value={offerText}
-                    onChange={(event) => setOfferText(event.target.value)}
+                    onChange={(event) => {
+                      setEdited(true);
+                      setOfferError(null);
+                      setOfferText(event.target.value);
+                    }}
                     inputMode="decimal"
-                    placeholder={formatEther(lot.minimumNextOffer)}
                     aria-label={t('lot.offerAmountLabel')}
                     disabled={busy}
                   />
-                  <Button type="submit" disabled={busy || offerText.trim() === ''}>
+                  <Button type="submit" disabled={busy}>
                     {isLeadingPatron ? t('lot.raiseOffer') : t('lot.placeOffer')}
                   </Button>
                 </form>
