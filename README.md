@@ -133,6 +133,7 @@ The app serves two hosts from one codebase: the marketing site (`cosmicsignature
 - **Contracts:** ABIs are generated into `contracts/generated.ts` via `npm run contracts:generate` (wagmi CLI). `contracts/abis.ts` re-exports them widened to viem's `Abi` for existing call sites; import from `contracts/generated` for fully literal types.
 - **Live updates:** `hooks/useLiveGameDataRefresh.ts` watches the on-chain `BidPlaced` event, invalidates live queries, and dispatches a `cosmic:gesture-placed` window event that drives UI pulses (gesture chat, latest-gesture ticker).
 - **Gesture Message Chat:** The home-page chat panel is current-cycle scoped and reuses `useGestureListByCycle(round, 'desc')`; see `docs/gesture-message-chat.md`.
+- **The Salon (V4):** The art-auction page at `/salon` reads lots straight from the chain and writes through `useTxFlow`; contract rules, vocabulary mapping, architecture, and local-testing guide in [The Salon](docs/salon.md).
 - **Error handling:** Errors are reported to Sentry via `utils/errors.ts`. Wallet errors use `isUserRejection()` to silently handle user-cancelled transactions.
 - **SEO:** Per-page metadata via `createMetadata()` (`utils/seo.ts`), JSON-LD via `utils/jsonLd.tsx`, host-aware sitemap/robots, dynamic OG images.
 - **State:** Wallet state via wagmi, server state via React Query, shared app state via React contexts.
