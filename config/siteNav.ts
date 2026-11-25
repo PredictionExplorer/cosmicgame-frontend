@@ -458,6 +458,9 @@ const entry = (id: SiteRouteId): HeaderPanelEntry => ({ kind: 'route', id });
 export const APP_HEADER_NAV: readonly HeaderNavItem[] = [
   { kind: 'link', route: 'observatory', sections: ['participate'] },
   { kind: 'link', route: 'gallery', sections: ['collection'] },
+  // Stands for no section: the Observatory carries the participate mark, and
+  // this link lights only on the salon page itself.
+  { kind: 'link', route: 'salon', sections: [] },
   {
     kind: 'panel',
     id: 'explore',

@@ -412,6 +412,8 @@ function HeaderLink({ item, location }: { item: HeaderLinkItem; location: SiteLo
   const route = getSiteRoute(item.route);
   const ariaCurrent =
     location.route?.id === item.route && location.exact ? 'page' : current ? 'true' : undefined;
+  // A link standing for no section (the salon) still lights on its own page.
+  const active = current || !!ariaCurrent;
 
   return (
     <li className="relative flex h-full items-center">
@@ -422,14 +424,14 @@ function HeaderLink({ item, location }: { item: HeaderLinkItem; location: SiteLo
         className={cn(
           TRIGGER_CLASS,
           'no-underline',
-          current
+          active
             ? 'text-foreground'
             : 'text-muted-foreground hover:bg-muted/70 hover:text-foreground',
         )}
       >
         {copy.routeLabel(item.route)}
       </SiteLink>
-      <CurrentMark visible={current} />
+      <CurrentMark visible={active} />
     </li>
   );
 }
@@ -441,8 +443,8 @@ interface HeaderNavigationProps {
 }
 
 /**
- * The desktop navigation (from 1024px): the Observatory and the Gallery as
- * direct links, then the Explore and Learn panels. The item that stands for
+ * The desktop navigation (from 1024px): the Observatory, the Gallery and the
+ * Salon as direct links, then the Explore and Learn panels. The item that stands for
  * the current page's section carries `aria-current` and a mark on the
  * header's bottom rule.
  *
