@@ -50,8 +50,16 @@ export const wagmiChains = [
   ...(activeChain.id === localChain.id ? [] : [localChain]),
 ] as [Chain, ...Chain[]];
 
+/**
+ * Requests issued within one 16ms window travel as a single JSON-RPC batch
+ * (one HTTP POST; the /api/rpc proxy forwards arrays). On a chain without
+ * multicall3 — the local node — this is what keeps a many-read poll from
+ * becoming a hundred HTTP round-trips.
+ */
+const TRANSPORT_BATCH = { batch: { wait: 16 } } as const;
+
 export const wagmiTransports = {
-  [activeChain.id]: http(transportUrl || undefined),
+  [activeChain.id]: http(transportUrl || undefined, TRANSPORT_BATCH),
   [localChain.id]: http(
     typeof window !== 'undefined' &&
       rpcUrl &&
@@ -59,6 +67,7 @@ export const wagmiTransports = {
       !rpcUrl.includes('alchemy.com')
       ? `${window.location.origin}/api/rpc`
       : rpcUrl || 'http://127.0.0.1:8545',
+    TRANSPORT_BATCH,
   ),
 };
 
