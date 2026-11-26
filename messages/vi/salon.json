@@ -50,5 +50,13 @@
     "retrievePiece": "Nhận về Signature",
     "awaitingRecipient": "Chờ người nhận nhận về:",
     "retrievedBy": "Đã nhận về bởi:"
+  },
+  "history": {
+    "show": "Lịch sử chào giá",
+    "hide": "Ẩn lịch sử chào giá",
+    "count": "Số lượt chào giá: {count}",
+    "first": "chào giá mở màn",
+    "empty": "Tác phẩm này chưa có lượt chào giá nào.",
+    "failed": "Không đọc được lịch sử chào giá. Hệ thống sẽ tự thử lại."
   }
 }

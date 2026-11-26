@@ -50,5 +50,13 @@
     "retrievePiece": "取回签名作品",
     "awaitingRecipient": "等待其取回：",
     "retrievedBy": "已取回至："
+  },
+  "history": {
+    "show": "报价历史",
+    "hide": "隐藏报价历史",
+    "count": "累计报价：{count}",
+    "first": "首笔报价",
+    "empty": "此作品尚无报价。",
+    "failed": "无法读取报价历史，将自动重试。"
   }
 }

@@ -50,5 +50,13 @@
     "retrievePiece": "Retrieve the Signature",
     "awaitingRecipient": "Awaiting retrieval by",
     "retrievedBy": "Retrieved by"
+  },
+  "history": {
+    "show": "Offer history",
+    "hide": "Hide offer history",
+    "count": "Offers so far: {count}",
+    "first": "opening offer",
+    "empty": "No offers have been placed on this piece yet.",
+    "failed": "The offer history could not be read. It retries on its own."
   }
 }

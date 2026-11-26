@@ -50,5 +50,13 @@
     "retrievePiece": "取回簽名作品",
     "awaitingRecipient": "等待其取回：",
     "retrievedBy": "已取回至："
+  },
+  "history": {
+    "show": "報價歷史",
+    "hide": "隱藏報價歷史",
+    "count": "累計報價：{count}",
+    "first": "首筆報價",
+    "empty": "此作品尚無報價。",
+    "failed": "無法讀取報價歷史，將自動重試。"
   }
 }

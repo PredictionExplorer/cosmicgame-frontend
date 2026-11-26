@@ -1,18 +1,22 @@
 'use client';
 
 import { useState, type FormEvent } from 'react';
-import { useTranslations } from 'next-intl';
+import { useLocale, useTranslations } from 'next-intl';
 import { formatEther, parseEther } from 'viem';
 
 import type { SalonLot } from '@/hooks/useSalonLots';
 import type { TxResult } from '@/hooks/useTxFlow';
+import { useLotOfferHistory } from '@/hooks/useLotOfferHistory';
 import { SignatureCard } from '@/components/nft/SignatureCard';
 import { AddressChip } from '@/components/ui/address-chip';
 import { Amount } from '@/components/ui/amount';
 import { Badge, type BadgeProps } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
+import { DateTime } from '@/components/ui/date-time';
 import { Duration } from '@/components/ui/duration';
 import { Input } from '@/components/ui/input';
+import { Spinner } from '@/components/ui/spinner';
+import { formatPercent } from '@/utils/format';
 
 /** Where a lot stands, derived from its chain state and the clock. */
 export type SalonLotPhase =
@@ -91,6 +95,7 @@ export function SalonLotCard({
 }: SalonLotCardProps) {
   const t = useTranslations('salon');
   const phase = salonLotPhase(lot, nowSeconds);
+  const [historyOpen, setHistoryOpen] = useState(false);
 
   // The field starts at — and, until the patron edits it, follows — the
   // lot's live minimum, so the form is submittable exactly as rendered;
@@ -230,8 +235,78 @@ export function SalonLotCard({
               {t('lot.retrievedBy')} <AddressChip address={lot.leadingPatron} variant="plain" />
             </p>
           )}
+          {lot.leadingOffer > 0n && (
+            <div>
+              <Button
+                variant="quiet"
+                size="sm"
+                aria-expanded={historyOpen}
+                onClick={() => setHistoryOpen((open) => !open)}
+              >
+                {historyOpen ? t('history.hide') : t('history.show')}
+              </Button>
+              {historyOpen && <LotOfferHistory nftId={lot.nftId} />}
+            </div>
+          )}
         </div>
       }
     />
+  );
+}
+
+/**
+ * Every offer a lot has received, newest first: who placed it, its total,
+ * how far it raised the one before, and when. Read from the chain's event
+ * log only once opened, then re-read on the salon's polling cadence so a
+ * live contest can be watched from the card.
+ */
+function LotOfferHistory({ nftId }: { nftId: number }) {
+  const t = useTranslations('salon');
+  const locale = useLocale();
+  const { offers, isPending, isError } = useLotOfferHistory(nftId, true);
+
+  if (isPending) {
+    return (
+      <div className="py-2">
+        <Spinner size="sm" />
+      </div>
+    );
+  }
+  if (isError) {
+    return <p className="type-caption text-destructive">{t('history.failed')}</p>;
+  }
+  if (!offers || offers.length === 0) {
+    return <p className="type-caption text-muted-foreground">{t('history.empty')}</p>;
+  }
+
+  return (
+    <div className="mt-1 space-y-1">
+      <p className="type-caption text-muted-foreground">
+        {t('history.count', { count: offers.length })}
+      </p>
+      <ol className="space-y-1">
+        {offers.map((offer) => (
+          <li
+            key={offer.txHash || `${offer.patron}-${offer.placedAt}`}
+            className="type-caption flex flex-wrap items-baseline gap-x-2"
+          >
+            <AddressChip address={offer.patron} variant="plain" />
+            <Amount value={offer.total} unit="ETH" context="exact" />
+            <span className="text-muted-foreground">
+              {offer.raisePercent !== null
+                ? formatPercent(offer.raisePercent, locale, { signDisplay: 'always' })
+                : t('history.first')}
+            </span>
+            {offer.placedAt > 0 && (
+              <DateTime
+                timestamp={offer.placedAt}
+                variant="relative"
+                className="text-muted-foreground"
+              />
+            )}
+          </li>
+        ))}
+      </ol>
+    </div>
   );
 }

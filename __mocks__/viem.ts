@@ -32,6 +32,11 @@ module.exports = {
   decodeEventLog: (args: unknown) =>
     // eslint-disable-next-line @typescript-eslint/no-require-imports
     (require('viem/utils') as { decodeEventLog: (a: unknown) => unknown }).decodeEventLog(args),
+  // Real ABI lookup (pure, no heavy deps): the salon's offer-history hook
+  // picks its event out of the generated ABI at import time.
+  getAbiItem: (args: unknown) =>
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    (require('viem/utils') as { getAbiItem: (a: unknown) => unknown }).getAbiItem(args),
   // Real revert decoding, so "Copy details" carries the decoded custom error
   // (utils/contractErrors withDecodedContractError) under test as in production.
   decodeErrorResult: (args: unknown) =>

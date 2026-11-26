@@ -50,5 +50,13 @@
     "retrievePiece": "시그니처 회수",
     "awaitingRecipient": "수령인의 회수 대기:",
     "retrievedBy": "회수한 주소:"
+  },
+  "history": {
+    "show": "오퍼 내역",
+    "hide": "오퍼 내역 숨기기",
+    "count": "지금까지의 오퍼: {count}",
+    "first": "첫 오퍼",
+    "empty": "이 작품에는 아직 오퍼가 없습니다.",
+    "failed": "오퍼 내역을 읽지 못했습니다. 자동으로 다시 시도합니다."
   }
 }
