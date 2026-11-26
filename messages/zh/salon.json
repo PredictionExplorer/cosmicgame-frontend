@@ -53,7 +53,8 @@
   },
   "history": {
     "show": "报价历史",
-    "hide": "隐藏报价历史",
+    "title": "{id} 的报价",
+    "description": "此作品收到的全部报价，最新在前。",
     "count": "累计报价：{count}",
     "first": "首笔报价",
     "empty": "此作品尚无报价。",

@@ -93,13 +93,13 @@ or retrieving needs a connected wallet on the game's network.
   of the page with your credit and a retrieve button.
 - **Conclude** appears on any closed lot — anyone may press it.
 - **Retrieve the piece** appears on a concluded lot for its leading patron.
-- **Offer history**: any lot that has received an offer gets an "Offer
-  history" toggle on its card. It lists every offer, newest first — who
-  placed it, its total, the percentage it raised the previous offer by, and
-  when — read straight from the contract's bid-placed event log (the token
-  id is an indexed topic, so it is one filtered `eth_getLogs`). While open
-  it re-reads on the salon's 12-second cadence, so a live contest can be
-  watched from the card.
+- **Offer history**: any lot that has received an offer gets a history icon
+  in its badge row. It opens a dialog listing every offer, newest first —
+  who placed it, its total, the percentage it raised the previous offer by,
+  and when — read straight from the contract's bid-placed event log (the
+  token id is an indexed topic, so it is one filtered `eth_getLogs`). While
+  the dialog is open it re-reads on the salon's 12-second cadence, so a live
+  contest can be watched from it; close it with the corner X or Escape.
 
 ## Testing locally
 

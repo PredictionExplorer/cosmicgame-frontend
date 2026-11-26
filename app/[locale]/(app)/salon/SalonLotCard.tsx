@@ -2,6 +2,7 @@
 
 import { useState, type FormEvent } from 'react';
 import { useLocale, useTranslations } from 'next-intl';
+import { History } from 'lucide-react';
 import { formatEther, parseEther } from 'viem';
 
 import type { SalonLot } from '@/hooks/useSalonLots';
@@ -13,10 +14,18 @@ import { Amount } from '@/components/ui/amount';
 import { Badge, type BadgeProps } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { DateTime } from '@/components/ui/date-time';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog';
 import { Duration } from '@/components/ui/duration';
 import { Input } from '@/components/ui/input';
 import { Spinner } from '@/components/ui/spinner';
 import { formatPercent } from '@/utils/format';
+import { formatId } from '@/utils/format/ids';
 
 /** Where a lot stands, derived from its chain state and the clock. */
 export type SalonLotPhase =
@@ -171,7 +180,7 @@ export function SalonLotCard({
       extraMeta={facts}
       after={
         <div className="mt-2 space-y-2">
-          <div className="flex flex-wrap gap-1.5">
+          <div className="flex flex-wrap items-center gap-1.5">
             <Badge tone={PHASE_TONE[phase]} size="sm" dot={phase === 'open'}>
               {t(`status.${phase}`)}
             </Badge>
@@ -179,6 +188,18 @@ export function SalonLotCard({
               <Badge tone="accent" size="sm">
                 {t('lot.youLead')}
               </Badge>
+            )}
+            {lot.leadingOffer > 0n && (
+              <Button
+                variant="ghost"
+                size="icon"
+                className="ml-auto h-8 w-8 min-h-0 min-w-0 sm:h-7 sm:w-7"
+                aria-label={t('history.show')}
+                title={t('history.show')}
+                onClick={() => setHistoryOpen(true)}
+              >
+                <History aria-hidden className="h-4 w-4" />
+              </Button>
             )}
           </div>
           {(phase === 'awaitingFirstOffer' || phase === 'open') && (
@@ -235,19 +256,15 @@ export function SalonLotCard({
               {t('lot.retrievedBy')} <AddressChip address={lot.leadingPatron} variant="plain" />
             </p>
           )}
-          {lot.leadingOffer > 0n && (
-            <div>
-              <Button
-                variant="quiet"
-                size="sm"
-                aria-expanded={historyOpen}
-                onClick={() => setHistoryOpen((open) => !open)}
-              >
-                {historyOpen ? t('history.hide') : t('history.show')}
-              </Button>
-              {historyOpen && <LotOfferHistory nftId={lot.nftId} />}
-            </div>
-          )}
+          <Dialog open={historyOpen} onOpenChange={setHistoryOpen}>
+            <DialogContent className="max-w-lg">
+              <DialogHeader className="pr-8 text-left">
+                <DialogTitle>{t('history.title', { id: formatId(lot.nftId) })}</DialogTitle>
+                <DialogDescription>{t('history.description')}</DialogDescription>
+              </DialogHeader>
+              <LotOfferHistory nftId={lot.nftId} />
+            </DialogContent>
+          </Dialog>
         </div>
       }
     />
@@ -256,9 +273,10 @@ export function SalonLotCard({
 
 /**
  * Every offer a lot has received, newest first: who placed it, its total,
- * how far it raised the one before, and when. Read from the chain's event
- * log only once opened, then re-read on the salon's polling cadence so a
- * live contest can be watched from the card.
+ * how far it raised the one before, and when. Shown in the card's history
+ * dialog, so the chain's event log is read only once the dialog opens, then
+ * re-read on the salon's polling cadence — a live contest can be watched
+ * from the open dialog.
  */
 function LotOfferHistory({ nftId }: { nftId: number }) {
   const t = useTranslations('salon');
@@ -267,28 +285,28 @@ function LotOfferHistory({ nftId }: { nftId: number }) {
 
   if (isPending) {
     return (
-      <div className="py-2">
+      <div className="flex justify-center py-6">
         <Spinner size="sm" />
       </div>
     );
   }
   if (isError) {
-    return <p className="type-caption text-destructive">{t('history.failed')}</p>;
+    return <p className="type-body-sm text-destructive">{t('history.failed')}</p>;
   }
   if (!offers || offers.length === 0) {
-    return <p className="type-caption text-muted-foreground">{t('history.empty')}</p>;
+    return <p className="type-body-sm text-muted-foreground">{t('history.empty')}</p>;
   }
 
   return (
-    <div className="mt-1 space-y-1">
+    <div className="space-y-2">
       <p className="type-caption text-muted-foreground">
         {t('history.count', { count: offers.length })}
       </p>
-      <ol className="space-y-1">
+      <ol className="max-h-80 space-y-2 overflow-y-auto">
         {offers.map((offer) => (
           <li
             key={offer.txHash || `${offer.patron}-${offer.placedAt}`}
-            className="type-caption flex flex-wrap items-baseline gap-x-2"
+            className="type-body-sm flex flex-wrap items-baseline gap-x-3"
           >
             <AddressChip address={offer.patron} variant="plain" />
             <Amount value={offer.total} unit="ETH" context="exact" />
@@ -301,7 +319,7 @@ function LotOfferHistory({ nftId }: { nftId: number }) {
               <DateTime
                 timestamp={offer.placedAt}
                 variant="relative"
-                className="text-muted-foreground"
+                className="ml-auto text-muted-foreground"
               />
             )}
           </li>

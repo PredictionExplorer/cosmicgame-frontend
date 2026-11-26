@@ -53,7 +53,8 @@
   },
   "history": {
     "show": "Offer history",
-    "hide": "Hide offer history",
+    "title": "Offers on {id}",
+    "description": "Every offer this piece has received, newest first.",
     "count": "Offers so far: {count}",
     "first": "opening offer",
     "empty": "No offers have been placed on this piece yet.",

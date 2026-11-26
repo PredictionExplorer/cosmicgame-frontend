@@ -53,7 +53,8 @@
   },
   "history": {
     "show": "報價歷史",
-    "hide": "隱藏報價歷史",
+    "title": "{id} 的報價",
+    "description": "此作品收到的全部報價，最新在前。",
     "count": "累計報價：{count}",
     "first": "首筆報價",
     "empty": "此作品尚無報價。",

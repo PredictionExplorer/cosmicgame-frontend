@@ -53,7 +53,8 @@
   },
   "history": {
     "show": "Lịch sử chào giá",
-    "hide": "Ẩn lịch sử chào giá",
+    "title": "Các lượt chào giá cho {id}",
+    "description": "Mọi lượt chào giá tác phẩm này đã nhận, mới nhất trước.",
     "count": "Số lượt chào giá: {count}",
     "first": "chào giá mở màn",
     "empty": "Tác phẩm này chưa có lượt chào giá nào.",
