@@ -83,15 +83,14 @@ const SalonPage = () => {
       {termsLine && <p className="type-caption text-muted-foreground">{termsLine}</p>}
 
       {account && credit > 0n && (
-        <div className="rounded-surface bg-surface flex flex-wrap items-center gap-x-6 gap-y-3 p-4">
+        <div className="rounded-surface border border-positive bg-positive-surface flex flex-wrap items-center gap-x-6 gap-y-3 p-4">
           <p className="type-body">
-            {t('credit.notice')} <Amount value={credit} unit="ETH" context="exact" />
+            {t('credit.notice')}{' '}
+            <span className="font-semibold text-positive">
+              <Amount value={credit} unit="ETH" context="exact" />
+            </span>
           </p>
-          <Button
-            variant="outline"
-            disabled={busy}
-            onClick={() => void retrieveReturnedOffers(credit)}
-          >
+          <Button disabled={busy} onClick={() => void retrieveReturnedOffers(credit)}>
             {t('credit.retrieve')}
           </Button>
         </div>
